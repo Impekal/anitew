@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { type Platform, splitEntries } from '../../core/index.ts'
 import type { RoundResult, SessionProgress } from '../../data/sessions.ts'
 import type { Dictionary } from '../../i18n/index.ts'
+import { useCountUp } from '../useCountUp.ts'
 
 import { useSessionRunner } from './useSessionRunner.ts'
 
@@ -87,6 +88,18 @@ function RunningSession({
       delete root.dataset.focus
     }
   }, [state.finished])
+
+  /*
+   * Jedes gelandete Wort klingt (D-011/G-9) — kurz, hoch, fast ein Tropfen.
+   * Gezählt wird die Zahl der Marken, nicht jeder Tastendruck: Sonst klapperte
+   * es beim Tippen wie eine Schreibmaschine.
+   */
+  const chipCount = splitEntries(state.entries).length
+  const chipsRef = useRef(0)
+  useEffect(() => {
+    if (chipCount > chipsRef.current) platform.sound.play('type', chipCount)
+    chipsRef.current = chipCount
+  }, [chipCount, platform])
 
   if (state.finished) {
     return <Summary dictionary={dictionary} results={state.results} onLeave={leave} />
@@ -196,9 +209,10 @@ function Summary({
   const correct = results.flatMap((round) => round.correct)
   const missed = results.flatMap((round) => round.missed)
   const total = correct.length + missed.length
+  const shown = useCountUp(correct.length)
 
   return (
-    <main className="app">
+    <main className="app summary-screen">
       <section className="challenge">
         <h2>{t.heading}</h2>
         {/*
@@ -207,7 +221,7 @@ function Summary({
           (D-006, Regel R-1 und D-011/G-6).
         */}
         <p className="summary-score">
-          <strong>{correct.length}</strong>
+          <strong>{shown}</strong>
           <span> / {total}</span>
         </p>
         <div className="summary-words">

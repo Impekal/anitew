@@ -17,12 +17,14 @@ import { type SessionProgress, beginSession, clearProgress, loadProgress } from 
 import { FoundationPanel } from './FoundationPanel.tsx'
 import { SessionScreen } from './session/SessionScreen.tsx'
 import { useLanguage } from './useLanguage.ts'
+import { useSoundSetting } from './useSoundSetting.ts'
 
 const MODE_ORDER: readonly TrainingMode[] = ['emergency', 'short', 'daily', 'extended']
 
 export function App() {
   const platform = useMemo(() => createWebPlatform(), [])
   const { language, dictionary, translated, ready, choose } = useLanguage(platform)
+  const sound = useSoundSetting(platform)
   const [mode, setMode] = useState<TrainingMode>('daily')
   const [running, setRunning] = useState<SessionProgress | undefined>()
   const [resumable, setResumable] = useState<SessionProgress | undefined>()
@@ -39,6 +41,9 @@ export function App() {
   }, [])
 
   const start = useCallback(() => {
+    // Der erste Ton der Einheit, ausgelöst vom Fingertipp — genau die Geste,
+    // die iOS verlangt, bevor eine Seite überhaupt klingen darf.
+    platform.sound.play('start')
     const now = platform.clock.now()
     const day = dayKeyOf(now, { offsetMinutes: platform.clock.offsetMinutes(now) })
     // Der Seed macht die Einheit reproduzierbar (A11): Aus Tag, Modus und
@@ -112,8 +117,20 @@ export function App() {
               type="button"
               className="quiet"
               onClick={() => {
-                setResumable(undefined)
-                void clearProgress().catch(() => undefined)
+                /*
+                 * Erst löschen, dann ausblenden — nicht umgekehrt.
+                 *
+                 * Vorher lief das Löschen nebenher, und wer unmittelbar danach
+                 * die App neu lud, bekam die verworfene Einheit zurück: Das
+                 * Neuladen überholte den Schreibvorgang in der Datenbank. Ein
+                 * E2E-Test hat genau das getroffen. Die paar Millisekunden
+                 * Wartezeit sind der richtige Tausch — „verworfen“ muss
+                 * verworfen bleiben, auch wenn das Telefon im nächsten
+                 * Augenblick abstürzt.
+                 */
+                void clearProgress()
+                  .catch(() => undefined)
+                  .finally(() => setResumable(undefined))
               }}
             >
               {dictionary.resume.discard}
@@ -157,6 +174,16 @@ export function App() {
             ))}
           </select>
         </label>
+        <button
+          type="button"
+          className="sound-toggle"
+          onClick={sound.toggle}
+          aria-pressed={sound.enabled}
+        >
+          <span aria-hidden="true">{sound.enabled ? '♪' : '·'}</span>
+          {sound.enabled ? dictionary.sound.on : dictionary.sound.off}
+        </button>
+
         {/*
           Fehlen Texte oder die eigene Wortliste (Backlog L6), wird auf der
           Rückfallsprache trainiert. Das ist eine Einschränkung und wird als

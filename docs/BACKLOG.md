@@ -16,7 +16,8 @@
 > Fundament steht, und eine echte Trainingseinheit läuft durch: Einprägen,
 > freier Abruf, ehrliche Zahl. Dazu kam **D-011**, die Gestaltungsentscheidung:
 > Die Oberfläche muss wirken, nicht nur funktionieren. Geprüft mit 73
-> Kern-Tests und 11 E2E-Tests.
+> Kern-Tests und 23 E2E-Tests. Dazu **G-9**: Die Oberfläche leuchtet und
+> klingt — Ton wird erzeugt, nicht mitgeliefert.
 > Als Nächstes M2: die Engine, die entscheidet, was heute drankommt.
 
 ---
@@ -36,7 +37,7 @@ unter „Nicht-Ziele“.
 | **R-1 Keine erfundenen Zahlen.** Trainingsscore und gemessene Gedächtnisleistung sind zwei verschiedene Dinge und werden nie vermischt | „Diese Prozentzahl darf nicht erfunden sein“ | Abschnitt F ist kein Nice-to-have, sondern Sperre für den Release |
 | **R-2 Kein Versprechen ohne Messung.** Nicht „wir verdoppeln dein Gedächtnis“, sondern „train, measure, remember more“ | „wissenschaftlich nicht seriös“ | bindet auch Store-Texte und Marketing (R5) |
 | **R-3 Nicht browser-only, local-first, modular.** Der Kern muss ohne Umbau in eine Android-TWA und später in eine iOS-App passen | „Do not create architecture that depends on the browser only“ | Abschnitt A4/A5 vor der ersten Zeile Produktcode |
-| **R-4 Die Oberfläche muss wirken.** Schön, angenehm, unterhaltsam, futuristisch-neuronal — warm für den Inhalt, kühl für die Technik | Vorgabe vom 2026-08-17 | **D-011** mit acht Regeln G-1…G-8; Abschnitt O ist damit keine Kür mehr |
+| **R-4 Die Oberfläche muss wirken.** Schön, angenehm, unterhaltsam, futuristisch-neuronal — warm für den Inhalt, kühl für die Technik | Vorgabe vom 2026-08-17 | **D-011** mit neun Regeln G-1…G-9; Abschnitt O ist damit keine Kür mehr |
 
 ---
 
@@ -246,7 +247,7 @@ Anforderung wie jede andere. Die acht Regeln G-1 bis G-8 stehen in
 | O3 | Hell/Dunkel nach Systemeinstellung | ✅ 2026-08-17 | warmes Papier im Hellen, warmes Dunkel im Dunklen — nirgends reines Weiß oder Schwarz (G-4) | S |
 | O4 | Barrierefreiheit: Kontrast, große Schrift, Screenreader, Fokusreihenfolge, reduzierte Bewegung | 🟨 2026-08-17 | „weniger Bewegung“ schaltet **alles** ab, auch das atmende Netz; das wechselnde Wort wird für den Screenreader mitgesprochen. Ein vollständiger Durchgang steht aus | M |
 | O5 | Einhändig bedienbar, alles Wichtige in der Daumenzone | 🟨 2026-08-17 | Startknopf optisch mittig, „Fertig“ und „Zurück“ am unteren Rand | M |
-| O6 | Haptik und Ton dezent und abschaltbar | ⬜ | bewusst noch nichts: eine Vibration alle vier Sekunden wäre keine Wärme, sondern Nerverei | S |
+| O6 | Haptik und Ton dezent und abschaltbar | 🟨 2026-08-17 | **Ton steht** (D-011/G-9): erzeugt statt mitgeliefert, pentatonisch — dadurch kann keine Reihenfolge falsch klingen —, voreingestellt an, Schalter im Fuß, Wahl gespeichert und im E2E geprüft. **Haptik bewusst noch nicht:** eine Vibration alle vier Sekunden wäre keine Wärme, sondern Nerverei | S |
 | O7 | Nie zwei harte Blöcke hintereinander — Anstrengung dosieren | ⬜ | „angenehm, nicht anstrengend“ ist eine Anforderung an die Sessionplanung, nicht an die Grafik | M |
 | O8 | **Ruhe statt Reiz** (G-1): keine Konfetti, keine Münzen, kein drängender Countdown | ✅ 2026-08-17 | statt Countdown ein 3-Sekunden-Ankommen mit atmendem Kreis, antippbar zum Überspringen; die Uhr der Einheit läuft erst danach | M |
 | O9 | **Ein Ding pro Bildschirm** (G-2) | ✅ 2026-08-17 | Beim Einprägen steht das Wort allein; „3 / 8“ wurde durch eine Punktekette ersetzt. Der Systemcheck aus M0 ist in ein aufklappbares Element am Fuß gewandert | M |

@@ -41,6 +41,10 @@ export const en: Dictionary = {
       extended: '15 minutes',
     },
   },
+  sound: {
+    on: 'Sound on',
+    off: 'Sound off',
+  },
   session: {
     settle: 'Arriving',
     settleHint: 'Tap when you are ready',

@@ -303,3 +303,71 @@ CONNECT-Tunnel). Das sieht nach einem fehlgeschlagenen Deploy aus, ist aber
 keiner — gegengeprüft mit dem nachweislich laufenden RReader, das denselben
 Fehler liefert. Verlässlich ist allein das Protokoll des Workflows:
 `Deployed anitew triggers` plus die URL.
+
+## 2026-08-17 · Leuchten und Töne (D-011/G-9)
+
+Rückmeldung nach dem ersten Tag auf dem echten Telefon: „könnte schöner sein
+trotz angenehm — spielerischer, unterhaltsamer, Leuchtungen, Töne“. Angenehm
+allein ist eben noch nicht schön; die Oberfläche war stumm und matt.
+
+**Ton wird erzeugt, nicht mitgeliefert.** Kein Audiofile im Repo — alles
+entsteht zur Laufzeit aus Sinusschwingungen (`platform/web/sound.ts`).
+Derselbe Gedanke wie bei den Gesichtern (D-005): kein Gewicht, keine Lizenz,
+offline vollständig, unendlich variierbar. Alle Töne kommen aus einer
+pentatonischen Tonleiter, die keine Halbtonschritte kennt — dadurch kann keine
+Reihenfolge falsch klingen, egal wie die Ereignisse fallen. Beim Einprägen
+steigt die Tonhöhe mit jedem Wort: Man hört, wie weit die Runde ist, ohne
+hinzusehen.
+
+Zwei Browser-Eigenheiten sind darin gelöst: iOS gibt keinen Ton ohne
+Berührung, deshalb entsteht der AudioContext erst beim ersten `play()` — und
+das erste `play()` ist der Startknopf. Und der Kontext wird angehalten, wenn
+die App in den Hintergrund geht, sonst klingt es aus der Tasche.
+
+**Licht ist Material, kein Feuerwerk.** Der Startknopf atmet in einem Schein,
+jedes Wort leuchtet beim Erscheinen auf und beruhigt sich, gelandete Marken
+glimmen kurz nach, sieben der fünfzig Netzknoten glühen in der Akzentfarbe.
+Nur sieben, weil `drop-shadow` je Element gerechnet wird — fünfzig würden auf
+einem älteren Telefon die Uhr der Einheit ins Stocken bringen.
+
+**Eine Grenze, die dabei gehalten wurde:** Kein Ton bewertet. Keine Fanfare
+für eine richtige Antwort, kein Trauerakkord für eine falsche. Das wäre die
+billige Variante aus G-7 und zugleich ein Urteil, das der App nach G-5 nicht
+zusteht.
+
+**Zwei Fehler auf dem Weg, beide lehrreich:**
+
+1. Beim Einführen der neuen Leucht-Variablen wurde `--glow` entfernt — das
+   aber an drei Stellen noch benutzt wurde. Ein Verweis auf eine nicht
+   definierte CSS-Variable macht die ganze Eigenschaft ungültig, still und
+   ohne Fehlermeldung. Aufgefallen ist es nur, weil ein Textabgleich im
+   Änderungsskript nicht passte. `--glow` ist jetzt wieder da.
+
+2. **Eine echte Wettlaufsituation, gefunden vom E2E-Test.** „Verwerfen und neu
+   beginnen“ blendete die Einheit sofort aus und löschte sie *nebenher* aus
+   der Datenbank. Wer unmittelbar danach die App neu lud, bekam die verworfene
+   Einheit zurück — das Neuladen überholte den Schreibvorgang. Der Test schlug
+   nur im vollen Lauf fehl und einzeln nie, also genau das Muster, das man
+   gern als Flackern abtut. Jetzt wird erst gelöscht und dann ausgeblendet;
+   dasselbe gilt beim Abbrechen einer laufenden Einheit.
+
+**Und eine Layout-Korrektur:** Der Ergebnisbildschirm hatte den Zurück-Knopf
+per `margin-top: auto` am unteren Rand und dazwischen ein Loch von einer
+halben Bildschirmhöhe. Bei einem kurzen Ergebnis — dem Normalfall — sah das
+aus, als fehlte etwas. Jetzt steht alles als ein Block in der Mitte.
+
+**Und derselbe Fehler noch einmal, an zweiter Stelle.** Kaum war die
+Wettlaufsituation beim Verwerfen behoben, fiel der neue Tonschalter-Test auf
+dieselbe Weise um: Die Wahl wurde nebenher geschrieben, die Anzeige wechselte
+sofort — wer unmittelbar neu lud, bekam den alten Zustand zurück. Beide Male
+war das Muster identisch (nur im vollen Lauf rot, einzeln nie), und beide Male
+war es kein Flackern.
+
+Daraus eine Regel für alles Weitere: **Was gespeichert werden muss, wird erst
+angezeigt, wenn es gespeichert ist.** Sofortige Rückmeldung darf davon
+abweichen, wo sie nichts behauptet — der Ton schaltet weiterhin ohne Verzögerung
+um, weil er nur ein Geräusch ist. Ein *Schalter* dagegen behauptet einen
+Zustand, und ein Schalter, der etwas anderes zeigt als das Gespeicherte, ist
+ein kaputter Schalter.
+
+**Geprüft:** 73 Kern-Tests, 24 E2E-Läufe.

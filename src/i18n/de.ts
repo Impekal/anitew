@@ -55,6 +55,10 @@ export const de = {
       extended: '15 Minuten',
     },
   },
+  sound: {
+    on: 'Ton an',
+    off: 'Ton aus',
+  },
   session: {
     settle: 'Ankommen',
     settleHint: 'Antippen, wenn du bereit bist',

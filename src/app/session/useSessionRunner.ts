@@ -107,6 +107,10 @@ export function useSessionRunner(
     persist(nextIndex, nextResults)
     setBlockIndex(nextIndex)
 
+    // Ein Block endet hörbar (D-011/G-9): zwei Töne abwärts, wenn es
+    // weitergeht — der ganze kleine Akkord, wenn es geschafft ist.
+    platform.sound.play(nextIndex >= plan.blocks.length ? 'done' : 'block')
+
     if (nextIndex >= plan.blocks.length) {
       void completeSession(sessionRef.current.sessionId, platform.clock.now()).catch(
         () => undefined,
@@ -142,13 +146,20 @@ export function useSessionRunner(
     const marker = `${block.id}:${itemIndex}`
     if (loggedRef.current === marker) return
     loggedRef.current = marker
+    // Die Tonhöhe steigt mit jedem Wort: Man hört, wie weit die Runde ist,
+    // ohne auf die Punkte zu sehen.
+    platform.sound.play('word', itemIndex)
     void logShown(sessionRef.current.sessionId, platform.clock.now(), item).catch(() => undefined)
     persist(blockIndex, results)
   }, [block, blockIndex, itemIndex, persist, platform, results])
 
   const leave = useCallback(() => {
-    void clearProgress().catch(() => undefined)
-    onLeave()
+    // Aus demselben Grund wie beim Verwerfen im Startbildschirm: erst löschen,
+    // dann zurück. Sonst kann ein Neustart die abgebrochene Einheit
+    // wiederauferstehen lassen.
+    void clearProgress()
+      .catch(() => undefined)
+      .finally(onLeave)
   }, [onLeave])
 
   const state: RunnerState = {

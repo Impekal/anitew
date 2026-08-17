@@ -351,6 +351,37 @@ wie im Hellen; während einer laufenden Einheit 0,07 beziehungsweise 0,05.
 Diese Zahlen stehen hier, weil sie sonst nur im Stylesheet stünden und beim
 nächsten Umbau als beliebig gälten — sie sind es nicht, sie sind ertastet.
 
+**G-9 Es leuchtet und es klingt — beides warm und beides leise.**
+Nachgereichte Vorgabe: „spielerischer, unterhaltsamer, Leuchtungen, Töne“. Das
+ist kein Widerruf von G-1, sondern dessen Ausbau in eine Richtung, die vorher
+fehlte: Die Oberfläche war angenehm, aber sie war *stumm und matt*. Angenehm
+allein ist noch nicht schön.
+
+*Licht* ist Material, nicht Feuerwerk. Der Startknopf atmet in einem Schein,
+jedes Wort leuchtet beim Erscheinen auf und beruhigt sich, eine gelandete Marke
+glimmt kurz nach, die Ergebniszahl trägt einen Hof. Im Dunkeln darf das
+deutlich sein; auf hellem Papier ist starkes Licht keine Helligkeit, sondern
+Unschärfe, deshalb liegen dort alle Werte niedriger. Nirgends blinkt etwas.
+
+*Ton* wird erzeugt, nicht mitgeliefert — kein einziges Audiofile, alles
+entsteht zur Laufzeit aus Sinusschwingungen. Derselbe Gedanke wie bei den
+Gesichtern (D-005): kein Gewicht, keine Lizenz, offline vollständig. Alle Töne
+stammen aus einer **pentatonischen** Tonleiter, die keine Halbtonschritte hat;
+dadurch kann keine Reihenfolge falsch klingen. Beim Einprägen steigt die
+Tonhöhe mit jedem Wort — man hört, wie weit die Runde ist, ohne hinzusehen.
+
+Die Grenze, an der beides gemessen wird: **Ein Ton bestätigt, er belohnt
+nicht.** Keine Fanfare für eine richtige Antwort, kein Trauerakkord für eine
+falsche — das wäre die billige Variante aus G-7 und zugleich ein Urteil, das
+der App nach G-5 nicht zusteht. Wer den Ton abschaltet, darf nichts vermissen
+außer der Bestätigung. Abschalten geht mit einem Tipp auf dem ersten
+Bildschirm, voreingestellt ist **an**: Eine Einstellung, die man erst finden
+muss, um überhaupt zu merken, dass es sie gibt, ist keine.
+
+Und weiterhin gilt G-3: Bei „weniger Bewegung“ steht alles still. Der Ton
+bleibt davon unberührt — er ist keine Bewegung, sondern hat seinen eigenen
+Schalter.
+
 ## D-010 · 2026-08-17 · Der Kern kennt keinen Browser
 
 Bekräftigt aus dem Produktgespräch, weil es die teuerste Regel ist, wenn man sie

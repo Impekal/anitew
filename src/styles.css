@@ -36,8 +36,18 @@
      eine Linie stärker auf als im Dunkeln. */
   --net: color-mix(in oklab, var(--calm) 40%, transparent);
   --net-strong: color-mix(in oklab, var(--calm) 70%, transparent);
+  /*
+   * Leuchten (D-011/G-9). Auf Papier ist Licht ein Hauch — ein starker Schein
+   * auf hellem Grund sieht nicht nach Leuchten aus, sondern nach Unschaerfe.
+   * Im Dunkeln darf es deutlich mehr sein, deshalb stehen die Werte unten
+   * noch einmal.
+   */
   --glow: 0 0 0 1px color-mix(in oklab, var(--accent) 30%, transparent),
     0 0 18px -2px color-mix(in oklab, var(--accent) 45%, transparent);
+  --glow-soft: 0 0 22px -8px color-mix(in oklab, var(--accent) 45%, transparent);
+  --glow-strong: 0 0 36px -10px color-mix(in oklab, var(--accent) 60%, transparent);
+  --glow-text: 0 0 16px color-mix(in oklab, var(--accent) 18%, transparent);
+  --glow-flare: 0 0 34px color-mix(in oklab, var(--accent) 42%, transparent);
 
   --sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   /* D-011/G-8: Gemessenes bekommt eine eigene Schrift. Gleich breite Ziffern,
@@ -74,6 +84,14 @@
     --shadow-lift: 0 2px 6px rgb(0 0 0 / 35%), 0 22px 48px -20px rgb(0 0 0 / 70%);
     --net: color-mix(in oklab, var(--calm) 55%, transparent);
     --net-strong: color-mix(in oklab, var(--calm) 100%, transparent);
+
+    /* Im Dunkeln traegt Licht. Hier darf es wirklich leuchten. */
+    --glow: 0 0 0 1px color-mix(in oklab, var(--accent) 38%, transparent),
+      0 0 26px -2px color-mix(in oklab, var(--accent) 60%, transparent);
+    --glow-soft: 0 0 34px -6px color-mix(in oklab, var(--accent) 55%, transparent);
+    --glow-strong: 0 0 60px -8px color-mix(in oklab, var(--accent) 70%, transparent);
+    --glow-text: 0 0 26px color-mix(in oklab, var(--accent) 32%, transparent);
+    --glow-flare: 0 0 52px color-mix(in oklab, var(--accent) 65%, transparent);
   }
 }
 
@@ -196,12 +214,16 @@ body::before {
   align-items: center;
   cursor: pointer;
   font: inherit;
-  box-shadow: var(--shadow-lift);
+  box-shadow: var(--shadow-lift), var(--glow-soft);
   transition: transform var(--step) var(--ease), box-shadow var(--step) var(--ease);
+  /* Der Knopf atmet, sehr langsam. Nicht um Aufmerksamkeit zu fordern,
+     sondern damit der Bildschirm lebt, solange niemand etwas tut (G-7). */
+  animation: button-breathe 5.5s ease-in-out infinite;
 }
 
 .start:hover {
   transform: translateY(-1px);
+  box-shadow: var(--shadow-lift), var(--glow-strong);
 }
 
 .start:active {
@@ -253,6 +275,9 @@ body::before {
   border-color: transparent;
   background: var(--accent-soft);
   color: var(--ink);
+  /* Enger als `--glow-soft`: Ein weiter Schein um eine kleine Pille herum
+     liest sich als Fleck, nicht als Licht. */
+  box-shadow: 0 0 14px -4px color-mix(in oklab, var(--accent) 55%, transparent);
 }
 
 /* ── Karten ───────────────────────────────────────────────────────────── */
@@ -328,6 +353,32 @@ body::before {
   border: 1px solid var(--line);
   background: var(--card);
   color: var(--ink);
+}
+
+/* Der Tonschalter sitzt beim Fuß, nicht in einem Menü: Wer den Ton abstellen
+   will, will das jetzt und nicht nach drei Tipps (G-1). */
+.sound-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  align-self: flex-start;
+  border: none;
+  background: transparent;
+  color: var(--ink-faint);
+  font: inherit;
+  font-size: 0.88rem;
+  padding: 0.25rem 0;
+  cursor: pointer;
+  transition: color var(--step) var(--ease);
+}
+
+.sound-toggle:hover {
+  color: var(--ink-soft);
+}
+
+.sound-toggle[aria-pressed='true'] {
+  color: var(--accent);
+  text-shadow: var(--glow-text);
 }
 
 .hint {
@@ -467,6 +518,21 @@ body::before {
   animation: node-pulse 7s ease-in-out infinite;
 }
 
+/*
+ * Ein paar Knoten glimmen (D-011/G-9) — jeder siebte, in der Akzentfarbe und
+ * mit einem weichen Schein. Sie liegen dadurch optisch vor dem übrigen Netz,
+ * und das reicht schon, damit der Hintergrund nicht flach wirkt.
+ *
+ * Nur jeder siebte, weil `drop-shadow` je Element gerechnet wird: sieben
+ * leuchtende Punkte kosten nichts, fünfzig würden auf einem älteren Telefon
+ * die Uhr der Einheit ins Stocken bringen.
+ */
+.neural-nodes circle:nth-child(7n) {
+  fill: var(--accent);
+  filter: drop-shadow(0 0 1.4px color-mix(in oklab, var(--accent) 80%, transparent));
+  animation-duration: 9s;
+}
+
 @keyframes node-pulse {
   0%,
   100% {
@@ -582,6 +648,7 @@ body::before {
 
 .encode-word {
   margin: 0;
+  text-shadow: var(--glow-text);
   font-family: var(--serif);
   font-size: clamp(2.6rem, 13vw, 4rem);
   font-weight: 400;
@@ -697,6 +764,10 @@ body::before {
 
 /* ── Ergebnis ─────────────────────────────────────────────────────────── */
 
+.summary-score strong {
+  text-shadow: var(--glow-text);
+}
+
 .summary-score {
   margin: 0;
   font-family: var(--mono);
@@ -714,8 +785,20 @@ body::before {
 
 /* Der Weg zurück sinkt ans untere Ende — in der Daumenzone, und ohne dass
    das Ergebnis oben an einer halbleeren Seite klebt (O5). */
+/*
+ * Das Ergebnis steht in der Mitte, nicht oben angeschlagen.
+ *
+ * Vorher hing der Zurück-Knopf per `margin-top: auto` am unteren Rand und
+ * riss dazwischen ein Loch von einer halben Bildschirmhöhe. Bei einem kurzen
+ * Ergebnis — und das ist der Normalfall — sah der Bildschirm dadurch aus, als
+ * fehlte etwas. Jetzt sitzt alles als ein Block zusammen.
+ */
+.summary-screen {
+  justify-content: center;
+}
+
 .summary-back {
-  margin-top: auto;
+  margin-top: 1.25rem;
 }
 
 .summary-words {
@@ -730,25 +813,50 @@ body::before {
   animation-delay: calc(var(--i) * 55ms);
 }
 
+/*
+ * Jedes Wort kommt mit einem Aufleuchten und beruhigt sich dann (G-9).
+ * Der Schein ist am Anfang kräftig und fällt schnell ab — das Erscheinen
+ * wirkt dadurch wie ein Anschlag, ohne dass danach etwas glimmt.
+ */
 @keyframes word-in {
   from {
     opacity: 0;
     transform: translateY(10px);
+    text-shadow: var(--glow-flare);
+  }
+  40% {
+    text-shadow: var(--glow-flare);
   }
   to {
     opacity: 1;
     transform: none;
+    text-shadow: var(--glow-text);
+  }
+}
+
+@keyframes button-breathe {
+  0%,
+  100% {
+    box-shadow: var(--shadow-lift), var(--glow-soft);
+  }
+  50% {
+    box-shadow: var(--shadow-lift), var(--glow-strong);
   }
 }
 
 @keyframes chip-in {
   from {
     opacity: 0;
-    transform: scale(0.88);
+    transform: scale(0.86);
+    box-shadow: var(--glow-strong);
+  }
+  60% {
+    transform: scale(1.05);
   }
   to {
     opacity: 1;
     transform: none;
+    box-shadow: none;
   }
 }
 

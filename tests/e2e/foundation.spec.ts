@@ -106,3 +106,20 @@ test('ist als App installierbar', async ({ page, request }) => {
     /bereit|wird eingerichtet/,
   )
 })
+
+test('lässt sich der Ton abschalten, und die Wahl bleibt', async ({ page }) => {
+  // D-011/G-9: Ton ist voreingestellt an — sonst wüsste niemand, dass es ihn
+  // gibt. Abschalten muss dafür an Ort und Stelle möglich sein und halten.
+  await page.goto('/')
+  const toggle = page.getByRole('button', { name: /Ton (an|aus)/ })
+  await expect(toggle).toHaveAttribute('aria-pressed', 'true')
+
+  await toggle.click()
+  await expect(toggle).toHaveAttribute('aria-pressed', 'false')
+
+  await page.reload()
+  await expect(page.getByRole('button', { name: /Ton (an|aus)/ })).toHaveAttribute(
+    'aria-pressed',
+    'false',
+  )
+})
