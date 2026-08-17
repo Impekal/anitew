@@ -57,10 +57,10 @@
   --glow: 0 0 0 1px rgb(168 95 34 / 30%), 0 4px 20px -2px rgb(168 95 34 / 45%);
   --glow: 0 0 0 1px color-mix(in oklab, var(--accent) 30%, transparent),
     0 4px 20px -2px color-mix(in oklab, var(--accent) 45%, transparent);
-  --glow-soft: 0 4px 24px -2px rgb(168 95 34 / 40%);
-  --glow-soft: 0 4px 24px -2px color-mix(in oklab, var(--accent) 40%, transparent);
-  --glow-strong: 0 8px 40px -4px rgb(168 95 34 / 58%);
-  --glow-strong: 0 8px 40px -4px color-mix(in oklab, var(--accent) 58%, transparent);
+  --glow-soft: 0 5px 28px -2px rgb(168 95 34 / 55%);
+  --glow-soft: 0 5px 28px -2px color-mix(in oklab, var(--accent) 55%, transparent);
+  --glow-strong: 0 10px 46px -4px rgb(168 95 34 / 72%);
+  --glow-strong: 0 10px 46px -4px color-mix(in oklab, var(--accent) 72%, transparent);
   --glow-text: 0 1px 14px rgb(168 95 34 / 32%);
   --glow-text: 0 1px 14px color-mix(in oklab, var(--accent) 32%, transparent);
   --glow-flare: 0 2px 28px rgb(168 95 34 / 58%);

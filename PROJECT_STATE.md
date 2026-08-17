@@ -465,3 +465,35 @@ Nebenbei abgesichert: Vor jeder `color-mix`-Zeile steht jetzt ein einfacher
 rgba-Wert. Kennt ein Browser `color-mix` nicht, wäre sonst die ganze
 Eigenschaft ungültig und der Schein ersatzlos weg — mit dem Vorrat bekommt er
 wenigstens etwas.
+
+## 2026-08-17 · „Hat sich nicht geändert“ — der Zwischenspeicher war schuld
+
+Nach der Korrektur des hellen Scheins kam vom Telefon: unverändert. Der
+Deploy war nachweislich fertig (17:51 UTC, Screenshot 17:56 UTC), die neue
+Datei lag also draußen. Der Fehler saß eine Ebene tiefer.
+
+**Eine installierte Web-App braucht zwei Neuladungen, wenn man nichts tut.**
+Der Service Worker holt die neue Fassung im Hintergrund und übernimmt auch —
+aber die bereits offene Seite behält die Dateien, die sie beim Öffnen bekommen
+hat. Erst die *zweite* Neuladung zeigt die Änderung. Von außen sieht das aus,
+als wäre die Änderung nicht angekommen, und man sucht den Fehler in der
+Änderung statt im Zwischenspeicher.
+
+`platform/web/updates.ts` behebt das dauerhaft: Beim Start und bei jeder
+Rückkehr aus dem Hintergrund wird nach einer neuen Fassung gefragt, und sobald
+der neue Service Worker übernimmt, lädt die Seite **einmal** neu. Die
+Bedingung `hadController` verhindert die Schleife — beim allerersten Besuch
+ist die Übernahme keine Aktualisierung, sondern die Erstinstallation.
+
+Das ist der wertvollere Teil dieser Runde: Ohne ihn wäre jede künftige
+Änderung auf dem Telefon wieder „ist nicht angekommen“, und jedes Mal hätte
+man erst den Zwischenspeicher ausschließen müssen.
+
+Nebenbei: Der Schein im Hellen war auch bei richtiger Machart noch
+grenzwertig und steht jetzt auf 55 % statt 40 %.
+
+**Und ein Werkzeug, das es schon gab und das hier gefehlt hätte:** Die Karte
+„Fundament“ am Fuß zeigt unter *Fassung* den Commit, der gerade läuft. Damit
+lässt sich in fünf Sekunden entscheiden, ob eine Änderung angekommen ist oder
+ob der Zwischenspeicher noch die alte hält — genau die Frage, die diese Runde
+gekostet hat.

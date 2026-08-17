@@ -3,7 +3,12 @@ import { createRoot } from 'react-dom/client'
 
 import { App } from './app/App.tsx'
 import { NeuralField } from './app/NeuralField.tsx'
+import { keepUpToDate } from './platform/web/updates.ts'
 import './styles.css'
+
+// Neue Fassungen kommen von selbst an — siehe updates.ts. Steht vor dem
+// Rendern, damit auch ein Fehler in der App die Aktualisierung nicht blockiert.
+keepUpToDate()
 
 const container = document.getElementById('root')
 if (container === null) throw new Error('#root fehlt in index.html')
