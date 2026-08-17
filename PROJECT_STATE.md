@@ -554,3 +554,31 @@ nur nach und lädt nur, wenn wirklich etwas Neues da ist.
 Damit ist die Frage vom Auftraggeber vollständig beantwortet — App schließen
 und wieder öffnen prüft jetzt auf Updates und führt sie aus, ohne
 Deinstallieren.
+
+## 2026-08-17 · Die Testsuite hat sich selbst im Weg gestanden
+
+Beim Push der Pillen-Änderung war ein E2E-Test rot — und ich habe trotzdem
+gepusht, weil in meiner Befehlskette `| tail -3` den Rückgabewert von
+Playwright verschluckt hat. Das ist ein Fehler in meinem Vorgehen, nicht im
+Projekt, und er gehört genauso hierher wie die Fehler im Code.
+
+Der Test selbst war nicht das Problem, aber auch kein Flackern. **Mehrere Tests
+warten auf echte Sekunden:** einer sitzt eine volle 60-Sekunden-Einheit ab, um
+nachzumessen, dass das Zeitbudget stimmt (B2); die beiden Wiederholungstests
+laufen je zwei Einheiten durch. Liefen zwei davon gleichzeitig, nahmen sie sich
+auf dieser kleinen Maschine die Rechenzeit weg, die Zeitgeber in den Seiten
+kamen ins Stocken, und ein Block dauerte länger als seine nominellen Sekunden.
+Der rote Lauf brauchte 3,1 Minuten statt der üblichen 1,9 — das war die Spur.
+
+Deshalb läuft die Suite jetzt mit **einem** Arbeiter. Das kostet Laufzeit (rund
+sechs statt zwei Minuten) und liefert dafür ein Ergebnis, auf das man sich
+verlassen kann. Bei einer Suite, die über Veröffentlichungen entscheidet, ist
+das der richtige Tausch.
+
+Zwei Lehren:
+
+1. **Wer auf echte Zeit wartet, darf nicht neben jemandem laufen, der dasselbe
+   tut.** Das gilt für jeden weiteren Test dieser Art.
+2. **`| tail` verschluckt den Rückgabewert.** Beim nächsten Mal `pipefail` oder
+   den Befehl ohne Rohr — ein grüner Bericht, der nur so aussieht, ist
+   schlimmer als gar keiner.

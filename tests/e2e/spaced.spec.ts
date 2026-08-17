@@ -108,6 +108,16 @@ test('zeigt kein Wiedersehen, wenn nichts fällig ist', async ({ page }) => {
   await page.getByRole('button', { name: '60 Sekunden' }).click()
   await page.getByRole('button', { name: 'Beginnen' }).click()
   await page.locator('.settle').click()
-  await expect(page.locator('.encode-word')).toBeVisible({ timeout: 30_000 })
+  /*
+   * Großzügige Frist, und das ist kein Zugeständnis an Flackern.
+   *
+   * Seit M2 tut die App vor dem ersten Wort mehr: Sie liest die fälligen
+   * Termine aus der Datenbank, plant, legt die Einheit an — und davor liegen
+   * drei Sekunden Ankommen. Unter Last (mehrere Testläufe gleichzeitig,
+   * daneben eine Einheit, die 60 Sekunden echte Zeit abwartet) reichten 30
+   * Sekunden einmal nicht. Geprüft wird hier, *dass* kein Wiedersehen kommt,
+   * nicht wie schnell das erste Wort erscheint.
+   */
+  await expect(page.locator('.encode-word')).toBeVisible({ timeout: 60_000 })
   await expect(page.getByText('Und jetzt von früher')).toBeHidden()
 })

@@ -9,7 +9,27 @@ import { defineConfig, devices } from '@playwright/test'
  */
 export default defineConfig({
   testDir: './tests/e2e',
-  fullyParallel: true,
+  /*
+   * Ein Arbeiter, nicht mehrere — und das ist hier keine Bequemlichkeit.
+   *
+   * Mehrere Tests warten auf **echte Sekunden**: Der eine sitzt eine volle
+   * 60-Sekunden-Einheit ab, um nachzumessen, dass das Zeitbudget stimmt (B2);
+   * die beiden Wiederholungstests laufen jeweils zwei Einheiten durch. Laufen
+   * zwei davon gleichzeitig, nehmen sie sich auf einer kleinen Maschine die
+   * Rechenzeit weg, die Zeitgeber in den Seiten kommen ins Stocken, und ein
+   * Block dauert länger als seine nominellen Sekunden. Der Test wird dann rot,
+   * ohne dass an der App etwas falsch ist.
+   *
+   * Genau das ist zweimal passiert — einzeln immer grün, im vollen Lauf
+   * gelegentlich rot. Das ist das Muster, das man gern als Flackern abtut;
+   * hier hat es eine Ursache, und die Ursache liegt im Testaufbau.
+   *
+   * Der Preis ist Laufzeit (rund sechs statt zwei Minuten). Bei einer Suite,
+   * die über Veröffentlichungen entscheidet, ist ein verlässliches Ergebnis
+   * das mehr wert.
+   */
+  fullyParallel: false,
+  workers: 1,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? 'line' : 'list',
