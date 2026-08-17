@@ -19,6 +19,7 @@ import { createWebPlatform } from '../platform/web/index.ts'
 import { loadDue, moduleOf, wordOf } from '../data/items.ts'
 import { type SessionProgress, beginSession, clearProgress, loadProgress } from '../data/sessions.ts'
 
+import { BackupPanel } from './BackupPanel.tsx'
 import { FoundationPanel } from './FoundationPanel.tsx'
 import { SessionScreen } from './session/SessionScreen.tsx'
 import { useLanguage } from './useLanguage.ts'
@@ -243,6 +244,17 @@ export function App() {
           „läuft ohne Netz“ und „Speicher bereit“ auf einem fremden Telefon die
           ersten Fragen sind, wenn etwas klemmt.
         */}
+        {/*
+          Die Sicherung steht **über** dem Systemcheck und nicht darunter: Sie
+          ist das Einzige hier unten, das jemand irgendwann dringend braucht
+          (N2). Zugeklappt bleibt sie trotzdem — sie gehört nicht auf den
+          ersten Bildschirm (D-011/G-2).
+        */}
+        <details className="details">
+          <summary>{dictionary.backup.heading}</summary>
+          <BackupPanel platform={platform} dictionary={dictionary} />
+        </details>
+
         <details className="details">
           <summary>{dictionary.check.heading}</summary>
           <FoundationPanel platform={platform} dictionary={dictionary} />

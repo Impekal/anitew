@@ -91,6 +91,29 @@ export const de = {
     continue: 'Fortsetzen',
     discard: 'Verwerfen und neu beginnen',
   },
+  backup: {
+    heading: 'Sicherung',
+    // Ohne Server ist die Datei der einzige Weg. Das wird gesagt, nicht
+    // verschwiegen — und zwar bevor jemand seine Wochen verliert (N2, D-009).
+    note: 'Alles liegt auf diesem Gerät und nirgends sonst. Wer den Browserspeicher löscht oder das Gerät wechselt, braucht diese Datei. Leg sie dorthin, wo du sie wiederfindest — in deine Cloud, in deine Mails, egal wohin.',
+    save: 'Sicherung speichern',
+    load: 'Sicherung einlesen',
+    saved: 'Gespeichert:',
+    records: 'Datensätze',
+    // G-5: Die App schimpft nicht. Auch nicht, wenn die falsche Datei kommt.
+    unreadable: 'Diese Datei lässt sich nicht lesen. Vielleicht war es eine andere?',
+    foreign: 'Das ist keine ANITEW-Sicherung.',
+    newer: 'Diese Sicherung stammt aus einer neueren Fassung von ANITEW. Aktualisiere die App, dann passt sie.',
+    imported: 'Eingelesen:',
+    added: 'neu dazu',
+    kept: 'schon vorhanden',
+    replaced: 'ergänzt',
+    dropped: 'nicht lesbar',
+    // Nichts geht verloren — das ist die Frage, die vor dem Antippen im Kopf
+    // steht, also steht die Antwort daneben.
+    merges: 'Vorhandenes bleibt. Zusammengeführt wird, nicht ersetzt.',
+    failed: 'Das Einlesen ist nicht durchgelaufen. Es wurde nichts verändert.',
+  },
   check: {
     heading: 'Fundament',
     // Bewusst keine erfundenen Trainingszahlen (Regel R-1). Was hier steht,

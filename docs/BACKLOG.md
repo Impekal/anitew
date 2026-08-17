@@ -224,15 +224,15 @@ Der Punkt, der aus einem Spiel einen Gedächtnistrainer macht.
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| N1 | Alles lokal in IndexedDB. **Kein Konto bei uns, kein Server, keine Nutzerdatenbank** — auch nicht, wenn später abgeglichen wird | ⬜ | **D-009** | S |
-| N2 | Export/Backup als Datei, Import auf einem neuen Gerät | ⬜ | ohne Server ist das der einzige Weg, Fortschritt nicht zu verlieren | M |
+| N1 | Alles lokal in IndexedDB. **Kein Konto bei uns, kein Server, keine Nutzerdatenbank** — auch nicht, wenn später abgeglichen wird | ✅ 2026-08-17 | **D-009**. Fünf Tabellen in `data/db.ts`, Version 1 wird nie mehr angefasst | S |
+| N2 | Export/Backup als Datei, Import auf einem neuen Gerät | ✅ 2026-08-17 | ohne Server ist das der einzige Weg, Fortschritt nicht zu verlieren. Eigene Fassungsnummer, **getrennt** vom Datenbankschema — sonst änderte eine Migration stillschweigend das Dateiformat. Einlesen führt zusammen und löscht nie; dieselbe Datei zweimal ändert nichts | M |
 | N3 | Vollständig offline nutzbar, auch beim allerersten Start nach der Installation | ⬜ | | M |
 | N4 | Löschen: einzelne Items, eigene Inhalte, alles | ⬜ | | S |
 | N5 | Speicherbedarf im Blick behalten (Bilder!) und dem Nutzer zeigen | ⬜ | | S |
-| N6 | **Stufe 1 (Phase 1):** ohne Anmeldung, alles lokal; Sicherung und Gerätewechsel über die Exportdatei aus N2 — die der Nutzer selbst in iCloud Drive oder Google Drive legen kann | ⬜ | **D-009** | S |
+| N6 | **Stufe 1 (Phase 1):** ohne Anmeldung, alles lokal; Sicherung und Gerätewechsel über die Exportdatei aus N2 — die der Nutzer selbst in iCloud Drive oder Google Drive legen kann | ✅ 2026-08-17 | **D-009**. Der Gerätewechsel ist als E2E-Lauf geprüft: zwei getrennte Umgebungen, wie zwei Telefone | S |
 | N7 | **Stufe 2 (Phase 2):** Anmeldung bei Google, Abgleich in den **app-privaten Ordner des eigenen Google Drive** (OAuth mit PKCE, kein Backend) | ⬜ | **D-009**. Die Daten liegen im Speicher des Nutzers, nicht bei uns | L |
 | N8 | **Stufe 3 (Phase 3):** iCloud — realistisch erst mit der nativen iOS-App, weil CloudKit ein Apple-Entwicklerkonto und einen App-Container braucht | ⬜ | **D-009**, hängt an Q6 | L |
-| N9 | Konfliktauflösung bei zwei Geräten (gleicher Tag, zwei Sessions) | ⬜ | Trainingshistorie ist additiv — zusammenführen statt überschreiben | M |
+| N9 | Konfliktauflösung bei zwei Geräten (gleicher Tag, zwei Sessions) | 🟨 2026-08-17 | Trainingshistorie ist additiv — zusammenführen statt überschreiben. Die Regeln stehen im Kern (`core/backup.ts`): Es gewinnt die **längere Geschichte**, nicht der jüngere Termin; Ereignisse werden am Fingerabdruck erkannt, nicht an der laufenden Nummer. Beim echten Abgleich (N7) kommt der Fall „gleichzeitig geändert“ dazu | M |
 | N10 | Googles Freigabeverfahren für den Drive-Zugriff samt Datenschutzerklärung | ⬜ | kostenlos, aber es dauert; früh anstoßen, hängt an R4 | M |
 
 ## O. Bedienung & Barrierefreiheit
@@ -263,8 +263,8 @@ Anforderung wie jede andere. Die acht Regeln G-1 bis G-8 stehen in
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | ✅ 2026-08-17 | 108 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Sessionplanung, Bewertung, Scheduler und Gesichtsgenerator sind abgedeckt | M |
-| P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | ✅ 2026-08-17 | 28 Läufe in Chromium und im Telefonprofil, darunter eine Einheit von vorn bis hinten und der Abbruch mitten drin. Seit M4 **liest der Test ab, welches Modul kam, statt es vorherzusagen** (`tests/e2e/helpers.ts`) | M |
+| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | ✅ 2026-08-17 | 122 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Sessionplanung, Bewertung, Scheduler und Gesichtsgenerator sind abgedeckt | M |
+| P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | ✅ 2026-08-17 | 32 Läufe in Chromium und im Telefonprofil, darunter eine Einheit von vorn bis hinten und der Abbruch mitten drin. Seit M4 **liest der Test ab, welches Modul kam, statt es vorherzusagen** (`tests/e2e/helpers.ts`) | M |
 | P3 | CI bei jedem Push: Typecheck (App **und** Kern getrennt), Tests, Build, E2E | ✅ 2026-08-17 | | S |
 | P4 | Performance: Kaltstart unter 2 s, Timer laufen ruckelfrei | ⬜ | | M |
 | P5 | Uhrmanipulation darf die Engine nicht zerstören (Streak-Betrug, Intervall-Chaos) | ⬜ | monotone Zeitquelle plus Plausibilitätsprüfung | M |

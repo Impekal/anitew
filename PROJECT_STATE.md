@@ -685,3 +685,75 @@ etwas gepusht wurde. Ein Zweig, der zufällig nie drankam, wäre ungeprüfter
 Code mit grünem Haken.
 
 **Stand:** 108 Kerntests, 28 E2E-Läufe, Typecheck für App und Kern grün.
+
+## 2026-08-17 · Die Sicherung (N2) — vorgezogen, weil der Anlass echt war
+
+Beim Löschen der Browserdaten ist eine Trainingshistorie verschwunden. Das ist
+der Grund, warum diese Aufgabe vor den restlichen Modulen drankam: Was hier
+hängt, ist nicht wiederherstellbar. Ein verlorenes Dokument kann man neu laden,
+eine verlorene Vergessenskurve (D-004) nicht — sie ist das Ergebnis von Wochen.
+
+Zwei Knöpfe im Fußbereich, aufgeklappt unter „Sicherung“, und ein Hinweis
+**über** den Knöpfen statt als Kleingedrucktes darunter: Wer nicht weiß, dass
+alles nur auf diesem Gerät liegt, kommt gar nicht auf die Idee zu sichern.
+
+### Das Dateiformat ist nicht das Datenbankschema
+
+Die Zeilenformen in `core/backup.ts` sehen denen in `data/db.ts` heute zum
+Verwechseln ähnlich und stehen trotzdem doppelt da. Die Datei hat eine eigene
+Fassungsnummer, die Datenbank hat ihre, und sie dürfen sich unabhängig bewegen.
+Würde das Format die Tabellen einfach spiegeln, **änderte eine Schemamigration
+stillschweigend das Dateiformat** — eine Sicherung von gestern wäre morgen
+unlesbar, ohne dass jemand eine Entscheidung getroffen hätte. Der Preis ist
+eine Abbildung, die heute eins zu eins ist. Der Gegenwert ist, dass jede
+Änderung am Format bewusst passieren muss.
+
+Eine Datei aus einer **neueren** Fassung wird abgelehnt statt halb gelesen.
+Halb gelesen wäre der schlimmste Ausgang: eine Sicherung, aus der
+stillschweigend die Hälfte fehlt.
+
+### Zusammenführen, nicht ersetzen
+
+Einlesen löscht nie. Zwei Geräte, die eine Woche getrennt liefen, haben beide
+recht (N9). Zwei Regeln, beide im Kern und ohne Browser geprüft:
+
+- **Es gewinnt die längere Geschichte, nicht der jüngere Termin.** Die Zahl der
+  Abfragen wächst nur, wenn wirklich geübt wurde. Nach dem Termin zu
+  entscheiden wäre falsch herum: Ein Gerät, das lange nicht lief, hat lauter
+  überfällige Termine — die sähen „dringender“ aus und würden die frischere
+  Historie verdrängen.
+- **Ereignisse erkennt man am Fingerabdruck, nicht an der Nummer.** Die
+  laufende Nummer ist auf jedem Gerät eine andere. Was ein Ereignis eindeutig
+  macht, ist, wann in welcher Einheit an welchem Gegenstand was passiert ist.
+
+### Zwei Funde, die ohne Prüfung durchgegangen wären
+
+**Der Typprüfer hat eine echte Naht gefunden.** Das Dateiformat nahm für die
+Art eines Ereignisses jede Zeichenkette an, die Datenbank kennt vier Werte. Der
+Übersetzer hat sich geweigert — zu Recht: Ein unbekannter Wert stünde für immer
+in der Ereignistabelle, und die ist die Rohdatenbasis für alles, was ANITEW
+später über jemanden behauptet. Solche Zeilen bleiben jetzt draußen, **und die
+Zahl steht im Bericht**. Stilles Wegwerfen ist genau das, wogegen diese ganze
+Funktion gebaut ist.
+
+**Der Bericht hat gelogen.** Dieselbe Datei zweimal einzulesen meldete „2 neu
+dazu“, obwohl sich nichts geändert hatte: Einstellungen wurden ohnehin
+geschrieben und deshalb ohne Prüfung als neu gezählt. Bei einer Sicherung ist
+das besonders schlecht — der Bericht ist das Einzige, woran man erkennt, ob
+etwas angekommen ist. Ein E2E-Lauf, der die Datei absichtlich zweimal einliest,
+hat es gefunden.
+
+### Eine Falle, die eine Stunde gekostet hat
+
+`setInputFiles` läuft bei einem Pfad mit **Umlauten** anstandslos durch und legt
+die Datei trotzdem nicht in die Seite. Kein Fehler, keine Ausnahme — die
+Meldung bleibt einfach aus. Und `testInfo.outputPath()` baut den Ordnernamen
+aus dem Titel des Tests, die hier deutsch sind („trägt die Trainingshistorie
+…“). Ich habe den Fehler zuerst in der App gesucht; erst ein Direktversuch
+außerhalb von Playwright zeigte, dass die App richtig arbeitet.
+
+Die Lehre: **Wenn die App im Direktversuch tut, was sie soll, liegt es am
+Test** — und der nächste Schritt ist, den Unterschied zwischen beiden Aufbauten
+zu suchen, nicht weiter im Code zu lesen.
+
+**Stand:** 122 Kerntests, 32 E2E-Läufe, Typecheck für App und Kern grün.

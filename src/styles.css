@@ -453,8 +453,34 @@ body::before {
   content: ' ⌄';
 }
 
-.details .foundation {
+.details .foundation,
+.details .backup {
   margin-top: 0.75rem;
+}
+
+/* ── Sicherung (N2) ───────────────────────────────────────────────────── */
+
+.backup {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  padding: 1.25rem 1.3rem;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+/* Nebeneinander, solange Platz ist — auf einem schmalen Telefon
+   untereinander, statt zwei umbrechende Knöpfe zu erzwingen (G-2). */
+.backup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+
+.backup-actions button {
+  flex: 1 1 11rem;
 }
 
 .foundation dl {
