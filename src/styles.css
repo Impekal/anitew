@@ -764,6 +764,16 @@ body::before {
 
 /* ── Ergebnis ─────────────────────────────────────────────────────────── */
 
+/* Das Wiedersehen bekommt eine eigene, etwas kleinere Zahl — eigenständig,
+   aber nicht lauter als das Ergebnis von heute. */
+.summary-score-small {
+  font-size: 2.6rem;
+}
+
+.summary-score-small span {
+  font-size: 1.2rem;
+}
+
 .summary-score strong {
   text-shadow: var(--glow-text);
 }

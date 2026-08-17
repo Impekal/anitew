@@ -65,6 +65,7 @@ export const de = {
     round: 'Runde',
     encodeHint: 'Sieh hin. Ein Wort nach dem anderen.',
     recallHint: 'Was ist geblieben? Reihenfolge egal.',
+    reviewHint: 'Und jetzt von früher: Woran erinnerst du dich noch?',
     recallPlaceholder: 'Ein Wort pro Zeile',
     doneWithBlock: 'Fertig',
     abort: 'Abbrechen',
@@ -77,6 +78,7 @@ export const de = {
     // G-5: kein „falsch“, kein „verpasst“ — die Wörter waren einfach noch
     // nicht dabei.
     missed: 'Noch nicht dabei',
+    fromBefore: 'Von früher',
     back: 'Zurück',
   },
   resume: {

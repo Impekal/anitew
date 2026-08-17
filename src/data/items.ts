@@ -1,0 +1,114 @@
+/**
+ * Der Wiederholungsplan auf dem Gerät (Backlog C1, D8).
+ *
+ * Bindeglied zwischen dem Scheduler im Kern — der nur rechnet und nichts
+ * speichert — und der Datenbank. Eine Zeile je Information, geschlüsselt nach
+ * Modul, Sprache und Wort.
+ */
+
+import {
+  type DayKey,
+  type Instant,
+  type Memory,
+  type DueItem,
+  newMemory,
+  review,
+} from '../core/index.ts'
+import { type ItemStateRow, db } from './db.ts'
+
+/** Das Modul, zu dem die Wortlisten gehören. */
+export const WORD_MODULE = 'words'
+
+/**
+ * Die Kennung einer Information.
+ *
+ * Sprache gehört hinein, und das ist keine Formalie: „Anker“ und „anchor“
+ * sind zwei Gedächtnisinhalte, nicht zwei Schreibweisen von einem. Wer beides
+ * lernt, soll für beides seinen eigenen Termin bekommen.
+ */
+export function itemIdOf(moduleId: string, language: string, word: string): string {
+  return `${moduleId}:${language}:${word}`
+}
+
+/** Das Wort aus einer Kennung zurückholen. */
+export function wordOf(itemId: string): string {
+  return itemId.split(':').slice(2).join(':')
+}
+
+/** Alle Informationen dieser Sprache, die einen Termin haben. */
+export async function loadDue(language: string): Promise<DueItem[]> {
+  const rows = await db.itemStates.where('language').equals(language).toArray()
+  return rows.filter(hasMemory).map((row) => ({ itemId: row.itemId, memory: toMemory(row) }))
+}
+
+/**
+ * Ein Ergebnis verbuchen: für jedes Wort den nächsten Termin berechnen und
+ * schreiben.
+ *
+ * In **einer** Transaktion. Eine halb geschriebene Runde wäre schlimmer als
+ * eine gar nicht geschriebene: Dann hätte die Hälfte der Wörter einen neuen
+ * Termin und die andere den alten, und niemand könnte das später auseinander-
+ * halten.
+ */
+export async function recordOutcome(
+  moduleId: string,
+  language: string,
+  day: DayKey,
+  at: Instant,
+  outcome: { recalled: readonly string[]; missed: readonly string[] },
+): Promise<void> {
+  const entries = [
+    ...outcome.recalled.map((word) => ({ word, recalled: true })),
+    ...outcome.missed.map((word) => ({ word, recalled: false })),
+  ]
+  if (entries.length === 0) return
+
+  await db.transaction('rw', db.itemStates, async () => {
+    for (const entry of entries) {
+      const itemId = itemIdOf(moduleId, language, entry.word)
+      const existing = await db.itemStates.get(itemId)
+      const memory =
+        existing !== undefined && hasMemory(existing)
+          ? review(toMemory(existing), day, entry.recalled)
+          : newMemory(day, entry.recalled)
+
+      await db.itemStates.put({
+        itemId,
+        moduleId,
+        language,
+        createdAt: existing?.createdAt ?? at,
+        lastSeenAt: at,
+        reviews: memory.reviews,
+        lapses: memory.lapses,
+        stability: memory.stability,
+        difficulty: memory.difficulty,
+        fsrsState: memory.state,
+        dueDay: memory.dueDay,
+        ...(memory.lastDay === undefined ? {} : { lastDay: memory.lastDay }),
+      })
+    }
+  })
+}
+
+/** Wie viele Informationen warten insgesamt auf ihren nächsten Termin? */
+export async function countTracked(language: string): Promise<number> {
+  return db.itemStates.where('language').equals(language).count()
+}
+
+function hasMemory(
+  row: ItemStateRow,
+): row is ItemStateRow & { stability: number; difficulty: number; dueDay: DayKey } {
+  return row.stability !== undefined && row.difficulty !== undefined && row.dueDay !== undefined
+}
+
+function toMemory(row: ItemStateRow & { stability: number; difficulty: number }): Memory {
+  return {
+    stability: row.stability,
+    difficulty: row.difficulty,
+    reviews: row.reviews,
+    lapses: row.lapses,
+    state: row.fsrsState ?? 0,
+    ...(row.lastDay === undefined ? {} : { lastDay: row.lastDay }),
+    dueDay: row.dueDay ?? '1970-01-01',
+  }
+}

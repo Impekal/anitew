@@ -34,7 +34,18 @@ const MAX_ROUNDS = 8
 /** Anteil einer Runde, der aufs Einprägen entfällt. Der Rest ist Abruf. */
 const ENCODE_SHARE = 0.4
 
-export type BlockKind = 'encode' | 'recall'
+/**
+ * Anteil der Einheit für das Wiedersehen mit früheren Tagen (Backlog D8).
+ *
+ * B3 sieht dafür 30 von 300 Sekunden vor, also ein Zehntel. Etwas mehr, weil
+ * hier das eigentliche Training steckt: Neues einzuprägen kann jeder, das
+ * Behalten entscheidet sich beim Abruf nach Tagen. Der Block entfällt
+ * vollständig, wenn nichts fällig ist — dann gibt es nichts vorzutäuschen.
+ */
+const REVIEW_SHARE = 0.15
+const MIN_REVIEW_SECONDS = 20
+
+export type BlockKind = 'encode' | 'recall' | 'review'
 
 export interface BlockPlan {
   /** Eindeutig innerhalb der Einheit, z. B. `r2-encode`. */
@@ -50,6 +61,9 @@ export interface BlockPlan {
 export interface SessionPlan {
   mode: TrainingMode
   day: DayKey
+  /** Die Trainingssprache. Sie gehört zur Einheit, nicht zur Oberfläche —
+      dieselbe Einheit auf Deutsch und auf Japanisch sind zwei Einheiten. */
+  language: string
   /** Aus ihm folgt die Wortauswahl — gleicher Seed, gleiche Einheit. */
   seed: string
   totalSeconds: number
@@ -59,23 +73,47 @@ export interface SessionPlan {
 export interface PlanInput {
   mode: TrainingMode
   day: DayKey
+  language: string
   seed: string
   /** Der Wortvorrat der Trainingssprache. */
   pool: readonly string[]
+  /**
+   * Wörter aus früheren Tagen, die heute fällig sind — bereits ausgewählt und
+   * gedeckelt (siehe `scheduler/due.ts`). Leer heißt: kein Wiederholungsblock.
+   */
+  due?: readonly string[]
 }
 
 export function planSession(input: PlanInput): SessionPlan {
   const totalSeconds = MODES[input.mode].seconds
-  const rounds = Math.min(MAX_ROUNDS, Math.max(1, Math.floor(totalSeconds / SECONDS_PER_ROUND)))
+  const due = input.due ?? []
+
+  // Erst das Wiedersehen abzweigen, dann den Rest in Runden teilen. Anders
+  // herum bliebe für die Wiederholung übrig, was zufällig übrig ist — und
+  // genau sie ist der Teil, der das Behalten ausmacht.
+  const reviewSeconds =
+    due.length === 0 ? 0 : Math.max(MIN_REVIEW_SECONDS, Math.round(totalSeconds * REVIEW_SHARE))
+  const learnSeconds = totalSeconds - reviewSeconds
+
+  const rounds = Math.min(MAX_ROUNDS, Math.max(1, Math.floor(learnSeconds / SECONDS_PER_ROUND)))
   const rng = createRng(input.seed)
 
-  const roundBudgets = share(totalSeconds, rounds)
+  const roundBudgets = share(learnSeconds, rounds)
   const blocks: BlockPlan[] = []
 
-  // Über die ganze Einheit ohne Zurücklegen ziehen: Ein Wort, das in Runde 1
-  // vorkam, darf in Runde 3 nicht noch einmal auftauchen — sonst misst der
-  // spätere Abruf Wiedererkennen statt Erinnern.
-  const remaining = rng.shuffle(input.pool)
+  /*
+   * Über die ganze Einheit ohne Zurücklegen ziehen: Ein Wort, das in Runde 1
+   * vorkam, darf in Runde 3 nicht noch einmal auftauchen — sonst misst der
+   * spätere Abruf Wiedererkennen statt Erinnern.
+   *
+   * Und aus demselben Grund werden die **fälligen Wörter vorher aus dem
+   * Vorrat genommen**. Ohne das konnte „Anker“ am selben Tag als neues Wort
+   * eingeprägt *und* am Ende als Wiedersehen abgefragt werden — der Abruf
+   * hätte dann nicht die Erinnerung von vorgestern gemessen, sondern die von
+   * vor zwei Minuten. Ein Test hat genau diesen Fall gefunden.
+   */
+  const dueSet = new Set(due)
+  const remaining = rng.shuffle(input.pool.filter((word) => !dueSet.has(word)))
   let taken = 0
 
   for (let round = 1; round <= rounds; round++) {
@@ -103,7 +141,27 @@ export function planSession(input: PlanInput): SessionPlan {
     })
   }
 
-  return { mode: input.mode, day: input.day, seed: input.seed, totalSeconds, blocks }
+  // Das Wiedersehen kommt zuletzt — so wie in der Blockfolge aus B3. Wer
+  // gerade acht neue Wörter eingeprägt hat, ist für den Abruf von gestern
+  // aufgewärmt, und der Abstand zum Einprägen ist am größten.
+  if (reviewSeconds > 0) {
+    blocks.push({
+      id: 'review',
+      kind: 'review',
+      round: rounds + 1,
+      seconds: reviewSeconds,
+      items: due,
+    })
+  }
+
+  return {
+    mode: input.mode,
+    day: input.day,
+    language: input.language,
+    seed: input.seed,
+    totalSeconds,
+    blocks,
+  }
 }
 
 function itemsForRound(roundSeconds: number, available: number): number {
@@ -130,7 +188,12 @@ function share(total: number, parts: number): number[] {
   })
 }
 
-/** Alle Wörter einer Einheit, in der Reihenfolge ihres Auftretens. */
+/** Die **neuen** Wörter einer Einheit, in der Reihenfolge ihres Auftretens. */
 export function itemsOf(plan: SessionPlan): string[] {
   return plan.blocks.filter((block) => block.kind === 'encode').flatMap((block) => [...block.items])
+}
+
+/** Die Wörter, die heute wiederkommen. Leer, wenn nichts fällig war. */
+export function reviewItemsOf(plan: SessionPlan): string[] {
+  return plan.blocks.filter((block) => block.kind === 'review').flatMap((block) => [...block.items])
 }

@@ -51,6 +51,7 @@ export const en: Dictionary = {
     round: 'Round',
     encodeHint: 'Look. One word at a time.',
     recallHint: 'What stayed with you? Order does not matter.',
+    reviewHint: 'And now from earlier days: what do you still remember?',
     recallPlaceholder: 'One word per line',
     doneWithBlock: 'Done',
     abort: 'Stop',
@@ -59,6 +60,7 @@ export const en: Dictionary = {
     heading: 'Stayed',
     note: 'Words you could recall freely after memorising them. What that says about your memory overall is what the benchmark will measure later — not this number.',
     missed: 'Not yet',
+    fromBefore: 'From earlier',
     back: 'Back',
   },
   resume: {

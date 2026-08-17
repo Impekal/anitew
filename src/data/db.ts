@@ -79,8 +79,16 @@ export interface EventRow {
 
 /**
  * Der Zustand einer einzelnen Information im Wiederholungsplan.
- * Die Felder für FSRS (D-004) kommen mit Meilenstein M2 und einer Migration
- * dazu — hier steht bewusst nur, was M1 wirklich braucht.
+ *
+ * Seit Version 2 stehen hier die FSRS-Werte (D-004): **Stabilität** (wie fest
+ * die Information sitzt) und **Schwierigkeit** (wie schwer sie diesem Nutzer
+ * fällt). Aus beiden folgt `dueDay` — der Tag, an dem die
+ * Erinnerungswahrscheinlichkeit auf die Zielmarke fällt.
+ *
+ * Der Primärschlüssel ist `itemId` und der ist das Wort selbst, ergänzt um
+ * Modul und Sprache (`recall:de:Anker`). Damit ist dieselbe Information in
+ * zwei Sprachen zweimal vorhanden — und das ist richtig so: „Anker“ und
+ * „anchor“ sind zwei Gedächtnisinhalte, nicht einer.
  */
 export interface ItemStateRow {
   itemId: string
@@ -91,6 +99,14 @@ export interface ItemStateRow {
   dueDay?: DayKey
   reviews: number
   lapses: number
+  /** Ab Version 2. Wie fest die Information sitzt, in Tagen. */
+  stability?: number
+  /** Ab Version 2. Wie schwer sie fällt, 1 bis 10. */
+  difficulty?: number
+  /** Ab Version 2. FSRS-eigener Zustand, damit exakt weitergerechnet wird. */
+  fsrsState?: number
+  /** Ab Version 2. Der Tag der letzten Abfrage. */
+  lastDay?: DayKey
 }
 
 /**
@@ -127,6 +143,24 @@ export class AnitewDatabase extends Dexie {
     // ─── Version 1 · 2026-08-17 · M0 ───────────────────────────────────────
     // NICHT BEARBEITEN. Änderungen kommen als version(2) darüber.
     this.version(1).stores({
+      settings: 'key',
+      sessions: 'id, day, startedAt, completed',
+      events: '++id, sessionId, at, itemId, moduleId',
+      itemStates: 'itemId, moduleId, language, dueDay',
+      benchmarks: 'id, day, ordinal, completed',
+    })
+
+    // ─── Version 2 · 2026-08-17 · M2 ───────────────────────────────────────
+    // Die FSRS-Werte kommen dazu (D-004). Der Schemastring bleibt gleich: Die
+    // neuen Felder werden nicht indiziert, weil nie nach ihnen gesucht wird —
+    // gesucht wird nach `dueDay`, und der steht schon in Version 1.
+    //
+    // Kein `upgrade`-Block. Die neuen Felder sind optional, und ein fehlender
+    // Wert bedeutet genau das Richtige: „diese Information hat noch keine
+    // Historie“. Sie erhält beim nächsten Kontakt ihren ersten Termin, so wie
+    // jede neue auch. Alte Zeilen mit Nullen zu füllen wäre schlimmer —
+    // Stabilität 0 ist eine Behauptung, `undefined` ist die Wahrheit.
+    this.version(2).stores({
       settings: 'key',
       sessions: 'id, day, startedAt, completed',
       events: '++id, sessionId, at, itemId, moduleId',

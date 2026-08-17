@@ -22,6 +22,8 @@ const ACTIVE_KEY = 'activeSession'
 
 export interface RoundResult {
   round: number
+  /** `recall` = heute Gelerntes, `review` = Wiedersehen mit früheren Tagen. */
+  kind: 'recall' | 'review'
   correct: string[]
   missed: string[]
   extra: string[]
@@ -85,12 +87,13 @@ export async function logRecall(
   at: Instant,
   result: RecallResult,
   blockDurationMs: number,
+  moduleId = 'recall',
 ): Promise<void> {
   const rows: EventRow[] = [
     ...result.correct.map((item) => ({
       sessionId,
       at,
-      moduleId: 'recall',
+      moduleId,
       itemId: item,
       kind: 'answered' as const,
       correct: true,
@@ -99,7 +102,7 @@ export async function logRecall(
     ...result.missed.map((item) => ({
       sessionId,
       at,
-      moduleId: 'recall',
+      moduleId,
       itemId: item,
       kind: 'answered' as const,
       correct: false,

@@ -11,14 +11,15 @@
 > Diese Datei ist Teil des Projektgedächtnisses. Jede Session, die Punkte
 > erledigt oder neue findet, aktualisiert sie.
 >
-> **Stand 2026-08-17:** Die neun Entscheidungen sind beantwortet (D-001 bis
-> D-010 in [`DECISIONS.md`](DECISIONS.md)). **M0 und M1 sind fertig** — das
-> Fundament steht, und eine echte Trainingseinheit läuft durch: Einprägen,
-> freier Abruf, ehrliche Zahl. Dazu kam **D-011**, die Gestaltungsentscheidung:
-> Die Oberfläche muss wirken, nicht nur funktionieren. Geprüft mit 73
-> Kern-Tests und 23 E2E-Tests. Dazu **G-9**: Die Oberfläche leuchtet und
-> klingt — Ton wird erzeugt, nicht mitgeliefert.
-> Als Nächstes M2: die Engine, die entscheidet, was heute drankommt.
+> **Stand 2026-08-17:** **M0, M1 und der Kern von M2 stehen.** Die App läuft
+> unter https://anitew.impekaltech.workers.dev, eine Einheit läuft durch, und
+> **was du lernst, kommt an seinem Tag von selbst zurück** — FSRS rechnet für
+> jedes Wort seinen eigenen Termin. Die Oberfläche leuchtet und klingt
+> (D-011/G-9). Geprüft mit 95 Kern-Tests und 28 E2E-Läufen.
+>
+> **Noch offen aus M2: das Gedächtnisprofil (E).** Bewusst — mit einem
+> einzigen Modul wäre ein „Profil“ ein einzelner Balken, also eine Attrappe.
+> Es braucht erst mehr Module (D9–D13), sonst verstößt es gegen R-1.
 
 ---
 
@@ -78,15 +79,15 @@ Abruftraining. Hier entscheidet sich, ob die App wirkt.
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| C1 | Item-Modell definieren: was genau ist ein „Gedächtnis-Item“, wie sieht sein Zustand aus | ⬜ | trägt Sprache, Typ, Herkunft (App-Inhalt vs. eigener Inhalt), Schwierigkeit, Stabilität | M |
-| C2 | Scheduler mit Zustand pro Item (Stabilität + Schwierigkeit), nicht mit festen Intervallen | ⬜ | **FSRS** mit mitgelieferten Standardparametern — **D-004**. Lizenz vor Einbau prüfen und in R1 eintragen | L |
-| C3 | Persönliche Vergessenskurve schätzen: „Diese Information vergisst DU wahrscheinlich in ~5 Tagen“ | ⬜ | Kern des Gesprächs. Zielretention einstellbar (z. B. 90 %) | L |
-| C4 | Kaltstart: sinnvolle erste Intervalle ohne jede Historie | ⬜ | | M |
+| C1 | Item-Modell definieren: was genau ist ein „Gedächtnis-Item“, wie sieht sein Zustand aus | ✅ 2026-08-17 | `Memory` im Kern, `itemStates` in Schema-Version 2. Die Kennung trägt **Sprache**: „Anker“ und „anchor“ sind zwei Gedächtnisinhalte, nicht zwei Schreibweisen von einem | M |
+| C2 | Scheduler mit Zustand pro Item (Stabilität + Schwierigkeit), nicht mit festen Intervallen | ✅ 2026-08-17 | **FSRS** über `ts-fsrs` (MIT, keine Abhängigkeiten, Lizenz vor dem Einbau geprüft). Ohne Zufallsstreuung (sonst bräche A11) und ohne Schritte innerhalb eines Tages | L |
+| C3 | Persönliche Vergessenskurve schätzen: „Diese Information vergisst DU wahrscheinlich in ~5 Tagen“ | 🟨 2026-08-17 | `forgetsInDays()` liefert die Vorhersage, Zielretention 90 %. **Noch nicht sichtbar** — angezeigt wird sie erst, wenn genug Historie da ist, um sie nicht zu erfinden | L |
+| C4 | Kaltstart: sinnvolle erste Intervalle ohne jede Historie | ✅ 2026-08-17 | kommt von FSRS selbst — aus der ersten Antwort folgt die erste Stabilität. Wir setzen ausdrücklich **nichts** davor: eine geratene Anfangsstabilität wäre die erfundene Zahl aus R-1 | M |
 | C5 | **Abruf, nicht Wiedererkennen**: freie Eingabe als Standard, Multiple Choice nur wo unvermeidbar | ✅ 2026-08-17 | Der Abruf ist ein leeres Textfeld. Die Bewertung ist absichtlich großzügig (Umlaute gefaltet, ein Tippfehler ab fünf Zeichen erlaubt): Gemessen wird das Gedächtnis, nicht die Rechtschreibung — eine strengere Zahl wäre kleiner, aber nicht richtiger | M |
 | C6 | Ähnliche Items nicht in derselben Session (Interferenz vermeiden) | 🟨 2026-08-17 | Die Wortlisten sind schon danach gebaut (keine Reimpaare, keine Wortfamilien) und innerhalb einer Einheit wiederholt sich kein Wort. Die Prüfung *zur Laufzeit* kommt mit M2 | M |
-| C7 | Überfälligkeitsdruck begrenzen: nie ein Berg von 800 fälligen Items nach einer Pause | ⬜ | genau hier steigen Nutzer bei Karteikarten-Apps aus | M |
+| C7 | Überfälligkeitsdruck begrenzen: nie ein Berg von 800 fälligen Items nach einer Pause | ✅ 2026-08-17 | Obergrenze aus dem Zeitbudget (`dueLimitFor`), höchstens 12. Am längsten Überfälliges zuerst. Wer zwei Wochen weg war, holt über mehrere Tage auf — langsamer, aber der einzige Weg, der zu einem zweiten Tag führt | M |
 | C8 | Engine deterministisch und seed-basiert, damit testbar | 🟨 2026-08-17 | `core/rng.ts` steht und ist geprüft; gilt für die Engine, sobald es eine gibt | S |
-| C9 | Simulator: synthetische Nutzer über 90 Tage, bevor echte Nutzer da sind | ⬜ | prüft, ob der Scheduler tut, was er soll — billiger als es an Menschen zu merken | M |
+| C9 | Simulator: synthetische Nutzer über 90 Tage, bevor echte Nutzer da sind | 🟨 2026-08-17 | läuft als Test über 120 und 400 Tage: Wer alles behält, wird immer seltener gefragt; wer die Hälfte vergisst, öfter. Deterministisch statt zufällig (A11) | M |
 | C10 | FSRS-Parameter später **auf dem Gerät** aus der eigenen Historie nachoptimieren | ⬜ | **D-004**, Phase nach M2; bis dahin Standardparameter | L |
 
 ## D. Übungsmodule
@@ -100,7 +101,7 @@ Abruftraining. Hier entscheidet sich, ob die App wirkt.
 | D5 | **Merktechniken werden beigebracht**, nicht nur abgefragt: Verknüpfung, Story-Methode, Major-System, Loci | ⬜ | „nicht stumpf auswendig lernen — die App bringt automatisch Merktechniken bei“. Das ist der Unterschied zu jeder Brain-Game-App | L |
 | D6 | **Recall** — freier Abruf ohne Hinweise | ✅ 2026-08-17 | leeres Feld, Reihenfolge egal, Bewertung in `core/session/grading.ts` | M |
 | D7 | **Working Memory** — behalten und gleichzeitig manipulieren (N-Back-artig) | ⬜ | | M |
-| D8 | **Spaced Recall** — etwas von gestern / vor 3 Tagen / letzter Woche | ⬜ | zieht seine Items direkt aus C | M |
+| D8 | **Spaced Recall** — etwas von gestern / vor 3 Tagen / letzter Woche | ✅ 2026-08-17 | eigener Block am Ende der Einheit, nur wenn etwas fällig ist. Fällige Wörter werden **aus dem Vorrat für neue genommen** — sonst wäre der Abruf ein Wiedererkennen (ein Test hat genau das gefunden). Eigene Zahl im Ergebnis, nicht mit dem heute Gelernten verrechnet | M |
 | D9 | **Namen & Gesichter** | ⬜ | schwächster Bereich im Beispielprofil, also wichtig | M |
 | D10 | **Zahlen** — Ziffernfolgen, Jahreszahlen, PINs, Telefonnummern | ⬜ | | M |
 | D11 | **Wörter & Listen** | 🟨 2026-08-17 | Wortvorrat je Sprache in `core/content/words.ts` — konkret und bildhaft, je Sprache eigen statt übersetzt, untereinander verschieden. DE und EN mit je ~80 Wörtern | S |

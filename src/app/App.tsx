@@ -7,11 +7,14 @@ import {
   type TrainingMode,
   createRng,
   dayKeyOf,
+  dueLimitFor,
   hasWordPool,
   planSession,
+  selectDue,
   wordPool,
 } from '../core/index.ts'
 import { createWebPlatform } from '../platform/web/index.ts'
+import { loadDue, wordOf } from '../data/items.ts'
 import { type SessionProgress, beginSession, clearProgress, loadProgress } from '../data/sessions.ts'
 
 import { FoundationPanel } from './FoundationPanel.tsx'
@@ -50,12 +53,41 @@ export function App() {
     // Startzeit folgen genau diese Wörter in genau dieser Reihenfolge.
     const seed = `${day}:${mode}:${now}`
     const sessionId = `s-${now.toString(36)}-${createRng(seed).int(1_000_000).toString(36)}`
-    const plan = planSession({ mode, day, seed, pool: wordPool(language) })
-    const progress: SessionProgress = { sessionId, plan, blockIndex: 0, results: [], startedAt: now }
+    const seconds = MODES[mode].seconds
 
-    setResumable(undefined)
-    setRunning(progress)
-    void beginSession(progress, day, now).catch(() => undefined)
+    void (async () => {
+      /*
+       * Vor dem Planen wird gefragt, was heute ansteht (D8).
+       *
+       * Der Scheduler weiß, welche Wörter fällig sind; `dueLimitFor` sorgt
+       * dafür, dass nur so viele zurückkommen, wie in die gewählte Zeit
+       * passen. Wer zwei Wochen weg war, bekommt keinen Berg vorgesetzt,
+       * sondern holt den Rückstand über mehrere Tage auf (C7).
+       */
+      let due: string[] = []
+      try {
+        const tracked = await loadDue(language)
+        const limit = dueLimitFor(Math.round(seconds * 0.15))
+        due = selectDue(tracked, day, limit).map((item) => wordOf(item.itemId))
+      } catch {
+        // Ohne Datenbank gibt es eben kein Wiedersehen. Die Einheit läuft
+        // trotzdem — ein Training, das an einem Lesefehler scheitert, wäre
+        // der schlechtere Tausch.
+      }
+
+      const plan = planSession({ mode, day, language, seed, pool: wordPool(language), due })
+      const progress: SessionProgress = {
+        sessionId,
+        plan,
+        blockIndex: 0,
+        results: [],
+        startedAt: now,
+      }
+
+      setResumable(undefined)
+      setRunning(progress)
+      void beginSession(progress, day, now).catch(() => undefined)
+    })()
   }, [language, mode, platform])
 
   const leave = useCallback(() => setRunning(undefined), [])

@@ -371,3 +371,73 @@ Zustand, und ein Schalter, der etwas anderes zeigt als das Gespeicherte, ist
 ein kaputter Schalter.
 
 **Geprüft:** 73 Kern-Tests, 24 E2E-Läufe.
+
+## 2026-08-17 · M2 — die App vergisst nicht mehr, was du vergessen hast
+
+Bis hierher war ANITEW eine Übung: Wörter einprägen, abrufen, fertig. Ab jetzt
+ist es ein Training. **Was du heute lernst, kommt an seinem Tag von selbst
+zurück** — und „sein Tag“ ist für jedes Wort ein anderer.
+
+**FSRS, und zwar das echte.** `ts-fsrs` (MIT, keine eigenen Abhängigkeiten,
+von Open Spaced Repetition). Die Lizenz wurde **vor** dem Einbau geprüft, wie
+D-004 es verlangt, und steht in `THIRD_PARTY_LICENSES.md`. Der naheliegende
+Weg wäre gewesen, die Formeln selbst nachzubauen — dabei hätte ich die
+Gewichte aus dem Gedächtnis geschrieben und das Ergebnis trotzdem „FSRS“
+genannt. Das wäre eine Behauptung gewesen, keine Umsetzung.
+
+Vier Anpassungen, jede begründet in `core/scheduler/memory.ts`:
+
+- **Keine Zufallsstreuung.** FSRS kann Intervalle leicht verwürfeln; das
+  braucht Zufall und bräche A11. Gegen Stapelbildung hilft stattdessen die
+  Obergrenze in `due.ts`.
+- **Keine Schritte innerhalb eines Tages.** ANITEW ist eine App für einmal
+  täglich; ein Intervall von zehn Minuten hätte hier keinen Ort.
+- **Tage statt Zeitstempel**, intern auf 12 Uhr UTC abgebildet. Von der
+  Tagesmitte aus sind es zu beiden Rändern zwölf Stunden Luft — keine
+  Zeitumstellung und keine Rundung kann ein Intervall um einen Tag verschieben.
+- **Zwei Noten statt vier.** Freier Abruf kennt „erinnert“ und „nicht
+  erinnert“. Nach dem Gefühl zu fragen und das als Messung zu verbuchen wäre
+  bequem und nach R-1 falsch.
+
+**Der Berg, an dem andere Apps scheitern.** Wer zwei Wochen nicht öffnet,
+bekommt bei Karteikarten-Apps 800 fällige Karten und kommt nicht wieder.
+`dueLimitFor` deckelt auf das, was in die gewählte Zeit passt, höchstens zwölf,
+am längsten Überfälliges zuerst. Der Preis ist ehrlich benannt: Der Rückstand
+wird über mehrere Tage abgebaut statt an einem. Das ist langsamer — und der
+einzige Weg, der überhaupt zu einem zweiten Tag führt.
+
+**Zwei Zahlen, nicht eine.** Das Wiedersehen zählt getrennt vom heute
+Gelernten. Sie zu verrechnen wäre bequem und falsch: Etwas nach drei Tagen zu
+erinnern ist eine andere Leistung, als es zwei Minuten nach dem Einprägen
+abzurufen. Dieselbe Trennung wie zwischen Trainingsscore und Benchmark.
+
+**Zwei Fehler, beide von Tests gefunden:**
+
+1. **Ein fälliges Wort konnte am selben Tag als „neu“ eingeprägt werden.** Der
+   Planer zog aus dem vollen Vorrat, ohne die Wiederholungswörter
+   herauszunehmen. „Anker“ wäre dann zwei Minuten vor der Abfrage gezeigt
+   worden — der Abruf hätte nicht die Erinnerung von vorgestern gemessen,
+   sondern die von eben. Genau der Fehler, vor dem C5 und C6 warnen, und ein
+   Test hat ihn im ersten Lauf gefunden.
+
+2. **Der E2E-Test wollte die Auswahl des Schedulers erraten.** Er tippte zwei
+   der gelernten Wörter ein und erwartete zwei Treffer — und bekam null, weil
+   die Auswahl gedeckelt und alphabetisch geordnet ist und diese beiden nicht
+   dabei waren. Kein Fehler der App, sondern eine falsche Annahme im Test. Er
+   tippt jetzt alles ein und prüft, dass alles Fällige als richtig zählt.
+
+**Und eine Eigenheit der Bibliothek, nachgemessen statt geraten:** `ts-fsrs`
+überschreitet die eingestellte Höchstdauer am Anschlag um genau einen Tag
+(3651 statt 3650). Belanglos bei zehn Jahren Abstand, aber es steht jetzt im
+Code und im Test, damit niemand die Grenze für exakt hält.
+
+**Bewusst nicht gebaut: das Gedächtnisprofil (E1–E7).** Es gehört zu M2 und
+fehlt. Der Grund: Ein Profil über acht Bereiche braucht acht Bereiche. Mit
+einem einzigen Modul wäre die „Memory DNA“ ein einzelner Balken, der so tut,
+als wüsste er etwas über Zahlen, Gesichter und Räume — also genau die Attrappe,
+die R-1 verbietet. Es kommt, wenn die Module aus D9–D13 da sind.
+
+**Geprüft:** 95 Kern-Tests (darunter der Simulator aus C9 über 120 und 400
+Tage) und 28 E2E-Läufe. Der wichtigste davon datiert die Datenbank vor, statt
+drei Tage zu warten: Er prüft die ganze Kette — Termin lesen, auswählen, in
+den Plan legen, abfragen, zurückschreiben.

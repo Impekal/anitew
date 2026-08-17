@@ -8,6 +8,7 @@ import {
   gradeRecall,
   splitEntries,
 } from '../../core/index.ts'
+import { WORD_MODULE, recordOutcome } from '../../data/items.ts'
 import {
   type RoundResult,
   type SessionProgress,
@@ -93,13 +94,33 @@ export function useSessionRunner(
     advancingRef.current = true
 
     const nextResults = [...results]
-    if (block.kind === 'recall') {
+    if (block.kind === 'recall' || block.kind === 'review') {
       const graded = gradeRecall(splitEntries(entries), block.items)
-      nextResults.push({ round: block.round, ...graded })
+      nextResults.push({ round: block.round, kind: block.kind, ...graded })
       const duration = platform.clock.elapsed() - blockStartedRef.current
-      void logRecall(sessionRef.current.sessionId, platform.clock.now(), graded, duration).catch(
-        () => undefined,
-      )
+      const at = platform.clock.now()
+
+      void logRecall(
+        sessionRef.current.sessionId,
+        at,
+        graded,
+        duration,
+        block.kind,
+      ).catch(() => undefined)
+
+      /*
+       * Hier wird aus einer Antwort ein Termin (D-004).
+       *
+       * Beide Blockarten schreiben denselben Weg: Ein heute gelerntes Wort
+       * bekommt seinen ersten Termin, ein wiedergesehenes seinen nächsten.
+       * Für den Scheduler ist das derselbe Vorgang — nur der Vorzustand
+       * unterscheidet sich, und den kennt er selbst.
+       */
+      void recordOutcome(WORD_MODULE, plan.language, plan.day, at, {
+        recalled: graded.correct,
+        missed: graded.missed,
+      }).catch(() => undefined)
+
       setResults(nextResults)
     }
 
@@ -116,7 +137,7 @@ export function useSessionRunner(
         () => undefined,
       )
     }
-  }, [block, blockIndex, entries, persist, plan.blocks.length, platform, results])
+  }, [block, blockIndex, entries, persist, plan, platform, results])
 
   // Der Herzschlag. 200 ms ist fein genug für eine Sekundenanzeige und grob
   // genug, dass es den Akku nicht kostet.

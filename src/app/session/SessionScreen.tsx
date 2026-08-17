@@ -158,7 +158,10 @@ function RunningSession({
         </section>
       ) : (
         <section className="recall">
-          <p className="hint">{t.recallHint}</p>
+          {/* Der Wiedersehensblock sieht aus wie der Abruf und ist doch etwas
+              anderes: Hier wurde nichts gezeigt. Der Text sagt das, sonst
+              sucht man den Einprägeteil, den es nie gab. */}
+          <p className="hint">{block.kind === 'review' ? t.reviewHint : t.recallHint}</p>
           <textarea
             className="recall-input"
             value={state.entries}
@@ -206,10 +209,16 @@ function Summary({
   onLeave: () => void
 }) {
   const t = dictionary.summary
-  const correct = results.flatMap((round) => round.correct)
-  const missed = results.flatMap((round) => round.missed)
+  const learned = results.filter((round) => round.kind === 'recall')
+  const revisited = results.filter((round) => round.kind === 'review')
+
+  const correct = learned.flatMap((round) => round.correct)
+  const missed = learned.flatMap((round) => round.missed)
   const total = correct.length + missed.length
   const shown = useCountUp(correct.length)
+
+  const reviewCorrect = revisited.flatMap((round) => round.correct)
+  const reviewTotal = reviewCorrect.length + revisited.flatMap((round) => round.missed).length
 
   return (
     <main className="app summary-screen">
@@ -232,6 +241,23 @@ function Summary({
           ))}
         </div>
       </section>
+
+      {/*
+        Das Wiedersehen bekommt eine eigene Zahl (D8).
+        Sie mit dem heute Gelernten zu verrechnen wäre bequem und falsch:
+        Etwas nach drei Tagen zu erinnern ist eine andere Leistung, als es
+        zwei Minuten nach dem Einprägen abzurufen. Zwei Leistungen, zwei
+        Zahlen — dieselbe Trennung wie zwischen Trainingsscore und Benchmark.
+      */}
+      {reviewTotal > 0 && (
+        <section className="challenge">
+          <h2>{t.fromBefore}</h2>
+          <p className="summary-score summary-score-small">
+            <strong>{reviewCorrect.length}</strong>
+            <span> / {reviewTotal}</span>
+          </p>
+        </section>
+      )}
 
       {missed.length > 0 && (
         <section className="challenge">

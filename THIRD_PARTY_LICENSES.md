@@ -24,6 +24,7 @@ läuft.
 | scheduler | MIT | von react-dom mitgebracht |
 | loose-envify, js-tokens | MIT | von react mitgebracht |
 | dexie | Apache-2.0 | IndexedDB auf dem Gerät (D-003) |
+| ts-fsrs | MIT | der Wiederholungsalgorithmus (D-004) — von Open Spaced Repetition, **ohne eigene Abhängigkeiten**, läuft vollständig auf dem Gerät |
 | workbox-* | MIT | Service Worker, von vite-plugin-pwa erzeugt |
 
 Alles davon ist permissiv lizenziert. **Kein Copyleft im ausgelieferten
@@ -64,7 +65,9 @@ Build-Werkzeugkette benutzt. Datensammlung, kein Code im Ergebnis.
 
 ## Was noch kommt und hier landen wird
 
-- **FSRS** (D-004) — Lizenz vor dem Einbau prüfen und hier eintragen.
+- ~~**FSRS** (D-004) — Lizenz vor dem Einbau prüfen und hier eintragen.~~
+  Erledigt 2026-08-17: `ts-fsrs` 5.4.1, MIT, keine eigenen Abhängigkeiten.
+  Geprüft **vor** dem Einbau, wie in D-004 festgelegt.
 - **CC0-Icon-Satz** für Objekte und Orte (D-005, Backlog D15) — Quelle und
   Lizenz namentlich dokumentieren, nicht pauschal „CC0 aus dem Netz“.
 - **Schriften**, falls je eine eigene dazukommt. Bisher ausschließlich
