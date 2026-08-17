@@ -24,6 +24,15 @@ export interface RoundResult {
   round: number
   /** `recall` = heute Gelerntes, `review` = Wiedersehen mit früheren Tagen. */
   kind: 'recall' | 'review'
+  /**
+   * Aus welchem Modul die Gegenstände stammen.
+   *
+   * Nötig geworden mit den Missionen: In der Zusammenfassung steht sonst
+   * `Elena#room` statt „Elena · 314“ — eine Kennung ist kein Satz. Ältere
+   * gespeicherte Einheiten haben das Feld nicht; dort bleibt es `undefined`
+   * und die Anzeige nimmt den Gegenstand, wie er ist.
+   */
+  moduleId?: string
   correct: string[]
   missed: string[]
   extra: string[]

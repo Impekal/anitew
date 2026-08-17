@@ -73,16 +73,48 @@ export const de = {
       words: 'Sieh hin. Ein Wort nach dem anderen.',
       faces: 'Gesicht und Name gehören zusammen. Merke dir beides.',
       numbers: 'Eine Zahl nach der anderen. Sprich sie innerlich mit.',
+      missions: 'Eine Szene. Was gehört zu wem?',
     },
     recallHint: 'Was ist geblieben? Reihenfolge egal.',
     reviewHint: 'Und jetzt von früher: Woran erinnerst du dich noch?',
     promptHint: 'Wer ist das?',
     reviewPromptHint: 'Und von früher: Wer ist das?',
     promptPlaceholder: 'Name',
+    /*
+      Die Fragen einer Mission (H1).
+
+      Jede nennt den Anker — „Elena“ steht mit im Bild —, denn ohne ihn ist
+      „Welches Zimmer?“ nach drei Tagen keine beantwortbare Frage: Es gab
+      inzwischen zwanzig Zimmer. Mit Anker ist es genau die Frage, die das
+      Leben stellt.
+    */
+    // Vorspann für den Wiedersehensblock — dieselbe Anrede wie bei den
+    // anderen Modulen.
+    reviewLead: 'Und von früher:',
+    missionAsk: {
+      room: 'Welche Zimmernummer?',
+      object: 'Was hatte sie oder er dabei?',
+      time: 'Wann ging es los?',
+      place: 'Wie hieß das Restaurant?',
+    },
+    missionPlaceholders: {
+      room: 'Zimmer',
+      object: 'Gegenstand',
+      time: 'z. B. 18:40',
+      place: 'Name',
+    },
     recallPlaceholder: 'Ein Wort pro Zeile',
     recallNumbersPlaceholder: 'Eine Zahl pro Zeile',
     doneWithBlock: 'Fertig',
     abort: 'Abbrechen',
+  },
+  mission: {
+    // Die Szene selbst. Kurze Zeilen, eine Tatsache je Zeile — eine Mission
+    // ist kein Fließtext, den man liest, sondern ein Bild, das man ansieht.
+    room: 'Zimmer',
+    departure: 'Abfahrt',
+    carrying: 'Dabei',
+    restaurant: 'Restaurant',
   },
   technique: {
     /*

@@ -112,6 +112,14 @@ export function App() {
           words: wordPool(language),
           faces: namePool(language),
           numbers: numberPool(seed, 60),
+          /*
+           * Missionen ziehen aus demselben Namensvorrat wie die Gesichter
+           * (H1): Aus dem Namen entsteht die ganze Szene, so wie aus ihm das
+           * Gesicht entsteht. Dass „Elena“ in beiden Modulen vorkommen kann,
+           * ist kein Versehen — es sind zwei verschiedene Aufgaben zu
+           * derselben Person, und in der Datenbank auch zwei Einträge.
+           */
+          missions: namePool(language),
         },
         due,
         taught,

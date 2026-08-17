@@ -68,8 +68,8 @@ test('trägt die Trainingshistorie auf ein zweites Gerät', async ({ browser }, 
   const page = await first.newPage()
   await page.goto('/')
   await startEmergency(page)
-  const items = await collectItems(page, 8)
-  await answerRecall(page, items, 'all')
+  const learned = await collectItems(page, 8)
+  await answerRecall(page, learned, 'all')
   await expect(page.getByRole('heading', { name: 'Geblieben' })).toBeVisible({ timeout: 30_000 })
   await page.getByRole('button', { name: 'Zurück' }).click()
 

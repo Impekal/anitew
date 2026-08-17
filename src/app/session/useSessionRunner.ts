@@ -5,10 +5,11 @@ import {
   type Platform,
   SECONDS_PER_ITEM,
   type SessionPlan,
-  gradePrompted,
   gradeRecall,
   isPrompted,
   leniencyFor,
+  promptedHits,
+  targetOf,
   splitEntries,
 } from '../../core/index.ts'
 import { recordOutcome } from '../../data/items.ts'
@@ -122,15 +123,32 @@ export function useSessionRunner(
       // Frei getippt oder Eintrag für Eintrag gefragt — die Bewertung
       // unterscheidet sich, das Ergebnis hat dieselbe Form.
       /*
-       * Die Strenge kommt vom Modul (`leniencyFor`), nicht von hier: Bei einer
-       * Zahl sind zwei vertauschte Ziffern eine andere Zahl, bei einem Wort
-       * ein Tippfehler.
+       * Die Strenge kommt vom Modul, nicht von hier — und innerhalb einer
+       * Mission sogar von der einzelnen Tatsache: Zimmernummer und Uhrzeit
+       * sind Zahlen, der Gegenstand ist ein Wort (D-012).
+       *
+       * Und noch etwas trennt sich hier, was überall sonst dasselbe ist:
+       * **Gefragt wird nach dem Wert, verbucht wird die Kennung.** Bei einem
+       * Wort ist beides „Anker“; bei einer Mission ist das eine „314“ und das
+       * andere `Elena#room`. Der Wiederholungstermin hängt an der Kennung —
+       * sonst wären zwei Szenen mit demselben Zimmer eine.
        */
-      const leniency = leniencyFor(block.moduleId)
       const graded = isPrompted(block.moduleId)
-        ? gradePrompted(finalAnswers ?? answers, block.items, leniency)
-        : gradeRecall(splitEntries(entries), block.items, leniency)
-      nextResults.push({ round: block.round, kind: block.kind, ...graded })
+        ? (() => {
+            const targets = block.items.map((item) => targetOf(block.moduleId, item, plan.language))
+            const hits = promptedHits(
+              finalAnswers ?? answers,
+              targets,
+              block.items.map((item) => leniencyFor(block.moduleId, item)),
+            )
+            return {
+              correct: block.items.filter((_, index) => hits[index] === true),
+              missed: block.items.filter((_, index) => hits[index] !== true),
+              extra: [] as string[],
+            }
+          })()
+        : gradeRecall(splitEntries(entries), block.items, leniencyFor(block.moduleId))
+      nextResults.push({ round: block.round, kind: block.kind, moduleId: block.moduleId, ...graded })
       const duration = platform.clock.elapsed() - blockStartedRef.current
       const at = platform.clock.now()
 

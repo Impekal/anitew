@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { answerRecall, recallKind } from './helpers.ts'
+import { answerRecall, collectItems, recallKind, sceneOf } from './helpers.ts'
 
 /**
  * Eine Trainingseinheit von vorn bis hinten (Backlog B1–B3, B5, D4, D6).
@@ -18,47 +18,58 @@ async function startEmergency(page: Page) {
   await page.locator('.settle').click()
 }
 
-/** Liest die Wörter mit, während sie eingeprägt werden. */
-async function collectWords(page: Page, expected: number): Promise<string[]> {
-  const word = page.locator('.encode-word')
-  const seen: string[] = []
-  while (seen.length < expected) {
-    await expect(word).toBeVisible({ timeout: 15_000 })
-    const text = (await word.textContent())?.trim() ?? ''
-    if (text !== '' && text !== seen[seen.length - 1]) seen.push(text)
-    await page.waitForTimeout(250)
-  }
-  return seen
-}
-
 test('führt durch Einprägen und Abrufen und zählt ehrlich', async ({ page }) => {
   await startEmergency(page)
 
-  // Der Einprägetext gehört zum Modul: Wörter kommen einzeln, beim Gesicht
-  // gehören Bild und Name zusammen, Zahlen spricht man innerlich mit. Einer
-  // von den dreien muss dastehen — welcher, entscheidet der Plan.
-  await expect(
-    page.getByText(
-      /Ein Wort nach dem anderen\.|Gesicht und Name gehören zusammen\.|Eine Zahl nach der anderen\./,
-    ),
-  ).toBeVisible()
+  /*
+   * Erst warten, dann lesen. Ohne das Warten prüft der Test den Bildschirm,
+   * bevor der Block überhaupt gezeichnet ist — und hält jedes Modul für ein
+   * Nicht-Szenenmodul, weil noch gar nichts dasteht.
+   */
+  await expect(page.locator('.encode-word, .scene').first()).toBeVisible({ timeout: 30_000 })
 
-  // Punkte statt „3 / 8“ — einer je Stück (D-011/G-1).
-  const total = await page.locator('.encode-dots span').count()
+  /*
+   * Welches Modul heute kommt, entscheidet der Plan — der Test liest ab, was
+   * dasteht. Eine **Mission** zeigt statt einzelner Stücke eine ganze Szene;
+   * alles andere zeigt ein Stück nach dem anderen.
+   */
+  const scene = await sceneOf(page)
+
+  if (scene === undefined) {
+    // Der Einprägetext gehört zum Modul: Wörter kommen einzeln, beim Gesicht
+    // gehören Bild und Name zusammen, Zahlen spricht man innerlich mit.
+    await expect(
+      page.getByText(
+        /Ein Wort nach dem anderen\.|Gesicht und Name gehören zusammen\.|Eine Zahl nach der anderen\./,
+      ),
+    ).toBeVisible()
+  } else {
+    await expect(page.getByText('Eine Szene. Was gehört zu wem?')).toBeVisible()
+  }
+
+  /*
+   * Die Punktreihe wird **während** des Einprägens gezählt, nicht danach.
+   *
+   * Beim ersten Anlauf stand die Zählung hinter `collectItems` — und das
+   * kehrt erst zurück, wenn der Abruf beginnt. Da war die Reihe längst weg,
+   * und der Test verglich sechs Stücke mit null Punkten. Punkte statt „3 / 8“
+   * ist D-011/G-1; eine Szene hat keine, dort wechselt nichts.
+   */
+  const dots = scene === undefined ? await page.locator('.encode-dots span').count() : 0
+
+  const learned = await collectItems(page, 8)
+  const total = learned.items.length
   expect(total).toBeGreaterThanOrEqual(3)
   expect(total).toBeLessThanOrEqual(8)
-
-  const words = await collectWords(page, total)
-  expect(new Set(words).size).toBe(total)
+  expect(new Set(learned.items).size).toBe(total)
+  if (scene === undefined) expect(dots).toBe(total)
 
   /*
    * Ab hier trennen sich die Wege, und zwar nach dem, was die App zeigt.
    *
-   * Seit M4 zieht der Plan das Modul aus dem Seed: Ein 60-Sekunden-Durchlauf
-   * bringt mal Wörter, mal Gesichter. Der freie Abruf mit seinem einen
-   * Textfeld ist die eine Aufgabe, der gestützte mit einem Gesicht nach dem
-   * anderen die andere — sie lassen sich nicht in eine Prüfung falten, ohne
-   * eine von beiden zu verbiegen.
+   * Der freie Abruf mit seinem einen Textfeld ist die eine Aufgabe, der
+   * gestützte mit einer Frage nach der anderen die andere — sie lassen sich
+   * nicht in eine Prüfung falten, ohne eine von beiden zu verbiegen.
    *
    * Beide Zweige prüfen dasselbe Versprechen: **Es wird gezählt, was da war,
    * und nichts dazuerfunden** (Regel R-1).
@@ -74,6 +85,7 @@ test('führt durch Einprägen und Abrufen und zählt ehrlich', async ({ page }) 
      * Unterscheidung ist der Sinn von `leniencyFor`, und sie wird hier bis
      * zur angezeigten Zahl durchgeprüft.
      */
+    const words = learned.items
     const numeric = words.every((word) => /^\d+$/.test(word))
     const spoiled = numeric ? otherNumber(words[2]!, words) : misspell(words[2]!)
     const typed = [words[0]!, words[1]!, spoiled, 'Zahnbürstenhalter']
@@ -84,19 +96,15 @@ test('führt durch Einprägen und Abrufen und zählt ehrlich', async ({ page }) 
     await expect(page.locator('.summary-score strong')).toHaveText(numeric ? '2' : '3')
   } else {
     /*
-     * Beim Gesichtsmodul steht die Reihenfolge fest: Was eingeprägt wurde,
-     * wird in derselben Folge abgefragt. Deshalb darf der Test hier antworten
-     * — anders als beim Wiedersehen in `spaced.spec.ts`, wo der Scheduler die
-     * Reihenfolge bestimmt und der Test sie nicht kennen darf.
+     * Gestützt: Alles richtig beantworten, nur das Letzte auslassen — was
+     * fehlt, gilt als nicht erinnert, und das ist der Normalfall, wenn die
+     * Zeit ausläuft.
      *
-     * Der vorletzte Name bekommt einen Tippfehler und zählt trotzdem, der
-     * letzte bleibt leer und zählt nicht. Gemessen wird das Gedächtnis, nicht
-     * die Rechtschreibung.
+     * Die Antworten kommen aus `helpers.ts` und richten sich nach der
+     * **Frage**, nicht nach der Stelle: Bei einer Mission fragt die App in
+     * einer anderen Reihenfolge, als sie gezeigt hat.
      */
-    const typed = [...words]
-    typed[total - 2] = misspell(words[total - 2]!)
-    typed[total - 1] = ''
-    await answerRecall(page, typed, 'all')
+    await answerRecall(page, learned, 'allButLast')
 
     await expect(page.getByRole('heading', { name: 'Geblieben' })).toBeVisible()
     await expect(page.locator('.summary-score strong')).toHaveText(String(total - 1))
@@ -112,7 +120,9 @@ test('hält das Zeitbudget ein, auch wenn niemand etwas tut', async ({ page }) =
   await startEmergency(page)
   // Ab dem ersten Wort laeuft die Uhr der Einheit — das Ankommen davor ist
   // ausdruecklich keine Trainingszeit (D-011/G-1).
-  await expect(page.locator('.encode-word')).toBeVisible({ timeout: 15_000 })
+  // Eine Mission zeigt statt einzelner Stücke ihre Szene — beides ist der
+  // Anfang der Trainingszeit.
+  await expect(page.locator('.encode-word, .scene').first()).toBeVisible({ timeout: 15_000 })
   const started = Date.now()
   await expect(page.getByRole('textbox')).toBeVisible({ timeout: 60_000 })
 
@@ -130,7 +140,7 @@ test('hält das Zeitbudget ein, auch wenn niemand etwas tut', async ({ page }) =
 
 test('überlebt eine Unterbrechung mitten in der Einheit (B5)', async ({ page }) => {
   await startEmergency(page)
-  await expect(page.locator('.encode-word')).toBeVisible()
+  await expect(page.locator('.encode-word, .scene').first()).toBeVisible()
   await page.waitForTimeout(1500)
 
   // Der harte Fall: Die Seite wird weggerissen, nicht sauber verlassen.
@@ -138,12 +148,12 @@ test('überlebt eine Unterbrechung mitten in der Einheit (B5)', async ({ page })
 
   await expect(page.getByRole('heading', { name: 'Eine Einheit läuft noch' })).toBeVisible()
   await page.getByRole('button', { name: 'Fortsetzen' }).click()
-  await expect(page.locator('.encode-word, .recall-input').first()).toBeVisible()
+  await expect(page.locator('.encode-word, .scene, .recall-input').first()).toBeVisible()
 })
 
 test('lässt sich verwerfen und beginnt dann neu', async ({ page }) => {
   await startEmergency(page)
-  await expect(page.locator('.encode-word')).toBeVisible()
+  await expect(page.locator('.encode-word, .scene').first()).toBeVisible()
   await page.reload()
 
   await page.getByRole('button', { name: 'Verwerfen und neu beginnen' }).click()

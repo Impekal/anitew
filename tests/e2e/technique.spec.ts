@@ -158,7 +158,9 @@ test('zeigt nichts an, solange nichts gelehrt ist', async ({ page }) => {
   await page.getByRole('button', { name: 'Beginnen' }).click()
   await page.locator('.settle').click()
 
-  await expect(page.locator('.encode-word')).toBeVisible({ timeout: 30_000 })
+  // Eine Mission zeigt statt einzelner Stücke ihre Szene — beides zählt als
+  // „das Einprägen läuft“.
+  await expect(page.locator('.encode-word, .scene').first()).toBeVisible({ timeout: 30_000 })
   await expect(page.locator('.lesson')).toBeHidden()
   await expect(page.locator('.major-letters')).toBeHidden()
 })

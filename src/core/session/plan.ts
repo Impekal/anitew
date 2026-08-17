@@ -19,6 +19,8 @@
 import { MODES, type TrainingMode } from '../modes.ts'
 import { createRng } from '../rng.ts'
 import type { DayKey } from '../time.ts'
+import { answerFor, factKindOf, missionFacts, personOf } from '../content/missions.ts'
+import type { Language } from '../language.ts'
 import { nextToTeach } from '../technique/major.ts'
 import type { Leniency } from './grading.ts'
 
@@ -76,7 +78,7 @@ export type BlockKind = 'teach' | 'encode' | 'recall' | 'review'
  * mischt sie. Was ein Modul *zeigt*, weiß er nicht — er kennt nur Kennungen,
  * Zeiten und die Frage, ob der Abruf frei oder gestützt ist.
  */
-export const TRAINING_MODULES = ['words', 'faces', 'numbers'] as const
+export const TRAINING_MODULES = ['words', 'faces', 'numbers', 'missions'] as const
 export type ModuleId = (typeof TRAINING_MODULES)[number]
 
 /**
@@ -91,7 +93,63 @@ export type ModuleId = (typeof TRAINING_MODULES)[number]
  * genau die Aufgabe, die im Alltag vorkommt.
  */
 export function isPrompted(moduleId: ModuleId): boolean {
-  return moduleId === 'faces'
+  return moduleId === 'faces' || moduleId === 'missions'
+}
+
+/**
+ * Sekunden je Gegenstand beim Einprägen.
+ *
+ * Eine **Szene** braucht länger als ein Wort: Bei einer Mission stehen Person,
+ * Zimmer, Gegenstand, Uhrzeit und Ort gleichzeitig da, und gemerkt werden soll
+ * nicht jedes für sich, sondern ihr Zusammenhang. Vier Sekunden reichen für
+ * ein Wort und nicht für eine Bindung.
+ *
+ * Dass die Betrachtungszeit später mit der Schwierigkeit wandert, steht als
+ * H6 im Backlog. Hier ist sie erst einmal eine Eigenschaft des Moduls.
+ */
+export function secondsPerItemFor(moduleId: ModuleId): number {
+  return moduleId === 'missions' ? 5 : SECONDS_PER_ITEM
+}
+
+/**
+ * Der Anker, an dem ein Gegenstand hängt.
+ *
+ * Bei einer Mission ist das die Person: `Elena#room` gehört zu Elena. Überall
+ * sonst ist der Gegenstand sein eigener Anker.
+ *
+ * Gebraucht wird das an einer Stelle, an der es sonst still schiefginge —
+ * beim Aussortieren der fälligen Einträge aus dem Vorrat: Ist heute
+ * `Elena#room` fällig, darf Elena nicht noch einmal als **neue** Szene
+ * kommen. Sonst prüfte das Wiedersehen eine Erinnerung von vor zwei Minuten.
+ */
+export function subjectOf(moduleId: ModuleId, item: string): string {
+  return moduleId === 'missions' ? personOf(item) : item
+}
+
+/**
+ * Die gesuchte Antwort zu einem Gegenstand.
+ *
+ * Überall außer bei den Missionen ist der Gegenstand seine eigene Antwort:
+ * Beim Wort „Anker“ ist „Anker“ gefragt, beim Gesicht „Elena“ der Name. Bei
+ * einer Mission steht in der Kennung `Elena#room`, gefragt ist aber „314“ —
+ * die Szene wird aus dem Anker neu erzeugt.
+ */
+export function targetOf(moduleId: ModuleId, item: string, language: string): string {
+  if (moduleId !== 'missions') return item
+  return answerFor(item, language as Language) ?? item
+}
+
+/**
+ * Wie ein Gegenstand im Ergebnis lesbar dasteht.
+ *
+ * `Elena#room` ist eine Kennung und kein Satz. In der Zusammenfassung soll
+ * stehen, woran man sich erinnert hat — „Elena · 314“ —, nicht, wie die
+ * Datenbank es nennt.
+ */
+export function displayOf(moduleId: ModuleId, item: string, language: string): string {
+  if (moduleId !== 'missions') return item
+  const answer = answerFor(item, language as Language)
+  return answer === undefined ? item : `${personOf(item)} · ${answer}`
 }
 
 /**
@@ -106,8 +164,20 @@ export function isPrompted(moduleId: ModuleId): boolean {
  * Die Strenge gehört zum Modul und nicht in die Bewertungsfunktion, weil sie
  * eine Aussage über den **Gegenstand** ist und nicht über das Verfahren.
  */
-export function leniencyFor(moduleId: ModuleId): Leniency {
-  return moduleId === 'numbers' ? 'exact' : 'typos'
+export function leniencyFor(moduleId: ModuleId, item?: string): Leniency {
+  if (moduleId === 'numbers') return 'exact'
+  if (moduleId === 'missions') {
+    /*
+     * Innerhalb einer Mission ist die Strenge **je Tatsache** verschieden, und
+     * das folgt aus derselben Überlegung wie D-012: Zimmernummer und Uhrzeit
+     * sind Zahlen — 314 und 341 sind nicht dasselbe Zimmer, 18:40 und 18:04
+     * nicht dieselbe Abfahrt. Der Gegenstand und der Name des Lokals sind
+     * Wörter, und dort ist ein Tippfehler ein Tippfehler.
+     */
+    const kind = factKindOf(item ?? '')
+    return kind === 'room' || kind === 'time' ? 'exact' : 'typos'
+  }
+  return 'typos'
 }
 
 export interface BlockPlan {
@@ -258,10 +328,14 @@ export function planSession(input: PlanInput): SessionPlan {
   const remaining = new Map<ModuleId, string[]>()
   const taken = new Map<ModuleId, number>()
   for (const moduleId of modules) {
-    const dueSet = new Set(input.due?.[moduleId] ?? [])
+    // Über den **Anker** aussortieren, nicht über den Gegenstand: Bei einer
+    // Mission ist heute `Elena#room` fällig, im Vorrat steht aber „Elena“.
+    const dueSubjects = new Set(
+      (input.due?.[moduleId] ?? []).map((entry) => subjectOf(moduleId, entry)),
+    )
     remaining.set(
       moduleId,
-      rng.shuffle((input.pools[moduleId] ?? []).filter((entry) => !dueSet.has(entry))),
+      rng.shuffle((input.pools[moduleId] ?? []).filter((entry) => !dueSubjects.has(entry))),
     )
     taken.set(moduleId, 0)
   }
@@ -272,10 +346,25 @@ export function planSession(input: PlanInput): SessionPlan {
     const used = taken.get(moduleId) as number
 
     const roundSeconds = roundBudgets[round - 1] as number
-    const itemCount = itemsForRound(roundSeconds, pool.length - used)
-    const encodeSeconds = itemCount * SECONDS_PER_ITEM
-    const items = pool.slice(used, used + itemCount)
-    taken.set(moduleId, used + itemCount)
+
+    /*
+     * Eine Runde Missionen ist **genau eine Szene** (H1).
+     *
+     * Der übliche Weg — so viele Gegenstände, wie in die Sekunden passen —
+     * ergäbe hier drei halbe Szenen. Eine Mission ist aber kein Vorrat, aus
+     * dem man abzählt, sondern eine Einheit: Person, Zimmer, Gegenstand,
+     * Uhrzeit, Ort. Gezogen wird deshalb **eine Person**, und ihre vier
+     * Tatsachen sind die Gegenstände der Runde.
+     */
+    const scene = moduleId === 'missions'
+    if (scene && pool.length - used < 1) {
+      throw new RangeError('Der Personenvorrat reicht nicht für eine Mission')
+    }
+    const items = scene
+      ? missionFacts(pool[used] as string)
+      : pool.slice(used, used + itemsForRound(roundSeconds, pool.length - used))
+    taken.set(moduleId, used + (scene ? 1 : items.length))
+    const encodeSeconds = items.length * secondsPerItemFor(moduleId)
 
     blocks.push({
       id: `r${round}-encode`,

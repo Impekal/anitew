@@ -94,7 +94,7 @@ Abruftraining. Hier entscheidet sich, ob die App wirkt.
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| D1 | Einheitliche Modulschnittstelle: Aufgabe rein, Score + Rohdaten raus | ✅ 2026-08-17 | **D-012**. Drei Module, und der Planer mischt sie reihum. Ein Modul bringt seine Regeln mit (`isPrompted`, `leniencyFor`); der Planer kennt nur Kennungen und Zeiten. Er kennt nur Kennungen, Zeiten und die Frage „freier oder gestützter Abruf“ — was ein Modul *zeigt*, weiß er nicht. Ein fehlender Modultext ist seit M4 ein Übersetzungsfehler und kein leerer Hinweis | M |
+| D1 | Einheitliche Modulschnittstelle: Aufgabe rein, Score + Rohdaten raus | ✅ 2026-08-17 | **D-012**, **D-014**. Vier Module, und der Planer mischt sie reihum. Ein Modul bringt seine Regeln mit (`isPrompted`, `leniencyFor`); der Planer kennt nur Kennungen und Zeiten. Er kennt nur Kennungen, Zeiten und die Frage „freier oder gestützter Abruf“ — was ein Modul *zeigt*, weiß er nicht. Ein fehlender Modultext ist seit M4 ein Übersetzungsfehler und kein leerer Hinweis | M |
 | D2 | Schwierigkeit adaptiv pro Modul, Zielkorridor um ~80 % Trefferquote | ⬜ | zu leicht = langweilig, zu schwer = Frust; beides bricht die Streak | M |
 | D3 | **Focus** — Ablenkungen ignorieren, kurze Aufmerksamkeitsschulung | ⬜ | 0:00–1:00 der Session | M |
 | D4 | **Encode** — 8 Bilder / Wörter / Personen / Orte merken | 🟨 2026-08-17 | Wörter und Personen laufen, ein Stück je 4 Sekunden, 3–8 je Runde. Bilder und Orte kommen mit D12/D15 | M |
@@ -106,7 +106,7 @@ Abruftraining. Hier entscheidet sich, ob die App wirkt.
 | D10 | **Zahlen** — Ziffernfolgen, Jahreszahlen, PINs, Telefonnummern | ✅ 2026-08-17 | **D-012**. 3–6 Ziffern, aus dem Seed erzeugt statt aus einer Liste — eine feste Liste wäre nach zwei Wochen durchgesehen. Geschenkte Folgen („1111“, „3456“) fallen raus. **Streng verglichen:** eine vertauschte Ziffer ist eine andere Zahl. Gruppierte Nummern („0176 4392 118“) fehlen noch — der freie Abruf zerlegt an Leerzeichen | M |
 | D11 | **Wörter & Listen** | 🟨 2026-08-17 | Wortvorrat je Sprache in `core/content/words.ts` — konkret und bildhaft, je Sprache eigen statt übersetzt, untereinander verschieden. DE und EN mit je ~80 Wörtern | S |
 | D12 | **Räumlich** | ⬜ | | M |
-| D13 | **Assoziativ** — „Meet 5 people“: Person + Land + Hobby + Stadt, später quer abgefragt | ⬜ | „Wie hieß die Person aus Indien?“ / „Wer spielte Gitarre?“ — trainiert, was im Alltag wirklich vorkommt | L |
+| D13 | **Assoziativ** — „Meet 5 people“: Person + Land + Hobby + Stadt, später quer abgefragt | 🟨 2026-08-17 | „Wie hieß die Person aus Indien?“ / „Wer spielte Gitarre?“ — trainiert, was im Alltag wirklich vorkommt. Die Missionen (H) machen die eine Richtung: **von der Person zur Tatsache**. Die Gegenrichtung — von der Tatsache zur Person — fehlt noch | L |
 | D14 | **Gesichtsgenerator**: parametrische SVG-Gesichter aus einem Seed (Kopf, Augen, Nase, Mund, Haar, Bart, Brille, Hautton) | ✅ 2026-08-17 | **D-005**. Aus einem Seed immer dasselbe Gesicht, aus vielen Seeds Millionen — Kilobytes statt Megabytes, keine Rechtefragen. Die Maße liegen im Kern (ohne SVG, ohne Browser), gezeichnet wird in `app/Face.tsx`. Geprüft wird mit `scripts/facesheet.mjs`: vierzig Gesichter nebeneinander — einzeln sieht fast jedes annehmbar aus | L |
 | D15 | Objekte und Orte: CC0-Icon-Satz auswählen, prüfen, dokumentieren, um eigene Formen ergänzen | ⬜ | **D-005**; Lizenzen nach R2 | M |
 | D16 | Fotorealistische Porträts als optionaler Nachladeinhalt | ⬜ | **D-005**, später. Gezeichnete Gesichter sind leichter als echte — der Benchmark (F2) muss das berücksichtigen, und die App darf es nicht als Alltagsleistung ausgeben (R-1) | L |
@@ -153,12 +153,12 @@ Abruftraining. Hier entscheidet sich, ob die App wirkt.
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| H1 | Szenenformat: Szene + Fakten + Fragen als Datenmodell | ⬜ | | M |
-| H2 | Referenzmission „The Hotel“ vollständig umgesetzt | ⬜ | Zimmer 314 · roter Koffer · Schlüssel auf Tisch · Elena · 18:40 · Restaurant „Luna“ | M |
+| H1 | Szenenformat: Szene + Fakten + Fragen als Datenmodell | ✅ 2026-08-17 | **D-014**. `Mission` = Person + Tatsachen; die Kennung `Elena#room` trägt den Anker mit. **Gefragt wird nach dem Wert, verbucht wird die Kennung** — überall sonst ist das dasselbe, hier nicht | M |
+| H2 | Referenzmission „The Hotel“ vollständig umgesetzt | 🟨 2026-08-17 | Zimmer · Gegenstand · Person · Abfahrt · Restaurant laufen. „Schlüssel auf Tisch“ fehlt noch: Eine **Ortsangabe zu einem Gegenstand** ist eine andere Art Tatsache und braucht eine eigene Frage | M |
 | H3 | **Verzögerter Abruf**: 20 Minuten später fragt die App nach | ⬜ | braucht B8 (lokale Benachrichtigung) und einen Weg, wenn die App zu ist | M |
-| H4 | Prozedurale Missionsgenerierung aus Bausteinen — offline, ohne KI | ⬜ | sonst ist der Vorrat nach zwei Wochen leer | L |
+| H4 | Prozedurale Missionsgenerierung aus Bausteinen — offline, ohne KI | 🟨 2026-08-17 | sonst ist der Vorrat nach zwei Wochen leer. Eine Vorlage (Hotel) mit Farben, Gegenständen, Lokalnamen, Zimmern und Zeiten — aus dem Namen erzeugt, also unbegrenzt. Weitere Vorlagen fehlen | L |
 | H5 | Missionsbibliothek, mehrsprachig und kulturell passend bestückt | ⬜ | hängt an L6 | M |
-| H6 | Schwierigkeitsstufen: Faktenzahl, Ablenkung, Betrachtungszeit, Abrufabstand | ⬜ | | M |
+| H6 | Schwierigkeitsstufen: Faktenzahl, Ablenkung, Betrachtungszeit, Abrufabstand | ⬜ | Die Betrachtungszeit ist seit H1 eine Moduleigenschaft (`secondsPerItemFor`) — der Haken, an dem das hängen kann | M |
 
 ## I. Real Life Memory
 
@@ -263,8 +263,8 @@ Anforderung wie jede andere. Die acht Regeln G-1 bis G-8 stehen in
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | ✅ 2026-08-17 | 150 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Sessionplanung, Bewertung, Scheduler und Gesichtsgenerator sind abgedeckt | M |
-| P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | ✅ 2026-08-17 | 40 Läufe in Chromium und im Telefonprofil, darunter eine Einheit von vorn bis hinten und der Abbruch mitten drin. Seit M4 **liest der Test ab, welches Modul kam, statt es vorherzusagen** (`tests/e2e/helpers.ts`) | M |
+| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | ✅ 2026-08-17 | 166 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Sessionplanung, Bewertung, Scheduler und Gesichtsgenerator sind abgedeckt | M |
+| P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | ✅ 2026-08-17 | 42 Läufe in Chromium und im Telefonprofil, darunter eine Einheit von vorn bis hinten und der Abbruch mitten drin. Seit M4 **liest der Test ab, welches Modul kam, statt es vorherzusagen** (`tests/e2e/helpers.ts`) | M |
 | P3 | CI bei jedem Push: Typecheck (App **und** Kern getrennt), Tests, Build, E2E | ✅ 2026-08-17 | | S |
 | P4 | Performance: Kaltstart unter 2 s, Timer laufen ruckelfrei | ⬜ | | M |
 | P5 | Uhrmanipulation darf die Engine nicht zerstören (Streak-Betrug, Intervall-Chaos) | ⬜ | monotone Zeitquelle plus Plausibilitätsprüfung | M |
@@ -328,7 +328,7 @@ Neu offen, entstanden aus den Antworten:
 | **M1** | Walking Skeleton | B1–B3, B5, B6, B9, C5, D4, D6, N1 | ✅ **2026-08-17** — Eine echte Einheit läuft täglich durch, überlebt eine Unterbrechung, und jede Antwort steht im Protokoll |
 | **M2** | Die Engine wird echt | C1–C9, D8, E1–E7, B4 | Die App entscheidet begründet, was du heute trainierst, und plant Wiederholungen persönlich |
 | **M3** | Ehrlichkeit | F1–F7, F2a, F2b | Es gibt zwei getrennte Zahlen, und die große Prozentzahl ist gemessen. **Vorher kein öffentlicher Release** |
-| **M4** | Inhalt & Spiel | D5, D9–D16, G, H, K, J | 🟨 **2026-08-17** — Drei Module (Wörter, Gesichter, Zahlen) und die erste Merktechnik (D5). Offen: Palast (G), Missionen (H), Gamification (K), weitere Techniken |
+| **M4** | Inhalt & Spiel | D5, D9–D16, G, H, K, J | 🟨 **2026-08-17** — Vier Module (Wörter, Gesichter, Zahlen, Missionen), die erste Merktechnik (D5). Offen: Palast (G), Gamification (K), weitere Vorlagen und Techniken |
 | **M5** | Sprachen | L1–L8 | Man kann heute auf Deutsch und morgen auf Japanisch trainieren |
 | **M6** | Echtes Leben | I, M | Eigene Präsentation rein, Wiederholungsplan raus |
 | **M7** | Stores & Cloud | Q, R, N7–N10 | .aab im Play-Track; Drive-Abgleich läuft; iOS-Weg entschieden (S10) |

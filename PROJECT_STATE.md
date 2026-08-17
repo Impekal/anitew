@@ -927,3 +927,118 @@ Zwei Dinge, die dabei richtig liefen und die ich mir merken will:
    Erst der zweite, saubere Lauf mit demselben Ergebnis hat bewiesen, dass es
    am Code liegt. **Eine Umgebungserklärung gilt erst, wenn der saubere Lauf
    grün ist** — sonst ist sie nur eine bequeme Ausrede.
+
+## 2026-08-17 · Memory Missions (H) — das Modul, das die anderen verbindet
+
+Person, Zimmernummer, Gegenstand, Uhrzeit, Restaurant: Gesicht, Zahl und Wort
+in **einer** Aufgabe. Trainiert wird dabei etwas anderes als in den
+Einzelmodulen, und das ist der ganze Punkt — nicht die Stücke, sondern die
+**Bindung** zwischen ihnen. Im Alltag merkt sich niemand „314“; man merkt
+sich, dass Elena in Zimmer 314 wohnt und um 18:40 abreist.
+
+Damit sind H1 (Szenenformat) und der Kern von H2/H4 erledigt: „The Hotel“ ist
+kein fester Text, sondern eine **Vorlage mit Lücken**. Eine feste Szene wäre
+nach dem zweiten Mal auswendig gelernt — derselbe Grund wie beim
+Gesichtsgenerator und beim Zahlenvorrat.
+
+### Die Person ist der Anker, und das ist keine Nebensache
+
+Aus dem Namen entsteht die ganze Szene, so wie aus ihm das Gesicht entsteht.
+Warum, sieht man erst beim Wiedersehen: Nach drei Tagen fragt die App eine
+**einzelne** Tatsache ab, und „Welche Zimmernummer?“ wäre dann keine
+beantwortbare Frage — es gab inzwischen zwanzig Zimmernummern. Mit Anker heißt
+sie „Elena — welches Zimmer?“, und das ist genau die Frage, die das Leben
+stellt. Das Gesicht steht dabei, der Name darunter; die Person ist hier nicht
+die Aufgabe, sondern der Haken, an dem sie hängt.
+
+### Was Kennung und Antwort trennt
+
+Überall bisher war beides dasselbe: Beim Wort „Anker“ ist „Anker“ die Frage,
+die Antwort und der Eintrag in der Datenbank. Bei einer Mission ist das eine
+„314“ und das andere `Elena#room`. Der Wiederholungstermin hängt an der
+Kennung — sonst wären zwei Szenen mit demselben Zimmer eine einzige
+Information.
+
+Die Bewertung liefert deshalb jetzt zwei Dinge getrennt: `promptedHits` sagt,
+**welche Stelle** stimmt, und der Aufrufer entscheidet, ob er dazu den Wert
+oder die Kennung ablegt. Ein Unterschied, der nur an einer Stelle auffällt und
+genau deshalb aufgeschrieben gehört.
+
+### D-012 eine Ebene tiefer
+
+Innerhalb *einer* Abfrage stehen eine Zimmernummer, eine Uhrzeit, ein
+Gegenstand und ein Name nebeneinander. 314 und 341 sind nicht dasselbe Zimmer;
+„roter Kofer“ ist ein Tippfehler. Die Strenge hängt hier also nicht am Modul,
+sondern an der einzelnen **Tatsache** — und genau dafür war es richtig, sie
+bei den Zahlen nicht als globalen Schalter zu bauen.
+
+### Zwei Testfehler, beide meine
+
+**Der Test hat meine eigene Reihenfolge geraten.** Die Szene zeigt Zimmer ·
+Abfahrt · Dabei · Restaurant, gefragt wird in der Reihenfolge der
+Tatsachenarten — Zimmer · Dabei · Abfahrt · Restaurant. Ich hatte beides
+stillschweigend für dasselbe gehalten und vier Antworten der Position nach
+eingetippt; drei landeten an der falschen Stelle.
+
+Dass die beiden Reihenfolgen auseinanderfallen, ist übrigens **gut**: Wer die
+Reihenfolge mitlernen kann, lernt die Reihenfolge statt die Szene. Der Test
+liest jetzt die Frage und antwortet darauf — so wie ein Mensch es täte.
+
+**Und der Tippfehler fiel über das ß.** Mein Prüf-Tippfehler vertauschte zwei
+Nachbarn im ersten Wort und traf „weißer“ → „weßier“. Vor dem Vergleich wird
+ß zu ss aufgelöst; aus der Nachbarvertauschung wurden dadurch zwei Fehler an
+auseinanderliegenden Stellen, und die Bewertung zählte den Treffer zu Recht
+nicht. **Die App hatte recht, der Test hatte unrecht** — beide Male.
+
+Gefunden habe ich es mit einer Sonde, die Szene, Antworten und Ergebnis
+ausgibt. Aus „2 von 4 statt 3“ lässt sich nichts schließen; aus „Zimmer 164,
+geantwortet 146, weißer Mantel, geantwortet weßier Mantel“ sofort. **Wenn eine
+Zahl nicht stimmt, muss man sich die Werte ansehen und nicht die Zahl.**
+
+**Stand:** 166 Kerntests, 42 E2E-Läufe, Typecheck für App und Kern grün.
+
+### Nachtrag: die Helfer kannten die Szene nicht
+
+Der erste vollständige Lauf nach den Missionen blieb hängen, und der Grund war
+dieselbe Sorte Annahme wie schon zweimal vorher: `collectItems` suchte
+`.encode-word`. Eine Mission hat das nicht — dort steht die ganze Szene auf
+einmal. Wo das Modul zufällig gezogen wurde, sammelte der Helfer nichts ein,
+und der Test prüfte anschließend eine leere Liste.
+
+Die gemeinsamen Helfer kennen jetzt beide Formen: eine Reihe einzelner Stücke
+oder eine Szene mit Etiketten. Und drei kleinere Nachziehungen, die alle
+dieselbe Ursache haben:
+
+- Wo Tests auf „das Einprägen hat begonnen“ warteten, warten sie jetzt auf
+  `.encode-word` **oder** `.scene`.
+- Die Punktreihe unter dem Stück gibt es bei einer Szene nicht — dort wechselt
+  nichts, es gäbe nichts zu zählen. Die Prüfung darauf gilt nur für die
+  anderen Module.
+- „Alles außer der letzten Antwort“ ist jetzt eine Angabe am Aufruf und keine
+  gekürzte Antwortliste mehr. Bei einer Mission kommen die Antworten aus der
+  Szene und nicht aus der Liste; eine gekürzte Liste blieb dort wirkungslos,
+  und der Test erwartete eine fehlende Antwort, die es nie gab.
+
+**Die Lehre ist inzwischen dreimal dieselbe**, und deshalb steht sie hier zum
+dritten Mal: Ein neues Modul bringt eine neue *Form* mit, nicht nur neuen
+Inhalt. Was die Tests über die Oberfläche annehmen, muss dann mitwachsen — und
+zwar an **einer** Stelle, sonst zieht es sich durch alle Dateien.
+
+Zwei weitere Anläufe brauchte es danach, und beide waren lehrreich:
+
+**Die Punktreihe wurde zu spät gezählt.** Beim Umbauen ist die Zählung hinter
+das Einsammeln gerutscht — und das kehrt erst zurück, wenn der Abruf beginnt.
+Da war die Reihe längst weg, und der Test verglich sechs Stücke mit null
+Punkten. Was während eines Blocks gilt, muss während des Blocks gelesen werden.
+
+**Und der Wiedersehensblock einer Mission hatte keinen Vorspann.** Ich hatte
+ihn bewusst weggelassen — die Person steht ja dabei, die Frage ist klar. Der
+Test fand den Block deshalb nicht, und beim Nachsehen war es kein
+Testproblem: Ohne Vorspann sieht „Welche Zimmernummer?“ genauso aus wie bei
+einer Szene, die man gerade eben gesehen hat. **Dass hier nach etwas von vor
+Tagen gefragt wird, ist eine Auskunft, die dem Nutzer zusteht.** Jetzt steht
+dort „Und von früher: Welche Zimmernummer?“ — dieselbe Anrede wie überall
+sonst.
+
+Das ist das zweite Mal in diesem Abschnitt, dass ein Test etwas gefunden hat,
+das ich für eine Geschmacksfrage gehalten hatte und das keine war.

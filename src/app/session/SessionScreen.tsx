@@ -1,10 +1,19 @@
 import { type CSSProperties, useEffect, useMemo, useRef, useState } from 'react'
 
 import {
+  type BlockPlan,
+  type FactKind,
+  type Language,
   type MajorPart,
+  type ModuleId,
   type Platform,
+  displayOf,
+  factKindOf,
   helpsWith,
   isPrompted,
+  missionFor,
+  personOf,
+  subjectOf,
   lettersFor,
   majorParts,
   splitEntries,
@@ -149,7 +158,14 @@ function RunningSession({
   }, [state.plan, state.blockIndex, taught])
 
   if (state.finished) {
-    return <Summary dictionary={dictionary} results={state.results} onLeave={leave} />
+    return (
+      <Summary
+        dictionary={dictionary}
+        results={state.results}
+        language={state.plan.language}
+        onLeave={leave}
+      />
+    )
   }
 
   const block = state.block
@@ -198,6 +214,15 @@ function RunningSession({
           first={taught.length === 0}
           onDone={() => advance()}
         />
+      ) : block.kind === 'encode' && block.moduleId === 'missions' ? (
+        /*
+          Eine Mission wird **als Ganzes** gezeigt und nicht Stück für Stück
+          (H1). Das ist der Unterschied zu jedem anderen Modul hier: Geübt
+          wird nicht, vier Tatsachen zu behalten, sondern dass sie
+          zusammengehören. Nacheinander gezeigt wären es vier Gegenstände,
+          und die Bindung — worauf es ankommt — käme gar nicht vor.
+        */
+        <Scene dictionary={dictionary} person={personOf(block.items[0] ?? '')} language={state.plan.language} />
       ) : block.kind === 'encode' ? (
         <section className="encode">
           <p className="hint">
@@ -264,11 +289,23 @@ function RunningSession({
       ) : isPrompted(block.moduleId) ? (
         <PromptedRecall
           key={`${block.id}-${state.promptIndex}`}
-          face={block.items[state.promptIndex] ?? ''}
+          face={subjectOf(block.moduleId, block.items[state.promptIndex] ?? '')}
+          /*
+            Bei der Mission steht der Name **unter** dem Gesicht — er ist hier
+            nicht die Frage, sondern der Anker: „Elena — welches Zimmer?“
+            Beim Gesichtsmodul wäre derselbe Name die Antwort und darf
+            deshalb nirgends stehen.
+          */
+          label={
+            block.moduleId === 'missions'
+              ? subjectOf(block.moduleId, block.items[state.promptIndex] ?? '')
+              : undefined
+          }
           position={state.promptIndex + 1}
           total={block.items.length}
-          hint={block.kind === 'review' ? t.reviewPromptHint : t.promptHint}
-          placeholder={t.promptPlaceholder}
+          hint={askFor(block, state.promptIndex, dictionary)}
+          placeholder={placeholderFor(block, state.promptIndex, dictionary)}
+          numeric={numericFor(block, state.promptIndex)}
           action={t.doneWithBlock}
           onSubmit={submitPrompt}
         />
@@ -332,18 +369,24 @@ function RunningSession({
  */
 function PromptedRecall({
   face,
+  label,
   position,
   total,
   hint,
   placeholder,
+  numeric,
   action,
   onSubmit,
 }: {
   face: string
+  /** Der Anker unter dem Gesicht — nur, wo der Name nicht die Antwort ist. */
+  label?: string
   position: number
   total: number
   hint: string
   placeholder: string
+  /** Zifferntastatur auf dem Telefon, wo eine Zahl gesucht ist. */
+  numeric?: boolean
   action: string
   onSubmit: (answer: string) => void
 }) {
@@ -353,6 +396,7 @@ function PromptedRecall({
     <section className="prompted">
       <p className="hint">{hint}</p>
       <Face name={face} size={168} />
+      {label !== undefined && <p className="prompted-anchor">{label}</p>}
       <form
         className="prompted-form"
         onSubmit={(event) => {
@@ -365,6 +409,7 @@ function PromptedRecall({
           value={answer}
           onChange={(event) => setAnswer(event.target.value)}
           placeholder={placeholder}
+          inputMode={numeric === true ? 'numeric' : 'text'}
           autoFocus
           autoCapitalize="words"
           autoCorrect="off"
@@ -385,18 +430,34 @@ function PromptedRecall({
 function Summary({
   dictionary,
   results,
+  language,
   onLeave,
 }: {
   dictionary: Dictionary
   results: RoundResult[]
+  language: string
   onLeave: () => void
 }) {
   const t = dictionary.summary
   const learned = results.filter((round) => round.kind === 'recall')
   const revisited = results.filter((round) => round.kind === 'review')
 
-  const correct = learned.flatMap((round) => round.correct)
-  const missed = learned.flatMap((round) => round.missed)
+  /*
+   * Aus Kennungen werden lesbare Zeilen.
+   *
+   * `Elena#room` ist der Name in der Datenbank und kein Satz. In der
+   * Zusammenfassung soll stehen, woran man sich erinnert hat — „Elena · 314“.
+   * Überall außer bei den Missionen ändert das nichts; dort ist die Kennung
+   * schon die Sache selbst. Einheiten aus älteren Fassungen haben kein Modul
+   * gespeichert; dann bleibt der Gegenstand, wie er ist.
+   */
+  const readable = (round: RoundResult, items: readonly string[]) =>
+    round.moduleId === undefined
+      ? [...items]
+      : items.map((item) => displayOf(round.moduleId as ModuleId, item, language))
+
+  const correct = learned.flatMap((round) => readable(round, round.correct))
+  const missed = learned.flatMap((round) => readable(round, round.missed))
   const total = correct.length + missed.length
   const shown = useCountUp(correct.length)
 
@@ -522,4 +583,93 @@ function Lesson({
       <p className="hint">{t.ready}</p>
     </section>
   )
+}
+
+/**
+ * Die Szene einer Mission (Backlog H1, H2).
+ *
+ * Alles auf einmal, nicht nacheinander: Person, Zimmer, Gegenstand, Abfahrt,
+ * Restaurant. Geübt wird nicht, vier Tatsachen zu behalten — geübt wird, dass
+ * sie **zusammengehören**. Wer sie einzeln zu sehen bekommt, merkt sich
+ * einzelne Dinge und hat beim Abruf nichts, woran sie hängen.
+ *
+ * Das Gesicht steht oben, weil es der Anker ist: Nach drei Tagen lautet die
+ * Frage „Elena — welches Zimmer?“, und dann muss Elena ein Gesicht haben.
+ */
+function Scene({
+  dictionary,
+  person,
+  language,
+}: {
+  dictionary: Dictionary
+  person: string
+  language: string
+}) {
+  const mission = missionFor(person, language as Language)
+  const t = dictionary.mission
+  const value = (kind: FactKind) => mission.facts.find((fact) => fact.kind === kind)?.value ?? ''
+
+  return (
+    <section className="encode scene">
+      <p className="hint">{dictionary.session.encodeHints.missions}</p>
+      <Face name={person} size={132} />
+      <p className="scene-person">{person}</p>
+      <dl className="scene-facts">
+        <div>
+          <dt>{t.room}</dt>
+          <dd>{value('room')}</dd>
+        </div>
+        <div>
+          <dt>{t.departure}</dt>
+          <dd>{value('time')}</dd>
+        </div>
+        <div>
+          <dt>{t.carrying}</dt>
+          <dd>{value('object')}</dd>
+        </div>
+        <div>
+          <dt>{t.restaurant}</dt>
+          <dd>{value('place')}</dd>
+        </div>
+      </dl>
+    </section>
+  )
+}
+
+/**
+ * Die Frage zur Stelle, an der der Abruf gerade steht.
+ *
+ * Beim Gesichtsmodul ist es immer dieselbe („Wer ist das?“), bei einer
+ * Mission hängt sie an der Tatsache.
+ *
+ * Der Wiedersehensblock bekommt in **beiden** Fällen seinen Vorspann. Zuerst
+ * hatte ich ihn bei der Mission weggelassen — die Person steht ja dabei, die
+ * Frage ist klar. Das war falsch, und ein E2E-Lauf hat es aufgedeckt: Ohne
+ * Vorspann sieht „Welche Zimmernummer?“ genauso aus wie bei einer Szene, die
+ * man gerade eben gesehen hat. Dass hier nach etwas von vor Tagen gefragt
+ * wird, ist eine Auskunft, die dem Nutzer zusteht — und nicht bloß eine
+ * Höflichkeitsfloskel.
+ */
+function askFor(block: BlockPlan, index: number, dictionary: Dictionary): string {
+  const t = dictionary.session
+  if (block.moduleId !== 'missions') {
+    return block.kind === 'review' ? t.reviewPromptHint : t.promptHint
+  }
+  const kind = factKindOf(block.items[index] ?? '')
+  const ask = kind === undefined ? t.promptHint : t.missionAsk[kind]
+  return block.kind === 'review' ? `${t.reviewLead} ${ask}` : ask
+}
+
+function placeholderFor(block: BlockPlan, index: number, dictionary: Dictionary): string {
+  const t = dictionary.session
+  if (block.moduleId !== 'missions') return t.promptPlaceholder
+  const kind = factKindOf(block.items[index] ?? '')
+  return kind === undefined ? t.promptPlaceholder : t.missionPlaceholders[kind]
+}
+
+/** Zimmernummer und Uhrzeit sind Zahlen — dann die Zifferntastatur. */
+function numericFor(block: BlockPlan, index: number): boolean {
+  if (block.moduleId !== 'missions') return false
+  const kind = factKindOf(block.items[index] ?? '')
+  return kind === 'room' || kind === 'time'
 }

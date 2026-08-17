@@ -15,6 +15,7 @@
 export * from './backup.ts'
 export * from './content/faces.ts'
 export * from './content/names.ts'
+export * from './content/missions.ts'
 export * from './content/numbers.ts'
 export * from './content/words.ts'
 export * from './language.ts'

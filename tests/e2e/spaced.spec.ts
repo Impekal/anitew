@@ -12,19 +12,19 @@ import { answerRecall, collectItems, recallKind, startEmergency } from './helper
  * auswählen, in den Plan legen, abfragen —, ohne dass jemand drei Tage
  * danebensitzt.
  *
- * Seit M4 gilt das für **beide** Module: Ob die Einheit Wörter oder Gesichter
- * bringt, entscheidet der Plan. Der Test folgt ihm, statt es zu raten
- * (siehe `helpers.ts`) — und prüft damit die Wiedervorlage für das, was
- * gerade dran war.
+ * Seit M4 gilt das für **jedes** Modul: Ob die Einheit Wörter, Gesichter,
+ * Zahlen oder eine Mission bringt, entscheidet der Plan. Der Test folgt ihm,
+ * statt es zu raten (siehe `helpers.ts`) — und prüft damit die Wiedervorlage
+ * für das, was gerade dran war.
  */
 
 async function runEmergencySession(page: Page, answer: 'all' | 'none') {
   await startEmergency(page)
-  const items = await collectItems(page, 8)
-  await answerRecall(page, items, answer)
+  const learned = await collectItems(page, 8)
+  await answerRecall(page, learned, answer)
   await expect(page.getByRole('heading', { name: 'Geblieben' })).toBeVisible({ timeout: 30_000 })
   await page.getByRole('button', { name: 'Zurück' }).click()
-  return items
+  return learned
 }
 
 /** Zieht alle Termine so weit vor, dass sie heute fällig sind. */
@@ -56,7 +56,7 @@ test('holt gelernte Wörter an einem späteren Tag zurück (D8)', async ({ page 
 
   await page.goto('/')
   const learned = await runEmergencySession(page, 'all')
-  expect(learned.length).toBeGreaterThanOrEqual(3)
+  expect(learned.items.length).toBeGreaterThanOrEqual(3)
 
   // Der Sprung in die Zukunft.
   await makeEverythingDueToday(page)
@@ -140,6 +140,8 @@ test('zeigt kein Wiedersehen, wenn nichts fällig ist', async ({ page }) => {
    * Sekunden einmal nicht. Geprüft wird hier, *dass* kein Wiedersehen kommt,
    * nicht wie schnell das erste Wort erscheint.
    */
-  await expect(page.locator('.encode-word')).toBeVisible({ timeout: 60_000 })
+  // Wörter, Gesichter und Zahlen stehen in `.encode-word`, eine Mission
+  // zeigt stattdessen ihre Szene. Eins von beidem muss kommen.
+  await expect(page.locator('.encode-word, .scene').first()).toBeVisible({ timeout: 60_000 })
   await expect(page.getByText(/Und (jetzt )?von früher/)).toBeHidden()
 })

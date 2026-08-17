@@ -167,6 +167,37 @@ export function withinOneEdit(a: string, b: string): boolean {
 }
 
 /**
+ * Welche Stellen des gestützten Abrufs stimmen — Stelle für Stelle.
+ *
+ * Getrennt von `gradePrompted`, weil die Mission beides braucht und es dort
+ * **nicht dasselbe** ist: Gefragt wird nach dem Wert („314“), verbucht wird
+ * die Kennung (`Elena#room`). Wer nur die Werte zurückbekommt, kann daraus
+ * keinen Wiederholungstermin machen — und zwei Szenen mit demselben Zimmer
+ * wären nicht mehr auseinanderzuhalten.
+ *
+ * Überall sonst sind Wert und Kennung dasselbe, und dann fällt der
+ * Unterschied nicht auf. Genau deshalb steht er hier aufgeschrieben.
+ */
+export function promptedHits(
+  answers: readonly string[],
+  targets: readonly string[],
+  leniency: Leniency | readonly Leniency[] = 'typos',
+): boolean[] {
+  return targets.map((target, index) => {
+    const normalAnswer = normalizeWord(answers[index] ?? '')
+    const normalTarget = normalizeWord(target)
+    const here = Array.isArray(leniency) ? leniency[index] ?? 'typos' : leniency
+    return (
+      normalAnswer !== '' &&
+      (normalAnswer === normalTarget ||
+        (here !== 'exact' &&
+          normalTarget.length >= 5 &&
+          withinOneEdit(normalTarget, normalAnswer)))
+    )
+  })
+}
+
+/**
  * Bewertung für den **gestützten** Abruf (Backlog D9).
  *
  * Beim Gesicht steht die Frage schon da; gesucht ist genau eine Antwort. Die
@@ -184,24 +215,20 @@ export function withinOneEdit(a: string, b: string): boolean {
 export function gradePrompted(
   answers: readonly string[],
   targets: readonly string[],
-  leniency: Leniency = 'typos',
+  /**
+   * Eine Strenge für alle — oder **eine je Stelle**.
+   *
+   * Das zweite braucht die Mission: In einer Szene stehen Zimmernummer und
+   * Uhrzeit neben einem Gegenstand und einem Namen. 314 und 341 sind nicht
+   * dasselbe Zimmer, „roter Kofer“ ist ein Tippfehler. Eine gemeinsame
+   * Strenge müsste sich für eine der beiden Sorten entscheiden und läge bei
+   * der anderen falsch.
+   */
+  leniency: Leniency | readonly Leniency[] = 'typos',
 ): RecallResult {
-  const correct: string[] = []
-  const missed: string[] = []
-
-  targets.forEach((target, index) => {
-    const answer = answers[index] ?? ''
-    const normalAnswer = normalizeWord(answer)
-    const normalTarget = normalizeWord(target)
-    const hit =
-      normalAnswer !== '' &&
-      (normalAnswer === normalTarget ||
-        (leniency !== 'exact' &&
-          normalTarget.length >= 5 &&
-          withinOneEdit(normalTarget, normalAnswer)))
-    if (hit) correct.push(target)
-    else missed.push(target)
-  })
+  const hits = promptedHits(answers, targets, leniency)
+  const correct = targets.filter((_, index) => hits[index])
+  const missed = targets.filter((_, index) => !hits[index])
 
   return { correct, missed, extra: [] }
 }

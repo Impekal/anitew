@@ -765,6 +765,68 @@ body::before {
   box-shadow: var(--glow);
 }
 
+/* ── Missionen (H) ────────────────────────────────────────────────────── */
+
+/* Eine Szene, kein Formular: Gesicht, Name, darunter vier kurze Zeilen. Alles
+   mittig und eng beieinander, damit es als **ein** Bild gelesen wird und
+   nicht als Liste — die Bindung ist die Aufgabe. */
+.scene {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  flex: 1;
+}
+
+.scene-person {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: clamp(1.6rem, 8vw, 2.2rem);
+  line-height: 1.1;
+  text-shadow: var(--glow-text);
+}
+
+.scene-facts {
+  margin: 0.4rem 0 0;
+  display: grid;
+  gap: 0.45rem 0.9rem;
+  /* Etikett rechtsbündig, Wert linksbündig: Die Werte stehen dadurch
+     untereinander und lassen sich mit einem Blick abtasten. */
+  grid-template-columns: auto auto;
+  align-items: baseline;
+}
+
+.scene-facts > div {
+  display: contents;
+}
+
+.scene-facts dt {
+  margin: 0;
+  justify-self: end;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.scene-facts dd {
+  margin: 0;
+  justify-self: start;
+  font-family: var(--serif);
+  font-size: 1.25rem;
+  color: var(--ink);
+}
+
+/* Der Anker unter dem Gesicht beim Abruf — er ist nicht die Frage, also
+   bekommt er auch nicht das Gewicht einer. */
+.prompted-anchor {
+  margin: -0.4rem 0 0;
+  font-family: var(--serif);
+  font-size: 1.35rem;
+  color: var(--ink-soft);
+}
+
 /* ── Merktechnik (D5) ─────────────────────────────────────────────────── */
 
 /* Der ruhigste Bildschirm der App: eine Ziffer, ihr Laut, ein Satz. */

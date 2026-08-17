@@ -494,3 +494,41 @@ nicht sofort anwendet, ist am nächsten Tag wieder weg.
 
 Die Lektion nimmt ihre vierzehn Sekunden aus dem Budget und nicht dazu. Die
 Zusage aus B2 gilt auch für den Unterricht: Fünf Minuten sind fünf Minuten.
+
+## D-014 · 2026-08-17 · Eine Mission ist eine Szene, und der Anker ist die Person
+
+Memory Missions (Backlog H) sind das erste Modul, das die anderen **verbindet**:
+Person, Zimmernummer, Gegenstand, Uhrzeit, Ort — Gesicht, Zahl und Wort in
+einer Aufgabe. Trainiert wird dabei etwas anderes als in den Einzelmodulen,
+und das ist der ganze Punkt: nicht die Stücke, sondern die **Bindung**
+zwischen ihnen. Im Alltag merkt sich niemand „314“; man merkt sich, dass
+*Elena* in Zimmer 314 wohnt und um 18:40 abreist.
+
+**Die Szene steht auf einmal da.** Nicht Stück für Stück wie die Wörter —
+nacheinander gezeigt wären es vier Gegenstände, und die Bindung käme in der
+Übung gar nicht vor. Deshalb bekommt eine Mission auch mehr Betrachtungszeit
+je Stück als ein Wort.
+
+**Die Person ist der Anker, und aus ihr entsteht die ganze Szene.** So wie aus
+dem Namen das Gesicht entsteht (D-005). Der Grund zeigt sich erst beim
+Wiedersehen: Nach drei Tagen fragt die App eine einzelne Tatsache ab, und
+„Welche Zimmernummer?“ wäre dann keine beantwortbare Frage — es gab inzwischen
+zwanzig Zimmernummern. Mit Anker heißt sie „Elena — welches Zimmer?“, und das
+ist genau die Frage, die das Leben stellt.
+
+**Die Vorlage ist fest, die Füllung nicht** (H4). „The Hotel“ aus H2 ist ein
+Gerüst mit Lücken, keine feste Szene: Eine feste wäre nach dem zweiten Mal
+auswendig gelernt, und die App misst dann Wiedererkennen statt Gedächtnis —
+derselbe Grund wie beim Gesichtsgenerator und beim Zahlenvorrat.
+
+**Gefragt wird nach dem Wert, verbucht wird die Kennung.** Überall sonst ist
+beides dasselbe: Beim Wort „Anker“ ist „Anker“ die Frage, die Antwort und der
+Eintrag in der Datenbank. Bei einer Mission ist das eine „314“ und das andere
+`Elena#room`. Der Wiederholungstermin hängt an der Kennung — sonst wären zwei
+Szenen mit demselben Zimmer eine einzige Information.
+
+**Die Strenge hängt an der einzelnen Tatsache**, nicht am Modul. Innerhalb
+*einer* Abfrage stehen eine Zimmernummer, eine Uhrzeit, ein Gegenstand und ein
+Name nebeneinander: 314 und 341 sind nicht dasselbe Zimmer, „roter Kofer“ ist
+ein Tippfehler. Das ist D-012 eine Ebene tiefer — und der Grund, warum die
+Strenge dort nicht als globaler Schalter gebaut wurde.
