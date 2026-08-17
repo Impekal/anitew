@@ -1,4 +1,10 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
+
+/** Der Systemcheck liegt zusammengeklappt am Fuß (D-011/G-2). */
+async function openFoundation(page: Page) {
+  await page.getByText('Fundament', { exact: true }).click()
+  await expect(page.locator('.foundation')).toBeVisible()
+}
 
 /**
  * Was M0 verspricht, hier nachgeprüft: Die App startet, spricht die Sprache
@@ -49,6 +55,7 @@ test('merkt sich die gewählte Sprache über einen Neustart hinweg', async ({ pa
 
 test('schreibt auf das Gerät und liest zurück', async ({ page }) => {
   await page.goto('/')
+  await openFoundation(page)
   const storage = page.locator('.foundation .row', { hasText: 'Speicher auf dem Gerät' })
   await expect(storage.locator('dd')).toHaveText('bereit')
 
@@ -56,13 +63,23 @@ test('schreibt auf das Gerät und liest zurück', async ({ page }) => {
   const counter = page.locator('.foundation .row', { hasText: 'Bisher geöffnet' }).locator('dd')
   await expect(counter).toContainText('1×')
   await page.reload()
+  await openFoundation(page)
   await expect(counter).toContainText('2×')
 })
 
 test('kennt den Trainingstag, mit der Grenze um 4 Uhr', async ({ page }) => {
   await page.goto('/')
+  await openFoundation(page)
   const day = page.locator('.foundation .row', { hasText: 'Trainingstag' }).locator('dd')
   await expect(day).toHaveText(/^\d{4}-\d{2}-\d{2}$/)
+})
+
+test('hält den ersten Bildschirm frei von Technik', async ({ page }) => {
+  // D-011/G-2: Der Systemcheck aus M0 ist erreichbar, aber er beherrscht den
+  // Einstieg nicht mehr. Wer die App öffnet, sieht ein Angebot, kein Protokoll.
+  await page.goto('/')
+  await expect(page.locator('.foundation')).toBeHidden()
+  await expect(page.getByRole('button', { name: 'Beginnen' })).toBeVisible()
 })
 
 test('ist als App installierbar', async ({ page, request }) => {

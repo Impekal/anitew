@@ -214,6 +214,109 @@ Was noch zu klären ist und im Backlog steht: Konfliktauflösung bei zwei Gerät
 (N9), Googles Freigabeverfahren für den Drive-Zugriff samt der dafür nötigen
 Datenschutzerklärung (N10, kostenlos, aber es dauert).
 
+## D-011 · 2026-08-17 · Die Oberfläche soll wirken, nicht nur funktionieren
+
+Vorgabe des Auftraggebers: schön, sehr angenehm, auf Gefühl und Seele wirkend —
+man soll **gern** in der App sein.
+
+Das ist keine Politur am Ende, sondern eine Anforderung an jeden Bildschirm,
+und deshalb steht sie hier statt in einer Wunschliste. Damit sie überprüfbar
+bleibt und nicht zum Geschmacksurteil wird, gilt sie in sechs Regeln:
+
+**G-1 Ruhe statt Reiz.** Keine Konfetti, keine Münzen, keine springenden
+Zahlen, kein Countdown, der drängt. Die Wirkung kommt aus Raum, Rhythmus und
+Wärme — nicht aus Aufmerksamkeitsreizen. Das ist zugleich die einzige
+Gestaltung, die zu K7 passt: Eine App, die Angst erzeugt und sie dann lindert,
+fühlt sich nie gut an, sondern nur dringend.
+
+**G-2 Ein Ding pro Bildschirm.** Wer sich acht Wörter merken soll, sieht ein
+Wort — nicht ein Wort, einen Zähler, einen Balken, eine Uhr und einen Hinweis.
+Alles, was nicht gerade gebraucht wird, verschwindet. Der schnellste Weg zu
+einer angenehmen Oberfläche ist Weglassen.
+
+**G-3 Nichts springt.** Jeder Wechsel hat einen Übergang: Wörter kommen und
+gehen weich, Bildschirme blenden. Ein harter Schnitt fühlt sich nach Maschine
+an, ein Übergang nach Atem. Wer „weniger Bewegung“ eingestellt hat, bekommt
+alles sofort und nichts davon — die Ruhe darf nie zulasten derer gehen, denen
+Bewegung schadet.
+
+**G-4 Warm, nicht kalt.** Gedecktes Papier im Hellen, warmes Dunkel im
+Dunklen. Für die Inhalte eine **Serifenschrift** — ein Wort, das man sich
+merken soll, soll aussehen wie etwas zum Lesen und nicht wie ein Messwert.
+Ausschließlich Systemschriften: nichts nachladen, offline vollständig, keine
+Lizenz, kein fremder Server (D-009/A10).
+
+**G-5 Die App schimpft nicht.** Was nicht erinnert wurde, ist kein Versagen,
+sondern der Ausgangspunkt. Der Ton bleibt freundlich und nüchtern — auch
+freundlich heißt nicht, jedem Ergebnis Lob hinterherzuwerfen.
+
+**G-6 Schönheit erkauft sich nie mit einer falschen Zahl.** R-1 steht über
+allem. Ein Ergebnisbildschirm darf warm sein, aber er darf nicht schmeicheln:
+keine aufgehübschte Prozentzahl, kein Fortschritt, der keiner ist. Eine App,
+die sich gut anfühlt, weil sie lügt, fühlt sich nur so lange gut an, bis es
+auffällt — und danach nie wieder.
+
+**G-7 Unterhaltsam — aber die Unterhaltung kommt aus dem Spiel, nicht aus dem
+Lärm.** Nachgereichte Vorgabe des Auftraggebers, und sie steht scheinbar gegen
+G-1. Sie tut es nicht, wenn man auseinanderhält, woher Vergnügen kommt:
+
+*Nicht* aus Reiz — Fanfaren, Konfetti, Münzregen. Das ist die billige Variante,
+sie nutzt sich in zwei Wochen ab, und danach bleibt eine App, die schreit.
+
+*Sondern* aus vier Quellen, in dieser Reihenfolge ihrer Kraft:
+
+1. **Inhalt mit Einfall** — die Missionen (Backlog H), der Gedächtnispalast
+   (G), die Quests (K4). „Zimmer 314, roter Koffer, Elena, Abfahrt 18:40“ ist
+   unterhaltsam, weil es eine kleine Geschichte ist. Hier liegt der Hauptteil,
+   und er kommt mit **M4**.
+2. **Abwechslung** — nie zweimal derselbe Tag. Andere Wörter, andere Aufgaben,
+   andere Begrüßung.
+3. **Spielgefühl im Kleinen** — jede Berührung antwortet. Ein getipptes Wort
+   landet sichtbar, ein Ergebnis blättert sich auf, statt einfach dazustehen.
+   Das ist der Teil, der **sofort** geht und die Oberfläche lebendig macht.
+4. **Der eigene Fortschritt** — die stärkste Belohnung überhaupt (K8), sobald
+   die Messung steht (M3).
+
+Ehrlich dazu: In M1 lässt sich nur Nummer 2 und 3 einlösen. Was ANITEW
+wirklich unterhaltsam macht, ist Inhalt, und Inhalt ist Arbeit. Eine
+Oberfläche, die schon jetzt so tut, als wäre sie ein Spiel, wäre eine Attrappe
+— und Attrappen sind genau das, was die App laut R-1 nicht macht.
+
+**G-8 Futuristisch und neuronal — als Präzision, nicht als Neon.** Dritte
+Vorgabe des Auftraggebers, und die schwierigste, weil sie gegen G-4 zu stehen
+scheint: warm und seelenvoll auf der einen Seite, futuristisch auf der anderen.
+
+Der naheliegende Weg wäre der falsche. „Futuristisch“ heißt in den meisten Apps
+Cyberpunk: tiefblaues Schwarz, Neongrün, Raster, Glitch, harte Kanten. Das ist
+kalt, es ist laut, es ist seit zehn Jahren dasselbe Bild — und es würde alles
+zerstören, was G-1 und G-4 aufgebaut haben.
+
+Die Auflösung liegt in einer Arbeitsteilung, und sie ist der eigentliche Grund,
+warum beides zusammengeht:
+
+**Warm ist der Inhalt. Kühl ist die Technik.**
+
+- **Serifenschrift für alles, was der Mensch beiträgt** — die Wörter, die er
+  sich merkt, das, was er abruft, die Anrede. Warm, gedruckt, lesbar.
+- **Schreibmaschinenschrift für alles, was die App misst** — Uhr, Zähler,
+  Ergebnis. Gleich breite Ziffern, weite Sperrung, nüchtern. Das wirkt wie ein
+  Instrument, und es ist zugleich inhaltlich richtig: Eine gemessene Zahl soll
+  aussehen wie eine gemessene Zahl (R-1).
+- **Bernstein für den Menschen, kühles Grün für das Netz.** Zwei Farbfamilien
+  statt einer, klar verteilt.
+
+„Neuronal“ wird wörtlich genommen und nicht als Dekor: **Knoten und
+Verbindungen**, Signale, die einen Weg entlanglaufen. Das ist keine Metapher,
+die man der App überstülpt — es ist ihre Form. Die Wiederholungskurve ist eine
+Kette mit wachsenden Abständen (schon im Zeichen, D-001). Die Punkte beim
+Einprägen sind eine Kette, auf der ein Signal wandert. Der Gedächtnispalast
+wird ein Graph (Backlog G). Alles davon *ist* bereits ein Netz; es wird nur
+sichtbar gemacht.
+
+Die Grenze bleibt G-1: Das Netz im Hintergrund atmet, es blinkt nicht. Es ist
+so leise, dass man es eher spürt als sieht — und bei „weniger Bewegung“ steht
+es still.
+
 ## D-010 · 2026-08-17 · Der Kern kennt keinen Browser
 
 Bekräftigt aus dem Produktgespräch, weil es die teuerste Regel ist, wenn man sie

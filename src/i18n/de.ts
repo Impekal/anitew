@@ -30,31 +30,49 @@ export const de = {
     },
     incomplete: 'Noch nicht übersetzt — die App zeigt Englisch.',
   },
+  // Jeden Tag eine andere — Abwechslung ist die zweite Quelle von Vergnügen
+  // (D-011/G-7). Kein Lob, keine Behauptung über den Nutzer, nur ein warmer
+  // Satz vor dem Anfang.
+  greetings: [
+    'Fünf Minuten gehören dir.',
+    'Schön, dass du da bist.',
+    'Ein Wort nach dem anderen.',
+    'Nimm dir den Moment.',
+    'Heute ist ein guter Tag dafür.',
+    'Kein Druck. Nur Übung.',
+    'Fang einfach an.',
+  ],
   start: {
-    heading: 'Deine Challenge heute',
+    // Die Frage steht über den Knöpfen, nicht auf jedem einzelnen: „Ich habe
+    // 15 Minuten“ bricht auf einem Telefon um, und vier umbrechende Knöpfe
+    // sind vier Unruheherde (D-011/G-2).
+    heading: 'Wie viel Zeit hast du?',
     start: 'Beginnen',
     modes: {
-      emergency: 'Ich habe 60 Sekunden',
-      short: 'Ich habe 3 Minuten',
-      daily: 'Ich habe 5 Minuten',
-      extended: 'Ich habe 15 Minuten',
+      emergency: '60 Sekunden',
+      short: '3 Minuten',
+      daily: '5 Minuten',
+      extended: '15 Minuten',
     },
   },
   session: {
+    settle: 'Ankommen',
+    settleHint: 'Antippen, wenn du bereit bist',
     round: 'Runde',
-    encodeHint: 'Merke dir diese Wörter.',
-    recallHint: 'Schreib auf, woran du dich erinnerst. Reihenfolge egal.',
+    encodeHint: 'Sieh hin. Ein Wort nach dem anderen.',
+    recallHint: 'Was ist geblieben? Reihenfolge egal.',
     recallPlaceholder: 'Ein Wort pro Zeile',
     doneWithBlock: 'Fertig',
     abort: 'Abbrechen',
   },
   summary: {
-    heading: 'Erinnert',
+    heading: 'Geblieben',
     // Bewusst keine Prozentzahl und kein „Memory Strength“ — die käme aus dem
-    // Benchmark, und den gibt es noch nicht (D-006, Regel R-1).
+    // Benchmark, und den gibt es noch nicht (D-006, Regel R-1, D-011/G-6).
     note: 'Wörter, die du nach dem Einprägen frei abrufen konntest. Was das über dein Gedächtnis insgesamt sagt, misst später der Benchmark — nicht diese Zahl.',
-    perRound: 'Nach Runden',
-    missed: 'gefehlt',
+    // G-5: kein „falsch“, kein „verpasst“ — die Wörter waren einfach noch
+    // nicht dabei.
+    missed: 'Noch nicht dabei',
     back: 'Zurück',
   },
   resume: {

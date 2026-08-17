@@ -1,32 +1,79 @@
 /*
- * Hell und dunkel nach Systemeinstellung (Backlog O3), große Flächen, alles
- * Wichtige in der Daumenzone (O5). Bewusst noch ohne Gestaltungssystem —
- * das kommt, wenn es etwas zu gestalten gibt.
+ * Die Gestaltung von ANITEW — nach den sieben Regeln aus D-011.
+ *
+ * G-4 (warm, nicht kalt) steckt in der Palette: gedecktes Papier im Hellen,
+ * warmes Dunkel im Dunklen, nirgends ein reines Weiß oder Schwarz. Beides
+ * blendet, und beides fühlt sich nach Bildschirm an statt nach Ding.
+ *
+ * Die Schriftwahl ist die halbe Aussage (G-8): **Serife für alles, was der
+ * Mensch beiträgt** — die Wörter, die er sich merkt, die Anrede. **Mono für
+ * alles, was die App misst** — Uhr, Zähler, Ergebnis. Warm ist der Inhalt,
+ * kühl ist die Technik. Ausschließlich Systemschriften — nichts nachladen,
+ * offline vollständig, keine Lizenz, kein fremder Server.
+ *
+ * Dieselbe Teilung gilt für die Farbe: Bernstein gehört dem Menschen, das
+ * kühle Grün dem Netz.
  */
 
 :root {
-  --ink: #12151c;
-  --ink-soft: #5a6274;
-  --paper: #f4f2ee;
-  --card: #ffffff;
-  --line: #e2ded6;
-  --accent: #9a5b2c;
-  --accent-ink: #ffffff;
-  --bad: #a3352b;
+  /* Hell: Papier, kein Weiß. */
+  --paper: #f7f3ec;
+  --paper-glow: #fdf8ee;
+  --card: #fffdf9;
+  --line: #e7ded0;
+  --ink: #241f19;
+  --ink-soft: #6f6558;
+  --ink-faint: #9c917f;
+  --accent: #a85f22;
+  --accent-soft: #f0dcc4;
+  --accent-ink: #fffaf3;
+  --calm: #4a6f6b;
+  --bad: #98392c;
+
+  --shadow: 0 1px 2px rgb(70 50 25 / 6%), 0 8px 24px -12px rgb(70 50 25 / 18%);
+  --shadow-lift: 0 2px 4px rgb(70 50 25 / 8%), 0 18px 40px -18px rgb(70 50 25 / 28%);
+  /* Das Netz bleibt im Hellen deutlich zurückhaltender — auf Papier fällt
+     eine Linie stärker auf als im Dunkeln. */
+  --net: color-mix(in oklab, var(--calm) 40%, transparent);
+  --net-strong: color-mix(in oklab, var(--calm) 70%, transparent);
+  --glow: 0 0 0 1px color-mix(in oklab, var(--accent) 30%, transparent),
+    0 0 18px -2px color-mix(in oklab, var(--accent) 45%, transparent);
+
+  --sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* D-011/G-8: Gemessenes bekommt eine eigene Schrift. Gleich breite Ziffern,
+     nüchtern, instrumentenhaft — und ebenfalls überall vorhanden. */
+  --mono: ui-monospace, 'SF Mono', 'Cascadia Mono', 'Segoe UI Mono', Menlo, monospace;
+  /* Auf iOS/macOS Iowan und Palatino, auf Windows Book Antiqua, sonst
+     Georgia — überall vorhanden, nirgends nachgeladen. */
+  --serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+
+  --step: 200ms;
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
 
   color-scheme: light dark;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --ink: #eef1f6;
-    --ink-soft: #98a1b3;
-    --paper: #0f1218;
-    --card: #171b23;
-    --line: #272d39;
-    --accent: #e0a86a;
-    --accent-ink: #1a1208;
-    --bad: #e8837a;
+    /* Dunkel: warmes Braunschwarz statt Blauschwarz. Der Unterschied ist
+       klein und der halbe Grund, warum sich das eine kalt anfühlt. */
+    --paper: #15120e;
+    --paper-glow: #221c15;
+    --card: #1f1a14;
+    --line: #322a21;
+    --ink: #f3ece1;
+    --ink-soft: #a99c8b;
+    --ink-faint: #7b7061;
+    --accent: #e5ab6b;
+    --accent-soft: #3a2c1c;
+    --accent-ink: #1c1409;
+    --calm: #8fb3ad;
+    --bad: #e0897c;
+
+    --shadow: 0 1px 2px rgb(0 0 0 / 30%), 0 10px 30px -14px rgb(0 0 0 / 60%);
+    --shadow-lift: 0 2px 6px rgb(0 0 0 / 35%), 0 22px 48px -20px rgb(0 0 0 / 70%);
+    --net: color-mix(in oklab, var(--calm) 55%, transparent);
+    --net-strong: color-mix(in oklab, var(--calm) 100%, transparent);
   }
 }
 
@@ -34,125 +81,209 @@
   box-sizing: border-box;
 }
 
+/*
+ * Die Grundfarbe steht auf `html`, nicht auf `body` — und das ist kein
+ * Geschmack, sondern eine Regel der Malreihenfolge:
+ *
+ *   1. Hintergrund des Wurzelelements
+ *   2. Ebenen mit negativem z-index   <- das Netz und der Lichtschein
+ *   3. Hintergruende der Blockelemente <- hier laege `body`
+ *
+ * Steht die Farbe auf `body`, deckt sie in Schritt 3 alles zu, was in
+ * Schritt 2 gezeichnet wurde. Genau daran war das Netz zuerst unsichtbar.
+ */
+html {
+  background: var(--paper);
+}
+
 html,
 body {
   margin: 0;
   padding: 0;
-  background: var(--paper);
+  min-height: 100%;
   color: var(--ink);
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  line-height: 1.5;
+  font-family: var(--sans);
+  line-height: 1.55;
   -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Ein sehr weicher Schein von oben. Er ist kaum zu sehen und genau deshalb
+   richtig: Der Bildschirm bekommt eine Richtung, ohne dass es auffällt. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(120% 60% at 50% 0%, var(--paper-glow) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: -1;
 }
 
 .app {
   max-width: 34rem;
   margin: 0 auto;
-  padding: 2rem 1.25rem calc(2rem + env(safe-area-inset-bottom));
+  padding: 2.5rem 1.35rem calc(2rem + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
-  gap: 1.75rem;
+  gap: 2rem;
+  /* Die Seite füllt den Bildschirm, statt in der Mitte aufzuhören. Alles
+     Nebensächliche sinkt nach unten (siehe .footer). */
+  min-height: 100vh;
+  min-height: 100dvh;
+  animation: settle-in 420ms var(--ease) both;
 }
+
+/* ── Kopf ─────────────────────────────────────────────────────────────── */
 
 .brand h1 {
   margin: 0;
-  font-size: 1.5rem;
-  letter-spacing: 0.22em;
-  font-weight: 600;
+  font-family: var(--serif);
+  font-size: 1.6rem;
+  letter-spacing: 0.3em;
+  font-weight: 400;
 }
 
 .tagline {
-  margin: 0.35rem 0 0;
+  margin: 0.5rem 0 0;
   color: var(--ink-soft);
-  font-size: 0.95rem;
+  font-size: 0.92rem;
+  max-width: 26rem;
+}
+
+.greeting {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 1.25rem;
+  line-height: 1.4;
+  color: var(--ink);
+}
+
+/* ── Der Startknopf ───────────────────────────────────────────────────── */
+
+.challenge {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .challenge h2 {
-  margin: 0 0 0.9rem;
-  font-size: 0.8rem;
+  margin: 0.6rem 0 -0.4rem;
+  font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 0.16em;
-  color: var(--ink-soft);
+  letter-spacing: 0.2em;
+  color: var(--ink-faint);
   font-weight: 600;
+}
+
+/* Der Knopf sitzt optisch in der Mitte, nicht oben angeklebt: zwei
+   automatische Ränder teilen sich den freien Platz mit dem Fuß. Auf einem
+   großen Bildschirm ist das der Unterschied zwischen „gestaltet“ und
+   „oben ausgekippt“. */
+.brand + .challenge {
+  margin-block: auto;
 }
 
 .start {
   width: 100%;
   border: none;
-  border-radius: 1.25rem;
-  background: var(--accent);
+  border-radius: 1.5rem;
+  background: linear-gradient(160deg, var(--accent) 0%, color-mix(in oklab, var(--accent) 82%, #000 18%) 100%);
   color: var(--accent-ink);
-  padding: 2rem 1rem;
+  padding: 2.4rem 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.4rem;
   align-items: center;
   cursor: pointer;
   font: inherit;
+  box-shadow: var(--shadow-lift);
+  transition: transform var(--step) var(--ease), box-shadow var(--step) var(--ease);
+}
+
+.start:hover {
+  transform: translateY(-1px);
 }
 
 .start:active {
-  transform: scale(0.99);
+  transform: translateY(1px) scale(0.995);
+  box-shadow: var(--shadow);
 }
 
 .start-time {
-  font-size: 3rem;
-  font-weight: 300;
+  /* Die Zeit ist eine Zusage, kein Zierrat — deshalb Mono (G-8). */
+  font-family: var(--mono);
+  letter-spacing: -0.02em;
+  font-size: 3.4rem;
+  font-weight: 400;
   font-variant-numeric: tabular-nums;
   line-height: 1;
 }
 
 .start-label {
   text-transform: uppercase;
-  letter-spacing: 0.16em;
-  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  font-size: 0.74rem;
+  opacity: 0.85;
 }
 
-/* Zwei feste Spalten statt umbrechender Zeilen: sonst hängt je nach
-   Sprachlänge mal ein Knopf allein in einer Reihe. */
 .modes {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
-  margin-top: 0.9rem;
+  gap: 0.55rem;
 }
 
 .mode {
   border: 1px solid var(--line);
-  background: var(--card);
+  background: transparent;
   color: var(--ink-soft);
   border-radius: 999px;
-  padding: 0.55rem 0.9rem;
+  padding: 0.6rem 0.9rem;
   font: inherit;
   font-size: 0.85rem;
   cursor: pointer;
+  transition: border-color var(--step) var(--ease), color var(--step) var(--ease),
+    background var(--step) var(--ease);
+}
+
+.mode:hover {
+  color: var(--ink);
 }
 
 .mode-active {
-  border-color: var(--accent);
+  border-color: transparent;
+  background: var(--accent-soft);
   color: var(--ink);
 }
+
+/* ── Karten ───────────────────────────────────────────────────────────── */
 
 .note,
 .foundation {
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 1rem;
-  padding: 1.1rem 1.15rem;
+  border-radius: 1.25rem;
+  padding: 1.25rem 1.3rem;
+  box-shadow: var(--shadow);
 }
 
 .note h3,
 .foundation h3 {
-  margin: 0 0 0.6rem;
-  font-size: 0.8rem;
+  margin: 0 0 0.7rem;
+  font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 0.14em;
-  color: var(--ink-soft);
+  letter-spacing: 0.16em;
+  color: var(--ink-faint);
   font-weight: 600;
 }
 
 .note p {
-  margin: 0 0 0.9rem;
+  margin: 0 0 1rem;
+}
+
+.note-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .quiet {
@@ -160,16 +291,87 @@ body {
   background: transparent;
   color: var(--ink);
   border-radius: 999px;
-  padding: 0.45rem 1.1rem;
+  padding: 0.55rem 1.25rem;
   font: inherit;
   cursor: pointer;
+  transition: background var(--step) var(--ease), border-color var(--step) var(--ease);
+}
+
+.quiet:hover {
+  background: var(--accent-soft);
+  border-color: transparent;
+}
+
+/* ── Fuß und Nebensachen ──────────────────────────────────────────────── */
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  color: var(--ink-faint);
+  margin-top: auto;
+  padding-top: 1.5rem;
+}
+
+.language {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.88rem;
+}
+
+.language select {
+  font: inherit;
+  padding: 0.45rem 0.7rem;
+  border-radius: 0.7rem;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--ink);
+}
+
+.hint {
+  margin: 0;
+  color: var(--ink-faint);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+/* Der Systemcheck aus M0 liegt jetzt zusammengeklappt am Fuß: Er hat seinen
+   Zweck erfüllt und darf den ersten Bildschirm nicht mehr beherrschen (G-2). */
+.details {
+  border: none;
+  padding: 0;
+}
+
+.details summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: var(--ink-faint);
+  list-style: none;
+}
+
+.details summary::-webkit-details-marker {
+  display: none;
+}
+
+.details summary::after {
+  content: ' ›';
+}
+
+.details[open] summary::after {
+  content: ' ⌄';
+}
+
+.details .foundation {
+  margin-top: 0.75rem;
 }
 
 .foundation dl {
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
+  gap: 0.6rem;
 }
 
 .row {
@@ -188,84 +390,152 @@ body {
 
 .row dd {
   margin: 0;
+  font-family: var(--mono);
+  font-size: 0.85rem;
   font-variant-numeric: tabular-nums;
   text-align: end;
-  /* Ein Datum darf nicht mitten im Wert umbrechen — „2026-“ / „08-17“ liest
-     sich wie ein Fehler. */
   white-space: nowrap;
 }
 
-.row-hint,
-.hint {
-  color: var(--ink-soft);
-  font-size: 0.78rem;
-  line-height: 1.4;
-}
-
-.hint {
-  margin: 0.9rem 0 0;
+.row-hint {
+  color: var(--ink-faint);
+  font-size: 0.76rem;
+  line-height: 1.45;
 }
 
 .bad {
   color: var(--bad);
 }
 
-.footer {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+/* ── Das Netz im Hintergrund (G-8) ────────────────────────────────────── */
+
+/*
+ * Es liegt hinter allem, nimmt keine Berührung an und ist absichtlich fast
+ * unsichtbar. Wer es bemerkt, hat zu lange hingesehen.
+ */
+.neural {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.45;
+  /*
+   * Die Mitte bleibt frei. Ohne diese Maske lief das Netz quer durch die
+   * Wörter, und ein Hintergrund, der mit dem Inhalt um Aufmerksamkeit
+   * streitet, ist ein Fehler — egal wie hübsch er ist (G-1, G-2).
+   */
+  mask-image: radial-gradient(ellipse 72% 52% at 50% 45%, transparent 25%, #000 100%);
+  -webkit-mask-image: radial-gradient(ellipse 72% 52% at 50% 45%, transparent 25%, #000 100%);
 }
 
-.language {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  font-size: 0.9rem;
-  color: var(--ink-soft);
+@media (prefers-color-scheme: light) {
+  /* Auf Papier trägt eine Linie weiter als im Dunkeln. */
+  .neural {
+    opacity: 0.3;
+  }
 }
 
-.language select {
-  font: inherit;
-  padding: 0.45rem 0.6rem;
-  border-radius: 0.6rem;
-  border: 1px solid var(--line);
-  background: var(--card);
-  color: var(--ink);
+.neural-links line {
+  stroke: var(--net);
+  stroke-width: 0.12;
 }
 
-.note-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+.neural-nodes circle {
+  fill: var(--net-strong);
+  opacity: 0.5;
+  /* Jeder Knoten hat seinen eigenen Versatz (siehe NeuralField.tsx), damit
+     das Netz atmet statt im Takt zu pulsen. */
+  animation: node-pulse 7s ease-in-out infinite;
 }
 
-/* ── Die Trainingseinheit ────────────────────────────────────────────────── */
+@keyframes node-pulse {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+/* ══ Die Trainingseinheit ═══════════════════════════════════════════════ */
 
 .session {
   min-height: 100vh;
   min-height: 100dvh;
   justify-content: flex-start;
+  gap: 1.5rem;
 }
+
+/* ── Ankommen ─────────────────────────────────────────────────────────── */
+
+/*
+ * Drei Sekunden zwischen Alltag und Training (D-011/G-1). Kein Countdown,
+ * der drängt — ein Atemzug. Antippen überspringt ihn; wer es eilig hat, soll
+ * nicht gebremst werden.
+ */
+.settle {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2.5rem;
+  min-height: 70vh;
+  text-align: center;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+.settle-breath {
+  width: 8rem;
+  height: 8rem;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 45%, var(--accent-soft) 0%, transparent 72%);
+  border: 1px solid var(--net);
+  box-shadow: var(--glow);
+  animation: breathe 3s var(--ease) infinite;
+}
+
+.settle-word {
+  font-family: var(--serif);
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+/* ── Kopfzeile der Einheit ────────────────────────────────────────────── */
 
 .session-head {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  color: var(--ink-soft);
-  font-size: 0.85rem;
-  letter-spacing: 0.1em;
+  color: var(--ink-faint);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
 .session-clock {
+  font-family: var(--mono);
   font-variant-numeric: tabular-nums;
-  font-size: 1.1rem;
-  color: var(--ink);
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+}
+
+.session-head span:first-child {
+  font-family: var(--mono);
+  font-size: 0.68rem;
 }
 
 .session-bar {
-  height: 4px;
+  height: 2px;
   border-radius: 999px;
   background: var(--line);
   overflow: hidden;
@@ -276,80 +546,229 @@ body {
   display: block;
   height: 100%;
   background: var(--accent);
+  opacity: 0.55;
+  transition: width 240ms linear;
 }
+
+/* ── Einprägen ────────────────────────────────────────────────────────── */
 
 .encode {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1.5rem;
-  /* Das Wort steht in der Mitte des Bildschirms und nicht am oberen Rand —
-     beim Einprägen soll nichts anderes im Blick sein. */
+  gap: 2.5rem;
   flex: 1;
-  min-height: 55vh;
+  min-height: 58vh;
   text-align: center;
 }
 
 .encode-word {
   margin: 0;
-  font-size: clamp(2.2rem, 12vw, 3.5rem);
-  font-weight: 300;
+  font-family: var(--serif);
+  font-size: clamp(2.6rem, 13vw, 4rem);
+  font-weight: 400;
   line-height: 1.1;
   overflow-wrap: anywhere;
+  /* Jedes Wort kommt und geht weich (G-3). Der Schlüssel am Element sorgt
+     dafür, dass React es beim Wechsel neu einsetzt und die Bewegung läuft. */
+  animation: word-in 460ms var(--ease) both;
 }
 
-.session-hint {
-  margin: 0;
-  color: var(--ink-soft);
-  font-size: 0.9rem;
-  text-align: center;
+/* Punkte statt „3 / 8“: genauso viel Information, aber es fühlt sich nicht
+   nach Prüfung an (G-1). */
+.encode-dots {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  position: relative;
 }
+
+/* Die Verbindung zwischen den Punkten: aus einer Reihe Punkte wird eine
+   Kette, auf der ein Signal wandert (G-8). */
+.encode-dots::before {
+  content: '';
+  position: absolute;
+  left: 0.2rem;
+  right: 0.2rem;
+  top: 50%;
+  height: 1px;
+  background: var(--net);
+}
+
+.encode-dots span {
+  position: relative;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: var(--line);
+  transition: background var(--step) var(--ease), transform var(--step) var(--ease),
+    box-shadow var(--step) var(--ease);
+}
+
+.encode-dots .dot-done {
+  background: var(--net-strong);
+}
+
+.encode-dots .dot-now {
+  background: var(--accent);
+  transform: scale(1.6);
+  box-shadow: var(--glow);
+}
+
+/* ── Abrufen ──────────────────────────────────────────────────────────── */
 
 .recall {
   display: flex;
   flex-direction: column;
-  gap: 0.9rem;
+  gap: 1rem;
+  flex: 1;
 }
 
 .recall-input {
-  font: inherit;
-  font-size: 1.15rem;
+  font-family: var(--serif);
+  font-size: 1.3rem;
   line-height: 1.7;
-  padding: 0.9rem 1rem;
-  border-radius: 1rem;
+  padding: 1rem 1.1rem;
+  border-radius: 1.25rem;
   border: 1px solid var(--line);
   background: var(--card);
   color: var(--ink);
-  resize: vertical;
+  resize: none;
+  box-shadow: var(--shadow);
+  transition: border-color var(--step) var(--ease);
 }
 
 .recall-input:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
+  outline: none;
+  border-color: transparent;
+  box-shadow: var(--shadow), var(--glow);
+}
+
+/* Jedes getippte Wort landet sichtbar (D-011/G-7, Punkt 3). Es ist nur die
+   eigene Eingabe zurückgespiegelt — keine Bewertung, kein Hinweis, ob es
+   richtig war. Das wäre ein Hinweis und würde den freien Abruf zerstören. */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  min-height: 2rem;
+}
+
+.chip {
+  font-family: var(--serif);
+  font-size: 0.95rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--ink);
+  animation: chip-in 260ms var(--ease) both;
+}
+
+.chip-muted {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
 }
 
 .session-abort {
   align-self: center;
   margin-top: auto;
+  color: var(--ink-faint);
+  border-color: transparent;
 }
 
+/* ── Ergebnis ─────────────────────────────────────────────────────────── */
+
 .summary-score {
-  margin: 0 0 0.6rem;
-  font-size: 3rem;
-  font-weight: 300;
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 4rem;
+  font-weight: 400;
   font-variant-numeric: tabular-nums;
+  line-height: 1;
+  animation: word-in 520ms var(--ease) both;
 }
 
 .summary-score span {
-  color: var(--ink-soft);
-  font-size: 1.6rem;
+  color: var(--ink-faint);
+  font-size: 1.8rem;
 }
 
-/* Wer „weniger Bewegung“ eingestellt hat, bekommt keine (Backlog O4). */
+/* Der Weg zurück sinkt ans untere Ende — in der Daumenzone, und ohne dass
+   das Ergebnis oben an einer halbleeren Seite klebt (O5). */
+.summary-back {
+  margin-top: auto;
+}
+
+.summary-words {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+/* Die Wörter blättern sich nacheinander auf, statt als Block dazustehen —
+   der eine Moment in der App, der sich wie ein Aufdecken anfühlen darf. */
+.summary-words .chip {
+  animation-delay: calc(var(--i) * 55ms);
+}
+
+@keyframes word-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes chip-in {
+  from {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes settle-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.75;
+  }
+  50% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+}
+
+/*
+ * G-3, zweiter Halbsatz: Wer „weniger Bewegung“ eingestellt hat, bekommt
+ * alles sofort und nichts davon. Ruhe für die einen darf nie Übelkeit für die
+ * anderen bedeuten.
+ */
 @media (prefers-reduced-motion: reduce) {
-  * {
-    animation: none !important;
-    transition: none !important;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
   }
 }

@@ -14,7 +14,9 @@
 > **Stand 2026-08-17:** Die neun Entscheidungen sind beantwortet (D-001 bis
 > D-010 in [`DECISIONS.md`](DECISIONS.md)). **M0 und M1 sind fertig** — das
 > Fundament steht, und eine echte Trainingseinheit läuft durch: Einprägen,
-> freier Abruf, ehrliche Zahl. Geprüft mit 73 Kern-Tests und 10 E2E-Tests.
+> freier Abruf, ehrliche Zahl. Dazu kam **D-011**, die Gestaltungsentscheidung:
+> Die Oberfläche muss wirken, nicht nur funktionieren. Geprüft mit 73
+> Kern-Tests und 11 E2E-Tests.
 > Als Nächstes M2: die Engine, die entscheidet, was heute drankommt.
 
 ---
@@ -34,6 +36,7 @@ unter „Nicht-Ziele“.
 | **R-1 Keine erfundenen Zahlen.** Trainingsscore und gemessene Gedächtnisleistung sind zwei verschiedene Dinge und werden nie vermischt | „Diese Prozentzahl darf nicht erfunden sein“ | Abschnitt F ist kein Nice-to-have, sondern Sperre für den Release |
 | **R-2 Kein Versprechen ohne Messung.** Nicht „wir verdoppeln dein Gedächtnis“, sondern „train, measure, remember more“ | „wissenschaftlich nicht seriös“ | bindet auch Store-Texte und Marketing (R5) |
 | **R-3 Nicht browser-only, local-first, modular.** Der Kern muss ohne Umbau in eine Android-TWA und später in eine iOS-App passen | „Do not create architecture that depends on the browser only“ | Abschnitt A4/A5 vor der ersten Zeile Produktcode |
+| **R-4 Die Oberfläche muss wirken.** Schön, angenehm, unterhaltsam, futuristisch-neuronal — warm für den Inhalt, kühl für die Technik | Vorgabe vom 2026-08-17 | **D-011** mit acht Regeln G-1…G-8; Abschnitt O ist damit keine Kür mehr |
 
 ---
 
@@ -232,15 +235,27 @@ Der Punkt, der aus einem Spiel einen Gedächtnistrainer macht.
 
 ## O. Bedienung & Barrierefreiheit
 
+Seit **D-011** ist dieser Abschnitt kein Nachklapp mehr, sondern eine
+Anforderung wie jede andere. Die acht Regeln G-1 bis G-8 stehen in
+[`DECISIONS.md`](DECISIONS.md); hier steht, was daraus gebaut ist.
+
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| O1 | Vom Öffnen zum laufenden Training: ein Tap, unter zwei Sekunden | ⬜ | „super technisch und einfach und nicht anstrengend“ | M |
-| O2 | Kein Onboarding-Wall, keine Registrierung, kein Einwilligungslabyrinth | ⬜ | | S |
-| O3 | Hell/Dunkel nach Systemeinstellung | ✅ 2026-08-17 | | S |
-| O4 | Barrierefreiheit: Kontrast, große Schrift, Screenreader, Fokusreihenfolge, reduzierte Bewegung | ⬜ | | M |
-| O5 | Einhändig bedienbar, alles Wichtige in der Daumenzone | ⬜ | | M |
-| O6 | Haptik und Ton dezent und abschaltbar | ⬜ | | S |
+| O1 | Vom Öffnen zum laufenden Training: ein Tap, unter zwei Sekunden | ✅ 2026-08-17 | | M |
+| O2 | Kein Onboarding-Wall, keine Registrierung, kein Einwilligungslabyrinth | ✅ 2026-08-17 | | S |
+| O3 | Hell/Dunkel nach Systemeinstellung | ✅ 2026-08-17 | warmes Papier im Hellen, warmes Dunkel im Dunklen — nirgends reines Weiß oder Schwarz (G-4) | S |
+| O4 | Barrierefreiheit: Kontrast, große Schrift, Screenreader, Fokusreihenfolge, reduzierte Bewegung | 🟨 2026-08-17 | „weniger Bewegung“ schaltet **alles** ab, auch das atmende Netz; das wechselnde Wort wird für den Screenreader mitgesprochen. Ein vollständiger Durchgang steht aus | M |
+| O5 | Einhändig bedienbar, alles Wichtige in der Daumenzone | 🟨 2026-08-17 | Startknopf optisch mittig, „Fertig“ und „Zurück“ am unteren Rand | M |
+| O6 | Haptik und Ton dezent und abschaltbar | ⬜ | bewusst noch nichts: eine Vibration alle vier Sekunden wäre keine Wärme, sondern Nerverei | S |
 | O7 | Nie zwei harte Blöcke hintereinander — Anstrengung dosieren | ⬜ | „angenehm, nicht anstrengend“ ist eine Anforderung an die Sessionplanung, nicht an die Grafik | M |
+| O8 | **Ruhe statt Reiz** (G-1): keine Konfetti, keine Münzen, kein drängender Countdown | ✅ 2026-08-17 | statt Countdown ein 3-Sekunden-Ankommen mit atmendem Kreis, antippbar zum Überspringen; die Uhr der Einheit läuft erst danach | M |
+| O9 | **Ein Ding pro Bildschirm** (G-2) | ✅ 2026-08-17 | Beim Einprägen steht das Wort allein; „3 / 8“ wurde durch eine Punktekette ersetzt. Der Systemcheck aus M0 ist in ein aufklappbares Element am Fuß gewandert | M |
+| O10 | **Nichts springt** (G-3): jeder Wechsel bekommt einen Übergang | ✅ 2026-08-17 | Wörter, Marken und Ergebnisse blenden auf; bei reduzierter Bewegung nichts davon | M |
+| O11 | **Warm für den Inhalt, kühl für die Technik** (G-4, G-8) | ✅ 2026-08-17 | Serife für alles vom Menschen, Schreibmaschinenschrift für alles Gemessene, Bernstein gegen kühles Grün. Nur Systemschriften — nichts nachgeladen | M |
+| O12 | **Die App schimpft nicht** (G-5) | ✅ 2026-08-17 | Nicht Erinnertes heißt „Noch nicht dabei“ und steht gedeckt daneben, ohne Kommentar | S |
+| O13 | **Das Netz im Hintergrund** (G-8): Knoten und Verbindungen, die atmen | ✅ 2026-08-17 | 30 Knoten, in CSS bewegt statt in JavaScript, aus einem Seed gebaut. Eine Maske hält die Mitte frei — ein Hintergrund, der mit dem Inhalt streitet, ist ein Fehler | M |
+| O14 | **Abwechslung** (G-7): nie zweimal derselbe Tag | 🟨 2026-08-17 | wechselnde Begrüßung, aus dem Tagesschlüssel gezogen. Der große Teil kommt mit den Missionen (H) | S |
+| O15 | Ergebnis als kleines Netz statt als Liste darstellen | ⬜ | naheliegende Fortsetzung von G-8: die erinnerten Wörter als verbundene Knoten | M |
 
 ## P. Qualität
 

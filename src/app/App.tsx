@@ -55,6 +55,16 @@ export function App() {
 
   const leave = useCallback(() => setRunning(undefined), [])
 
+  const today = useMemo(() => {
+    const now = platform.clock.now()
+    return dayKeyOf(now, { offsetMinutes: platform.clock.offsetMinutes(now) })
+  }, [platform])
+
+  const greeting = useMemo(() => {
+    const lines = dictionary.greetings
+    return lines[createRng(today).int(lines.length)] ?? dictionary.app.tagline
+  }, [dictionary, today])
+
   if (!ready) return null
 
   if (running !== undefined) {
@@ -75,7 +85,12 @@ export function App() {
     <main className="app">
       <header className="brand">
         <h1>{dictionary.app.name}</h1>
-        <p className="tagline">{dictionary.app.tagline}</p>
+        {/*
+          Nicht der Werbespruch, sondern ein Satz für heute (D-011/G-7).
+          Er wechselt mit dem Tag und ist deshalb aus dem Tagesschlüssel
+          gezogen: derselbe Satz den ganzen Tag, morgen ein anderer.
+        */}
+        <p className="greeting">{greeting}</p>
       </header>
 
       {resumable !== undefined && (
@@ -107,14 +122,16 @@ export function App() {
         </section>
       )}
 
-      <section className="challenge" aria-labelledby="challenge-heading">
-        <h2 id="challenge-heading">{dictionary.start.heading}</h2>
+      <section className="challenge">
+        {/* Kein Titel über dem Knopf — „5:00 Beginnen“ erklärt sich, und ein
+            Etikett darüber wäre genau das Möbel, das G-2 weglässt. */}
         <button type="button" className="start" onClick={start}>
           <span className="start-time">{label}</span>
           <span className="start-label">{dictionary.start.start}</span>
         </button>
 
-        <div className="modes" role="group" aria-label={dictionary.start.heading}>
+        <h2 id="challenge-heading">{dictionary.start.heading}</h2>
+        <div className="modes" role="group" aria-labelledby="challenge-heading">
           {MODE_ORDER.map((id) => (
             <button
               key={id}
@@ -128,8 +145,6 @@ export function App() {
           ))}
         </div>
       </section>
-
-      <FoundationPanel platform={platform} dictionary={dictionary} />
 
       <footer className="footer">
         <label className="language">
@@ -150,6 +165,17 @@ export function App() {
         {(!translated || !hasWordPool(language)) && (
           <p className="hint">{dictionary.language.incomplete}</p>
         )}
+
+        {/*
+          Der Systemcheck aus M0 hat seinen Zweck erfüllt und beherrscht den
+          ersten Bildschirm nicht mehr (D-011/G-2). Er bleibt erreichbar, weil
+          „läuft ohne Netz“ und „Speicher bereit“ auf einem fremden Telefon die
+          ersten Fragen sind, wenn etwas klemmt.
+        */}
+        <details className="details">
+          <summary>{dictionary.check.heading}</summary>
+          <FoundationPanel platform={platform} dictionary={dictionary} />
+        </details>
       </footer>
     </main>
   )

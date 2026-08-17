@@ -28,8 +28,9 @@ export function FoundationPanel({
         : t.offlineUnavailable
 
   return (
-    <section className="foundation" aria-labelledby="foundation-heading">
-      <h3 id="foundation-heading">{t.heading}</h3>
+    // Die Überschrift trägt jetzt das aufklappbare Element darüber (App.tsx),
+    // deshalb steht sie hier nicht noch einmal.
+    <section className="foundation" aria-label={t.heading}>
       <dl>
         <Row label={t.storage} value={storage} bad={state.storage === 'failed'} />
         <Row label={t.offline} value={offline} />

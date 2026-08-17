@@ -1,10 +1,55 @@
-import type { Platform } from '../../core/index.ts'
-import type { SessionProgress } from '../../data/sessions.ts'
+import { useEffect, useState } from 'react'
+
+import { type Platform, splitEntries } from '../../core/index.ts'
+import type { RoundResult, SessionProgress } from '../../data/sessions.ts'
 import type { Dictionary } from '../../i18n/index.ts'
 
 import { useSessionRunner } from './useSessionRunner.ts'
 
-export function SessionScreen({
+/** So lange dauert das Ankommen, bevor die Uhr läuft (D-011/G-1). */
+const SETTLE_MS = 3000
+
+export function SessionScreen(props: {
+  platform: Platform
+  dictionary: Dictionary
+  progress: SessionProgress
+  onLeave: () => void
+}) {
+  const [settled, setSettled] = useState(false)
+
+  if (!settled) {
+    return <Settle dictionary={props.dictionary} onDone={() => setSettled(true)} />
+  }
+  return <RunningSession {...props} />
+}
+
+/**
+ * Drei Sekunden zwischen Alltag und Training.
+ *
+ * Kein Countdown — der drängt. Ein Kreis, der atmet. Wer ihn antippt,
+ * überspringt ihn: Ruhe darf niemandem aufgezwungen werden.
+ *
+ * Die Uhr der Einheit läuft erst danach. Das Zeitbudget bleibt Trainingszeit
+ * und wird nicht heimlich mit Ankommen gefüllt (B2).
+ */
+function Settle({ dictionary, onDone }: { dictionary: Dictionary; onDone: () => void }) {
+  useEffect(() => {
+    const timer = setTimeout(onDone, SETTLE_MS)
+    return () => clearTimeout(timer)
+  }, [onDone])
+
+  return (
+    <main className="app session">
+      <button type="button" className="settle" onClick={onDone}>
+        <span className="settle-breath" aria-hidden="true" />
+        <p className="settle-word">{dictionary.session.settle}</p>
+        <p className="hint">{dictionary.session.settleHint}</p>
+      </button>
+    </main>
+  )
+}
+
+function RunningSession({
   platform,
   dictionary,
   progress,
@@ -26,17 +71,15 @@ export function SessionScreen({
   if (block === undefined) return null
 
   const rounds = new Set(state.plan.blocks.map((b) => b.round)).size
-  const elapsedShare = 1 - state.remaining / block.seconds
+  const done = 1 - state.remaining / block.seconds
 
   return (
     <main className="app session">
       <header className="session-head">
-        <span className="session-round">
+        <span>
           {t.round} {block.round}/{rounds}
         </span>
-        <span className="session-clock" aria-live="off">
-          {formatSeconds(state.remaining)}
-        </span>
+        <span className="session-clock">{formatSeconds(state.remaining)}</span>
       </header>
 
       <div
@@ -46,39 +89,62 @@ export function SessionScreen({
         aria-valuemax={block.seconds}
         aria-valuenow={block.seconds - state.remaining}
       >
-        <span style={{ width: `${Math.min(100, elapsedShare * 100)}%` }} />
+        <span style={{ width: `${Math.min(100, done * 100)}%` }} />
       </div>
 
       {block.kind === 'encode' ? (
         <section className="encode">
-          <p className="session-hint">{t.encodeHint}</p>
-          {/* Das Wort wechselt von selbst; aria-live spricht es für den
-              Screenreader mit, sonst bliebe der Block dort still. */}
-          <p className="encode-word" aria-live="polite">
+          <p className="hint">{t.encodeHint}</p>
+          {/*
+            Der Schlüssel wechselt mit dem Wort, damit React das Element neu
+            einsetzt und die Bewegung erneut läuft — sonst tauschte nur der
+            Text, und das wäre der harte Schnitt aus G-3.
+          */}
+          <p className="encode-word" key={block.id + state.itemIndex} aria-live="polite">
             {state.currentItem}
           </p>
-          <p className="session-hint">
-            {state.itemIndex + 1} / {block.items.length}
-          </p>
+          <div
+            className="encode-dots"
+            role="img"
+            aria-label={`${state.itemIndex + 1} / ${block.items.length}`}
+          >
+            {block.items.map((item, index) => (
+              <span
+                key={item}
+                className={
+                  index === state.itemIndex ? 'dot-now' : index < state.itemIndex ? 'dot-done' : ''
+                }
+              />
+            ))}
+          </div>
         </section>
       ) : (
         <section className="recall">
-          <p className="session-hint">{t.recallHint}</p>
+          <p className="hint">{t.recallHint}</p>
           <textarea
             className="recall-input"
             value={state.entries}
             onChange={(event) => setEntries(event.target.value)}
             placeholder={t.recallPlaceholder}
-            rows={5}
+            rows={4}
             autoFocus
             autoCapitalize="off"
             autoCorrect="off"
             spellCheck={false}
             aria-label={t.recallHint}
           />
-          <p className="session-hint">
-            {countEntries(state.entries)} / {block.items.length}
-          </p>
+          {/*
+            Das Getippte kommt als Marke zurück — sichtbar, greifbar, ohne
+            jede Bewertung. Ein „richtig“ oder „falsch“ an dieser Stelle wäre
+            ein Hinweis und würde den freien Abruf zerstören (C5).
+          */}
+          <div className="chips" aria-hidden="true">
+            {splitEntries(state.entries).map((entry, index) => (
+              <span className="chip" key={`${entry}-${index}`}>
+                {entry}
+              </span>
+            ))}
+          </div>
           <button type="button" className="start" onClick={advance}>
             <span className="start-label">{t.doneWithBlock}</span>
           </button>
@@ -98,59 +164,62 @@ function Summary({
   onLeave,
 }: {
   dictionary: Dictionary
-  results: { round: number; correct: string[]; missed: string[] }[]
+  results: RoundResult[]
   onLeave: () => void
 }) {
   const t = dictionary.summary
-  const correct = results.reduce((sum, round) => sum + round.correct.length, 0)
-  const total = results.reduce((sum, round) => sum + round.correct.length + round.missed.length, 0)
+  const correct = results.flatMap((round) => round.correct)
+  const missed = results.flatMap((round) => round.missed)
+  const total = correct.length + missed.length
 
   return (
     <main className="app">
       <section className="challenge">
         <h2>{t.heading}</h2>
         {/*
-          Eine einzige, echte Zahl: wie viele Wörter von wie vielen. Kein
-          Prozentwert, keine „Memory Strength“ — die käme aus dem Benchmark
-          und den gibt es noch nicht (D-006, Regel R-1).
+          Eine einzige, echte Zahl. Kein Prozentwert, keine „Memory Strength“ —
+          die käme aus dem Benchmark, und den gibt es noch nicht
+          (D-006, Regel R-1 und D-011/G-6).
         */}
         <p className="summary-score">
-          <strong>{correct}</strong>
+          <strong>{correct.length}</strong>
           <span> / {total}</span>
         </p>
-        <p className="session-hint">{t.note}</p>
-      </section>
-
-      <section className="foundation">
-        <h3>{t.perRound}</h3>
-        <dl>
-          {results.map((round) => (
-            <div className="row" key={round.round}>
-              <dt>
-                {dictionary.session.round} {round.round}
-                {round.missed.length > 0 && (
-                  <span className="row-hint">
-                    {t.missed}: {round.missed.join(', ')}
-                  </span>
-                )}
-              </dt>
-              <dd>
-                {round.correct.length} / {round.correct.length + round.missed.length}
-              </dd>
-            </div>
+        <div className="summary-words">
+          {correct.map((word, index) => (
+            <span className="chip" key={word} style={{ '--i': index } as React.CSSProperties}>
+              {word}
+            </span>
           ))}
-        </dl>
+        </div>
       </section>
 
-      <button type="button" className="quiet" onClick={onLeave}>
+      {missed.length > 0 && (
+        <section className="challenge">
+          {/* G-5: Was nicht kam, ist kein Versagen — es steht nur daneben,
+              in gedeckter Farbe, ohne Kommentar. */}
+          <h2>{t.missed}</h2>
+          <div className="summary-words">
+            {missed.map((word, index) => (
+              <span
+                className="chip chip-muted"
+                key={word}
+                style={{ '--i': index } as React.CSSProperties}
+              >
+                {word}
+              </span>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <p className="hint">{t.note}</p>
+
+      <button type="button" className="quiet summary-back" onClick={onLeave}>
         {t.back}
       </button>
     </main>
   )
-}
-
-function countEntries(text: string): number {
-  return text.split(/[\s,;]+/).filter((entry) => entry.trim().length > 0).length
 }
 
 function formatSeconds(seconds: number): string {

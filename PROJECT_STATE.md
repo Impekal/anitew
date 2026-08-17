@@ -171,3 +171,61 @@ misst gleich mit, dass die Einheit weder zu kurz noch zu lang war.
 **Als Nächstes: M2** — die Engine, die entscheidet, was heute drankommt:
 Wiederholungsplan nach FSRS, Gedächtnisprofil, Spaced Recall aus den Tagen
 davor. Erst dort wird aus einer Übung ein Training.
+
+## 2026-08-17 · D-011 — die Oberfläche bekommt eine Aufgabe
+
+Drei Vorgaben kamen nacheinander herein, und die dritte stand scheinbar gegen
+die erste: *schön, angenehm, auf Seele wirkend* — dann *auch unterhaltsam* —
+dann *futuristisch, vielleicht neuronal*.
+
+Alle drei liegen jetzt als **D-011** mit acht Regeln (G-1…G-8) im
+Entscheidungsprotokoll, weil es sonst Geschmacksfragen geblieben wären, über
+die man in drei Monaten wieder streitet. Zwei der Regeln waren echte
+Konfliktlösungen und nicht bloß Beschreibung:
+
+**„Unterhaltsam“ gegen „Ruhe statt Reiz“** (G-7). Auflösung: Vergnügen kommt
+nicht aus Reiz, sondern aus Inhalt mit Einfall (Missionen, Palast — das ist
+M4), aus Abwechslung, aus Spielgefühl im Kleinen, und am Ende aus dem eigenen
+Fortschritt. Ehrlich festgehalten: In M1 lassen sich nur die mittleren beiden
+einlösen. Eine Oberfläche, die schon jetzt so tut, als wäre sie ein Spiel, wäre
+eine Attrappe.
+
+**„Futuristisch“ gegen „warm, nicht kalt“** (G-8). Der naheliegende Weg wäre
+Cyberpunk gewesen — Neon, Raster, Blauschwarz — und hätte alles zerstört, was
+vorher aufgebaut war. Die Auflösung ist eine Arbeitsteilung: **Warm ist der
+Inhalt, kühl ist die Technik.** Serife für alles, was der Mensch beiträgt;
+Schreibmaschinenschrift für alles, was die App misst; Bernstein für den
+Menschen, kühles Grün für das Netz. „Neuronal“ wird dabei wörtlich genommen und
+nicht als Dekor — Knoten und Verbindungen sind bereits die Form dieser App
+(Wiederholungskurve, Punktekette, später der Palast als Graph), sie werden nur
+sichtbar gemacht.
+
+**Was gebaut wurde:** warme Palette in beiden Modi, Serife und Mono statt einer
+Einheitsschrift, ein 3-Sekunden-Ankommen mit atmendem Kreis statt eines
+Countdowns, das Wort beim Einprägen allein auf dem Bildschirm, eine Punktekette
+mit wanderndem Signal statt „3 / 8“, getippte Wörter, die als Marken landen,
+ein Ergebnis, das sich aufblättert, und ein Netz aus 30 Knoten im Hintergrund.
+
+**Weggenommen wurde mehr als hinzugefügt.** Der Systemcheck aus M0 hatte den
+Startbildschirm beherrscht — er liegt jetzt zusammengeklappt am Fuß. Über dem
+Startknopf stand ein Etikett, das nichts erklärte. Die Modusknöpfe hießen „Ich
+habe 15 Minuten“ und brachen auf dem Telefon um; die Frage steht jetzt einmal
+darüber, die Knöpfe tragen nur noch die Zeit.
+
+**Ein Fehler, der eine Weile unsichtbar war:** Das Netz stand vollständig im
+DOM, mit richtigen Farben und Maßen — und war trotzdem nicht zu sehen. Ursache
+war die Malreihenfolge von CSS: Der Hintergrund eines Blockelements wird
+*nach* den Ebenen mit negativem z-index gezeichnet. Die Grundfarbe stand auf
+`body` und hat alles zugedeckt, auch den Lichtschein, der schon vorher
+unsichtbar gewesen war, ohne dass es jemandem aufgefallen wäre. Jetzt steht sie
+auf `html`. Notiert, weil das Symptom („Element ist da, Element ist unsichtbar“)
+zu einer langen Suche an der falschen Stelle einlädt.
+
+**Der zweite Anlauf war die eigentliche Arbeit.** Die erste Fassung des Netzes
+war zu laut: wenige große Dreiecke quer über den Text — eine Grafik statt eines
+Hintergrunds. Jetzt kürzere Verbindungen, mehr und kleinere Knoten, geringere
+Deckkraft und eine Maske, die die Mitte frei hält. Ein Hintergrund, der mit dem
+Inhalt um Aufmerksamkeit streitet, ist ein Fehler, egal wie hübsch er ist.
+
+**Bewusst nicht gebaut:** Haptik. Eine Vibration alle vier Sekunden wäre keine
+Wärme, sondern Nerverei (O6 bleibt offen).
