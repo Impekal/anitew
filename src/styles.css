@@ -65,6 +65,11 @@
   --glow-text: 0 1px 16px color-mix(in oklab, var(--accent) 48%, transparent);
   --glow-flare: 0 2px 32px rgb(168 95 34 / 80%);
   --glow-flare: 0 2px 32px color-mix(in oklab, var(--accent) 80%, transparent);
+  /* Eigener Wert für die kleinen Pillen: Der weite Schein des Startknopfs
+     legt sich um eine Pille herum als Fleck, nicht als Licht. Enger und
+     etwas kräftiger trifft dieselbe Wirkung bei einem Viertel der Fläche. */
+  --glow-pill: 0 4px 22px 3px rgb(168 95 34 / 88%);
+  --glow-pill: 0 4px 22px 3px color-mix(in oklab, var(--accent) 88%, transparent);
 
   --sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   /* D-011/G-8: Gemessenes bekommt eine eigene Schrift. Gleich breite Ziffern,
@@ -115,6 +120,8 @@
     --glow-text: 0 0 26px color-mix(in oklab, var(--accent) 32%, transparent);
     --glow-flare: 0 0 52px rgb(229 171 107 / 65%);
     --glow-flare: 0 0 52px color-mix(in oklab, var(--accent) 65%, transparent);
+    --glow-pill: 0 0 28px 1px rgb(229 171 107 / 75%);
+    --glow-pill: 0 0 28px 1px color-mix(in oklab, var(--accent) 75%, transparent);
   }
 }
 
@@ -292,15 +299,24 @@ body::before {
 
 .mode:hover {
   color: var(--ink);
+  box-shadow: var(--glow-pill);
+}
+
+/* Auch eine nicht gewählte Pille antwortet auf die Berührung — sonst fühlt
+   sich der Wechsel des Modus an wie ein Klick ins Leere (G-7). */
+.mode:active {
+  box-shadow: var(--glow-pill);
+  transform: translateY(1px);
 }
 
 .mode-active {
   border-color: transparent;
-  background: var(--accent-soft);
+  /* Etwas mehr Farbe als `--accent-soft`: Ein blasser Körper trägt keinen
+     kräftigen Hof — der Schein sähe dann aus wie ein Fleck *neben* der Pille
+     statt wie Licht *von* ihr. */
+  background: color-mix(in oklab, var(--accent) 26%, var(--card));
   color: var(--ink);
-  /* Enger als `--glow-soft`: Ein weiter Schein um eine kleine Pille herum
-     liest sich als Fleck, nicht als Licht. */
-  box-shadow: 0 0 14px -4px color-mix(in oklab, var(--accent) 55%, transparent);
+  box-shadow: var(--glow-pill);
 }
 
 /* ── Karten ───────────────────────────────────────────────────────────── */

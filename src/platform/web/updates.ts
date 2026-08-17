@@ -50,9 +50,23 @@ export function keepUpToDate(): void {
   }
 
   check()
+
+  /*
+   * Zwei Auslöser, weil ein einzelner Lücken lässt:
+   *
+   * `visibilitychange` deckt den Normalfall ab — die App kommt aus dem
+   * Hintergrund zurück, wird also wieder sichtbar.
+   *
+   * `pageshow` deckt den Fall ab, in dem iOS die Seite aus seinem eigenen
+   * Zwischenspeicher wiederherstellt (`persisted`). Dabei kann es passieren,
+   * dass die Seite als „nie unsichtbar gewesen“ gilt und der erste Auslöser
+   * schweigt. Zweimal zu prüfen kostet nichts — `update()` fragt nur nach und
+   * lädt nur, wenn es wirklich etwas Neues gibt.
+   */
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden) check()
   })
+  window.addEventListener('pageshow', () => check())
 }
 
 /**

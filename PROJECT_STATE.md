@@ -529,3 +529,28 @@ Dass es drei Runden gebraucht hat, liegt an einer Eigenheit, die man kennen
 sollte: **Ein Schein auf hellem Grund sieht auf dem Entwicklungsmonitor immer
 kräftiger aus als auf einem Telefon im Tageslicht.** Im Zweifel zu kräftig
 einstellen und vom Gerät aus zurücknehmen — nicht umgekehrt.
+
+## 2026-08-17 · Die Pille leuchtet, und der zweite Auslöser fürs Update
+
+Zwei Nachträge vom Gerät.
+
+**Der aktive Minutenknopf war zu schwach.** Der Grund ist ein anderer als beim
+großen Knopf, und er ist lehrreich: Ein **blasser Körper trägt keinen
+kräftigen Hof**. Solange die Pille fast so hell war wie das Papier, sah der
+Schein aus wie ein Fleck *neben* ihr statt wie Licht *von* ihr — egal wie stark
+man ihn stellte. Erst mehr Farbe im Körper (26 % Akzent statt der blassen
+Voreinstellung) macht den Hof glaubhaft.
+
+Und die kleinen Pillen haben jetzt einen eigenen Wert: Der weite Schein des
+Startknopfs legt sich um eine Pille als Fleck; enger und dichter trifft
+dieselbe Wirkung bei einem Viertel der Fläche.
+
+**Zweiter Auslöser für die Update-Prüfung: `pageshow`.** `visibilitychange`
+deckt den Normalfall ab, aber iOS kann eine Seite aus seinem eigenen
+Zwischenspeicher wiederherstellen, ohne dass sie je als unsichtbar galt — dann
+schweigt der erste Auslöser. Zweimal zu prüfen kostet nichts: `update()` fragt
+nur nach und lädt nur, wenn wirklich etwas Neues da ist.
+
+Damit ist die Frage vom Auftraggeber vollständig beantwortet — App schließen
+und wieder öffnen prüft jetzt auf Updates und führt sie aus, ohne
+Deinstallieren.
