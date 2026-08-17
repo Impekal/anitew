@@ -1,0 +1,243 @@
+/*
+ * Hell und dunkel nach Systemeinstellung (Backlog O3), große Flächen, alles
+ * Wichtige in der Daumenzone (O5). Bewusst noch ohne Gestaltungssystem —
+ * das kommt, wenn es etwas zu gestalten gibt.
+ */
+
+:root {
+  --ink: #12151c;
+  --ink-soft: #5a6274;
+  --paper: #f4f2ee;
+  --card: #ffffff;
+  --line: #e2ded6;
+  --accent: #9a5b2c;
+  --accent-ink: #ffffff;
+  --bad: #a3352b;
+
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #eef1f6;
+    --ink-soft: #98a1b3;
+    --paper: #0f1218;
+    --card: #171b23;
+    --line: #272d39;
+    --accent: #e0a86a;
+    --accent-ink: #1a1208;
+    --bad: #e8837a;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+}
+
+.app {
+  max-width: 34rem;
+  margin: 0 auto;
+  padding: 2rem 1.25rem calc(2rem + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  letter-spacing: 0.22em;
+  font-weight: 600;
+}
+
+.tagline {
+  margin: 0.35rem 0 0;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+
+.challenge h2 {
+  margin: 0 0 0.9rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+.start {
+  width: 100%;
+  border: none;
+  border-radius: 1.25rem;
+  background: var(--accent);
+  color: var(--accent-ink);
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  align-items: center;
+  cursor: pointer;
+  font: inherit;
+}
+
+.start:active {
+  transform: scale(0.99);
+}
+
+.start-time {
+  font-size: 3rem;
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.start-label {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.8rem;
+}
+
+/* Zwei feste Spalten statt umbrechender Zeilen: sonst hängt je nach
+   Sprachlänge mal ein Knopf allein in einer Reihe. */
+.modes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+}
+
+.mode {
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--ink-soft);
+  border-radius: 999px;
+  padding: 0.55rem 0.9rem;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.mode-active {
+  border-color: var(--accent);
+  color: var(--ink);
+}
+
+.note,
+.foundation {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  padding: 1.1rem 1.15rem;
+}
+
+.note h3,
+.foundation h3 {
+  margin: 0 0 0.6rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+.note p {
+  margin: 0 0 0.9rem;
+}
+
+.quiet {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 0.45rem 1.1rem;
+  font: inherit;
+  cursor: pointer;
+}
+
+.foundation dl {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  font-size: 0.9rem;
+}
+
+.row dt {
+  color: var(--ink-soft);
+  display: flex;
+  flex-direction: column;
+}
+
+.row dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+  /* Ein Datum darf nicht mitten im Wert umbrechen — „2026-“ / „08-17“ liest
+     sich wie ein Fehler. */
+  white-space: nowrap;
+}
+
+.row-hint,
+.hint {
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.hint {
+  margin: 0.9rem 0 0;
+}
+
+.bad {
+  color: var(--bad);
+}
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.language {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+
+.language select {
+  font: inherit;
+  padding: 0.45rem 0.6rem;
+  border-radius: 0.6rem;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--ink);
+}
+
+/* Wer „weniger Bewegung“ eingestellt hat, bekommt keine (Backlog O4). */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

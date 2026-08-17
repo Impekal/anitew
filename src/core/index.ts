@@ -1,0 +1,19 @@
+/**
+ * Der Kern von ANITEW.
+ *
+ * Reines TypeScript, kein DOM, kein React, keine Browser-Schnittstelle
+ * (D-010). Er wird von `tsconfig.core.json` ein zweites Mal übersetzt — ohne
+ * die DOM-Bibliothek —, damit ein Verstoß als Übersetzungsfehler auffällt und
+ * nicht erst Jahre später beim Verpacken für die Stores.
+ *
+ * Was hierher gehört: Wiederholungsplanung, Bewertung, Sessionaufbau,
+ * Gedächtnisprofil, Benchmark, Inhaltsgeneratoren, Zeitrechnung, Zufall.
+ * Was nicht: alles, was ein Gerät anfasst — das steht in src/platform/ hinter
+ * den Schnittstellen aus `ports.ts`.
+ */
+
+export * from './language.ts'
+export * from './modes.ts'
+export * from './ports.ts'
+export * from './rng.ts'
+export * from './time.ts'

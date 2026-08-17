@@ -1,0 +1,16 @@
+// Cloudflare Workers (Static Assets) — Backlog A7.
+//
+// Kein Servercode: `wrangler deploy` lädt dist/ als statische Dateien hoch.
+// Das ist kostenlos und bleibt austauschbar — der Build ist ein Ordner, den
+// jeder Hoster ausliefern kann. Es gibt hier ausdrücklich kein Backend
+// (D-009: kein Konto, keine Nutzerdatenbank, kein Server).
+{
+  "name": "anitew",
+  "compatibility_date": "2026-08-01",
+  "assets": {
+    "directory": "./dist",
+    // Die App ist eine einzige Seite; unbekannte Pfade führen zu index.html
+    // statt zu einem 404.
+    "not_found_handling": "single-page-application"
+  }
+}

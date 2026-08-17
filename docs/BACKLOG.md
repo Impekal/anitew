@@ -11,9 +11,10 @@
 > Diese Datei ist Teil des Projektgedächtnisses. Jede Session, die Punkte
 > erledigt oder neue findet, aktualisiert sie.
 >
-> **Stand 2026-08-17:** Die neun offenen Entscheidungen aus Abschnitt S sind
-> beantwortet und liegen als D-001 bis D-010 in [`DECISIONS.md`](DECISIONS.md).
-> Meilenstein M0 ist damit frei.
+> **Stand 2026-08-17:** Die neun Entscheidungen sind beantwortet (D-001 bis
+> D-010 in [`DECISIONS.md`](DECISIONS.md)). **Meilenstein M0 ist fertig** —
+> das Fundament steht, geprüft mit 43 Kern-Tests und 6 E2E-Tests. Als Nächstes
+> M1: die erste echte 5-Minuten-Session.
 
 ---
 
@@ -40,15 +41,16 @@ unter „Nicht-Ziele“.
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
 | A1 | Stack festlegen und begründen | ✅ 2026-08-17 | React 18 + TS strict + Vite 6 + vite-plugin-pwa + Dexie — **D-003** | S |
-| A2 | Repo-Grundgerüst, Ordnerstruktur, Lint/Format, tsconfig strict | ⬜ | | S |
-| A3 | PWA-Grundlage: Manifest, Service Worker, Offline-Start, Update-Strategie | ⬜ | erster Start nach Installation muss offline funktionieren | M |
-| A4 | **Architekturregel: `src/core/` ist reines TypeScript** — keine DOM-, React- oder Browser-API-Zugriffe | ⬜ | Engine, Scheduler, Scoring, Profil, Sessionplanung leben hier. Voraussetzung für R-3 und für Tests ohne Browser | M |
-| A5 | Plattform-Adapter-Schicht: Storage, Uhr/Timer, Benachrichtigungen, Audio, Datei-Export | ⬜ | eine Schnittstelle, austauschbare Implementierung (Web heute, TWA/iOS später) | M |
-| A6 | Datenschicht: Dexie-Schema **mit Migrationen ab Version 1** | ⬜ | Trainingshistorie ist nicht wiederherstellbar — ein Schemafehler kostet später echte Nutzerdaten | M |
-| A7 | Deployment: Auto-Build bei Push, statisches Hosting, kein Backend | ⬜ | Cloudflare Pages/Workers wie RReader; Build muss auf jedem statischen Host laufen | S |
-| A8 | Projektgedächtnis anlegen: `PROJECT_STATE.md`, `docs/DECISIONS.md`, diese Liste | 🟨 2026-08-17 | BACKLOG und DECISIONS stehen; `PROJECT_STATE.md` folgt mit M0 | S |
-| A9 | App-Identität: Icon, Splash, Theme-Farben, Statusleiste, Name im Manifest | ⬜ | Name steht (**D-001**: ANITEW); Icon erst nach R3 | S |
-| A10 | Kein Tracking, keine Analytics-Dritte. Nutzungsstatistik nur lokal auf dem Gerät | ⬜ | | S |
+| A2 | Repo-Grundgerüst, Ordnerstruktur, tsconfig strict | ✅ 2026-08-17 | | S |
+| A3 | PWA-Grundlage: Manifest, Service Worker, Offline-Start, Update-Strategie | ✅ 2026-08-17 | `registerType: autoUpdate`; E2E prüft Manifest inkl. maskable Icon | M |
+| A4 | **Architekturregel: `src/core/` ist reines TypeScript** — keine DOM-, React- oder Browser-API-Zugriffe | ✅ 2026-08-17 | `tsconfig.core.json` übersetzt den Kern ein zweites Mal **ohne DOM-Bibliothek** — ein Verstoß ist ein Übersetzungsfehler, kein guter Vorsatz. Gegengeprüft: absichtlicher Verstoß eingebaut, Prüfung schlug fehl, Verstoß entfernt | M |
+| A5 | Plattform-Adapter-Schicht: Storage, Uhr/Timer, Benachrichtigungen, Audio, Datei-Export | 🟨 2026-08-17 | `core/ports.ts` + `platform/web/`. Uhr und Einstellungen stehen; Benachrichtigungen, Audio und Dateien kommen, wenn sie gebraucht werden | M |
+| A6 | Datenschicht: Dexie-Schema **mit Migrationen ab Version 1** | ✅ 2026-08-17 | Version 1 ist festgeschrieben und wird nie bearbeitet — die Regel steht oben in `src/data/db.ts`. Benchmarks liegen in einer **eigenen** Tabelle, damit eine spätere Auswertung sie nicht mit Trainingsdaten vermischen kann (R-1 bis ins Schema) | M |
+| A7 | Deployment: Auto-Build bei Push, statisches Hosting, kein Backend | 🟨 2026-08-17 | `wrangler.jsonc` + `deploy.yml` stehen. Es fehlen `CLOUDFLARE_API_TOKEN` und `CLOUDFLARE_ACCOUNT_ID` in den Repo-Einstellungen; ohne sie baut die CI und überspringt das Veröffentlichen still | S |
+| A8 | Projektgedächtnis: `PROJECT_STATE.md`, `docs/DECISIONS.md`, diese Liste | ✅ 2026-08-17 | | S |
+| A9 | App-Identität: Icon, Splash, Theme-Farben, Statusleiste, Name im Manifest | 🟨 2026-08-17 | Zeichen ist **vorläufig** (fünf Punkte mit wachsenden Abständen — die Wiederholungskurve aus D-004), endgültig erst nach R3 | S |
+| A10 | Kein Tracking, keine Analytics-Dritte. Nutzungsstatistik nur lokal auf dem Gerät | ✅ 2026-08-17 | keine einzige Abhängigkeit, die nach außen funkt | S |
+| A11 | Kein `Math.random()` irgendwo — aller Zufall kommt aus `createRng(seed)` | ✅ 2026-08-17 | ohne Determinismus ist ein Fehlerbericht wertlos und der Simulator (C9) beweist nichts | S |
 
 ## B. Die 5-Minuten-Session
 
@@ -78,7 +80,7 @@ Abruftraining. Hier entscheidet sich, ob die App wirkt.
 | C5 | **Abruf, nicht Wiedererkennen**: freie Eingabe als Standard, Multiple Choice nur wo unvermeidbar | ⬜ | Wiedererkennen fühlt sich leichter an und trainiert weniger | M |
 | C6 | Ähnliche Items nicht in derselben Session (Interferenz vermeiden) | ⬜ | | M |
 | C7 | Überfälligkeitsdruck begrenzen: nie ein Berg von 800 fälligen Items nach einer Pause | ⬜ | genau hier steigen Nutzer bei Karteikarten-Apps aus | M |
-| C8 | Engine deterministisch und seed-basiert, damit testbar | ⬜ | folgt aus A4 | S |
+| C8 | Engine deterministisch und seed-basiert, damit testbar | 🟨 2026-08-17 | `core/rng.ts` steht und ist geprüft; gilt für die Engine, sobald es eine gibt | S |
 | C9 | Simulator: synthetische Nutzer über 90 Tage, bevor echte Nutzer da sind | ⬜ | prüft, ob der Scheduler tut, was er soll — billiger als es an Menschen zu merken | M |
 | C10 | FSRS-Parameter später **auf dem Gerät** aus der eigenen Historie nachoptimieren | ⬜ | **D-004**, Phase nach M2; bis dahin Standardparameter | L |
 
@@ -170,7 +172,7 @@ Der Punkt, der aus einem Spiel einen Gedächtnistrainer macht.
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
 | J1 | Vier Modi: ⚡ 60 Sekunden · ⚡ 3 Minuten · 🧠 5 Minuten (Standard) · 🔥 15 Minuten | ⬜ | | M |
-| J2 | Jeder Modus ist ein Zeitbudget-Profil derselben Engine, kein eigener Code | ⬜ | folgt aus B2/B4 | S |
+| J2 | Jeder Modus ist ein Zeitbudget-Profil derselben Engine, kein eigener Code | 🟨 2026-08-17 | `core/modes.ts` legt die vier Budgets fest; die Engine, die sie füllt, kommt mit M1 | S |
 | J3 | Auswahl in einem Tap direkt vom Startbildschirm | ⬜ | | S |
 | J4 | 60-Sekunden-Modus hält die Streak am Leben | ⬜ | **D-008** — daneben getrennt gezählt, wie viele Tage volle Challenges waren | S |
 
@@ -192,10 +194,10 @@ Der Punkt, der aus einem Spiel einen Gedächtnistrainer macht.
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| L1 | i18n-Grundgerüst, Sprachwechsel zur Laufzeit, von Anfang an | ⬜ | nachträglich eingezogen kostet es das Zehnfache | M |
-| L1a | Beim ersten Start die **Systemsprache** übernehmen; Umschalten sichtbar auf dem ersten Bildschirm, nicht in den Einstellungen vergraben | ⬜ | **D-007** | S |
-| L2 | Elf Sprachen: DE · EN · FR · ES · IT · PT · NL · TR · AR · ZH · JA | ⬜ | | L |
-| L3 | RTL für Arabisch — Layout, nicht nur Text | ⬜ | | M |
+| L1 | i18n-Grundgerüst, Sprachwechsel zur Laufzeit, von Anfang an | ✅ 2026-08-17 | die Form der Wörterbücher wird aus der deutschen Quelle abgeleitet — ein vergessener Schlüssel ist ein Übersetzungsfehler, kein leerer Text zur Laufzeit | M |
+| L1a | Beim ersten Start die **Systemsprache** übernehmen; Umschalten sichtbar auf dem ersten Bildschirm | ✅ 2026-08-17 | **D-007**. Die Regel liegt in `core/language.ts` und ist ohne Browser prüfbar; E2E prüft sie zusätzlich echt (de-DE, en-GB, sv-SE → Englisch) | S |
+| L2 | Elf Sprachen: DE · EN · FR · ES · IT · PT · NL · TR · AR · ZH · JA | 🟨 2026-08-17 | alle elf sind als Sprache bekannt und wählbar; übersetzt sind DE und EN, die übrigen zeigen Englisch **und sagen das auch** | L |
+| L3 | RTL für Arabisch — Layout, nicht nur Text | 🟨 2026-08-17 | `dir` wird gesetzt; das Layout ist noch nicht daraufhin geprüft | M |
 | L4 | CJK: Schriftschnitte, Zeilenumbruch, Eingabemethoden bei freiem Abruf (C5) | ⬜ | freier Abruf auf Japanisch ist ein eigenes Problem | M |
 | L5 | Engine bleibt sprachunabhängig; Sprache ist ein Attribut am Item | ⬜ | Voraussetzung für L7 | M |
 | L6 | Inhaltspools je Sprache: Wörter, Namen, Orte — kulturell passend, nicht durchübersetzt | ⬜ | ein deutscher Namenspool auf Japanisch trainiert nichts Sinnvolles | L |
@@ -233,7 +235,7 @@ Der Punkt, der aus einem Spiel einen Gedächtnistrainer macht.
 |---|---|---|---|---|
 | O1 | Vom Öffnen zum laufenden Training: ein Tap, unter zwei Sekunden | ⬜ | „super technisch und einfach und nicht anstrengend“ | M |
 | O2 | Kein Onboarding-Wall, keine Registrierung, kein Einwilligungslabyrinth | ⬜ | | S |
-| O3 | Hell/Dunkel nach Systemeinstellung | ⬜ | | S |
+| O3 | Hell/Dunkel nach Systemeinstellung | ✅ 2026-08-17 | | S |
 | O4 | Barrierefreiheit: Kontrast, große Schrift, Screenreader, Fokusreihenfolge, reduzierte Bewegung | ⬜ | | M |
 | O5 | Einhändig bedienbar, alles Wichtige in der Daumenzone | ⬜ | | M |
 | O6 | Haptik und Ton dezent und abschaltbar | ⬜ | | S |
@@ -243,9 +245,9 @@ Der Punkt, der aus einem Spiel einen Gedächtnistrainer macht.
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | ⬜ | möglich, weil A4 den Kern browserfrei hält | M |
-| P2 | E2E-Test: eine vollständige 5-Minuten-Session durchlaufen | ⬜ | Playwright | M |
-| P3 | CI bei jedem Push: Typecheck, Tests, Build | ⬜ | | S |
+| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | 🟨 2026-08-17 | 43 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Scheduler und Scoring folgen mit M2 | M |
+| P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | 🟨 2026-08-17 | 6 Tests in Chromium und im Telefonprofil. Die vollständige 5-Minuten-Session kommt mit M1 | M |
+| P3 | CI bei jedem Push: Typecheck (App **und** Kern getrennt), Tests, Build, E2E | ✅ 2026-08-17 | | S |
 | P4 | Performance: Kaltstart unter 2 s, Timer laufen ruckelfrei | ⬜ | | M |
 | P5 | Uhrmanipulation darf die Engine nicht zerstören (Streak-Betrug, Intervall-Chaos) | ⬜ | monotone Zeitquelle plus Plausibilitätsprüfung | M |
 | P6 | Zeitzonenwechsel und Reisen: was ist „heute“? | ⬜ | | M |
@@ -256,7 +258,7 @@ Der Punkt, der aus einem Spiel einen Gedächtnistrainer macht.
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| Q1 | PWA so bauen, dass TWA-Verpackung ohne Umbau möglich ist | ⬜ | ist R-3 / A4 / A5 — hier nur die Abnahme | S |
+| Q1 | PWA so bauen, dass TWA-Verpackung ohne Umbau möglich ist | 🟨 2026-08-17 | Kern ist browserfrei (A4), Manifest trägt schon den endgültigen Namen und ein maskable Icon. Abnahme erst beim tatsächlichen Verpacken | S |
 | Q2 | Digital Asset Links vorbereiten (assetlinks.json, Signaturfingerprint) | ⬜ | | S |
 | Q3 | Bubblewrap → .aab → Play Console, Signierung, Test-Track | ⬜ | Phase 2 | M |
 | Q4 | Play: Datenschutzerklärung, Data-Safety-Formular, Altersfreigabe | ⬜ | | M |
@@ -268,7 +270,7 @@ Der Punkt, der aus einem Spiel einen Gedächtnistrainer macht.
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| R1 | `THIRD_PARTY_LICENSES.md` ab dem ersten Paket pflegen | ⬜ | wie in RReader | S |
+| R1 | `THIRD_PARTY_LICENSES.md` ab dem ersten Paket pflegen | ✅ 2026-08-17 | Ausgeliefertes vom nur Bauenden getrennt. Im ausgelieferten Stand kein Copyleft; die LGPL-Teile (sharp über wrangler) laufen nur auf dem Buildrechner | S |
 | R2 | Lizenzen für Icons, Töne und Namenslisten dokumentieren | ⬜ | Gesichter erzeugen wir selbst (D14), damit entfällt der größte Teil | M |
 | R3 | Marken- und Namensrecherche für **ANITEW** | ⬜ | **D-001**. Vor Icon und Store-Eintrag, also vor den ersten Ausgaben. Keine Rechtsberatung, aber eine Prüfung, die vorher stattfinden muss | S |
 | R4 | Datenschutzerklärung — auch eine App ohne Server braucht eine | ⬜ | | S |
@@ -304,7 +306,7 @@ Neu offen, entstanden aus den Antworten:
 
 | | Meilenstein | Inhalt | Fertig, wenn |
 |---|---|---|---|
-| **M0** | Fundament | A1–A8, L1/L1a | Push baut, App installiert sich, `src/core/` läuft ohne Browser · **frei seit 2026-08-17** |
+| **M0** | Fundament | A1–A11, L1/L1a, P3 | ✅ **2026-08-17** — Push baut, App installiert sich, `src/core/` läuft ohne Browser und wird von der CI daran gehalten |
 | **M1** | Walking Skeleton | B1–B3, B5, B9, D1, zwei Module (D4 Encode + D6 Recall), N1 | Eine echte 5-Minuten-Session lässt sich täglich durchlaufen, Ergebnisse bleiben erhalten |
 | **M2** | Die Engine wird echt | C1–C9, D8, E1–E7, B4 | Die App entscheidet begründet, was du heute trainierst, und plant Wiederholungen persönlich |
 | **M3** | Ehrlichkeit | F1–F7, F2a, F2b | Es gibt zwei getrennte Zahlen, und die große Prozentzahl ist gemessen. **Vorher kein öffentlicher Release** |
@@ -333,13 +335,19 @@ Bewusst nicht gebaut, damit die Liste oben nicht ausfranst:
 
 ## Erste Schritte, konkret
 
-1. ~~S1 und S3 entscheiden~~ — erledigt am 2026-08-17, alle neun Fragen sind
+1. ~~S1 und S3 entscheiden~~ — erledigt am 2026-08-17, alle neun Fragen
    beantwortet (D-001 bis D-010).
-2. **M0 umsetzen:** Gerüst, PWA, `src/core/` ohne Browser, Datenschicht mit
-   Migrationen ab Version 1, i18n von der ersten Zeile an, CI. ← *hier stehen wir*
-3. M1 umsetzen: eine echte, durchlaufbare 5-Minuten-Session mit zwei Modulen.
-   Ab hier kannst du sie selbst täglich benutzen — und alles Weitere an echter
+2. ~~M0: Gerüst, PWA, `src/core/` ohne Browser, Datenschicht mit Migrationen,
+   i18n, CI~~ — erledigt am 2026-08-17.
+3. **M1 umsetzen:** eine echte, durchlaufbare 5-Minuten-Session mit zwei
+   Modulen (B1–B3, B5, B9, D1, D4, D6). ← *hier stehen wir*
+   Ab hier lässt sie sich täglich benutzen — und alles Weitere an echter
    Erfahrung statt an Vermutungen ausrichten.
 
-Nebenbei und unabhängig davon: **R3** (Markenrecherche ANITEW) sollte laufen,
-bevor Icon, Domain und Store-Eintrag Geld kosten.
+Zwei Dinge nebenher, unabhängig vom Meilenstein:
+
+- **R3** (Markenrecherche ANITEW) sollte laufen, bevor Icon, Domain und
+  Store-Eintrag Geld kosten.
+- **A7**: `CLOUDFLARE_API_TOKEN` und `CLOUDFLARE_ACCOUNT_ID` im Repo
+  hinterlegen, damit jeder Push auch live geht. Bis dahin baut die CI und
+  überspringt das Veröffentlichen still.

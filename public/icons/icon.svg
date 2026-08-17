@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="ANITEW">
+  <!--
+    Fünf Punkte auf einem Bogen, mit wachsenden Abständen: die
+    Wiederholungskurve aus D-004. Erst dicht, dann immer weiter auseinander.
+    Vorläufiges Zeichen, bis die Markenrecherche (Backlog R3) durch ist.
+  -->
+  <rect width="512" height="512" rx="112" fill="#0f1218" />
+  <g stroke="#e0a86a" stroke-width="16" stroke-linecap="round" fill="none">
+    <path d="M102 338 L154 287 L230 230 L333 184 L425 164" />
+  </g>
+  <g fill="#e0a86a">
+    <circle cx="102" cy="338" r="19" />
+    <circle cx="154" cy="287" r="21" />
+    <circle cx="230" cy="230" r="25" />
+    <circle cx="333" cy="184" r="29" />
+    <circle cx="425" cy="164" r="34" />
+  </g>
+</svg>

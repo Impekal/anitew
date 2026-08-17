@@ -1,0 +1,60 @@
+import type { Dictionary } from './index.ts'
+
+export const en: Dictionary = {
+  app: {
+    name: 'ANITEW',
+    tagline: 'Train your memory. Measure your progress. Remember more.',
+  },
+  language: {
+    label: 'Language',
+    names: {
+      de: 'Deutsch',
+      en: 'English',
+      fr: 'Français',
+      es: 'Español',
+      it: 'Italiano',
+      pt: 'Português',
+      nl: 'Nederlands',
+      tr: 'Türkçe',
+      ar: 'العربية',
+      zh: '中文',
+      ja: '日本語',
+    },
+    incomplete: 'Not translated yet — the app falls back to English.',
+  },
+  start: {
+    heading: "Today's challenge",
+    start: 'Begin',
+    modes: {
+      emergency: 'I have 60 seconds',
+      short: 'I have 3 minutes',
+      daily: 'I have 5 minutes',
+      extended: 'I have 15 minutes',
+    },
+  },
+  notYet: {
+    heading: 'Training comes next',
+    body: 'The foundation stands: the app installs, runs without a network and remembers things. The five-minute session itself is the next step (M1).',
+    close: 'Got it',
+  },
+  check: {
+    heading: 'Foundation',
+    note: 'A temporary panel, shown until training exists. Every value here is measured — none of them is invented.',
+    storage: 'On-device storage',
+    storageOk: 'ready',
+    storageFail: 'unavailable',
+    offline: 'Works without a network',
+    offlineOk: 'ready',
+    offlinePending: 'setting up',
+    offlineUnavailable: 'needs HTTPS',
+    installed: 'Launched as an app',
+    yes: 'yes',
+    no: 'no (in the browser)',
+    today: 'Training day',
+    todayHint: 'A day starts at 4 a.m., not at midnight.',
+    firstSeen: 'First opened',
+    openCount: 'Opened',
+    times: 'times',
+    version: 'Build',
+  },
+}

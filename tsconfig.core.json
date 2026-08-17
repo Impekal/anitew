@@ -1,0 +1,34 @@
+{
+  // Der Kern wird ein zweites Mal übersetzt — ohne DOM.
+  //
+  // Das ist die Durchsetzung von D-010, nicht bloß eine gute Absicht: `lib`
+  // enthält kein "DOM" und `types` ist leer. Wer in src/core/ `window`,
+  // `document`, `navigator`, `localStorage` oder `fetch` anfasst, bekommt
+  // hier einen Übersetzungsfehler — in der Entwicklung, in der CI, sofort.
+  //
+  // Der Sinn: Der Kern (Engine, Wiederholungsplanung, Bewertung, Profil)
+  // muss ohne Browser laufen, damit er ohne Browser testbar ist und damit die
+  // App später als Android-TWA und als native iOS-App verpackt werden kann,
+  // ohne noch einmal geschrieben zu werden.
+  //
+  // Alles Plattformabhängige gehört hinter die Schnittstellen in
+  // src/core/ports.ts und wird in src/platform/ umgesetzt.
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noUncheckedIndexedAccess": true,
+    "types": []
+  },
+  "include": ["src/core"]
+}

@@ -1,0 +1,33 @@
+# Prüft jeden Push und jeden Pull Request (Backlog P3).
+#
+# Der Kern wird zweimal übersetzt: einmal als Teil der App, einmal für sich
+# allein ohne DOM. Der zweite Durchgang ist die Durchsetzung von D-010 — wer in
+# src/core/ nach `window` greift, scheitert hier und nicht erst beim Verpacken
+# für die Stores.
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Typen prüfen (App und Kern getrennt)
+        run: npm run typecheck
+      - name: Tests (Kern, ohne Browser)
+        run: npm test
+      - name: Build
+        run: npm run build
+      - name: Browser für die E2E-Tests
+        run: npx playwright install --with-deps chromium
+      - name: Tests (die gebaute App im Browser)
+        run: npx playwright test --project=chromium
