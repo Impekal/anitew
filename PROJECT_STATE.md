@@ -257,3 +257,23 @@ Hintergrund mehr, sondern ein Mitbewerber (G-2). Während einer laufenden
 Einheit blendet es deshalb auf ein Achtel herunter und danach wieder auf. Das
 ist der beste Teil des ganzen Umbaus, und er ist erst durch den Einwand
 entstanden: Die Aufmerksamkeit verengt sich, also verengt sich das Bild mit.
+
+## 2026-08-17 · Das Netz, vierter Anlauf — und der Fehler dazwischen
+
+Rückmeldung: deutlich dünner, kaum sichtbar.
+
+Der Weg dahin ging einmal zu weit in die andere Richtung, und das gehört
+festgehalten, weil der Denkfehler naheliegt: Nachdem der Zuschnitt behoben war
+(Feld hochkant statt quadratisch), reichte das Netz plötzlich über den ganzen
+Bildschirm statt über einen Streifen. Die Verstärkung von Linien und Knoten aus
+dem Anlauf davor war eine Reaktion auf den Zuschnittfehler gewesen — mit dem
+behobenen Zuschnitt war sie nicht mehr nötig, sondern zu viel. Zwei
+Korrekturen für dasselbe Symptom, und die zweite hob die erste auf.
+
+Jetzt: Linienstärke 0,16 statt 0,38, Knoten 0,4–0,7 statt 0,85–1,55, Deckkraft
+0,32 im Dunkeln und 0,2 im Hellen. Während einer Einheit 0,07. Das Netz ist
+Textur, nicht Zeichnung.
+
+Die Faustregel steht jetzt in D-011/G-8, damit die nächste Änderung nicht
+wieder zwischen den Extremen pendelt: **Wer das Netz auf dem Startbildschirm
+bemerkt, bevor er den Knopf sieht, hat es zu stark eingestellt.**

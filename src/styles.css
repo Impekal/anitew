@@ -420,7 +420,7 @@ body::before {
   height: 100%;
   pointer-events: none;
   z-index: -1;
-  opacity: 0.55;
+  opacity: 0.32;
   transition: opacity 900ms var(--ease);
   /*
    * Die Mitte wird **gedämpft, nicht ausgeschnitten**.
@@ -438,25 +438,25 @@ body::before {
 @media (prefers-color-scheme: light) {
   /* Auf Papier trägt eine Linie weiter als im Dunkeln. */
   .neural {
-    opacity: 0.38;
+    opacity: 0.2;
   }
 }
 
 /* Während einer laufenden Einheit zieht sich das Netz zurück — siehe die
    Begründung in SessionScreen.tsx. Es blendet, es springt nicht (G-3). */
 :root[data-focus='on'] .neural {
-  opacity: 0.12;
+  opacity: 0.07;
 }
 
 @media (prefers-color-scheme: light) {
   :root[data-focus='on'] .neural {
-    opacity: 0.09;
+    opacity: 0.05;
   }
 }
 
 .neural-links line {
   stroke: var(--net);
-  stroke-width: 0.38;
+  stroke-width: 0.16;
 }
 
 .neural-nodes circle {

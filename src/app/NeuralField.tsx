@@ -102,7 +102,7 @@ function buildField(): { nodes: Node[]; links: [number, number][] } {
     nodes.push({
       x: (column + 0.5) * cellWidth + (rng.next() - 0.5) * cellWidth * 0.9,
       y: (row + 0.5) * cellHeight + (rng.next() - 0.5) * cellHeight * 0.8,
-      r: 0.85 + rng.next() * 0.7,
+      r: 0.4 + rng.next() * 0.32,
       delay: rng.next() * 6,
     })
   }

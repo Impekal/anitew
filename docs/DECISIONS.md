@@ -339,6 +339,13 @@ einem Telefonbildschirm seitlich beschnitten; sichtbar blieb knapp die halbe
 Breite. Das Netz wirkte dadurch dünn und löchrig, obwohl es das nicht war — der
 Fehler lag nicht in der Zeichnung, sondern im Zuschnitt.
 
+*Und es bleibt kaum sichtbar.* Nachdem der Zuschnitt saß, war die naheliegende
+Folgerung falsch: Ein Netz, das nun über den ganzen Bildschirm reichte, brauchte
+**weniger** Gewicht, nicht mehr. Haarfeine Linien, winzige Knoten, niedrige
+Deckkraft — es soll als Textur wirken, die man eher spürt als liest. Die
+Faustregel für jede spätere Änderung: Wer das Netz auf dem Startbildschirm
+*bemerkt*, bevor er den Knopf sieht, hat es zu stark eingestellt.
+
 ## D-010 · 2026-08-17 · Der Kern kennt keinen Browser
 
 Bekräftigt aus dem Produktgespräch, weil es die teuerste Regel ist, wenn man sie
