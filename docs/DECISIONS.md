@@ -357,7 +357,14 @@ ist kein Widerruf von G-1, sondern dessen Ausbau in eine Richtung, die vorher
 fehlte: Die Oberfläche war angenehm, aber sie war *stumm und matt*. Angenehm
 allein ist noch nicht schön.
 
-*Licht* ist Material, nicht Feuerwerk. Der Startknopf atmet in einem Schein,
+*Licht* ist Material, nicht Feuerwerk. **Und im Hellen funktioniert es
+anders als im Dunkeln** — nicht schwächer, sondern umgekehrt. Auf Papier kann
+man nicht mit Licht leuchten: Der Hintergrund ist schon fast weiß, alles
+Hellere daneben verschwindet darin. Ein Leuchten auf hellem Grund ist ein
+warmer, satter Schein, der *dunkler* ist als das Papier — physikalisch ein
+farbiger Schatten, im Auge ein Glühen. Wer im Hellen nur die dunklen Werte
+abschwächt, bekommt gar nichts; genau das ist im ersten Anlauf passiert und
+auf dem Telefon aufgefallen. Der Startknopf atmet in einem Schein,
 jedes Wort leuchtet beim Erscheinen auf und beruhigt sich, eine gelandete Marke
 glimmt kurz nach, die Ergebniszahl trägt einen Hof. Im Dunkeln darf das
 deutlich sein; auf hellem Papier ist starkes Licht keine Helligkeit, sondern

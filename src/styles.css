@@ -37,17 +37,34 @@
   --net: color-mix(in oklab, var(--calm) 40%, transparent);
   --net-strong: color-mix(in oklab, var(--calm) 70%, transparent);
   /*
-   * Leuchten (D-011/G-9). Auf Papier ist Licht ein Hauch — ein starker Schein
-   * auf hellem Grund sieht nicht nach Leuchten aus, sondern nach Unschaerfe.
-   * Im Dunkeln darf es deutlich mehr sein, deshalb stehen die Werte unten
-   * noch einmal.
+   * Leuchten (D-011/G-9) — und im Hellen funktioniert das anders als gedacht.
+   *
+   * Der erste Anlauf nahm hier dieselbe Art Schein wie im Dunkeln, nur
+   * schwächer. Auf dem Telefon war davon **nichts** zu sehen, und der Grund
+   * ist grundsätzlich: Auf Papier kann man nicht mit Licht leuchten. Der
+   * Hintergrund ist schon fast weiß; alles Hellere daneben verschwindet
+   * darin.
+   *
+   * Ein Leuchten auf hellem Grund ist ein **warmer, satter Schein, der
+   * dunkler ist als das Papier** — physikalisch ein farbiger Schatten, im
+   * Auge ein Glühen. Deshalb hier: kräftige Farbe, echte Deckkraft, kaum
+   * negative Streuung. Im Dunkeln bleibt es umgekehrt ein Bloom.
+   *
+   * Vor jeder `color-mix`-Zeile steht ein einfacher rgba-Wert. Ältere
+   * Browser überspringen die zweite Zeile und bekommen wenigstens etwas —
+   * ohne den Vorrat wäre die ganze Eigenschaft ungültig und der Schein weg.
    */
+  --glow: 0 0 0 1px rgb(168 95 34 / 30%), 0 4px 20px -2px rgb(168 95 34 / 45%);
   --glow: 0 0 0 1px color-mix(in oklab, var(--accent) 30%, transparent),
-    0 0 18px -2px color-mix(in oklab, var(--accent) 45%, transparent);
-  --glow-soft: 0 0 22px -8px color-mix(in oklab, var(--accent) 45%, transparent);
-  --glow-strong: 0 0 36px -10px color-mix(in oklab, var(--accent) 60%, transparent);
-  --glow-text: 0 0 16px color-mix(in oklab, var(--accent) 18%, transparent);
-  --glow-flare: 0 0 34px color-mix(in oklab, var(--accent) 42%, transparent);
+    0 4px 20px -2px color-mix(in oklab, var(--accent) 45%, transparent);
+  --glow-soft: 0 4px 24px -2px rgb(168 95 34 / 40%);
+  --glow-soft: 0 4px 24px -2px color-mix(in oklab, var(--accent) 40%, transparent);
+  --glow-strong: 0 8px 40px -4px rgb(168 95 34 / 58%);
+  --glow-strong: 0 8px 40px -4px color-mix(in oklab, var(--accent) 58%, transparent);
+  --glow-text: 0 1px 14px rgb(168 95 34 / 32%);
+  --glow-text: 0 1px 14px color-mix(in oklab, var(--accent) 32%, transparent);
+  --glow-flare: 0 2px 28px rgb(168 95 34 / 58%);
+  --glow-flare: 0 2px 28px color-mix(in oklab, var(--accent) 58%, transparent);
 
   --sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   /* D-011/G-8: Gemessenes bekommt eine eigene Schrift. Gleich breite Ziffern,
@@ -85,12 +102,18 @@
     --net: color-mix(in oklab, var(--calm) 55%, transparent);
     --net-strong: color-mix(in oklab, var(--calm) 100%, transparent);
 
-    /* Im Dunkeln traegt Licht. Hier darf es wirklich leuchten. */
+    /* Im Dunkeln trägt Licht. Hier ist es ein echter Schein nach allen
+       Seiten — und darf deutlich weiter reichen als auf Papier. */
+    --glow: 0 0 0 1px rgb(229 171 107 / 38%), 0 0 26px -2px rgb(229 171 107 / 60%);
     --glow: 0 0 0 1px color-mix(in oklab, var(--accent) 38%, transparent),
       0 0 26px -2px color-mix(in oklab, var(--accent) 60%, transparent);
+    --glow-soft: 0 0 34px -6px rgb(229 171 107 / 55%);
     --glow-soft: 0 0 34px -6px color-mix(in oklab, var(--accent) 55%, transparent);
+    --glow-strong: 0 0 60px -8px rgb(229 171 107 / 70%);
     --glow-strong: 0 0 60px -8px color-mix(in oklab, var(--accent) 70%, transparent);
+    --glow-text: 0 0 26px rgb(229 171 107 / 32%);
     --glow-text: 0 0 26px color-mix(in oklab, var(--accent) 32%, transparent);
+    --glow-flare: 0 0 52px rgb(229 171 107 / 65%);
     --glow-flare: 0 0 52px color-mix(in oklab, var(--accent) 65%, transparent);
   }
 }

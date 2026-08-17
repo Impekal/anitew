@@ -441,3 +441,27 @@ die R-1 verbietet. Es kommt, wenn die Module aus D9–D13 da sind.
 Tage) und 28 E2E-Läufe. Der wichtigste davon datiert die Datenbank vor, statt
 drei Tage zu warten: Er prüft die ganze Kette — Termin lesen, auswählen, in
 den Plan legen, abfragen, zurückschreiben.
+
+## 2026-08-17 · Im Hellen leuchtete nichts
+
+Rückmeldung vom Telefon mit einem Bild: heller Modus, kein Schein zu sehen.
+Nachgestellt und bestätigt — mein eigenes Testbild sah genauso aus. Der Fehler
+lag nicht an den Werten, sondern an einer falschen Annahme.
+
+**Auf Papier kann man nicht mit Licht leuchten.** Der Hintergrund ist schon
+fast weiß; ein heller Schein daneben verschwindet darin. Im ersten Anlauf hatte
+der helle Modus dieselbe Art Schein wie der dunkle, nur abgeschwächt und mit
+kräftiger negativer Streuung — das Ergebnis war exakt nichts.
+
+Ein Leuchten auf hellem Grund ist ein **warmer, satter Schein, der dunkler ist
+als das Papier**: physikalisch ein farbiger Schatten, im Auge ein Glühen. Also
+kräftige Farbe, echte Deckkraft, kaum negative Streuung, leicht nach unten
+versetzt. Im Dunkeln bleibt es umgekehrt ein Bloom nach allen Seiten.
+
+Die Lehre, die über diesen Fall hinausgeht: **Zwei Farbschemata sind nicht ein
+Entwurf mit zwei Helligkeiten.** Manches muss man umkehren, nicht dimmen.
+
+Nebenbei abgesichert: Vor jeder `color-mix`-Zeile steht jetzt ein einfacher
+rgba-Wert. Kennt ein Browser `color-mix` nicht, wäre sonst die ganze
+Eigenschaft ungültig und der Schein ersatzlos weg — mit dem Vorrat bekommt er
+wenigstens etwas.
