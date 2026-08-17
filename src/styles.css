@@ -420,7 +420,7 @@ body::before {
   height: 100%;
   pointer-events: none;
   z-index: -1;
-  opacity: 0.32;
+  opacity: 0.2;
   transition: opacity 900ms var(--ease);
   /*
    * Die Mitte wird **gedämpft, nicht ausgeschnitten**.
@@ -456,7 +456,7 @@ body::before {
 
 .neural-links line {
   stroke: var(--net);
-  stroke-width: 0.16;
+  stroke-width: 0.14;
 }
 
 .neural-nodes circle {

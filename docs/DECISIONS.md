@@ -346,6 +346,11 @@ Deckkraft — es soll als Textur wirken, die man eher spürt als liest. Die
 Faustregel für jede spätere Änderung: Wer das Netz auf dem Startbildschirm
 *bemerkt*, bevor er den Knopf sieht, hat es zu stark eingestellt.
 
+Eingestellt ist es damit auf Strichstärke 0,14 und Deckkraft 0,2 im Dunkeln
+wie im Hellen; während einer laufenden Einheit 0,07 beziehungsweise 0,05.
+Diese Zahlen stehen hier, weil sie sonst nur im Stylesheet stünden und beim
+nächsten Umbau als beliebig gälten — sie sind es nicht, sie sind ertastet.
+
 ## D-010 · 2026-08-17 · Der Kern kennt keinen Browser
 
 Bekräftigt aus dem Produktgespräch, weil es die teuerste Regel ist, wenn man sie
