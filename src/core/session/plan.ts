@@ -19,6 +19,7 @@
 import { MODES, type TrainingMode } from '../modes.ts'
 import { createRng } from '../rng.ts'
 import type { DayKey } from '../time.ts'
+import type { Leniency } from './grading.ts'
 
 /** Sekunden, die ein einzelnes Wort beim Einprägen bekommt. */
 export const SECONDS_PER_ITEM = 4
@@ -55,7 +56,7 @@ export type BlockKind = 'encode' | 'recall' | 'review'
  * mischt sie. Was ein Modul *zeigt*, weiß er nicht — er kennt nur Kennungen,
  * Zeiten und die Frage, ob der Abruf frei oder gestützt ist.
  */
-export const TRAINING_MODULES = ['words', 'faces'] as const
+export const TRAINING_MODULES = ['words', 'faces', 'numbers'] as const
 export type ModuleId = (typeof TRAINING_MODULES)[number]
 
 /**
@@ -71,6 +72,22 @@ export type ModuleId = (typeof TRAINING_MODULES)[number]
  */
 export function isPrompted(moduleId: ModuleId): boolean {
   return moduleId === 'faces'
+}
+
+/**
+ * Wie streng dieses Modul vergleicht.
+ *
+ * **Zahlen genau, alles andere nachsichtig.** Bei Wörtern und Namen ist ein
+ * Tippfehler ein Tippfehler — gemessen werden soll das Gedächtnis, nicht die
+ * Tastatur. Bei einer Zahl sind zwei vertauschte Ziffern eine *andere Zahl*:
+ * 4719 und 4791 sind nicht dieselbe PIN. Dort milde zu sein hieße, die
+ * Aufgabe abzuschaffen und trotzdem einen Punkt zu geben.
+ *
+ * Die Strenge gehört zum Modul und nicht in die Bewertungsfunktion, weil sie
+ * eine Aussage über den **Gegenstand** ist und nicht über das Verfahren.
+ */
+export function leniencyFor(moduleId: ModuleId): Leniency {
+  return moduleId === 'numbers' ? 'exact' : 'typos'
 }
 
 export interface BlockPlan {

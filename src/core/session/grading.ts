@@ -23,6 +23,24 @@
  * ein Buchstabe Unterschied oft ein anderes Wort.
  */
 
+/**
+ * Wie streng verglichen wird — und das hängt am Modul, nicht am Geschmack.
+ *
+ * `typos` verzeiht ab fünf Zeichen einen Tippfehler. Das ist bei Wörtern und
+ * Namen richtig: „Blmue“ statt „Blume“ ist erinnert, nur falsch getippt, und
+ * gemessen werden soll das Gedächtnis und nicht die Tastatur.
+ *
+ * `exact` verzeiht nichts. Bei einer Zahl sind zwei vertauschte Ziffern
+ * **eine andere Zahl** — 4719 und 4791 sind nicht dieselbe PIN, und wer sie
+ * verwechselt, hat sie sich nicht gemerkt. Genau das ist die Übung. Hier
+ * milde zu sein hieße, die Aufgabe abzuschaffen und trotzdem einen Punkt zu
+ * geben; das wäre eine erfundene Zahl (Regel R-1).
+ *
+ * Die Zuordnung Modul → Strenge steht in `session/plan.ts` bei den übrigen
+ * Moduleigenschaften.
+ */
+export type Leniency = 'typos' | 'exact'
+
 export interface RecallResult {
   /** Gesuchte Wörter, die erinnert wurden — in der Reihenfolge der Vorlage. */
   correct: string[]
@@ -57,7 +75,11 @@ export function splitEntries(text: string): string[] {
  * Jede Eingabe zählt für höchstens ein gesuchtes Wort, und jedes gesuchte Wort
  * kann nur einmal getroffen werden — zehnmal dasselbe Wort ist ein Treffer.
  */
-export function gradeRecall(entries: readonly string[], targets: readonly string[]): RecallResult {
+export function gradeRecall(
+  entries: readonly string[],
+  targets: readonly string[],
+  leniency: Leniency = 'typos',
+): RecallResult {
   const normalizedTargets = targets.map((target) => ({
     original: target,
     normal: normalizeWord(target),
@@ -74,9 +96,13 @@ export function gradeRecall(entries: readonly string[], targets: readonly string
       exact.hit = true
       continue
     }
-    const close = normalizedTargets.find(
-      (target) => !target.hit && target.normal.length >= 5 && withinOneEdit(target.normal, normal),
-    )
+    const close =
+      leniency === 'exact'
+        ? undefined
+        : normalizedTargets.find(
+            (target) =>
+              !target.hit && target.normal.length >= 5 && withinOneEdit(target.normal, normal),
+          )
     if (close !== undefined) {
       close.hit = true
       continue
@@ -158,6 +184,7 @@ export function withinOneEdit(a: string, b: string): boolean {
 export function gradePrompted(
   answers: readonly string[],
   targets: readonly string[],
+  leniency: Leniency = 'typos',
 ): RecallResult {
   const correct: string[] = []
   const missed: string[] = []
@@ -169,7 +196,9 @@ export function gradePrompted(
     const hit =
       normalAnswer !== '' &&
       (normalAnswer === normalTarget ||
-        (normalTarget.length >= 5 && withinOneEdit(normalTarget, normalAnswer)))
+        (leniency !== 'exact' &&
+          normalTarget.length >= 5 &&
+          withinOneEdit(normalTarget, normalAnswer)))
     if (hit) correct.push(target)
     else missed.push(target)
   })

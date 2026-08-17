@@ -63,14 +63,24 @@ export const de = {
     settle: 'Ankommen',
     settleHint: 'Antippen, wenn du bereit bist',
     round: 'Runde',
-    encodeHint: 'Sieh hin. Ein Wort nach dem anderen.',
-    encodeFacesHint: 'Gesicht und Name gehören zusammen. Merke dir beides.',
+    /*
+      Je Modul ein eigener Satz, als Verzeichnis und nicht als Kette von
+      Wenn-dann. Der Grund ist mechanisch: `TRAINING_MODULES` bestimmt die
+      Schlüssel, die hier stehen müssen — wer ein Modul hinzufügt und den Satz
+      vergisst, bekommt einen Übersetzungsfehler und keinen leeren Hinweis.
+    */
+    encodeHints: {
+      words: 'Sieh hin. Ein Wort nach dem anderen.',
+      faces: 'Gesicht und Name gehören zusammen. Merke dir beides.',
+      numbers: 'Eine Zahl nach der anderen. Sprich sie innerlich mit.',
+    },
     recallHint: 'Was ist geblieben? Reihenfolge egal.',
     reviewHint: 'Und jetzt von früher: Woran erinnerst du dich noch?',
     promptHint: 'Wer ist das?',
     reviewPromptHint: 'Und von früher: Wer ist das?',
     promptPlaceholder: 'Name',
     recallPlaceholder: 'Ein Wort pro Zeile',
+    recallNumbersPlaceholder: 'Eine Zahl pro Zeile',
     doneWithBlock: 'Fertig',
     abort: 'Abbrechen',
   },

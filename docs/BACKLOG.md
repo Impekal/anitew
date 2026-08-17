@@ -94,7 +94,7 @@ Abruftraining. Hier entscheidet sich, ob die App wirkt.
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| D1 | Einheitliche Modulschnittstelle: Aufgabe rein, Score + Rohdaten raus | 🟨 2026-08-17 | Seit M4 gibt es zwei Module, und der Planer mischt sie reihum (`TRAINING_MODULES`, `isPrompted`). Er kennt nur Kennungen, Zeiten und die Frage „freier oder gestützter Abruf“ — was ein Modul *zeigt*, weiß er nicht. Eine echte Registrierung lohnt erst beim dritten | M |
+| D1 | Einheitliche Modulschnittstelle: Aufgabe rein, Score + Rohdaten raus | ✅ 2026-08-17 | **D-012**. Drei Module, und der Planer mischt sie reihum. Ein Modul bringt seine Regeln mit (`isPrompted`, `leniencyFor`); der Planer kennt nur Kennungen und Zeiten. Er kennt nur Kennungen, Zeiten und die Frage „freier oder gestützter Abruf“ — was ein Modul *zeigt*, weiß er nicht. Ein fehlender Modultext ist seit M4 ein Übersetzungsfehler und kein leerer Hinweis | M |
 | D2 | Schwierigkeit adaptiv pro Modul, Zielkorridor um ~80 % Trefferquote | ⬜ | zu leicht = langweilig, zu schwer = Frust; beides bricht die Streak | M |
 | D3 | **Focus** — Ablenkungen ignorieren, kurze Aufmerksamkeitsschulung | ⬜ | 0:00–1:00 der Session | M |
 | D4 | **Encode** — 8 Bilder / Wörter / Personen / Orte merken | 🟨 2026-08-17 | Wörter und Personen laufen, ein Stück je 4 Sekunden, 3–8 je Runde. Bilder und Orte kommen mit D12/D15 | M |
@@ -103,7 +103,7 @@ Abruftraining. Hier entscheidet sich, ob die App wirkt.
 | D7 | **Working Memory** — behalten und gleichzeitig manipulieren (N-Back-artig) | ⬜ | | M |
 | D8 | **Spaced Recall** — etwas von gestern / vor 3 Tagen / letzter Woche | ✅ 2026-08-17 | eigener Block am Ende der Einheit, nur wenn etwas fällig ist. Fällige Wörter werden **aus dem Vorrat für neue genommen** — sonst wäre der Abruf ein Wiedererkennen (ein Test hat genau das gefunden). Eigene Zahl im Ergebnis, nicht mit dem heute Gelernten verrechnet | M |
 | D9 | **Namen & Gesichter** | ✅ 2026-08-17 | schwächster Bereich im Beispielprofil, also wichtig. Abruf **gestützt**: Das Gesicht steht da, gesucht ist der Name (`gradePrompted`) — „nenne alle Gesichter“ wäre keine Frage. Die Wiedervorlage über D8 gilt genauso wie für Wörter | M |
-| D10 | **Zahlen** — Ziffernfolgen, Jahreszahlen, PINs, Telefonnummern | ⬜ | | M |
+| D10 | **Zahlen** — Ziffernfolgen, Jahreszahlen, PINs, Telefonnummern | ✅ 2026-08-17 | **D-012**. 3–6 Ziffern, aus dem Seed erzeugt statt aus einer Liste — eine feste Liste wäre nach zwei Wochen durchgesehen. Geschenkte Folgen („1111“, „3456“) fallen raus. **Streng verglichen:** eine vertauschte Ziffer ist eine andere Zahl. Gruppierte Nummern („0176 4392 118“) fehlen noch — der freie Abruf zerlegt an Leerzeichen | M |
 | D11 | **Wörter & Listen** | 🟨 2026-08-17 | Wortvorrat je Sprache in `core/content/words.ts` — konkret und bildhaft, je Sprache eigen statt übersetzt, untereinander verschieden. DE und EN mit je ~80 Wörtern | S |
 | D12 | **Räumlich** | ⬜ | | M |
 | D13 | **Assoziativ** — „Meet 5 people“: Person + Land + Hobby + Stadt, später quer abgefragt | ⬜ | „Wie hieß die Person aus Indien?“ / „Wer spielte Gitarre?“ — trainiert, was im Alltag wirklich vorkommt | L |
@@ -263,7 +263,7 @@ Anforderung wie jede andere. Die acht Regeln G-1 bis G-8 stehen in
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | ✅ 2026-08-17 | 122 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Sessionplanung, Bewertung, Scheduler und Gesichtsgenerator sind abgedeckt | M |
+| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | ✅ 2026-08-17 | 134 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Sessionplanung, Bewertung, Scheduler und Gesichtsgenerator sind abgedeckt | M |
 | P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | ✅ 2026-08-17 | 32 Läufe in Chromium und im Telefonprofil, darunter eine Einheit von vorn bis hinten und der Abbruch mitten drin. Seit M4 **liest der Test ab, welches Modul kam, statt es vorherzusagen** (`tests/e2e/helpers.ts`) | M |
 | P3 | CI bei jedem Push: Typecheck (App **und** Kern getrennt), Tests, Build, E2E | ✅ 2026-08-17 | | S |
 | P4 | Performance: Kaltstart unter 2 s, Timer laufen ruckelfrei | ⬜ | | M |
@@ -328,7 +328,7 @@ Neu offen, entstanden aus den Antworten:
 | **M1** | Walking Skeleton | B1–B3, B5, B6, B9, C5, D4, D6, N1 | ✅ **2026-08-17** — Eine echte Einheit läuft täglich durch, überlebt eine Unterbrechung, und jede Antwort steht im Protokoll |
 | **M2** | Die Engine wird echt | C1–C9, D8, E1–E7, B4 | Die App entscheidet begründet, was du heute trainierst, und plant Wiederholungen persönlich |
 | **M3** | Ehrlichkeit | F1–F7, F2a, F2b | Es gibt zwei getrennte Zahlen, und die große Prozentzahl ist gemessen. **Vorher kein öffentlicher Release** |
-| **M4** | Inhalt & Spiel | D5, D9–D16, G, H, K, J | 🟨 **2026-08-17** — Namen & Gesichter (D9/D14) laufen. Offen: Zahlen (D10), Merktechniken (D5), Palast (G), Missionen (H), Gamification (K) |
+| **M4** | Inhalt & Spiel | D5, D9–D16, G, H, K, J | 🟨 **2026-08-17** — Drei Module laufen: Wörter, Namen & Gesichter (D9/D14), Zahlen (D10). Offen: Merktechniken (D5), Palast (G), Missionen (H), Gamification (K) |
 | **M5** | Sprachen | L1–L8 | Man kann heute auf Deutsch und morgen auf Japanisch trainieren |
 | **M6** | Echtes Leben | I, M | Eigene Präsentation rein, Wiederholungsplan raus |
 | **M7** | Stores & Cloud | Q, R, N7–N10 | .aab im Play-Track; Drive-Abgleich läuft; iOS-Weg entschieden (S10) |

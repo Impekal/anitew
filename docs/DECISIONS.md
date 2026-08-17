@@ -429,3 +429,29 @@ Benachrichtigungen, Ton, Dateien, Cloud) liegt hinter einer Adapterschicht.
 Zwei Dinge folgen daraus, und beide sind der eigentliche Zweck: Der Kern lässt
 sich ohne Browser testen, und die App lässt sich später als Android-TWA und als
 native iOS-App verpacken, ohne noch einmal geschrieben zu werden.
+
+## D-012 · 2026-08-17 · Wie streng verglichen wird, entscheidet das Modul
+
+Die Bewertung verzeiht ab fünf Zeichen einen Tippfehler — eine Einfügung, eine
+Auslassung, eine Vertauschung. Das ist bei **Wörtern und Namen** richtig und
+steht in `grading.ts` ausführlich begründet: Gemessen werden soll das
+Gedächtnis, nicht die Rechtschreibung und nicht die Tastatur. „Blmue“ statt
+„Blume“ ist erinnert, nur falsch getippt.
+
+Bei **Zahlen** ist dieselbe Nachsicht falsch, und zwar nicht ein bisschen,
+sondern grundsätzlich: 4719 und 4791 sind nicht dieselbe PIN. Zwei vertauschte
+Ziffern sind eine andere Zahl, und sie auseinanderzuhalten **ist** die Übung.
+Dort milde zu sein hieße, die Aufgabe abzuschaffen und trotzdem einen Punkt zu
+geben — eine geschenkte Zahl, die in dieselbe Anzeige einginge wie die
+verdienten. Das ist Regel R-1.
+
+Deshalb ist die Strenge eine Eigenschaft des **Moduls** und kein Schalter in
+der Bewertungsfunktion: Sie ist eine Aussage über den Gegenstand, nicht über
+das Verfahren. `leniencyFor()` steht in `session/plan.ts` bei `isPrompted()`,
+also bei den übrigen Moduleigenschaften. Wer ein Modul hinzufügt, entscheidet
+beides an einer Stelle.
+
+Die allgemeine Form davon: **Ein Modul bringt seine Regeln mit.** Frei oder
+gestützt abgefragt, streng oder nachsichtig verglichen, Zifferntastatur oder
+Buchstaben — das gehört zum Gegenstand und nicht in eine wachsende Kette von
+Sonderfällen im Bildschirmcode.

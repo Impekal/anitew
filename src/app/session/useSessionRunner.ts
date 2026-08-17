@@ -8,6 +8,7 @@ import {
   gradePrompted,
   gradeRecall,
   isPrompted,
+  leniencyFor,
   splitEntries,
 } from '../../core/index.ts'
 import { recordOutcome } from '../../data/items.ts'
@@ -108,9 +109,15 @@ export function useSessionRunner(
     if (block.kind === 'recall' || block.kind === 'review') {
       // Frei getippt oder Eintrag für Eintrag gefragt — die Bewertung
       // unterscheidet sich, das Ergebnis hat dieselbe Form.
+      /*
+       * Die Strenge kommt vom Modul (`leniencyFor`), nicht von hier: Bei einer
+       * Zahl sind zwei vertauschte Ziffern eine andere Zahl, bei einem Wort
+       * ein Tippfehler.
+       */
+      const leniency = leniencyFor(block.moduleId)
       const graded = isPrompted(block.moduleId)
-        ? gradePrompted(finalAnswers ?? answers, block.items)
-        : gradeRecall(splitEntries(entries), block.items)
+        ? gradePrompted(finalAnswers ?? answers, block.items, leniency)
+        : gradeRecall(splitEntries(entries), block.items, leniency)
       nextResults.push({ round: block.round, kind: block.kind, ...graded })
       const duration = platform.clock.elapsed() - blockStartedRef.current
       const at = platform.clock.now()

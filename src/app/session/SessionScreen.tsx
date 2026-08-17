@@ -138,7 +138,7 @@ function RunningSession({
       {block.kind === 'encode' ? (
         <section className="encode">
           <p className="hint">
-            {block.moduleId === 'faces' ? t.encodeFacesHint : t.encodeHint}
+            {t.encodeHints[block.moduleId]}
           </p>
           {/*
             Der Schlüssel wechselt mit dem Wort, damit React das Element neu
@@ -192,7 +192,14 @@ function RunningSession({
             className="recall-input"
             value={state.entries}
             onChange={(event) => setEntries(event.target.value)}
-            placeholder={t.recallPlaceholder}
+            placeholder={
+              block.moduleId === 'numbers' ? t.recallNumbersPlaceholder : t.recallPlaceholder
+            }
+            /* Auf dem Telefon die Zifferntastatur. Wer eine sechsstellige Zahl
+               auf der Buchstabentastatur sucht, verliert Sekunden an etwas,
+               das mit Gedächtnis nichts zu tun hat. `numeric` und nicht `tel`:
+               `tel` bringt Stern und Raute mit, die hier nichts sollen. */
+            inputMode={block.moduleId === 'numbers' ? 'numeric' : 'text'}
             rows={4}
             autoFocus
             autoCapitalize="off"

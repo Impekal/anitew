@@ -11,6 +11,7 @@ import {
   hasWordPool,
   type ModuleId,
   namePool,
+  numberPool,
   planSession,
   selectDue,
   wordPool,
@@ -86,7 +87,18 @@ export function App() {
         day,
         language,
         seed,
-        pools: { words: wordPool(language), faces: namePool(language) },
+        /*
+         * Zahlen kommen nicht aus einer Liste, sondern werden aus dem Seed
+         * erzeugt (D10): Eine feste Liste wäre nach zwei Wochen durchgesehen,
+         * und die App misst dann Wiedererkennen statt Gedächtnis. Sechzig
+         * reichen weit über die längste Einheit hinaus — der Planer nimmt
+         * sich, was er braucht.
+         */
+        pools: {
+          words: wordPool(language),
+          faces: namePool(language),
+          numbers: numberPool(seed, 60),
+        },
         due,
       })
       const progress: SessionProgress = {

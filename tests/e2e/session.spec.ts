@@ -35,9 +35,12 @@ test('führt durch Einprägen und Abrufen und zählt ehrlich', async ({ page }) 
   await startEmergency(page)
 
   // Der Einprägetext gehört zum Modul: Wörter kommen einzeln, beim Gesicht
-  // gehören Bild und Name zusammen. Einer von beiden muss dastehen.
+  // gehören Bild und Name zusammen, Zahlen spricht man innerlich mit. Einer
+  // von den dreien muss dastehen — welcher, entscheidet der Plan.
   await expect(
-    page.getByText(/Sieh hin\. Ein Wort nach dem anderen\.|Gesicht und Name gehören zusammen\./),
+    page.getByText(
+      /Ein Wort nach dem anderen\.|Gesicht und Name gehören zusammen\.|Eine Zahl nach der anderen\./,
+    ),
   ).toBeVisible()
 
   // Punkte statt „3 / 8“ — einer je Stück (D-011/G-1).
@@ -61,14 +64,24 @@ test('führt durch Einprägen und Abrufen und zählt ehrlich', async ({ page }) 
    * und nichts dazuerfunden** (Regel R-1).
    */
   if ((await recallKind(page)) === 'free') {
-    // Zwei richtig, eines absichtlich mit Tippfehler, eines erfunden.
-    const typed = [words[0]!, words[1]!, misspell(words[2]!), 'Zahnbürstenhalter']
+    /*
+     * Zwei richtig, eines absichtlich verfälscht, eines erfunden.
+     *
+     * Was das dritte wert ist, hängt am Gegenstand — und den liest der Test
+     * ab, statt ihn zu erraten: Bei einem **Wort** ist ein vertauschter
+     * Buchstabe ein Tippfehler und zählt. Bei einer **Zahl** ist eine
+     * geänderte Ziffer eine andere Zahl und zählt nicht (D10). Genau diese
+     * Unterscheidung ist der Sinn von `leniencyFor`, und sie wird hier bis
+     * zur angezeigten Zahl durchgeprüft.
+     */
+    const numeric = words.every((word) => /^\d+$/.test(word))
+    const spoiled = numeric ? otherNumber(words[2]!, words) : misspell(words[2]!)
+    const typed = [words[0]!, words[1]!, spoiled, 'Zahnbürstenhalter']
     await page.locator('.recall-input').fill(typed.join('\n'))
     await page.getByRole('button', { name: 'Fertig' }).click()
 
     await expect(page.getByRole('heading', { name: 'Geblieben' })).toBeVisible()
-    // Drei Treffer: der Tippfehler zählt, das erfundene Wort nicht.
-    await expect(page.locator('.summary-score strong')).toHaveText('3')
+    await expect(page.locator('.summary-score strong')).toHaveText(numeric ? '2' : '3')
   } else {
     /*
      * Beim Gesichtsmodul steht die Reihenfolge fest: Was eingeprägt wurde,
@@ -145,4 +158,20 @@ test('lässt sich verwerfen und beginnt dann neu', async ({ page }) => {
 function misspell(word: string): string {
   if (word.length < 5) return word
   return word.slice(0, 2) + word[3] + word[2] + word.slice(4)
+}
+
+/**
+ * Eine Zahl um eine Ziffer daneben — und garantiert keine der gesuchten.
+ *
+ * Die letzte Bedingung ist nicht Pedanterie: Läge die verfälschte Zahl
+ * zufällig auch im Vorrat der Runde, träfe sie dort und der Test zählte einen
+ * Treffer, den er gerade ausschließen wollte. Er wäre dann selten und
+ * unerklärlich rot — die schlimmste Sorte Test.
+ */
+function otherNumber(value: string, avoid: readonly string[]): string {
+  for (let step = 1; step < 10; step++) {
+    const candidate = value.slice(0, -1) + String((Number(value.slice(-1)) + step) % 10)
+    if (!avoid.includes(candidate)) return candidate
+  }
+  throw new Error(`keine abweichende Zahl zu ${value} gefunden`)
 }

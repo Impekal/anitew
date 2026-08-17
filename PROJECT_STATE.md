@@ -757,3 +757,69 @@ Test** — und der nächste Schritt ist, den Unterschied zwischen beiden Aufbaut
 zu suchen, nicht weiter im Code zu lesen.
 
 **Stand:** 122 Kerntests, 32 E2E-Läufe, Typecheck für App und Kern grün.
+
+## 2026-08-17 · Zahlen (D10) — und eine Regel, die vorher fehlte
+
+Das dritte Modul. Zahlen kommen **nicht aus einer Liste**, sondern werden aus
+dem Seed erzeugt: Achtzig feste Zahlen wären nach zwei Wochen durchgesehen,
+und die App misst dann Wiedererkennen statt Gedächtnis — derselbe Grund wie
+beim Gesichtsgenerator. Drei bis sechs Ziffern, Länge gestreut, weil fünf
+gleich lange Folgen den Abruf leichter machen, als er sein sollte: Wer weiß,
+dass alles vierstellig ist, muss die Länge nicht mehr behalten.
+
+Geschenkte Folgen fallen raus. „1111“ merkt sich als ein Zeichen, „3456“ als
+eine Regel — beide sagen nichts über das Gedächtnis für Ziffernfolgen aus, und
+ihr Treffer ginge doch in dieselbe Zahl ein wie die verdienten (R-1).
+
+### Die Milde war global, und das war falsch
+
+Die Bewertung verzeiht ab fünf Zeichen einen Tippfehler. Bei „Blmue“ statt
+„Blume“ ist das richtig. Bei einer Zahl **nicht**: 4719 und 4791 sind nicht
+dieselbe PIN, und sie auseinanderzuhalten ist die Übung. Hätte ich das Modul
+ohne diese Änderung gebaut, hätte die App für eine vertauschte Ziffer einen
+Punkt vergeben — genau die erfundene Zahl, gegen die R-1 steht.
+
+Die Strenge liegt jetzt beim **Modul** und nicht in der Bewertungsfunktion
+(`leniencyFor` in `plan.ts`, neben `isPrompted`): Sie ist eine Aussage über den
+Gegenstand, nicht über das Verfahren. Daraus ist D-012 geworden, und die
+allgemeine Form davon trägt weiter als dieser eine Fall — **ein Modul bringt
+seine Regeln mit**: frei oder gestützt abgefragt, streng oder nachsichtig
+verglichen, Zifferntastatur oder Buchstaben.
+
+### Der Übersetzer hat die Arbeit verteilt
+
+`TRAINING_MODULES` um einen Eintrag zu erweitern hat drei Übersetzungsfehler
+ausgelöst — App und zwei Teststellen —, und das ist der Zweck der Übung: Der
+Vorrat je Modul ist ein `Record<ModuleId, …>`, ein fehlendes Modul ist deshalb
+kein leerer Bildschirm zur Laufzeit, sondern ein roter Übersetzer.
+
+Denselben Griff habe ich für die Texte nachgezogen: Aus `encodeHint` und
+`encodeFacesHint` ist ein Verzeichnis `encodeHints` geworden, indiziert mit
+`ModuleId`. Wer künftig ein Modul hinzufügt und den Satz vergisst, bekommt
+einen Übersetzungsfehler statt eines leeren Hinweises.
+
+Nebenbei: Auf dem Telefon kommt beim Zahlenmodul die Zifferntastatur
+(`inputMode="numeric"`). Wer eine sechsstellige Zahl auf der
+Buchstabentastatur sucht, verliert Sekunden an etwas, das mit Gedächtnis
+nichts zu tun hat.
+
+### Was der E2E-Lauf jetzt prüft
+
+Der Sessiontest liest ab, **was** er vor sich hat, und prüft die passende
+Regel: Bei einem Wort zählt der vertauschte Buchstabe, bei einer Zahl die
+geänderte Ziffer nicht. Eine Prüfung, zwei Regeln — und die neue Strenge ist
+damit bis zur angezeigten Zahl durchgeprüft und nicht nur im Kern.
+
+Alle drei Module habe ich im Lauf gesehen, bevor etwas gepusht wurde: Wörter,
+Gesichter und viermal Zahlen (darunter eine dreistellige, wo die Längenregel
+allein schon greift — die Stichprobe musste auch den Fall treffen, in dem die
+**neue** Regel den Ausschlag gibt).
+
+### Offen und benannt
+
+Gruppierte Nummern („0176 4392 118“) gibt es noch nicht: Der freie Abruf
+zerlegt die Eingabe an Leerzeichen, aus einer Nummer würden drei Antworten.
+Das braucht erst eine Eingabe, die weiß, dass sie **eine** Antwort erwartet.
+Steht als Einschränkung in `numbers.ts` und im Backlog, statt still zu fehlen.
+
+**Stand:** 134 Kerntests, 32 E2E-Läufe, Typecheck für App und Kern grün.
