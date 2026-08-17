@@ -120,6 +120,31 @@ ist also etwas einfacher als das echte Leben. Das ist eine Aussage über die
 werden. Fotorealistische Porträts als optionaler Nachladeinhalt bleiben eine
 Möglichkeit für später (Backlog D16).
 
+**Nachtrag 2026-08-17, beim Bau des Moduls.** Zwei Dinge, die sich erst am
+gezeichneten Ergebnis entschieden haben:
+
+*Der Bart richtet sich nach dem Namen.* Der Generator würfelte ihn blind, und
+rund jedes vierte Gesicht bekam einen — auch Margarethe und Jolanda. Das liest
+sich nicht als Vielfalt, sondern als Fehler, und wer einen Fehler sieht,
+schaut auf den Fehler statt auf das Gesicht, das er sich merken soll. Die
+Namenslisten sind deshalb zweigeteilt. Das ist **keine Aussage darüber, wie
+Menschen aussehen** — es gibt bärtige Frauen. Es ist eine Aussage über eine
+Zeichnung aus fünf Strichen: Die kann Zwischentöne nicht transportieren, also
+zeichnet sie das Naheliegende und behauptet nicht mehr, als sie zeigen kann.
+Kahlköpfigkeit bleibt für alle möglich; sie fällt nicht als Fehler auf.
+
+*Kleidung trägt bewusst keine Information.* Die Schultern sind für alle
+gleich und ohne eigene Farbe. Ein farbiges Hemd wäre das bequemste Merkmal von
+allen — man würde sich „der in Blau“ merken statt des Gesichts, und die App
+misst dann Kleidung. Aus demselben Grund bleibt die Zeichnung insgesamt
+schlicht: Zu viele Einzelheiten machen Gesichter **ähnlicher**, nicht
+verschiedener, weil am Ende nur „der mit der Brille“ hängen bleibt.
+
+*Geprüft wird im Raster, nicht einzeln.* `scripts/facesheet.mjs` legt vierzig
+Gesichter nebeneinander. Einzeln sah jedes annehmbar aus; nebeneinander war
+sofort zu sehen, dass die halbe Reihe dieselbe schnurgerade Haarlinie trug.
+Was nur einzeln geprüft wird, wird gar nicht geprüft.
+
 ## D-006 · 2026-08-17 · Wie die Fortschrittszahl entsteht
 
 Das ist die Antwort auf die schwierigste Frage im Projekt: **Woher kommt die

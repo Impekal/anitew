@@ -47,10 +47,37 @@ const MIN_REVIEW_SECONDS = 20
 
 export type BlockKind = 'encode' | 'recall' | 'review'
 
+/**
+ * Die Trainingsmodule (Backlog D1).
+ *
+ * Ab hier wird die Modulschnittstelle konkret, und zwar an der einzigen
+ * Stelle, an der sie es sein muss: Der Planer weiß, dass es mehrere gibt, und
+ * mischt sie. Was ein Modul *zeigt*, weiß er nicht — er kennt nur Kennungen,
+ * Zeiten und die Frage, ob der Abruf frei oder gestützt ist.
+ */
+export const TRAINING_MODULES = ['words', 'faces'] as const
+export type ModuleId = (typeof TRAINING_MODULES)[number]
+
+/**
+ * Freier Abruf oder gestützter?
+ *
+ * **Wörter frei** — leeres Feld, schreib auf, was geblieben ist. Das ist die
+ * stärkere Übung (C5).
+ *
+ * **Gesichter gestützt** — das Gesicht steht da, gesucht ist der Name. Anders
+ * geht es nicht: „Nenne alle Gesichter“ ist keine Frage, die sich beantworten
+ * lässt. Das ist keine Bequemlichkeit, sondern die Natur der Aufgabe — und
+ * genau die Aufgabe, die im Alltag vorkommt.
+ */
+export function isPrompted(moduleId: ModuleId): boolean {
+  return moduleId === 'faces'
+}
+
 export interface BlockPlan {
   /** Eindeutig innerhalb der Einheit, z. B. `r2-encode`. */
   id: string
   kind: BlockKind
+  moduleId: ModuleId
   /** Ab 1 gezählt — die Runde, zu der dieser Block gehört. */
   round: number
   seconds: number
@@ -75,28 +102,55 @@ export interface PlanInput {
   day: DayKey
   language: string
   seed: string
-  /** Der Wortvorrat der Trainingssprache. */
-  pool: readonly string[]
+  /** Der Vorrat je Modul in der Trainingssprache. */
+  pools: Pools
   /**
-   * Wörter aus früheren Tagen, die heute fällig sind — bereits ausgewählt und
-   * gedeckelt (siehe `scheduler/due.ts`). Leer heißt: kein Wiederholungsblock.
+   * Einträge aus früheren Tagen, die heute fällig sind — je Modul, bereits
+   * ausgewählt und gedeckelt (siehe `scheduler/due.ts`). Leer heißt: kein
+   * Wiederholungsblock.
    */
-  due?: readonly string[]
+  due?: Partial<Record<ModuleId, readonly string[]>>
+  /**
+   * Welche Module dürfen heute vorkommen? Voreingestellt alle. Der Parameter
+   * ist da, damit ein Test ein einzelnes Modul erzwingen kann, ohne dass der
+   * Planer dafür eine Sonderregel bekommt.
+   */
+  modules?: readonly ModuleId[]
 }
+
+export type Pools = Readonly<Record<ModuleId, readonly string[]>>
 
 export function planSession(input: PlanInput): SessionPlan {
   const totalSeconds = MODES[input.mode].seconds
-  const due = input.due ?? []
+  const modules = input.modules ?? TRAINING_MODULES
+
+  // Nur Module, für die heute wirklich etwas fällig ist. Ein leerer
+  // Wiederholungsblock wäre eine Frage ohne Gegenstand.
+  const dueByModule = modules
+    .map((moduleId) => ({ moduleId, items: input.due?.[moduleId] ?? [] }))
+    .filter((entry) => entry.items.length > 0)
 
   // Erst das Wiedersehen abzweigen, dann den Rest in Runden teilen. Anders
   // herum bliebe für die Wiederholung übrig, was zufällig übrig ist — und
   // genau sie ist der Teil, der das Behalten ausmacht.
   const reviewSeconds =
-    due.length === 0 ? 0 : Math.max(MIN_REVIEW_SECONDS, Math.round(totalSeconds * REVIEW_SHARE))
+    dueByModule.length === 0
+      ? 0
+      : Math.max(MIN_REVIEW_SECONDS * dueByModule.length, Math.round(totalSeconds * REVIEW_SHARE))
   const learnSeconds = totalSeconds - reviewSeconds
 
   const rounds = Math.min(MAX_ROUNDS, Math.max(1, Math.floor(learnSeconds / SECONDS_PER_ROUND)))
   const rng = createRng(input.seed)
+
+  /*
+   * Welches Modul in welcher Runde? Reihum, mit einem Startversatz aus dem
+   * Seed. Ohne den Versatz käme in der kürzesten Einheit — die nur eine Runde
+   * hat — immer dasselbe Modul dran, und wer nur den Notfallmodus benutzt,
+   * sähe nie ein Gesicht.
+   */
+  const offset = rng.int(modules.length)
+  const moduleForRound = (round: number): ModuleId =>
+    modules[(offset + round - 1) % modules.length] as ModuleId
 
   const roundBudgets = share(learnSeconds, rounds)
   const blocks: BlockPlan[] = []
@@ -112,20 +166,32 @@ export function planSession(input: PlanInput): SessionPlan {
    * hätte dann nicht die Erinnerung von vorgestern gemessen, sondern die von
    * vor zwei Minuten. Ein Test hat genau diesen Fall gefunden.
    */
-  const dueSet = new Set(due)
-  const remaining = rng.shuffle(input.pool.filter((word) => !dueSet.has(word)))
-  let taken = 0
+  const remaining = new Map<ModuleId, string[]>()
+  const taken = new Map<ModuleId, number>()
+  for (const moduleId of modules) {
+    const dueSet = new Set(input.due?.[moduleId] ?? [])
+    remaining.set(
+      moduleId,
+      rng.shuffle((input.pools[moduleId] ?? []).filter((entry) => !dueSet.has(entry))),
+    )
+    taken.set(moduleId, 0)
+  }
 
   for (let round = 1; round <= rounds; round++) {
+    const moduleId = moduleForRound(round)
+    const pool = remaining.get(moduleId) as string[]
+    const used = taken.get(moduleId) as number
+
     const roundSeconds = roundBudgets[round - 1] as number
-    const itemCount = itemsForRound(roundSeconds, remaining.length - taken)
+    const itemCount = itemsForRound(roundSeconds, pool.length - used)
     const encodeSeconds = itemCount * SECONDS_PER_ITEM
-    const items = remaining.slice(taken, taken + itemCount)
-    taken += itemCount
+    const items = pool.slice(used, used + itemCount)
+    taken.set(moduleId, used + itemCount)
 
     blocks.push({
       id: `r${round}-encode`,
       kind: 'encode',
+      moduleId,
       round,
       seconds: encodeSeconds,
       items,
@@ -133,6 +199,7 @@ export function planSession(input: PlanInput): SessionPlan {
     blocks.push({
       id: `r${round}-recall`,
       kind: 'recall',
+      moduleId,
       round,
       // Was vom Rundenbudget übrig ist — dadurch stimmt die Summe exakt,
       // ganz ohne Nachkommastellen.
@@ -144,13 +211,21 @@ export function planSession(input: PlanInput): SessionPlan {
   // Das Wiedersehen kommt zuletzt — so wie in der Blockfolge aus B3. Wer
   // gerade acht neue Wörter eingeprägt hat, ist für den Abruf von gestern
   // aufgewärmt, und der Abstand zum Einprägen ist am größten.
+  //
+  // Je Modul ein eigener Block: Wörter werden frei abgerufen, Gesichter
+  // gestützt. Beides in einen Block zu werfen ginge nicht, ohne eine der
+  // beiden Abrufarten zu verbiegen.
   if (reviewSeconds > 0) {
-    blocks.push({
-      id: 'review',
-      kind: 'review',
-      round: rounds + 1,
-      seconds: reviewSeconds,
-      items: due,
+    const reviewBudgets = share(reviewSeconds, dueByModule.length)
+    dueByModule.forEach((entry, index) => {
+      blocks.push({
+        id: `review-${entry.moduleId}`,
+        kind: 'review',
+        moduleId: entry.moduleId,
+        round: rounds + 1 + index,
+        seconds: reviewBudgets[index] as number,
+        items: entry.items,
+      })
     })
   }
 
@@ -189,11 +264,24 @@ function share(total: number, parts: number): number[] {
 }
 
 /** Die **neuen** Wörter einer Einheit, in der Reihenfolge ihres Auftretens. */
-export function itemsOf(plan: SessionPlan): string[] {
-  return plan.blocks.filter((block) => block.kind === 'encode').flatMap((block) => [...block.items])
+export function itemsOf(plan: SessionPlan, moduleId?: ModuleId): string[] {
+  return plan.blocks
+    .filter(
+      (block) => block.kind === 'encode' && (moduleId === undefined || block.moduleId === moduleId),
+    )
+    .flatMap((block) => [...block.items])
 }
 
 /** Die Wörter, die heute wiederkommen. Leer, wenn nichts fällig war. */
-export function reviewItemsOf(plan: SessionPlan): string[] {
-  return plan.blocks.filter((block) => block.kind === 'review').flatMap((block) => [...block.items])
+export function reviewItemsOf(plan: SessionPlan, moduleId?: ModuleId): string[] {
+  return plan.blocks
+    .filter(
+      (block) => block.kind === 'review' && (moduleId === undefined || block.moduleId === moduleId),
+    )
+    .flatMap((block) => [...block.items])
+}
+
+/** Welche Module kommen in dieser Einheit vor? */
+export function modulesOf(plan: SessionPlan): ModuleId[] {
+  return [...new Set(plan.blocks.map((block) => block.moduleId))]
 }

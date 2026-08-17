@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 
-import { type Platform, splitEntries } from '../../core/index.ts'
+import { type Platform, isPrompted, splitEntries } from '../../core/index.ts'
 import type { RoundResult, SessionProgress } from '../../data/sessions.ts'
 import type { Dictionary } from '../../i18n/index.ts'
+import { Face } from '../Face.tsx'
 import { useCountUp } from '../useCountUp.ts'
 
 import { useSessionRunner } from './useSessionRunner.ts'
@@ -61,7 +62,11 @@ function RunningSession({
   progress: SessionProgress
   onLeave: () => void
 }) {
-  const { state, setEntries, advance, leave } = useSessionRunner(platform, progress, onLeave)
+  const { state, setEntries, submitPrompt, advance, leave } = useSessionRunner(
+    platform,
+    progress,
+    onLeave,
+  )
   const t = dictionary.session
 
   /*
@@ -132,12 +137,22 @@ function RunningSession({
 
       {block.kind === 'encode' ? (
         <section className="encode">
-          <p className="hint">{t.encodeHint}</p>
+          <p className="hint">
+            {block.moduleId === 'faces' ? t.encodeFacesHint : t.encodeHint}
+          </p>
           {/*
             Der Schlüssel wechselt mit dem Wort, damit React das Element neu
             einsetzt und die Bewegung erneut läuft — sonst tauschte nur der
             Text, und das wäre der harte Schnitt aus G-3.
           */}
+          {/*
+            Beim Gesichtsmodul steht das Bild über dem Namen — und beides
+            zusammen ist die Information, die eingeprägt wird. Der Name allein
+            wäre ein Wort, das Bild allein nichts.
+          */}
+          {block.moduleId === 'faces' && state.currentItem !== undefined && (
+            <Face key={`face-${state.currentItem}`} name={state.currentItem} />
+          )}
           <p className="encode-word" key={block.id + state.itemIndex} aria-live="polite">
             {state.currentItem}
           </p>
@@ -156,6 +171,17 @@ function RunningSession({
             ))}
           </div>
         </section>
+      ) : isPrompted(block.moduleId) ? (
+        <PromptedRecall
+          key={`${block.id}-${state.promptIndex}`}
+          face={block.items[state.promptIndex] ?? ''}
+          position={state.promptIndex + 1}
+          total={block.items.length}
+          hint={block.kind === 'review' ? t.reviewPromptHint : t.promptHint}
+          placeholder={t.promptPlaceholder}
+          action={t.doneWithBlock}
+          onSubmit={submitPrompt}
+        />
       ) : (
         <section className="recall">
           {/* Der Wiedersehensblock sieht aus wie der Abruf und ist doch etwas
@@ -186,7 +212,7 @@ function RunningSession({
               </span>
             ))}
           </div>
-          <button type="button" className="start" onClick={advance}>
+          <button type="button" className="start" onClick={() => advance()}>
             <span className="start-label">{t.doneWithBlock}</span>
           </button>
         </section>
@@ -196,6 +222,66 @@ function RunningSession({
         {t.abort}
       </button>
     </main>
+  )
+}
+
+/**
+ * Gestützter Abruf: ein Gesicht, ein Feld, ein Name (Backlog D9).
+ *
+ * Der Schlüssel am Aufrufort wechselt mit dem Eintrag — dadurch setzt React
+ * das Feld neu ein, es ist leer, und die Bewegung läuft erneut. Ohne das
+ * stünde die vorige Antwort noch da, und der Nutzer müsste sie löschen, bevor
+ * er die nächste tippen kann.
+ */
+function PromptedRecall({
+  face,
+  position,
+  total,
+  hint,
+  placeholder,
+  action,
+  onSubmit,
+}: {
+  face: string
+  position: number
+  total: number
+  hint: string
+  placeholder: string
+  action: string
+  onSubmit: (answer: string) => void
+}) {
+  const [answer, setAnswer] = useState('')
+
+  return (
+    <section className="prompted">
+      <p className="hint">{hint}</p>
+      <Face name={face} size={168} />
+      <form
+        className="prompted-form"
+        onSubmit={(event) => {
+          event.preventDefault()
+          onSubmit(answer)
+        }}
+      >
+        <input
+          className="recall-input prompted-input"
+          value={answer}
+          onChange={(event) => setAnswer(event.target.value)}
+          placeholder={placeholder}
+          autoFocus
+          autoCapitalize="words"
+          autoCorrect="off"
+          spellCheck={false}
+          aria-label={hint}
+        />
+        <button type="submit" className="start">
+          <span className="start-label">{action}</span>
+        </button>
+      </form>
+      <p className="hint">
+        {position} / {total}
+      </p>
+    </section>
   )
 }
 

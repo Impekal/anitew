@@ -12,6 +12,8 @@
  * den Schnittstellen aus `ports.ts`.
  */
 
+export * from './content/faces.ts'
+export * from './content/names.ts'
 export * from './content/words.ts'
 export * from './language.ts'
 export * from './modes.ts'

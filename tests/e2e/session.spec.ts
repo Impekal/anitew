@@ -1,5 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 
+import { answerRecall, recallKind } from './helpers.ts'
+
 /**
  * Eine Trainingseinheit von vorn bis hinten (Backlog B1–B3, B5, D4, D6).
  *
@@ -32,8 +34,13 @@ async function collectWords(page: Page, expected: number): Promise<string[]> {
 test('führt durch Einprägen und Abrufen und zählt ehrlich', async ({ page }) => {
   await startEmergency(page)
 
-  await expect(page.getByText('Sieh hin. Ein Wort nach dem anderen.')).toBeVisible()
-  // Punkte statt „3 / 8“ — einer je Wort (D-011/G-1).
+  // Der Einprägetext gehört zum Modul: Wörter kommen einzeln, beim Gesicht
+  // gehören Bild und Name zusammen. Einer von beiden muss dastehen.
+  await expect(
+    page.getByText(/Sieh hin\. Ein Wort nach dem anderen\.|Gesicht und Name gehören zusammen\./),
+  ).toBeVisible()
+
+  // Punkte statt „3 / 8“ — einer je Stück (D-011/G-1).
   const total = await page.locator('.encode-dots span').count()
   expect(total).toBeGreaterThanOrEqual(3)
   expect(total).toBeLessThanOrEqual(8)
@@ -41,17 +48,47 @@ test('führt durch Einprägen und Abrufen und zählt ehrlich', async ({ page }) 
   const words = await collectWords(page, total)
   expect(new Set(words).size).toBe(total)
 
-  const input = page.getByRole('textbox')
-  await expect(input).toBeVisible({ timeout: 15_000 })
+  /*
+   * Ab hier trennen sich die Wege, und zwar nach dem, was die App zeigt.
+   *
+   * Seit M4 zieht der Plan das Modul aus dem Seed: Ein 60-Sekunden-Durchlauf
+   * bringt mal Wörter, mal Gesichter. Der freie Abruf mit seinem einen
+   * Textfeld ist die eine Aufgabe, der gestützte mit einem Gesicht nach dem
+   * anderen die andere — sie lassen sich nicht in eine Prüfung falten, ohne
+   * eine von beiden zu verbiegen.
+   *
+   * Beide Zweige prüfen dasselbe Versprechen: **Es wird gezählt, was da war,
+   * und nichts dazuerfunden** (Regel R-1).
+   */
+  if ((await recallKind(page)) === 'free') {
+    // Zwei richtig, eines absichtlich mit Tippfehler, eines erfunden.
+    const typed = [words[0]!, words[1]!, misspell(words[2]!), 'Zahnbürstenhalter']
+    await page.locator('.recall-input').fill(typed.join('\n'))
+    await page.getByRole('button', { name: 'Fertig' }).click()
 
-  // Zwei richtig, eines absichtlich mit Tippfehler, eines erfunden.
-  const typed = [words[0]!, words[1]!, misspell(words[2]!), 'Zahnbürstenhalter']
-  await input.fill(typed.join('\n'))
-  await page.getByRole('button', { name: 'Fertig' }).click()
+    await expect(page.getByRole('heading', { name: 'Geblieben' })).toBeVisible()
+    // Drei Treffer: der Tippfehler zählt, das erfundene Wort nicht.
+    await expect(page.locator('.summary-score strong')).toHaveText('3')
+  } else {
+    /*
+     * Beim Gesichtsmodul steht die Reihenfolge fest: Was eingeprägt wurde,
+     * wird in derselben Folge abgefragt. Deshalb darf der Test hier antworten
+     * — anders als beim Wiedersehen in `spaced.spec.ts`, wo der Scheduler die
+     * Reihenfolge bestimmt und der Test sie nicht kennen darf.
+     *
+     * Der vorletzte Name bekommt einen Tippfehler und zählt trotzdem, der
+     * letzte bleibt leer und zählt nicht. Gemessen wird das Gedächtnis, nicht
+     * die Rechtschreibung.
+     */
+    const typed = [...words]
+    typed[total - 2] = misspell(words[total - 2]!)
+    typed[total - 1] = ''
+    await answerRecall(page, typed, 'all')
 
-  await expect(page.getByRole('heading', { name: 'Geblieben' })).toBeVisible()
-  // Drei Treffer: der Tippfehler zählt, das erfundene Wort nicht.
-  await expect(page.locator('.summary-score strong')).toHaveText('3')
+    await expect(page.getByRole('heading', { name: 'Geblieben' })).toBeVisible()
+    await expect(page.locator('.summary-score strong')).toHaveText(String(total - 1))
+  }
+
   await expect(page.locator('.summary-score span')).toHaveText(`/ ${total}`)
 })
 

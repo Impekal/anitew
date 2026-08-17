@@ -739,6 +739,39 @@ body::before {
   box-shadow: var(--glow);
 }
 
+/* ── Gesichter ────────────────────────────────────────────────────────── */
+
+.face {
+  display: block;
+  filter: drop-shadow(0 6px 18px rgb(0 0 0 / 12%));
+}
+
+.encode .face {
+  animation: word-in 460ms var(--ease) both;
+}
+
+/* Ein Gesicht, ein Feld, ein Name (D9). Alles untereinander, damit der Blick
+   nicht zwischen Bild und Eingabe springen muss. */
+.prompted {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.1rem;
+  flex: 1;
+}
+
+.prompted-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  width: 100%;
+}
+
+.prompted-input {
+  text-align: center;
+  font-size: 1.4rem;
+}
+
 /* ── Abrufen ──────────────────────────────────────────────────────────── */
 
 .recall {

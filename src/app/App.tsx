@@ -9,12 +9,14 @@ import {
   dayKeyOf,
   dueLimitFor,
   hasWordPool,
+  type ModuleId,
+  namePool,
   planSession,
   selectDue,
   wordPool,
 } from '../core/index.ts'
 import { createWebPlatform } from '../platform/web/index.ts'
-import { loadDue, wordOf } from '../data/items.ts'
+import { loadDue, moduleOf, wordOf } from '../data/items.ts'
 import { type SessionProgress, beginSession, clearProgress, loadProgress } from '../data/sessions.ts'
 
 import { FoundationPanel } from './FoundationPanel.tsx'
@@ -64,18 +66,28 @@ export function App() {
        * passen. Wer zwei Wochen weg war, bekommt keinen Berg vorgesetzt,
        * sondern holt den Rückstand über mehrere Tage auf (C7).
        */
-      let due: string[] = []
+      const due: Partial<Record<ModuleId, string[]>> = {}
       try {
         const tracked = await loadDue(language)
         const limit = dueLimitFor(Math.round(seconds * 0.15))
-        due = selectDue(tracked, day, limit).map((item) => wordOf(item.itemId))
+        for (const item of selectDue(tracked, day, limit)) {
+          const moduleId = moduleOf(item.itemId) as ModuleId
+          ;(due[moduleId] ??= []).push(wordOf(item.itemId))
+        }
       } catch {
         // Ohne Datenbank gibt es eben kein Wiedersehen. Die Einheit läuft
         // trotzdem — ein Training, das an einem Lesefehler scheitert, wäre
         // der schlechtere Tausch.
       }
 
-      const plan = planSession({ mode, day, language, seed, pool: wordPool(language), due })
+      const plan = planSession({
+        mode,
+        day,
+        language,
+        seed,
+        pools: { words: wordPool(language), faces: namePool(language) },
+        due,
+      })
       const progress: SessionProgress = {
         sessionId,
         plan,

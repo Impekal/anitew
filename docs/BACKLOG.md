@@ -94,20 +94,20 @@ Abruftraining. Hier entscheidet sich, ob die App wirkt.
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| D1 | Einheitliche Modulschnittstelle: Aufgabe rein, Score + Rohdaten raus | 🟨 2026-08-17 | Blöcke haben eine gemeinsame Form (`BlockPlan`) und ein gemeinsames Ereignisformat. Eine echte Registrierung von Modulen lohnt erst beim dritten — vorher wäre sie geraten | M |
+| D1 | Einheitliche Modulschnittstelle: Aufgabe rein, Score + Rohdaten raus | 🟨 2026-08-17 | Seit M4 gibt es zwei Module, und der Planer mischt sie reihum (`TRAINING_MODULES`, `isPrompted`). Er kennt nur Kennungen, Zeiten und die Frage „freier oder gestützter Abruf“ — was ein Modul *zeigt*, weiß er nicht. Eine echte Registrierung lohnt erst beim dritten | M |
 | D2 | Schwierigkeit adaptiv pro Modul, Zielkorridor um ~80 % Trefferquote | ⬜ | zu leicht = langweilig, zu schwer = Frust; beides bricht die Streak | M |
 | D3 | **Focus** — Ablenkungen ignorieren, kurze Aufmerksamkeitsschulung | ⬜ | 0:00–1:00 der Session | M |
-| D4 | **Encode** — 8 Bilder / Wörter / Personen / Orte merken | 🟨 2026-08-17 | Wörter laufen, ein Wort je 4 Sekunden, 3–8 je Runde. Bilder, Personen und Orte kommen mit D9/D12/D14 | M |
+| D4 | **Encode** — 8 Bilder / Wörter / Personen / Orte merken | 🟨 2026-08-17 | Wörter und Personen laufen, ein Stück je 4 Sekunden, 3–8 je Runde. Bilder und Orte kommen mit D12/D15 | M |
 | D5 | **Merktechniken werden beigebracht**, nicht nur abgefragt: Verknüpfung, Story-Methode, Major-System, Loci | ⬜ | „nicht stumpf auswendig lernen — die App bringt automatisch Merktechniken bei“. Das ist der Unterschied zu jeder Brain-Game-App | L |
 | D6 | **Recall** — freier Abruf ohne Hinweise | ✅ 2026-08-17 | leeres Feld, Reihenfolge egal, Bewertung in `core/session/grading.ts` | M |
 | D7 | **Working Memory** — behalten und gleichzeitig manipulieren (N-Back-artig) | ⬜ | | M |
 | D8 | **Spaced Recall** — etwas von gestern / vor 3 Tagen / letzter Woche | ✅ 2026-08-17 | eigener Block am Ende der Einheit, nur wenn etwas fällig ist. Fällige Wörter werden **aus dem Vorrat für neue genommen** — sonst wäre der Abruf ein Wiedererkennen (ein Test hat genau das gefunden). Eigene Zahl im Ergebnis, nicht mit dem heute Gelernten verrechnet | M |
-| D9 | **Namen & Gesichter** | ⬜ | schwächster Bereich im Beispielprofil, also wichtig | M |
+| D9 | **Namen & Gesichter** | ✅ 2026-08-17 | schwächster Bereich im Beispielprofil, also wichtig. Abruf **gestützt**: Das Gesicht steht da, gesucht ist der Name (`gradePrompted`) — „nenne alle Gesichter“ wäre keine Frage. Die Wiedervorlage über D8 gilt genauso wie für Wörter | M |
 | D10 | **Zahlen** — Ziffernfolgen, Jahreszahlen, PINs, Telefonnummern | ⬜ | | M |
 | D11 | **Wörter & Listen** | 🟨 2026-08-17 | Wortvorrat je Sprache in `core/content/words.ts` — konkret und bildhaft, je Sprache eigen statt übersetzt, untereinander verschieden. DE und EN mit je ~80 Wörtern | S |
 | D12 | **Räumlich** | ⬜ | | M |
 | D13 | **Assoziativ** — „Meet 5 people“: Person + Land + Hobby + Stadt, später quer abgefragt | ⬜ | „Wie hieß die Person aus Indien?“ / „Wer spielte Gitarre?“ — trainiert, was im Alltag wirklich vorkommt | L |
-| D14 | **Gesichtsgenerator**: parametrische SVG-Gesichter aus einem Seed (Kopf, Augen, Nase, Mund, Haar, Bart, Brille, Hautton) | ⬜ | **D-005**. Aus einem Seed immer dasselbe Gesicht, aus vielen Seeds Millionen — Kilobytes statt Megabytes, keine Rechtefragen | L |
+| D14 | **Gesichtsgenerator**: parametrische SVG-Gesichter aus einem Seed (Kopf, Augen, Nase, Mund, Haar, Bart, Brille, Hautton) | ✅ 2026-08-17 | **D-005**. Aus einem Seed immer dasselbe Gesicht, aus vielen Seeds Millionen — Kilobytes statt Megabytes, keine Rechtefragen. Die Maße liegen im Kern (ohne SVG, ohne Browser), gezeichnet wird in `app/Face.tsx`. Geprüft wird mit `scripts/facesheet.mjs`: vierzig Gesichter nebeneinander — einzeln sieht fast jedes annehmbar aus | L |
 | D15 | Objekte und Orte: CC0-Icon-Satz auswählen, prüfen, dokumentieren, um eigene Formen ergänzen | ⬜ | **D-005**; Lizenzen nach R2 | M |
 | D16 | Fotorealistische Porträts als optionaler Nachladeinhalt | ⬜ | **D-005**, später. Gezeichnete Gesichter sind leichter als echte — der Benchmark (F2) muss das berücksichtigen, und die App darf es nicht als Alltagsleistung ausgeben (R-1) | L |
 
@@ -206,7 +206,7 @@ Der Punkt, der aus einem Spiel einen Gedächtnistrainer macht.
 | L3 | RTL für Arabisch — Layout, nicht nur Text | 🟨 2026-08-17 | `dir` wird gesetzt; das Layout ist noch nicht daraufhin geprüft | M |
 | L4 | CJK: Schriftschnitte, Zeilenumbruch, Eingabemethoden bei freiem Abruf (C5) | ⬜ | freier Abruf auf Japanisch ist ein eigenes Problem | M |
 | L5 | Engine bleibt sprachunabhängig; Sprache ist ein Attribut am Item | ⬜ | Voraussetzung für L7 | M |
-| L6 | Inhaltspools je Sprache: Wörter, Namen, Orte — kulturell passend, nicht durchübersetzt | 🟨 2026-08-17 | Wörter für DE und EN stehen. Für Sprachen ohne eigene Liste gibt es **bewusst keinen** automatischen Ersatz aus einer anderen — die App trainiert dann auf der Rückfallsprache und sagt das | L |
+| L6 | Inhaltspools je Sprache: Wörter, Namen, Orte — kulturell passend, nicht durchübersetzt | 🟨 2026-08-17 | Wörter **und Namen** für DE und EN stehen (je ~46 Namen, untereinander unähnlich). Für Sprachen ohne eigene Liste gibt es **bewusst keinen** automatischen Ersatz aus einer anderen — die App trainiert dann auf der Rückfallsprache und sagt das | L |
 | L7 | Trainingssprache getrennt von Oberflächensprache: „Train your memory in Japanese today“ | ⬜ | Gedächtnis- und Sprachtraining zugleich — ein echtes Alleinstellungsmerkmal | M |
 | L8 | Übersetzungsprozess: Quelltexte **auf Deutsch**, von dort übersetzt; Pflege ohne Wildwuchs | ⬜ | **D-007** | S |
 
@@ -263,8 +263,8 @@ Anforderung wie jede andere. Die acht Regeln G-1 bis G-8 stehen in
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | 🟨 2026-08-17 | 73 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Sessionplanung und Bewertung sind abgedeckt; der Scheduler folgt mit M2 | M |
-| P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | ✅ 2026-08-17 | 10 Tests in Chromium und im Telefonprofil, darunter eine Einheit von vorn bis hinten und der Abbruch mitten drin | M |
+| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | ✅ 2026-08-17 | 108 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Sessionplanung, Bewertung, Scheduler und Gesichtsgenerator sind abgedeckt | M |
+| P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | ✅ 2026-08-17 | 28 Läufe in Chromium und im Telefonprofil, darunter eine Einheit von vorn bis hinten und der Abbruch mitten drin. Seit M4 **liest der Test ab, welches Modul kam, statt es vorherzusagen** (`tests/e2e/helpers.ts`) | M |
 | P3 | CI bei jedem Push: Typecheck (App **und** Kern getrennt), Tests, Build, E2E | ✅ 2026-08-17 | | S |
 | P4 | Performance: Kaltstart unter 2 s, Timer laufen ruckelfrei | ⬜ | | M |
 | P5 | Uhrmanipulation darf die Engine nicht zerstören (Streak-Betrug, Intervall-Chaos) | ⬜ | monotone Zeitquelle plus Plausibilitätsprüfung | M |
@@ -328,7 +328,7 @@ Neu offen, entstanden aus den Antworten:
 | **M1** | Walking Skeleton | B1–B3, B5, B6, B9, C5, D4, D6, N1 | ✅ **2026-08-17** — Eine echte Einheit läuft täglich durch, überlebt eine Unterbrechung, und jede Antwort steht im Protokoll |
 | **M2** | Die Engine wird echt | C1–C9, D8, E1–E7, B4 | Die App entscheidet begründet, was du heute trainierst, und plant Wiederholungen persönlich |
 | **M3** | Ehrlichkeit | F1–F7, F2a, F2b | Es gibt zwei getrennte Zahlen, und die große Prozentzahl ist gemessen. **Vorher kein öffentlicher Release** |
-| **M4** | Inhalt & Spiel | D5, D9–D16, G, H, K, J | Es macht Spaß, und der Vorrat geht nicht aus |
+| **M4** | Inhalt & Spiel | D5, D9–D16, G, H, K, J | 🟨 **2026-08-17** — Namen & Gesichter (D9/D14) laufen. Offen: Zahlen (D10), Merktechniken (D5), Palast (G), Missionen (H), Gamification (K) |
 | **M5** | Sprachen | L1–L8 | Man kann heute auf Deutsch und morgen auf Japanisch trainieren |
 | **M6** | Echtes Leben | I, M | Eigene Präsentation rein, Wiederholungsplan raus |
 | **M7** | Stores & Cloud | Q, R, N7–N10 | .aab im Play-Track; Drive-Abgleich läuft; iOS-Weg entschieden (S10) |

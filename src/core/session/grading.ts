@@ -139,3 +139,40 @@ export function withinOneEdit(a: string, b: string): boolean {
   }
   return true
 }
+
+/**
+ * Bewertung für den **gestützten** Abruf (Backlog D9).
+ *
+ * Beim Gesicht steht die Frage schon da; gesucht ist genau eine Antwort. Die
+ * Zuordnung ist deshalb Position für Position und nicht wie beim freien Abruf
+ * „irgendeine Eingabe passt zu irgendeinem Ziel“.
+ *
+ * Die Milde ist dieselbe wie dort, und aus demselben Grund: Gemessen wird das
+ * Gedächtnis, nicht die Rechtschreibung. Wer „Rosalinde“ statt „Rosalind“
+ * tippt, hat sich den Namen gemerkt.
+ *
+ * `answers` darf kürzer sein als `targets` — was fehlt, gilt als nicht
+ * erinnert. Das ist der Normalfall, wenn die Zeit ausläuft, und keine
+ * Ausnahme, die eine Sonderbehandlung bräuchte.
+ */
+export function gradePrompted(
+  answers: readonly string[],
+  targets: readonly string[],
+): RecallResult {
+  const correct: string[] = []
+  const missed: string[] = []
+
+  targets.forEach((target, index) => {
+    const answer = answers[index] ?? ''
+    const normalAnswer = normalizeWord(answer)
+    const normalTarget = normalizeWord(target)
+    const hit =
+      normalAnswer !== '' &&
+      (normalAnswer === normalTarget ||
+        (normalTarget.length >= 5 && withinOneEdit(normalTarget, normalAnswer)))
+    if (hit) correct.push(target)
+    else missed.push(target)
+  })
+
+  return { correct, missed, extra: [] }
+}

@@ -1,36 +1,30 @@
 import { expect, test, type Page } from '@playwright/test'
 
+import { answerRecall, collectItems, recallKind, startEmergency } from './helpers.ts'
+
 /**
  * Das Versprechen aus D-004, im Browser nachgeprüft: **Was du heute lernst,
  * kommt an einem späteren Tag von selbst zurück.**
  *
  * Der Trick des Tests ist, dass er nicht wartet, sondern die Datenbank
- * vordatiert: Die Termine der gestern gelernten Wörter werden auf heute
+ * vordatiert: Die Termine der gestern gelernten Stücke werden auf heute
  * gezogen. Das prüft genau die Kette, auf die es ankommt — Termin lesen,
  * auswählen, in den Plan legen, abfragen —, ohne dass jemand drei Tage
  * danebensitzt.
+ *
+ * Seit M4 gilt das für **beide** Module: Ob die Einheit Wörter oder Gesichter
+ * bringt, entscheidet der Plan. Der Test folgt ihm, statt es zu raten
+ * (siehe `helpers.ts`) — und prüft damit die Wiedervorlage für das, was
+ * gerade dran war.
  */
 
 async function runEmergencySession(page: Page, answer: 'all' | 'none') {
-  await page.getByRole('button', { name: '60 Sekunden' }).click()
-  await page.getByRole('button', { name: 'Beginnen' }).click()
-  await page.locator('.settle').click()
-
-  const words: string[] = []
-  const word = page.locator('.encode-word')
-  while (words.length < 8) {
-    if (await page.locator('.recall-input').count()) break
-    const text = (await word.textContent().catch(() => null))?.trim()
-    if (text !== undefined && text !== '' && text !== words[words.length - 1]) words.push(text)
-    await page.waitForTimeout(150)
-  }
-
-  await page.locator('.recall-input').waitFor({ timeout: 30_000 })
-  if (answer === 'all') await page.locator('.recall-input').fill(words.join('\n'))
-  await page.getByRole('button', { name: 'Fertig' }).click()
+  await startEmergency(page)
+  const items = await collectItems(page, 8)
+  await answerRecall(page, items, answer)
   await expect(page.getByRole('heading', { name: 'Geblieben' })).toBeVisible({ timeout: 30_000 })
   await page.getByRole('button', { name: 'Zurück' }).click()
-  return words
+  return items
 }
 
 /** Zieht alle Termine so weit vor, dass sie heute fällig sind. */
@@ -68,16 +62,28 @@ test('holt gelernte Wörter an einem späteren Tag zurück (D8)', async ({ page 
   await makeEverythingDueToday(page)
   await page.reload()
 
-  await page.getByRole('button', { name: '60 Sekunden' }).click()
-  await page.getByRole('button', { name: 'Beginnen' }).click()
-  await page.locator('.settle').click()
-
-  // Jetzt muss der Wiedersehensblock kommen — und zwar mit den Wörtern von
-  // vorhin, ohne dass sie noch einmal gezeigt wurden.
-  await expect(page.getByText('Und jetzt von früher')).toBeVisible({ timeout: 60_000 })
+  await startEmergency(page)
 
   /*
-   * Alle gelernten Wörter eintippen, nicht eine Auswahl davon.
+   * Jetzt muss der Wiedersehensblock kommen — mit dem von vorhin, ohne dass
+   * es noch einmal gezeigt wurde.
+   *
+   * Er kommt zuletzt, hinter der Lernrunde: Im Notfallmodus sind das rund
+   * vierzig Sekunden Vorlauf, die hier schlicht abgewartet werden. Welches
+   * Modul die Lernrunde bringt, ist dabei gleichgültig — der Wiedersehensblock
+   * gehört dem Modul, in dem etwas fällig ist, und nicht dem, das gerade
+   * gelernt wird.
+   *
+   * Beide Anreden gelten: „Und jetzt von früher: Woran erinnerst du dich
+   * noch?“ beim freien Abruf, „Und von früher: Wer ist das?“ beim gestützten.
+   * Nur den einen Satz zu suchen hieße wieder, das Modul vorherzusagen.
+   */
+  await expect(page.getByText(/Und (jetzt )?von früher/)).toBeVisible({ timeout: 60_000 })
+
+  const kind = await recallKind(page)
+
+  /*
+   * Alles Gelernte eintippen, nicht eine Auswahl davon.
    *
    * Der erste Anlauf tippte die ersten zwei ein und erwartete zwei Treffer —
    * und bekam null. Der Grund liegt in `due.ts` und ist kein Fehler: Die
@@ -85,18 +91,36 @@ test('holt gelernte Wörter an einem späteren Tag zurück (D8)', async ({ page 
    * die beiden Wörter waren schlicht nicht dabei. Der Test darf die Auswahl
    * des Schedulers nicht erraten wollen.
    */
-  await page.locator('.recall-input').fill(learned.join('\n'))
-  await page.getByRole('button', { name: 'Fertig' }).click()
+  await answerRecall(page, learned, 'all')
 
   await expect(page.getByRole('heading', { name: 'Von früher' })).toBeVisible({ timeout: 30_000 })
   const score = page.locator('.summary-score-small')
   const text = (await score.textContent()) ?? ''
   const [correct, total] = text.split('/').map((part) => Number(part.replace(/\D/g, '')))
 
+  // Das Entscheidende, und es gilt für beide Module: Was gestern gelernt
+  // wurde, ist heute von selbst zurückgekommen und wird getrennt vom heute
+  // Gelernten gezählt.
   expect(total).toBeGreaterThan(0)
-  // Wer alles weiß, hat alles richtig — und das Wiedersehen zählt getrennt
-  // vom heute Gelernten.
-  expect(correct).toBe(total)
+  expect(correct).toBeLessThanOrEqual(total as number)
+
+  if (kind === 'free') {
+    // Wer alles weiß, hat alles richtig.
+    expect(correct).toBe(total)
+  }
+  /*
+   * Beim gestützten Abruf steht diese Zusage hier bewusst **nicht**.
+   *
+   * Dort gehört zu jeder Stelle ein bestimmtes Gesicht, und welches, ist dem
+   * Test nicht zu entnehmen — der Name steht ja gerade nicht auf dem
+   * Bildschirm, das ist die Aufgabe. Um richtig zu antworten, müsste er die
+   * Reihenfolge des Schedulers nachbauen; genau davor warnt der Absatz
+   * darüber, und eine zweite Kopie derselben Logik im Test wäre keine
+   * Prüfung, sondern eine Verdopplung.
+   *
+   * Dass die Zuordnung Stelle für Stelle stimmt, prüft `gradePrompted` in den
+   * Kerntests — dort ohne Browser und ohne Raten.
+   */
 })
 
 test('zeigt kein Wiedersehen, wenn nichts fällig ist', async ({ page }) => {
@@ -104,10 +128,8 @@ test('zeigt kein Wiedersehen, wenn nichts fällig ist', async ({ page }) => {
   await page.goto('/')
   await runEmergencySession(page, 'all')
 
-  // Nichts vordatiert: Die frisch gelernten Wörter sind erst in Tagen dran.
-  await page.getByRole('button', { name: '60 Sekunden' }).click()
-  await page.getByRole('button', { name: 'Beginnen' }).click()
-  await page.locator('.settle').click()
+  // Nichts vordatiert: Das frisch Gelernte ist erst in Tagen dran.
+  await startEmergency(page)
   /*
    * Großzügige Frist, und das ist kein Zugeständnis an Flackern.
    *
@@ -119,5 +141,5 @@ test('zeigt kein Wiedersehen, wenn nichts fällig ist', async ({ page }) => {
    * nicht wie schnell das erste Wort erscheint.
    */
   await expect(page.locator('.encode-word')).toBeVisible({ timeout: 60_000 })
-  await expect(page.getByText('Und jetzt von früher')).toBeHidden()
+  await expect(page.getByText(/Und (jetzt )?von früher/)).toBeHidden()
 })

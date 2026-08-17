@@ -5,10 +5,12 @@ import {
   type Platform,
   SECONDS_PER_ITEM,
   type SessionPlan,
+  gradePrompted,
   gradeRecall,
+  isPrompted,
   splitEntries,
 } from '../../core/index.ts'
-import { WORD_MODULE, recordOutcome } from '../../data/items.ts'
+import { recordOutcome } from '../../data/items.ts'
 import {
   type RoundResult,
   type SessionProgress,
@@ -29,6 +31,10 @@ export interface RunnerState {
   currentItem: string | undefined
   itemIndex: number
   entries: string
+  /** Beim gestützten Abruf: die Antworten in der Reihenfolge der Einträge. */
+  answers: string[]
+  /** Beim gestützten Abruf: welcher Eintrag gerade gefragt wird. */
+  promptIndex: number
   results: RoundResult[]
   finished: boolean
 }
@@ -52,6 +58,8 @@ export function useSessionRunner(
   const [blockIndex, setBlockIndex] = useState(initial.blockIndex)
   const [results, setResults] = useState<RoundResult[]>(initial.results)
   const [entries, setEntries] = useState('')
+  const [answers, setAnswers] = useState<string[]>([])
+  const [promptIndex, setPromptIndex] = useState(0)
   const [itemIndex, setItemIndex] = useState(0)
   const [remaining, setRemaining] = useState(0)
 
@@ -68,6 +76,8 @@ export function useSessionRunner(
     blockStartedRef.current = platform.clock.elapsed()
     setItemIndex(0)
     setEntries('')
+    setAnswers([])
+    setPromptIndex(0)
     advancingRef.current = false
     setRemaining(block?.seconds ?? 0)
   }, [blockIndex, block?.seconds, platform])
@@ -89,13 +99,18 @@ export function useSessionRunner(
   )
 
   /** Block beenden — durch Zeitablauf oder weil der Nutzer fertig ist. */
-  const advance = useCallback(() => {
+  const advance = useCallback(
+    (finalAnswers?: readonly string[]) => {
     if (advancingRef.current || block === undefined) return
     advancingRef.current = true
 
     const nextResults = [...results]
     if (block.kind === 'recall' || block.kind === 'review') {
-      const graded = gradeRecall(splitEntries(entries), block.items)
+      // Frei getippt oder Eintrag für Eintrag gefragt — die Bewertung
+      // unterscheidet sich, das Ergebnis hat dieselbe Form.
+      const graded = isPrompted(block.moduleId)
+        ? gradePrompted(finalAnswers ?? answers, block.items)
+        : gradeRecall(splitEntries(entries), block.items)
       nextResults.push({ round: block.round, kind: block.kind, ...graded })
       const duration = platform.clock.elapsed() - blockStartedRef.current
       const at = platform.clock.now()
@@ -116,7 +131,7 @@ export function useSessionRunner(
        * Für den Scheduler ist das derselbe Vorgang — nur der Vorzustand
        * unterscheidet sich, und den kennt er selbst.
        */
-      void recordOutcome(WORD_MODULE, plan.language, plan.day, at, {
+      void recordOutcome(block.moduleId, plan.language, plan.day, at, {
         recalled: graded.correct,
         missed: graded.missed,
       }).catch(() => undefined)
@@ -137,7 +152,9 @@ export function useSessionRunner(
         () => undefined,
       )
     }
-  }, [block, blockIndex, entries, persist, plan, platform, results])
+    },
+    [answers, block, blockIndex, entries, persist, plan, platform, results],
+  )
 
   // Der Herzschlag. 200 ms ist fein genug für eine Sekundenanzeige und grob
   // genug, dass es den Akku nicht kostet.
@@ -174,6 +191,40 @@ export function useSessionRunner(
     persist(blockIndex, results)
   }, [block, blockIndex, itemIndex, persist, platform, results])
 
+  /**
+   * Eine Antwort im gestützten Abruf abgeben.
+   *
+   * Kein eigener Zeitgeber je Eintrag: Der Block hat sein Budget, und wer
+   * schnell ist, kommt weiter. Läuft die Zeit ab, gilt der Rest als nicht
+   * erinnert — das ist ehrlicher, als jedem Gesicht dieselben Sekunden zu
+   * geben und den Nutzer warten zu lassen, wenn er den Namen sofort weiß.
+   */
+  const submitPrompt = useCallback(
+    (answer: string) => {
+      if (block === undefined) return
+      const next = [...answers]
+      next[promptIndex] = answer
+      setAnswers(next)
+      platform.sound.play('type', promptIndex)
+
+      if (promptIndex + 1 >= block.items.length) {
+        /*
+         * Der letzte Eintrag beendet den Block sofort.
+         *
+         * Die Antworten werden `advance()` **direkt übergeben** und nicht aus
+         * dem Zustand gelesen: `setAnswers` wirkt erst beim nächsten
+         * Durchlauf, und der kommt hier zu spät. Über den Zustand zu gehen
+         * hieße, die letzte Antwort zu verlieren — bei fünf Gesichtern also
+         * jedes fünfte Ergebnis.
+         */
+        advance(next)
+        return
+      }
+      setPromptIndex(promptIndex + 1)
+    },
+    [advance, answers, block, platform, promptIndex],
+  )
+
   const leave = useCallback(() => {
     // Aus demselben Grund wie beim Verwerfen im Startbildschirm: erst löschen,
     // dann zurück. Sonst kann ein Neustart die abgebrochene Einheit
@@ -191,9 +242,11 @@ export function useSessionRunner(
     currentItem: block?.kind === 'encode' ? block.items[itemIndex] : undefined,
     itemIndex,
     entries,
+    answers,
+    promptIndex,
     results,
     finished,
   }
 
-  return { state, setEntries, advance, leave }
+  return { state, setEntries, submitPrompt, advance, leave }
 }

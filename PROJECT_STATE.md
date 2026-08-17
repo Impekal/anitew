@@ -582,3 +582,106 @@ Zwei Lehren:
 2. **`| tail` verschluckt den Rückgabewert.** Beim nächsten Mal `pipefail` oder
    den Befehl ohne Rohr — ein grüner Bericht, der nur so aussieht, ist
    schlimmer als gar keiner.
+
+## 2026-08-17 · M4 beginnt: Namen & Gesichter
+
+Das Modul steht (D9/D14). Der Kern erzeugt aus einem Namen die **Maße** eines
+Gesichts, gezeichnet wird eine Ebene höher — der Kern kennt weiterhin kein SVG
+und keinen Browser (D-010). Derselbe Name ergibt immer dasselbe Gesicht;
+darauf beruht das Wiedersehen nach Tagen, sonst lernte man jedes Mal ein neues
+Gesicht zum alten Namen.
+
+Der Abruf ist hier **gestützt**, und das ist keine Bequemlichkeit: „Nenne alle
+Gesichter“ ist keine Frage, die sich beantworten lässt. Das Gesicht steht da,
+gesucht ist der Name — genau die Aufgabe, die im Alltag vorkommt.
+
+### Ein Werkzeug, das den eigentlichen Fortschritt gebracht hat
+
+Bis hierher habe ich Gesichter geprüft, indem ich die App startete und ein
+Bildschirmfoto machte: **ein** Gesicht je Minute. So sah alles annehmbar aus.
+
+`scripts/facesheet.mjs` legt jetzt vierzig nebeneinander, hell und dunkel. Im
+ersten Bogen war sofort zu sehen, was einzeln nie auffiel:
+
+- Die halbe Reihe hatte eine **schnurgerade Haarlinie quer übers Gesicht** —
+  jedes zweite Gesicht wirkte wie ein Helm. Eine sichtbare Stirn ist eines der
+  stärksten Unterscheidungsmerkmale überhaupt; ohne sie sehen sich alle
+  ähnlich.
+- „Lange Haare“ setzten unterhalb des Scheitels an: oben kahl, links und
+  rechts zwei Vorhänge übers Gesicht.
+- Der Vollbart war eine **Maske über der halben unteren Gesichtshälfte** —
+  die Koteletten begannen über den Augen.
+- Bei hohen Köpfen war der Haarknoten oben abgeschnitten und sah aus wie eine
+  angeklebte Lasche.
+- Die Schultern waren eine angeschnittene Ellipse: Der Kopf stand auf einem
+  Teller.
+
+Die Lehre ist allgemein und gilt über Gesichter hinaus: **Was nur einzeln
+geprüft wird, wird gar nicht geprüft.** Ein Fehler, der bei einem von sieben
+auftritt, ist in einer Stichprobe von einem unsichtbar.
+
+Ein zweites Mal half derselbe Bogen, gefiltert: Von vier bärtigen Gesichtern
+waren zwei **nicht als bärtig zu erkennen** — dunkles Haar auf dunkler Haut
+ist eine Fläche in einer Fläche. Seitdem hat der Bart eine dunkle Oberkante.
+Ohne `--nur=bart` hätte ich drei Bärte gesehen und den Rest für Zufall
+gehalten.
+
+### Jolanda hatte einen Bart
+
+Der Generator würfelte den Bart aus dem Namen, ohne den Namen anzusehen. Rund
+jedes vierte Gesicht bekam einen — auch Margarethe und Jolanda. Das liest sich
+nicht als Vielfalt, sondern als Fehler, und wer einen Fehler sieht, schaut auf
+den Fehler statt auf das Gesicht, das er sich merken soll.
+
+Die Namenslisten sind deshalb jetzt zweigeteilt. Die Trennung ist ausdrücklich
+**keine Aussage darüber, wie Menschen aussehen** — es gibt bärtige Frauen. Sie
+ist eine Aussage über eine Zeichnung aus fünf Strichen: Die kann Zwischentöne
+nicht transportieren. Kahlköpfigkeit bleibt bewusst für alle möglich; die
+fällt nicht als Fehler auf, der Vollbart schon.
+
+Nebenbei kam heraus, dass die Abwechslung vorher gar keine Eigenschaft war,
+sondern nur die Reihenfolge, in der ich die Namen aufgeschrieben hatte — im
+englischen Pool stimmte sie ab „Ximena“ nicht mehr. **Was eine Eigenschaft
+sein soll, gehört in die Struktur und nicht in die Sortierung.**
+
+### Der Bart hing an der Kette des Zufalls
+
+`beard` verbrauchte zwei Würfe, den zweiten nur, wenn der erste durchkam.
+Damit hingen Brauen, Augen, Nase und Mund daran, **ob** das Gesicht einen Bart
+hat. Je Name blieb das gleich, es ist also nie aufgefallen — aber wer die
+Bartschwelle ändert, hätte damit alle Gesichter geändert. Jetzt ein Wurf, eine
+Entscheidung.
+
+Ein Test dazu ist wieder herausgeflogen, und das gehört zum Bericht: Ich
+wollte die Eigenschaft über die Streuung der übrigen Merkmale messen, und der
+Versuch scheiterte an sich selbst — bei sieben bärtigen Namen und 48 möglichen
+Kombinationen fallen zwei zusammen, wie es die Wahrscheinlichkeit vorsieht.
+Der Test war falsch, nicht der Code. **Ein Test, der nur so lange grün ist,
+wie der Zufall mitspielt, ist schlimmer als keiner.** Die Begründung steht
+jetzt als Kommentar an der Stelle, wo sie gebraucht wird.
+
+### Vier E2E-Tests waren rot, und sie hatten recht
+
+Seit es zwei Module gibt, **wechselt die Einheit von Mal zu Mal die Sorte**:
+Der Plan zieht das Modul aus dem Seed, und der Seed enthält die Startzeit. Die
+Tests hatten das fest angenommen und suchten immer das Textfeld des freien
+Abrufs.
+
+Die Reparatur ist eine Regel, keine Anpassung: **Der Test liest ab, was die
+App zeigt, statt vorherzusagen, was sie zeigen wird** (`tests/e2e/helpers.ts`).
+
+An einer Stelle geht das bewusst nicht bis zum Ende. Beim Wiedersehen mit
+Gesichtern gehört zu jeder Stelle ein bestimmtes Gesicht, und welches, ist dem
+Test nicht zu entnehmen — der Name steht ja gerade nicht auf dem Bildschirm,
+das ist die Aufgabe. Um richtig zu antworten, müsste er die Reihenfolge des
+Schedulers nachbauen. Genau davor warnt eine frühere Lehre in derselben Datei,
+und eine zweite Kopie derselben Logik wäre keine Prüfung, sondern eine
+Verdopplung. Der Test prüft dort, dass das Wiedersehen stattfindet und die
+Zahlen zusammenpassen; dass die Zuordnung Stelle für Stelle stimmt, prüft
+`gradePrompted` im Kern — ohne Browser und ohne Raten.
+
+Beide Zweige des neuen Sessiontests habe ich je dreimal laufen sehen, bevor
+etwas gepusht wurde. Ein Zweig, der zufällig nie drankam, wäre ungeprüfter
+Code mit grünem Haken.
+
+**Stand:** 108 Kerntests, 28 E2E-Läufe, Typecheck für App und Kern grün.

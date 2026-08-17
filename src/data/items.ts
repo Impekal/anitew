@@ -30,6 +30,11 @@ export function itemIdOf(moduleId: string, language: string, word: string): stri
   return `${moduleId}:${language}:${word}`
 }
 
+/** Das Modul aus einer Kennung lesen. */
+export function moduleOf(itemId: string): string {
+  return itemId.split(':')[0] ?? ''
+}
+
 /** Das Wort aus einer Kennung zurückholen. */
 export function wordOf(itemId: string): string {
   return itemId.split(':').slice(2).join(':')
