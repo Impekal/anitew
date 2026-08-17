@@ -1,7 +1,5 @@
 # ANITEW
 
-*Arbeitstitel — der Name ist noch nicht entschieden (siehe Backlog, S1).*
-
 Eine Gedächtnis-App, die mit **5 Minuten täglich** auskommt: kein weiteres
 Brain-Training-Spiel, sondern Abruftraining plus zeitlich verteiltes
 Wiederholen — die beiden am besten belegten Lernmechanismen — mit einer
@@ -17,7 +15,8 @@ ohne Neubau eine Android-App (TWA) und eine iOS-App werden kann.
 
 | Datei | Inhalt |
 |---|---|
-| [`docs/BACKLOG.md`](docs/BACKLOG.md) | Die Aufgabenliste — alles, was zu bauen ist, mit Status, Aufwand und Begründung. Am Ende: Meilensteine und die offenen Entscheidungen |
+| [`docs/BACKLOG.md`](docs/BACKLOG.md) | Die Aufgabenliste — alles, was zu bauen ist, mit Status, Aufwand und Begründung. Am Ende: Meilensteine und der aktuelle Stand |
+| [`docs/DECISIONS.md`](docs/DECISIONS.md) | Die bindenden Entscheidungen mit ihren Gründen — und mit dem, was sie ausschließen |
 
-Es steht noch kein Code im Repo. Zuerst die Entscheidungen S1 (Name) und S3
-(Stack) aus dem Backlog, dann Meilenstein M0.
+Es steht noch kein Code im Repo. Die Grundentscheidungen sind getroffen
+(D-001 bis D-010), als Nächstes kommt Meilenstein M0: Gerüst, PWA, Datenschicht.

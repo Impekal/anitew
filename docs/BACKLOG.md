@@ -10,6 +10,10 @@
 >
 > Diese Datei ist Teil des Projektgedächtnisses. Jede Session, die Punkte
 > erledigt oder neue findet, aktualisiert sie.
+>
+> **Stand 2026-08-17:** Die neun offenen Entscheidungen aus Abschnitt S sind
+> beantwortet und liegen als D-001 bis D-010 in [`DECISIONS.md`](DECISIONS.md).
+> Meilenstein M0 ist damit frei.
 
 ---
 
@@ -35,15 +39,15 @@ unter „Nicht-Ziele“.
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| A1 | Stack festlegen und begründen | ❗ | Vorschlag: React 18 + TypeScript (strict) + Vite 6 + vite-plugin-pwa + Dexie/IndexedDB — wie RReader, bewährt, permissiv lizenziert | S |
+| A1 | Stack festlegen und begründen | ✅ 2026-08-17 | React 18 + TS strict + Vite 6 + vite-plugin-pwa + Dexie — **D-003** | S |
 | A2 | Repo-Grundgerüst, Ordnerstruktur, Lint/Format, tsconfig strict | ⬜ | | S |
 | A3 | PWA-Grundlage: Manifest, Service Worker, Offline-Start, Update-Strategie | ⬜ | erster Start nach Installation muss offline funktionieren | M |
 | A4 | **Architekturregel: `src/core/` ist reines TypeScript** — keine DOM-, React- oder Browser-API-Zugriffe | ⬜ | Engine, Scheduler, Scoring, Profil, Sessionplanung leben hier. Voraussetzung für R-3 und für Tests ohne Browser | M |
 | A5 | Plattform-Adapter-Schicht: Storage, Uhr/Timer, Benachrichtigungen, Audio, Datei-Export | ⬜ | eine Schnittstelle, austauschbare Implementierung (Web heute, TWA/iOS später) | M |
 | A6 | Datenschicht: Dexie-Schema **mit Migrationen ab Version 1** | ⬜ | Trainingshistorie ist nicht wiederherstellbar — ein Schemafehler kostet später echte Nutzerdaten | M |
 | A7 | Deployment: Auto-Build bei Push, statisches Hosting, kein Backend | ⬜ | Cloudflare Pages/Workers wie RReader; Build muss auf jedem statischen Host laufen | S |
-| A8 | Projektgedächtnis anlegen: `PROJECT_STATE.md`, `docs/DECISIONS.md`, diese Liste | 🟨 | BACKLOG steht; die anderen beiden fehlen noch | S |
-| A9 | App-Identität: Icon, Splash, Theme-Farben, Statusleiste, Name im Manifest | ⬜ | hängt an S1 (Name) | S |
+| A8 | Projektgedächtnis anlegen: `PROJECT_STATE.md`, `docs/DECISIONS.md`, diese Liste | 🟨 2026-08-17 | BACKLOG und DECISIONS stehen; `PROJECT_STATE.md` folgt mit M0 | S |
+| A9 | App-Identität: Icon, Splash, Theme-Farben, Statusleiste, Name im Manifest | ⬜ | Name steht (**D-001**: ANITEW); Icon erst nach R3 | S |
 | A10 | Kein Tracking, keine Analytics-Dritte. Nutzungsstatistik nur lokal auf dem Gerät | ⬜ | | S |
 
 ## B. Die 5-Minuten-Session
@@ -68,7 +72,7 @@ Abruftraining. Hier entscheidet sich, ob die App wirkt.
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
 | C1 | Item-Modell definieren: was genau ist ein „Gedächtnis-Item“, wie sieht sein Zustand aus | ⬜ | trägt Sprache, Typ, Herkunft (App-Inhalt vs. eigener Inhalt), Schwierigkeit, Stabilität | M |
-| C2 | Scheduler mit Zustand pro Item (Stabilität + Schwierigkeit), nicht mit festen Intervallen | ❗ | FSRS-artig; Algorithmus **und dessen Lizenz** vor der Umsetzung prüfen (S4) | L |
+| C2 | Scheduler mit Zustand pro Item (Stabilität + Schwierigkeit), nicht mit festen Intervallen | ⬜ | **FSRS** mit mitgelieferten Standardparametern — **D-004**. Lizenz vor Einbau prüfen und in R1 eintragen | L |
 | C3 | Persönliche Vergessenskurve schätzen: „Diese Information vergisst DU wahrscheinlich in ~5 Tagen“ | ⬜ | Kern des Gesprächs. Zielretention einstellbar (z. B. 90 %) | L |
 | C4 | Kaltstart: sinnvolle erste Intervalle ohne jede Historie | ⬜ | | M |
 | C5 | **Abruf, nicht Wiedererkennen**: freie Eingabe als Standard, Multiple Choice nur wo unvermeidbar | ⬜ | Wiedererkennen fühlt sich leichter an und trainiert weniger | M |
@@ -76,6 +80,7 @@ Abruftraining. Hier entscheidet sich, ob die App wirkt.
 | C7 | Überfälligkeitsdruck begrenzen: nie ein Berg von 800 fälligen Items nach einer Pause | ⬜ | genau hier steigen Nutzer bei Karteikarten-Apps aus | M |
 | C8 | Engine deterministisch und seed-basiert, damit testbar | ⬜ | folgt aus A4 | S |
 | C9 | Simulator: synthetische Nutzer über 90 Tage, bevor echte Nutzer da sind | ⬜ | prüft, ob der Scheduler tut, was er soll — billiger als es an Menschen zu merken | M |
+| C10 | FSRS-Parameter später **auf dem Gerät** aus der eigenen Historie nachoptimieren | ⬜ | **D-004**, Phase nach M2; bis dahin Standardparameter | L |
 
 ## D. Übungsmodule
 
@@ -94,7 +99,9 @@ Abruftraining. Hier entscheidet sich, ob die App wirkt.
 | D11 | **Wörter & Listen** | ⬜ | | S |
 | D12 | **Räumlich** | ⬜ | | M |
 | D13 | **Assoziativ** — „Meet 5 people“: Person + Land + Hobby + Stadt, später quer abgefragt | ⬜ | „Wie hieß die Person aus Indien?“ / „Wer spielte Gitarre?“ — trainiert, was im Alltag wirklich vorkommt | L |
-| D14 | Bild- und Gesichtsmaterial beschaffen: lizenzfrei, offline, klein genug fürs Bundle | ❗ | eigener Punkt, weil es ein echtes Problem ist (S5) | M |
+| D14 | **Gesichtsgenerator**: parametrische SVG-Gesichter aus einem Seed (Kopf, Augen, Nase, Mund, Haar, Bart, Brille, Hautton) | ⬜ | **D-005**. Aus einem Seed immer dasselbe Gesicht, aus vielen Seeds Millionen — Kilobytes statt Megabytes, keine Rechtefragen | L |
+| D15 | Objekte und Orte: CC0-Icon-Satz auswählen, prüfen, dokumentieren, um eigene Formen ergänzen | ⬜ | **D-005**; Lizenzen nach R2 | M |
+| D16 | Fotorealistische Porträts als optionaler Nachladeinhalt | ⬜ | **D-005**, später. Gezeichnete Gesichter sind leichter als echte — der Benchmark (F2) muss das berücksichtigen, und die App darf es nicht als Alltagsleistung ausgeben (R-1) | L |
 
 ## E. Memory Profile & Personalisierung
 
@@ -113,8 +120,10 @@ Abruftraining. Hier entscheidet sich, ob die App wirkt.
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
 | F1 | **Trainingsscore und Benchmark strikt trennen** — zwei Datenreihen, zwei Anzeigen, nie vermischt | ⬜ | „Die App muss zwischen Trainingsscore und tatsächlich gemessener Gedächtnisleistung unterscheiden“ | M |
-| F2 | Benchmark-Test: standardisiert, unverändert, nicht trainiert, alle N Tage | ❗ | Design ist die schwierigste offene Frage des Projekts (S6) | L |
-| F3 | „Memory Strength +18 %“ nur aus dem Benchmark, mit Antippen → was genau gemessen wurde | ⬜ | | M |
+| F2 | Benchmark-Test: ~3 min, Tag 0 und dann alle 14 Tage; gleicher Aufbau, neuer Inhalt; misst sofort / nach 20 min / am Folgetag | ⬜ | **D-006** | L |
+| F3 | „Memory Strength +18 %“ nur aus dem Benchmark, mit Antippen → was genau gemessen wurde | ⬜ | Vergleich immer gegen den eigenen Tag 0, nie gegen andere Nutzer | M |
+| F2a | **Quarantäne-Itempool**: Benchmark-Inhalte kommen sonst nirgends vor und wandern nie in die Wiederholung | ⬜ | **D-006** — ohne diese Trennung misst der Benchmark nur Übung | M |
+| F2b | Erste zwei Messungen als **Eichung** kennzeichnen (Gewöhnung ans Format), Ergebnis als Spanne solange die Datenlage dünn ist | ⬜ | **D-006**; hängt an E7 | M |
 | F4 | Kein behaupteter Alltagstransfer, der nicht gemessen wurde | ⬜ | der Unterschied zwischen „besser in dieser Übung“ und „besseres Gedächtnis“ ist der wunde Punkt des ganzen Genres | S |
 | F5 | Fortschritt in echten Zahlen: „Day 1: 8/20 · Day 7: 15/20 · Day 30: 18/20 — du erinnerst 10 Dinge mehr als am ersten Tag“ | ⬜ | überzeugender als „+50 Coins“, und es stimmt | M |
 | F6 | Wissenschaftsseite in der App: was belegt ist (Spacing, Retrieval Practice), was nicht (allgemeine Intelligenzsteigerung), mit Quellen | ⬜ | | M |
@@ -163,33 +172,35 @@ Der Punkt, der aus einem Spiel einen Gedächtnistrainer macht.
 | J1 | Vier Modi: ⚡ 60 Sekunden · ⚡ 3 Minuten · 🧠 5 Minuten (Standard) · 🔥 15 Minuten | ⬜ | | M |
 | J2 | Jeder Modus ist ein Zeitbudget-Profil derselben Engine, kein eigener Code | ⬜ | folgt aus B2/B4 | S |
 | J3 | Auswahl in einem Tap direkt vom Startbildschirm | ⬜ | | S |
-| J4 | Zählt der 60-Sekunden-Modus für die Streak? | ❗ | Ja wäre ehrlicher gegenüber schlechten Tagen; nein wäre strenger. Entscheiden (S8) | S |
+| J4 | 60-Sekunden-Modus hält die Streak am Leben | ⬜ | **D-008** — daneben getrennt gezählt, wie viele Tage volle Challenges waren | S |
 
 ## K. Gamification
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
 | K1 | XP und Level — an **Abrufleistung** gekoppelt, nicht an verbrachte Zeit | ⬜ | sonst belohnt die App Anwesenheit statt Lernen | M |
-| K2 | Streak inklusive Schutztag/Freeze | ⬜ | Sucht ja, Schuldgefühl nein — ein verpasster Tag darf nicht 60 Tage vernichten | M |
+| K2 | Streak inklusive Schutztag: einer pro Woche, bis zu zwei angespart, **nicht kaufbar und nicht durch Werbung verdienbar** | ⬜ | **D-008**. Sucht ja, Schuldgefühl nein — ein verpasster Tag darf nicht 60 Tage vernichten | M |
 | K3 | Achievements | ⬜ | | M |
 | K4 | Daily Missions und Memory Quests | ⬜ | | M |
 | K5 | Persönliche Rekorde | ⬜ | | S |
 | K6 | Unlockable Worlds — rein kosmetisch | ⬜ | | M |
 | K7 | **Anti-Dark-Pattern-Regel**: keine künstliche Verknappung, kein Angstdruck, keine erfundenen Zahlen | ⬜ | „nicht mit billigen Belohnungen“. Gehört als Regel in DECISIONS.md, nicht nur hierher | S |
 | K8 | Die wichtigste Belohnung ist F5: der Nutzer merkt selbst, dass er besser wird | ⬜ | | — |
+| K9 | Spendenweg: externer Link (Ko-fi / PayPal / GitHub Sponsors) im Web; Store-Regeln für Spenden getrennt prüfen, wenn wir dort ankommen | ⬜ | **D-002**. Kern bleibt dauerhaft kostenlos; ein späteres Pro darf nur Bequemlichkeit hinzufügen, nie Trainingsleistung | S |
 
 ## L. Mehrsprachigkeit
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
 | L1 | i18n-Grundgerüst, Sprachwechsel zur Laufzeit, von Anfang an | ⬜ | nachträglich eingezogen kostet es das Zehnfache | M |
+| L1a | Beim ersten Start die **Systemsprache** übernehmen; Umschalten sichtbar auf dem ersten Bildschirm, nicht in den Einstellungen vergraben | ⬜ | **D-007** | S |
 | L2 | Elf Sprachen: DE · EN · FR · ES · IT · PT · NL · TR · AR · ZH · JA | ⬜ | | L |
 | L3 | RTL für Arabisch — Layout, nicht nur Text | ⬜ | | M |
 | L4 | CJK: Schriftschnitte, Zeilenumbruch, Eingabemethoden bei freiem Abruf (C5) | ⬜ | freier Abruf auf Japanisch ist ein eigenes Problem | M |
 | L5 | Engine bleibt sprachunabhängig; Sprache ist ein Attribut am Item | ⬜ | Voraussetzung für L7 | M |
 | L6 | Inhaltspools je Sprache: Wörter, Namen, Orte — kulturell passend, nicht durchübersetzt | ⬜ | ein deutscher Namenspool auf Japanisch trainiert nichts Sinnvolles | L |
 | L7 | Trainingssprache getrennt von Oberflächensprache: „Train your memory in Japanese today“ | ⬜ | Gedächtnis- und Sprachtraining zugleich — ein echtes Alleinstellungsmerkmal | M |
-| L8 | Übersetzungsprozess und Ausgangssprache festlegen | ❗ | (S7) | S |
+| L8 | Übersetzungsprozess: Quelltexte **auf Deutsch**, von dort übersetzt; Pflege ohne Wildwuchs | ⬜ | **D-007** | S |
 
 ## M. KI (BYOK)
 
@@ -205,12 +216,16 @@ Der Punkt, der aus einem Spiel einen Gedächtnistrainer macht.
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| N1 | Alles lokal in IndexedDB, kein Konto, keine Anmeldung | ⬜ | | S |
+| N1 | Alles lokal in IndexedDB. **Kein Konto bei uns, kein Server, keine Nutzerdatenbank** — auch nicht, wenn später abgeglichen wird | ⬜ | **D-009** | S |
 | N2 | Export/Backup als Datei, Import auf einem neuen Gerät | ⬜ | ohne Server ist das der einzige Weg, Fortschritt nicht zu verlieren | M |
 | N3 | Vollständig offline nutzbar, auch beim allerersten Start nach der Installation | ⬜ | | M |
 | N4 | Löschen: einzelne Items, eigene Inhalte, alles | ⬜ | | S |
 | N5 | Speicherbedarf im Blick behalten (Bilder!) und dem Nutzer zeigen | ⬜ | | S |
-| N6 | Sync zwischen Geräten | ❗ | (S9) — entweder Ende-zu-Ende-verschlüsselt oder gar nicht | L |
+| N6 | **Stufe 1 (Phase 1):** ohne Anmeldung, alles lokal; Sicherung und Gerätewechsel über die Exportdatei aus N2 — die der Nutzer selbst in iCloud Drive oder Google Drive legen kann | ⬜ | **D-009** | S |
+| N7 | **Stufe 2 (Phase 2):** Anmeldung bei Google, Abgleich in den **app-privaten Ordner des eigenen Google Drive** (OAuth mit PKCE, kein Backend) | ⬜ | **D-009**. Die Daten liegen im Speicher des Nutzers, nicht bei uns | L |
+| N8 | **Stufe 3 (Phase 3):** iCloud — realistisch erst mit der nativen iOS-App, weil CloudKit ein Apple-Entwicklerkonto und einen App-Container braucht | ⬜ | **D-009**, hängt an Q6 | L |
+| N9 | Konfliktauflösung bei zwei Geräten (gleicher Tag, zwei Sessions) | ⬜ | Trainingshistorie ist additiv — zusammenführen statt überschreiben | M |
+| N10 | Googles Freigabeverfahren für den Drive-Zugriff samt Datenschutzerklärung | ⬜ | kostenlos, aber es dauert; früh anstoßen, hängt an R4 | M |
 
 ## O. Bedienung & Barrierefreiheit
 
@@ -254,27 +269,34 @@ Der Punkt, der aus einem Spiel einen Gedächtnistrainer macht.
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
 | R1 | `THIRD_PARTY_LICENSES.md` ab dem ersten Paket pflegen | ⬜ | wie in RReader | S |
-| R2 | Lizenzen für Bilder, Gesichter, Töne, Namenslisten dokumentieren | ⬜ | hängt an D14 | M |
-| R3 | Namens- und Markenrecherche für den Produktnamen | ❗ | vor dem ersten Icon (S1) | S |
+| R2 | Lizenzen für Icons, Töne und Namenslisten dokumentieren | ⬜ | Gesichter erzeugen wir selbst (D14), damit entfällt der größte Teil | M |
+| R3 | Marken- und Namensrecherche für **ANITEW** | ⬜ | **D-001**. Vor Icon und Store-Eintrag, also vor den ersten Ausgaben. Keine Rechtsberatung, aber eine Prüfung, die vorher stattfinden muss | S |
 | R4 | Datenschutzerklärung — auch eine App ohne Server braucht eine | ⬜ | | S |
 | R5 | Wirkungsaussagen prüfen: keine Gesundheits- oder Heilversprechen (R-2, F7) | ⬜ | betrifft App-Texte und Store-Beschreibung gleichermaßen | S |
 
-## S. Offene Entscheidungen  ❗
+## S. Entscheidungen  ✅ 2026-08-17
 
-Diese Punkte kann niemand außer dir entscheiden. Sie blockieren jeweils
-konkrete Aufgaben.
+Alle neun beantwortet. Die Begründungen stehen in [`DECISIONS.md`](DECISIONS.md);
+hier nur, was entschieden wurde und welche Aufgaben dadurch frei sind.
+
+| # | Frage | Antwort | → |
+|---|---|---|---|
+| S1 | Produktname | **ANITEW** | D-001 · A9, R3, Q7 |
+| S2 | Geld | kostenlos + Spende; Pro bleibt möglich, darf aber nur Bequemlichkeit hinzufügen, nie Trainingsleistung | D-002 · K9, Q4 |
+| S3 | Stack | React 18 + TS strict + Vite 6 + PWA + Dexie | D-003 · A1 ✅ |
+| S4 | Wiederholungsalgorithmus | **FSRS**, Standardparameter, später lokal nachoptimiert. Kostenlos, offline, kein Dienst | D-004 · C2, C10 |
+| S5 | Bildmaterial | selbst erzeugt: parametrischer SVG-Gesichtsgenerator + CC0-Icons; KI-Bilder nur für Missionsszenen | D-005 · D14–D16 |
+| S6 | Benchmark | eigener 3-Minuten-Test mit Quarantäne-Items, alle 14 Tage, gegen den eigenen Tag 0, erste zwei Messungen als Eichung | D-006 · F2, F2a, F2b |
+| S7 | Sprache | Quelltexte Deutsch; erster Start in der Systemsprache, sofort umschaltbar | D-007 · L1a, L8 |
+| S8 | Streak | 60 Sekunden halten sie; volle Tage getrennt gezählt; ein Schutztag pro Woche, nicht kaufbar | D-008 · J4, K2 |
+| S9 | Abgleich | lokal ohne Anmeldung; mit Anmeldung in die **eigene** Cloud des Nutzers (Google Drive, später iCloud). Kein Konto bei uns | D-009 · N6–N10 |
+
+Neu offen, entstanden aus den Antworten:
 
 | # | Frage | Blockiert |
 |---|---|---|
-| S1 | **Produktname**: ANITEW · MEMORA · MNEMO · RECALL · MEMORY QUEST | A9, R3, Q7 |
-| S2 | **Geld**: dauerhaft kostenlos? Spende? Pro-Funktionen? Und wenn ja, welche dürfen es sein, ohne K7 zu verletzen | K, Q4 |
-| S3 | **Stack** bestätigen (Vorschlag in A1) | A2 ff. |
-| S4 | **Scheduler-Algorithmus** und dessen Lizenz | C2, C3 |
-| S5 | **Bildmaterial**: woher kommen Gesichter, Objekte, Orte — lizenzfrei, offline, klein | D14, R2 |
-| S6 | **Benchmark-Design**: was genau ist die Zahl hinter „+18 %“, und wie oft wird sie gemessen | F2, F3 |
-| S7 | **Ausgangssprache** für Übersetzungen: Deutsch oder Englisch | L8 |
-| S8 | **Streak-Regeln**: zählt der 60-Sekunden-Modus, gibt es Schutztage | J4, K2 |
-| S9 | **Sync**: nie, oder später Ende-zu-Ende-verschlüsselt | N6 |
+| S10 | **iOS App Store**: welcher eigenständige Mehrwert rechtfertigt die App gegenüber der Web-Version | Q6, N8 |
+| S11 | **Spenden in den Stores**: Google und Apple regeln das unterschiedlich — erst prüfen, wenn wir dort ankommen | K9, Q4 |
 
 ---
 
@@ -282,14 +304,14 @@ konkrete Aufgaben.
 
 | | Meilenstein | Inhalt | Fertig, wenn |
 |---|---|---|---|
-| **M0** | Fundament | A1–A8, S1/S3 entschieden | Push baut, App installiert sich, `src/core/` läuft ohne Browser |
+| **M0** | Fundament | A1–A8, L1/L1a | Push baut, App installiert sich, `src/core/` läuft ohne Browser · **frei seit 2026-08-17** |
 | **M1** | Walking Skeleton | B1–B3, B5, B9, D1, zwei Module (D4 Encode + D6 Recall), N1 | Eine echte 5-Minuten-Session lässt sich täglich durchlaufen, Ergebnisse bleiben erhalten |
 | **M2** | Die Engine wird echt | C1–C9, D8, E1–E7, B4 | Die App entscheidet begründet, was du heute trainierst, und plant Wiederholungen persönlich |
-| **M3** | Ehrlichkeit | F1–F7 | Es gibt zwei getrennte Zahlen, und die große Prozentzahl ist gemessen. **Vorher kein öffentlicher Release** |
-| **M4** | Inhalt & Spiel | D5, D9–D13, G, H, K, J | Es macht Spaß, und der Vorrat geht nicht aus |
+| **M3** | Ehrlichkeit | F1–F7, F2a, F2b | Es gibt zwei getrennte Zahlen, und die große Prozentzahl ist gemessen. **Vorher kein öffentlicher Release** |
+| **M4** | Inhalt & Spiel | D5, D9–D16, G, H, K, J | Es macht Spaß, und der Vorrat geht nicht aus |
 | **M5** | Sprachen | L1–L8 | Man kann heute auf Deutsch und morgen auf Japanisch trainieren |
 | **M6** | Echtes Leben | I, M | Eigene Präsentation rein, Wiederholungsplan raus |
-| **M7** | Stores | Q, R | .aab im Play-Track; iOS-Weg entschieden |
+| **M7** | Stores & Cloud | Q, R, N7–N10 | .aab im Play-Track; Drive-Abgleich läuft; iOS-Weg entschieden (S10) |
 
 ---
 
@@ -311,8 +333,13 @@ Bewusst nicht gebaut, damit die Liste oben nicht ausfranst:
 
 ## Erste Schritte, konkret
 
-1. S1 und S3 entscheiden (Name, Stack) — beides blockiert M0.
-2. M0 umsetzen: Gerüst, PWA, `src/core/`, Datenschicht mit Migrationen, CI.
+1. ~~S1 und S3 entscheiden~~ — erledigt am 2026-08-17, alle neun Fragen sind
+   beantwortet (D-001 bis D-010).
+2. **M0 umsetzen:** Gerüst, PWA, `src/core/` ohne Browser, Datenschicht mit
+   Migrationen ab Version 1, i18n von der ersten Zeile an, CI. ← *hier stehen wir*
 3. M1 umsetzen: eine echte, durchlaufbare 5-Minuten-Session mit zwei Modulen.
    Ab hier kannst du sie selbst täglich benutzen — und alles Weitere an echter
    Erfahrung statt an Vermutungen ausrichten.
+
+Nebenbei und unabhängig davon: **R3** (Markenrecherche ANITEW) sollte laufen,
+bevor Icon, Domain und Store-Eintrag Geld kosten.
