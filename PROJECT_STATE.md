@@ -497,3 +497,35 @@ grenzwertig und steht jetzt auf 55 % statt 40 %.
 lässt sich in fünf Sekunden entscheiden, ob eine Änderung angekommen ist oder
 ob der Zwischenspeicher noch die alte hält — genau die Frage, die diese Runde
 gekostet hat.
+
+## 2026-08-17 · Warum installierte Apps nie aktuell wurden
+
+Rückmeldung, und sie benennt das Problem schärfer als meine erste Diagnose:
+*„Updates werden im installierten PWA nicht übernommen, man muss immer wieder
+deinstallieren und neu installieren.“*
+
+Das ist kein Zufall und kein iOS-Fehler, sondern die Folge davon, wie eine
+installierte App lebt: Sie wird **geweckt, nicht neu geladen**. Wer sie aus dem
+App-Umschalter zurückholt, löst keinen Seitenaufruf aus — und ohne Seitenaufruf
+fragt sie nie, ob es etwas Neues gibt. Sie kann Wochen so laufen. Der einzige
+Ausweg, der von außen bleibt, ist Deinstallieren und Neuinstallieren.
+
+Deshalb ist die Nachfrage **beim Sichtbarwerden** der eigentlich wichtige
+Auslöser in `updates.ts`, nicht die beim Start. Ohne sie wäre die Änderung von
+vorhin nur eine halbe gewesen: Sie hätte den Browser-Tab geheilt und die
+installierte App genauso stehen lassen wie zuvor.
+
+**Und eine Ergänzung, die dabei aufgefallen ist:** Automatisch neu laden darf
+die App nicht *mitten in einer Einheit*. Die Einheit überlebt das zwar (B5),
+aber der Bildschirm spränge beim Einprägen eines Wortes weg und stünde danach
+mit „Fortsetzen“ da — der denkbar schlechteste Moment (G-1). Der Neustart
+wartet jetzt, bis die Einheit vorbei ist. Erkannt wird sie an demselben
+Merkmal, mit dem sie schon das Netz im Hintergrund zurückdrängt: kein zweiter
+Zustand, der aus dem Tritt geraten könnte.
+
+Der Schein im Hellen steht nach einer weiteren Rückmeldung jetzt auf 78 %
+(statt 40 % im ersten und 55 % im zweiten Anlauf), ohne negative Streuung.
+Dass es drei Runden gebraucht hat, liegt an einer Eigenheit, die man kennen
+sollte: **Ein Schein auf hellem Grund sieht auf dem Entwicklungsmonitor immer
+kräftiger aus als auf einem Telefon im Tageslicht.** Im Zweifel zu kräftig
+einstellen und vom Gerät aus zurücknehmen — nicht umgekehrt.

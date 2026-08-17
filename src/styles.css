@@ -57,14 +57,14 @@
   --glow: 0 0 0 1px rgb(168 95 34 / 30%), 0 4px 20px -2px rgb(168 95 34 / 45%);
   --glow: 0 0 0 1px color-mix(in oklab, var(--accent) 30%, transparent),
     0 4px 20px -2px color-mix(in oklab, var(--accent) 45%, transparent);
-  --glow-soft: 0 5px 28px -2px rgb(168 95 34 / 55%);
-  --glow-soft: 0 5px 28px -2px color-mix(in oklab, var(--accent) 55%, transparent);
-  --glow-strong: 0 10px 46px -4px rgb(168 95 34 / 72%);
-  --glow-strong: 0 10px 46px -4px color-mix(in oklab, var(--accent) 72%, transparent);
-  --glow-text: 0 1px 14px rgb(168 95 34 / 32%);
-  --glow-text: 0 1px 14px color-mix(in oklab, var(--accent) 32%, transparent);
-  --glow-flare: 0 2px 28px rgb(168 95 34 / 58%);
-  --glow-flare: 0 2px 28px color-mix(in oklab, var(--accent) 58%, transparent);
+  --glow-soft: 0 6px 34px 0 rgb(168 95 34 / 78%);
+  --glow-soft: 0 6px 34px 0 color-mix(in oklab, var(--accent) 78%, transparent);
+  --glow-strong: 0 10px 54px 4px rgb(168 95 34 / 92%);
+  --glow-strong: 0 10px 54px 4px color-mix(in oklab, var(--accent) 92%, transparent);
+  --glow-text: 0 1px 16px rgb(168 95 34 / 48%);
+  --glow-text: 0 1px 16px color-mix(in oklab, var(--accent) 48%, transparent);
+  --glow-flare: 0 2px 32px rgb(168 95 34 / 80%);
+  --glow-flare: 0 2px 32px color-mix(in oklab, var(--accent) 80%, transparent);
 
   --sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   /* D-011/G-8: Gemessenes bekommt eine eigene Schrift. Gleich breite Ziffern,
