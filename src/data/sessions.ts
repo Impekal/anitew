@@ -1,0 +1,125 @@
+/**
+ * Eine Trainingseinheit auf dem Gerät festhalten (Backlog B5/B9).
+ *
+ * Zwei getrennte Dinge werden hier geschrieben:
+ *
+ * **Das Ereignisprotokoll** (`events`) ist die Wahrheit. Nur anhängen, nie
+ * ändern. Daraus lässt sich später jede Auswertung neu berechnen — die
+ * Vergessenskurve (D-004), das Profil, der Benchmark (D-006). Aus einer
+ * Zusammenfassung ließen sich die Rohdaten nie zurückgewinnen.
+ *
+ * **Der Fortschritt** (`activeSession` in den Einstellungen) ist Arbeitsstand
+ * und wird überschrieben. Er existiert nur, damit ein Anruf, ein App-Wechsel
+ * oder ein Absturz die Einheit nicht vernichtet. Geschrieben wird nach **jedem
+ * Wort**, nicht am Ende des Blocks: Ein verlorener Block wäre bei einer
+ * Fünf-Minuten-Einheit ein Drittel.
+ */
+
+import type { Instant, RecallResult, SessionPlan } from '../core/index.ts'
+import { type EventRow, db } from './db.ts'
+
+const ACTIVE_KEY = 'activeSession'
+
+export interface RoundResult {
+  round: number
+  correct: string[]
+  missed: string[]
+  extra: string[]
+}
+
+export interface SessionProgress {
+  sessionId: string
+  plan: SessionPlan
+  /** Der Block, der gerade läuft. Gleich `plan.blocks.length`, wenn fertig. */
+  blockIndex: number
+  results: RoundResult[]
+  startedAt: Instant
+}
+
+export async function beginSession(
+  progress: SessionProgress,
+  day: string,
+  startedAt: Instant,
+): Promise<void> {
+  await db.sessions.put({
+    id: progress.sessionId,
+    day,
+    mode: progress.plan.mode,
+    startedAt,
+    completed: false,
+  })
+  await saveProgress(progress)
+}
+
+export async function saveProgress(progress: SessionProgress): Promise<void> {
+  await db.settings.put({ key: ACTIVE_KEY, value: progress })
+}
+
+export async function loadProgress(): Promise<SessionProgress | undefined> {
+  const row = await db.settings.get(ACTIVE_KEY)
+  return row?.value as SessionProgress | undefined
+}
+
+export async function clearProgress(): Promise<void> {
+  await db.settings.delete(ACTIVE_KEY)
+}
+
+/** Ein Wort wurde gezeigt. */
+export async function logShown(
+  sessionId: string,
+  at: Instant,
+  itemId: string,
+): Promise<void> {
+  await append({ sessionId, at, moduleId: 'encode', itemId, kind: 'shown' })
+}
+
+/**
+ * Das Ergebnis eines Abrufblocks — ein Ereignis je gesuchtem Wort.
+ *
+ * Absichtlich je Wort und nicht „6 von 8“: Später soll die Engine wissen, ob
+ * *dieses* Wort saß, nicht nur wie viele. Ohne diese Auflösung gäbe es keine
+ * Vergessenskurve pro Information.
+ */
+export async function logRecall(
+  sessionId: string,
+  at: Instant,
+  result: RecallResult,
+  blockDurationMs: number,
+): Promise<void> {
+  const rows: EventRow[] = [
+    ...result.correct.map((item) => ({
+      sessionId,
+      at,
+      moduleId: 'recall',
+      itemId: item,
+      kind: 'answered' as const,
+      correct: true,
+      latencyMs: blockDurationMs,
+    })),
+    ...result.missed.map((item) => ({
+      sessionId,
+      at,
+      moduleId: 'recall',
+      itemId: item,
+      kind: 'answered' as const,
+      correct: false,
+      latencyMs: blockDurationMs,
+    })),
+  ]
+  await db.events.bulkAdd(rows)
+}
+
+export async function completeSession(sessionId: string, endedAt: Instant): Promise<void> {
+  await db.sessions.update(sessionId, { endedAt, completed: true })
+  await clearProgress()
+}
+
+/** Abgebrochen: Die Einheit bleibt als unvollständig stehen, statt zu verschwinden. */
+export async function abandonSession(sessionId: string, endedAt: Instant): Promise<void> {
+  await db.sessions.update(sessionId, { endedAt, completed: false })
+  await clearProgress()
+}
+
+async function append(row: EventRow): Promise<void> {
+  await db.events.add(row)
+}

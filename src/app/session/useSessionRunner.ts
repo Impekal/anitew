@@ -1,0 +1,167 @@
+import { useCallback, useEffect, useRef, useState } from 'react'
+
+import {
+  type BlockPlan,
+  type Platform,
+  SECONDS_PER_ITEM,
+  type SessionPlan,
+  gradeRecall,
+  splitEntries,
+} from '../../core/index.ts'
+import {
+  type RoundResult,
+  type SessionProgress,
+  clearProgress,
+  completeSession,
+  logRecall,
+  logShown,
+  saveProgress,
+} from '../../data/sessions.ts'
+
+export interface RunnerState {
+  plan: SessionPlan
+  blockIndex: number
+  block: BlockPlan | undefined
+  /** Verbleibende Sekunden im laufenden Block, aufgerundet. */
+  remaining: number
+  /** Das Wort, das gerade gezeigt wird — nur beim Einprägen. */
+  currentItem: string | undefined
+  itemIndex: number
+  entries: string
+  results: RoundResult[]
+  finished: boolean
+}
+
+/**
+ * Führt eine Trainingseinheit aus (Backlog B2).
+ *
+ * Die Zeit kommt aus `clock.elapsed()`, nicht aus `Date.now()`: Die Wanduhr
+ * kann während einer Einheit springen — durch die Zeitumstellung, durch einen
+ * Abgleich mit dem Netz oder weil jemand die Streak überlisten will. Ein Block,
+ * der 60 Sekunden dauern soll, darf davon nichts merken (Backlog P5).
+ *
+ * Ein Block endet, wenn seine Zeit abgelaufen ist — oder früher, wenn der
+ * Nutzer fertig ist. Das Budget ist eine Obergrenze, keine Wartepflicht.
+ */
+export function useSessionRunner(
+  platform: Platform,
+  initial: SessionProgress,
+  onLeave: () => void,
+) {
+  const [blockIndex, setBlockIndex] = useState(initial.blockIndex)
+  const [results, setResults] = useState<RoundResult[]>(initial.results)
+  const [entries, setEntries] = useState('')
+  const [itemIndex, setItemIndex] = useState(0)
+  const [remaining, setRemaining] = useState(0)
+
+  const blockStartedRef = useRef(platform.clock.elapsed())
+  const sessionRef = useRef(initial)
+  const advancingRef = useRef(false)
+
+  const plan = initial.plan
+  const block = plan.blocks[blockIndex]
+  const finished = blockIndex >= plan.blocks.length
+
+  // Jeder Blockwechsel setzt die Uhr neu.
+  useEffect(() => {
+    blockStartedRef.current = platform.clock.elapsed()
+    setItemIndex(0)
+    setEntries('')
+    advancingRef.current = false
+    setRemaining(block?.seconds ?? 0)
+  }, [blockIndex, block?.seconds, platform])
+
+  const persist = useCallback(
+    (nextIndex: number, nextResults: RoundResult[]) => {
+      const progress: SessionProgress = {
+        ...sessionRef.current,
+        blockIndex: nextIndex,
+        results: nextResults,
+      }
+      sessionRef.current = progress
+      void saveProgress(progress).catch(() => {
+        // Kein Speicher heißt: Die Einheit läuft weiter, überlebt aber keinen
+        // Absturz. Ein Dialog mitten im Training wäre der schlechtere Tausch.
+      })
+    },
+    [],
+  )
+
+  /** Block beenden — durch Zeitablauf oder weil der Nutzer fertig ist. */
+  const advance = useCallback(() => {
+    if (advancingRef.current || block === undefined) return
+    advancingRef.current = true
+
+    const nextResults = [...results]
+    if (block.kind === 'recall') {
+      const graded = gradeRecall(splitEntries(entries), block.items)
+      nextResults.push({ round: block.round, ...graded })
+      const duration = platform.clock.elapsed() - blockStartedRef.current
+      void logRecall(sessionRef.current.sessionId, platform.clock.now(), graded, duration).catch(
+        () => undefined,
+      )
+      setResults(nextResults)
+    }
+
+    const nextIndex = blockIndex + 1
+    persist(nextIndex, nextResults)
+    setBlockIndex(nextIndex)
+
+    if (nextIndex >= plan.blocks.length) {
+      void completeSession(sessionRef.current.sessionId, platform.clock.now()).catch(
+        () => undefined,
+      )
+    }
+  }, [block, blockIndex, entries, persist, plan.blocks.length, platform, results])
+
+  // Der Herzschlag. 200 ms ist fein genug für eine Sekundenanzeige und grob
+  // genug, dass es den Akku nicht kostet.
+  useEffect(() => {
+    if (finished || block === undefined) return
+    const timer = setInterval(() => {
+      const elapsed = (platform.clock.elapsed() - blockStartedRef.current) / 1000
+      const left = Math.max(0, block.seconds - elapsed)
+      setRemaining(Math.ceil(left))
+
+      if (block.kind === 'encode') {
+        const index = Math.min(block.items.length - 1, Math.floor(elapsed / SECONDS_PER_ITEM))
+        setItemIndex(index)
+      }
+      if (left <= 0) advance()
+    }, 200)
+    return () => clearInterval(timer)
+  }, [advance, block, finished, platform])
+
+  // Jedes gezeigte Wort landet im Protokoll — und der Fortschritt wird
+  // mitgeschrieben, damit ein Anruf höchstens ein Wort kostet (B5).
+  const loggedRef = useRef<string>('')
+  useEffect(() => {
+    if (block === undefined || block.kind !== 'encode') return
+    const item = block.items[itemIndex]
+    if (item === undefined) return
+    const marker = `${block.id}:${itemIndex}`
+    if (loggedRef.current === marker) return
+    loggedRef.current = marker
+    void logShown(sessionRef.current.sessionId, platform.clock.now(), item).catch(() => undefined)
+    persist(blockIndex, results)
+  }, [block, blockIndex, itemIndex, persist, platform, results])
+
+  const leave = useCallback(() => {
+    void clearProgress().catch(() => undefined)
+    onLeave()
+  }, [onLeave])
+
+  const state: RunnerState = {
+    plan,
+    blockIndex,
+    block,
+    remaining,
+    currentItem: block?.kind === 'encode' ? block.items[itemIndex] : undefined,
+    itemIndex,
+    entries,
+    results,
+    finished,
+  }
+
+  return { state, setEntries, advance, leave }
+}

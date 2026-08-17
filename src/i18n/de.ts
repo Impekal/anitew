@@ -40,10 +40,28 @@ export const de = {
       extended: 'Ich habe 15 Minuten',
     },
   },
-  notYet: {
-    heading: 'Das Training kommt als Nächstes',
-    body: 'Das Fundament steht: Die App lässt sich installieren, läuft ohne Netz und merkt sich etwas. Die eigentliche 5-Minuten-Session ist der nächste Schritt (M1).',
-    close: 'Verstanden',
+  session: {
+    round: 'Runde',
+    encodeHint: 'Merke dir diese Wörter.',
+    recallHint: 'Schreib auf, woran du dich erinnerst. Reihenfolge egal.',
+    recallPlaceholder: 'Ein Wort pro Zeile',
+    doneWithBlock: 'Fertig',
+    abort: 'Abbrechen',
+  },
+  summary: {
+    heading: 'Erinnert',
+    // Bewusst keine Prozentzahl und kein „Memory Strength“ — die käme aus dem
+    // Benchmark, und den gibt es noch nicht (D-006, Regel R-1).
+    note: 'Wörter, die du nach dem Einprägen frei abrufen konntest. Was das über dein Gedächtnis insgesamt sagt, misst später der Benchmark — nicht diese Zahl.',
+    perRound: 'Nach Runden',
+    missed: 'gefehlt',
+    back: 'Zurück',
+  },
+  resume: {
+    heading: 'Eine Einheit läuft noch',
+    body: 'Du warst mittendrin. Weitermachen, wo du aufgehört hast?',
+    continue: 'Fortsetzen',
+    discard: 'Verwerfen und neu beginnen',
   },
   check: {
     heading: 'Fundament',

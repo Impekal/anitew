@@ -113,3 +113,61 @@ baut die CI und überspringt das Veröffentlichen still.
 
 **Als Nächstes: M1** — die erste echte 5-Minuten-Session, unterbrechungsfest,
 mit Encode und Recall, jeder Antwort im Ereignisprotokoll.
+
+## 2026-08-17 · M1 — eine Einheit läuft durch
+
+Einprägen und freier Abruf, in Runden, mit hartem Zeitbudget. Der Knopf auf dem
+Startbildschirm führt jetzt in ein echtes Training statt in einen Hinweis.
+
+**Das Zeitbudget ist eine Zusage.** Die Summe aller Blöcke ist auf die Sekunde
+die Länge des Modus — geprüft für alle vier Modi im Kern-Test und einmal in
+echter Zeit im Browser (der E2E-Test wartet 60 Sekunden ab und misst nach). Der
+Rest einer Division wandert nach vorn: lieber die erste Runde eine Sekunde
+länger als am Ende eine Einheit, die 4:59 dauert. Umgekehrt ist das Budget eine
+*Obergrenze* — wer früher fertig ist, ist früher fertig. Zeit zurückzuhalten,
+damit die Zahl stimmt, wäre Beschäftigung statt Training.
+
+**B3 wurde nicht behauptet, sondern zugeschnitten.** Die Blockstruktur aus dem
+Produktgespräch nennt fünf Blöcke; Module gibt es für zwei. Statt Focus,
+Working Memory und Spaced Recall als leere Hüllen zu bauen, plant der Planer
+Runden aus Einprägen und Abrufen — und wächst, sobald die Module da sind. Im
+Backlog steht B3 deshalb auf 🟨 und nicht auf ✅.
+
+**Die Bewertung ist absichtlich großzügig.** Umlaute und Akzente werden
+gefaltet („Bäcker“ = „Baecker“ = „backer“), ab fünf Zeichen ist ein Tippfehler
+erlaubt, auch die Vertauschung zweier Nachbarn. Unter fünf Zeichen gilt die
+Toleranz nicht — dort ist ein Buchstabe Unterschied oft ein anderes Wort
+(„Igel“/„Egel“). Der Grund ist nicht Nachsicht, sondern Messgenauigkeit:
+Gemessen werden soll das Gedächtnis, nicht die Rechtschreibung und nicht die
+Tastatur. Eine strengere Zahl wäre kleiner, aber nicht richtiger — und nach
+R-1 ist eine falsche Zahl schlimmer als eine milde. Ein Test hält die andere
+Richtung fest: Wer sechsmal Unsinn eintippt, bekommt null Treffer. Eine
+Bewertung, die bei genug Rateversuchen irgendwann trifft, wäre genau die
+erfundene Zahl, die R-1 verbietet.
+
+**Unterbrechungsfest heißt: nach jedem Wort.** Der Fortschritt wird alle vier
+Sekunden geschrieben, nicht am Blockende — bei einer Fünf-Minuten-Einheit wäre
+ein verlorener Block ein Drittel. Der E2E-Test prüft den harten Fall: Die Seite
+wird mitten im Einprägen neu geladen, nicht sauber verlassen. Danach steht
+„Fortsetzen“ da.
+
+**Das Ereignisprotokoll führt je Wort Buch**, nicht „6 von 8“. Ohne diese
+Auflösung gäbe es später keine Vergessenskurve pro Information — und die ist
+der Kern von D-004.
+
+**Bewusst nicht gebaut: die Streak.** Sie wäre billig gewesen und hätte die App
+sofort motivierender gemacht. Aber D-008 verspricht Schutztage, und eine Streak
+ohne sie bricht hart — genau das, wovor die Entscheidung schützen soll. Lieber
+zwei Wochen ohne Streak als eine, die das Versprechen bricht. Kommt vollständig
+mit M4.
+
+**Geprüft:** 73 Kern-Tests, 10 E2E-Tests (Chromium und Telefonprofil).
+
+**Ein Stolperstein:** Der Test, der das Zeitbudget nachmisst, lief in Playwrights
+30-Sekunden-Grenze — nicht in einen Fehler der App. Eine 60-Sekunden-Einheit
+braucht mehr als 30 Sekunden Testzeit. Er hat jetzt seine eigene Grenze und
+misst gleich mit, dass die Einheit weder zu kurz noch zu lang war.
+
+**Als Nächstes: M2** — die Engine, die entscheidet, was heute drankommt:
+Wiederholungsplan nach FSRS, Gedächtnisprofil, Spaced Recall aus den Tagen
+davor. Erst dort wird aus einer Übung ein Training.

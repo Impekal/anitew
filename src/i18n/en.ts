@@ -32,10 +32,26 @@ export const en: Dictionary = {
       extended: 'I have 15 minutes',
     },
   },
-  notYet: {
-    heading: 'Training comes next',
-    body: 'The foundation stands: the app installs, runs without a network and remembers things. The five-minute session itself is the next step (M1).',
-    close: 'Got it',
+  session: {
+    round: 'Round',
+    encodeHint: 'Memorise these words.',
+    recallHint: 'Write down what you remember. Order does not matter.',
+    recallPlaceholder: 'One word per line',
+    doneWithBlock: 'Done',
+    abort: 'Stop',
+  },
+  summary: {
+    heading: 'Recalled',
+    note: 'Words you could recall freely after memorising them. What that says about your memory overall is what the benchmark will measure later — not this number.',
+    perRound: 'By round',
+    missed: 'missed',
+    back: 'Back',
+  },
+  resume: {
+    heading: 'A session is still open',
+    body: 'You were in the middle of one. Pick up where you left off?',
+    continue: 'Continue',
+    discard: 'Discard and start over',
   },
   check: {
     heading: 'Foundation',

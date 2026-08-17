@@ -12,8 +12,11 @@
  * den Schnittstellen aus `ports.ts`.
  */
 
+export * from './content/words.ts'
 export * from './language.ts'
 export * from './modes.ts'
 export * from './ports.ts'
 export * from './rng.ts'
+export * from './session/grading.ts'
+export * from './session/plan.ts'
 export * from './time.ts'

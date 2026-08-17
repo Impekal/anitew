@@ -12,9 +12,10 @@
 > erledigt oder neue findet, aktualisiert sie.
 >
 > **Stand 2026-08-17:** Die neun Entscheidungen sind beantwortet (D-001 bis
-> D-010 in [`DECISIONS.md`](DECISIONS.md)). **Meilenstein M0 ist fertig** —
-> das Fundament steht, geprüft mit 43 Kern-Tests und 6 E2E-Tests. Als Nächstes
-> M1: die erste echte 5-Minuten-Session.
+> D-010 in [`DECISIONS.md`](DECISIONS.md)). **M0 und M1 sind fertig** — das
+> Fundament steht, und eine echte Trainingseinheit läuft durch: Einprägen,
+> freier Abruf, ehrliche Zahl. Geprüft mit 73 Kern-Tests und 10 E2E-Tests.
+> Als Nächstes M2: die Engine, die entscheidet, was heute drankommt.
 
 ---
 
@@ -56,15 +57,15 @@ unter „Nicht-Ziele“.
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| B1 | Startbildschirm: **TODAY'S MEMORY CHALLENGE · 5:00** — ein Knopf, sonst nichts | ⬜ | Weg von „App öffnen“ bis „Training läuft“: höchstens ein Tap | S |
-| B2 | Session-Runner: Blockfolge mit hartem Gesamtzeitbudget | ⬜ | die 5 Minuten sind eine Garantie, keine Schätzung | M |
-| B3 | Blockstruktur v1: Focus 60 s · Encode 60 s · Recall 90 s · Working Memory 60 s · Spaced Recall 30 s | ⬜ | genau die Aufteilung aus dem Gespräch, als Startpunkt | M |
-| B4 | Blocklängen adaptiv umverteilbar (Engine entscheidet), Gesamtzeit bleibt fix | ⬜ | „90 Sekunden Zahlen-Encoding, 60 Sekunden Namen-Recall“ | M |
-| B5 | Session ist unterbrechungsfest: App-Wechsel, Anruf, Bildschirm aus, Absturz | ⬜ | Zustand nach jedem Item persistieren, nicht erst am Ende | M |
-| B6 | Abschlussbildschirm mit ehrlichen Zahlen (siehe F) | ⬜ | | S |
+| B1 | Startbildschirm: ein Knopf, sonst nichts | ✅ 2026-08-17 | ein Tap vom Öffnen bis zum laufenden Training | S |
+| B2 | Session-Runner: Blockfolge mit hartem Gesamtzeitbudget | ✅ 2026-08-17 | Summe der Blöcke ist auf die Sekunde die Länge des Modus — je Modus im Test geprüft, und im E2E-Test einmal in echter Zeit abgewartet. Zeit läuft über die **monotone** Uhr, nicht über die Wanduhr (P5) | M |
+| B3 | Blockstruktur v1: Focus · Encode · Recall · Working Memory · Spaced Recall | 🟨 2026-08-17 | Es laufen **Runden aus Einprägen und Abrufen** — die anderen drei Blöcke haben noch keine Module. Statt sie zu behaupten, plant der Planer nur, was es gibt, und wächst mit M2/M4 | M |
+| B4 | Blocklängen adaptiv umverteilbar (Engine entscheidet), Gesamtzeit bleibt fix | 🟨 2026-08-17 | Die Aufteilung steht (Rundenzahl und Wortzahl folgen aus dem Budget); *adaptiv* wird sie erst mit dem Profil (M2) | M |
+| B5 | Session ist unterbrechungsfest: App-Wechsel, Anruf, Bildschirm aus, Absturz | ✅ 2026-08-17 | Fortschritt wird nach **jedem Wort** geschrieben, nicht am Blockende. E2E prüft den harten Fall: Seite mitten in der Einheit neu geladen → „Fortsetzen“ | M |
+| B6 | Abschlussbildschirm mit ehrlichen Zahlen (siehe F) | ✅ 2026-08-17 | eine einzige echte Zahl (x von y erinnert), kein Prozentwert, keine „Memory Strength“ — die käme aus dem Benchmark (D-006) | S |
 | B7 | Weitermachen nach der Tages-Challenge: freies Training, zählt für Fortschritt, aber ohne Druck | ⬜ | „Man kann natürlich mehr wählen“ | S |
 | B8 | Tageserinnerung als **lokale** Benachrichtigung, opt-in, feste Uhrzeit wählbar | ⬜ | kein Server-Push, kein Konto | M |
-| B9 | Session-Log: jede Antwort mit Item-ID, richtig/falsch, Latenz, Kontext | ⬜ | Rohdatenbasis für C, E und F — ohne sie ist alles andere geraten | M |
+| B9 | Session-Log: jede Antwort mit Item-ID, richtig/falsch, Latenz, Kontext | ✅ 2026-08-17 | ein Ereignis **je Wort**, nicht „6 von 8“ — ohne diese Auflösung gäbe es später keine Vergessenskurve pro Information. Nur anhängen, nie ändern | M |
 
 ## C. Memory Engine — Spacing & Retrieval
 
@@ -77,8 +78,8 @@ Abruftraining. Hier entscheidet sich, ob die App wirkt.
 | C2 | Scheduler mit Zustand pro Item (Stabilität + Schwierigkeit), nicht mit festen Intervallen | ⬜ | **FSRS** mit mitgelieferten Standardparametern — **D-004**. Lizenz vor Einbau prüfen und in R1 eintragen | L |
 | C3 | Persönliche Vergessenskurve schätzen: „Diese Information vergisst DU wahrscheinlich in ~5 Tagen“ | ⬜ | Kern des Gesprächs. Zielretention einstellbar (z. B. 90 %) | L |
 | C4 | Kaltstart: sinnvolle erste Intervalle ohne jede Historie | ⬜ | | M |
-| C5 | **Abruf, nicht Wiedererkennen**: freie Eingabe als Standard, Multiple Choice nur wo unvermeidbar | ⬜ | Wiedererkennen fühlt sich leichter an und trainiert weniger | M |
-| C6 | Ähnliche Items nicht in derselben Session (Interferenz vermeiden) | ⬜ | | M |
+| C5 | **Abruf, nicht Wiedererkennen**: freie Eingabe als Standard, Multiple Choice nur wo unvermeidbar | ✅ 2026-08-17 | Der Abruf ist ein leeres Textfeld. Die Bewertung ist absichtlich großzügig (Umlaute gefaltet, ein Tippfehler ab fünf Zeichen erlaubt): Gemessen wird das Gedächtnis, nicht die Rechtschreibung — eine strengere Zahl wäre kleiner, aber nicht richtiger | M |
+| C6 | Ähnliche Items nicht in derselben Session (Interferenz vermeiden) | 🟨 2026-08-17 | Die Wortlisten sind schon danach gebaut (keine Reimpaare, keine Wortfamilien) und innerhalb einer Einheit wiederholt sich kein Wort. Die Prüfung *zur Laufzeit* kommt mit M2 | M |
 | C7 | Überfälligkeitsdruck begrenzen: nie ein Berg von 800 fälligen Items nach einer Pause | ⬜ | genau hier steigen Nutzer bei Karteikarten-Apps aus | M |
 | C8 | Engine deterministisch und seed-basiert, damit testbar | 🟨 2026-08-17 | `core/rng.ts` steht und ist geprüft; gilt für die Engine, sobald es eine gibt | S |
 | C9 | Simulator: synthetische Nutzer über 90 Tage, bevor echte Nutzer da sind | ⬜ | prüft, ob der Scheduler tut, was er soll — billiger als es an Menschen zu merken | M |
@@ -88,17 +89,17 @@ Abruftraining. Hier entscheidet sich, ob die App wirkt.
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| D1 | Einheitliche Modulschnittstelle: Aufgabe rein, Score + Rohdaten raus | ⬜ | ohne sie wird jedes neue Modul ein Sonderfall | M |
+| D1 | Einheitliche Modulschnittstelle: Aufgabe rein, Score + Rohdaten raus | 🟨 2026-08-17 | Blöcke haben eine gemeinsame Form (`BlockPlan`) und ein gemeinsames Ereignisformat. Eine echte Registrierung von Modulen lohnt erst beim dritten — vorher wäre sie geraten | M |
 | D2 | Schwierigkeit adaptiv pro Modul, Zielkorridor um ~80 % Trefferquote | ⬜ | zu leicht = langweilig, zu schwer = Frust; beides bricht die Streak | M |
 | D3 | **Focus** — Ablenkungen ignorieren, kurze Aufmerksamkeitsschulung | ⬜ | 0:00–1:00 der Session | M |
-| D4 | **Encode** — 8 Bilder / Wörter / Personen / Orte merken | ⬜ | | M |
+| D4 | **Encode** — 8 Bilder / Wörter / Personen / Orte merken | 🟨 2026-08-17 | Wörter laufen, ein Wort je 4 Sekunden, 3–8 je Runde. Bilder, Personen und Orte kommen mit D9/D12/D14 | M |
 | D5 | **Merktechniken werden beigebracht**, nicht nur abgefragt: Verknüpfung, Story-Methode, Major-System, Loci | ⬜ | „nicht stumpf auswendig lernen — die App bringt automatisch Merktechniken bei“. Das ist der Unterschied zu jeder Brain-Game-App | L |
-| D6 | **Recall** — freier Abruf ohne Hinweise | ⬜ | | M |
+| D6 | **Recall** — freier Abruf ohne Hinweise | ✅ 2026-08-17 | leeres Feld, Reihenfolge egal, Bewertung in `core/session/grading.ts` | M |
 | D7 | **Working Memory** — behalten und gleichzeitig manipulieren (N-Back-artig) | ⬜ | | M |
 | D8 | **Spaced Recall** — etwas von gestern / vor 3 Tagen / letzter Woche | ⬜ | zieht seine Items direkt aus C | M |
 | D9 | **Namen & Gesichter** | ⬜ | schwächster Bereich im Beispielprofil, also wichtig | M |
 | D10 | **Zahlen** — Ziffernfolgen, Jahreszahlen, PINs, Telefonnummern | ⬜ | | M |
-| D11 | **Wörter & Listen** | ⬜ | | S |
+| D11 | **Wörter & Listen** | 🟨 2026-08-17 | Wortvorrat je Sprache in `core/content/words.ts` — konkret und bildhaft, je Sprache eigen statt übersetzt, untereinander verschieden. DE und EN mit je ~80 Wörtern | S |
 | D12 | **Räumlich** | ⬜ | | M |
 | D13 | **Assoziativ** — „Meet 5 people“: Person + Land + Hobby + Stadt, später quer abgefragt | ⬜ | „Wie hieß die Person aus Indien?“ / „Wer spielte Gitarre?“ — trainiert, was im Alltag wirklich vorkommt | L |
 | D14 | **Gesichtsgenerator**: parametrische SVG-Gesichter aus einem Seed (Kopf, Augen, Nase, Mund, Haar, Bart, Brille, Hautton) | ⬜ | **D-005**. Aus einem Seed immer dasselbe Gesicht, aus vielen Seeds Millionen — Kilobytes statt Megabytes, keine Rechtefragen | L |
@@ -200,7 +201,7 @@ Der Punkt, der aus einem Spiel einen Gedächtnistrainer macht.
 | L3 | RTL für Arabisch — Layout, nicht nur Text | 🟨 2026-08-17 | `dir` wird gesetzt; das Layout ist noch nicht daraufhin geprüft | M |
 | L4 | CJK: Schriftschnitte, Zeilenumbruch, Eingabemethoden bei freiem Abruf (C5) | ⬜ | freier Abruf auf Japanisch ist ein eigenes Problem | M |
 | L5 | Engine bleibt sprachunabhängig; Sprache ist ein Attribut am Item | ⬜ | Voraussetzung für L7 | M |
-| L6 | Inhaltspools je Sprache: Wörter, Namen, Orte — kulturell passend, nicht durchübersetzt | ⬜ | ein deutscher Namenspool auf Japanisch trainiert nichts Sinnvolles | L |
+| L6 | Inhaltspools je Sprache: Wörter, Namen, Orte — kulturell passend, nicht durchübersetzt | 🟨 2026-08-17 | Wörter für DE und EN stehen. Für Sprachen ohne eigene Liste gibt es **bewusst keinen** automatischen Ersatz aus einer anderen — die App trainiert dann auf der Rückfallsprache und sagt das | L |
 | L7 | Trainingssprache getrennt von Oberflächensprache: „Train your memory in Japanese today“ | ⬜ | Gedächtnis- und Sprachtraining zugleich — ein echtes Alleinstellungsmerkmal | M |
 | L8 | Übersetzungsprozess: Quelltexte **auf Deutsch**, von dort übersetzt; Pflege ohne Wildwuchs | ⬜ | **D-007** | S |
 
@@ -245,8 +246,8 @@ Der Punkt, der aus einem Spiel einen Gedächtnistrainer macht.
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | 🟨 2026-08-17 | 43 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Scheduler und Scoring folgen mit M2 | M |
-| P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | 🟨 2026-08-17 | 6 Tests in Chromium und im Telefonprofil. Die vollständige 5-Minuten-Session kommt mit M1 | M |
+| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | 🟨 2026-08-17 | 73 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Sessionplanung und Bewertung sind abgedeckt; der Scheduler folgt mit M2 | M |
+| P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | ✅ 2026-08-17 | 10 Tests in Chromium und im Telefonprofil, darunter eine Einheit von vorn bis hinten und der Abbruch mitten drin | M |
 | P3 | CI bei jedem Push: Typecheck (App **und** Kern getrennt), Tests, Build, E2E | ✅ 2026-08-17 | | S |
 | P4 | Performance: Kaltstart unter 2 s, Timer laufen ruckelfrei | ⬜ | | M |
 | P5 | Uhrmanipulation darf die Engine nicht zerstören (Streak-Betrug, Intervall-Chaos) | ⬜ | monotone Zeitquelle plus Plausibilitätsprüfung | M |
@@ -307,7 +308,7 @@ Neu offen, entstanden aus den Antworten:
 | | Meilenstein | Inhalt | Fertig, wenn |
 |---|---|---|---|
 | **M0** | Fundament | A1–A11, L1/L1a, P3 | ✅ **2026-08-17** — Push baut, App installiert sich, `src/core/` läuft ohne Browser und wird von der CI daran gehalten |
-| **M1** | Walking Skeleton | B1–B3, B5, B9, D1, zwei Module (D4 Encode + D6 Recall), N1 | Eine echte 5-Minuten-Session lässt sich täglich durchlaufen, Ergebnisse bleiben erhalten |
+| **M1** | Walking Skeleton | B1–B3, B5, B6, B9, C5, D4, D6, N1 | ✅ **2026-08-17** — Eine echte Einheit läuft täglich durch, überlebt eine Unterbrechung, und jede Antwort steht im Protokoll |
 | **M2** | Die Engine wird echt | C1–C9, D8, E1–E7, B4 | Die App entscheidet begründet, was du heute trainierst, und plant Wiederholungen persönlich |
 | **M3** | Ehrlichkeit | F1–F7, F2a, F2b | Es gibt zwei getrennte Zahlen, und die große Prozentzahl ist gemessen. **Vorher kein öffentlicher Release** |
 | **M4** | Inhalt & Spiel | D5, D9–D16, G, H, K, J | Es macht Spaß, und der Vorrat geht nicht aus |
@@ -339,10 +340,11 @@ Bewusst nicht gebaut, damit die Liste oben nicht ausfranst:
    beantwortet (D-001 bis D-010).
 2. ~~M0: Gerüst, PWA, `src/core/` ohne Browser, Datenschicht mit Migrationen,
    i18n, CI~~ — erledigt am 2026-08-17.
-3. **M1 umsetzen:** eine echte, durchlaufbare 5-Minuten-Session mit zwei
-   Modulen (B1–B3, B5, B9, D1, D4, D6). ← *hier stehen wir*
-   Ab hier lässt sie sich täglich benutzen — und alles Weitere an echter
-   Erfahrung statt an Vermutungen ausrichten.
+3. ~~M1: eine echte, durchlaufbare Einheit aus Einprägen und freiem Abruf~~ —
+   erledigt am 2026-08-17. **Ab hier lässt sie sich täglich benutzen** — und
+   alles Weitere an echter Erfahrung statt an Vermutungen ausrichten.
+4. **M2:** die Engine, die entscheidet, was heute drankommt — Wiederholungsplan
+   (C1–C9), Gedächtnisprofil (E1–E7), Spaced Recall (D8). ← *hier stehen wir*
 
 Zwei Dinge nebenher, unabhängig vom Meilenstein:
 
