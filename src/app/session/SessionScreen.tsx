@@ -63,6 +63,31 @@ function RunningSession({
   const { state, setEntries, advance, leave } = useSessionRunner(platform, progress, onLeave)
   const t = dictionary.session
 
+  /*
+   * Während des Trainings tritt das Netz im Hintergrund fast vollständig
+   * zurück (D-011/G-2).
+   *
+   * Auf dem Startbildschirm darf es da sein — dort ist Platz und es soll
+   * wirken. Beim Einprägen steht ein einziges Wort im Mittelpunkt, und ein
+   * Gewebe aus fünfzig Knoten dahinter ist dann kein Hintergrund mehr,
+   * sondern ein Mitbewerber. Die Aufmerksamkeit verengt sich, also verengt
+   * sich auch das Bild.
+   *
+   * Der Hook steht vor dem vorzeitigen `return` — sonst hinge die Reihenfolge
+   * der Hooks davon ab, ob die Einheit schon fertig ist.
+   */
+  useEffect(() => {
+    const root = document.documentElement
+    if (state.finished) {
+      delete root.dataset.focus
+      return
+    }
+    root.dataset.focus = 'on'
+    return () => {
+      delete root.dataset.focus
+    }
+  }, [state.finished])
+
   if (state.finished) {
     return <Summary dictionary={dictionary} results={state.results} onLeave={leave} />
   }

@@ -420,26 +420,43 @@ body::before {
   height: 100%;
   pointer-events: none;
   z-index: -1;
-  opacity: 0.45;
+  opacity: 0.55;
+  transition: opacity 900ms var(--ease);
   /*
-   * Die Mitte bleibt frei. Ohne diese Maske lief das Netz quer durch die
-   * Wörter, und ein Hintergrund, der mit dem Inhalt um Aufmerksamkeit
-   * streitet, ist ein Fehler — egal wie hübsch er ist (G-1, G-2).
+   * Die Mitte wird **gedämpft, nicht ausgeschnitten**.
+   *
+   * Der erste Versuch nahm sie ganz heraus (Alpha 0 im Zentrum). Das
+   * beruhigte zwar den Text, riss aber ein Loch in ein Netz, dessen ganzer
+   * Sinn Zusammenhang ist — und ein Netz mit Loch sieht kaputt aus, nicht
+   * ruhig. Jetzt läuft es durchgehend über den Bildschirm und tritt hinter
+   * dem Inhalt nur zurück: Alpha 0,3 in der Mitte, voll am Rand.
    */
-  mask-image: radial-gradient(ellipse 72% 52% at 50% 45%, transparent 25%, #000 100%);
-  -webkit-mask-image: radial-gradient(ellipse 72% 52% at 50% 45%, transparent 25%, #000 100%);
+  mask-image: radial-gradient(ellipse 78% 58% at 50% 45%, rgb(0 0 0 / 30%) 20%, #000 95%);
+  -webkit-mask-image: radial-gradient(ellipse 78% 58% at 50% 45%, rgb(0 0 0 / 30%) 20%, #000 95%);
 }
 
 @media (prefers-color-scheme: light) {
   /* Auf Papier trägt eine Linie weiter als im Dunkeln. */
   .neural {
-    opacity: 0.3;
+    opacity: 0.38;
+  }
+}
+
+/* Während einer laufenden Einheit zieht sich das Netz zurück — siehe die
+   Begründung in SessionScreen.tsx. Es blendet, es springt nicht (G-3). */
+:root[data-focus='on'] .neural {
+  opacity: 0.12;
+}
+
+@media (prefers-color-scheme: light) {
+  :root[data-focus='on'] .neural {
+    opacity: 0.09;
   }
 }
 
 .neural-links line {
   stroke: var(--net);
-  stroke-width: 0.12;
+  stroke-width: 0.38;
 }
 
 .neural-nodes circle {

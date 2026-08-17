@@ -313,9 +313,31 @@ Einprägen sind eine Kette, auf der ein Signal wandert. Der Gedächtnispalast
 wird ein Graph (Backlog G). Alles davon *ist* bereits ein Netz; es wird nur
 sichtbar gemacht.
 
-Die Grenze bleibt G-1: Das Netz im Hintergrund atmet, es blinkt nicht. Es ist
-so leise, dass man es eher spürt als sieht — und bei „weniger Bewegung“ steht
-es still.
+Die Grenze bleibt G-1: Das Netz im Hintergrund atmet, es blinkt nicht, und bei
+„weniger Bewegung“ steht es still.
+
+**Wie präsent es sein darf, hängt vom Bildschirm ab** — nachgeschärft, nachdem
+der erste Anlauf zu zaghaft ausfiel und der zweite zu laut:
+
+- Auf dem **Startbildschirm** und im **Ergebnis** ist es deutlich da. Dort ist
+  Platz, und dort soll es wirken.
+- **Während einer laufenden Einheit** zieht es sich fast vollständig zurück.
+  Beim Einprägen steht ein einziges Wort im Mittelpunkt; ein Gewebe aus fünfzig
+  Knoten dahinter wäre dann kein Hintergrund mehr, sondern ein Mitbewerber
+  (G-2). Die Aufmerksamkeit verengt sich, also verengt sich auch das Bild — und
+  es blendet dabei, es springt nicht.
+
+Zwei Dinge, an denen die ersten Versuche gescheitert sind und die deshalb
+festgehalten gehören:
+
+*Die Mitte wird gedämpft, nicht ausgeschnitten.* Eine Maske, die das Zentrum
+ganz herausnimmt, beruhigt den Text — und reißt ein Loch in ein Netz, dessen
+ganzer Sinn Zusammenhang ist. Ein Netz mit Loch sieht kaputt aus, nicht ruhig.
+
+*Das Feld ist hochkant, nicht quadratisch.* Ein quadratisches Feld wird auf
+einem Telefonbildschirm seitlich beschnitten; sichtbar blieb knapp die halbe
+Breite. Das Netz wirkte dadurch dünn und löchrig, obwohl es das nicht war — der
+Fehler lag nicht in der Zeichnung, sondern im Zuschnitt.
 
 ## D-010 · 2026-08-17 · Der Kern kennt keinen Browser
 

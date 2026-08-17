@@ -15,20 +15,33 @@ import { createRng } from '../core/index.ts'
  *   Rechnen pro Bild.
  * - **Es bewegt sich in CSS**, nicht in JavaScript. Der Browser macht das auf
  *   der Grafikkarte; der Hauptthread bleibt frei für die Uhr der Einheit.
- * - **Es ist klein.** 30 Knoten mit kurzen Verbindungen. Ein dichteres Netz
- *   sähe nach Bildschirmschoner aus, ein weiteres nach Sternbild.
+ * - **Es ist klein.** 50 Knoten. Ein dichteres Netz sähe nach
+ *   Bildschirmschoner aus, ein weiteres nach Sternbild.
+ *
+ * Das Feld ist **hochkant** (100 × 210), nicht quadratisch. Das war der Fehler
+ * im ersten Anlauf: Ein quadratisches Feld wird von `slice` auf einem
+ * Telefonbildschirm seitlich beschnitten — sichtbar blieb ein Streifen von
+ * knapp der halben Breite, und das Netz wirkte deshalb dünn und löchrig,
+ * obwohl es das gar nicht war.
  *
  * Bei „weniger Bewegung“ steht es still — dafür sorgt die Regel am Ende von
  * styles.css, ohne dass hier etwas abgefragt werden muss.
  */
 
-const NODE_COUNT = 30
+/** Das Koordinatenfeld — hochkant, damit auf dem Telefon nichts wegfällt. */
+export const FIELD_WIDTH = 100
+export const FIELD_HEIGHT = 210
+
+const NODE_COUNT = 50
+const COLUMNS = 5
+
 /**
- * Nur nahe Knoten werden verbunden. Beim ersten Versuch stand hier 27, und
- * das Ergebnis waren wenige große Dreiecke quer über den Text — eine Grafik
- * statt eines Hintergrunds. Kurze Verbindungen ergeben ein Gewebe.
+ * Nur nahe Knoten werden verbunden. Zu weit ergibt wenige große Dreiecke quer
+ * über den Text — eine Grafik statt eines Hintergrunds. Zu kurz ergibt lose
+ * Paare statt eines Gewebes. Bei einem mittleren Abstand von rund 20 Einheiten
+ * treffen 30 den Punkt, an dem jeder Knoten drei bis vier Nachbarn hat.
  */
-const LINK_DISTANCE = 19
+const LINK_DISTANCE = 30
 
 interface Node {
   x: number
@@ -43,7 +56,7 @@ export function NeuralField() {
   return (
     <svg
       className="neural"
-      viewBox="0 0 100 100"
+      viewBox={`0 0 ${FIELD_WIDTH} ${FIELD_HEIGHT}`}
       preserveAspectRatio="xMidYMid slice"
       aria-hidden="true"
       focusable="false"
@@ -80,15 +93,16 @@ function buildField(): { nodes: Node[]; links: [number, number][] } {
 
   // Gestreut, aber nicht gehäuft: ein grobes Raster mit Zufall darin. Reiner
   // Zufall legt drei Knoten übereinander und lässt daneben ein Loch.
-  const columns = 5
-  const rows = Math.ceil(NODE_COUNT / columns)
+  const rows = Math.ceil(NODE_COUNT / COLUMNS)
+  const cellWidth = FIELD_WIDTH / COLUMNS
+  const cellHeight = FIELD_HEIGHT / rows
   for (let index = 0; index < NODE_COUNT; index++) {
-    const column = index % columns
-    const row = Math.floor(index / columns)
+    const column = index % COLUMNS
+    const row = Math.floor(index / COLUMNS)
     nodes.push({
-      x: (column + 0.5) * (100 / columns) + (rng.next() - 0.5) * 18,
-      y: (row + 0.5) * (100 / rows) + (rng.next() - 0.5) * 16,
-      r: 0.22 + rng.next() * 0.3,
+      x: (column + 0.5) * cellWidth + (rng.next() - 0.5) * cellWidth * 0.9,
+      y: (row + 0.5) * cellHeight + (rng.next() - 0.5) * cellHeight * 0.8,
+      r: 0.85 + rng.next() * 0.7,
       delay: rng.next() * 6,
     })
   }

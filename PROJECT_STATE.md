@@ -229,3 +229,31 @@ Inhalt um Aufmerksamkeit streitet, ist ein Fehler, egal wie hübsch er ist.
 
 **Bewusst nicht gebaut:** Haptik. Eine Vibration alle vier Sekunden wäre keine
 Wärme, sondern Nerverei (O6 bleibt offen).
+
+## 2026-08-17 · Das Netz, dritter Anlauf
+
+Rückmeldung: zu dünn — und der Einwand, dass es besser sei, das Netz *hinter*
+den Inhalt zu stellen, statt es aus der Mitte herauszuschneiden. Beides
+zutreffend, und der zweite Punkt zeigte auf einen Fehler, der bis dahin für
+Gestaltung gehalten wurde.
+
+**Der eigentliche Grund für „zu dünn“ war ein Zuschnittfehler, keine
+Linienstärke.** Das Feld war 100 × 100, wurde aber mit `slice` auf einen
+Bildschirm von 390 × 844 gelegt. Die Skalierung richtet sich dabei nach der
+größeren Seite — sichtbar blieben also nur rund 46 der 100 Einheiten in der
+Breite, gut zwei von fünf Knotenspalten. Das Netz war nie dünn; es war
+beschnitten. Jetzt ist das Feld hochkant (100 × 210) mit 50 Knoten, und Linien
+wie Knoten sind auf den neuen Maßstab umgerechnet.
+
+**Dämpfen statt schneiden.** Die Maske nahm die Mitte vorher vollständig heraus
+(Alpha 0). Das beruhigte den Text und riss ein Loch in ein Netz, dessen ganzer
+Sinn Zusammenhang ist. Jetzt läuft es durchgehend über den Bildschirm und
+tritt in der Mitte nur zurück (Alpha 0,3).
+
+**Und die Präsenz hängt jetzt vom Bildschirm ab.** In voller Dichte war das
+Netz auf dem Startbildschirm richtig und beim Einprägen falsch: Dort steht ein
+einziges Wort im Mittelpunkt, und fünfzig Knoten dahinter sind kein
+Hintergrund mehr, sondern ein Mitbewerber (G-2). Während einer laufenden
+Einheit blendet es deshalb auf ein Achtel herunter und danach wieder auf. Das
+ist der beste Teil des ganzen Umbaus, und er ist erst durch den Einwand
+entstanden: Die Aufmerksamkeit verengt sich, also verengt sich das Bild mit.
