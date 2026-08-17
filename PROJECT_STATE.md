@@ -277,3 +277,29 @@ Textur, nicht Zeichnung.
 Die Faustregel steht jetzt in D-011/G-8, damit die nächste Änderung nicht
 wieder zwischen den Extremen pendelt: **Wer das Netz auf dem Startbildschirm
 bemerkt, bevor er den Knopf sieht, hat es zu stark eingestellt.**
+
+## 2026-08-17 · Die App ist live
+
+https://anitew.impekaltech.workers.dev — Cloudflare Workers, statische Dateien,
+kein Backend. Jeder Push auf den Arbeitszweig veröffentlicht.
+
+Zwei Dinge, die dabei Zeit gekostet haben und beim nächsten Projekt nicht
+wieder kosten müssen:
+
+**Die Account ID musste niemand suchen.** Sie stand längst im Klartext in
+RReaders `deploy.yml` — dieselbe Kennung, dasselbe Konto. Sie ist kein
+Geheimnis (ohne Token nutzlos), also steht sie jetzt auch bei ANITEW fest in
+der Workflow-Datei statt als Secret. Für die Einrichtung bleibt damit genau ein
+Handgriff übrig: das API-Token.
+
+**Der Knopf „Run workflow“ fehlt.** GitHub zeigt die manuelle Auslösung nur an,
+wenn die Workflow-Datei auf dem Standard-Branch liegt. `deploy.yml` liegt aber
+bisher nur auf dem Arbeitszweig. Ausgelöst wird deshalb über einen Push — beim
+ersten Mal über einen leeren Commit.
+
+**Und eine Falle beim Prüfen:** Von dieser Entwicklungsumgebung aus ist
+`*.workers.dev` nicht erreichbar (der Proxy antwortet mit 403 auf den
+CONNECT-Tunnel). Das sieht nach einem fehlgeschlagenen Deploy aus, ist aber
+keiner — gegengeprüft mit dem nachweislich laufenden RReader, das denselben
+Fehler liefert. Verlässlich ist allein das Protokoll des Workflows:
+`Deployed anitew triggers` plus die URL.

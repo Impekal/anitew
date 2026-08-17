@@ -50,7 +50,7 @@ unter „Nicht-Ziele“.
 | A4 | **Architekturregel: `src/core/` ist reines TypeScript** — keine DOM-, React- oder Browser-API-Zugriffe | ✅ 2026-08-17 | `tsconfig.core.json` übersetzt den Kern ein zweites Mal **ohne DOM-Bibliothek** — ein Verstoß ist ein Übersetzungsfehler, kein guter Vorsatz. Gegengeprüft: absichtlicher Verstoß eingebaut, Prüfung schlug fehl, Verstoß entfernt | M |
 | A5 | Plattform-Adapter-Schicht: Storage, Uhr/Timer, Benachrichtigungen, Audio, Datei-Export | 🟨 2026-08-17 | `core/ports.ts` + `platform/web/`. Uhr und Einstellungen stehen; Benachrichtigungen, Audio und Dateien kommen, wenn sie gebraucht werden | M |
 | A6 | Datenschicht: Dexie-Schema **mit Migrationen ab Version 1** | ✅ 2026-08-17 | Version 1 ist festgeschrieben und wird nie bearbeitet — die Regel steht oben in `src/data/db.ts`. Benchmarks liegen in einer **eigenen** Tabelle, damit eine spätere Auswertung sie nicht mit Trainingsdaten vermischen kann (R-1 bis ins Schema) | M |
-| A7 | Deployment: Auto-Build bei Push, statisches Hosting, kein Backend | 🟨 2026-08-17 | `wrangler.jsonc` + `deploy.yml` stehen, Account ID steht fest darin. Es fehlt nur noch `CLOUDFLARE_API_TOKEN` als Repo-Secret; ohne es baut die CI und überspringt das Veröffentlichen still | S |
+| A7 | Deployment: Auto-Build bei Push, statisches Hosting, kein Backend | ✅ 2026-08-17 | **Live: https://anitew.impekaltech.workers.dev** — jeder Push auf den Zweig veröffentlicht. Account ID fest in `deploy.yml`, Token als Repo-Secret | S |
 | A8 | Projektgedächtnis: `PROJECT_STATE.md`, `docs/DECISIONS.md`, diese Liste | ✅ 2026-08-17 | | S |
 | A9 | App-Identität: Icon, Splash, Theme-Farben, Statusleiste, Name im Manifest | 🟨 2026-08-17 | Zeichen ist **vorläufig** (fünf Punkte mit wachsenden Abständen — die Wiederholungskurve aus D-004), endgültig erst nach R3 | S |
 | A10 | Kein Tracking, keine Analytics-Dritte. Nutzungsstatistik nur lokal auf dem Gerät | ✅ 2026-08-17 | keine einzige Abhängigkeit, die nach außen funkt | S |
@@ -365,7 +365,5 @@ Zwei Dinge nebenher, unabhängig vom Meilenstein:
 
 - **R3** (Markenrecherche ANITEW) sollte laufen, bevor Icon, Domain und
   Store-Eintrag Geld kosten.
-- **A7**: `CLOUDFLARE_API_TOKEN` als Repo-Secret hinterlegen, damit jeder Push
-  auch live geht. Die Account ID steht fest in `deploy.yml` — sie ist eine
-  Kennung, kein Geheimnis. Bis das Token da ist, baut die CI und überspringt
-  das Veröffentlichen still.
+- ~~A7: Veröffentlichung einrichten~~ — erledigt, die App läuft unter
+  https://anitew.impekaltech.workers.dev
