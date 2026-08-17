@@ -12,6 +12,7 @@ import {
   splitEntries,
 } from '../../core/index.ts'
 import { recordOutcome } from '../../data/items.ts'
+import { markTaught } from '../../data/technique.ts'
 import {
   type RoundResult,
   type SessionProgress,
@@ -106,6 +107,17 @@ export function useSessionRunner(
     advancingRef.current = true
 
     const nextResults = [...results]
+
+    /*
+     * Eine Lektion gilt als gehalten, sobald sie vorbei ist — ob durch Tippen
+     * oder durch Ablauf der Zeit (D5). Das Merken passiert hier und nicht im
+     * Bildschirm: Wer die Lektion wegtippt, hat sie ebenso gesehen wie wer
+     * sie ausliest, und beide sollen morgen die nächste bekommen.
+     */
+    if (block.kind === 'teach') {
+      void markTaught(Number(block.items[0])).catch(() => undefined)
+    }
+
     if (block.kind === 'recall' || block.kind === 'review') {
       // Frei getippt oder Eintrag für Eintrag gefragt — die Bewertung
       // unterscheidet sich, das Ergebnis hat dieselbe Form.

@@ -98,7 +98,7 @@ Abruftraining. Hier entscheidet sich, ob die App wirkt.
 | D2 | Schwierigkeit adaptiv pro Modul, Zielkorridor um ~80 % Trefferquote | ⬜ | zu leicht = langweilig, zu schwer = Frust; beides bricht die Streak | M |
 | D3 | **Focus** — Ablenkungen ignorieren, kurze Aufmerksamkeitsschulung | ⬜ | 0:00–1:00 der Session | M |
 | D4 | **Encode** — 8 Bilder / Wörter / Personen / Orte merken | 🟨 2026-08-17 | Wörter und Personen laufen, ein Stück je 4 Sekunden, 3–8 je Runde. Bilder und Orte kommen mit D12/D15 | M |
-| D5 | **Merktechniken werden beigebracht**, nicht nur abgefragt: Verknüpfung, Story-Methode, Major-System, Loci | ⬜ | „nicht stumpf auswendig lernen — die App bringt automatisch Merktechniken bei“. Das ist der Unterschied zu jeder Brain-Game-App | L |
+| D5 | **Merktechniken werden beigebracht**, nicht nur abgefragt: Verknüpfung, Story-Methode, Major-System, Loci | 🟨 2026-08-17 | **D-013**. Das Major-System läuft: eine Ziffer je Lektion, vierzehn Sekunden aus dem Budget, danach steht der Konsonant unter jeder gelehrten Ziffer. Das **Wort zur Zahl liefert die App nicht** — selbst gebaute Bilder sitzen besser. Verknüpfung, Story-Methode und Loci fehlen noch (Loci hängt an G) | L |
 | D6 | **Recall** — freier Abruf ohne Hinweise | ✅ 2026-08-17 | leeres Feld, Reihenfolge egal, Bewertung in `core/session/grading.ts` | M |
 | D7 | **Working Memory** — behalten und gleichzeitig manipulieren (N-Back-artig) | ⬜ | | M |
 | D8 | **Spaced Recall** — etwas von gestern / vor 3 Tagen / letzter Woche | ✅ 2026-08-17 | eigener Block am Ende der Einheit, nur wenn etwas fällig ist. Fällige Wörter werden **aus dem Vorrat für neue genommen** — sonst wäre der Abruf ein Wiedererkennen (ein Test hat genau das gefunden). Eigene Zahl im Ergebnis, nicht mit dem heute Gelernten verrechnet | M |
@@ -263,8 +263,8 @@ Anforderung wie jede andere. Die acht Regeln G-1 bis G-8 stehen in
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | ✅ 2026-08-17 | 134 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Sessionplanung, Bewertung, Scheduler und Gesichtsgenerator sind abgedeckt | M |
-| P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | ✅ 2026-08-17 | 32 Läufe in Chromium und im Telefonprofil, darunter eine Einheit von vorn bis hinten und der Abbruch mitten drin. Seit M4 **liest der Test ab, welches Modul kam, statt es vorherzusagen** (`tests/e2e/helpers.ts`) | M |
+| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | ✅ 2026-08-17 | 150 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Sessionplanung, Bewertung, Scheduler und Gesichtsgenerator sind abgedeckt | M |
+| P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | ✅ 2026-08-17 | 40 Läufe in Chromium und im Telefonprofil, darunter eine Einheit von vorn bis hinten und der Abbruch mitten drin. Seit M4 **liest der Test ab, welches Modul kam, statt es vorherzusagen** (`tests/e2e/helpers.ts`) | M |
 | P3 | CI bei jedem Push: Typecheck (App **und** Kern getrennt), Tests, Build, E2E | ✅ 2026-08-17 | | S |
 | P4 | Performance: Kaltstart unter 2 s, Timer laufen ruckelfrei | ⬜ | | M |
 | P5 | Uhrmanipulation darf die Engine nicht zerstören (Streak-Betrug, Intervall-Chaos) | ⬜ | monotone Zeitquelle plus Plausibilitätsprüfung | M |
@@ -328,7 +328,7 @@ Neu offen, entstanden aus den Antworten:
 | **M1** | Walking Skeleton | B1–B3, B5, B6, B9, C5, D4, D6, N1 | ✅ **2026-08-17** — Eine echte Einheit läuft täglich durch, überlebt eine Unterbrechung, und jede Antwort steht im Protokoll |
 | **M2** | Die Engine wird echt | C1–C9, D8, E1–E7, B4 | Die App entscheidet begründet, was du heute trainierst, und plant Wiederholungen persönlich |
 | **M3** | Ehrlichkeit | F1–F7, F2a, F2b | Es gibt zwei getrennte Zahlen, und die große Prozentzahl ist gemessen. **Vorher kein öffentlicher Release** |
-| **M4** | Inhalt & Spiel | D5, D9–D16, G, H, K, J | 🟨 **2026-08-17** — Drei Module laufen: Wörter, Namen & Gesichter (D9/D14), Zahlen (D10). Offen: Merktechniken (D5), Palast (G), Missionen (H), Gamification (K) |
+| **M4** | Inhalt & Spiel | D5, D9–D16, G, H, K, J | 🟨 **2026-08-17** — Drei Module (Wörter, Gesichter, Zahlen) und die erste Merktechnik (D5). Offen: Palast (G), Missionen (H), Gamification (K), weitere Techniken |
 | **M5** | Sprachen | L1–L8 | Man kann heute auf Deutsch und morgen auf Japanisch trainieren |
 | **M6** | Echtes Leben | I, M | Eigene Präsentation rein, Wiederholungsplan raus |
 | **M7** | Stores & Cloud | Q, R, N7–N10 | .aab im Play-Track; Drive-Abgleich läuft; iOS-Weg entschieden (S10) |

@@ -84,6 +84,39 @@ export const de = {
     doneWithBlock: 'Fertig',
     abort: 'Abbrechen',
   },
+  technique: {
+    /*
+      D5 — die Technik wird beigebracht, nicht nur abgefragt. Das ist der
+      Unterschied zu jeder Brain-Game-App, und deshalb steht hier Prosa und
+      kein Etikett.
+    */
+    heading: 'Merktechnik',
+    majorName: 'Das Major-System',
+    // Nur beim allerersten Mal. Danach wäre es das Möbel aus G-2.
+    intro: 'Ziffern sind schwer zu behalten, Bilder nicht. Jede Ziffer bekommt einen Laut — daraus wird ein Wort, und ein Wort merkt man sich.',
+    // Der Satz nach der Lektion. Kein Lob (G-5), nur der nächste Schritt.
+    ready: 'Ab jetzt steht sie unter den Zahlen.',
+    // Die Brücke je Ziffer. Sie ist der eigentliche Inhalt der Lektion:
+    // Ohne Bild ist die Zuordnung Willkür, und Willkür merkt sich niemand.
+    hooks: {
+      0: 'Die Null ist rund wie ein zischendes S — und „Zero“ beginnt mit Z.',
+      1: 'Das kleine t hat einen Abstrich, genau wie die Eins.',
+      2: 'Das kleine n hat zwei Abstriche.',
+      3: 'Das kleine m hat drei Abstriche.',
+      4: '„vieR“ endet auf r. Das ist die ganze Brücke.',
+      5: 'Die römische Fünfzig ist ein L — und die offene Hand mit fünf Fingern bildet eines.',
+      6: 'Ein gespiegeltes j ist eine Sechs. Dazu der weiche Zischlaut: sch, ch, j.',
+      7: 'Zwei Siebenen aneinandergelegt ergeben ein K.',
+      8: 'Das geschriebene f hat zwei Schlaufen — wie die Acht.',
+      9: 'Die Neun gespiegelt ist ein p, gedreht ein b.',
+    },
+    // Steht unter der Zahl beim Einprägen, sobald die erste Ziffer sitzt.
+    hint: 'Mach ein Wort daraus. Vokale sind frei.',
+    progress: 'Ziffern gelernt',
+    // Im Fußbereich nachzulesen — wer die Technik vertiefen will, soll nicht
+    // auf die nächste Lektion warten müssen.
+    note: 'Die Vokale zählen nicht mit, nur die Konsonanten. Aus 4–7 wird r–k, daraus „Rakete“ oder „Rock“ — welches Bild du nimmst, ist deine Sache. Selbst gebaute Bilder sitzen besser als vorgesetzte, deshalb liefert ANITEW keins.',
+  },
   summary: {
     heading: 'Geblieben',
     // Bewusst keine Prozentzahl und kein „Memory Strength“ — die käme aus dem

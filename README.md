@@ -23,8 +23,16 @@ sie sind der schnellere Weg hinein:
 | [`docs/DECISIONS.md`](docs/DECISIONS.md) | Die bindenden Entscheidungen mit ihren Gründen — und mit dem, was sie ausschließen |
 | [`THIRD_PARTY_LICENSES.md`](THIRD_PARTY_LICENSES.md) | Jede Abhängigkeit, getrennt nach „wird ausgeliefert“ und „baut nur“ |
 
-**Stand:** Meilenstein M0 ist fertig — das Fundament trägt, das Training kommt
-mit M1.
+**Stand:** M0 bis M2 sind fertig, M4 läuft. Eine Einheit trainiert täglich mit
+drei Modulen — **Wörter, Namen & Gesichter, Zahlen** —, holt Gelerntes nach
+Tagen von selbst zurück (FSRS) und **bringt die erste Merktechnik bei** statt
+sie nur abzufragen. Gesichter entstehen aus einem Generator, Zahlen aus einem
+Seed; eine Sicherungsdatei trägt alles auf ein zweites Gerät.
+
+Was noch fehlt, steht im Backlog — und **M3 ist die Sperre vor jeder
+Veröffentlichung**: Solange der Benchmark nicht misst, gibt es keine
+Prozentzahl über das Gedächtnis. Was in der App steht, ist gezählt, nicht
+behauptet.
 
 ## Entwicklung
 
@@ -35,7 +43,17 @@ npm run typecheck    # App und Kern getrennt prüfen (siehe unten)
 npm test             # Kern-Tests, in Node, ohne Browser
 npm run build        # Typprüfung + Produktionsbau → dist/
 npm run test:e2e     # die gebaute App im Browser — vorher `npm run build`
+
+node scripts/facesheet.mjs bogen.html 40 --png   # 40 Gesichter nebeneinander
 ```
+
+`ANITEW_CHROMIUM=/pfad/zu/chromium` benutzt einen bereits vorhandenen Browser,
+statt einen zweiten herunterzuladen — für beide Befehle mit Browser.
+
+Der Gesichtsbogen ist ein Werkzeug und kein Teil der App. Er existiert, weil
+sich Gesichter einzeln nicht beurteilen lassen: Im Raster war auf einen Blick
+zu sehen, dass die halbe Reihe denselben Haaransatz trug — was in einzelnen
+Bildschirmfotos nie aufgefallen war.
 
 ### Die eine Regel, die man kennen muss
 

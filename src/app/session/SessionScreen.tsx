@@ -1,6 +1,14 @@
-import { useEffect, useRef, useState } from 'react'
+import { type CSSProperties, useEffect, useMemo, useRef, useState } from 'react'
 
-import { type Platform, isPrompted, splitEntries } from '../../core/index.ts'
+import {
+  type MajorPart,
+  type Platform,
+  helpsWith,
+  isPrompted,
+  lettersFor,
+  majorParts,
+  splitEntries,
+} from '../../core/index.ts'
 import type { RoundResult, SessionProgress } from '../../data/sessions.ts'
 import type { Dictionary } from '../../i18n/index.ts'
 import { Face } from '../Face.tsx'
@@ -15,6 +23,8 @@ export function SessionScreen(props: {
   platform: Platform
   dictionary: Dictionary
   progress: SessionProgress
+  /** Die schon gelehrten Ziffern des Major-Systems (D5). */
+  taught: readonly number[]
   onLeave: () => void
 }) {
   const [settled, setSettled] = useState(false)
@@ -55,11 +65,13 @@ function RunningSession({
   platform,
   dictionary,
   progress,
+  taught,
   onLeave,
 }: {
   platform: Platform
   dictionary: Dictionary
   progress: SessionProgress
+  taught: readonly number[]
   onLeave: () => void
 }) {
   const { state, setEntries, submitPrompt, advance, leave } = useSessionRunner(
@@ -106,6 +118,36 @@ function RunningSession({
     chipsRef.current = chipCount
   }, [chipCount, platform])
 
+  /*
+   * Dieser Hook stand zuerst **unter** dem Return für die Zusammenfassung —
+   * und wurde damit nur gerufen, solange die Einheit lief. React zählt Hooks
+   * je Durchlauf; sobald die letzte Antwort da war, fehlte einer, die
+   * Komponente brach ab und die Zusammenfassung erschien nie. Zehn E2E-Läufe
+   * wurden rot, und alle zehn liefen bis zum Ende einer Einheit — die
+   * kürzeren nicht. Hooks stehen vor jedem Return, ausnahmslos.
+   */
+  /*
+   * Die Ziffer aus der Lektion **dieser** Einheit zählt sofort mit.
+   *
+   * Sie steht nach der Lektion in den Einstellungen, aber der Startbildschirm
+   * liest sie erst wieder, wenn die Einheit vorbei ist — der Konsonant
+   * erschiene also erstmals beim *nächsten* Training. Das ist genau der
+   * falsche Moment: Wer eben gelernt hat, dass die Eins ein t ist, soll das
+   * an der nächsten Zahl sehen und nicht morgen. Ein E2E-Test hat es
+   * gefunden.
+   *
+   * Abgeleitet aus Plan und Blockzähler statt aus einem zweiten Zustand: Ein
+   * vorbeigezogener Lehrblock **ist** die Auskunft, dass seine Ziffer gehalten
+   * wurde — und kann mit der Datenbank nicht aus dem Tritt geraten.
+   */
+  const taughtNow = useMemo(() => {
+    const fresh = state.plan.blocks
+      .filter((candidate, index) => candidate.kind === 'teach' && index < state.blockIndex)
+      .map((candidate) => Number(candidate.items[0]))
+      .filter((digit) => Number.isInteger(digit))
+    return fresh.length === 0 ? taught : [...taught, ...fresh]
+  }, [state.plan, state.blockIndex, taught])
+
   if (state.finished) {
     return <Summary dictionary={dictionary} results={state.results} onLeave={leave} />
   }
@@ -115,6 +157,20 @@ function RunningSession({
 
   const rounds = new Set(state.plan.blocks.map((b) => b.round)).size
   const done = 1 - state.remaining / block.seconds
+
+  /*
+   * Die Konsonantenzeile erscheint erst, wenn sie etwas beiträgt (D5).
+   * Solange keine einzige Ziffer gelehrt ist, stünde dort eine Reihe Punkte —
+   * das wäre ein Versprechen auf etwas, das noch nicht da ist, und nach G-2
+   * schlicht Möbel.
+   */
+  const parts: readonly MajorPart[] | undefined =
+    block.kind === 'encode' &&
+    block.moduleId === 'numbers' &&
+    state.currentItem !== undefined &&
+    helpsWith(state.currentItem, taughtNow)
+      ? majorParts(state.currentItem, taughtNow)
+      : undefined
 
   return (
     <main className="app session">
@@ -135,7 +191,14 @@ function RunningSession({
         <span style={{ width: `${Math.min(100, done * 100)}%` }} />
       </div>
 
-      {block.kind === 'encode' ? (
+      {block.kind === 'teach' ? (
+        <Lesson
+          dictionary={dictionary}
+          digit={Number(block.items[0])}
+          first={taught.length === 0}
+          onDone={() => advance()}
+        />
+      ) : block.kind === 'encode' ? (
         <section className="encode">
           <p className="hint">
             {t.encodeHints[block.moduleId]}
@@ -153,9 +216,36 @@ function RunningSession({
           {block.moduleId === 'faces' && state.currentItem !== undefined && (
             <Face key={`face-${state.currentItem}`} name={state.currentItem} />
           )}
-          <p className="encode-word" key={block.id + state.itemIndex} aria-live="polite">
-            {state.currentItem}
-          </p>
+          {/*
+            Beim Zahlenmodul steht unter jeder Ziffer ihr Konsonant — sobald
+            sie gelehrt wurde (D5). Zwei Raster übereinander mit derselben
+            Spaltenzahl: Nur so steht der Buchstabe wirklich unter *seiner*
+            Ziffer, und genau darum geht es beim Lernen der Zuordnung.
+
+            Die Ziffern bleiben dabei allein in `.encode-word` — die
+            Buchstaben stehen daneben und nicht darin, sonst läse jeder, der
+            das Element ausliest, „4r7k“ statt „47“.
+          */}
+          {parts !== undefined ? (
+            <div className="major" style={{ '--cells': parts.length } as CSSProperties}>
+              <p className="encode-word major-row" key={block.id + state.itemIndex} aria-live="polite">
+                {parts.map((part, index) => (
+                  <span key={index}>{part.digit}</span>
+                ))}
+              </p>
+              <p className="major-row major-letters" aria-hidden="true">
+                {parts.map((part, index) => (
+                  <span key={index}>{part.letters ?? '·'}</span>
+                ))}
+              </p>
+            </div>
+          ) : (
+            <p className="encode-word" key={block.id + state.itemIndex} aria-live="polite">
+              {state.currentItem}
+            </p>
+          )}
+          {parts !== undefined && <p className="hint">{dictionary.technique.hint}</p>}
+
           <div
             className="encode-dots"
             role="img"
@@ -384,4 +474,52 @@ function formatSeconds(seconds: number): string {
   return `${Math.floor(seconds / 60)}:${Math.floor(seconds % 60)
     .toString()
     .padStart(2, '0')}`
+}
+
+/**
+ * Eine Lektion (Backlog D5).
+ *
+ * Der Bildschirm, auf dem ANITEW etwas **beibringt** statt abzufragen — und
+ * er ist bewusst der ruhigste der ganzen App: eine Ziffer, ihr Laut, ein Satz
+ * dazu. Ein Bild pro Bildschirm (G-2), kein Fortschrittsbalken, keine
+ * Belohnung, kein „Verstanden?“-Knopf, der eine Prüfung andeutet.
+ *
+ * Die Brücke ist der eigentliche Inhalt: Ohne sie ist die Zuordnung Willkür,
+ * und Willkür merkt sich niemand. „Das kleine n hat zwei Abstriche“ ist der
+ * Grund, warum die Zwei hängen bleibt.
+ *
+ * Antippen geht weiter; wer nichts tut, wird nach vierzehn Sekunden von
+ * selbst weitergetragen. Beides gilt als gehalten — die Lektion ist kein
+ * Hindernis, das man nehmen muss.
+ */
+function Lesson({
+  dictionary,
+  digit,
+  first,
+  onDone,
+}: {
+  dictionary: Dictionary
+  digit: number
+  /** Beim allerersten Mal steht der Zweck darüber, danach nicht mehr (G-2). */
+  first: boolean
+  onDone: () => void
+}) {
+  const t = dictionary.technique
+  // Die Schlüssel in `de.ts` sind Zahlen, keine Zeichenketten — ein Blick
+  // durch `Record<number, string>` erspart die Wandlung und die Behauptung,
+  // der Wert sei sicher da.
+  const hooks: Record<number, string> = t.hooks
+  const hook = hooks[digit] ?? ''
+
+  return (
+    <section className="lesson">
+      <p className="hint">{first ? t.intro : t.majorName}</p>
+      <button type="button" className="lesson-card" onClick={onDone}>
+        <span className="lesson-digit">{digit}</span>
+        <span className="lesson-letters">{lettersFor(digit)}</span>
+      </button>
+      <p className="lesson-hook">{hook}</p>
+      <p className="hint">{t.ready}</p>
+    </section>
+  )
 }

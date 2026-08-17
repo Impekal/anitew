@@ -19,6 +19,7 @@ import {
 import { createWebPlatform } from '../platform/web/index.ts'
 import { loadDue, moduleOf, wordOf } from '../data/items.ts'
 import { type SessionProgress, beginSession, clearProgress, loadProgress } from '../data/sessions.ts'
+import { loadTaught } from '../data/technique.ts'
 
 import { BackupPanel } from './BackupPanel.tsx'
 import { FoundationPanel } from './FoundationPanel.tsx'
@@ -35,6 +36,19 @@ export function App() {
   const [mode, setMode] = useState<TrainingMode>('daily')
   const [running, setRunning] = useState<SessionProgress | undefined>()
   const [resumable, setResumable] = useState<SessionProgress | undefined>()
+  /*
+   * Die schon gelehrten Ziffern des Major-Systems (D5).
+   *
+   * Neu gelesen, sobald eine Einheit endet — die Lektion darin kann eine
+   * dazugelegt haben. Ohne das zeigte die nächste Einheit desselben Besuchs
+   * wieder dieselbe Ziffer.
+   */
+  const [taught, setTaught] = useState<readonly number[]>([])
+  useEffect(() => {
+    void loadTaught()
+      .then(setTaught)
+      .catch(() => undefined)
+  }, [running])
 
   // Eine unterbrochene Einheit steht beim nächsten Start wieder da (B5).
   useEffect(() => {
@@ -100,6 +114,7 @@ export function App() {
           numbers: numberPool(seed, 60),
         },
         due,
+        taught,
       })
       const progress: SessionProgress = {
         sessionId,
@@ -113,7 +128,7 @@ export function App() {
       setRunning(progress)
       void beginSession(progress, day, now).catch(() => undefined)
     })()
-  }, [language, mode, platform])
+  }, [language, mode, platform, taught])
 
   const leave = useCallback(() => setRunning(undefined), [])
 
@@ -135,6 +150,7 @@ export function App() {
         platform={platform}
         dictionary={dictionary}
         progress={running}
+        taught={taught}
         onLeave={leave}
       />
     )

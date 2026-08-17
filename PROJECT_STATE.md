@@ -823,3 +823,107 @@ Das braucht erst eine Eingabe, die weiß, dass sie **eine** Antwort erwartet.
 Steht als Einschränkung in `numbers.ts` und im Backlog, statt still zu fehlen.
 
 **Stand:** 134 Kerntests, 32 E2E-Läufe, Typecheck für App und Kern grün.
+
+## 2026-08-17 · Die App bringt etwas bei (D5)
+
+Das Major-System ist drin, und damit der Satz, an dem sich ANITEW von jeder
+Brain-Game-App unterscheidet: **Merktechniken werden beigebracht, nicht nur
+abgefragt.** Eine App, die einen dreimal täglich Ziffern raten lässt, macht
+niemanden besser — sie misst nur, wie gut man ohnehin schon ist.
+
+Eine Lektion je Einheit, vierzehn Sekunden, eine Ziffer: die Ziffer, ihr Laut,
+und die Brücke dazwischen. „Das kleine n hat zwei Abstriche.“ Ohne diese
+Brücke ist die Zuordnung Willkür, und Willkür merkt sich niemand. Danach steht
+der Konsonant unter jeder gelehrten Ziffer, und nur unter ihr.
+
+### Drei Entscheidungen gegen den bequemeren Weg (D-013)
+
+**Das Wort zur Zahl liefert die App nicht.** Sie bringt die Zuordnung bei, das
+Bild baut der Nutzer. Ein selbst gebildetes Bild sitzt besser als ein
+vorgesetztes — eine mitgelieferte Wortliste würde genau den Effekt abschalten,
+um dessentwillen die Technik wirkt. Wer „Rakete“ vorgesetzt bekommt, hat ein
+Wort gelesen; wer es selbst findet, hat es gebaut.
+
+**Angezeigt wird nur, was schon sitzt.** Die ganze Tabelle unter die Zahl zu
+schreiben wäre einfacher und falsch: Wer eine Tabelle vorgesetzt bekommt, die
+er nicht kann, liest sie ab statt sie zu lernen — und übt dann Ablesen.
+
+**Unterricht nur in Ruhe und nur mit Anlass.** Nicht im 60-Sekunden-Modus, und
+nicht, wenn heute gar keine Zahl vorkommt.
+
+### Was der Bildschirm gezeigt hat, was die Tests nicht sahen
+
+Nach der ersten Lektion kamen drei Runden Wörter, und die frische Technik
+durfte man in Runde drei benutzen. Fachlich lief alles richtig, die Tests waren
+grün — es war trotzdem falsch: **Was man nach dem Lernen nicht sofort anwendet,
+ist am nächsten Tag wieder weg.** Steht heute eine Lektion an, beginnt die
+Einheit jetzt mit Zahlen.
+
+Dabei fiel eine Falle auf, die es hier schon einmal gab: Der Wurf, der das
+Startmodul zieht, fällt weiterhin — auch wenn er verworfen wird. Sonst hinge
+die ganze folgende Mischung daran, ob heute unterrichtet wird, und dieselbe
+Einheit sähe je nach Lernstand anders aus. Genau denselben Fehler hatte der
+Bartwurf im Gesichtsgenerator.
+
+### Der Fehler, der am meisten wehgetan hätte
+
+Die frisch gelehrte Ziffer wirkte erst in der **nächsten** Einheit: Sie stand
+zwar sofort in den Einstellungen, aber der Startbildschirm liest sie erst
+wieder, wenn die Einheit vorbei ist. Also: Lektion über die Eins, und die
+nächste Zahl zeigt dazu — nichts. Der schlechtestmögliche Zeitpunkt für eine
+Verzögerung.
+
+Behoben, ohne einen zweiten Zustand: Ein bereits vorbeigezogener Lehrblock
+**ist** die Auskunft, dass seine Ziffer gehalten wurde. Abgeleitet aus Plan und
+Blockzähler kann das mit der Datenbank nicht aus dem Tritt geraten.
+
+### Der Test, der zweimal grün war, obwohl der Fehler drin war
+
+Und das ist die eigentliche Lehre dieses Abschnitts. Meine erste Fassung prüfte
+die Konsonantenzeile nur, **wenn in der gezogenen Zahl zufällig eine Eins
+vorkam**. Sie lief grün. Ich habe die Reparatur zurückgenommen, um zu sehen,
+ob der Test sie fängt — er fing sie nicht, zweimal nicht, weil die Gelegenheit
+schlicht nicht kam.
+
+Erst die dritte Fassung wartet auf ihre Gelegenheit: neun Ziffern vorab
+gesetzt, die zehnte kommt als Lektion, und danach wird der **ganze Block**
+beobachtet, bis eine Zahl mit der frisch gelernten Ziffer erscheint. Diese
+Fassung wurde rot, sobald ich den Fehler wieder einbaute — und erst da wusste
+ich, dass sie etwas prüft.
+
+Zwei Lehren:
+
+1. **Ein Test, der sich seine Gelegenheit vom Zufall geben lässt, ist keiner.**
+   Entweder man stellt die Bedingung her oder man wartet auf sie.
+2. **Einen Test, der einen Fehler fangen soll, muss man einmal rot gesehen
+   haben.** Ich habe das hier zuerst nachlässig gemacht: Beim ersten Versuch
+   scheiterte der Build am Typprüfer, die Suite lief gegen den alten Stand und
+   meldete grün. Ein Beweis, der aus einem fehlgeschlagenen Build stammt, ist
+   keiner.
+
+**Stand:** 150 Kerntests, 40 E2E-Läufe, Typecheck für App und Kern grün.
+
+### Nachtrag: der bedingte Hook
+
+Nach der Reparatur oben waren **zehn** E2E-Läufe rot, und das Muster war der
+ganze Hinweis: Rot wurde alles, was eine Einheit **bis zum Ende** durchspielte;
+alles Kürzere blieb grün.
+
+Der `useMemo`, der die frisch gelehrte Ziffer mitzählt, stand unter dem
+vorzeitigen Return für die Zusammenfassung. React zählt Hooks je Durchlauf —
+sobald die letzte Antwort da war, fehlte einer, die Komponente brach ab, und
+die Zusammenfassung erschien nie. Ein Anfängerfehler, und er hätte auf dem
+Telefon so ausgesehen: Man trainiert fünf Minuten, tippt die letzte Antwort,
+und der Bildschirm bleibt leer.
+
+Zwei Dinge, die dabei richtig liefen und die ich mir merken will:
+
+1. **Das Muster war die Diagnose.** „Alles, was bis zum Ende läuft“ ist eine
+   viel schärfere Auskunft als „zehn Tests rot“. Erst danach habe ich in den
+   Code gesehen.
+2. **Ich habe zuerst die Umgebung verdächtigt** — ein 33 Minuten alter
+   Preview-Server lief tatsächlich noch, und Playwright hatte ihn
+   wiederverwendet. Das aufzuräumen war richtig, hat aber nichts geändert.
+   Erst der zweite, saubere Lauf mit demselben Ergebnis hat bewiesen, dass es
+   am Code liegt. **Eine Umgebungserklärung gilt erst, wenn der saubere Lauf
+   grün ist** — sonst ist sie nur eine bequeme Ausrede.

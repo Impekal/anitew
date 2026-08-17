@@ -765,6 +765,85 @@ body::before {
   box-shadow: var(--glow);
 }
 
+/* ── Merktechnik (D5) ─────────────────────────────────────────────────── */
+
+/* Der ruhigste Bildschirm der App: eine Ziffer, ihr Laut, ein Satz. */
+.lesson {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.1rem;
+  flex: 1;
+  text-align: center;
+}
+
+/* Die Karte ist ein Knopf, weil sie einer ist — Antippen geht weiter. Sie
+   sieht nur nicht danach aus: Ein Knopf mit Beschriftung wäre eine Aufgabe,
+   und die Lektion ist keine (G-5). */
+.lesson-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 1.4rem 2.2rem;
+  border: 1px solid var(--line);
+  border-radius: 1.5rem;
+  background: var(--card);
+  box-shadow: var(--glow-soft, var(--shadow));
+  cursor: pointer;
+  animation: word-in 460ms var(--ease) both;
+}
+
+.lesson-digit {
+  font-family: var(--serif);
+  font-size: clamp(3.4rem, 18vw, 5.4rem);
+  line-height: 1;
+  color: var(--ink);
+  text-shadow: var(--glow-text);
+}
+
+.lesson-letters {
+  font-size: 1.5rem;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
+.lesson-hook {
+  margin: 0;
+  max-width: 22rem;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+/* Zwei Raster übereinander mit derselben Spaltenzahl: Nur so steht der
+   Buchstabe unter *seiner* Ziffer — und genau das ist beim Lernen der
+   Zuordnung der ganze Punkt. */
+.major {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.major-row {
+  display: grid;
+  grid-template-columns: repeat(var(--cells), 1fr);
+  justify-items: center;
+  gap: 0 0.12em;
+  margin: 0;
+}
+
+.major-letters {
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  color: var(--accent);
+  /* Sie kommt eine Spur später als die Zahl — erst die Aufgabe, dann die
+     Hilfe. Gleichzeitig eingeblendet sähe es aus, als gehöre sie dazu. */
+  animation: word-in 460ms var(--ease) 140ms both;
+}
+
 /* ── Gesichter ────────────────────────────────────────────────────────── */
 
 .face {

@@ -455,3 +455,42 @@ Die allgemeine Form davon: **Ein Modul bringt seine Regeln mit.** Frei oder
 gestützt abgefragt, streng oder nachsichtig verglichen, Zifferntastatur oder
 Buchstaben — das gehört zum Gegenstand und nicht in eine wachsende Kette von
 Sonderfällen im Bildschirmcode.
+
+## D-013 · 2026-08-17 · Die Technik wird beigebracht — das Bild liefert die App nicht
+
+D5 ist der Satz, an dem sich ANITEW von jeder Brain-Game-App unterscheidet:
+**Merktechniken werden beigebracht, nicht nur abgefragt.** Eine App, die einen
+dreimal täglich Ziffern raten lässt, macht niemanden besser — sie misst nur,
+wie gut man ohnehin schon ist.
+
+Die erste Technik ist das **Major-System**, und zwar deshalb, weil man sie in
+der ersten Sitzung spürt: Jede Ziffer bekommt einen Konsonanten, die Vokale
+bleiben frei. Aus vier Ziffern wird ein Wort und aus dem Wort ein Bild.
+
+Drei Entscheidungen dazu, alle drei gegen den bequemeren Weg:
+
+**Die App liefert das Wort zur Zahl nicht.** Sie bringt die Zuordnung bei, eine
+Ziffer nach der anderen, mit dem Bild, an dem man sie behält — „das kleine n
+hat zwei Abstriche“. Das Wort baut der Nutzer. Ein selbst gebildetes Bild
+sitzt besser als ein vorgesetztes; eine mitgelieferte Wortliste würde genau
+den Effekt abschalten, um dessentwillen die Technik überhaupt wirkt. Wer
+„Rakete“ vorgesetzt bekommt, hat ein Wort gelesen; wer es selbst findet, hat
+es gebaut. (Dass die App damit auch keine hundert Wörter je Sprache pflegen
+muss, ist der zweite Grund, nicht der erste.)
+
+**Es wird immer nur eine Ziffer gelehrt, und angezeigt wird nur, was schon
+sitzt.** Die ganze Tabelle unter die Zahl zu schreiben wäre einfacher und
+falsch: Wer eine Tabelle vorgesetzt bekommt, die er nicht kann, liest sie ab
+statt sie zu lernen — und übt dann Ablesen. Die Reihenfolge beginnt bei den
+sichtbaren Brücken (1, 2, 3) und endet bei den schwächsten (0, 6); wer mit den
+schwachen anfängt, hält die Technik für willkürlich und hört auf.
+
+**Gelehrt wird nur mit Anlass und nur in Ruhe.** Kein Unterricht im
+60-Sekunden-Modus — wer es eilig hat, will trainieren und nicht unterrichtet
+werden. Kein Unterricht ohne Gegenstand: Das Major-System zu erklären und dann
+keine einzige Zahl zu zeigen wäre eine Lektion ins Leere. Und wenn eine
+Lektion ansteht, kommt das Zahlenmodul **zuerst** — was man nach dem Lernen
+nicht sofort anwendet, ist am nächsten Tag wieder weg.
+
+Die Lektion nimmt ihre vierzehn Sekunden aus dem Budget und nicht dazu. Die
+Zusage aus B2 gilt auch für den Unterricht: Fünf Minuten sind fünf Minuten.

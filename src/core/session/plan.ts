@@ -19,6 +19,7 @@
 import { MODES, type TrainingMode } from '../modes.ts'
 import { createRng } from '../rng.ts'
 import type { DayKey } from '../time.ts'
+import { nextToTeach } from '../technique/major.ts'
 import type { Leniency } from './grading.ts'
 
 /** Sekunden, die ein einzelnes Wort beim Einprägen bekommt. */
@@ -46,7 +47,26 @@ const ENCODE_SHARE = 0.4
 const REVIEW_SHARE = 0.15
 const MIN_REVIEW_SECONDS = 20
 
-export type BlockKind = 'encode' | 'recall' | 'review'
+/**
+ * Sekunden für eine Lektion (Backlog D5).
+ *
+ * Vierzehn, weil eine Lektion aus einer Ziffer, zwei Buchstaben und einem Satz
+ * besteht — mehr Zeit macht sie nicht besser, weniger reicht nicht zum Lesen.
+ * Wer schneller ist, tippt weiter; das Budget ist auch hier eine Obergrenze.
+ */
+export const TEACH_SECONDS = 14
+
+/**
+ * Ab wann überhaupt gelehrt wird.
+ *
+ * Im Notfallmodus nicht. Sechzig Sekunden sind für den Fall gedacht, dass
+ * jemand zwischen Tür und Angel übt — vierzehn davon für eine Lektion wäre
+ * ein Viertel der Einheit, und wer es eilig hat, will trainieren und nicht
+ * unterrichtet werden. Eine Technik lernt man in Ruhe oder gar nicht.
+ */
+export const MIN_SECONDS_FOR_TEACHING = 180
+
+export type BlockKind = 'teach' | 'encode' | 'recall' | 'review'
 
 /**
  * Die Trainingsmodule (Backlog D1).
@@ -128,6 +148,12 @@ export interface PlanInput {
    */
   due?: Partial<Record<ModuleId, readonly string[]>>
   /**
+   * Ziffern des Major-Systems, die schon gelehrt wurden (D5). Fehlt der Wert,
+   * wird nicht gelehrt — eine Einheit ohne diese Angabe soll nicht plötzlich
+   * bei der Eins anfangen.
+   */
+  taught?: readonly number[]
+  /**
    * Welche Module dürfen heute vorkommen? Voreingestellt alle. Der Parameter
    * ist da, damit ein Test ein einzelnes Modul erzwingen kann, ohne dass der
    * Planer dafür eine Sonderregel bekommt.
@@ -165,12 +191,58 @@ export function planSession(input: PlanInput): SessionPlan {
    * hat — immer dasselbe Modul dran, und wer nur den Notfallmodus benutzt,
    * sähe nie ein Gesicht.
    */
-  const offset = rng.int(modules.length)
+  const drawn = rng.int(modules.length)
+
+  /*
+   * Steht heute eine Lektion an, beginnt die Einheit mit **Zahlen** (D5).
+   *
+   * Der erste Anlauf hat das dem Zufall überlassen, und auf dem Bildschirm
+   * sah man sofort, warum das falsch ist: Erst wird das Major-System erklärt,
+   * dann kommen drei Runden Wörter, und benutzen darf man die frische Technik
+   * in Runde drei. Eine Technik, die man nach dem Lernen nicht sofort
+   * anwendet, ist am nächsten Tag wieder weg.
+   *
+   * Der Wurf fällt trotzdem — auch wenn er verworfen wird. Sonst hinge die
+   * ganze folgende Mischung daran, ob heute unterrichtet wird, und dieselbe
+   * Einheit sähe je nach Lernstand anders aus. Denselben Fehler hatte der
+   * Bartwurf im Gesichtsgenerator schon einmal.
+   */
+  const numbersAt = modules.indexOf('numbers')
+  const wantsLesson =
+    totalSeconds >= MIN_SECONDS_FOR_TEACHING &&
+    input.taught !== undefined &&
+    nextToTeach(input.taught) !== undefined
+  const teachesNumbers = wantsLesson && numbersAt >= 0
+
+  const offset = teachesNumbers ? numbersAt : drawn
   const moduleForRound = (round: number): ModuleId =>
     modules[(offset + round - 1) % modules.length] as ModuleId
 
-  const roundBudgets = share(learnSeconds, rounds)
+  // Gelehrt wird nur mit Gegenstand: Das Major-System zu erklären und dann
+  // keine einzige Zahl zu zeigen wäre Unterricht ohne Anlass.
+  const teachSeconds = teachesNumbers ? TEACH_SECONDS : 0
+  const roundBudgets = share(learnSeconds - teachSeconds, rounds)
   const blocks: BlockPlan[] = []
+
+  /*
+   * Die Lektion steht **vorn**, vor der ersten Runde: Eine Technik, die man
+   * nach der Übung erklärt bekommt, hat man bei der Übung nicht gehabt.
+   */
+  if (teachesNumbers) {
+    blocks.push({
+      id: 'teach-major',
+      kind: 'teach',
+      moduleId: 'numbers',
+      // Dieselbe Runde wie das erste Einprägen: Die Lektion gehört dazu und
+      // ist keine eigene. Sonst zählte der Kopf des Bildschirms sie mit und
+      // zeigte „Runde 0 von 3“.
+      round: 1,
+      seconds: teachSeconds,
+      // Die Ziffer, um die es geht — als Zeichenkette, wie jeder andere
+      // Gegenstand auch. Der Block wird nicht bewertet.
+      items: [String(nextToTeach(input.taught ?? []))],
+    })
+  }
 
   /*
    * Über die ganze Einheit ohne Zurücklegen ziehen: Ein Wort, das in Runde 1
