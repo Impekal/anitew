@@ -1668,3 +1668,12 @@ body::before {
 .wipe-go {
   color: var(--bad);
 }
+
+/* Weitermachen und Zurück nebeneinander (B7) — gleiches Gewicht, kein Knopf
+   drängt. */
+.summary-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: center;
+}

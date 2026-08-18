@@ -528,6 +528,8 @@ export const de = {
     missed: 'Noch nicht dabei',
     fromBefore: 'Von früher',
     back: 'Zurück',
+    // B7: Weitermachen ist ein Angebot, kein Auftrag — ruhig, neben „Zurück“.
+    again: 'Noch eine Runde',
   },
   resume: {
     heading: 'Eine Einheit läuft noch',

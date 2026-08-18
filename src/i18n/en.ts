@@ -339,6 +339,7 @@ export const en: Dictionary = {
     missed: 'Not yet',
     fromBefore: 'From earlier',
     back: 'Back',
+    again: 'Another round',
   },
   resume: {
     heading: 'A session is still open',

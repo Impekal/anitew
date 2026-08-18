@@ -440,12 +440,19 @@ export function App() {
   if (running !== undefined) {
     return (
       <SessionScreen
+        /*
+          Der Schlüssel ist die sessionId: „Noch eine Runde“ (B7) setzt eine
+          neue Einheit, und der Runner baut seinen Zustand nur beim Einhängen
+          auf. Ohne den Schlüssel liefe die alte Einheit weiter.
+        */
+        key={running.sessionId}
         platform={platform}
         dictionary={dictionary}
         progress={running}
         taught={taught}
         own={own}
         onLeave={leave}
+        onAgain={start}
       />
     )
   }

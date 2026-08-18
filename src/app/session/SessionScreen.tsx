@@ -43,6 +43,8 @@ export function SessionScreen(props: {
   /** Der selbst angelegte Palast, wenn es einen gibt (G3). */
   own?: OwnPalace
   onLeave: () => void
+  /** „Noch eine Runde“ vom Abschluss aus (B7). */
+  onAgain: () => void
 }) {
   const [settled, setSettled] = useState(false)
 
@@ -85,6 +87,7 @@ function RunningSession({
   taught,
   own,
   onLeave,
+  onAgain,
 }: {
   platform: Platform
   dictionary: Dictionary
@@ -92,6 +95,7 @@ function RunningSession({
   taught: readonly number[]
   own?: OwnPalace
   onLeave: () => void
+  onAgain: () => void
 }) {
   const { state, setEntries, submitPrompt, advance, leave } = useSessionRunner(
     platform,
@@ -174,6 +178,7 @@ function RunningSession({
         results={state.results}
         language={state.plan.language}
         onLeave={leave}
+        onAgain={onAgain}
       />
     )
   }
@@ -478,11 +483,13 @@ function Summary({
   results,
   language,
   onLeave,
+  onAgain,
 }: {
   dictionary: Dictionary
   results: RoundResult[]
   language: string
   onLeave: () => void
+  onAgain: () => void
 }) {
   const t = dictionary.summary
   const learned = results.filter((round) => round.kind === 'recall')
@@ -570,9 +577,20 @@ function Summary({
 
       <p className="hint">{t.note}</p>
 
-      <button type="button" className="quiet summary-back" onClick={onLeave}>
-        {t.back}
-      </button>
+      {/*
+        Weitermachen (B7): ein Angebot, kein Auftrag. Es steht neben „Zurück“,
+        nicht darüber, und trägt kein Ausrufezeichen — wer aufhören will, hört
+        auf; wer weitermachen will, tippt einmal. Die neue Runde zählt wie
+        jede andere für Serie und Wiedersehen, ohne eigenen Druck.
+      */}
+      <div className="summary-actions">
+        <button type="button" className="quiet" onClick={onAgain}>
+          {t.again}
+        </button>
+        <button type="button" className="quiet summary-back" onClick={onLeave}>
+          {t.back}
+        </button>
+      </div>
     </main>
   )
 }

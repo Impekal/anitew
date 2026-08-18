@@ -201,3 +201,22 @@ function otherNumber(value: string, avoid: readonly string[]): string {
   }
   throw new Error(`keine abweichende Zahl zu ${value} gefunden`)
 }
+
+test('lässt nach der Einheit weitermachen — noch eine Runde (B7)', async ({ page }) => {
+  test.setTimeout(180_000)
+
+  await startEmergency(page)
+  const learned = await collectItems(page, 8)
+  await answerRecall(page, learned, 'all')
+  await expect(page.getByRole('heading', { name: 'Geblieben' })).toBeVisible({ timeout: 60_000 })
+
+  /*
+   * „Noch eine Runde“ ist ein Angebot, kein Auftrag: Es steht neben „Zurück“,
+   * und ein Tap beginnt eine frische Einheit — mit neuem Ankommen, also einem
+   * wirklich neuen Durchlauf und nicht dem alten Zustand.
+   */
+  await page.getByRole('button', { name: 'Noch eine Runde' }).click()
+  await expect(page.locator('.settle')).toBeVisible({ timeout: 30_000 })
+  await page.locator('.settle').click()
+  await expect(page.locator('.encode-word, .scene, .lesson').first()).toBeVisible({ timeout: 30_000 })
+})
