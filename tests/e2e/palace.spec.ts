@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { answerRecall, collectItems, startButton, visit } from './helpers.ts'
+import { answerRecall, collectItems, openPage, startButton, visit } from './helpers.ts'
 
 /**
  * Der Gedächtnispalast, im Browser nachgeprüft (Backlog G1, G2, G4, G6).
@@ -137,7 +137,7 @@ test('lässt einen eigenen Weg anlegen und benutzt ihn (G3)', async ({ page }) =
    */
   await visit(page)
   await expect(startButton(page)).toBeVisible()
-  await page.getByText('Der Gedächtnispalast', { exact: true }).click()
+  await openPage(page, 'Der Gedächtnispalast')
 
   const own = ['Wohnungstür', 'Bad', 'Balkon', 'Bücherregal', 'Nachttisch']
   await page.getByLabel('Wie heißt der Weg?').fill('Meine Bude')
@@ -153,7 +153,7 @@ test('lässt einen eigenen Weg anlegen und benutzt ihn (G3)', async ({ page }) =
   // Er bleibt liegen — er steht in denselben Einstellungen wie der Lernstand
   // und wandert damit auch in die Sicherung (N2).
   await page.reload()
-  await page.getByText('Der Gedächtnispalast', { exact: true }).click()
+  await openPage(page, 'Der Gedächtnispalast')
   await expect(page.getByLabel('Station 3')).toHaveValue('Balkon')
 
   /*
@@ -227,7 +227,7 @@ test('lässt einen eigenen Weg anlegen und benutzt ihn (G3)', async ({ page }) =
 test('nimmt keinen halben Weg an', async ({ page }) => {
   await visit(page)
   await expect(startButton(page)).toBeVisible()
-  await page.getByText('Der Gedächtnispalast', { exact: true }).click()
+  await openPage(page, 'Der Gedächtnispalast')
 
   await page.getByLabel('Wie heißt der Weg?').fill('Halb')
   await page.getByLabel('Station 1').fill('Bad')

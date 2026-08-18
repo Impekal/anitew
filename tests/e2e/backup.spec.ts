@@ -3,7 +3,7 @@ import { join } from 'node:path'
 
 import { expect, test, type Page, type TestInfo } from '@playwright/test'
 
-import { answerRecall, collectItems, startEmergency, visit } from './helpers.ts'
+import { answerRecall, collectItems, openPage, startEmergency, visit } from './helpers.ts'
 
 /**
  * Die Sicherung, im Browser nachgeprüft (Backlog N2, N6).
@@ -56,7 +56,7 @@ async function countStored(page: Page): Promise<{ itemStates: number; events: nu
 }
 
 async function openBackupPanel(page: Page) {
-  await page.getByText('Sicherung', { exact: true }).click()
+  await openPage(page, 'Sicherung')
   await expect(page.locator('.backup')).toBeVisible()
 }
 

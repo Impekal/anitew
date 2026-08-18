@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-import { startButton, visit } from './helpers.ts'
+import { openPage, startButton, visit } from './helpers.ts'
 
 /**
  * Datenschutz in der App (Backlog R4).
@@ -12,7 +12,7 @@ import { startButton, visit } from './helpers.ts'
 test('sagt in fünf Zeilen, wo die Daten liegen', async ({ page }) => {
   await visit(page)
   await expect(startButton(page)).toBeVisible()
-  await page.getByText('Datenschutz', { exact: true }).click()
+  await openPage(page, 'Datenschutz')
 
   await expect(page.locator('.privacy-lead')).toHaveText('ANITEW hat keinen Server.')
   await expect(page.locator('.privacy-points li')).toHaveCount(5)
@@ -27,7 +27,7 @@ test('nennt auch das Unbequeme', async ({ page }) => {
    */
   await visit(page)
   await expect(startButton(page)).toBeVisible()
-  await page.getByText('Datenschutz', { exact: true }).click()
+  await openPage(page, 'Datenschutz')
 
   await expect(page.getByText(/wird sie einmal geladen/)).toBeVisible()
   await expect(page.getByText(/was jeder Webserver sieht/)).toBeVisible()

@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-import { startButton } from './helpers.ts'
+import { openPage, startButton } from './helpers.ts'
 
 /**
  * Das Kennenlernen (Onboarding).
@@ -78,7 +78,7 @@ test('macht die Antworten unter „Über dich“ änderbar — und die Änderung
   await expect(page.locator('.focus')).toHaveCount(0)
 
   // Nachträglich ein Ziel setzen.
-  await page.locator('summary', { hasText: 'Über dich' }).click()
+  await openPage(page, 'Über dich')
   await page.locator('.about-field select').first().selectOption('names')
 
   // Die Änderung überlebt das Neuladen und wird zum Vorschlag.

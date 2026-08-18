@@ -74,6 +74,23 @@ export async function visit(page: Page) {
   }
 }
 
+/**
+ * Öffnet eine Menüseite: Menüknopf, dann der Eintrag mit dieser
+ * Beschriftung. Seit dem Menü-Umbau ist jeder Punkt eine eigene Seite —
+ * die Prüfungen gehen denselben Weg wie der Finger.
+ */
+export async function openPage(page: Page, label: string) {
+  await page.locator('button.hamburger').click()
+  await page.locator('.drawer-item', { hasText: label }).click()
+  await page.locator('.page').waitFor()
+}
+
+/** Von einer Menüseite zurück auf den Startbildschirm. */
+export async function leavePage(page: Page) {
+  await page.locator('.page-back').click()
+  await page.locator('.challenge').waitFor()
+}
+
 /** Startet den Notfallmodus und überspringt das Ankommen. */
 export async function startEmergency(page: Page) {
   await page.getByRole('button', { name: '60 Sekunden' }).click()

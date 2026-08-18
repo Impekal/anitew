@@ -246,6 +246,7 @@ Anforderung wie jede andere. Die acht Regeln G-1 bis G-8 stehen in
 |---|---|---|---|---|
 | O1 | Vom Öffnen zum laufenden Training: ein Tap, unter zwei Sekunden | ✅ 2026-08-17 | | M |
 | O2 | Kein Onboarding-Wall, keine Registrierung, kein Einwilligungslabyrinth | ✅ 2026-08-17 | Das Kennenlernen (B10) ist kein Wall: ein Tap („Ohne Fragen anfangen“) und man ist drin — geprüft im E2E | S |
+| O2a | Menü: Schublade mit Gruppen, eine Seite je Punkt | ✅ 2026-08-18 | **D-025**. Menüknopf oben rechts; „Dein Stand“ / „App & Gerät“; Zurück-Geste des Systems schließt die Seite (ein History-Eintrag). Die Messung bleibt außerhalb — sie meldet sich selbst | M |
 | O3 | Hell/Dunkel nach Systemeinstellung | ✅ 2026-08-17 | warmes Papier im Hellen, warmes Dunkel im Dunklen — nirgends reines Weiß oder Schwarz (G-4) | S |
 | O4 | Barrierefreiheit: Kontrast, große Schrift, Screenreader, Fokusreihenfolge, reduzierte Bewegung | ✅ 2026-08-18 | „weniger Bewegung“ schaltet alles still (`prefers-reduced-motion`). **Sichtbarer Fokusring auf jedem bedienbaren Element** (`:focus-visible`, deutlich auf Dunkel), Bilder benannt oder `aria-hidden`, die Uhr der Einheit als `progressbar` mit Werten. Große Schrift: relative Einheiten, Browser-Zoom trägt. `tests/e2e/accessibility.spec.ts` | M |
 | O5 | Einhändig bedienbar, alles Wichtige in der Daumenzone | ✅ 2026-08-18 | Startknopf mittig-groß, „Fertig“/„Zurück“ am unteren Rand, Abbruch unten. Die zwei häufigsten Knöpfe (Zeitwahl, „Beginnen“) auf 44 px Mindesthöhe angehoben | M |

@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-import { startButton, visit } from './helpers.ts'
+import { openPage, startButton, visit } from './helpers.ts'
 
 /**
  * Die Wissenschaftsseite, im Browser nachgeprüft (Backlog F6, R-2, R5).
@@ -13,7 +13,7 @@ import { startButton, visit } from './helpers.ts'
 async function openScience(page: import('@playwright/test').Page) {
   await visit(page)
   await expect(startButton(page)).toBeVisible()
-  await page.getByText('Was belegt ist', { exact: true }).click()
+  await openPage(page, 'Was belegt ist')
 }
 
 test('nennt, worauf die App steht — mit Quelle', async ({ page }) => {

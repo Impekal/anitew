@@ -988,3 +988,39 @@ Training, die Messung bleibt die einzige Auskunft über das Gedächtnis (F1).
 Kennenlernen ist ein Angebot mit sichtbarem Ausgang nach einem Tap — und der
 E2E-Test öffnet die App genau so, wie es alle Prüfungen tun: erst fragen
 lassen, dann übergehen.
+
+## D-025 · 2026-08-18 · Das Menü ist eine Schublade, jeder Punkt eine Seite
+
+**Entscheidung:** Die zugeklappten Fächer am Fuß des Startbildschirms sind
+ersetzt: Ein Menüknopf oben rechts öffnet eine Schublade mit zwei benannten
+Gruppen („Dein Stand“ / „App & Gerät“), und jeder Eintrag öffnet eine
+**eigene Seite** — Titel, Zurück, ein Inhalt.
+
+**Warum:** Die Fächer waren die konsequente, aber gescheiterte Anwendung von
+G-2 (nichts drängt sich vor): Sie drängten sich so wenig vor, dass sie
+niemand fand — der Nutzer nannte sie „unauffällig“, und er hatte recht. Die
+Schublade behält die Ruhe des Startbildschirms (ein Knopf, sonst nichts) und
+gibt den Auskünften trotzdem einen auffindbaren Ort. Eine Seite je Punkt ist
+dieselbe Regel wie im Training — **ein Ding pro Bildschirm** (D-011/G-1) —
+auf die Auskünfte angewandt; die Klappfächer hatten auf einem Bildschirm
+zehn Dinge.
+
+**Einzelheiten, die Entscheidungen sind:**
+
+- **„Erreicht“ steht nur im Menü, wenn es Erreichtes gibt** (K7 — kein
+  Menüpunkt als leeres Versprechen). „Auf den Startbildschirm“ nur auf iOS.
+- **Ein Eintrag in der Browsergeschichte je geöffneter Seite:** Die
+  Zurück-Geste des Systems schließt die Seite, statt die App zu verlassen —
+  auf Android der Unterschied zwischen „fühlt sich wie eine App an“ und
+  „wirft mich raus“.
+- **Die Messung bleibt außerhalb des Menüs.** Sie meldet sich auf dem
+  Startbildschirm, wenn sie etwas will (D-011/G-2), und muss nicht gefunden
+  werden.
+- **Die Zeichen sind selbst gezeichnet** (eine Strichstärke, `currentColor`,
+  D-005) — und beim Erreichten ist es eine Liste mit Haken, kein Pokal
+  (D-019).
+
+**Verworfen:** ein Kartenraster im Fuß (gebaut, angesehen, wieder
+ausgebaut) — besser auffindbar als die Fächer, aber immer noch zehn Dinge
+auf einem Bildschirm; und ein Router mit URLs je Seite — eine Ebene
+Navigation braucht keinen, und die App bleibt eine Datei Zustand.

@@ -1810,3 +1810,153 @@ body::before {
   background: var(--card);
   color: var(--ink);
 }
+
+/* ── Das Menü: Knopf, Schublade, Seiten ───────────────────────────────── */
+
+.brand-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* Der Menüknopf: das einzige Möbel neben dem Namen. Ruhig, aber sichtbar —
+   die alte Fassung (blasse Klappzeilen am Fuß) hat niemand gefunden. */
+.hamburger {
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--ink-soft);
+  border-radius: 0.8rem;
+  width: 2.6rem;
+  height: 2.6rem;
+  padding: 0.55rem;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: border-color var(--step) var(--ease), color var(--step) var(--ease);
+}
+
+.hamburger:hover {
+  color: var(--ink);
+  border-color: color-mix(in oklab, var(--accent) 45%, var(--line));
+}
+
+.hamburger svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Der Schleier: dunkelt ab und fängt den Tipp daneben. */
+.drawer-veil {
+  position: fixed;
+  inset: 0;
+  background: rgb(20 14 8 / 32%);
+  z-index: 20;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.drawer {
+  width: min(20rem, 86vw);
+  height: 100%;
+  overflow-y: auto;
+  background: var(--paper-glow);
+  border-left: 1px solid var(--line);
+  box-shadow: var(--shadow-lift);
+  padding: 1.1rem 1.1rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.drawer-close {
+  align-self: flex-end;
+  border: none;
+  background: transparent;
+  color: var(--ink-faint);
+  width: 2.2rem;
+  height: 2.2rem;
+  padding: 0.45rem;
+  cursor: pointer;
+}
+
+.drawer-close svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.menu-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+/* Dieselbe Stimme wie die Frage über den Zeitknöpfen. */
+.menu-label {
+  margin: 0 0 0.3rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--ink-faint);
+  font-weight: 600;
+}
+
+.drawer-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.95rem;
+  text-align: left;
+  padding: 0.65rem 0.5rem;
+  border-radius: 0.8rem;
+  cursor: pointer;
+  transition: background var(--step) var(--ease);
+}
+
+.drawer-item:hover {
+  background: var(--accent-soft);
+}
+
+.drawer-item > span {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Bernstein gehört dem Menschen, das kühle Grün dem Gerät — dieselbe
+   Teilung wie überall (G-8), hier nur im Zeichen. */
+.menu-icon {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex: none;
+  color: var(--accent);
+}
+
+.menu-group-device .menu-icon {
+  color: var(--calm);
+}
+
+/* ── Eine Menüseite: Titel, Zurück, ein Inhalt ────────────────────────── */
+
+.page-head {
+  display: flex;
+}
+
+.page-title {
+  margin: 0.4rem 0 0;
+  font-family: var(--serif);
+  font-size: 1.6rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.page-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}

@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-import { answerRecall, collectItems, startButton, visit } from './helpers.ts'
+import { answerRecall, collectItems, openPage, startButton, visit } from './helpers.ts'
 
 /**
  * Fehlertoleranz (Backlog P7).
@@ -103,7 +103,7 @@ test('bleibt heil, wenn Benachrichtigungen abgelehnt sind (P7)', async ({ page }
 
   await visit(page)
   await expect(startButton(page)).toBeVisible()
-  await page.getByText('Erinnerung', { exact: true }).click()
+  await openPage(page, 'Erinnerung')
 
   await expect(page.getByText(/abgelehnt/)).toBeVisible()
   // Kein Knopf, der ein Recht erbittet, das der Browser schon verweigert hat.
@@ -138,7 +138,7 @@ test('löscht auf Wunsch alles — aber erst nach einer echten Rückfrage (N4)',
     })
   })
 
-  await page.getByText('Sicherung', { exact: true }).click()
+  await openPage(page, 'Sicherung')
 
   // Ein Klick auf „Allöschen“ löscht noch nichts — er fragt.
   await page.locator('.wipe').getByRole('button', { name: 'Alles löschen' }).click()
@@ -182,7 +182,7 @@ test('zeigt, wie viel Platz belegt ist (N5)', async ({ page }) => {
   // hält. Nach einer Einheit steht dort eine echte Größe.
   await visit(page)
   await expect(startButton(page)).toBeVisible()
-  await page.getByText('Sicherung', { exact: true }).click()
+  await openPage(page, 'Sicherung')
   await expect(page.getByText(/Auf diesem Gerät belegt: etwa/)).toBeVisible()
   await expect(page.getByText(/etwa \d+([.,]\d+)? (B|KB|MB)/)).toBeVisible()
 })

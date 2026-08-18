@@ -7,7 +7,10 @@ import type { Dictionary } from '../i18n/index.ts'
  * Kein Trophäenschrank mit gesperrten Feldern — das wäre die Aufforderung,
  * die K7 ausschließt. Nur die Tatsachen, die wirklich zutreffen, jede in
  * einem Satz, im ruhigen Ton der Serie. Ist noch keine erreicht, steht hier
- * gar nichts.
+ * gar nichts — und der Menüpunkt steht dann auch nicht im Menü.
+ *
+ * Seit dem Menü-Umbau nur noch die Liste selbst: Überschrift und Ort stellt
+ * die Menüseite.
  */
 export function AchievementsLine({
   input,
@@ -22,13 +25,10 @@ export function AchievementsLine({
   const facts: Record<AchievementId, string> = dictionary.achievements.facts
 
   return (
-    <details className="details">
-      <summary>{dictionary.achievements.heading}</summary>
-      <ul className="reached">
-        {reached.map((id) => (
-          <li key={id}>{facts[id]}</li>
-        ))}
-      </ul>
-    </details>
+    <ul className="reached">
+      {reached.map((id) => (
+        <li key={id}>{facts[id]}</li>
+      ))}
+    </ul>
   )
 }

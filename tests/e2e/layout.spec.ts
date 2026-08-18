@@ -60,19 +60,29 @@ test('der Startbildschirm passt, ohne seitlich zu schieben', async ({ page }) =>
   }
 })
 
-test('hält die Breite, wenn alle Klappfächer offen stehen', async ({ page }) => {
+test('hält die Breite auf jeder Menüseite — und in der Schublade', async ({ page }) => {
   await visit(page)
   await expect(startButton(page)).toBeVisible()
 
-  // Jedes Detail am Fuß aufklappen — dort steckt der meiste Text, und ein zu
-  // breites Wort in einer Sprache oder eine lange Quelle sprengt hier zuerst.
-  const summaries = page.locator('.footer .details > summary')
-  const count = await summaries.count()
-  expect(count).toBeGreaterThan(0)
-  for (let index = 0; index < count; index++) {
-    await summaries.nth(index).click()
-  }
+  // Die Schublade selbst zuerst.
+  await page.locator('button.hamburger').click()
+  await expect(page.locator('.drawer')).toBeVisible()
   await noHorizontalOverflow(page)
+
+  // Dann jede Seite: Dort steckt der meiste Text, und ein zu breites Wort in
+  // einer Sprache oder eine lange Quelle sprengt zuerst hier. Die Liste wird
+  // abgelesen, nicht behauptet — was im Menü steht, wird geprüft.
+  const labels = await page.locator('.drawer-item > span').allTextContents()
+  await page.keyboard.press('Escape')
+  expect(labels.length).toBeGreaterThan(0)
+  for (const label of labels) {
+    await page.locator('button.hamburger').click()
+    await page.locator('.drawer-item', { hasText: label }).click()
+    await page.locator('.page').waitFor()
+    await noHorizontalOverflow(page)
+    await page.locator('.page-back').click()
+    await page.locator('.challenge').waitFor()
+  }
 })
 
 test('das Kennenlernen passt auf jedes Gerät', async ({ page }) => {

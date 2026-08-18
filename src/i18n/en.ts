@@ -22,7 +22,7 @@ export const en: Dictionary = {
     },
     incomplete: 'Not translated yet — the app falls back to English.',
     training: 'Training language',
-    trainingNote: 'The app speaks English, the words you memorise are German — memory and a language at once. Switching loses nothing: "anchor" and "Anker" are two memories, each with its own schedule.',
+    trainingNote: 'What you train in is separate from what the app speaks. Switching loses nothing: "anchor" and "Anker" are two memories, each with its own schedule.',
     trainingOnly: 'On offer is whatever has its own words, names and scenes. Offering a language and then showing English words would not be a training language.',
   },
   greetings: [
@@ -445,5 +445,11 @@ export const en: Dictionary = {
     editNote: 'Your answers from the start. Change or clear them — any time.',
     hello: 'Hello',
     unanswered: 'Not answered',
+  },
+  menu: {
+    heading: 'Menu',
+    close: 'Close menu',
+    yours: 'Where you stand',
+    device: 'App & device',
   },
 }

@@ -46,8 +46,14 @@ export const de = {
       Er hat recht gehabt. In einer App, deren ganzer Punkt ist, dass nichts
       behauptet wird, was nicht stimmt, ist ein Satz, der sich falsch lesen
       lässt, ein Fehler — auch wenn er sich richtig lesen lässt.
+
+      Die zweite Fassung behauptete dann eine feste Kombination („Bedienung
+      auf Deutsch, geübt mit englischen Wörtern“) — und stand so auch da,
+      wenn jemand längst auf Deutsch trainierte. Auf einem Bildschirmabzug
+      gesehen. Der Satz beschreibt jetzt die Regel statt eines Beispiels,
+      das meistens falsch ist.
     */
-    trainingNote: 'Bedienung auf Deutsch, geübt wird mit englischen Wörtern — Gedächtnis und Sprache in einem. Ein Wechsel verliert nichts: „Anker“ und „anchor“ sind zwei Gedächtnisinhalte, jeder mit eigenen Terminen.',
+    trainingNote: 'Worin du trainierst, ist unabhängig davon, worin die App spricht. Ein Wechsel verliert nichts: „Anker“ und „anchor“ sind zwei Gedächtnisinhalte, jeder mit eigenen Terminen.',
     trainingOnly: 'Zur Auswahl steht, wofür es eigene Wörter, Namen und Szenen gibt. Eine Sprache anzubieten und dann englische Wörter zu zeigen wäre keine Trainingssprache.',
   },
   /*
@@ -658,5 +664,18 @@ export const de = {
     editNote: 'Deine Antworten vom Anfang. Ändern oder leeren — beides jederzeit.',
     hello: 'Hallo',
     unanswered: 'Nicht beantwortet',
+  },
+  menu: {
+    /*
+      Das Menü (D-011 im Rückblick): Die Fächer lagen als blasse Zeilen am
+      Fuß — ruhig, aber so unauffällig, dass niemand sie fand. Jetzt ein
+      Menüknopf oben und **eine Seite je Punkt**: Das ist dieselbe Regel wie
+      im Training — ein Ding pro Bildschirm —, nur auf die Auskünfte
+      angewandt. Zwei benannte Gruppen, damit die Liste eine Ordnung hat.
+    */
+    heading: 'Menü',
+    close: 'Menü schließen',
+    yours: 'Dein Stand',
+    device: 'App & Gerät',
   },
 } as const

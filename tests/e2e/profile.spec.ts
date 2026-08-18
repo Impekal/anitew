@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { startButton, visit } from './helpers.ts'
+import { leavePage, openPage, startButton, visit } from './helpers.ts'
 
 /**
  * Das Gedächtnisprofil im Browser (Backlog E3, E4, E7 · D-021).
@@ -43,7 +43,7 @@ async function seed(page: Page, rows: readonly { module: string; reviews: number
   }, rows as { module: string; reviews: number; lapses: number }[])
   await page.reload()
   await expect(startButton(page)).toBeVisible()
-  await page.getByText('Dein Profil', { exact: true }).click()
+  await openPage(page, 'Dein Profil')
 }
 
 test('zeigt vor der ersten Aussage einen Satz statt neun leerer Achsen', async ({ page }) => {
@@ -127,6 +127,8 @@ test('kündigt einen Schwerpunkt an und sagt, warum (E5, E6)', async ({ page }) 
     { module: 'words', reviews: 61, lapses: 3 },
     { module: 'numbers', reviews: 61, lapses: 40 },
   ])
+  // Der Schwerpunkt steht auf dem Startbildschirm, nicht auf der Profilseite.
+  await leavePage(page)
 
   await expect(page.locator('.focus')).toContainText('Heute mit Schwerpunkt: Zahlen')
   await expect(page.getByText(/Ändert sich, sobald sich die Zahlen ändern/)).toBeVisible()
@@ -137,6 +139,8 @@ test('kündigt keinen an, wo der Unterschied Zufall sein kann', async ({ page })
     { module: 'words', reviews: 21, lapses: 5 },
     { module: 'numbers', reviews: 21, lapses: 6 },
   ])
+  // Der Schwerpunkt steht auf dem Startbildschirm, nicht auf der Profilseite.
+  await leavePage(page)
   await expect(page.locator('.focus')).toHaveCount(0)
 })
 
@@ -150,6 +154,8 @@ test('verspricht keinen Schwerpunkt, den die gewählte Zeit nicht hergibt', asyn
     { module: 'words', reviews: 61, lapses: 3 },
     { module: 'palace', reviews: 61, lapses: 40 },
   ])
+  // Der Schwerpunkt steht auf dem Startbildschirm, nicht auf der Profilseite.
+  await leavePage(page)
 
   await expect(page.locator('.focus')).toContainText('Palast')
   await page.getByRole('button', { name: '60 Sekunden' }).click()

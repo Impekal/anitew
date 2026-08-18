@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { startButton, visit } from './helpers.ts'
+import { openPage, startButton, visit } from './helpers.ts'
 
 /**
  * Erreichtes (Backlog K3 · D-019).
@@ -42,7 +42,7 @@ test('sagt am Anfang gar nichts (K7)', async ({ page }) => {
 
 test('nennt eine Tatsache, sobald sie zutrifft', async ({ page }) => {
   await seedReached(page)
-  await page.getByText('Erreicht', { exact: true }).click()
+  await openPage(page, 'Erreicht')
   await expect(page.getByText(/Zum ersten Mal etwas nach Tagen zurückgeholt/)).toBeVisible()
   // Und nur das Erreichte — keine gesperrten, ausgegrauten Zeilen.
   const count = await page.locator('.reached li').count()

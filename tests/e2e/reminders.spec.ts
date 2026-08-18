@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { startButton, visit } from './helpers.ts'
+import { openPage, startButton, visit } from './helpers.ts'
 
 /**
  * Erinnerungen im Browser (Backlog B8 · D-022).
@@ -15,7 +15,7 @@ import { startButton, visit } from './helpers.ts'
 async function openReminders(page: Page) {
   await visit(page)
   await expect(startButton(page)).toBeVisible()
-  await page.getByText('Erinnerung', { exact: true }).click()
+  await openPage(page, 'Erinnerung')
 }
 
 test('sagt zuerst, was dieses Gerät kann — und dann erst die Einstellung', async ({ page }) => {
@@ -66,7 +66,7 @@ test('merkt sich die Uhrzeit und lässt sie wieder abstellen', async ({ page, br
   // Sie überlebt einen Neustart — sie liegt in denselben Einstellungen wie
   // alles andere und wandert damit in die Sicherung (N2).
   await page.reload()
-  await page.getByText('Erinnerung', { exact: true }).click()
+  await openPage(page, 'Erinnerung')
   await expect(page.locator('.reminder input[type="time"]')).toHaveValue('07:15')
 
   await page.getByRole('button', { name: 'Keine Erinnerung' }).click()

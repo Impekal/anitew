@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import {
   MODES,
@@ -39,6 +39,7 @@ import {
   planSession,
   selectDue,
   streakOf,
+  achievementsOf,
   wordPool,
 } from '../core/index.ts'
 import { createWebPlatform } from '../platform/web/index.ts'
@@ -57,6 +58,7 @@ import { loadPalaceTaught, loadTaught } from '../data/technique.ts'
 
 import { AboutPanel } from './AboutPanel.tsx'
 import { BackupPanel } from './BackupPanel.tsx'
+import { MenuIcon, type MenuIconKind } from './MenuIcon.tsx'
 import { OnboardingScreen } from './onboarding/OnboardingScreen.tsx'
 import { PalacePanel } from './PalacePanel.tsx'
 import { ProfilePanel } from './ProfilePanel.tsx'
@@ -122,6 +124,46 @@ export function App() {
     modeSeeded.current = true
     setMode(suggestedMode(profile))
   }, [profileReady, profile])
+
+  /*
+   * Das Menü: ein Knopf oben, eine Seite je Punkt (D-011 auf die Auskünfte
+   * angewandt — ein Ding pro Bildschirm). Die Seite ist Zustand, kein
+   * Router: Es gibt genau eine Ebene, und die Zurück-Geste des Systems soll
+   * sie schließen statt die App zu verlassen — dafür der eine Eintrag in der
+   * Browsergeschichte.
+   */
+  const [pageId, setPageId] = useState<MenuIconKind | undefined>(undefined)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const openPage = useCallback((id: MenuIconKind) => {
+    setMenuOpen(false)
+    setPageId(id)
+    window.history.pushState({ page: id }, '')
+  }, [])
+  const closePage = useCallback(() => {
+    setPageId(undefined)
+    // Der Eintrag von openPage soll nicht liegen bleiben — sonst führt die
+    // nächste Zurück-Geste ins Leere. Ist er schon weg (Systemgeste), ist
+    // `back` ein stiller Leerlauf auf dem Ausgangszustand.
+    if ((window.history.state as { page?: string } | null)?.page !== undefined) {
+      window.history.back()
+    }
+  }, [])
+  useEffect(() => {
+    const onPop = () => {
+      setPageId(undefined)
+      setMenuOpen(false)
+    }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
+  useEffect(() => {
+    if (!menuOpen) return
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMenuOpen(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [menuOpen])
   const [running, setRunning] = useState<SessionProgress | undefined>()
   const [resumable, setResumable] = useState<SessionProgress | undefined>()
   /*
@@ -530,13 +572,135 @@ export function App() {
     )
   }
 
+  /*
+   * Eine Menüseite: Titel, Zurück, ein Inhalt — sonst nichts. `undefined`
+   * bei einem gesperrten Eintrag (Erreichtes ohne Erreichtes, Installation
+   * außerhalb von iOS) fällt still auf den Startbildschirm zurück.
+   */
+  if (pageId !== undefined) {
+    const reached = achievementsOf(achievementInput)
+    const pages: Partial<Record<MenuIconKind, { title: string; body: ReactNode }>> = {
+      ...(reached.length > 0
+        ? {
+            reached: {
+              title: dictionary.achievements.heading,
+              body: <AchievementsLine input={achievementInput} dictionary={dictionary} />,
+            },
+          }
+        : {}),
+      profile: {
+        title: dictionary.profile.heading,
+        body: <ProfilePanel counts={dimensionCounts} dictionary={dictionary} />,
+      },
+      about: {
+        title: dictionary.onboarding.editHeading,
+        body: <AboutPanel dictionary={dictionary} profile={profile} onSave={saveProfile} />,
+      },
+      palace: {
+        title: dictionary.palace.heading,
+        body: <PalacePanel dictionary={dictionary} own={own} onChange={reloadOwn} />,
+      },
+      reminder: {
+        title: dictionary.reminder.heading,
+        body: (
+          <ReminderPanel
+            platform={platform}
+            dictionary={dictionary}
+            daily={daily}
+            suggested={
+              profile?.dayPart === undefined ? undefined : reminderTimeFor(profile.dayPart)
+            }
+            onChange={reloadDaily}
+          />
+        ),
+      },
+      science: {
+        title: dictionary.science.heading,
+        body: <SciencePanel dictionary={dictionary} />,
+      },
+      ...(advice.kind === 'ios'
+        ? {
+            install: {
+              title: dictionary.install.heading,
+              body: (
+                <div className="privacy">
+                  <p className="privacy-lead">{dictionary.install.why}</p>
+                  <ol className="privacy-points">
+                    {dictionary.install.steps.map((step) => (
+                      <li key={step}>{step}</li>
+                    ))}
+                  </ol>
+                  <p className="hint">{dictionary.install.orBackup}</p>
+                </div>
+              ),
+            },
+          }
+        : {}),
+      privacy: {
+        title: dictionary.privacy.heading,
+        body: (
+          <div className="privacy">
+            <p className="privacy-lead">{dictionary.privacy.lead}</p>
+            <ul className="privacy-points">
+              {dictionary.privacy.points.map((point) => (
+                <li key={point}>{point}</li>
+              ))}
+            </ul>
+            <p className="hint">{dictionary.privacy.honest}</p>
+          </div>
+        ),
+      },
+      backup: {
+        title: dictionary.backup.heading,
+        body: <BackupPanel platform={platform} dictionary={dictionary} />,
+      },
+      check: {
+        title: dictionary.check.heading,
+        body: <FoundationPanel platform={platform} dictionary={dictionary} />,
+      },
+    }
+    const entry = pages[pageId]
+    if (entry !== undefined) {
+      return (
+        <main className="app page">
+          <header className="page-head">
+            <button type="button" className="quiet page-back" onClick={closePage}>
+              {dictionary.summary.back}
+            </button>
+          </header>
+          <h1 className="page-title">{entry.title}</h1>
+          <section className="page-body">{entry.body}</section>
+        </main>
+      )
+    }
+    setPageId(undefined)
+  }
+
   const seconds = MODES[mode].seconds
   const label = `${Math.floor(seconds / 60)}:${(seconds % 60).toString().padStart(2, '0')}`
 
   return (
     <main className="app">
       <header className="brand">
-        <h1>{dictionary.app.name}</h1>
+        <div className="brand-row">
+          <h1>{dictionary.app.name}</h1>
+          {/*
+            Der Menüknopf ist das einzige Möbel neben dem Namen — oben
+            rechts, wo ihn jede App-Gewohnheit vermutet. Er öffnet die Liste
+            der Seiten; der Startbildschirm selbst bleibt der eine Knopf.
+          */}
+          <button
+            type="button"
+            className="hamburger"
+            aria-expanded={menuOpen}
+            aria-label={dictionary.menu.heading}
+            onClick={() => setMenuOpen(true)}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+              <path d="M4 7h16M4 12h16M4 17h16" />
+            </svg>
+          </button>
+        </div>
         {/*
           Nicht der Werbespruch, sondern ein Satz für heute (D-011/G-7).
           Er wechselt mit dem Tag und ist deshalb aus dem Tagesschlüssel
@@ -841,103 +1005,85 @@ export function App() {
           Auskunft über den Nutzer, die aus dem Training kommt — die aus der
           Messung steht darüber und bleibt davon getrennt (F1).
         */}
-        <details className="details">
-          <summary>{dictionary.reminder.heading}</summary>
-          <ReminderPanel
-            platform={platform}
-            dictionary={dictionary}
-            daily={daily}
-            suggested={profile?.dayPart === undefined ? undefined : reminderTimeFor(profile.dayPart)}
-            onChange={reloadDaily}
-          />
-        </details>
-
-        <AchievementsLine input={achievementInput} dictionary={dictionary} />
-
-        <details className="details">
-          <summary>{dictionary.profile.heading}</summary>
-          <ProfilePanel counts={dimensionCounts} dictionary={dictionary} />
-        </details>
-
-        {/*
-          „Über dich“ — die Antworten aus dem Ankommen, jederzeit änderbar.
-          Direkt unter dem Gedächtnisprofil, und die Trennung ist dieselbe wie
-          dort (F1): Hier steht, was jemand über sich *gesagt* hat; darüber
-          steht, was gezählt wurde. Die beiden mischen sich nie.
-        */}
-        <details className="details">
-          <summary>{dictionary.onboarding.editHeading}</summary>
-          <AboutPanel dictionary={dictionary} profile={profile} onSave={saveProfile} />
-        </details>
-
-        <details className="details">
-          <summary>{dictionary.palace.heading}</summary>
-          {/*
-            Kein `key`, der den Baustein neu montiert: Der erste Anlauf hängte
-            ihn an den Namen des Palastes, und damit verschwand ausgerechnet
-            beim Speichern die Bestätigung — der Baustein wurde in dem Moment
-            ausgetauscht, in dem er sie zeigen sollte. Ein E2E-Lauf hat es
-            gefunden. Die Felder pflegt er selbst.
-          */}
-          <PalacePanel dictionary={dictionary} own={own} onChange={reloadOwn} />
-        </details>
-
-        <details className="details">
-          <summary>{dictionary.science.heading}</summary>
-          <SciencePanel dictionary={dictionary} />
-        </details>
-
-        {/*
-          Der Weg auf den Startbildschirm steht **über** dem Datenschutz und
-          der Sicherung, weil er auf iOS dieselbe Gefahr betrifft: Im Browser
-          kann der Speicher nach sieben Tagen ohne Benutzung weggeräumt werden
-          (Q5). Anderswo steht hier nichts — dort ist es ein Angebot und keine
-          Warnung, und die Einladung des Browsers reicht.
-        */}
-        {advice.kind === 'ios' && (
-          <details className="details">
-            <summary>{dictionary.install.heading}</summary>
-            <div className="privacy">
-              <p className="privacy-lead">{dictionary.install.why}</p>
-              <ol className="privacy-points">
-                {dictionary.install.steps.map((step) => (
-                  <li key={step}>{step}</li>
-                ))}
-              </ol>
-              <p className="hint">{dictionary.install.orBackup}</p>
-            </div>
-          </details>
-        )}
-
-        {/*
-          Der Datenschutz steht bei der Sicherung, weil beides dieselbe Frage
-          beantwortet: Wo liegen meine Daten? Die lange Fassung steht in
-          `docs/PRIVACY.md` und im Store-Eintrag — hier die fünf Zeilen, die
-          jemand wirklich wissen will (R4).
-        */}
-        <details className="details">
-          <summary>{dictionary.privacy.heading}</summary>
-          <div className="privacy">
-            <p className="privacy-lead">{dictionary.privacy.lead}</p>
-            <ul className="privacy-points">
-              {dictionary.privacy.points.map((point) => (
-                <li key={point}>{point}</li>
-              ))}
-            </ul>
-            <p className="hint">{dictionary.privacy.honest}</p>
-          </div>
-        </details>
-
-        <details className="details">
-          <summary>{dictionary.backup.heading}</summary>
-          <BackupPanel platform={platform} dictionary={dictionary} />
-        </details>
-
-        <details className="details">
-          <summary>{dictionary.check.heading}</summary>
-          <FoundationPanel platform={platform} dictionary={dictionary} />
-        </details>
       </footer>
+
+      {/*
+        Die Schublade: dieselben zwei Gruppen wie im Kopf gedacht — Dein
+        Stand (was aus dem Training über dich zu sagen ist) und App & Gerät
+        (alles Technische). „Erreicht“ steht nur da, wenn es etwas gibt (K7),
+        „Auf den Startbildschirm“ nur auf iOS. Bernstein gehört dem Menschen,
+        das kühle Grün dem Gerät — dieselbe Teilung wie überall (G-8).
+      */}
+      {menuOpen && (
+        <div className="drawer-veil" onClick={() => setMenuOpen(false)}>
+          <nav
+            className="drawer"
+            aria-label={dictionary.menu.heading}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="drawer-close"
+              aria-label={dictionary.menu.close}
+              onClick={() => setMenuOpen(false)}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+                <path d="M6 6l12 12M18 6L6 18" />
+              </svg>
+            </button>
+            <section className="menu-group">
+              <h2 className="menu-label">{dictionary.menu.yours}</h2>
+              {achievementsOf(achievementInput).length > 0 && (
+                <button type="button" className="drawer-item" onClick={() => openPage('reached')}>
+                  <MenuIcon kind="reached" />
+                  <span>{dictionary.achievements.heading}</span>
+                </button>
+              )}
+              <button type="button" className="drawer-item" onClick={() => openPage('profile')}>
+                <MenuIcon kind="profile" />
+                <span>{dictionary.profile.heading}</span>
+              </button>
+              <button type="button" className="drawer-item" onClick={() => openPage('about')}>
+                <MenuIcon kind="about" />
+                <span>{dictionary.onboarding.editHeading}</span>
+              </button>
+              <button type="button" className="drawer-item" onClick={() => openPage('palace')}>
+                <MenuIcon kind="palace" />
+                <span>{dictionary.palace.heading}</span>
+              </button>
+            </section>
+            <section className="menu-group menu-group-device">
+              <h2 className="menu-label">{dictionary.menu.device}</h2>
+              <button type="button" className="drawer-item" onClick={() => openPage('reminder')}>
+                <MenuIcon kind="reminder" />
+                <span>{dictionary.reminder.heading}</span>
+              </button>
+              <button type="button" className="drawer-item" onClick={() => openPage('science')}>
+                <MenuIcon kind="science" />
+                <span>{dictionary.science.heading}</span>
+              </button>
+              {advice.kind === 'ios' && (
+                <button type="button" className="drawer-item" onClick={() => openPage('install')}>
+                  <MenuIcon kind="install" />
+                  <span>{dictionary.install.heading}</span>
+                </button>
+              )}
+              <button type="button" className="drawer-item" onClick={() => openPage('privacy')}>
+                <MenuIcon kind="privacy" />
+                <span>{dictionary.privacy.heading}</span>
+              </button>
+              <button type="button" className="drawer-item" onClick={() => openPage('backup')}>
+                <MenuIcon kind="backup" />
+                <span>{dictionary.backup.heading}</span>
+              </button>
+              <button type="button" className="drawer-item" onClick={() => openPage('check')}>
+                <MenuIcon kind="check" />
+                <span>{dictionary.check.heading}</span>
+              </button>
+            </section>
+          </nav>
+        </div>
+      )}
     </main>
   )
 }

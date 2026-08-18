@@ -1,10 +1,10 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { startButton, visit } from './helpers.ts'
+import { openPage, startButton, visit } from './helpers.ts'
 
 /** Der Systemcheck liegt zusammengeklappt am Fuß (D-011/G-2). */
 async function openFoundation(page: Page) {
-  await page.getByText('Fundament', { exact: true }).click()
+  await openPage(page, 'Fundament')
   await expect(page.locator('.foundation')).toBeVisible()
 }
 
@@ -141,7 +141,9 @@ test('ist als App installierbar', async ({ page, request }) => {
     (manifest.icons as { purpose?: string }[]).some((icon) => icon.purpose === 'maskable'),
   ).toBe(true)
 
-  // Der Service Worker ist die Bedingung für „ohne Netz nutzbar“.
+  // Der Service Worker ist die Bedingung für „ohne Netz nutzbar“ — die
+  // Anzeige dazu steht seit dem Menü-Umbau auf ihrer eigenen Seite.
+  await openPage(page, 'Fundament')
   await expect(page.locator('.foundation .row', { hasText: 'Ohne Netz' }).locator('dd')).toHaveText(
     /bereit|wird eingerichtet/,
   )

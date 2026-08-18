@@ -1,6 +1,6 @@
 import { devices, expect, test } from '@playwright/test'
 
-import { startButton, visit } from './helpers.ts'
+import { openPage, startButton, visit } from './helpers.ts'
 
 /**
  * Der Weg auf den Startbildschirm (Backlog Q5).
@@ -16,7 +16,7 @@ test('sagt auf dem iPhone, warum der Startbildschirm zählt', async ({ browser }
 
   await visit(page)
   await expect(startButton(page)).toBeVisible()
-  await page.getByText('Auf den Startbildschirm', { exact: true }).click()
+  await openPage(page, 'Auf den Startbildschirm')
 
   // Der Grund zuerst — er ist eine Tatsache über iOS und keine Werbung.
   await expect(page.getByText(/sieben Tage lang nicht benutzt wurde/)).toBeVisible()
@@ -34,6 +34,9 @@ test('schweigt auf Android und am Schreibtisch', async ({ page }) => {
    */
   await visit(page)
   await expect(startButton(page)).toBeVisible()
+  // Auch im geöffneten Menü nicht — dort stünde er, wenn es ihn gäbe.
+  await page.locator('button.hamburger').click()
+  await expect(page.locator('.drawer')).toBeVisible()
   await expect(page.getByText('Auf den Startbildschirm', { exact: true })).toHaveCount(0)
 })
 
