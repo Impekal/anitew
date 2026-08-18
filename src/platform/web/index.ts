@@ -1,6 +1,7 @@
 import type { Platform } from '../../core/index.ts'
 
 import { createWebClock } from './clock.ts'
+import { createWebReminders } from './reminders.ts'
 import { createWebSettings } from './settings.ts'
 import { createWebSound } from './sound.ts'
 
@@ -20,5 +21,6 @@ export function createWebPlatform(): Platform {
     // Ton eingeschaltet hat, soll ihn nicht erst nach einer Zehntelsekunde
     // bekommen und den ersten Anschlag verpassen.
     sound: createWebSound(true),
+    reminders: createWebReminders(),
   }
 }

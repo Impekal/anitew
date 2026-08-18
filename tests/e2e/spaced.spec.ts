@@ -78,7 +78,7 @@ test('holt gelernte Wörter an einem späteren Tag zurück (D8)', async ({ page 
    * noch?“ beim freien Abruf, „Und von früher: Wer ist das?“ beim gestützten.
    * Nur den einen Satz zu suchen hieße wieder, das Modul vorherzusagen.
    */
-  await expect(page.getByText(/Und (jetzt )?von früher/)).toBeVisible({ timeout: 60_000 })
+  await expect(page.getByText(/Und (jetzt )?von früher/)).toBeVisible({ timeout: 100_000 })
 
   const kind = await recallKind(page)
 

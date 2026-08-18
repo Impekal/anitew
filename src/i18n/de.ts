@@ -361,6 +361,36 @@ export const de = {
     noWeakest: 'Kein Unterschied zwischen den Achsen, der sich vom Zufall trennen lässt.',
     empty: 'Noch nichts zu zeigen. Das Profil entsteht aus dem Training — nicht aus einem Test am Anfang.',
   },
+  reminder: {
+    /*
+      Erinnerungen (B8 · D-022).
+
+      Der heikelste Text der App nach der Messung: Hier wird etwas
+      **zugesagt**, und das Web kann diese Zusage nicht halten. Also sagt sie
+      genau das — vor der Einstellung und nicht als Fußnote danach. Eine App,
+      die eine Erinnerung ankündigt und keine schickt, hat schlimmer gelogen,
+      als wenn sie gar keine angeboten hätte (R-2).
+    */
+    heading: 'Erinnerung',
+    note: 'Ohne Konto, ohne Server. Was hier eingestellt wird, bleibt auf dem Gerät.',
+    // Die drei Fähigkeitsstufen, im Klartext.
+    whileOpen: 'Auf diesem Gerät kann ANITEW nur erinnern, **solange es offen ist** — auch im Hintergrund, aber nicht nach dem Schließen. Eine feste Uhrzeit am nächsten Tag lässt sich im Browser nicht zusagen. Die Uhrzeit wird trotzdem gemerkt: Sie gilt, sobald ANITEW als App aus dem Store läuft.',
+    scheduled: 'Erinnerungen kommen an, auch wenn ANITEW geschlossen ist.',
+    none: 'Erinnerungen sind auf diesem Gerät nicht möglich.',
+    denied: 'Benachrichtigungen sind für ANITEW abgelehnt. Das lässt sich nur in den Einstellungen des Browsers ändern — von hier aus geht es nicht.',
+    ask: 'Benachrichtigungen erlauben',
+    time: 'Uhrzeit',
+    save: 'Erinnerung merken',
+    off: 'Keine Erinnerung',
+    saved: 'Gemerkt.',
+    cleared: 'Aus.',
+    // Der Text der Erinnerung selbst. Keine Drohung, keine Serie, kein
+    // Ausrufezeichen (D-015): nur, dass jetzt die Zeit wäre.
+    dailyTitle: 'ANITEW',
+    dailyBody: 'Jetzt wären die fünf Minuten.',
+    benchmarkTitle: 'Die Messung wartet',
+    benchmarkBody: 'Zwanzig Minuten sind um. Was ist geblieben?',
+  },
   streak: {
     /*
       Die Serie sagt, was war — mehr nicht (K7). Keine Drohung, kein

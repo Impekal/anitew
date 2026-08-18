@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import {
+  BENCHMARK_REMINDER_ID,
   BENCHMARK_SECONDS_PER_ITEM,
+  benchmarkReminderAt,
   type BenchmarkPhase,
   type BenchmarkRun,
   type Platform,
@@ -188,11 +190,34 @@ function Recall({
        * Zahl kleiner, aber nicht richtiger.
        */
       const graded = gradeRecall(splitEntries(text), items)
-      void recordPhase(runId, phase, graded.correct.length, platform.clock.now())
+      const at = platform.clock.now()
+
+      /*
+       * Nach dem ersten Abruf beginnt das Zwanzig-Minuten-Fenster — und damit
+       * die einzige Stelle der App, an der eine Erinnerung wirklich etwas
+       * rettet (B8, D-022): Wer sie verpasst, hat eine Messung umsonst
+       * gemacht, denn eine unvollständige zählt nicht (F1).
+       *
+       * Ob sie ankommt, entscheidet die Plattform. Hier wird nichts
+       * versprochen, was `Reminders` nicht halten kann — im Browser hält der
+       * Wecker nur, solange ANITEW offen ist, und der Panel sagt das auch.
+       */
+      if (phase === 'immediate') {
+        void platform.reminders
+          .schedule({
+            id: BENCHMARK_REMINDER_ID,
+            at: benchmarkReminderAt(at),
+            title: dictionary.reminder.benchmarkTitle,
+            body: dictionary.reminder.benchmarkBody,
+          })
+          .catch(() => undefined)
+      }
+
+      void recordPhase(runId, phase, graded.correct.length, at)
         .catch(() => undefined)
         .finally(onDone)
     },
-    [items, onDone, phase, platform, runId],
+    [dictionary, items, onDone, phase, platform, runId],
   )
 
   useEffect(() => {

@@ -67,9 +67,50 @@ export interface Sound {
   isEnabled(): boolean
 }
 
+/**
+ * Was die Plattform an Erinnerungen wirklich kann (Backlog B8).
+ *
+ * Diese drei Stufen sind der Grund, warum es diese Schnittstelle überhaupt
+ * gibt. Im Web lässt sich eine Benachrichtigung **nicht** verlässlich für
+ * später einplanen: Der Weg dafür (`TimestampTrigger`) ist nie über einen
+ * Versuch hinausgekommen, und der übliche Ersatz ist ein Server, der pusht —
+ * den es hier nicht gibt und nicht geben soll (D-003).
+ *
+ * Also wird die Fähigkeit **abgefragt und gesagt**, statt sie anzunehmen. Eine
+ * App, die eine Erinnerung verspricht und keine schickt, hat schlimmer
+ * gelogen, als wenn sie gar keine angeboten hätte (R-2).
+ */
+export type ReminderAbility =
+  /** Erinnert auch, wenn die App zu ist. */
+  | 'scheduled'
+  /** Erinnert nur, solange die App offen ist. */
+  | 'whileOpen'
+  /** Kann nicht erinnern — kein Recht, keine Unterstützung, kein sicherer Kontext. */
+  | 'none'
+
+export type ReminderPermission = 'granted' | 'denied' | 'unasked'
+
+export interface Reminder {
+  /** Damit sich dieselbe Erinnerung ersetzen statt verdoppeln lässt. */
+  id: string
+  at: Instant
+  title: string
+  body: string
+}
+
+export interface Reminders {
+  ability(): ReminderAbility
+  permission(): ReminderPermission
+  ask(): Promise<ReminderPermission>
+  /** Plant eine Erinnerung. Gibt zurück, ob sie **wirklich** geplant wurde. */
+  schedule(reminder: Reminder): Promise<boolean>
+  cancel(id: string): Promise<void>
+}
+
 /** Alles, was die App von der Plattform bekommt, an einer Stelle. */
 export interface Platform {
   clock: Clock
   settings: SettingsStore
   sound: Sound
+  reminders: Reminders
 }

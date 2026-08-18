@@ -13,8 +13,13 @@ import {
   namePool,
   READY_PALACES,
   type OwnPalace,
+  DAILY_REMINDER_ID,
   type DimensionCounts,
   type DimensionId,
+  type TimeOfDay,
+  needsDailyReminder,
+  nextDailyAt,
+  reminderDay,
   learnableModules,
   moduleForDimension,
   numberPool,
@@ -42,11 +47,13 @@ import {
 } from '../data/sessions.ts'
 import { abandonRun, beginRun, loadOpenRun, loadRuns } from '../data/benchmark.ts'
 import { loadOwnPalace } from '../data/palace.ts'
+import { loadDailyTime } from '../data/reminders.ts'
 import { loadPalaceTaught, loadTaught } from '../data/technique.ts'
 
 import { BackupPanel } from './BackupPanel.tsx'
 import { PalacePanel } from './PalacePanel.tsx'
 import { ProfilePanel } from './ProfilePanel.tsx'
+import { ReminderPanel } from './ReminderPanel.tsx'
 import { SciencePanel } from './SciencePanel.tsx'
 import { FoundationPanel } from './FoundationPanel.tsx'
 import { ReturnsLine } from './ReturnsLine.tsx'
@@ -280,6 +287,42 @@ export function App() {
   }, [platform])
 
   const streak = useMemo(() => streakOf(trainingDays, today), [trainingDays, today])
+
+  /*
+   * Die Tageserinnerung (B8).
+   *
+   * Sie wird nach **jeder** Einheit neu gesetzt, und sie entfällt für heute,
+   * sobald heute trainiert wurde: Eine App, die abends fragt, ob man schon
+   * geübt hat, obwohl sie es weiß, ist lästig und wirkt dumm.
+   */
+  const [daily, setDaily] = useState<TimeOfDay | undefined>(undefined)
+  const reloadDaily = useCallback(() => {
+    void loadDailyTime()
+      .then(setDaily)
+      .catch(() => undefined)
+  }, [])
+  useEffect(reloadDaily, [reloadDaily, running])
+
+  useEffect(() => {
+    if (daily === undefined) {
+      void platform.reminders.cancel(DAILY_REMINDER_ID).catch(() => undefined)
+      return
+    }
+    const now = platform.clock.now()
+    const at = nextDailyAt(daily, now, platform.clock.offsetMinutes(now))
+    if (!needsDailyReminder(trainingDays, reminderDay(at, platform.clock.offsetMinutes(at)))) {
+      void platform.reminders.cancel(DAILY_REMINDER_ID).catch(() => undefined)
+      return
+    }
+    void platform.reminders
+      .schedule({
+        id: DAILY_REMINDER_ID,
+        at,
+        title: dictionary.reminder.dailyTitle,
+        body: dictionary.reminder.dailyBody,
+      })
+      .catch(() => undefined)
+  }, [daily, dictionary, platform, trainingDays])
 
   /*
    * Die Wiedersehen — gerechnet, nicht fortgeschrieben (D-019). Nach jeder
@@ -644,6 +687,16 @@ export function App() {
           Auskunft über den Nutzer, die aus dem Training kommt — die aus der
           Messung steht darüber und bleibt davon getrennt (F1).
         */}
+        <details className="details">
+          <summary>{dictionary.reminder.heading}</summary>
+          <ReminderPanel
+            platform={platform}
+            dictionary={dictionary}
+            daily={daily}
+            onChange={reloadDaily}
+          />
+        </details>
+
         <details className="details">
           <summary>{dictionary.profile.heading}</summary>
           <ProfilePanel counts={dimensionCounts} dictionary={dictionary} />

@@ -115,7 +115,19 @@ export async function collectItems(page: Page, limit = 12): Promise<Learned> {
   while (seen.length < limit) {
     if ((await page.locator('.recall-input').count()) > 0) break
     expect(Date.now(), 'der Abruf hat nicht begonnen').toBeLessThan(deadline)
-    const text = (await word.textContent().catch(() => null))?.trim()
+    /*
+     * Mit **kurzer** Frist, und das ist der eigentliche Fehler, den zwei
+     * hängende Prüfungen gekostet haben: `textContent()` wartet von Haus aus
+     * dreißig Sekunden darauf, dass es das Element gibt. Sobald der Abruf
+     * beginnt, verschwindet `.encode-word` — die Schleife hing dann eine halbe
+     * Minute in dieser einen Zeile, während der Abrufblock ablief und die
+     * Einheit weiterlief. Wenn sie wieder aufwachte, war die Einheit vorbei
+     * und `.recall-input` nie wieder da.
+     *
+     * **Ein Warten ohne Frist in einer Schleife, die pollen soll, schaltet
+     * das Pollen ab.**
+     */
+    const text = (await word.textContent({ timeout: 1000 }).catch(() => null))?.trim()
     if (text !== undefined && text !== '' && text !== seen[seen.length - 1]) seen.push(text)
     await page.waitForTimeout(150)
   }

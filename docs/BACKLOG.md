@@ -69,7 +69,7 @@ unter „Nicht-Ziele“.
 | B5 | Session ist unterbrechungsfest: App-Wechsel, Anruf, Bildschirm aus, Absturz | ✅ 2026-08-17 | Fortschritt wird nach **jedem Wort** geschrieben, nicht am Blockende. E2E prüft den harten Fall: Seite mitten in der Einheit neu geladen → „Fortsetzen“ | M |
 | B6 | Abschlussbildschirm mit ehrlichen Zahlen (siehe F) | ✅ 2026-08-17 | eine einzige echte Zahl (x von y erinnert), kein Prozentwert, keine „Memory Strength“ — die käme aus dem Benchmark (D-006) | S |
 | B7 | Weitermachen nach der Tages-Challenge: freies Training, zählt für Fortschritt, aber ohne Druck | ⬜ | „Man kann natürlich mehr wählen“ | S |
-| B8 | Tageserinnerung als **lokale** Benachrichtigung, opt-in, feste Uhrzeit wählbar | ⬜ | kein Server-Push, kein Konto | M |
+| B8 | Tageserinnerung als **lokale** Benachrichtigung, opt-in, feste Uhrzeit wählbar | 🟨 2026-08-18 | **D-022**. Der Mechanismus steht und die Uhrzeit wird gemerkt — aber das Web kann eine Benachrichtigung nicht für später einplanen (`TimestampTrigger` gibt es nirgends dauerhaft, und ein Server-Push kommt nicht in Frage). Die App **sagt das**, vor der Einstellung. Zugesagt werden kann es erst als App aus dem Store (Q) | M |
 | B9 | Session-Log: jede Antwort mit Item-ID, richtig/falsch, Latenz, Kontext | ✅ 2026-08-17 | ein Ereignis **je Wort**, nicht „6 von 8“ — ohne diese Auflösung gäbe es später keine Vergessenskurve pro Information. Nur anhängen, nie ändern | M |
 
 ## C. Memory Engine — Spacing & Retrieval
@@ -155,7 +155,7 @@ Abruftraining. Hier entscheidet sich, ob die App wirkt.
 |---|---|---|---|---|
 | H1 | Szenenformat: Szene + Fakten + Fragen als Datenmodell | ✅ 2026-08-17 | **D-014**. `Mission` = Person + Tatsachen; die Kennung `Elena#room` trägt den Anker mit. **Gefragt wird nach dem Wert, verbucht wird die Kennung** — überall sonst ist das dasselbe, hier nicht | M |
 | H2 | Referenzmission „The Hotel“ vollständig umgesetzt | 🟨 2026-08-17 | Zimmer · Gegenstand · Person · Abfahrt · Restaurant laufen. „Schlüssel auf Tisch“ fehlt noch: Eine **Ortsangabe zu einem Gegenstand** ist eine andere Art Tatsache und braucht eine eigene Frage | M |
-| H3 | **Verzögerter Abruf**: 20 Minuten später fragt die App nach | ⬜ | braucht B8 (lokale Benachrichtigung) und einen Weg, wenn die App zu ist | M |
+| H3 | **Verzögerter Abruf**: 20 Minuten später fragt die App nach | ⬜ | wartet weiter auf B8 — und nach **D-022** ist klar, dass „einen Weg, wenn die App zu ist“ im Browser gar nicht existiert. Der verzögerte Abruf einer Mission ist deshalb ein Store-Thema (Q), kein Web-Thema. Die Messung kommt bereits ohne ihn aus, weil ihr Fenster 30 Minuten breit ist | M |
 | H4 | Prozedurale Missionsgenerierung aus Bausteinen — offline, ohne KI | 🟨 2026-08-17 | sonst ist der Vorrat nach zwei Wochen leer. Eine Vorlage (Hotel) mit Farben, Gegenständen, Lokalnamen, Zimmern und Zeiten — aus dem Namen erzeugt, also unbegrenzt. Weitere Vorlagen fehlen | L |
 | H5 | Missionsbibliothek, mehrsprachig und kulturell passend bestückt | ⬜ | hängt an L6 | M |
 | H6 | Schwierigkeitsstufen: Faktenzahl, Ablenkung, Betrachtungszeit, Abrufabstand | ⬜ | Die Betrachtungszeit ist seit H1 eine Moduleigenschaft (`secondsPerItemFor`) — der Haken, an dem das hängen kann | M |
@@ -263,8 +263,8 @@ Anforderung wie jede andere. Die acht Regeln G-1 bis G-8 stehen in
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | ✅ 2026-08-18 | 280 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Sessionplanung, Bewertung, Scheduler, Gesichtsgenerator, die ganze Messung und die Wirkungsaussagen (R5) sind abgedeckt | M |
-| P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | ✅ 2026-08-18 | 118 Läufe in Chromium und im Telefonprofil, darunter eine Einheit von vorn bis hinten und der Abbruch mitten drin. Seit M4 **liest der Test ab, welches Modul kam, statt es vorherzusagen** (`tests/e2e/helpers.ts`) | M |
+| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | ✅ 2026-08-18 | 288 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Sessionplanung, Bewertung, Scheduler, Gesichtsgenerator, die ganze Messung und die Wirkungsaussagen (R5) sind abgedeckt | M |
+| P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | ✅ 2026-08-18 | 126 Läufe in Chromium und im Telefonprofil, darunter eine Einheit von vorn bis hinten und der Abbruch mitten drin. Seit M4 **liest der Test ab, welches Modul kam, statt es vorherzusagen** (`tests/e2e/helpers.ts`) | M |
 | P3 | CI bei jedem Push: Typecheck (App **und** Kern getrennt), Tests, Build, E2E | ✅ 2026-08-17 | | S |
 | P4 | Performance: Kaltstart unter 2 s, Timer laufen ruckelfrei | ⬜ | | M |
 | P5 | Uhrmanipulation darf die Engine nicht zerstören (Streak-Betrug, Intervall-Chaos) | ⬜ | monotone Zeitquelle plus Plausibilitätsprüfung | M |

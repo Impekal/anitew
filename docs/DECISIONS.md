@@ -851,3 +851,44 @@ deine Schwachstelle“ steht erst da, wenn sich die Spannen zweier Achsen nicht
 überlappen. Sonst hieße es nur, dass der Zufall an diesem Tag so lag — und
 eine App, die daraufhin den Trainingsplan umbaut (E5), baut ihn auf Rauschen
 um.
+
+---
+
+## D-022 · 2026-08-18 · Erinnerungen werden abgefragt, nicht angenommen
+
+**Entscheidung:** Die Fähigkeit, zu erinnern, ist eine **Eigenschaft der
+Plattform** und wird als solche abgefragt (`Reminders.ability()`), bevor die
+App irgendetwas anbietet. Drei Stufen: `scheduled` (auch bei geschlossener
+App), `whileOpen` (nur solange ANITEW läuft), `none`.
+
+**Warum das nötig ist:** Das Web kann eine Benachrichtigung **nicht** für
+später einplanen. Der Weg dafür (`TimestampTrigger`) ist über einen Versuch
+nie hinausgekommen und in keinem Browser dauerhaft verfügbar; der übliche
+Ersatz ist ein Server, der zur richtigen Zeit pusht — den es hier nicht gibt
+und nicht geben soll (D-003, R-3). Was bleibt, ist ein Wecker innerhalb der
+laufenden Seite: Er hält auch im Hintergrund, aber nicht über das Schließen
+hinaus.
+
+Damit steht B8 („Tageserinnerung, feste Uhrzeit wählbar“) im Browser auf
+wackligem Grund — und genau das sagt die App, **vor** der Einstellung und
+nicht als Fußnote danach. Eine App, die eine Erinnerung ankündigt und keine
+schickt, hat schlimmer gelogen, als wenn sie gar keine angeboten hätte (R-2).
+Die gewählte Uhrzeit wird trotzdem gemerkt: Sie gilt, sobald ANITEW als App
+aus dem Store läuft (Backlog Q) — dann tritt neben `platform/web/` eine zweite
+Umsetzung, und der Kern merkt nichts davon (D-010).
+
+**Gefragt wird spät.** Das Recht auf Benachrichtigungen wird erst dort
+erbeten, wo jemand eine Erinnerung wirklich will — nicht beim ersten Start.
+Wer eine App öffnet und sofort gefragt wird, lehnt ab, und eine Ablehnung
+lässt sich von der App aus nie wieder zurücknehmen.
+
+**Der Text ist keine Drohung.** „Jetzt wären die fünf Minuten.“ Kein „deine
+Serie läuft ab“, kein Countdown, keine Zahl (D-015). Und es wird gar nicht
+erinnert, wenn heute schon trainiert wurde — eine App, die abends fragt, ob
+man schon geübt hat, obwohl sie es weiß, ist lästig und wirkt dumm.
+
+**Die eine Stelle, an der es wirklich etwas rettet**, ist die Messung: Nach
+dem ersten Abruf läuft ein Fenster von 15 bis 45 Minuten, und wer es verpasst,
+hat eine Messung umsonst gemacht (F1). Erinnert wird nach **zwanzig** Minuten
+— in der ersten Hälfte des Fensters, damit fünfundzwanzig Minuten Luft
+bleiben.

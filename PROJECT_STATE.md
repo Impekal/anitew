@@ -1645,3 +1645,120 @@ auf `waitForTimeout` zeigte und damit auf gar nichts.
 Sie hat jetzt eine Frist von neunzig Sekunden und sagt beim Anschlagen, was
 fehlt. Der längste Einprägeblock dauert dreißig; wer hier anschlägt, hat kein
 Zeitproblem, sondern ein anderes — und liest das dann auch.
+
+---
+
+## 2026-08-18 · Erinnerungen (B8) — und was das Web nicht kann
+
+B8 sah nach einer kleinen Aufgabe aus: „Tageserinnerung als lokale
+Benachrichtigung, opt-in, feste Uhrzeit wählbar.“ Beim Bauen stellte sich
+heraus, dass die eigentliche Arbeit nicht im Einplanen liegt, sondern im
+**Zugeben**.
+
+### Das Web kann es nicht
+
+Eine Benachrichtigung lässt sich im Browser **nicht für später einplanen**.
+Der Weg dafür (`TimestampTrigger`) ist über einen Versuch nie hinausgekommen
+und in keinem Browser dauerhaft verfügbar. Der übliche Ersatz ist ein Server,
+der zur richtigen Zeit pusht — den es hier nicht gibt und nicht geben soll
+(D-003). Was bleibt, ist ein Wecker innerhalb der laufenden Seite: Er hält
+auch im Hintergrund, aber nicht über das Schließen hinaus.
+
+Damit gab es zwei ehrliche Möglichkeiten: B8 auf die Store-Fassung verschieben
+— oder den Mechanismus bauen und **sagen**, was er kann. Ich habe das zweite
+gewählt, weil die Uhrzeit dann schon gespeichert ist, wenn ANITEW später als
+App läuft, und weil die Fähigkeit als Frage in der Schnittstelle steht
+(`Reminders.ability()`) statt als Annahme im Code.
+
+Auf dem Bildschirm steht die Einschränkung **vor** der Einstellung, nicht als
+Fußnote danach. Umgekehrt hätte jemand eine Uhrzeit gewählt und läse
+hinterher, dass sie nicht gilt.
+
+### Zwei Regeln, die den Ton machen
+
+**Gefragt wird spät.** Das Recht auf Benachrichtigungen wird erst dort
+erbeten, wo jemand eine Erinnerung wirklich will — nicht beim ersten Start.
+Wer eine App öffnet und sofort gefragt wird, lehnt ab, und eine Ablehnung
+lässt sich von der App aus nie wieder zurücknehmen.
+
+**Der Text ist keine Drohung.** „Jetzt wären die fünf Minuten.“ Keine Serie,
+kein Countdown, keine Zahl. Und es wird gar nicht erinnert, wenn heute schon
+trainiert wurde: Eine App, die abends fragt, ob man schon geübt hat, obwohl
+sie es weiß, ist lästig und wirkt dumm.
+
+### Wo es wirklich etwas rettet
+
+Nicht die Tageserinnerung, sondern die **Messung**: Nach dem ersten Abruf
+läuft ein Fenster von 15 bis 45 Minuten, und wer es verpasst, hat eine Messung
+umsonst gemacht (F1). Dort wird jetzt nach zwanzig Minuten erinnert — in der
+ersten Hälfte des Fensters, damit fünfundzwanzig Minuten Luft bleiben.
+
+Und für H3 (der verzögerte Abruf einer Mission) ist damit etwas klar, das
+vorher nur als Nebensatz im Backlog stand: **Er ist kein Web-Thema.** Ohne
+zugesagte Benachrichtigung gibt es keinen Weg, jemanden nach zwanzig Minuten
+zu erreichen. Die Messung kommt ohne aus, weil ihr Fenster dreißig Minuten
+breit ist; eine Mission könnte das nicht.
+
+### Zwei Sterne, die auf dem Bildschirm standen
+
+Beim Prüfen der Erinnerungsseite fiel ein Fehler auf, der schon länger drin
+war: In zwei Texten standen `**Sterne**` für Hervorhebungen — und React zeigt
+eine Zeichenkette so, wie sie dasteht. Auf der Wissenschaftsseite stand also
+wörtlich „ist damit **nicht** gezeigt“.
+
+Die Sterne einfach zu entfernen wäre der falsche Weg gewesen: An beiden
+Stellen **trägt** die Hervorhebung die Aussage. Jetzt gibt es zwölf Zeilen
+`Emphasis` — mehr als fett kann es nicht, und mehr soll es nicht können; eine
+Markdown-Abhängigkeit öffnete eine Tür, durch die Übersetzungen kein Markup
+tragen sollen. Ein Test hält seither fest, dass Sterne **paarweise** stehen:
+Ein einzelner bliebe stehen und sähe aus wie ein Tippfehler.
+
+**Stand:** 288 Kerntests, 126 E2E-Läufe, Typecheck für App und Kern grün.
+
+### Ein Selektor, der vier Jahre lang immer etwas fand
+
+Beim vollen Lauf fiel eine Prüfung um, die vorher grün war — und der Grund ist
+lehrreicher als die Erinnerungen selbst.
+
+`getByRole('button', { name: 'Begin' })` sollte prüfen, ob die App nach einem
+Neustart noch auf Englisch steht. Playwright vergleicht Namen als
+Teilzeichenkette und ohne Rücksicht auf Groß- und Kleinschreibung — und
+**„Begin“ steckt in „Messung beginnen“**. Die Prüfung war also grün, egal
+welche Sprache dastand. Vierte Begegnung mit derselben Falle in diesem
+Projekt; sie hat inzwischen „Beginnen“, „5 Minuten“, „Aus.“ und jetzt „Begin“
+erwischt.
+
+Nachdem der Selektor genauer war (die Beschriftung des Startknopfes statt sein
+Rollenname), kam sofort ein zweiter Fund heraus: Die Prüfung lud die Seite
+**unmittelbar** nach der Sprachwahl neu — der Bildschirm wechselt sofort,
+geschrieben wird eine Spur später. Im Alltag trifft das niemanden, in einer
+Prüfung mit Millisekunden schon. Sie wartet jetzt, bis die Wahl wirklich auf
+dem Gerät steht: Gefragt ist „überlebt sie einen Neustart“, nicht „überlebt
+sie einen Neustart fünf Millisekunden später“.
+
+**Die Lehre, die ich mir für dieses Projekt notiere:** Ein Selektor, der immer
+etwas findet, ist schlimmer als einer, der nie etwas findet. Der zweite fällt
+sofort auf.
+
+### Der Fehler, der die Prüfungen hängen ließ
+
+Zwei Prüfungen fielen im vollen Lauf um, beide mit derselben nichtssagenden
+Meldung („Target page closed“), und beide zeigten im Abzug etwas Verräterisches:
+**Die Einheit war längst vorbei und die Zusammenfassung stand da**, während der
+Test noch auf den Beginn des Abrufs wartete.
+
+Die Ursache lag in einer einzigen Zeile im gemeinsamen Helfer:
+
+    const text = (await word.textContent().catch(() => null))?.trim()
+
+`textContent()` wartet von Haus aus **dreißig Sekunden** darauf, dass es das
+Element überhaupt gibt. Sobald der Abruf beginnt, verschwindet `.encode-word` —
+die Schleife hing dann eine halbe Minute in dieser Zeile, während der Abrufblock
+ablief. Als sie wieder aufwachte, war die Einheit fertig und `.recall-input` nie
+wieder da. Danach drehte sie bis zur Zeitgrenze.
+
+**Ein Warten ohne Frist in einer Schleife, die pollen soll, schaltet das Pollen
+ab.** Die Zeile hat jetzt eine Sekunde Frist. Die Frist von neunzig Sekunden,
+die ich der Schleife zwei Runden vorher gegeben hatte, hat übrigens nicht
+gegriffen — sie prüfte zwischen den Iterationen, und genau dort kam die
+Schleife ja nicht mehr an. Eine Frist an der falschen Stelle ist keine.

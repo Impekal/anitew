@@ -87,6 +87,27 @@ describe('was ANITEW über sich selbst sagt', () => {
     }
   })
 
+  it('setzt Hervorhebungen paarweise', () => {
+    /*
+     * Zwei Sterne machen fett (`app/Emphasis.tsx`). Ein einzelner Stern bleibt
+     * als Stern stehen und sieht aus wie ein Tippfehler — genau das stand
+     * schon einmal auf dem Bildschirm, in zwei Texten, die niemand mehr
+     * gelesen hat.
+     */
+    for (const file of ['src/i18n/de.ts', 'src/i18n/en.ts']) {
+      const text = textOf(file)
+      for (const line of text.split('\n')) {
+        // Kommentare bleiben draußen — `/**` ist ein Kommentaranfang und
+        // keine halbe Hervorhebung.
+        const start = line.trimStart()
+        if (start.startsWith('*') || start.startsWith('//') || start.startsWith('/*')) continue
+        if (!line.includes("'")) continue
+        const stars = line.split('**').length - 1
+        expect(stars % 2, `ungerade Hervorhebung: ${line.trim()}`).toBe(0)
+      }
+    }
+  })
+
   it('nennt die Sperrliste auch im Dokument, nicht nur im Test', () => {
     // Sonst steht die Regel an einer Stelle, an der sie beim Texten niemand
     // liest — und ein Test, den man erst beim Fehlschlag entdeckt, ist eine

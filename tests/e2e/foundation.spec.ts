@@ -38,21 +38,59 @@ test('übernimmt beim ersten Start die Sprache des Geräts (D-007)', async ({ br
   await expect(startButton(germanPage)).toBeVisible()
 
   await englishPage.goto('/')
-  await expect(englishPage.getByRole('button', { name: 'Begin' })).toBeVisible()
+  /*
+   * Über die Beschriftung des Startknopfes, nicht über seinen Rollennamen:
+   * „Begin“ steckt als Teilzeichenkette in „Messung beginnen“, und Playwright
+   * vergleicht ohne Rücksicht auf Groß- und Kleinschreibung. Solange die
+   * gespeicherte Sprache noch geladen wird, steht die deutsche Einladung zur
+   * Messung da — und der Selektor fand zwei Knöpfe. Vierte Begegnung mit
+   * derselben Falle in diesem Projekt.
+   */
+  await expect(startButton(englishPage).locator('.start-label')).toHaveText('Begin')
 
   // Eine Sprache, die wir nicht anbieten, landet auf Englisch — nicht auf leer.
   const swedishPage = await (await browser.newContext({ locale: 'sv-SE' })).newPage()
   await swedishPage.goto('/')
-  await expect(swedishPage.getByRole('button', { name: 'Begin' })).toBeVisible()
+  await expect(startButton(swedishPage).locator('.start-label')).toHaveText('Begin')
 })
 
 test('merkt sich die gewählte Sprache über einen Neustart hinweg', async ({ page }) => {
   await page.goto('/')
   await page.getByLabel('Sprache').selectOption('en')
-  await expect(page.getByRole('button', { name: 'Begin' })).toBeVisible()
+  await expect(startButton(page).locator('.start-label')).toHaveText('Begin')
+
+  /*
+   * Erst warten, bis die Wahl wirklich auf dem Gerät steht — dann neu laden.
+   *
+   * Der Bildschirm wechselt sofort, geschrieben wird gleich danach. Wer in
+   * dieser Lücke neu lädt, liest den alten Stand; im Alltag passiert das
+   * niemandem, in einer Prüfung mit Millisekunden schon. Die Prüfung fragt
+   * „überlebt die Wahl einen Neustart“ und nicht „überlebt sie einen Neustart
+   * fünf Millisekunden später“.
+   *
+   * Aufgefallen ist das erst, als der Selektor genauer wurde: `{ name:
+   * 'Begin' }` fand vorher auch die deutsche Einladung „Messung beginnen“ —
+   * die Prüfung war grün, egal welche Sprache dastand.
+   */
+  await expect
+    .poll(() =>
+      page.evaluate(async () => {
+        const open = indexedDB.open('anitew')
+        const database: IDBDatabase = await new Promise((resolve, reject) => {
+          open.onsuccess = () => resolve(open.result)
+          open.onerror = () => reject(open.error)
+        })
+        return new Promise<unknown>((resolve) => {
+          const request = database.transaction('settings').objectStore('settings').get('language')
+          request.onsuccess = () => resolve(request.result?.value)
+          request.onerror = () => resolve(undefined)
+        })
+      }),
+    )
+    .toBe('en')
 
   await page.reload()
-  await expect(page.getByRole('button', { name: 'Begin' })).toBeVisible()
+  await expect(startButton(page).locator('.start-label')).toHaveText('Begin')
 })
 
 test('schreibt auf das Gerät und liest zurück', async ({ page }) => {

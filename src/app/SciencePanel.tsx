@@ -1,6 +1,8 @@
 import { STANDING_ORDER, citationOf, claimsWithStanding } from '../core/index.ts'
 import type { Dictionary } from '../i18n/index.ts'
 
+import { Emphasis } from './Emphasis.tsx'
+
 /**
  * Die Wissenschaftsseite (Backlog F6, R-2).
  *
@@ -34,7 +36,9 @@ export function SciencePanel({ dictionary }: { dictionary: Dictionary }) {
             {claims.map((claim) => (
               <article key={claim.id} className="claim">
                 <h4>{t.claims[claim.id].title}</h4>
-                <p>{t.claims[claim.id].body}</p>
+                <p>
+                  <Emphasis text={t.claims[claim.id].body} />
+                </p>
 
                 {/*
                   Woran die App hängt, steht an der Aussage und nicht in einer
