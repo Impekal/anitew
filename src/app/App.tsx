@@ -14,6 +14,7 @@ import {
   READY_PALACES,
   type OwnPalace,
   numberPool,
+  returnsOf,
   palaceOf,
   walkPool,
   type BenchmarkRun,
@@ -25,7 +26,7 @@ import {
   wordPool,
 } from '../core/index.ts'
 import { createWebPlatform } from '../platform/web/index.ts'
-import { loadDue, moduleOf, wordOf } from '../data/items.ts'
+import { loadDue, loadReviewed, moduleOf, wordOf } from '../data/items.ts'
 import {
   type SessionProgress,
   beginSession,
@@ -41,6 +42,7 @@ import { BackupPanel } from './BackupPanel.tsx'
 import { PalacePanel } from './PalacePanel.tsx'
 import { SciencePanel } from './SciencePanel.tsx'
 import { FoundationPanel } from './FoundationPanel.tsx'
+import { ReturnsLine } from './ReturnsLine.tsx'
 import { StreakLine } from './StreakLine.tsx'
 import { BenchmarkPanel } from './benchmark/BenchmarkPanel.tsx'
 import { BenchmarkScreen } from './benchmark/BenchmarkScreen.tsx'
@@ -243,6 +245,18 @@ export function App() {
   const streak = useMemo(() => streakOf(trainingDays, today), [trainingDays, today])
 
   /*
+   * Die Wiedersehen — gerechnet, nicht fortgeschrieben (D-019). Nach jeder
+   * Einheit neu gelesen: Was dort passiert ist, steht in den Terminen.
+   */
+  const [reviewed, setReviewed] = useState<readonly { reviews: number }[]>([])
+  useEffect(() => {
+    void loadReviewed(language)
+      .then(setReviewed)
+      .catch(() => undefined)
+  }, [language, running])
+  const returns = useMemo(() => returnsOf(reviewed), [reviewed])
+
+  /*
    * Was die Messung gerade von einem will.
    *
    * Läuft keine, ist die nächste fällig, wenn seit der letzten vierzehn Tage
@@ -346,6 +360,7 @@ export function App() {
       </header>
 
       <StreakLine streak={streak} dictionary={dictionary} />
+      <ReturnsLine returns={returns} dictionary={dictionary} />
 
       {/*
         Die Messung meldet sich nur, wenn sie etwas will (D-011/G-2). Kein

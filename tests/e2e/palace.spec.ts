@@ -13,13 +13,25 @@ import { answerRecall, collectItems, startButton } from './helpers.ts'
  *    für Station — „Flur. Was lag hier?“
  */
 
-/** Startet neu, bis der Plan einen Gang zieht. */
+/**
+ * Startet neu, bis der Plan einen Gang zieht.
+ *
+ * **Drei Minuten, nicht sechzig Sekunden.** Ein Gang wird in der kürzesten
+ * Einheit gar nicht mehr angeboten (`MIN_SECONDS_FOR_PALACE`): Nach dem
+ * Wiedersehensanteil blieben für fünf Fragen zehn Sekunden, und zwei Sekunden
+ * je Station sind keine Frage, sondern eine Formalie.
+ *
+ * Auf einer frischen Datenbank steht davor die Lektion — die wird
+ * weggetippt, sie ist an anderer Stelle geprüft.
+ */
 async function startWalk(page: Page): Promise<boolean> {
   for (let attempt = 0; attempt < 25; attempt++) {
     await page.goto('/')
-    await page.getByRole('button', { name: '60 Sekunden' }).click()
+    await page.getByRole('button', { name: '3 Minuten' }).click()
     await startButton(page).click()
     await page.locator('.settle').click()
+    const lesson = page.locator('.lesson-card')
+    if ((await lesson.count()) > 0) await lesson.click()
     await expect(page.locator('.scene, .encode-word').first()).toBeVisible({ timeout: 30_000 })
     if ((await page.locator('.walk').count()) > 0) return true
     await page.evaluate(() => indexedDB.deleteDatabase('anitew'))
@@ -102,18 +114,17 @@ test('legt fünf Dinge auf einen Weg und geht ihn danach ab', async ({ page }) =
 
   await answerRecall(page, learned, 'all')
 
-  // Fünf Stationen, fünf richtige Antworten — und die Zusammenfassung zählt
-  // ehrlich mit.
-  await expect(page.locator('.summary-score').first()).toBeVisible({ timeout: 60_000 })
-  await expect(page.locator('.summary-score strong').first()).toHaveText('5')
-  await expect(page.locator('.summary-score span').first()).toHaveText('/ 5')
-
   /*
-   * In der Zusammenfassung steht der **Gegenstand**, nicht seine Station:
-   * „Toaster“ trägt sich selbst, und erinnert hat man sich an das Ding.
+   * Hier endet die Prüfung, und zwar bewusst vor der Zusammenfassung: In der
+   * Drei-Minuten-Einheit folgt noch eine zweite Runde, deren Modul der Plan
+   * bestimmt. Die Zusammenfassung zählte dann Stücke aus beiden Runden — eine
+   * feste Zahl zu erwarten hieße wieder, das nächste Modul vorherzusagen.
+   * **Dass ehrlich gezählt wird, steht in `session.spec.ts`**; hier geht es um
+   * den Weg und sein Abgehen.
    */
-  const listed = await page.locator('.summary-words').first().allTextContents()
-  for (const object of objects) expect(listed.join(' ')).toContain(object)
+  await expect(page.locator('.placemark-station')).toHaveCount(0)
+  await page.getByRole('button', { name: 'Abbrechen' }).click()
+  await expect(startButton(page)).toBeVisible()
 })
 
 test('lässt einen eigenen Weg anlegen und benutzt ihn (G3)', async ({ page }) => {
@@ -186,10 +197,29 @@ test('lässt einen eigenen Weg anlegen und benutzt ihn (G3)', async ({ page }) =
   await startButton(page).click()
   await page.locator('.settle').click()
 
-  const mark = page.locator('.placemark-station')
-  await mark.waitFor({ timeout: 60_000 })
+  /*
+   * Vor dem Wiedersehen steht noch die Lernrunde — welches Modul, entscheidet
+   * der Plan. Der Test geht deshalb durch, bis der Vorspann „Und von früher“
+   * dasteht: Das ist die einzige Stelle, an der sich ein Wiedersehen sicher
+   * erkennen lässt. Ein früherer Anlauf nahm das erste Schild für das
+   * gesuchte und traf „Wohnungstür“ statt „Balkon“ — ein *neuer* Gang durch
+   * denselben eigenen Palast.
+   */
+  const lead = page.getByText(/Und von früher/)
+  for (let step = 0; step < 24; step++) {
+    if ((await lead.count()) > 0) break
+    const prompted = page.locator('.prompted-input')
+    const free = page.locator('.recall-input')
+    if ((await prompted.count()) > 0 || (await free.count()) > 0) {
+      await page.getByRole('button', { name: 'Fertig' }).first().click()
+    } else {
+      await page.waitForTimeout(400)
+    }
+  }
+  await expect(lead).toBeVisible({ timeout: 60_000 })
+
   // Das dritte Schild trägt, was der Nutzer geschrieben hat — nicht „Küche“.
-  await expect(mark).toHaveText('Balkon')
+  await expect(page.locator('.placemark-station')).toHaveText('Balkon')
   await expect(page.locator('.placemark-palace')).toHaveText('Meine Bude')
   await expect(page.locator('.prompted .hint').first()).toContainText('Was lag hier?')
 })

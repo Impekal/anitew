@@ -238,6 +238,36 @@ describe('die Lektion (G, D-013)', () => {
     expect(withPalace(undefined).blocks.some((block) => block.kind === 'teach')).toBe(false)
   })
 
+  it('bietet im Notfallmodus gar keinen Gang an', () => {
+    /*
+     * Nicht aus Vorsicht, sondern aus Rechnen: Nach dem Wiedersehensanteil
+     * bleiben rund vierzig Sekunden, dreißig davon gingen ans Einprägen —
+     * für fünf Fragen blieben zehn. Zwei Sekunden je Station sind keine
+     * Frage, sondern eine Formalie. Und ein halber Weg ist kein Weg.
+     */
+    const plan = planSession({
+      ...base,
+      mode: 'emergency',
+      pools: { ...pools(walkPool('f', 12)), words: Array.from({ length: 20 }, (_, i) => `w${i}`) },
+      modules: ['words', 'palace'],
+    })
+    expect(plan.blocks.every((block) => block.moduleId !== 'palace')).toBe(true)
+  })
+
+  it('lässt das Wiedersehen trotzdem durch', () => {
+    // Was fällig ist, kommt zurück — egal wie kurz die Einheit ist (D-004).
+    // Dort wird nichts eingeprägt, es sind nur die Fragen.
+    const plan = planSession({
+      ...base,
+      mode: 'emergency',
+      pools: { ...pools(walkPool('g', 12)), words: Array.from({ length: 20 }, (_, i) => `w${i}`) },
+      modules: ['words', 'palace'],
+      due: { palace: ['home~4#hall'] },
+    })
+    const review = plan.blocks.filter((block) => block.kind === 'review')
+    expect(review.map((block) => block.moduleId)).toContain('palace')
+  })
+
   it('unterrichtet im Notfallmodus nicht', () => {
     const plan = planSession({
       ...base,

@@ -293,6 +293,22 @@ export const de = {
     ownSaved: 'Gemerkt. Er kommt ab jetzt im Training vor.',
     ownRule: 'Fünf Orte, alle verschieden, keiner leer — und ein Name für den Weg.',
   },
+  returns: {
+    /*
+      Das Maß, das an die Stelle von XP tritt (K1, D-019).
+
+      Der zweite Satz ist der wichtigste der ganzen Zeile: **„Gezählt, nicht
+      vergeben.“** Er sagt in drei Wörtern, was diese App von jeder anderen
+      unterscheidet, die eine große Zahl auf den Startbildschirm stellt.
+    */
+    one: 'Wiedersehen',
+    many: 'Wiedersehen',
+    note: 'So oft ist eine Information nach Tagen zurückgekommen. Gezählt, nicht vergeben.',
+    tracked: 'in Pflege',
+    // Der ehrlichste Rekord der App: Er lässt sich an keinem Nachmittag holen.
+    longest: 'Am häufigsten zurückgeholt',
+    times: 'mal',
+  },
   streak: {
     /*
       Die Serie sagt, was war — mehr nicht (K7). Keine Drohung, kein

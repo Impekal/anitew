@@ -142,7 +142,7 @@ Abruftraining. Hier entscheidet sich, ob die App wirkt.
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
 | G1 | Palast-Datenmodell: Räume, Stationen, feste Reihenfolge | ✅ 2026-08-18 | **D-017**. Ein Gang ist eine Szene wie eine Mission (D-014): Anker `home~3`, Stück `home~3#hall`. Fünf Stationen, feste Reihenfolge — die ist nicht Zierde, sondern die halbe Technik | M |
-| G2 | Vorgefertigte Paläste: Wohnung, Straße, Körper | ✅ 2026-08-18 | Drei Wege zu je fünf Stationen. Absichtlich die banalsten Orte der Welt: Ein Palast wirkt, weil man ihn kennt | M |
+| G2 | Vorgefertigte Paläste: Wohnung, Straße, Körper | ✅ 2026-08-18 | Drei Wege zu je fünf Stationen. Absichtlich die banalsten Orte der Welt: Ein Palast wirkt, weil man ihn kennt. **Erst ab drei Minuten** (D-020) — darunter blieben für fünf Fragen zehn Sekunden | M |
 | G3 | Eigener Palast: Nutzer legt Räume und Stationen selbst an | ✅ 2026-08-18 | Fünf Orte und ein Name. **Feste Kennungen, freie Beschriftungen**: In der Datenbank steht `own~7#own3`, das Schild liegt in den Einstellungen — wer seinen Balkon umbenennt, verliert nicht, was er dort abgelegt hat. Ein Gang durch einen weggeworfenen Palast wird übergangen, nicht ohne Schild gefragt | M |
 | G4 | Automatische Zuordnung Item → Station | ✅ 2026-08-18 | Aus dem Anker gerechnet, ohne Zurücklegen. „Such dir selbst aus, was wohin gehört“ wäre eine Aufgabe vor der Aufgabe — Zuordnung ist Verwaltung, das Bild ist die Technik (D-017) | M |
 | G5 | Merkbilder erzeugen | ❗ **umgeschrieben** | **D-017**: Die App liefert **kein** Bild. Ein selbst gebautes sitzt besser als ein vorgesetztes — wer „qualmender Toaster“ vorgesetzt bekommt, hat einen Satz gelesen. Sie verlangt das Bild, sagt wie eins aussieht, das trägt, und gibt dem Palast dafür sechs Sekunden je Station statt vier | L |
@@ -186,14 +186,14 @@ Der Punkt, der aus einem Spiel einen Gedächtnistrainer macht.
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| K1 | XP und Level — an **Abrufleistung** gekoppelt, nicht an verbrachte Zeit | ⬜ | sonst belohnt die App Anwesenheit statt Lernen | M |
+| K1 | ~~XP und Level~~ → **Das Wiedersehen** | ✅ 2026-08-18 · ❗ **ersetzt** | **D-019**. Ein neuer Name für XP hätte nichts geheilt: Eine Punktewährung ist von Bauart erfunden. Gezählt wird stattdessen ein Ereignis — eine Information, die nach ihrem ersten Tag zurückkam. **Nicht farmbar**: Wer heute länger übt, verschiebt nur Termine. Keine Level, kein Balken — jede Marke wäre ausgedacht | M |
 | K2 | Streak inklusive Schutztag: einer pro Woche, bis zu zwei angespart, **nicht kaufbar und nicht durch Werbung verdienbar** | ✅ 2026-08-17 | **D-008**, **D-015**. Ein Tag zählt, sobald eine Einheit zu Ende gelaufen ist — die kürzeste dauert 60 Sekunden. Je sieben Trainingstage ein Schutztag, höchstens zwei. **Aus den Trainingstagen gerechnet, nicht fortgeschrieben:** ein Zähler wäre eine Behauptung, die nach einem Absturz oder einem eingelesenen Backup danebenliegen kann | M |
-| K3 | Achievements | ⬜ | | M |
-| K4 | Daily Missions und Memory Quests | ⬜ | | M |
-| K5 | Persönliche Rekorde | 🟨 2026-08-17 | Die längste je erreichte Serie steht da, sobald sie etwas anderes sagt als die laufende. Weitere Rekorde (bester Abruf, längste Zahl) fehlen | S |
+| K3 | Achievements | ⬜ | offen, und unter **D-019** nur als benannte Tatsache denkbar („nach 30 Tagen zurückgeholt“), nie als Rang über einen Menschen | M |
+| K4 | Daily Missions und Memory Quests | ❌ **abgelehnt** | **D-019**. Manufacturierte Verpflichtung. Was täglich ansteht, entscheidet der Wiederholungsplan — der weiß es aus der Vergessenskurve und nicht aus der Bindungsabsicht. Ein ausgedachter Tagesauftrag daneben nähme dem echten die Glaubwürdigkeit | M |
+| K5 | Persönliche Rekorde | 🟨 2026-08-18 | Die längste je erreichte Serie, und seit D-019 der **längste Fall**: wie oft dieselbe Information schon zurückkam. Er lässt sich an keinem Nachmittag holen — darum taugt er als Rekord. Weitere (längste Zahl) fehlen | S |
 | K6 | Unlockable Worlds — rein kosmetisch | ⬜ | | M |
 | K7 | **Anti-Dark-Pattern-Regel**: keine künstliche Verknappung, kein Angstdruck, keine erfundenen Zahlen | ✅ 2026-08-17 | **D-015** — jetzt eine bindende Regel mit Namen und nicht nur ein Vorsatz im Backlog | S |
-| K8 | Die wichtigste Belohnung ist F5: der Nutzer merkt selbst, dass er besser wird | ⬜ | | — |
+| K8 | Die wichtigste Belohnung ist F5: der Nutzer merkt selbst, dass er besser wird | ✅ 2026-08-18 | Die Messung steht seit M3, und daneben jetzt das Wiedersehen (K1) — zwei gezählte Größen, keine vergebene | — |
 | K9 | Spendenweg: externer Link (Ko-fi / PayPal / GitHub Sponsors) im Web; Store-Regeln für Spenden getrennt prüfen, wenn wir dort ankommen | ⬜ | **D-002**. Kern bleibt dauerhaft kostenlos; ein späteres Pro darf nur Bequemlichkeit hinzufügen, nie Trainingsleistung | S |
 
 ## L. Mehrsprachigkeit
@@ -263,8 +263,8 @@ Anforderung wie jede andere. Die acht Regeln G-1 bis G-8 stehen in
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | ✅ 2026-08-18 | 252 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Sessionplanung, Bewertung, Scheduler, Gesichtsgenerator, die ganze Messung und die Wirkungsaussagen (R5) sind abgedeckt | M |
-| P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | ✅ 2026-08-18 | 88 Läufe in Chromium und im Telefonprofil, darunter eine Einheit von vorn bis hinten und der Abbruch mitten drin. Seit M4 **liest der Test ab, welches Modul kam, statt es vorherzusagen** (`tests/e2e/helpers.ts`) | M |
+| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | ✅ 2026-08-18 | 262 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Sessionplanung, Bewertung, Scheduler, Gesichtsgenerator, die ganze Messung und die Wirkungsaussagen (R5) sind abgedeckt | M |
+| P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | ✅ 2026-08-18 | 98 Läufe in Chromium und im Telefonprofil, darunter eine Einheit von vorn bis hinten und der Abbruch mitten drin. Seit M4 **liest der Test ab, welches Modul kam, statt es vorherzusagen** (`tests/e2e/helpers.ts`) | M |
 | P3 | CI bei jedem Push: Typecheck (App **und** Kern getrennt), Tests, Build, E2E | ✅ 2026-08-17 | | S |
 | P4 | Performance: Kaltstart unter 2 s, Timer laufen ruckelfrei | ⬜ | | M |
 | P5 | Uhrmanipulation darf die Engine nicht zerstören (Streak-Betrug, Intervall-Chaos) | ⬜ | monotone Zeitquelle plus Plausibilitätsprüfung | M |
@@ -328,7 +328,7 @@ Neu offen, entstanden aus den Antworten:
 | **M1** | Walking Skeleton | B1–B3, B5, B6, B9, C5, D4, D6, N1 | ✅ **2026-08-17** — Eine echte Einheit läuft täglich durch, überlebt eine Unterbrechung, und jede Antwort steht im Protokoll |
 | **M2** | Die Engine wird echt | C1–C9, D8, E1–E7, B4 | Die App entscheidet begründet, was du heute trainierst, und plant Wiederholungen persönlich |
 | **M3** | Ehrlichkeit | F1–F7, F2a, F2b | ✅ **2026-08-18** — Zwei getrennte Zahlen, und die große ist gemessen: Sie steht nur da, wenn ihre Spanne die Null nicht enthält. Daneben eine Seite, die sagt, was belegt ist und was nicht (F6), und Store-Texte, die jede Aussage auf ihre Deckung zurückführen (F7). **Die Release-Sperre ist gefallen** |
-| **M4** | Inhalt & Spiel | D5, D9–D16, G, H, K, J | 🟨 **2026-08-18** — Fünf Module, zwei Merktechniken (D5 Major, G Palast), die Serie mit Schutztagen (K2). Offen: XP/Achievements (K1/K3/K4), weitere Missionsvorlagen, H3 (verzögerter Abruf, braucht B8) |
+| **M4** | Inhalt & Spiel | D5, D9–D16, G, H, K, J | 🟨 **2026-08-18** — Fünf Module, zwei Merktechniken (D5 Major, G Palast), die Serie mit Schutztagen (K2). Offen: Achievements (K3), weitere Missionsvorlagen, H3 (verzögerter Abruf, braucht B8) |
 | **M5** | Sprachen | L1–L8 | Man kann heute auf Deutsch und morgen auf Japanisch trainieren |
 | **M6** | Echtes Leben | I, M | Eigene Präsentation rein, Wiederholungsplan raus |
 | **M7** | Stores & Cloud | Q, R, N7–N10 | .aab im Play-Track; Drive-Abgleich läuft; iOS-Weg entschieden (S10) |

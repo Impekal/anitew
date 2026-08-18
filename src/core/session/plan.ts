@@ -69,6 +69,27 @@ export const TEACH_SECONDS = 14
  */
 export const MIN_SECONDS_FOR_TEACHING = 180
 
+/**
+ * Ab wann ein Gang durch einen Palast angeboten wird (G, D-017).
+ *
+ * Der Grund ist Rechnen, und er ist im Bildschirmabzug einer fehlgeschlagenen
+ * Prüfung aufgefallen: Ein Gang prägt **fünf Stationen à sechs Sekunden** ein.
+ * Im Notfallmodus bleiben nach dem Wiedersehensanteil rund vierzig Sekunden
+ * für die Runde — dreißig davon gingen ans Einprägen, und für fünf Fragen
+ * blieben zehn. **Zwei Sekunden je Station** sind keine Frage, sondern eine
+ * Formalie.
+ *
+ * Anders als beim Wortmodul lässt sich das nicht durch weniger Stücke lösen:
+ * Ein halber Weg ist kein Weg (D-017). Also gibt es den Palast erst, wo er
+ * hinpasst. Sechzig Sekunden sind für den Fall gedacht, dass jemand zwischen
+ * Tür und Angel übt — ein Gedächtnispalast ist das Gegenteil davon.
+ *
+ * Der **Wiedersehensblock** bleibt davon unberührt: Was fällig ist, kommt
+ * zurück, egal wie kurz die Einheit ist (D-004). Dort wird nichts eingeprägt,
+ * es sind nur die Fragen.
+ */
+export const MIN_SECONDS_FOR_PALACE = 180
+
 export type BlockKind = 'teach' | 'encode' | 'recall' | 'review'
 
 /**
@@ -280,6 +301,26 @@ export function planSession(input: PlanInput): SessionPlan {
   const totalSeconds = MODES[input.mode].seconds
   const modules = input.modules ?? TRAINING_MODULES
 
+  /*
+   * Woraus **gelernt** wird — und nur das.
+   *
+   * In einer sehr kurzen Einheit fällt der Palast hier heraus (siehe
+   * `MIN_SECONDS_FOR_PALACE`). Ein Test darf ihn erzwingen, indem er ihn als
+   * einziges Modul verlangt; sonst ließe sich das kürzeste Zusammenspiel
+   * nicht mehr prüfen.
+   *
+   * **Das Wiedersehen bleibt davon unberührt**, und das war beim ersten
+   * Anlauf falsch: Ich hatte die Liste vor der Auswahl der fälligen Einträge
+   * gekürzt — damit wäre ein fälliger Gang in einer 60-Sekunden-Einheit
+   * stillschweigend liegengeblieben. Ein Kerntest hat es gefunden. Was fällig
+   * ist, kommt zurück (D-004); dort wird nichts eingeprägt, es sind nur die
+   * Fragen.
+   */
+  const learnFrom =
+    totalSeconds >= MIN_SECONDS_FOR_PALACE || modules.length === 1
+      ? modules
+      : modules.filter((moduleId) => moduleId !== 'palace')
+
   // Nur Module, für die heute wirklich etwas fällig ist. Ein leerer
   // Wiederholungsblock wäre eine Frage ohne Gegenstand.
   const dueByModule = modules
@@ -304,7 +345,7 @@ export function planSession(input: PlanInput): SessionPlan {
    * hat — immer dasselbe Modul dran, und wer nur den Notfallmodus benutzt,
    * sähe nie ein Gesicht.
    */
-  const drawn = rng.int(modules.length)
+  const drawn = rng.int(learnFrom.length)
 
   /*
    * Steht heute eine Lektion an, beginnt die Einheit mit **Zahlen** (D5).
@@ -320,8 +361,8 @@ export function planSession(input: PlanInput): SessionPlan {
    * Einheit sähe je nach Lernstand anders aus. Denselben Fehler hatte der
    * Bartwurf im Gesichtsgenerator schon einmal.
    */
-  const numbersAt = modules.indexOf('numbers')
-  const palaceAt = modules.indexOf('palace')
+  const numbersAt = learnFrom.indexOf('numbers')
+  const palaceAt = learnFrom.indexOf('palace')
   const hasTime = totalSeconds >= MIN_SECONDS_FOR_TEACHING
 
   /*
@@ -344,7 +385,7 @@ export function planSession(input: PlanInput): SessionPlan {
 
   const offset = teachesPalace ? palaceAt : teachesNumbers ? numbersAt : drawn
   const moduleForRound = (round: number): ModuleId =>
-    modules[(offset + round - 1) % modules.length] as ModuleId
+    learnFrom[(offset + round - 1) % learnFrom.length] as ModuleId
 
   // Gelehrt wird nur mit Gegenstand: Das Major-System zu erklären und dann
   // keine einzige Zahl zu zeigen wäre Unterricht ohne Anlass.

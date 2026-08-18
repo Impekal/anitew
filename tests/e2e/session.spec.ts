@@ -19,6 +19,14 @@ async function startEmergency(page: Page) {
 }
 
 test('führt durch Einprägen und Abrufen und zählt ehrlich', async ({ page }) => {
+  /*
+   * Die Standardgrenze von dreißig Sekunden reicht seit dem Palast nicht mehr:
+   * Ein Gang prägt fünf Stationen à sechs Sekunden ein und braucht damit die
+   * halbe Notfall-Einheit allein fürs Einprägen (D-017). Bis dahin war das
+   * längste Modul die Mission mit zwanzig Sekunden — und der Test lief
+   * jahrelang knapp, ohne dass es jemandem auffiel.
+   */
+  test.setTimeout(120_000)
   await startEmergency(page)
 
   /*
@@ -44,7 +52,15 @@ test('führt durch Einprägen und Abrufen und zählt ehrlich', async ({ page }) 
       ),
     ).toBeVisible()
   } else {
-    await expect(page.getByText('Eine Szene. Was gehört zu wem?')).toBeVisible()
+    /*
+      Zwei Module bauen eine Szene, und sie sagen Verschiedenes an: Die
+      Mission fragt nach der Bindung zwischen den Stücken, der Gang verlangt,
+      dass man sie hinlegt. Der Test liest ab, welche dasteht — vorherzusagen
+      welche, war schon zweimal der Fehler.
+    */
+    await expect(
+      page.getByText(/Eine Szene\. Was gehört zu wem\?|Geh den Weg ab\./),
+    ).toBeVisible()
   }
 
   /*

@@ -208,6 +208,14 @@ export const en: Dictionary = {
     ownSaved: 'Kept. It appears in training from now on.',
     ownRule: 'Five places, all different, none empty — and a name for the route.',
   },
+  returns: {
+    one: 'return',
+    many: 'returns',
+    note: 'That is how often a piece of information came back after days away. Counted, not awarded.',
+    tracked: 'under care',
+    longest: 'Brought back most often',
+    times: 'times',
+  },
   streak: {
     days: 'days in a row',
     day: 'day in a row',

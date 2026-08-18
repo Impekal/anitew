@@ -1437,3 +1437,100 @@ gemacht**: Ein Wiedersehensblock entsteht für jedes Modul, für das etwas
 ansteht. Derselbe Weg wie im echten Betrieb, nur ohne die zwei Wochen.
 
 **Stand:** 252 Kerntests, 88 E2E-Läufe, Typecheck für App und Kern grün.
+
+---
+
+## 2026-08-18 · Kein XP. Das Wiedersehen. (K1, D-019)
+
+Die Frage kam als Namensfrage: ob „XP“ nicht besser etwas heißen sollte, das
+zur App passt. Die Antwort darauf ist, dass ein neuer Name nichts geheilt
+hätte.
+
+**XP ist von Bauart eine erfundene Währung.** Ihre Zahl ist beliebig, ihre
+Skala auch — und genau deshalb lässt sich mit ihr jedes Gefühl herstellen, das
+man herstellen will. Sie „Merkkraft“ oder „Synapsen“ zu nennen hätte den
+Verstoß gegen R-1 nur schöner beschriftet.
+
+Also nicht umbenannt, sondern ersetzt — durch ein Ereignis, das wirklich
+stattgefunden hat:
+
+> **Ein Wiedersehen = eine Information, die nach ihrem ersten Tag noch einmal
+> abgefragt wurde.**
+
+### Warum ausgerechnet das
+
+**Es ist der Vorgang, auf dem die App steht.** Etwas nach Tagen wieder aus dem
+Kopf zu holen, *ist* das Lernen — nicht die verbrachte Zeit, nicht die Zahl
+der geöffneten Einheiten. K1 hatte das schon verlangt: an die Abrufleistung
+gekoppelt, nicht an Anwesenheit.
+
+**Es ist das Wort, das die App ohnehin benutzt.** Der Wiederholungsblock heißt
+seit M1 „das Wiedersehen“. Ein Maß, das man erklären muss, ist schon deshalb
+das falsche.
+
+**Es lässt sich nicht farmen.** Das ist der entscheidende Punkt und der Grund,
+warum ich es für besser halte als alles, was mir als Punktezahl eingefallen
+wäre: Niemand bekommt mehr Wiedersehen, indem er heute länger übt. Sie kommen,
+wenn der Plan sagt, dass etwas fällig ist. Wer heute zehn Einheiten macht,
+verschiebt damit nur Termine in die Zukunft. **Die einzige Art, die Zahl zu
+erhöhen, ist: etwas lernen und an späteren Tagen wiederkommen.**
+
+**Es schrumpft nie.** Eine Zahl, die bei Nichtstun kleiner wird, wäre
+Angstdruck mit anderen Mitteln (D-015).
+
+Darunter steht ein Satz, der die halbe Entscheidung trägt: **„Gezählt, nicht
+vergeben.“**
+
+### Was es ausdrücklich nicht gibt
+
+**Keine Level, keinen Balken.** Ein Fortschrittsbalken braucht eine Marke, und
+jede Marke wäre ausgedacht — „ab 500 bist du Fortgeschritten“ ist eine
+Behauptung über einen Menschen ohne Grundlage. Ein E2E-Test prüft die
+Abwesenheit des Balkens; ohne ihn könnte später jemand einen einbauen, ohne
+dass es auffällt.
+
+**K4 abgelehnt.** „Daily Missions und Memory Quests“ sind manufacturierte
+Verpflichtung. Was hier täglich ansteht, entscheidet der Wiederholungsplan —
+der weiß es wirklich, aus der Vergessenskurve und nicht aus der
+Bindungsabsicht. Ein zweiter, ausgedachter Tagesauftrag daneben nähme dem
+echten die Glaubwürdigkeit.
+
+**Stattdessen ein Rekord, der einer ist (K5):** der längste Fall — wie oft
+dieselbe Information schon zurückkam. Er wächst nur über Wochen, weil die
+Abstände mit jedem Mal größer werden. An einem Nachmittag ist er nicht zu
+holen, und genau darum taugt er.
+
+**Stand:** 260 Kerntests, 98 E2E-Läufe, Typecheck für App und Kern grün.
+
+### Zwei Nachträge aus dem Prüflauf
+
+Der volle Lauf hat zwei Stellen gefunden, beide in Tests und beide dieselbe
+Ursache wie schon zweimal: **Ein Gang ist eine Szene.** Die Einheitsprüfung
+erwartete im Szenenfall den Missionstext, und die Palastprüfung hielt das
+erste Schild für das gesuchte — dabei kann davor noch eine gewöhnliche Runde
+durch denselben eigenen Palast stehen. Sie geht jetzt durch, bis der Vorspann
+„Und von früher“ dasteht; das ist die einzige Stelle, an der sich ein
+Wiedersehen sicher erkennen lässt.
+
+Der zweite Nachtrag ist interessanter, weil er nichts mit den Tests zu tun
+hat: **Der Palast prägt dreißig Sekunden lang ein** — fünf Stationen à sechs
+Sekunden (D-017). Das sprengte zuerst nur die
+Standardgrenze der Prüfung von dreißig Sekunden — bis dahin war das längste
+Modul die Mission mit zwanzig.
+
+**Der Bildschirmabzug einer zweiten fehlgeschlagenen Prüfung zeigte dann, dass
+es kein Testproblem war.** Im Notfallmodus bleiben nach dem Wiedersehensanteil
+rund vierzig Sekunden für die Runde; dreißig davon gingen ans Einprägen, und
+für fünf Fragen blieben zehn. **Zwei Sekunden je Station sind keine Frage,
+sondern eine Formalie.** Anders als beim Wortmodul lässt sich das nicht durch
+weniger Stücke lösen — ein halber Weg ist kein Weg. Also gibt es den Palast
+erst ab drei Minuten. Sechzig Sekunden sind für den Fall gedacht, dass jemand
+zwischen Tür und Angel übt; ein Gedächtnispalast ist das Gegenteil davon.
+
+Und die erste Fassung dieser Änderung war falsch: Ich hatte die Modulliste
+**vor** der Auswahl der fälligen Einträge gekürzt — damit wäre ein fälliger
+Gang in einer kurzen Einheit stillschweigend liegengeblieben. Ein Kerntest,
+den ich im selben Zug geschrieben hatte, hat es sofort gefunden. **Was fällig
+ist, kommt zurück** (D-004), egal wie kurz die Einheit ist; dort wird nichts
+eingeprägt, es sind nur die Fragen. Gelernt wird aus der gekürzten Liste,
+gefragt aus der vollen.

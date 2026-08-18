@@ -1489,3 +1489,31 @@ body::before {
   opacity: 0.45;
   cursor: not-allowed;
 }
+
+/* Die Wiedersehen (K1, D-019). Bewusst dieselbe Ruhe wie die Serie: eine
+   Zahl, ein Satz, kein Balken. Ein Balken bräuchte eine Marke, und jede Marke
+   wäre ausgedacht. */
+.returns {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  align-items: center;
+  text-align: center;
+}
+
+.returns-line {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+}
+
+.returns-line strong {
+  font-family: var(--mono);
+  font-size: 1.35rem;
+  color: var(--ink);
+  text-shadow: var(--glow-text);
+}
+
+.returns-tracked {
+  color: var(--ink-faint);
+}

@@ -95,6 +95,17 @@ export async function recordOutcome(
   })
 }
 
+/**
+ * Was für die Wiedersehen-Rechnung gebraucht wird (K1).
+ *
+ * Nur die Zahl der Abfragen je Information — mehr nicht. Die Rechnung selbst
+ * steht im Kern und läuft ohne Browser (D-010).
+ */
+export async function loadReviewed(language: string): Promise<{ reviews: number }[]> {
+  const rows = await db.itemStates.where('language').equals(language).toArray()
+  return rows.map((row) => ({ reviews: row.reviews }))
+}
+
 /** Wie viele Informationen warten insgesamt auf ihren nächsten Termin? */
 export async function countTracked(language: string): Promise<number> {
   return db.itemStates.where('language').equals(language).count()

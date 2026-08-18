@@ -698,3 +698,96 @@ nächste Messung nimmt die nächsten zwanzig und rückt damit näher an die
 Stelle, an der sich der Quarantänevorrat wiederholt — was die App an dieser
 Stelle ohnehin sagt (`poolCycles`). Wer oft abbricht, kommt schneller dorthin;
 das ist der ehrliche Preis und keine Strafe.
+
+---
+
+## D-019 · 2026-08-18 · Kein XP, keine Level — das Wiedersehen
+
+**Entscheidung:** ANITEW hat keine Erfahrungspunkte, keine Level und keine
+Tagesaufträge. Was auf dem Startbildschirm steht, ist eine gezählte Größe:
+
+> **Ein Wiedersehen = eine Information, die nach ihrem ersten Tag noch einmal
+> abgefragt wurde.**
+
+**Warum kein neuer Name für XP.** Die Frage kam als Namensfrage — ob „XP“
+nicht besser etwas heißen sollte, das zur App passt. Die Antwort ist, dass ein
+neuer Name nichts geheilt hätte: **XP ist von Bauart eine erfundene Währung.**
+Ihre Zahl ist beliebig, ihre Skala auch, und genau deshalb lässt sich mit ihr
+jedes Gefühl herstellen, das man herstellen will. Sie umzubenennen hätte die
+Verletzung von R-1 nur schöner beschriftet.
+
+Also nicht umbenannt, sondern **ersetzt**: durch ein Ereignis, das wirklich
+stattgefunden hat.
+
+**Warum ausgerechnet das Wiedersehen:**
+
+1. **Es ist der Vorgang, auf dem die App steht.** Etwas nach Tagen wieder aus
+   dem Kopf zu holen, *ist* das Lernen (C5, `science.retrieval`) — nicht die
+   verbrachte Zeit, nicht die Zahl der geöffneten Einheiten. K1 verlangte
+   genau das: an die Abrufleistung gekoppelt, nicht an Anwesenheit.
+2. **Es ist das Wort, das die App ohnehin benutzt.** Der Wiederholungsblock
+   heißt seit M1 „das Wiedersehen“. Ein Maß, das man erklären muss, ist schon
+   deshalb das falsche.
+3. **Es lässt sich nicht farmen.** Der entscheidende Punkt. Niemand bekommt
+   mehr Wiedersehen, indem er heute länger übt — sie kommen, wenn der Plan
+   sagt, dass etwas fällig ist (C1). Wer heute zehn Einheiten macht,
+   verschiebt damit nur Termine in die Zukunft. Die einzige Art, die Zahl zu
+   erhöhen, ist: etwas lernen und an späteren Tagen wiederkommen. Das ist
+   genau das, was eine Punktewährung nie leisten kann, weil sie fürs Mahlen
+   gebaut ist.
+4. **Es schrumpft nie.** Eine Zahl, die bei Nichtstun kleiner wird, wäre
+   Angstdruck mit anderen Mitteln (D-015). Was gewesen ist, bleibt gewesen.
+
+**Keine Level, kein Balken.** Ein Fortschrittsbalken braucht eine Marke, und
+jede Marke wäre ausgedacht — „ab 500 bist du Fortgeschritten“ ist eine
+Behauptung über einen Menschen, für die es keine Grundlage gibt. Was es
+stattdessen gibt, ist der **längste Fall**: wie oft dieselbe Information schon
+zurückkam (K5). Er wächst nur über Wochen, weil die Abstände mit jedem Mal
+größer werden — an einem Nachmittag ist er nicht zu holen, und genau darum
+taugt er als Rekord.
+
+**K4 wird abgelehnt.** „Daily Missions und Memory Quests“ sind manufacturierte
+Verpflichtung: eine Aufgabe, die die App sich ausdenkt, damit man wiederkommt.
+Was hier täglich ansteht, entscheidet der Wiederholungsplan — der weiß es
+wirklich, und er weiß es aus der Vergessenskurve und nicht aus der
+Bindungsabsicht. Ein zweiter, ausgedachter Tagesauftrag daneben würde dem
+ersten die Glaubwürdigkeit nehmen.
+
+**Gerechnet, nicht fortgeschrieben.** Wie die Serie: Die Zahl wird jedes Mal
+aus den Terminen neu gerechnet. Ausgerechnet die Zahl, unter der „gezählt,
+nicht vergeben“ steht, darf kein hochgezählter Zähler sein, der nach einem
+Absturz oder einer eingelesenen Sicherung danebenliegt.
+
+
+---
+
+## D-020 · 2026-08-18 · Ein Gang braucht Zeit — sechzig Sekunden sind keine
+
+**Entscheidung:** Der Gedächtnispalast wird in Einheiten unter drei Minuten
+nicht mehr zum Lernen angeboten (`MIN_SECONDS_FOR_PALACE`). Der
+**Wiederholungsblock** bleibt davon unberührt.
+
+**Warum:** Rechnen, nicht Geschmack. Ein Gang prägt fünf Stationen à sechs
+Sekunden ein (D-017). Im Notfallmodus bleiben nach dem Wiedersehensanteil rund
+vierzig Sekunden für die Runde — dreißig gingen ans Einprägen, und für fünf
+Fragen blieben zehn. **Zwei Sekunden je Station sind keine Frage, sondern eine
+Formalie.**
+
+Anders als beim Wortmodul lässt sich das nicht durch weniger Stücke lösen: Bei
+Wörtern rechnet der Planer aus, wie viele in die Zeit passen — ein Gang ist
+eine Szene, und ein halber Weg ist kein Weg (D-017). Also gibt es ihn erst,
+wo er hinpasst. Sechzig Sekunden sind für den Fall gedacht, dass jemand
+zwischen Tür und Angel übt; ein Gedächtnispalast ist das Gegenteil davon.
+
+**Die Grenze trennt Lernen von Wiedersehen.** Der erste Anlauf kürzte die
+Modulliste, bevor die fälligen Einträge ausgewählt wurden — damit wäre ein
+fälliger Gang in einer kurzen Einheit stillschweigend liegengeblieben, und
+D-004 („was du lernst, kommt zurück“) hätte eine leise Ausnahme bekommen. Ein
+Kerntest hat es gefunden. Jetzt gilt: **gelernt wird aus der gekürzten Liste,
+gefragt aus der vollen.** Im Wiedersehensblock wird nichts eingeprägt — es
+sind nur die Fragen, und die passen in jede Einheit.
+
+**Gefunden wurde das nicht durch Nachdenken, sondern durch einen
+Bildschirmabzug.** Eine fehlgeschlagene Prüfung hing im Abruf einer
+Palastrunde mit 0:01 auf der Uhr. Der Test war zu langsam — die App war zu
+schnell, und zwar für einen Menschen.
