@@ -1,4 +1,4 @@
-import { expect, type Page } from '@playwright/test'
+import { expect, type Locator, type Page } from '@playwright/test'
 
 /**
  * Gemeinsame Handgriffe für die Durchläufe im Browser.
@@ -39,10 +39,26 @@ const MISSION_LABEL_OF_QUESTION = new Map([
   ['Wie hieß das Restaurant?', 'Restaurant'],
 ])
 
+/**
+ * Der Startknopf der Trainingseinheit.
+ *
+ * Absichtlich über die Klasse und nicht über den Namen: Playwright vergleicht
+ * zugängliche Namen von Haus aus als Teilzeichenkette und ohne Rücksicht auf
+ * Groß- und Kleinschreibung. Seit M3 steht auf dem Startbildschirm auch
+ * „Messung beginnen“ — damit fand `{ name: 'Beginnen' }` zwei Knöpfe, und
+ * sechs Prüfungen wurden rot, ohne dass an der App etwas kaputt war.
+ *
+ * Ein `exact: true` hätte hier nicht geholfen: Der Knopf trägt die Dauer mit
+ * im Namen („5:00 Beginnen“). Die Klasse ist das eindeutige Merkmal.
+ */
+export function startButton(page: Page): Locator {
+  return page.locator('button.start')
+}
+
 /** Startet den Notfallmodus und überspringt das Ankommen. */
 export async function startEmergency(page: Page) {
   await page.getByRole('button', { name: '60 Sekunden' }).click()
-  await page.getByRole('button', { name: 'Beginnen' }).click()
+  await startButton(page).click()
   // Das Ankommen (D-011/G-1) lässt sich antippen — im Test warten wir nicht
   // drei Sekunden auf einen atmenden Kreis.
   await page.locator('.settle').click()

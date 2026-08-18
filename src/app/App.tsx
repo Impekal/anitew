@@ -12,6 +12,9 @@ import {
   type ModuleId,
   namePool,
   numberPool,
+  type BenchmarkRun,
+  nextRunDue,
+  nextStep,
   planSession,
   selectDue,
   streakOf,
@@ -26,11 +29,14 @@ import {
   loadProgress,
   loadTrainingDays,
 } from '../data/sessions.ts'
+import { abandonRun, beginRun, loadOpenRun, loadRuns } from '../data/benchmark.ts'
 import { loadTaught } from '../data/technique.ts'
 
 import { BackupPanel } from './BackupPanel.tsx'
 import { FoundationPanel } from './FoundationPanel.tsx'
 import { StreakLine } from './StreakLine.tsx'
+import { BenchmarkPanel } from './benchmark/BenchmarkPanel.tsx'
+import { BenchmarkScreen } from './benchmark/BenchmarkScreen.tsx'
 import { SessionScreen } from './session/SessionScreen.tsx'
 import { useLanguage } from './useLanguage.ts'
 import { useSoundSetting } from './useSoundSetting.ts'
@@ -65,6 +71,28 @@ export function App() {
    * dazugelegt haben. Ohne das zeigte die nächste Einheit desselben Besuchs
    * wieder dieselbe Ziffer.
    */
+  /*
+   * Die Messungen (M3, D-006).
+   *
+   * `open` ist die Messung, die noch läuft — sie überlebt bewusst das
+   * Schließen der App: Zwischen dem Einprägen und dem Abruf am Folgetag
+   * liegen Stunden, und genau darin besteht die Messung.
+   */
+  const [runs, setRuns] = useState<readonly BenchmarkRun[]>([])
+  const [open, setOpen] = useState<
+    { run: BenchmarkRun; items: readonly string[]; id: string } | undefined
+  >()
+  const [measuring, setMeasuring] = useState(false)
+  const reloadBenchmark = useCallback(() => {
+    void loadRuns()
+      .then(setRuns)
+      .catch(() => undefined)
+    void loadOpenRun()
+      .then(setOpen)
+      .catch(() => undefined)
+  }, [])
+  useEffect(reloadBenchmark, [reloadBenchmark, running, measuring])
+
   const [taught, setTaught] = useState<readonly number[]>([])
   useEffect(() => {
     void loadTaught()
@@ -169,12 +197,57 @@ export function App() {
 
   const streak = useMemo(() => streakOf(trainingDays, today), [trainingDays, today])
 
+  /*
+   * Was die Messung gerade von einem will.
+   *
+   * Läuft keine, ist die nächste fällig, wenn seit der letzten vierzehn Tage
+   * vergangen sind — und die allererste sofort. Läuft eine, entscheidet
+   * `nextStep`, ob gerade abgerufen, gewartet oder das Fenster verpasst wird.
+   */
+  const step = useMemo(() => {
+    if (open === undefined) {
+      const last = runs[runs.length - 1]
+      const due = nextRunDue(last)
+      return last === undefined || (due !== undefined && today >= due)
+        ? ({ kind: 'invite' } as const)
+        : ({ kind: 'none' } as const)
+    }
+    return nextStep(open.run, platform.clock.now(), today)
+  }, [open, platform, runs, today])
+
+  const startBenchmark = useCallback(() => {
+    void (async () => {
+      const now = platform.clock.now()
+      const day = dayKeyOf(now, { offsetMinutes: platform.clock.offsetMinutes(now) })
+      const started = await beginRun(day, now, language)
+      setOpen({
+        id: started.id,
+        items: started.items,
+        run: { ordinal: started.ordinal, day, total: started.items.length },
+      })
+      setMeasuring(true)
+    })()
+  }, [language, platform])
+
   const greeting = useMemo(() => {
     const lines = dictionary.greetings
     return lines[createRng(today).int(lines.length)] ?? dictionary.app.tagline
   }, [dictionary, today])
 
   if (!ready) return null
+
+  if (measuring && open !== undefined) {
+    return (
+      <BenchmarkScreen
+        platform={platform}
+        dictionary={dictionary}
+        run={open.run}
+        runId={open.id}
+        items={open.items}
+        onDone={() => setMeasuring(false)}
+      />
+    )
+  }
 
   if (running !== undefined) {
     return (
@@ -204,6 +277,70 @@ export function App() {
       </header>
 
       <StreakLine streak={streak} dictionary={dictionary} />
+
+      {/*
+        Die Messung meldet sich nur, wenn sie etwas will (D-011/G-2). Kein
+        Dauerbanner, kein Countdown — sie steht da, wenn sie dran ist, und
+        sonst gar nicht.
+      */}
+      {step.kind === 'invite' && (
+        <section className="note" role="status">
+          <h3>{dictionary.benchmark.invite}</h3>
+          <p>{dictionary.benchmark.inviteNote}</p>
+          <div className="note-actions">
+            <button type="button" className="quiet" onClick={startBenchmark}>
+              {dictionary.benchmark.start}
+            </button>
+          </div>
+        </section>
+      )}
+
+      {step.kind === 'recall' && (
+        <section className="note" role="status">
+          <h3>{dictionary.benchmark.ready}</h3>
+          <div className="note-actions">
+            <button type="button" className="quiet" onClick={() => setMeasuring(true)}>
+              {dictionary.benchmark.continue}
+            </button>
+          </div>
+        </section>
+      )}
+
+      {step.kind === 'waiting' && (
+        <section className="note" role="status">
+          <h3>{dictionary.benchmark.waitingTitle}</h3>
+          <p>
+            {step.phase === 'after20Minutes'
+              ? dictionary.benchmark.waitingSoon
+              : dictionary.benchmark.waitingTomorrow}
+          </p>
+        </section>
+      )}
+
+      {/*
+        Ein verpasstes Fenster wird gesagt und nicht stillschweigend
+        weggerechnet: Eine Messung nach drei Stunden ist keine Messung nach
+        zwanzig Minuten (F1).
+      */}
+      {step.kind === 'missed' && open !== undefined && (
+        <section className="note" role="status">
+          <h3>{dictionary.benchmark.missedTitle}</h3>
+          <p>{dictionary.benchmark.missedNote}</p>
+          <div className="note-actions">
+            <button
+              type="button"
+              className="quiet"
+              onClick={() => {
+                void abandonRun(open.id)
+                  .catch(() => undefined)
+                  .finally(reloadBenchmark)
+              }}
+            >
+              {dictionary.benchmark.discard}
+            </button>
+          </div>
+        </section>
+      )}
 
       {resumable !== undefined && (
         <section className="note" role="status">
@@ -312,6 +449,8 @@ export function App() {
           (N2). Zugeklappt bleibt sie trotzdem — sie gehört nicht auf den
           ersten Bildschirm (D-011/G-2).
         */}
+        <BenchmarkPanel runs={runs} language={language} dictionary={dictionary} />
+
         <details className="details">
           <summary>{dictionary.backup.heading}</summary>
           <BackupPanel platform={platform} dictionary={dictionary} />

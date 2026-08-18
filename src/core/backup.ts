@@ -104,10 +104,25 @@ export interface BackupBenchmark {
   day: string
   startedAt: number
   ordinal: number
+  /*
+   * Diese drei kamen mit M3 dazu, und die Fassung des Formats bleibt
+   * trotzdem bei 1.
+   *
+   * Erlaubt ist das, weil sie **optional** sind und weil es keine Datei
+   * geben kann, die sie bräuchte: Vor M3 gab es keinen Benchmark, also auch
+   * keine Zeile in dieser Tabelle. Eine ältere Datei bringt hier nichts mit,
+   * und eine neuere liest die alte App weiterhin — sie kennt die Felder nur
+   * nicht. Eine Fassungsnummer heraufzusetzen, ohne dass jemandem etwas
+   * fehlt, machte alte Dateien grundlos unlesbar.
+   */
+  total?: number
+  items?: string[]
+  encodedAt?: number
   immediate?: number
   after20Minutes?: number
   nextDay?: number
   completed: boolean
+  abandoned?: boolean
 }
 
 export interface BackupTables {

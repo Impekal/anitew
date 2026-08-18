@@ -1103,3 +1103,87 @@ fiel in die Zukunft — wo die Serie es zu Recht übergeht (P5).
 E2E-Test bildet den Tagesschlüssel deshalb genauso, mit der Vier-Uhr-Grenze.
 
 **Stand:** 182 Kerntests, 52 E2E-Läufe, Typecheck für App und Kern grün.
+
+---
+
+## 2026-08-18 · Die Messung (M3) — die Release-Sperre fällt
+
+M3 war nie eine Funktion, sondern eine **Erlaubnis**: Solange die Messung
+nicht misst, darf ANITEW keinen einzigen Satz über das Gedächtnis eines
+Nutzers sagen. Ab jetzt darf sie es — und zwar genau so weit, wie gezählt
+wurde.
+
+### Was gemessen wird
+
+Zwanzig Wörter, fünf Sekunden je Wort, dann Abruf in drei Stufen: sofort, nach
+zwanzig Minuten, am Folgetag. Alle vierzehn Tage. Die Wörter kommen aus einem
+**Quarantänevorrat** (F2a) von sechzig Stück je Sprache, der sich mit dem
+Trainingswortschatz nirgends überschneidet — geprüft, nicht behauptet — und
+der keinen Wiederholungstermin erzeugt. Ohne diese Trennung misst ein
+Benchmark nur, wie oft man seine eigenen Testwörter schon geübt hat.
+
+Das Fenster für die zweite Stufe ist 15 bis 45 Minuten. Wer es verpasst, liest
+keinen Vorwurf, sondern den Grund: Eine Messung nach drei Stunden ist keine
+Messung nach zwanzig Minuten, also zählt diese nicht mit.
+
+### Die Stelle, an der die App schweigt
+
+Der wichtigste Teil ist das, was **nicht** dasteht.
+
+Vor der dritten Messung steht keine Veränderung, sondern das Wort *Eichung*
+und die Erklärung dazu (F2b): Auch ein Test wird durch Gewöhnung an seinen
+Ablauf besser, und die ersten beiden Läufe messen zu einem guten Teil genau
+das.
+
+Danach steht eine Zahl nur, wenn sie sich trägt. Aus zwanzig Wörtern ergibt
+sich ein binomialer Standardfehler; die Spanne ist das Doppelte davon. Enthält
+sie die Null, dann heißt der Satz: **„Kein Unterschied, der sich vom Zufall
+trennen lässt. Zwanzig Wörter sind eine kleine Stichprobe: Zwei Wörter mehr
+oder weniger sind schon zehn Prozentpunkte.“** Ein Wort mehr als bei der
+Eichung ist kein Fortschritt, und die App verkauft es auch nicht als einen.
+Genau dieser Fall hat einen eigenen E2E-Test.
+
+Wo eine Zahl steht, steht die Spanne daneben — und aufklappbar, was gezählt
+wurde. Der Erklärtext endet mit dem Satz, den das Genre sonst auslässt: „Über
+dein Gedächtnis im Alltag sagt es nichts, solange es niemand dort gemessen
+hat.“ (F4)
+
+### Zwei Zahlen, die sich nie berühren (F1)
+
+Trainingsscore und Messung liegen in getrennten Tabellen, werden von
+getrennten Bausteinen angezeigt und teilen keinen Wert. Die Zusammenfassung
+einer Einheit sagt selbst dazu, dass ihr Ergebnis nichts über das Gedächtnis
+insgesamt aussagt — das misst die Messung. Eine abgebrochene Messung wird als
+abgebrochen markiert und fällt aus der Reihe heraus, statt sie zu verdünnen.
+
+### Ein Format, das seine Nummer behalten durfte
+
+Die Sicherungsdatei (N2) bekam vier neue Felder für die Messung und bleibt bei
+`BACKUP_VERSION = 1`. Erlaubt war das, weil sie optional sind und weil es
+keine ältere Datei geben *kann*, der sie fehlen: Vor M3 gab es keine Messung,
+also auch keine Zeile in dieser Tabelle. Eine Fassungsnummer heraufzusetzen,
+ohne dass jemandem etwas fehlt, machte alte Dateien grundlos unlesbar. Beim
+Einlesen wird ergänzt statt erfunden — die Anzahl ist die feste Größe der
+Messung.
+
+### Der Fehler dieser Runde: ein Name, der zu wenig unterschied
+
+Sechs von sieben neuen E2E-Prüfungen fielen sofort aus, alle an derselben
+Zeile: `getByRole('button', { name: 'Beginnen' })`. Die App war in Ordnung.
+Playwright vergleicht zugängliche Namen von Haus aus als **Teilzeichenkette
+und ohne Rücksicht auf Groß- und Kleinschreibung** — und seit M3 steht auf dem
+Startbildschirm auch „Messung beginnen“. Der Selektor fand zwei Knöpfe.
+
+Ein `exact: true` hätte es nicht behoben, weil der Startknopf die Dauer im
+Namen trägt („5:00 Beginnen“). Der Griff steht jetzt einmal in
+`tests/e2e/helpers.ts` als `startButton()` und sucht über die Klasse. Damit
+ist auch der eigentliche Schaden repariert: Der Selektor lag **zweiundzwanzig
+Mal** in sechs Dateien, und jede spätere Beschriftung, die zufällig
+„beginnen“ enthält, hätte sie alle wieder umgeworfen.
+
+Die Lehre ist dieselbe wie in M4, nur an anderer Stelle: **Ein Griff, der in
+sechs Dateien kopiert liegt, ist sechs Fehler, die noch nicht passiert sind.**
+
+**Stand:** 203 Kerntests, 66 E2E-Läufe, Typecheck für App und Kern grün.
+Offen in M3: die Wissenschaftsseite (F6) und die Store-Texte (F7), die daran
+hängen.

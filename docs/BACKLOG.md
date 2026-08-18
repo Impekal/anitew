@@ -127,15 +127,15 @@ Abruftraining. Hier entscheidet sich, ob die App wirkt.
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| F1 | **Trainingsscore und Benchmark strikt trennen** — zwei Datenreihen, zwei Anzeigen, nie vermischt | ⬜ | „Die App muss zwischen Trainingsscore und tatsächlich gemessener Gedächtnisleistung unterscheiden“ | M |
-| F2 | Benchmark-Test: ~3 min, Tag 0 und dann alle 14 Tage; gleicher Aufbau, neuer Inhalt; misst sofort / nach 20 min / am Folgetag | ⬜ | **D-006** | L |
-| F3 | „Memory Strength +18 %“ nur aus dem Benchmark, mit Antippen → was genau gemessen wurde | ⬜ | Vergleich immer gegen den eigenen Tag 0, nie gegen andere Nutzer | M |
-| F2a | **Quarantäne-Itempool**: Benchmark-Inhalte kommen sonst nirgends vor und wandern nie in die Wiederholung | ⬜ | **D-006** — ohne diese Trennung misst der Benchmark nur Übung | M |
-| F2b | Erste zwei Messungen als **Eichung** kennzeichnen (Gewöhnung ans Format), Ergebnis als Spanne solange die Datenlage dünn ist | ⬜ | **D-006**; hängt an E7 | M |
-| F4 | Kein behaupteter Alltagstransfer, der nicht gemessen wurde | ⬜ | der Unterschied zwischen „besser in dieser Übung“ und „besseres Gedächtnis“ ist der wunde Punkt des ganzen Genres | S |
-| F5 | Fortschritt in echten Zahlen: „Day 1: 8/20 · Day 7: 15/20 · Day 30: 18/20 — du erinnerst 10 Dinge mehr als am ersten Tag“ | ⬜ | überzeugender als „+50 Coins“, und es stimmt | M |
-| F6 | Wissenschaftsseite in der App: was belegt ist (Spacing, Retrieval Practice), was nicht (allgemeine Intelligenzsteigerung), mit Quellen | ⬜ | | M |
-| F7 | Alle Marketing- und Store-Texte an F1–F6 binden | ⬜ | „Train your memory. Measure your progress. Remember more.“ | S |
+| F1 | **Trainingsscore und Benchmark strikt trennen** — zwei Datenreihen, zwei Anzeigen, nie vermischt | ✅ 2026-08-18 | Zwei Tabellen (`sessions`/`events` gegen `benchmarks`), zwei Bausteine (`Summary` gegen `BenchmarkPanel`), keine gemeinsame Zahl. Die Zusammenfassung sagt ausdrücklich, dass ihr Wert *nichts* über das Gedächtnis insgesamt aussagt. Eine abgebrochene Messung fällt aus der Reihe heraus, statt sie zu verdünnen | M |
+| F2 | Benchmark-Test: ~3 min, Tag 0 und dann alle 14 Tage; gleicher Aufbau, neuer Inhalt; misst sofort / nach 20 min / am Folgetag | ✅ 2026-08-18 | `core/benchmark/plan.ts`: 20 Wörter × 5 s, Abruf in drei Stufen, das Fenster für die zweite ist 15–45 Minuten. Wer es verpasst, bekommt keinen Vorwurf, sondern die Ansage, dass diese Messung nicht zählt | L |
+| F3 | „Memory Strength +18 %“ nur aus dem Benchmark, mit Antippen → was genau gemessen wurde | ✅ 2026-08-18 | Die große Zahl ist die Differenz zur eigenen Eichung, und sie steht nur da, wenn die Spanne (±2 Standardfehler) die Null **nicht** enthält. Sonst steht dort, dass kein Unterschied erkennbar ist. Aufklappbar: was gezählt wurde | M |
+| F2a | **Quarantäne-Itempool**: Benchmark-Inhalte kommen sonst nirgends vor und wandern nie in die Wiederholung | ✅ 2026-08-18 | 60 Wörter je Sprache in `core/benchmark/pool.ts`, per Test gegen den Trainingswortschatz auf Überschneidungsfreiheit geprüft. Sie erzeugen keinen `itemState`, also auch keinen Termin. `poolCycles()` sagt, ab welcher Messung sich der Vorrat wiederholt — und die App sagt es dann auch | M |
+| F2b | Erste zwei Messungen als **Eichung** kennzeichnen (Gewöhnung ans Format), Ergebnis als Spanne solange die Datenlage dünn ist | ✅ 2026-08-18 | `CALIBRATION_RUNS = 2`. Vor der dritten Messung zeigt die App keine Veränderung, sondern erklärt, warum noch keine dasteht. Danach immer Wert **und** Spanne | M |
+| F4 | Kein behaupteter Alltagstransfer, der nicht gemessen wurde | ✅ 2026-08-18 | Der Erklärtext endet mit dem Satz, der dem ganzen Genre fehlt: „Über dein Gedächtnis im Alltag sagt es nichts, solange es niemand dort gemessen hat.“ | S |
+| F5 | Fortschritt in echten Zahlen: „Day 1: 8/20 · Day 7: 15/20 · Day 30: 18/20 — du erinnerst 10 Dinge mehr als am ersten Tag“ | ✅ 2026-08-18 | Die Reihe steht als Liste unter dem Ergebnis, jede Messung mit ihrem Tag und ihrem Zähler. Unvollständige Läufe stehen nicht darin | M |
+| F6 | Wissenschaftsseite in der App: was belegt ist (Spacing, Retrieval Practice), was nicht (allgemeine Intelligenzsteigerung), mit Quellen | ⬜ | offen. Der Erklärtext der Messung nimmt einen Teil davon vorweg, ersetzt die Seite aber nicht | M |
+| F7 | Alle Marketing- und Store-Texte an F1–F6 binden | ⬜ | offen, wartet auf F6. Der Slogan steht schon: „Gedächtnis ist Technik, kein Talent.“ | S |
 
 ## G. Memory-Palace-Modus
 
@@ -263,8 +263,8 @@ Anforderung wie jede andere. Die acht Regeln G-1 bis G-8 stehen in
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | ✅ 2026-08-17 | 182 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Sessionplanung, Bewertung, Scheduler und Gesichtsgenerator sind abgedeckt | M |
-| P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | ✅ 2026-08-17 | 52 Läufe in Chromium und im Telefonprofil, darunter eine Einheit von vorn bis hinten und der Abbruch mitten drin. Seit M4 **liest der Test ab, welches Modul kam, statt es vorherzusagen** (`tests/e2e/helpers.ts`) | M |
+| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | ✅ 2026-08-18 | 203 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Sessionplanung, Bewertung, Scheduler, Gesichtsgenerator und die ganze Messung sind abgedeckt | M |
+| P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | ✅ 2026-08-18 | 66 Läufe in Chromium und im Telefonprofil, darunter eine Einheit von vorn bis hinten und der Abbruch mitten drin. Seit M4 **liest der Test ab, welches Modul kam, statt es vorherzusagen** (`tests/e2e/helpers.ts`) | M |
 | P3 | CI bei jedem Push: Typecheck (App **und** Kern getrennt), Tests, Build, E2E | ✅ 2026-08-17 | | S |
 | P4 | Performance: Kaltstart unter 2 s, Timer laufen ruckelfrei | ⬜ | | M |
 | P5 | Uhrmanipulation darf die Engine nicht zerstören (Streak-Betrug, Intervall-Chaos) | ⬜ | monotone Zeitquelle plus Plausibilitätsprüfung | M |
@@ -327,7 +327,7 @@ Neu offen, entstanden aus den Antworten:
 | **M0** | Fundament | A1–A11, L1/L1a, P3 | ✅ **2026-08-17** — Push baut, App installiert sich, `src/core/` läuft ohne Browser und wird von der CI daran gehalten |
 | **M1** | Walking Skeleton | B1–B3, B5, B6, B9, C5, D4, D6, N1 | ✅ **2026-08-17** — Eine echte Einheit läuft täglich durch, überlebt eine Unterbrechung, und jede Antwort steht im Protokoll |
 | **M2** | Die Engine wird echt | C1–C9, D8, E1–E7, B4 | Die App entscheidet begründet, was du heute trainierst, und plant Wiederholungen persönlich |
-| **M3** | Ehrlichkeit | F1–F7, F2a, F2b | Es gibt zwei getrennte Zahlen, und die große Prozentzahl ist gemessen. **Vorher kein öffentlicher Release** |
+| **M3** | Ehrlichkeit | F1–F7, F2a, F2b | 🟨 **2026-08-18** — Die Messung läuft, die große Zahl ist gemessen und schweigt, wenn die Datenlage sie nicht trägt (F1–F5). Offen: Wissenschaftsseite (F6) und die Store-Texte (F7). **Vorher kein öffentlicher Release** |
 | **M4** | Inhalt & Spiel | D5, D9–D16, G, H, K, J | 🟨 **2026-08-17** — Vier Module, die erste Merktechnik (D5), die Serie mit Schutztagen (K2). Offen: Palast (G), XP/Achievements (K1/K3/K4), weitere Vorlagen und Techniken |
 | **M5** | Sprachen | L1–L8 | Man kann heute auf Deutsch und morgen auf Japanisch trainieren |
 | **M6** | Echtes Leben | I, M | Eigene Präsentation rein, Wiederholungsplan raus |

@@ -1,0 +1,224 @@
+import { useCallback, useEffect, useRef, useState } from 'react'
+
+import {
+  BENCHMARK_SECONDS_PER_ITEM,
+  type BenchmarkPhase,
+  type BenchmarkRun,
+  type Platform,
+  RECALL_SECONDS,
+  dayKeyOf,
+  gradeRecall,
+  nextStep,
+  splitEntries,
+} from '../../core/index.ts'
+import { recordPhase } from '../../data/benchmark.ts'
+import type { Dictionary } from '../../i18n/index.ts'
+
+/**
+ * Die Messung (Backlog F2 · D-006).
+ *
+ * Sie sieht dem Training absichtlich ähnlich und ist etwas anderes: Was hier
+ * gezählt wird, geht in **keinen** Trainingsscore ein, und die Wörter
+ * bekommen **keinen** Wiederholungstermin (F1, F2a). Die Ähnlichkeit ist
+ * gewollt — ein fremd aussehender Test misst zum Teil die Fremdheit.
+ *
+ * Drei Abrufe: sofort, nach zwanzig Minuten, am Folgetag. Dieser Bildschirm
+ * führt immer nur den einen aus, der gerade dran ist; die Wartezeit dazwischen
+ * gehört zur Messung und nicht in eine Schleife.
+ */
+export function BenchmarkScreen({
+  platform,
+  dictionary,
+  run,
+  runId,
+  items,
+  onDone,
+}: {
+  platform: Platform
+  dictionary: Dictionary
+  run: BenchmarkRun
+  runId: string
+  items: readonly string[]
+  onDone: () => void
+}) {
+  const now = platform.clock.now()
+  const today = dayKeyOf(now, { offsetMinutes: platform.clock.offsetMinutes(now) })
+  const step = nextStep(run, now, today)
+
+  if (step.kind === 'encode') {
+    return (
+      <Encode
+        dictionary={dictionary}
+        platform={platform}
+        items={items}
+        runId={runId}
+        onDone={onDone}
+      />
+    )
+  }
+  if (step.kind === 'recall') {
+    return (
+      <Recall
+        dictionary={dictionary}
+        platform={platform}
+        items={items}
+        phase={step.phase}
+        runId={runId}
+        onDone={onDone}
+      />
+    )
+  }
+  return null
+}
+
+/**
+ * Einprägen — zwanzig Wörter, fünf Sekunden je Wort.
+ *
+ * Die Zeiten stehen fest und hängen an **keinem** Trainingswert: „Immer
+ * gleich aufgebaut“ (D-006) heißt, dass eine spätere Änderung an der
+ * Trainingsschwierigkeit die Messreihe nicht verbiegt.
+ */
+function Encode({
+  dictionary,
+  platform,
+  items,
+  runId,
+  onDone,
+}: {
+  dictionary: Dictionary
+  platform: Platform
+  items: readonly string[]
+  runId: string
+  onDone: () => void
+}) {
+  const [index, setIndex] = useState(0)
+  const startedRef = useRef(platform.clock.elapsed())
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const elapsed = (platform.clock.elapsed() - startedRef.current) / 1000
+      const at = Math.floor(elapsed / BENCHMARK_SECONDS_PER_ITEM)
+      setIndex(Math.min(at, items.length))
+    }, 200)
+    return () => clearInterval(timer)
+  }, [items.length, platform])
+
+  if (index >= items.length) {
+    return (
+      <Recall
+        dictionary={dictionary}
+        platform={platform}
+        items={items}
+        phase="immediate"
+        runId={runId}
+        onDone={onDone}
+      />
+    )
+  }
+
+  return (
+    <main className="app session">
+      <p className="hint">{dictionary.benchmark.encodeHint}</p>
+      <section className="encode">
+        <p className="encode-word" key={index} aria-live="polite">
+          {items[index]}
+        </p>
+        <div className="encode-dots" role="img" aria-label={`${index + 1} / ${items.length}`}>
+          {items.map((item, position) => (
+            <span
+              key={item}
+              className={position === index ? 'dot-now' : position < index ? 'dot-done' : ''}
+            />
+          ))}
+        </div>
+      </section>
+    </main>
+  )
+}
+
+/** Ein Abruf — frei, ohne Hinweise, in derselben Form wie im Training. */
+function Recall({
+  dictionary,
+  platform,
+  items,
+  phase,
+  runId,
+  onDone,
+}: {
+  dictionary: Dictionary
+  platform: Platform
+  items: readonly string[]
+  phase: BenchmarkPhase
+  runId: string
+  onDone: () => void
+}) {
+  const t = dictionary.benchmark
+  const [entries, setEntries] = useState('')
+  const [remaining, setRemaining] = useState(RECALL_SECONDS)
+  const startedRef = useRef(platform.clock.elapsed())
+  const doneRef = useRef(false)
+
+  const finish = useCallback(
+    (text: string) => {
+      if (doneRef.current) return
+      doneRef.current = true
+      /*
+       * Bewertet wird nachsichtig wie im Training — gemessen werden soll das
+       * Gedächtnis und nicht die Rechtschreibung. Streng zu sein machte die
+       * Zahl kleiner, aber nicht richtiger.
+       */
+      const graded = gradeRecall(splitEntries(text), items)
+      void recordPhase(runId, phase, graded.correct.length, platform.clock.now())
+        .catch(() => undefined)
+        .finally(onDone)
+    },
+    [items, onDone, phase, platform, runId],
+  )
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const elapsed = (platform.clock.elapsed() - startedRef.current) / 1000
+      const left = Math.max(0, RECALL_SECONDS - elapsed)
+      setRemaining(Math.ceil(left))
+      if (left <= 0) finish(entries)
+    }, 200)
+    return () => clearInterval(timer)
+  }, [entries, finish, platform])
+
+  const hint =
+    phase === 'immediate'
+      ? t.recallNow
+      : phase === 'after20Minutes'
+        ? t.recallAfter
+        : t.recallNextDay
+
+  return (
+    <main className="app session">
+      <header className="session-head">
+        <span>{t.heading}</span>
+        <span className="session-clock">
+          {Math.floor(remaining / 60)}:{String(remaining % 60).padStart(2, '0')}
+        </span>
+      </header>
+
+      <section className="recall">
+        <p className="hint">{hint}</p>
+        <textarea
+          className="recall-input"
+          value={entries}
+          onChange={(event) => setEntries(event.target.value)}
+          placeholder={dictionary.session.recallPlaceholder}
+          rows={6}
+          autoFocus
+          autoCapitalize="off"
+          autoCorrect="off"
+          spellCheck={false}
+          aria-label={hint}
+        />
+        <button type="button" className="start" onClick={() => finish(entries)}>
+          <span className="start-label">{dictionary.session.doneWithBlock}</span>
+        </button>
+      </section>
+    </main>
+  )
+}

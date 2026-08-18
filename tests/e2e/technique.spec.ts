@@ -1,5 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 
+import { startButton } from './helpers.ts'
+
 /**
  * Die Merktechnik, im Browser nachgeprüft (Backlog D5).
  *
@@ -32,7 +34,7 @@ const TEACH_ORDER = [1, 2, 3, 4, 5, 9, 7, 8, 0, 6]
 async function seedTaught(page: Page, digits: readonly number[]) {
   await page.goto('/')
   // Erst nach dem ersten Laden gibt es das Schema, in das geschrieben wird.
-  await expect(page.getByRole('button', { name: 'Beginnen' })).toBeVisible()
+  await expect(startButton(page)).toBeVisible()
   await page.evaluate(async (value) => {
     const open = indexedDB.open('anitew')
     const database: IDBDatabase = await new Promise((resolve, reject) => {
@@ -53,7 +55,7 @@ async function seedTaught(page: Page, digits: readonly number[]) {
 
 async function startShort(page: Page) {
   await page.getByRole('button', { name: '3 Minuten' }).click()
-  await page.getByRole('button', { name: 'Beginnen' }).click()
+  await startButton(page).click()
   await page.locator('.settle').click()
 }
 
@@ -137,7 +139,7 @@ test('schreibt den Konsonanten unter seine Ziffer — auch den frisch gelernten'
       return
     }
     await page.getByRole('button', { name: 'Abbrechen' }).click()
-    await expect(page.getByRole('button', { name: 'Beginnen' })).toBeVisible()
+    await expect(startButton(page)).toBeVisible()
   }
 
   throw new Error(`In drei Einheiten kam keine Zahl mit der Ziffer ${fresh} vor`)
@@ -155,7 +157,7 @@ test('zeigt nichts an, solange nichts gelehrt ist', async ({ page }) => {
    */
   await page.goto('/')
   await page.getByRole('button', { name: '60 Sekunden' }).click()
-  await page.getByRole('button', { name: 'Beginnen' }).click()
+  await startButton(page).click()
   await page.locator('.settle').click()
 
   // Eine Mission zeigt statt einzelner Stücke ihre Szene — beides zählt als
@@ -176,7 +178,7 @@ test('hält beim nächsten Mal die nächste Lektion', async ({ page }) => {
   // Abbrechen statt abwarten: Gelehrt ist gelehrt, sobald die Lektion vorbei
   // ist — davon hängt nicht ab, ob die Einheit zu Ende läuft.
   await page.getByRole('button', { name: 'Abbrechen' }).click()
-  await expect(page.getByRole('button', { name: 'Beginnen' })).toBeVisible()
+  await expect(startButton(page)).toBeVisible()
 
   await startShort(page)
 

@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { answerRecall, collectItems, startEmergency } from './helpers.ts'
+import { answerRecall, collectItems, startButton, startEmergency } from './helpers.ts'
 
 /**
  * Die Serie, im Browser nachgeprüft (Backlog K2, K5, K7 · D-008).
@@ -60,7 +60,7 @@ test('sagt nichts, solange nichts trainiert wurde (K7)', async ({ page }) => {
    * bevor überhaupt etwas passiert ist.
    */
   await page.goto('/')
-  await expect(page.getByRole('button', { name: 'Beginnen' })).toBeVisible()
+  await expect(startButton(page)).toBeVisible()
   await expect(page.locator('.streak')).toBeHidden()
 })
 
@@ -82,7 +82,7 @@ test('zählt einen Tag, sobald eine Einheit zu Ende gelaufen ist', async ({ page
 
 test('hält die Serie über einen verpassten Tag hinweg (D-008)', async ({ page }) => {
   await page.goto('/')
-  await expect(page.getByRole('button', { name: 'Beginnen' })).toBeVisible()
+  await expect(startButton(page)).toBeVisible()
 
   /*
    * Neun Tage bis vorgestern, gestern nichts, heute wieder. Nach sieben Tagen
@@ -102,7 +102,7 @@ test('hält die Serie über einen verpassten Tag hinweg (D-008)', async ({ page 
 
 test('zeigt die Schutztage, die auf Vorrat sind', async ({ page }) => {
   await page.goto('/')
-  await expect(page.getByRole('button', { name: 'Beginnen' })).toBeVisible()
+  await expect(startButton(page)).toBeVisible()
 
   // Vierzehn Tage am Stück: zwei Schutztage, und mehr lassen sich nicht
   // ansparen — sonst wäre die Serie irgendwann nicht mehr zu verlieren und
@@ -119,7 +119,7 @@ test('zeigt die Schutztage, die auf Vorrat sind', async ({ page }) => {
 
 test('nennt die Bestmarke erst, wenn sie etwas anderes sagt (K5, G-2)', async ({ page }) => {
   await page.goto('/')
-  await expect(page.getByRole('button', { name: 'Beginnen' })).toBeVisible()
+  await expect(startButton(page)).toBeVisible()
 
   // Eine laufende Serie ohne Bruch: Bestmarke und laufende Serie wären
   // dieselbe Zahl, und zweimal dieselbe Zahl ist ein Möbel.

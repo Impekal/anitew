@@ -117,17 +117,49 @@ export interface ItemStateRow {
  * laufen — auch nicht in der Datenbank, wo eine spätere Auswertung sie aus
  * Versehen vermischen könnte. Das ist Regel R-1, bis in das Schema gezogen.
  */
+/*
+ * Nachtrag 2026-08-17 (M3): Die Felder haben sich geändert — aus Anteilen
+ * wurden Anzahlen, dazu kamen `total`, `items` und `encodedAt`.
+ *
+ * Das verstößt **nicht** gegen die Regel oben: Geändert hat sich die Form der
+ * Datensätze, nicht das Schema. Der Zeichenkettenausdruck in `version(1)` und
+ * `version(2)` nennt nur Primärschlüssel und Indizes, und keiner davon ist
+ * betroffen. Und diese Tabelle hat bis heute keine einzige Zeile gesehen —
+ * es gab noch keinen Benchmark, der hätte schreiben können.
+ */
 export interface BenchmarkRow {
   id: string
   day: DayKey
   startedAt: Instant
   /** Fortlaufende Nummer. Die ersten beiden gelten als Eichung (D-006). */
   ordinal: number
-  /** Anteil richtig erinnerter Items, je Abstand. Leer, solange offen. */
+  /** Wie viele Wörter gefragt waren. Immer gleich — aber mitgeschrieben. */
+  total: number
+  /** Die Wörter dieser Messung, damit der Abruf sie nach Tagen noch kennt. */
+  items: string[]
+  /** Wann das Einprägen endete — daran hängen die beiden Zeitfenster. */
+  encodedAt?: Instant
+  /**
+   * **Anzahl** richtig erinnerter Wörter je Abstand, nicht ihr Anteil. Leer,
+   * solange der Abruf noch aussteht.
+   *
+   * Die Anzahl und nicht der Anteil, weil F5 genau das zeigen soll — „Tag 1:
+   * 8/20“ — und weil sich aus der Anzahl der Anteil ergibt, aus dem Anteil
+   * die Anzahl aber nur mit Rundungsfehlern.
+   */
   immediate?: number
   after20Minutes?: number
   nextDay?: number
   completed: boolean
+  /**
+   * Abgebrochen, weil ein Zeitfenster verpasst wurde.
+   *
+   * Ein eigenes Feld und nicht `completed: true`: Die Messung ist **beendet**,
+   * aber sie ist nicht **gültig**. Beides in einen Wahrheitswert zu falten
+   * hieße, eine unvollständige Messung als vollständig zu führen — genau die
+   * Verwechslung, die F1 ausschließt.
+   */
+  abandoned?: boolean
 }
 
 export class AnitewDatabase extends Dexie {

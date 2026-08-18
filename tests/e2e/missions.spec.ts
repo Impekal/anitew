@@ -1,5 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 
+import { startButton } from './helpers.ts'
+
 /**
  * Memory Missions, im Browser nachgeprüft (Backlog H1, H2, H4).
  *
@@ -21,7 +23,7 @@ async function startMission(page: Page): Promise<boolean> {
   for (let attempt = 0; attempt < 14; attempt++) {
     await page.goto('/')
     await page.getByRole('button', { name: '60 Sekunden' }).click()
-    await page.getByRole('button', { name: 'Beginnen' }).click()
+    await startButton(page).click()
     await page.locator('.settle').click()
     await expect(page.locator('.scene, .encode-word').first()).toBeVisible({ timeout: 30_000 })
     if ((await page.locator('.scene').count()) > 0) return true

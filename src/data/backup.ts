@@ -8,6 +8,7 @@
  */
 
 import {
+  BENCHMARK_ITEMS,
   type BackupCounts,
   type BackupFile,
   type BackupReading,
@@ -153,7 +154,14 @@ export async function importBackup(file: BackupFile): Promise<ImportReport> {
       for (const benchmark of file.tables.benchmarks) {
         const mine = await db.benchmarks.get(benchmark.id)
         if (mine === undefined) {
-          await db.benchmarks.put(benchmark)
+          // Was eine ältere Datei nicht mitbringt, wird hier ergänzt statt
+          // erfunden: Die Anzahl ist die feste Größe der Messung, die Wörter
+          // sind nach Abschluss ohnehin nicht mehr nötig.
+          await db.benchmarks.put({
+            ...benchmark,
+            total: benchmark.total ?? BENCHMARK_ITEMS,
+            items: benchmark.items ?? [],
+          })
           added['benchmarks'] = (added['benchmarks'] as number) + 1
         } else kept++
       }

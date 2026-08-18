@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { answerRecall, collectItems, recallKind, sceneOf } from './helpers.ts'
+import { answerRecall, collectItems, recallKind, sceneOf, startButton } from './helpers.ts'
 
 /**
  * Eine Trainingseinheit von vorn bis hinten (Backlog B1–B3, B5, D4, D6).
@@ -12,7 +12,7 @@ import { answerRecall, collectItems, recallKind, sceneOf } from './helpers.ts'
 async function startEmergency(page: Page) {
   await page.goto('/')
   await page.getByRole('button', { name: '60 Sekunden' }).click()
-  await page.getByRole('button', { name: 'Beginnen' }).click()
+  await startButton(page).click()
   // Das Ankommen (D-011/G-1) lässt sich antippen — im Test warten wir nicht
   // drei Sekunden auf einen atmenden Kreis.
   await page.locator('.settle').click()
@@ -158,7 +158,7 @@ test('lässt sich verwerfen und beginnt dann neu', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Verwerfen und neu beginnen' }).click()
   await expect(page.getByRole('heading', { name: 'Eine Einheit läuft noch' })).toBeHidden()
-  await expect(page.getByRole('button', { name: 'Beginnen' })).toBeVisible()
+  await expect(startButton(page)).toBeVisible()
 
   await page.reload()
   await expect(page.getByRole('heading', { name: 'Eine Einheit läuft noch' })).toBeHidden()

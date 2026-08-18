@@ -122,6 +122,53 @@ export const de = {
     doneWithBlock: 'Fertig',
     abort: 'Abbrechen',
   },
+  benchmark: {
+    /*
+      Die schwierigste Stelle im ganzen Projekt (D-006): Woher kommt die Zahl,
+      wenn eine App sagt „Memory Strength +18 %“?
+
+      Jeder Satz hier ist darauf geprüft, dass er nichts behauptet, was nicht
+      gemessen wurde (R-1, F4). „Dein Gedächtnis ist besser geworden“ steht
+      nirgends — die App sagt, was sie gezählt hat, und der Nutzer zieht den
+      Schluss.
+    */
+    heading: 'Messung',
+    // Der Aufruf auf dem Startbildschirm. Sachlich, kein Ausrufezeichen.
+    invite: 'Zeit für eine Messung',
+    inviteNote: 'Drei Minuten. Zwanzig Wörter, die im Training nie vorkommen — deshalb misst sie dein Gedächtnis und nicht deine Übung.',
+    start: 'Messung beginnen',
+    encodeHint: 'Zwanzig Wörter. Sieh sie an.',
+    recallNow: 'Was ist geblieben?',
+    recallAfter: 'Und jetzt, nach der Pause: was ist geblieben?',
+    recallNextDay: 'Von gestern: was ist geblieben?',
+    // Die Wartezeit ist Teil der Messung und keine Unterbrechung.
+    waitingTitle: 'Die Messung läuft weiter',
+    waitingSoon: 'In zwanzig Minuten fragt sie noch einmal. Bis dahin: alles wie sonst.',
+    waitingTomorrow: 'Morgen fragt sie ein letztes Mal.',
+    ready: 'Die Messung wartet auf dich',
+    continue: 'Weiter',
+    // G-5: kein Vorwurf. Es ist nur vorbei.
+    missedTitle: 'Das Zeitfenster ist vorbei',
+    missedNote: 'Eine Messung nach drei Stunden ist keine Messung nach zwanzig Minuten. Diese hier zählt deshalb nicht mit — die nächste beginnt von vorn.',
+    discard: 'Verstanden',
+    // Die Ergebnisanzeige.
+    resultTitle: 'Gemessen',
+    ofItems: 'von 20',
+    phaseImmediate: 'sofort',
+    phaseAfter: 'nach 20 Minuten',
+    phaseNextDay: 'am Folgetag',
+    calibrating: 'Eichung',
+    calibratingNote: 'Auch eine Messung wird durch Gewöhnung an ihren Ablauf ein wenig besser. Die ersten beiden zählen deshalb als Eichung — eine Veränderung steht hier erst ab der dritten.',
+    changeUp: 'Prozentpunkte mehr behalten als bei der Eichung',
+    changeDown: 'Prozentpunkte weniger behalten als bei der Eichung',
+    range: 'Spanne',
+    // Der wichtigste Satz der ganzen App.
+    tooClose: 'Kein Unterschied, der sich vom Zufall trennen lässt. Zwanzig Wörter sind eine kleine Stichprobe: Zwei Wörter mehr oder weniger sind schon zehn Prozentpunkte.',
+    explain: 'Was hier gemessen wurde',
+    explainNote: 'Zwanzig Wörter, die es sonst nirgends in der App gibt und die nie in den Wiederholungsplan wandern. Gezählt wird, wie viele davon am Folgetag noch da sind — verglichen mit dir selbst bei der Eichung, nie mit anderen. Was hier steht, ist gezählt. Über dein Gedächtnis im Alltag sagt es nichts, solange es niemand dort gemessen hat.',
+    series: 'Die Reihe',
+    cycles: 'Ab der {n}. Messung wiederholen sich die Wörter. Ein Wort, das man vor Monaten einmal drei Minuten lang gesehen hat, verfälscht wenig — aber es verfälscht.',
+  },
   streak: {
     /*
       Die Serie sagt, was war — mehr nicht (K7). Keine Drohung, kein

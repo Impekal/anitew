@@ -1,5 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 
+import { startButton } from './helpers.ts'
+
 /** Der Systemcheck liegt zusammengeklappt am Fuß (D-011/G-2). */
 async function openFoundation(page: Page) {
   await page.getByText('Fundament', { exact: true }).click()
@@ -33,7 +35,7 @@ test('übernimmt beim ersten Start die Sprache des Geräts (D-007)', async ({ br
   const germanPage = await german.newPage()
 
   await germanPage.goto('/')
-  await expect(germanPage.getByRole('button', { name: 'Beginnen' })).toBeVisible()
+  await expect(startButton(germanPage)).toBeVisible()
 
   await englishPage.goto('/')
   await expect(englishPage.getByRole('button', { name: 'Begin' })).toBeVisible()
@@ -79,7 +81,7 @@ test('hält den ersten Bildschirm frei von Technik', async ({ page }) => {
   // Einstieg nicht mehr. Wer die App öffnet, sieht ein Angebot, kein Protokoll.
   await page.goto('/')
   await expect(page.locator('.foundation')).toBeHidden()
-  await expect(page.getByRole('button', { name: 'Beginnen' })).toBeVisible()
+  await expect(startButton(page)).toBeVisible()
 })
 
 test('ist als App installierbar', async ({ page, request }) => {
