@@ -309,6 +309,41 @@ export const de = {
     longest: 'Am häufigsten zurückgeholt',
     times: 'mal',
   },
+  profile: {
+    /*
+      Das Gedächtnisprofil (E · D-021).
+
+      Die gefährlichste Anzeige der ganzen App: Sie sieht aus wie ein Befund
+      über einen Menschen. Jeder Satz hier ist daraufhin geprüft, dass er
+      sagt, **was gezählt wurde** — und dass „nicht gemessen“ nirgends wie
+      „schlecht“ aussieht.
+    */
+    heading: 'Dein Profil',
+    note: 'Gezählt wird nur das Wiedersehen: wie oft eine Information nach Tagen zurückkam und noch da war. Wie gut du am Lerntag selbst abschneidest, steht hier absichtlich nicht — das ist Übung, nicht Gedächtnis.',
+    names: {
+      words: 'Wörter',
+      faces: 'Namen & Gesichter',
+      numbers: 'Zahlen',
+      spatial: 'Räumlich',
+      binding: 'Zusammenhänge',
+      visual: 'Visuell',
+      attention: 'Aufmerksamkeit',
+      working: 'Arbeitsgedächtnis',
+      longTerm: 'Langfristiger Abruf',
+    },
+    of: 'von',
+    kept: 'behalten',
+    range: 'Spanne',
+    // E7: Der Unterschied zwischen „zu wenig“ und „schlecht“ ist die ganze Regel.
+    tooFew: 'Noch zu wenige Gelegenheiten für eine Aussage.',
+    chancesSoFar: 'bisher',
+    of15: 'von 15',
+    notMeasured: 'Misst diese App nicht.',
+    elsewhere: 'Das misst die Messung, nicht das Training.',
+    weakest: 'Am wenigsten bleibt hier hängen:',
+    noWeakest: 'Kein Unterschied zwischen den Achsen, der sich vom Zufall trennen lässt.',
+    empty: 'Noch nichts zu zeigen. Das Profil entsteht aus dem Training — nicht aus einem Test am Anfang.',
+  },
   streak: {
     /*
       Die Serie sagt, was war — mehr nicht (K7). Keine Drohung, kein

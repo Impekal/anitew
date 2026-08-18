@@ -791,3 +791,63 @@ sind nur die Fragen, und die passen in jede Einheit.
 Bildschirmabzug.** Eine fehlgeschlagene Prüfung hing im Abruf einer
 Palastrunde mit 0:01 auf der Uhr. Der Test war zu langsam — die App war zu
 schnell, und zwar für einen Menschen.
+
+---
+
+## D-021 · 2026-08-18 · Kein Erstdiagnose-Test — das Profil wächst aus dem Training
+
+**Entscheidung:** ANITEW hat **keine** Erstdiagnose. E1 im Backlog hieß „YOUR
+MEMORY DNA — kurz, spielbar, nicht wie ein Test“: drei Minuten am Anfang, aus
+denen ein Profil fällt. Das wird nicht gebaut. Das Profil entsteht
+ausschließlich aus dem, was das Training über Wochen tatsächlich hergibt.
+
+**Warum:** Der Grund steht zwei Zeilen weiter im selben Backlog, bei E7: „82
+nach drei Aufgaben wäre eine erfundene Zahl.“ Ein Profil aus drei Minuten
+Erstkontakt ist genau das — und es wäre die **eindrucksvollste** erfundene
+Zahl der ganzen App, weil es nicht wie eine Punktzahl aussieht, sondern wie
+ein Befund über einen Menschen. „Dein visuelles Gedächtnis: 41“ liest sich wie
+eine Diagnose und ist ein Münzwurf.
+
+Der Preis ist bekannt und wird bezahlt: Der Ersteindruck ist schwächer. Eine
+App, die einem am ersten Tag ein buntes Netzdiagramm über die eigene Person
+zeigt, fühlt sich persönlicher an als eine, die sagt „dafür weiß ich noch zu
+wenig“. Sie ist es nur nicht.
+
+**Was gezählt wird:** ausschließlich der **verzögerte Abruf** —
+
+> Gelegenheiten = wie oft etwas nach seinem ersten Tag zurückkam
+> Verloren = wie oft es dabei weg war
+
+Wie gut jemand am Lerntag selbst abschneidet, bleibt draußen. Das ist der
+Trainingsscore, und ihn als Gedächtnisleistung auszugeben ist die
+Vermischung, gegen die F1 geschrieben ist. Beide Zahlen stehen exakt in den
+Terminen (`reviews - 1` und `lapses`); ein Fehlschlag am Lerntag zählt bei
+keiner mit, weil FSRS einen Rückfall erst führt, wenn eine Information den
+Lernzustand verlassen hat.
+
+**Drei Achsen bleiben leer, und das steht auch so da.** Für *Visuell*,
+*Aufmerksamkeit* und *Arbeitsgedächtnis* gibt es kein Modul, das sie misst.
+Dort steht „misst diese App nicht“ — kein leerer Balken mit Hoffnung daneben.
+Dieselbe Ehrlichkeit wie auf der Wissenschaftsseite (D-016), und derselbe
+Grund: **„nicht gemessen“ darf nirgends wie „schlecht“ aussehen.**
+
+**Langfristiger Abruf verweist auf die Messung.** Ihn hier noch einmal aus
+Trainingsdaten zu schätzen hieße, zwei Zahlen über dasselbe zu haben — und die
+eine wäre die schlechtere, ohne dass jemand wüsste, welche (F1).
+
+**Eine neunte Achse: Zusammenhänge.** E2 nennt acht Dimensionen; die Missionen
+passen in keine davon. Sie üben, dass Zimmer, Gegenstand, Uhrzeit und Ort *zu
+einer Person gehören* (D-014) — eine eigene Fähigkeit, und die alltagsnächste
+von allen. Sie unter „Namen & Gesichter“ zu verbuchen wäre bequem und falsch.
+
+**Kein Netzdiagramm.** Ein Netz aus neun Achsen sähe eindrucksvoll aus und
+würde genau das verwischen, worauf es ankommt: dass drei davon nicht gemessen
+werden und eine woanders steht. Ein Netz braucht für jede Achse einen Wert —
+es *zwingt* zur erfundenen Zahl. Also eine Liste, in der jede Zeile ihren
+eigenen Satz sagen darf.
+
+**Und die Schwachstelle wird nur genannt, wenn es eine ist.** „Zahlen sind
+deine Schwachstelle“ steht erst da, wenn sich die Spannen zweier Achsen nicht
+überlappen. Sonst hieße es nur, dass der Zufall an diesem Tag so lag — und
+eine App, die daraufhin den Trainingsplan umbaut (E5), baut ihn auf Rauschen
+um.

@@ -8,6 +8,10 @@
 
 import {
   type DayKey,
+  type DimensionCounts,
+  type DimensionId,
+  type ModuleId,
+  dimensionOf,
   type Instant,
   type Memory,
   type DueItem,
@@ -104,6 +108,33 @@ export async function recordOutcome(
 export async function loadReviewed(language: string): Promise<{ reviews: number }[]> {
   const rows = await db.itemStates.where('language').equals(language).toArray()
   return rows.map((row) => ({ reviews: row.reviews }))
+}
+
+/**
+ * Die Zahlen des Gedächtnisprofils, je Achse (Backlog E3).
+ *
+ * Beides kommt exakt aus den Terminen: `reviews - 1` ist, wie oft eine
+ * Information **nach ihrem ersten Tag** zurückkam, `lapses` ist, wie oft sie
+ * dabei weg war. Ein Fehlschlag am Lerntag zählt bei keinem von beiden mit —
+ * FSRS führt einen Rückfall erst, wenn eine Information den Lernzustand
+ * verlassen hat. Damit ist `lapses` nie größer als die Gelegenheiten, und
+ * der Anteil bleibt eine echte Quote.
+ */
+export async function loadDimensionCounts(
+  language: string,
+): Promise<Partial<Record<DimensionId, DimensionCounts>>> {
+  const rows = await db.itemStates.where('language').equals(language).toArray()
+  const counts: Partial<Record<DimensionId, DimensionCounts>> = {}
+
+  for (const row of rows) {
+    const dimension = dimensionOf(row.moduleId as ModuleId)
+    if (dimension === undefined) continue
+    const entry = (counts[dimension] ??= { chances: 0, lost: 0 })
+    entry.chances += Math.max(0, row.reviews - 1)
+    entry.lost += row.lapses
+  }
+
+  return counts
 }
 
 /** Wie viele Informationen warten insgesamt auf ihren nächsten Termin? */

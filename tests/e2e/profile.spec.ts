@@ -1,0 +1,118 @@
+import { expect, test, type Page } from '@playwright/test'
+
+import { startButton } from './helpers.ts'
+
+/**
+ * Das Gedächtnisprofil im Browser (Backlog E3, E4, E7 · D-021).
+ *
+ * Die gefährlichste Anzeige der App: Sie sieht aus wie ein Befund über einen
+ * Menschen. Geprüft wird deshalb überwiegend, was **nicht** dasteht.
+ */
+
+/** Legt Termine mit Abfragen und Rückfällen je Modul in die Datenbank. */
+async function seed(page: Page, rows: readonly { module: string; reviews: number; lapses: number }[]) {
+  await page.goto('/')
+  await expect(startButton(page)).toBeVisible()
+  await page.evaluate(async (list) => {
+    const open = indexedDB.open('anitew')
+    const database: IDBDatabase = await new Promise((resolve, reject) => {
+      open.onsuccess = () => resolve(open.result)
+      open.onerror = () => reject(open.error)
+    })
+    await new Promise<void>((resolve, reject) => {
+      const transaction = database.transaction('itemStates', 'readwrite')
+      const store = transaction.objectStore('itemStates')
+      list.forEach((row, index) => {
+        store.put({
+          itemId: `${row.module}:de:stueck${index}`,
+          moduleId: row.module,
+          language: 'de',
+          createdAt: 1,
+          lastSeenAt: 1,
+          reviews: row.reviews,
+          lapses: row.lapses,
+          stability: 3,
+          difficulty: 5,
+          fsrsState: 2,
+          dueDay: '2099-01-01',
+        })
+      })
+      transaction.oncomplete = () => resolve()
+      transaction.onerror = () => reject(transaction.error)
+    })
+  }, rows as { module: string; reviews: number; lapses: number }[])
+  await page.reload()
+  await expect(startButton(page)).toBeVisible()
+  await page.getByText('Dein Profil', { exact: true }).click()
+}
+
+test('zeigt vor der ersten Aussage einen Satz statt neun leerer Achsen', async ({ page }) => {
+  /*
+   * Neun Achsen ohne Zahl sähen aus wie neun Defizite. Und der Satz sagt
+   * zugleich, woher das Profil kommt: aus dem Training, nicht aus einem Test
+   * am Anfang (D-021).
+   */
+  await seed(page, [])
+  await expect(page.getByText(/Das Profil entsteht aus dem Training/)).toBeVisible()
+  await expect(page.locator('.axis')).toHaveCount(0)
+})
+
+test('sagt bei dünner Datenlage „zu wenig“ und nicht „null“ (E7)', async ({ page }) => {
+  // Fünf Gelegenheiten, alle verloren. Eine Null stünde da wie ein Ergebnis —
+  // es ist aber gar keins.
+  await seed(page, [
+    { module: 'words', reviews: 6, lapses: 5 },
+    { module: 'faces', reviews: 21, lapses: 2 },
+  ])
+
+  const words = page.locator('.axis', { hasText: 'Wörter' })
+  await expect(words).toContainText('Noch zu wenige Gelegenheiten')
+  await expect(words).toContainText('bisher 5 von 15')
+  await expect(words).not.toContainText('%')
+})
+
+test('zeigt Gemessenes mit seiner Spanne', async ({ page }) => {
+  await seed(page, [{ module: 'faces', reviews: 21, lapses: 4 }])
+
+  const faces = page.locator('.axis', { hasText: 'Namen & Gesichter' })
+  await expect(faces).toContainText('16 von 20 behalten')
+  await expect(faces).toContainText('Spanne')
+})
+
+test('sagt bei drei Achsen offen, dass sie nichts misst', async ({ page }) => {
+  await seed(page, [{ module: 'words', reviews: 21, lapses: 3 }])
+
+  for (const name of ['Visuell', 'Aufmerksamkeit', 'Arbeitsgedächtnis']) {
+    await expect(page.locator('.axis', { hasText: name })).toContainText('Misst diese App nicht.')
+  }
+  // Und den langfristigen Abruf überlässt sie der Messung (F1).
+  await expect(page.locator('.axis', { hasText: 'Langfristiger Abruf' })).toContainText(
+    'Das misst die Messung',
+  )
+})
+
+test('nennt keine Schwachstelle, wo der Unterschied Zufall sein kann (R-1)', async ({ page }) => {
+  await seed(page, [
+    { module: 'words', reviews: 21, lapses: 5 },
+    { module: 'numbers', reviews: 21, lapses: 6 },
+  ])
+  await expect(page.getByText(/Kein Unterschied zwischen den Achsen/)).toBeVisible()
+})
+
+test('nennt sie, wenn der Unterschied deutlich ist', async ({ page }) => {
+  await seed(page, [
+    { module: 'words', reviews: 61, lapses: 3 },
+    { module: 'numbers', reviews: 61, lapses: 40 },
+  ])
+  await expect(page.getByText('Am wenigsten bleibt hier hängen: Zahlen')).toBeVisible()
+})
+
+test('hält den Trainingsscore heraus (F1)', async ({ page }) => {
+  /*
+   * Der Satz, auf den es ankommt: Was am Lerntag passiert, ist Übung. Es hier
+   * mitzuzählen wäre genau die Vermischung, gegen die die ganze Trennung
+   * gebaut ist.
+   */
+  await seed(page, [{ module: 'words', reviews: 21, lapses: 3 }])
+  await expect(page.getByText(/das ist Übung, nicht Gedächtnis/)).toBeVisible()
+})

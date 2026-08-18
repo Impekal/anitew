@@ -115,13 +115,13 @@ Abruftraining. Hier entscheidet sich, ob die App wirkt.
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| E1 | Erstdiagnose („YOUR MEMORY DNA“) — kurz, spielbar, nicht wie ein Test | ⬜ | | L |
-| E2 | Acht Dimensionen: Visuell · Namen & Gesichter · Zahlen · Wörter · Räumlich · Aufmerksamkeit · Arbeitsgedächtnis · Langfristiger Abruf | ⬜ | genau die aus dem Gespräch | M |
-| E3 | Profilwerte ausschließlich aus gemessenen Daten (R-1) | ⬜ | | M |
-| E4 | Profilanzeige plus Verlauf über die Zeit | ⬜ | | M |
-| E5 | Adaptive Tagesplanung: Schwächen priorisieren, Stärken erhalten | ⬜ | „Zahlen und Namen sind deine Schwachstellen, deshalb bekommst du morgen …“ | L |
+| E1 | ~~Erstdiagnose („YOUR MEMORY DNA“)~~ | ❌ **abgelehnt** | **D-021**. Ein Profil aus drei Minuten Erstkontakt ist die eindrucksvollste erfundene Zahl der App — es sieht nicht wie eine Punktzahl aus, sondern wie ein Befund über einen Menschen. Es wächst stattdessen aus dem Training | L |
+| E2 | Acht Dimensionen … plus eine neunte | ✅ 2026-08-18 | **Zusammenhänge** kam dazu: Die Missionen üben, dass Zimmer, Gegenstand, Uhrzeit und Ort *zu einer Person gehören* (D-014) — eine eigene Fähigkeit, und die alltagsnächste. Drei der acht (Visuell, Aufmerksamkeit, Arbeitsgedächtnis) misst diese App nicht, und genau das steht dort | M |
+| E3 | Profilwerte ausschließlich aus gemessenen Daten (R-1) | ✅ 2026-08-18 | Nur **verzögerter Abruf**: wie oft etwas nach seinem ersten Tag zurückkam und dabei noch da war. Der Lerntag bleibt draußen — das ist Übung und nicht Gedächtnis (F1). Beide Zahlen exakt aus den Terminen | M |
+| E4 | Profilanzeige plus Verlauf über die Zeit | 🟨 2026-08-18 | Die Anzeige steht — als **Liste, nicht als Netzdiagramm**: Ein Netz braucht für jede Achse einen Wert und zwingt damit zur erfundenen Zahl. Der Verlauf über die Zeit fehlt noch | M |
+| E5 | Adaptive Tagesplanung: Schwächen priorisieren, Stärken erhalten | 🟨 2026-08-18 | Die Grundlage steht: `weakest()` nennt die schwächste Achse **nur**, wenn sich die Spannen zweier Achsen nicht überlappen — sonst baute die App den Plan auf Rauschen um. Dass der Planer sie benutzt, fehlt noch | L |
 | E6 | Die App erklärt ihre Entscheidung in einem Satz | ⬜ | macht Personalisierung spürbar statt nur behauptet | S |
-| E7 | Unsicherheit ehrlich zeigen, solange zu wenig Daten da sind | ⬜ | „82“ nach drei Aufgaben wäre eine erfundene Zahl (R-1) | S |
+| E7 | Unsicherheit ehrlich zeigen, solange zu wenig Daten da sind | ✅ 2026-08-18 | Unter 15 Gelegenheiten steht „noch zu wenig“ — als **eigener Fall**, nicht als Null: Eine Null ließe sich als schlechtes Ergebnis lesen. Darüber immer Wert **und** Spanne | S |
 
 ## F. Messung & Ehrlichkeit  🔴 Release-Sperre
 
@@ -263,8 +263,8 @@ Anforderung wie jede andere. Die acht Regeln G-1 bis G-8 stehen in
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | ✅ 2026-08-18 | 262 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Sessionplanung, Bewertung, Scheduler, Gesichtsgenerator, die ganze Messung und die Wirkungsaussagen (R5) sind abgedeckt | M |
-| P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | ✅ 2026-08-18 | 98 Läufe in Chromium und im Telefonprofil, darunter eine Einheit von vorn bis hinten und der Abbruch mitten drin. Seit M4 **liest der Test ab, welches Modul kam, statt es vorherzusagen** (`tests/e2e/helpers.ts`) | M |
+| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | ✅ 2026-08-18 | 275 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Sessionplanung, Bewertung, Scheduler, Gesichtsgenerator, die ganze Messung und die Wirkungsaussagen (R5) sind abgedeckt | M |
+| P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | ✅ 2026-08-18 | 112 Läufe in Chromium und im Telefonprofil, darunter eine Einheit von vorn bis hinten und der Abbruch mitten drin. Seit M4 **liest der Test ab, welches Modul kam, statt es vorherzusagen** (`tests/e2e/helpers.ts`) | M |
 | P3 | CI bei jedem Push: Typecheck (App **und** Kern getrennt), Tests, Build, E2E | ✅ 2026-08-17 | | S |
 | P4 | Performance: Kaltstart unter 2 s, Timer laufen ruckelfrei | ⬜ | | M |
 | P5 | Uhrmanipulation darf die Engine nicht zerstören (Streak-Betrug, Intervall-Chaos) | ⬜ | monotone Zeitquelle plus Plausibilitätsprüfung | M |

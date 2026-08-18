@@ -13,6 +13,8 @@ import {
   namePool,
   READY_PALACES,
   type OwnPalace,
+  type DimensionCounts,
+  type DimensionId,
   numberPool,
   returnsOf,
   palaceOf,
@@ -26,7 +28,7 @@ import {
   wordPool,
 } from '../core/index.ts'
 import { createWebPlatform } from '../platform/web/index.ts'
-import { loadDue, loadReviewed, moduleOf, wordOf } from '../data/items.ts'
+import { loadDimensionCounts, loadDue, loadReviewed, moduleOf, wordOf } from '../data/items.ts'
 import {
   type SessionProgress,
   beginSession,
@@ -40,6 +42,7 @@ import { loadPalaceTaught, loadTaught } from '../data/technique.ts'
 
 import { BackupPanel } from './BackupPanel.tsx'
 import { PalacePanel } from './PalacePanel.tsx'
+import { ProfilePanel } from './ProfilePanel.tsx'
 import { SciencePanel } from './SciencePanel.tsx'
 import { FoundationPanel } from './FoundationPanel.tsx'
 import { ReturnsLine } from './ReturnsLine.tsx'
@@ -255,6 +258,17 @@ export function App() {
       .catch(() => undefined)
   }, [language, running])
   const returns = useMemo(() => returnsOf(reviewed), [reviewed])
+
+  // Das Profil (E). Wie die Serie und die Wiedersehen: aus den Terminen
+  // gerechnet, nach jeder Einheit neu gelesen.
+  const [dimensionCounts, setDimensionCounts] = useState<
+    Partial<Record<DimensionId, DimensionCounts>>
+  >({})
+  useEffect(() => {
+    void loadDimensionCounts(language)
+      .then(setDimensionCounts)
+      .catch(() => undefined)
+  }, [language, running])
 
   /*
    * Was die Messung gerade von einem will.
@@ -579,6 +593,16 @@ export function App() {
           trotzdem erreichbar — und der Hinweis in der Lektion sagt, dass es
           ihn gibt.
         */}
+        {/*
+          Das Profil steht über dem Palast und unter der Messung: Es ist die
+          Auskunft über den Nutzer, die aus dem Training kommt — die aus der
+          Messung steht darüber und bleibt davon getrennt (F1).
+        */}
+        <details className="details">
+          <summary>{dictionary.profile.heading}</summary>
+          <ProfilePanel counts={dimensionCounts} dictionary={dictionary} />
+        </details>
+
         <details className="details">
           <summary>{dictionary.palace.heading}</summary>
           {/*

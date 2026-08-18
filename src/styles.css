@@ -1517,3 +1517,56 @@ body::before {
 .returns-tracked {
   color: var(--ink-faint);
 }
+
+/* ── Gedächtnisprofil (E, D-021) ────────────────────────────────────────────
+   Absichtlich kein Netzdiagramm und keine Balken. Ein Netz aus neun Achsen
+   sähe eindrucksvoll aus und würde genau das verwischen, worauf es ankommt:
+   dass drei davon gar nicht gemessen werden und eine woanders steht. Also
+   eine Liste, in der jede Zeile ihren eigenen Satz sagen darf. */
+.profile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.axes {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.axis {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  border-left: 2px solid var(--line);
+  padding-left: 0.75rem;
+}
+
+/* Gemessen hat eine Kante, alles andere bleibt neutral — „nicht gemessen“
+   darf nirgends wie „schlecht“ aussehen. */
+.axis-measured {
+  border-left-color: var(--calm);
+}
+
+.axis-name {
+  font-size: 0.78rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.axis-value {
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.axis-measured .axis-value {
+  font-family: var(--mono);
+  font-size: 0.86rem;
+  color: var(--ink);
+}
