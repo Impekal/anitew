@@ -63,6 +63,7 @@ import { BenchmarkPanel } from './benchmark/BenchmarkPanel.tsx'
 import { BenchmarkScreen } from './benchmark/BenchmarkScreen.tsx'
 import { SessionScreen } from './session/SessionScreen.tsx'
 import { useLanguage } from './useLanguage.ts'
+import { useStoragePersists } from './useStoragePersists.ts'
 import { useTrainingLanguage } from './useTrainingLanguage.ts'
 import { useSoundSetting } from './useSoundSetting.ts'
 
@@ -78,6 +79,8 @@ export function App() {
    * `training`.
    */
   const { training, chooseTraining } = useTrainingLanguage(platform, language)
+  // Speichert dieses Gerät überhaupt? Sonst wird es gesagt (P7).
+  const storagePersists = useStoragePersists(platform)
   const trainable = trainingLanguages()
   /*
    * Einmal beim Aufbau ermittelt: Weder die Browserkennung noch der
@@ -461,6 +464,17 @@ export function App() {
         */}
         <p className="greeting">{greeting}</p>
       </header>
+
+      {/*
+        Ganz oben, weil es alles darunter betrifft: Wenn nichts gespeichert
+        wird, ist jede Serie und jede Messung darunter vergänglich. Ruhig,
+        aber sichtbar — nicht im zugeklappten Fundament-Fach versteckt (P7).
+      */}
+      {storagePersists === false && (
+        <section className="note" role="status">
+          <p>{dictionary.storage.note}</p>
+        </section>
+      )}
 
       <StreakLine streak={streak} dictionary={dictionary} />
       <ReturnsLine returns={returns} dictionary={dictionary} />

@@ -2034,3 +2034,58 @@ Veröffentlichung zum Testen kostet nichts, nur die Domain am Ende kostet.
 
 **Stand:** 303 Kerntests, 144 Funktionsläufe + Layout-Matrix über sieben
 Geräte, Typecheck für App und Kern grün.
+
+---
+
+## 2026-08-18 · Fehlertoleranz (P7) — bevor das echte Gerät sie findet
+
+Mit der App live auf einer Test-Adresse und dem Gerätedurchgang vor der Tür
+war der wertvollste nächste Schritt, die Fälle abzufangen, die der
+Buildrechner nie sieht und ein echtes iPhone sofort: **privater Modus, voller
+Speicher, abgelehnte Benachrichtigungen.**
+
+### Der weiße Bildschirm, der nicht kommt
+
+Der schlimmste Ausgang eines Gerätetests wäre ein weißer Bildschirm im
+**privaten Safari-Fenster** — dort gibt es keine IndexedDB. Die erste Prüfung
+nahm die Datenbank komplett weg und stellte fest: **Es kommt keiner.** Die App
+rendert, eine Einheit startet, kein ungefangener Fehler. Dexie liest faul, und
+alle Lesezugriffe hängen in `try/catch` — das hat sich hier ausgezahlt.
+
+### Aber Schweigen ist nicht gut genug
+
+Die App *lief* — sagte aber nichts. Jemand im privaten Modus hätte tagelang
+geübt und beim Schließen alles verloren, **still**. Genau der Datenverlust,
+gegen den die Sicherung gebaut ist (N2). Also eine ruhige, ehrliche Zeile ganz
+oben — nicht im zugeklappten Fundament-Fach, wo sie niemand läse, bevor es zu
+spät ist:
+
+> „Dieses Gerät speichert gerade nichts — vermutlich ein privates Fenster.
+> Training läuft, aber beim Schließen ist alles weg. Für dauerhaften
+> Fortschritt ein normales Fenster benutzen.“
+
+Kein Ausrufezeichen, keine rote Warnung — aber deutlich, und **mit Ausweg
+statt nur Diagnose.** Erkannt wird es über eine ehrliche Runde: schreiben,
+zurücklesen, vergleichen. `undefined` heißt „wird noch geprüft“ und löst
+**keine** Warnung aus — eine Warnung, die kurz aufblitzt und verschwindet,
+wäre schlimmer als keine. Und die Gegenprobe ist ein eigener Test: Auf einem
+gewöhnlichen Gerät darf die Zeile **nie** erscheinen, denn Fehlalarme lehrt
+man sich zu übersehen.
+
+### Voller Speicher, bewiesen statt behauptet
+
+Alle Schreibwege in einer Einheit sind längst mit `.catch(() => undefined)`
+abgesichert. Statt mich darauf zu verlassen, führt eine Prüfung jetzt eine
+**ganze Einheit bis zur Zusammenfassung**, während *jeder* Schreibvorgang
+wirft — derselbe Fehlerfall wie ein voller Speicher. Sie kommt an: Die Zahl in
+der Zusammenfassung steht im Kopf, nicht in der Datenbank. Nur der Fortschritt
+danach ist weg — und dass er weg ist, sagt die Zeile oben.
+
+### Abgelehnte Benachrichtigungen
+
+Ein Browser, der Benachrichtigungen kennt, aber verweigert: Die
+Erinnerungsseite sagt es und bleibt heil — kein Knopf, der ein Recht erbittet,
+das schon verweigert ist, kein Uhrzeit-Feld, das ohnehin nicht griffe.
+
+**Stand:** 303 Kerntests, 154 Funktionsläufe (5 neue Fehlertoleranz-Prüfungen)
+plus Layout-Matrix über sieben Geräte, Typecheck für App und Kern grün.

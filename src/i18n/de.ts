@@ -452,6 +452,16 @@ export const de = {
     // Der zweite Weg, und er gilt immer: Die Datei gehört dir.
     orBackup: 'Wer das nicht will, sollte regelmäßig eine Sicherung speichern. Die Datei liegt dann bei dir und überlebt jedes Aufräumen.',
   },
+  storage: {
+    /*
+      Die ehrliche Zeile für den privaten Modus (P7).
+
+      Ruhig, kein Ausrufezeichen, keine rote Warnung — aber deutlich, denn
+      hier geht es um genau den stillen Verlust, gegen den die Sicherung
+      gebaut ist (N2). Und mit einem Ausweg, nicht nur einer Diagnose.
+    */
+    note: 'Dieses Gerät speichert gerade nichts — vermutlich ein privates Fenster. Training läuft, aber beim Schließen ist alles weg. Für dauerhaften Fortschritt ein normales Fenster benutzen.',
+  },
   streak: {
     /*
       Die Serie sagt, was war — mehr nicht (K7). Keine Drohung, kein

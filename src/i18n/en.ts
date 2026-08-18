@@ -294,6 +294,9 @@ export const en: Dictionary = {
     ],
     orBackup: 'If you would rather not, save a backup regularly. The file then lives with you and survives any clean-up.',
   },
+  storage: {
+    note: 'This device is not saving anything right now — probably a private window. Training runs, but everything is gone when you close it. For lasting progress, use a normal window.',
+  },
   streak: {
     days: 'days in a row',
     day: 'day in a row',
