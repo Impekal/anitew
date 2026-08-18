@@ -1979,3 +1979,58 @@ den eigenen Namen.
 
 **Stand:** unverändert 303 Kerntests, 144 E2E-Läufe (nur Dokumentation
 geändert).
+
+---
+
+## 2026-08-18 · Fehlerfrei auf allen Geräten — die Layout-Matrix (P2, P8)
+
+Der Auftraggeber hat die Reihenfolge klargestellt: **Geld kommt zuletzt**,
+nach dem Testen. Bis dahin soll ANITEW auf allem laufen — iPhone, iPad, Mac,
+Windows, Android-Telefon, Android-Tablet. (Und R3 ist erledigt: vor
+Projektbeginn geprüft, der Name ist frei.)
+
+### Was der Rechner jetzt selbst prüft
+
+`tests/e2e/layout.spec.ts` läuft über **sieben Geräteprofile**: iPhone SE,
+iPhone 14 Pro, iPad hoch und quer, Android-Tablet, Schreibtisch schmal (1280)
+und breit (1920). Geprüft werden die wenigen Wahrheiten, an denen sich Layout
+entscheidet:
+
+- **Kein seitliches Schieben** — der klassische Responsive-Fehler, gemessen
+  über `scrollWidth − clientWidth`.
+- Startknopf und alle vier Zeitknöpfe **ganz im Rahmen** (der Kommentar in
+  de.ts warnt, dass „15 Minuten“ auf einem schmalen Telefon umbricht).
+- Mit **allen Klappfächern offen** bleibt die Breite — dort steckt der meiste
+  Text und die längsten Quellen.
+- Beim **Einprägen** passt alles, und der Abbruch bleibt erreichbar.
+- Auf **1920 px** steht die Spalte mittig statt über den ganzen Schirm gezerrt.
+
+Ergebnis beim ersten Lauf: **23 grün, 5 planmäßig übersprungen** (der
+Breitbild-Test auf Telefonen). Das Layout war schon solide — die Arbeit an den
+sicheren Rändern (Q5) und die `max-width`-Spalte von Anfang an haben sich
+ausgezahlt. Kein einziger Fund, und das ist die gute Sorte Ergebnis: Der Test
+hält den Zustand jetzt fest, damit ein künftiger Umbau ihn nicht unbemerkt
+bricht.
+
+Damit die lange Funktionssuite nicht auf sieben Geräten dauert, trennt die
+Konfig sauber: Die zwei funktionalen Profile (Schreibtisch, Telefon) fahren
+alles **außer** dem Layouttest; die sieben Geräteprofile fahren **nur** ihn —
+schnell, ohne echte Sekunden. Alle laufen auf Chromium, weil mehr nicht
+installiert ist; der `defaultBrowserType: 'chromium'` über den iOS-Profilen
+verhindert, dass Playwright ein WebKit sucht, das es nicht gibt.
+
+### Die ehrliche Grenze — und ein Weg drumherum
+
+Die **Safari-Engine** lässt sich hier nicht automatisch prüfen. Zwei Dinge
+hängen allein an echter Hardware: das Ton-Freischalten beim ersten Tippen auf
+iOS und die Darstellung der System-Eingabefelder (Zeit, Datei) in echtem
+Safari.
+
+Dafür gibt es `docs/DEVICES.md`: eine Checkliste je Gerät **und** der
+kostenlose Weg, die App auf echte Geräte zu bekommen — über eine
+`*.workers.dev`-Adresse, ohne Domain und ohne Store-Konto. Das ist die
+Auflösung des scheinbaren Widerspruchs „testen, bevor Geld fließt“: Die
+Veröffentlichung zum Testen kostet nichts, nur die Domain am Ende kostet.
+
+**Stand:** 303 Kerntests, 144 Funktionsläufe + Layout-Matrix über sieben
+Geräte, Typecheck für App und Kern grün.

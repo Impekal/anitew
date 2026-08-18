@@ -7,6 +7,9 @@ import { defineConfig, devices } from '@playwright/test'
  *
  * Vorher `npm run build`.
  */
+/** Der Layouttest läuft auf der Gerätematrix, alles andere nicht. */
+const LAYOUT = /layout\.spec\.ts/
+
 export default defineConfig({
   testDir: './tests/e2e',
   /*
@@ -49,10 +52,35 @@ export default defineConfig({
       : {}),
   },
   projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    /*
+     * Die **funktionalen** Projekte fahren die ganze Suite — außer dem
+     * Layouttest. Zwei genügen: der Schreibtisch und ein Telefon.
+     */
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] }, testIgnore: LAYOUT },
     // Ein Telefon ist der eigentliche Zielfall — eine App, die nur am
     // Schreibtisch geprüft wird, ist am Telefon ungeprüft.
-    { name: 'mobile', use: { ...devices['Pixel 7'] } },
+    { name: 'mobile', use: { ...devices['Pixel 7'] }, testIgnore: LAYOUT },
+
+    /*
+     * Die **Geräteprojekte** fahren nur `layout.spec.ts` — schnelle Prüfungen
+     * ohne Wartezeiten, dafür über die ganze Breite echter Geräte:
+     * kleines und randloses iPhone, iPad hoch und quer, Android-Tablet,
+     * Schreibtisch schmal und breit (P6).
+     *
+     * Alle laufen auf Chromium (mehr ist hier nicht installiert), deshalb
+     * `defaultBrowserType: 'chromium'` über den iOS-Profilen — sonst suchte
+     * Playwright ein WebKit, das es nicht gibt. Geprüft wird damit das
+     * **Layout** über alle Größen, Hoch- und Querformat und die sicheren
+     * Ränder — **nicht** die Safari-Engine. Deren Eigenheiten fängt nur ein
+     * echtes iPhone (siehe `docs/DEVICES.md`).
+     */
+    { name: 'iphone-se', testMatch: LAYOUT, use: { ...devices['iPhone SE'], defaultBrowserType: 'chromium' } },
+    { name: 'iphone-15', testMatch: LAYOUT, use: { ...devices['iPhone 14 Pro'], defaultBrowserType: 'chromium' } },
+    { name: 'ipad', testMatch: LAYOUT, use: { ...devices['iPad (gen 7)'], defaultBrowserType: 'chromium' } },
+    { name: 'ipad-landscape', testMatch: LAYOUT, use: { ...devices['iPad (gen 7) landscape'], defaultBrowserType: 'chromium' } },
+    { name: 'android-tablet', testMatch: LAYOUT, use: { ...devices['Galaxy Tab S4'], defaultBrowserType: 'chromium' } },
+    { name: 'desktop-small', testMatch: LAYOUT, use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 720 } } },
+    { name: 'desktop-wide', testMatch: LAYOUT, use: { ...devices['Desktop Chrome'], viewport: { width: 1920, height: 1080 } } },
   ],
   webServer: {
     command: 'npm run preview -- --port 4173 --strictPort',

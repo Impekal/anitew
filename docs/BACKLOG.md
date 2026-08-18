@@ -264,13 +264,13 @@ Anforderung wie jede andere. Die acht Regeln G-1 bis G-8 stehen in
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
 | P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | ✅ 2026-08-18 | 303 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Sessionplanung, Bewertung, Scheduler, Gesichtsgenerator, die ganze Messung und die Wirkungsaussagen (R5) sind abgedeckt | M |
-| P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | ✅ 2026-08-18 | 144 Läufe in Chromium und im Telefonprofil, darunter eine Einheit von vorn bis hinten und der Abbruch mitten drin. Seit M4 **liest der Test ab, welches Modul kam, statt es vorherzusagen** (`tests/e2e/helpers.ts`) | M |
+| P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | ✅ 2026-08-18 | 144 Funktionsläufe plus ein **Layout-Durchlauf über sieben Geräteprofile** (iPhone SE/14 Pro, iPad hoch/quer, Android-Tablet, Schreibtisch schmal/breit): kein seitliches Schieben, Knöpfe im Rahmen, Einprägen passt, Desktop zentriert. 144 Läufe in Chromium und im Telefonprofil, darunter eine Einheit von vorn bis hinten und der Abbruch mitten drin. Seit M4 **liest der Test ab, welches Modul kam, statt es vorherzusagen** (`tests/e2e/helpers.ts`) | M |
 | P3 | CI bei jedem Push: Typecheck (App **und** Kern getrennt), Tests, Build, E2E | ✅ 2026-08-17 | | S |
 | P4 | Performance: Kaltstart unter 2 s, Timer laufen ruckelfrei | ⬜ | | M |
 | P5 | Uhrmanipulation darf die Engine nicht zerstören (Streak-Betrug, Intervall-Chaos) | ⬜ | monotone Zeitquelle plus Plausibilitätsprüfung | M |
 | P6 | Zeitzonenwechsel und Reisen: was ist „heute“? | ⬜ | | M |
 | P7 | Fehlertoleranz: voller Speicher, DB-Fehler, abgelehnte Benachrichtigungsrechte | ⬜ | | M |
-| P8 | Gerätedurchgang auf echtem iPhone und echtem Android — manche Dinge lassen sich nicht vom Buildrechner prüfen | ⬜ | eigene Datei wie in RReader | M |
+| P8 | Gerätedurchgang auf echtem iPhone und echtem Android — manche Dinge lassen sich nicht vom Buildrechner prüfen | 🟨 2026-08-18 | `docs/DEVICES.md`: Checkliste je Gerät (iPhone, iPad, Mac, Windows, Android Phone/Tablet) plus der **kostenlose** Weg, die App über eine `*.workers.dev`-Adresse auf echte Geräte zu bekommen — ohne Domain, ohne Store-Konto. Der Durchgang selbst gehört auf echte Hardware; die Layout-Matrix (P2) nimmt ihm die Größenfragen ab, offen bleibt die Safari-Engine | M |
 
 ## Q. Weg in die Stores
 
@@ -290,7 +290,7 @@ Anforderung wie jede andere. Die acht Regeln G-1 bis G-8 stehen in
 |---|---|---|---|---|
 | R1 | `THIRD_PARTY_LICENSES.md` ab dem ersten Paket pflegen | ✅ 2026-08-17 | Ausgeliefertes vom nur Bauenden getrennt. Im ausgelieferten Stand kein Copyleft; die LGPL-Teile (sharp über wrangler) laufen nur auf dem Buildrechner | S |
 | R2 | Lizenzen für Icons, Töne und Namenslisten dokumentieren | ✅ 2026-08-18 | In `THIRD_PARTY_LICENSES.md` unter „Eigene Bestandteile“. Der größte Teil entfällt, weil ANITEW seine Inhalte **erzeugt** statt sie zu lizenzieren: Töne aus Sinusschwingungen, Gesichter aus dem Namen, alle Listen selbst zusammengestellt. Bei den Wortlisten ist die **Auswahl und Anordnung** der schutzfähige Teil — deshalb steht dort, dass sie eigene Arbeit ist | M |
-| R3 | Marken- und Namensrecherche für **ANITEW** | 🟨 2026-08-18 | `docs/TRADEMARK.md`. **Vorprüfung** gemacht: keine gleichnamige App, kein exakter Markentreffer (nächstliegend ANIKEW, andere Klasse), Domains frei von aktiven Auftritten. **Freigabe steht aus** — die Register (EUIPO/DPMA/USPTO über TMview) waren aus dieser Umgebung nicht erreichbar. Fund: „anitew“ ist ein Twi-Wort (Ghana), kein Markenhindernis. R3 bleibt offen bis zur Register-Recherche in Klasse 9/41 vor den ersten Ausgaben | S |
+| R3 | Marken- und Namensrecherche für **ANITEW** | ✅ 2026-08-18 | **Auftraggeber bestätigt: vor Projektbeginn geprüft, ANITEW ist frei und sauber.** Die eigene Vorprüfung (`docs/TRADEMARK.md`) stützt das: keine gleichnamige App, kein exakter Markentreffer, Domains ohne aktiven Auftritt. Anmerkung dort festgehalten: „anitew“ ist ein Twi-Wort (Ghana) — kein Hindernis, aber die D-001-Annahme „sagt nichts“ gilt nur außerhalb des Twi | S |
 | R4 | Datenschutzerklärung — auch eine App ohne Server braucht eine | ✅ 2026-08-18 | `docs/PRIVACY.md`, plus fünf Zeilen in der App neben der Sicherung. Enthält ausdrücklich auch das Unbequeme: Damit die App aufs Gerät kommt, wird sie einmal geladen, und der Anbieter sieht dabei das, was jeder Webserver sieht. Und was sich ändern **würde**, falls Cloud-Abgleich (N7) oder KI (M) kommen | S |
 | R5 | Wirkungsaussagen prüfen: keine Gesundheits- oder Heilversprechen (R-2, F7) | ✅ 2026-08-18 | `tests/core/claims.test.ts` liest `index.html`, das Manifest, `docs/STORE.md` und beide Wörterbücher. Gesperrt ist nur, was sich nicht ehrlich verwenden lässt — „klüger“ steht in der App, in dem Satz, dass Gehirnjogging das nicht bewirkt | S |
 
