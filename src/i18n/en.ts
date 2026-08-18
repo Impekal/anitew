@@ -297,6 +297,19 @@ export const en: Dictionary = {
   storage: {
     note: 'This device is not saving anything right now — probably a private window. Training runs, but everything is gone when you close it. For lasting progress, use a normal window.',
   },
+  achievements: {
+    heading: 'Reached',
+    facts: {
+      firstReturn: 'Brought something back after days for the first time.',
+      week: 'Trained a week straight.',
+      fortnight: 'Trained two weeks straight.',
+      hundredReturns: 'Brought something back a hundred times.',
+      heldOften: 'Held the same thing five times over.',
+      calibrated: 'Finished calibrating the measurement.',
+      majorLearned: 'Learned all ten digits of the Major System.',
+      ownPalace: 'Laid out your own memory palace.',
+    },
+  },
   streak: {
     days: 'days in a row',
     day: 'day in a row',

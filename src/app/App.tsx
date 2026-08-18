@@ -22,6 +22,7 @@ import {
   learnableModules,
   moduleForDimension,
   installAdvice,
+  isComplete,
   numberPool,
   trainingLanguages,
   profileOf,
@@ -57,6 +58,7 @@ import { ProfilePanel } from './ProfilePanel.tsx'
 import { ReminderPanel } from './ReminderPanel.tsx'
 import { SciencePanel } from './SciencePanel.tsx'
 import { FoundationPanel } from './FoundationPanel.tsx'
+import { AchievementsLine } from './AchievementsLine.tsx'
 import { ReturnsLine } from './ReturnsLine.tsx'
 import { StreakLine } from './StreakLine.tsx'
 import { BenchmarkPanel } from './benchmark/BenchmarkPanel.tsx'
@@ -359,6 +361,19 @@ export function App() {
       .catch(() => undefined)
   }, [training, running])
   const returns = useMemo(() => returnsOf(reviewed), [reviewed])
+
+  // Erreichtes (K3): aus den Zahlen gerechnet, die es ohnehin gibt.
+  const achievementInput = useMemo(
+    () => ({
+      returnsTotal: returns.total,
+      returnsLongest: returns.longest,
+      streakBest: streak.best,
+      taughtCount: taught.length,
+      completedBenchmarks: runs.filter(isComplete).length,
+      hasOwnPalace: own !== undefined,
+    }),
+    [returns, streak.best, taught.length, runs, own],
+  )
 
 
   /*
@@ -770,6 +785,8 @@ export function App() {
             onChange={reloadDaily}
           />
         </details>
+
+        <AchievementsLine input={achievementInput} dictionary={dictionary} />
 
         <details className="details">
           <summary>{dictionary.profile.heading}</summary>

@@ -462,6 +462,24 @@ export const de = {
     */
     note: 'Dieses Gerät speichert gerade nichts — vermutlich ein privates Fenster. Training läuft, aber beim Schließen ist alles weg. Für dauerhaften Fortschritt ein normales Fenster benutzen.',
   },
+  achievements: {
+    /*
+      Erreichtes (K3 · D-019). Benannte Tatsachen, keine Ränge. Jede Zeile
+      sagt, was war — im Ton wie die Serie: ohne Lob, ohne Zahl, die nicht
+      gezählt ist. Was noch nicht ist, steht gar nicht da.
+    */
+    heading: 'Erreicht',
+    facts: {
+      firstReturn: 'Zum ersten Mal etwas nach Tagen zurückgeholt.',
+      week: 'Eine Woche am Stück trainiert.',
+      fortnight: 'Zwei Wochen am Stück trainiert.',
+      hundredReturns: 'Hundert Mal etwas zurückgeholt.',
+      heldOften: 'Dieselbe Sache fünfmal über die Zeit gehalten.',
+      calibrated: 'Die Eichung der Messung abgeschlossen.',
+      majorLearned: 'Alle zehn Ziffern des Major-Systems gelernt.',
+      ownPalace: 'Einen eigenen Gedächtnispalast angelegt.',
+    },
+  },
   streak: {
     /*
       Die Serie sagt, was war — mehr nicht (K7). Keine Drohung, kein
