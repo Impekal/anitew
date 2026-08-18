@@ -50,7 +50,7 @@ unter „Nicht-Ziele“.
 | A2 | Repo-Grundgerüst, Ordnerstruktur, tsconfig strict | ✅ 2026-08-17 | | S |
 | A3 | PWA-Grundlage: Manifest, Service Worker, Offline-Start, Update-Strategie | ✅ 2026-08-17 | `registerType: autoUpdate`; E2E prüft Manifest inkl. maskable Icon | M |
 | A4 | **Architekturregel: `src/core/` ist reines TypeScript** — keine DOM-, React- oder Browser-API-Zugriffe | ✅ 2026-08-17 | `tsconfig.core.json` übersetzt den Kern ein zweites Mal **ohne DOM-Bibliothek** — ein Verstoß ist ein Übersetzungsfehler, kein guter Vorsatz. Gegengeprüft: absichtlicher Verstoß eingebaut, Prüfung schlug fehl, Verstoß entfernt | M |
-| A5 | Plattform-Adapter-Schicht: Storage, Uhr/Timer, Benachrichtigungen, Audio, Datei-Export | 🟨 2026-08-17 | `core/ports.ts` + `platform/web/`. Uhr und Einstellungen stehen; Benachrichtigungen, Audio und Dateien kommen, wenn sie gebraucht werden | M |
+| A5 | Plattform-Adapter-Schicht: Storage, Uhr/Timer, Benachrichtigungen, Audio, Datei-Export | ✅ 2026-08-18 | Vollständig hinter `core/ports.ts`: `platform/web/` liefert Storage (IndexedDB), Uhr (Wand- und monotone Zeit), Ton (erzeugt), Erinnerungen (D-022) — und der Datei-Export ist die Sicherung (N2). Der Kern kennt keinen davon (D-010) | M |
 | A6 | Datenschicht: Dexie-Schema **mit Migrationen ab Version 1** | ✅ 2026-08-17 | Version 1 ist festgeschrieben und wird nie bearbeitet — die Regel steht oben in `src/data/db.ts`. Benchmarks liegen in einer **eigenen** Tabelle, damit eine spätere Auswertung sie nicht mit Trainingsdaten vermischen kann (R-1 bis ins Schema) | M |
 | A7 | Deployment: Auto-Build bei Push, statisches Hosting, kein Backend | ✅ 2026-08-17 | **Live: https://anitew.impekaltech.workers.dev** — jeder Push auf den Zweig veröffentlicht. Account ID fest in `deploy.yml`, Token als Repo-Secret | S |
 | A8 | Projektgedächtnis: `PROJECT_STATE.md`, `docs/DECISIONS.md`, diese Liste | ✅ 2026-08-17 | | S |
@@ -86,8 +86,8 @@ Abruftraining. Hier entscheidet sich, ob die App wirkt.
 | C5 | **Abruf, nicht Wiedererkennen**: freie Eingabe als Standard, Multiple Choice nur wo unvermeidbar | ✅ 2026-08-17 | Der Abruf ist ein leeres Textfeld. Die Bewertung ist absichtlich großzügig (Umlaute gefaltet, ein Tippfehler ab fünf Zeichen erlaubt): Gemessen wird das Gedächtnis, nicht die Rechtschreibung — eine strengere Zahl wäre kleiner, aber nicht richtiger | M |
 | C6 | Ähnliche Items nicht in derselben Session (Interferenz vermeiden) | 🟨 2026-08-17 | Die Wortlisten sind schon danach gebaut (keine Reimpaare, keine Wortfamilien) und innerhalb einer Einheit wiederholt sich kein Wort. Die Prüfung *zur Laufzeit* kommt mit M2 | M |
 | C7 | Überfälligkeitsdruck begrenzen: nie ein Berg von 800 fälligen Items nach einer Pause | ✅ 2026-08-17 | Obergrenze aus dem Zeitbudget (`dueLimitFor`), höchstens 12. Am längsten Überfälliges zuerst. Wer zwei Wochen weg war, holt über mehrere Tage auf — langsamer, aber der einzige Weg, der zu einem zweiten Tag führt | M |
-| C8 | Engine deterministisch und seed-basiert, damit testbar | 🟨 2026-08-17 | `core/rng.ts` steht und ist geprüft; gilt für die Engine, sobald es eine gibt | S |
-| C9 | Simulator: synthetische Nutzer über 90 Tage, bevor echte Nutzer da sind | 🟨 2026-08-17 | läuft als Test über 120 und 400 Tage: Wer alles behält, wird immer seltener gefragt; wer die Hälfte vergisst, öfter. Deterministisch statt zufällig (A11) | M |
+| C8 | Engine deterministisch und seed-basiert, damit testbar | ✅ 2026-08-18 | Die Engine steht (FSRS, Sessionplan, Serie, Messung, Profil) und ist durchgängig aus einem Seed reproduzierbar — `Math.random()` ist verboten, geprüft in 322 Kerntests. Genau das trägt auch die Simulation (C9) | S |
+| C9 | Simulator: synthetische Nutzer über 90 Tage, bevor echte Nutzer da sind | ✅ 2026-08-18 | Läuft als deterministischer Test über 120 und 400 Tage: Wer alles behält, wird immer seltener gefragt; wer die Hälfte vergisst, öfter. Zeigt, dass der Scheduler über lange Horizonte stabil bleibt (A11) | M |
 | C10 | FSRS-Parameter später **auf dem Gerät** aus der eigenen Historie nachoptimieren | ⬜ | **D-004**, Phase nach M2; bis dahin Standardparameter | L |
 
 ## D. Übungsmodule
@@ -177,10 +177,10 @@ Der Punkt, der aus einem Spiel einen Gedächtnistrainer macht.
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| J1 | Vier Modi: ⚡ 60 Sekunden · ⚡ 3 Minuten · 🧠 5 Minuten (Standard) · 🔥 15 Minuten | ⬜ | | M |
-| J2 | Jeder Modus ist ein Zeitbudget-Profil derselben Engine, kein eigener Code | 🟨 2026-08-17 | `core/modes.ts` legt die vier Budgets fest; die Engine, die sie füllt, kommt mit M1 | S |
-| J3 | Auswahl in einem Tap direkt vom Startbildschirm | ⬜ | | S |
-| J4 | 60-Sekunden-Modus hält die Streak am Leben | ⬜ | **D-008** — daneben getrennt gezählt, wie viele Tage volle Challenges waren | S |
+| J1 | Vier Modi: 60 Sekunden · 3 Minuten · 5 Minuten (Standard) · 15 Minuten | ✅ 2026-08-18 | Alle vier auf dem Startbildschirm, `core/modes.ts`. Der Standard ist voreingestellt | M |
+| J2 | Jeder Modus ist ein Zeitbudget-Profil derselben Engine, kein eigener Code | ✅ 2026-08-18 | `core/modes.ts` legt vier Budgets fest; `planSession` teilt jedes in Runden und Blöcke — ein Codeweg für alle vier. Die Summe der Blöcke ist auf die Sekunde die Moduslänge (B2) | M |
+| J3 | Auswahl in einem Tap direkt vom Startbildschirm | ✅ 2026-08-18 | Vier Knöpfe unter „Beginnen“, ein Tap wählt, ein Tap startet (O1). 44 px Mindesthöhe (O5) | S |
+| J4 | 60-Sekunden-Modus hält die Streak am Leben | ✅ 2026-08-18 | **D-008**: Eine zu Ende gelaufene 60-Sekunden-Einheit zählt als Trainingstag, geprüft im Streak-E2E. Das getrennte Zählen voller Challenges ist eine spätere Beigabe, keine Voraussetzung | S |
 
 ## K. Gamification
 

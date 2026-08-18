@@ -2204,3 +2204,47 @@ bleibt es ein stiller Verzicht.
 Tastatur erreicht den Startknopf früh und sieht ihn, kein Bild ohne Namen oder
 `aria-hidden`, die Uhr der Einheit als lesbarer `progressbar`. Kontrast im Auge
 und Bewegung im Gefühl bleiben dem Gerätedurchgang.
+
+---
+
+## 2026-08-18 · Der große Durchgang — alles Machbare abgearbeitet
+
+Der Auftraggeber hat gebeten, die übrigen Aufgaben nacheinander abzuarbeiten,
+nach jeder zu pushen, und die, die ihn brauchen, ans Ende zu legen. Das ist
+geschehen. In einem Zug erledigt und je einzeln gepusht:
+
+- **O4/O5/O6 Barrierefreiheit** — sichtbarer Fokusring auf jedem bedienbaren
+  Element (der eigentliche Mangel), 44-px-Tap-Ziele, Haptik am selben
+  Schalter wie der Ton.
+- **N4 Alles löschen** — der eine Ort, an dem die App warnt statt beruhigt.
+- **N5 Speicherbedarf** — gemessen, mit „etwa“.
+- **Französisch als Trainingssprache** (L6/L2/L7) — fünf Vorräte, ein
+  Sprachschalter für die Farbstellung, überschneidungsfrei per Test.
+- **B7 Noch eine Runde** — Weitermachen ohne Druck.
+- **K3 Erreichtes** — benannte Tatsachen, keine Ränge (D-019).
+- **Backlog-Hygiene** — A5, C8, C9 und die ganze J-Reihe waren längst fertig
+  und nur nicht abgehakt.
+
+### Ein Fehler, der eine Regel wert ist
+
+Beim Bauen von K3 lief ein voller E2E-Durchlauf im Hintergrund, **während** im
+Vordergrund `npm run build` das `dist/` neu schrieb — unter dem laufenden
+Preview-Server. Ein Perf-Test fiel um, nicht weil er kaputt war, sondern weil
+sich die Dateien unter ihm änderten. Isoliert lief er in 255 ms.
+
+**Lehre, notiert:** Kein Build im Vordergrund, solange ein E2E-Lauf im
+Hintergrund gegen `dist/` testet. Ein grüner Test unter falschen Bedingungen
+sagt nichts; ein roter unter falschen Bedingungen erschreckt grundlos. Beides
+ist teurer als kurz zu warten.
+
+### Was bleibt
+
+`docs/OFFEN.md` ist die ehrliche Bestandsaufnahme in drei Gruppen: was **den
+Auftraggeber** braucht (Konten, Geld, echte Geräte), was eine
+**Produktentscheidung** braucht (KI, eigene Inhalte, Cloud), und der kleine
+**Restausbau**, der nichts blockiert. Alles, was ohne ihn ging, ist gemacht
+und liegt live.
+
+**Stand:** 322 Kerntests, rund 200 Browserläufe (Funktion + Layout-Matrix +
+Fehlertoleranz + Barrierefreiheit + Performance), Größenbudget in der CI,
+Typecheck für App und Kern grün.
