@@ -15,7 +15,11 @@ import {
   type OwnPalace,
   type DimensionCounts,
   type DimensionId,
+  learnableModules,
+  moduleForDimension,
   numberPool,
+  profileOf,
+  weakest,
   returnsOf,
   palaceOf,
   walkPool,
@@ -144,6 +148,35 @@ export function App() {
       .catch(() => undefined)
   }, [])
 
+  // Das Profil (E). Wie die Serie und die Wiedersehen: aus den Terminen
+  // gerechnet, nach jeder Einheit neu gelesen.
+  const [dimensionCounts, setDimensionCounts] = useState<
+    Partial<Record<DimensionId, DimensionCounts>>
+  >({})
+  useEffect(() => {
+    void loadDimensionCounts(language)
+      .then(setDimensionCounts)
+      .catch(() => undefined)
+  }, [language, running])
+
+  /*
+   * Der Schwerpunkt des heutigen Trainings (E5, E6).
+   *
+   * Er entsteht **nur**, wenn sich zwei Achsen wirklich unterscheiden — das
+   * entscheidet `weakest` und nicht diese Datei. Und er wird nur angekündigt,
+   * wenn er in der gewählten Zeit überhaupt vorkommen kann: `learnableModules`
+   * ist dieselbe Regel, die der Planer benutzt. Zwei Regeln wären zwei
+   * Wahrheiten, und die App verspräche einen Schwerpunkt, den der Plan nicht
+   * einhält.
+   */
+  const focus = useMemo(() => {
+    const weak = weakest(profileOf(dimensionCounts))
+    if (weak === undefined) return undefined
+    const moduleId = moduleForDimension(weak)
+    if (moduleId === undefined) return undefined
+    return learnableModules(MODES[mode].seconds).includes(moduleId) ? moduleId : undefined
+  }, [dimensionCounts, mode])
+
   const start = useCallback(() => {
     // Der erste Ton der Einheit, ausgelöst vom Fingertipp — genau die Geste,
     // die iOS verlangt, bevor eine Seite überhaupt klingen darf.
@@ -223,6 +256,7 @@ export function App() {
         due,
         taught,
         palaceTaught,
+        focus,
       })
       const progress: SessionProgress = {
         sessionId,
@@ -236,7 +270,7 @@ export function App() {
       setRunning(progress)
       void beginSession(progress, day, now).catch(() => undefined)
     })()
-  }, [language, mode, platform, taught, palaceTaught, own])
+  }, [language, mode, platform, taught, palaceTaught, own, focus])
 
   const leave = useCallback(() => setRunning(undefined), [])
 
@@ -259,16 +293,6 @@ export function App() {
   }, [language, running])
   const returns = useMemo(() => returnsOf(reviewed), [reviewed])
 
-  // Das Profil (E). Wie die Serie und die Wiedersehen: aus den Terminen
-  // gerechnet, nach jeder Einheit neu gelesen.
-  const [dimensionCounts, setDimensionCounts] = useState<
-    Partial<Record<DimensionId, DimensionCounts>>
-  >({})
-  useEffect(() => {
-    void loadDimensionCounts(language)
-      .then(setDimensionCounts)
-      .catch(() => undefined)
-  }, [language, running])
 
   /*
    * Was die Messung gerade von einem will.
@@ -323,6 +347,7 @@ export function App() {
       setMeasuring(true)
     })()
   }, [language, platform])
+
 
   const greeting = useMemo(() => {
     const lines = dictionary.greetings
@@ -518,6 +543,27 @@ export function App() {
           <span className="start-time">{label}</span>
           <span className="start-label">{dictionary.start.start}</span>
         </button>
+
+        {/*
+          E6: Die Entscheidung wird gesagt, nicht nur getroffen. Eine Zeile,
+          keine Meldung — und sie steht nur da, wenn es wirklich einen
+          Schwerpunkt gibt (D-011/G-2).
+        */}
+        {focus !== undefined && (
+          <>
+            <p className="focus">
+              {dictionary.profile.focus}{' '}
+              <strong>{(dictionary.profile.modules as Record<string, string>)[focus]}</strong>
+            </p>
+            {/*
+              Der Grund gehört dazu, sonst ist es eine Behauptung (E6). Und der
+              zweite Halbsatz gehört auch dazu: Ein Schwerpunkt, der wie ein
+              Urteil über einen Menschen klingt, wäre die Diagnose, die D-021
+              ausschließt — er ändert sich, sobald sich die Zahlen ändern.
+            */}
+            <p className="hint focus-why">{dictionary.profile.focusWhy}</p>
+          </>
+        )}
 
         <h2 id="challenge-heading">{dictionary.start.heading}</h2>
         <div className="modes" role="group" aria-labelledby="challenge-heading">

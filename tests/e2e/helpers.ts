@@ -100,8 +100,21 @@ export async function collectItems(page: Page, limit = 12): Promise<Learned> {
 
   const word = page.locator('.encode-word')
   const seen: string[] = []
+  /*
+   * Mit Frist, und das ist eine Lehre aus einem einzigen Fehlschlag in einem
+   * vollen Lauf: Die Schleife hatte keinen Ausgang außer dem Beginn des
+   * Abrufs. Als der einmal ausblieb, drehte sie drei Minuten lang, bis die
+   * Prüfung an ihrer eigenen Zeitgrenze starb — mit einer Fehlermeldung, die
+   * auf `waitForTimeout` zeigte und damit auf gar nichts.
+   *
+   * Neunzig Sekunden sind großzügig: Der längste Einprägeblock (ein Gang,
+   * fünf Stationen à sechs Sekunden) dauert dreißig. Wer hier anschlägt, hat
+   * kein Zeitproblem, sondern ein anderes — und liest das jetzt auch.
+   */
+  const deadline = Date.now() + 90_000
   while (seen.length < limit) {
     if ((await page.locator('.recall-input').count()) > 0) break
+    expect(Date.now(), 'der Abruf hat nicht begonnen').toBeLessThan(deadline)
     const text = (await word.textContent().catch(() => null))?.trim()
     if (text !== undefined && text !== '' && text !== seen[seen.length - 1]) seen.push(text)
     await page.waitForTimeout(150)

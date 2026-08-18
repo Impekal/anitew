@@ -119,8 +119,8 @@ Abruftraining. Hier entscheidet sich, ob die App wirkt.
 | E2 | Acht Dimensionen … plus eine neunte | ✅ 2026-08-18 | **Zusammenhänge** kam dazu: Die Missionen üben, dass Zimmer, Gegenstand, Uhrzeit und Ort *zu einer Person gehören* (D-014) — eine eigene Fähigkeit, und die alltagsnächste. Drei der acht (Visuell, Aufmerksamkeit, Arbeitsgedächtnis) misst diese App nicht, und genau das steht dort | M |
 | E3 | Profilwerte ausschließlich aus gemessenen Daten (R-1) | ✅ 2026-08-18 | Nur **verzögerter Abruf**: wie oft etwas nach seinem ersten Tag zurückkam und dabei noch da war. Der Lerntag bleibt draußen — das ist Übung und nicht Gedächtnis (F1). Beide Zahlen exakt aus den Terminen | M |
 | E4 | Profilanzeige plus Verlauf über die Zeit | 🟨 2026-08-18 | Die Anzeige steht — als **Liste, nicht als Netzdiagramm**: Ein Netz braucht für jede Achse einen Wert und zwingt damit zur erfundenen Zahl. Der Verlauf über die Zeit fehlt noch | M |
-| E5 | Adaptive Tagesplanung: Schwächen priorisieren, Stärken erhalten | 🟨 2026-08-18 | Die Grundlage steht: `weakest()` nennt die schwächste Achse **nur**, wenn sich die Spannen zweier Achsen nicht überlappen — sonst baute die App den Plan auf Rauschen um. Dass der Planer sie benutzt, fehlt noch | L |
-| E6 | Die App erklärt ihre Entscheidung in einem Satz | ⬜ | macht Personalisierung spürbar statt nur behauptet | S |
+| E5 | Adaptive Tagesplanung: Schwächen priorisieren, Stärken erhalten | ✅ 2026-08-18 | Der Schwerpunkt bekommt **jede zweite Runde** — nicht alle: Eine Einheit, die nur noch das Schwächste übt, ist keine Personalisierung, sondern eine Strafe für eine Schwäche, und sie ließe alles andere verfallen. Er entsteht nur, wenn sich zwei Spannen nicht überlappen, und die Lektion geht ihm vor | L |
+| E6 | Die App erklärt ihre Entscheidung in einem Satz | ✅ 2026-08-18 | „Heute mit Schwerpunkt: Zahlen — von dem, was zurückkam, ist dort am wenigsten geblieben. Ändert sich, sobald sich die Zahlen ändern.“ Der zweite Halbsatz gehört dazu: Ein Schwerpunkt, der wie ein Urteil klingt, wäre die Diagnose, die D-021 ausschließt. Startbildschirm und Planer benutzen **dieselbe** Regel (`learnableModules`) — sonst verspräche die App einen Schwerpunkt, den der Plan nicht einhält | S |
 | E7 | Unsicherheit ehrlich zeigen, solange zu wenig Daten da sind | ✅ 2026-08-18 | Unter 15 Gelegenheiten steht „noch zu wenig“ — als **eigener Fall**, nicht als Null: Eine Null ließe sich als schlechtes Ergebnis lesen. Darüber immer Wert **und** Spanne | S |
 
 ## F. Messung & Ehrlichkeit  🔴 Release-Sperre
@@ -263,8 +263,8 @@ Anforderung wie jede andere. Die acht Regeln G-1 bis G-8 stehen in
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | ✅ 2026-08-18 | 275 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Sessionplanung, Bewertung, Scheduler, Gesichtsgenerator, die ganze Messung und die Wirkungsaussagen (R5) sind abgedeckt | M |
-| P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | ✅ 2026-08-18 | 112 Läufe in Chromium und im Telefonprofil, darunter eine Einheit von vorn bis hinten und der Abbruch mitten drin. Seit M4 **liest der Test ab, welches Modul kam, statt es vorherzusagen** (`tests/e2e/helpers.ts`) | M |
+| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | ✅ 2026-08-18 | 280 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Sessionplanung, Bewertung, Scheduler, Gesichtsgenerator, die ganze Messung und die Wirkungsaussagen (R5) sind abgedeckt | M |
+| P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | ✅ 2026-08-18 | 118 Läufe in Chromium und im Telefonprofil, darunter eine Einheit von vorn bis hinten und der Abbruch mitten drin. Seit M4 **liest der Test ab, welches Modul kam, statt es vorherzusagen** (`tests/e2e/helpers.ts`) | M |
 | P3 | CI bei jedem Push: Typecheck (App **und** Kern getrennt), Tests, Build, E2E | ✅ 2026-08-17 | | S |
 | P4 | Performance: Kaltstart unter 2 s, Timer laufen ruckelfrei | ⬜ | | M |
 | P5 | Uhrmanipulation darf die Engine nicht zerstören (Streak-Betrug, Intervall-Chaos) | ⬜ | monotone Zeitquelle plus Plausibilitätsprüfung | M |
@@ -326,7 +326,7 @@ Neu offen, entstanden aus den Antworten:
 |---|---|---|---|
 | **M0** | Fundament | A1–A11, L1/L1a, P3 | ✅ **2026-08-17** — Push baut, App installiert sich, `src/core/` läuft ohne Browser und wird von der CI daran gehalten |
 | **M1** | Walking Skeleton | B1–B3, B5, B6, B9, C5, D4, D6, N1 | ✅ **2026-08-17** — Eine echte Einheit läuft täglich durch, überlebt eine Unterbrechung, und jede Antwort steht im Protokoll |
-| **M2** | Die Engine wird echt | C1–C9, D8, E1–E7, B4 | Die App entscheidet begründet, was du heute trainierst, und plant Wiederholungen persönlich |
+| **M2** | Die Engine wird echt | C1–C9, D8, E1–E7, B4 | 🟨 **2026-08-18** — Die App entscheidet begründet, was du heute trainierst (E5/E6), und plant Wiederholungen persönlich (FSRS). Offen: der Verlauf des Profils über die Zeit (E4), Interferenzprüfung zur Laufzeit (C6), B4 |
 | **M3** | Ehrlichkeit | F1–F7, F2a, F2b | ✅ **2026-08-18** — Zwei getrennte Zahlen, und die große ist gemessen: Sie steht nur da, wenn ihre Spanne die Null nicht enthält. Daneben eine Seite, die sagt, was belegt ist und was nicht (F6), und Store-Texte, die jede Aussage auf ihre Deckung zurückführen (F7). **Die Release-Sperre ist gefallen** |
 | **M4** | Inhalt & Spiel | D5, D9–D16, G, H, K, J | 🟨 **2026-08-18** — Fünf Module, zwei Merktechniken (D5 Major, G Palast), die Serie mit Schutztagen (K2). Offen: Achievements (K3), weitere Missionsvorlagen, H3 (verzögerter Abruf, braucht B8) |
 | **M5** | Sprachen | L1–L8 | Man kann heute auf Deutsch und morgen auf Japanisch trainieren |

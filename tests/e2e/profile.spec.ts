@@ -116,3 +116,42 @@ test('hält den Trainingsscore heraus (F1)', async ({ page }) => {
   await seed(page, [{ module: 'words', reviews: 21, lapses: 3 }])
   await expect(page.getByText(/das ist Übung, nicht Gedächtnis/)).toBeVisible()
 })
+
+test('kündigt einen Schwerpunkt an und sagt, warum (E5, E6)', async ({ page }) => {
+  /*
+   * Personalisierung, die man sieht, statt einer, die behauptet wird. Und der
+   * zweite Satz gehört dazu: Ein Schwerpunkt, der wie ein Urteil über einen
+   * Menschen klingt, wäre die Diagnose, die D-021 ausschließt.
+   */
+  await seed(page, [
+    { module: 'words', reviews: 61, lapses: 3 },
+    { module: 'numbers', reviews: 61, lapses: 40 },
+  ])
+
+  await expect(page.locator('.focus')).toContainText('Heute mit Schwerpunkt: Zahlen')
+  await expect(page.getByText(/Ändert sich, sobald sich die Zahlen ändern/)).toBeVisible()
+})
+
+test('kündigt keinen an, wo der Unterschied Zufall sein kann', async ({ page }) => {
+  await seed(page, [
+    { module: 'words', reviews: 21, lapses: 5 },
+    { module: 'numbers', reviews: 21, lapses: 6 },
+  ])
+  await expect(page.locator('.focus')).toHaveCount(0)
+})
+
+test('verspricht keinen Schwerpunkt, den die gewählte Zeit nicht hergibt', async ({ page }) => {
+  /*
+   * Der Palast wird unter drei Minuten nicht gelernt (D-020). Wäre er die
+   * schwächste Achse, dürfte er im Notfallmodus nicht angekündigt werden —
+   * sonst verspräche der Startbildschirm etwas, das der Plan nicht einhält.
+   */
+  await seed(page, [
+    { module: 'words', reviews: 61, lapses: 3 },
+    { module: 'palace', reviews: 61, lapses: 40 },
+  ])
+
+  await expect(page.locator('.focus')).toContainText('Palast')
+  await page.getByRole('button', { name: '60 Sekunden' }).click()
+  await expect(page.locator('.focus')).toHaveCount(0)
+})

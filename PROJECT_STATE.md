@@ -1603,3 +1603,45 @@ Trainingsplan umbaut, baut ihn auf Rauschen um.
 **Stand:** 275 Kerntests, 112 E2E-Läufe, Typecheck für App und Kern grün.
 Offen in E: der Verlauf über die Zeit (E4), die adaptive Planung selbst (E5)
 und ihr erklärender Satz (E6).
+
+### Und jetzt entscheidet sie sichtbar (E5, E6)
+
+Aus dem Profil folgt eine Entscheidung: **Der Schwerpunkt bekommt jede zweite
+Runde.** Nicht alle — eine Einheit, die nur noch das Schwächste übt, ist keine
+Personalisierung, sondern eine Strafe für eine Schwäche, und sie ließe alles
+andere verfallen, obwohl der Wiederholungsplan es weiter für fällig hält. Die
+Hälfte ist der spürbare und trotzdem verträgliche Anteil.
+
+Auf dem Startbildschirm steht dann: **„Heute mit Schwerpunkt: Zahlen. Von dem,
+was zurückkam, ist dort am wenigsten geblieben. Ändert sich, sobald sich die
+Zahlen ändern.“** Der letzte Halbsatz gehört dazu — ein Schwerpunkt, der wie
+ein Urteil über einen Menschen klingt, wäre genau die Diagnose, die D-021
+ausschließt.
+
+Eine Stelle war beim Bauen wichtiger, als sie aussieht: **Startbildschirm und
+Planer benutzen dieselbe Regel.** `learnableModules()` steht einmal im Kern
+und wird von beiden aufgerufen. Zweimal geschrieben wären es zwei Wahrheiten,
+die irgendwann auseinanderlaufen — und dann kündigte die App einen Schwerpunkt
+an, den der Plan nicht einhält. Der Fall ist nicht theoretisch: Wäre der
+Palast die schwächste Achse und jemand wählt sechzig Sekunden, gibt es dort
+gar keinen Gang (D-020). Ein E2E-Test klickt genau das durch.
+
+Die Lektion geht dem Schwerpunkt vor. Wer heute die erste Major-Ziffer lernt,
+fängt mit Zahlen an, auch wenn Wörter schwächer sind: Unterricht ohne
+Anwendung ist am nächsten Tag wieder weg (D5).
+
+**Damit ist M2 im Kern durch.** Offen bleiben der Verlauf des Profils über die
+Zeit (E4) und die Interferenzprüfung zur Laufzeit (C6).
+
+### Eine Schleife ohne Ausgang
+
+Im vollen Lauf ist eine Prüfung einmal gehängt — und sechs Wiederholungen
+danach lief sie sechsmal durch. Der eigentliche Mangel war nicht die Ursache,
+sondern die Form: **`collectItems` hatte keinen Ausgang außer dem Beginn des
+Abrufs.** Als der einmal ausblieb, drehte die Schleife drei Minuten lang, bis
+die Prüfung an ihrer eigenen Zeitgrenze starb — mit einer Fehlermeldung, die
+auf `waitForTimeout` zeigte und damit auf gar nichts.
+
+Sie hat jetzt eine Frist von neunzig Sekunden und sagt beim Anschlagen, was
+fehlt. Der längste Einprägeblock dauert dreißig; wer hier anschlägt, hat kein
+Zeitproblem, sondern ein anderes — und liest das dann auch.

@@ -1570,3 +1570,22 @@ body::before {
   font-size: 0.86rem;
   color: var(--ink);
 }
+
+/* Der angekündigte Schwerpunkt (E6). Eine Zeile über der Zeitwahl, leise —
+   sie erklärt eine Entscheidung, sie fordert nichts. */
+.focus {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--ink-faint);
+}
+
+.focus strong {
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+.focus-why {
+  margin: 0;
+  max-width: 22rem;
+  font-size: 0.82rem;
+}

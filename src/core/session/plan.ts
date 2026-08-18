@@ -250,6 +250,8 @@ export interface BlockPlan {
 
 export interface SessionPlan {
   mode: TrainingMode
+  /** Das Modul, das heute Vorrang bekommen hat — oder keins (E5, E6). */
+  focus?: ModuleId
   day: DayKey
   /** Die Trainingssprache. Sie gehört zur Einheit, nicht zur Oberfläche —
       dieselbe Einheit auf Deutsch und auf Japanisch sind zwei Einheiten. */
@@ -288,6 +290,17 @@ export interface PlanInput {
    */
   palaceTaught?: boolean
   /**
+   * Das Modul, das heute Vorrang bekommt (Backlog E5).
+   *
+   * Kommt aus dem Gedächtnisprofil und **nur dann**, wenn sich zwei Achsen
+   * wirklich unterscheiden (`weakest`). Der Planer prüft das nicht nach — er
+   * bekommt entweder einen Schwerpunkt oder keinen. Ein Modul, das hier gar
+   * nicht gelernt werden kann (der Palast in einer kurzen Einheit), wird
+   * stillschweigend übergangen; angekündigt wurde es dann auch nicht, weil
+   * der Startbildschirm dieselbe Regel benutzt (`learnableModules`).
+   */
+  focus?: ModuleId
+  /**
    * Welche Module dürfen heute vorkommen? Voreingestellt alle. Der Parameter
    * ist da, damit ein Test ein einzelnes Modul erzwingen kann, ohne dass der
    * Planer dafür eine Sonderregel bekommt.
@@ -296,6 +309,23 @@ export interface PlanInput {
 }
 
 export type Pools = Readonly<Record<ModuleId, readonly string[]>>
+
+/**
+ * Woraus in einer Einheit dieser Länge überhaupt gelernt werden kann.
+ *
+ * Steht als eigene Funktion da, weil die Regel an **zwei** Stellen gebraucht
+ * wird: hier beim Planen und auf dem Startbildschirm, der den Schwerpunkt
+ * ankündigt (E6). Zweimal geschrieben wären es zwei Regeln, die irgendwann
+ * auseinanderlaufen — und dann verspräche die App einen Schwerpunkt, den der
+ * Plan nicht einhält.
+ */
+export function learnableModules(
+  totalSeconds: number,
+  modules: readonly ModuleId[] = TRAINING_MODULES,
+): readonly ModuleId[] {
+  if (totalSeconds >= MIN_SECONDS_FOR_PALACE || modules.length === 1) return modules
+  return modules.filter((moduleId) => moduleId !== 'palace')
+}
 
 export function planSession(input: PlanInput): SessionPlan {
   const totalSeconds = MODES[input.mode].seconds
@@ -316,10 +346,7 @@ export function planSession(input: PlanInput): SessionPlan {
    * ist, kommt zurück (D-004); dort wird nichts eingeprägt, es sind nur die
    * Fragen.
    */
-  const learnFrom =
-    totalSeconds >= MIN_SECONDS_FOR_PALACE || modules.length === 1
-      ? modules
-      : modules.filter((moduleId) => moduleId !== 'palace')
+  const learnFrom = learnableModules(totalSeconds, modules)
 
   // Nur Module, für die heute wirklich etwas fällig ist. Ein leerer
   // Wiederholungsblock wäre eine Frage ohne Gegenstand.
@@ -384,8 +411,32 @@ export function planSession(input: PlanInput): SessionPlan {
   const teachesNumbers = wantsLesson && numbersAt >= 0
 
   const offset = teachesPalace ? palaceAt : teachesNumbers ? numbersAt : drawn
-  const moduleForRound = (round: number): ModuleId =>
-    learnFrom[(offset + round - 1) % learnFrom.length] as ModuleId
+
+  /*
+   * Der Schwerpunkt bekommt **jede zweite Runde** (E5).
+   *
+   * Nicht alle: Eine Einheit, die nur noch das Schwächste übt, ist keine
+   * Personalisierung, sondern eine Strafe für eine Schwäche — und sie ließe
+   * alles andere verfallen, obwohl der Wiederholungsplan es weiter für fällig
+   * hält. Die Hälfte ist der spürbare und trotzdem verträgliche Anteil.
+   *
+   * Eine Lektion geht vor: Wer heute den Palast erklärt bekommt, fängt mit dem
+   * Palast an, auch wenn die Zahlen schwächer sind. Unterricht ohne
+   * Anwendung ist am nächsten Tag wieder weg (D5).
+   */
+  const focus =
+    input.focus !== undefined && learnFrom.includes(input.focus) && !teachesPalace && !teachesNumbers
+      ? input.focus
+      : undefined
+  const others = focus === undefined ? learnFrom : learnFrom.filter((id) => id !== focus)
+
+  const moduleForRound = (round: number): ModuleId => {
+    if (focus === undefined || others.length === 0) {
+      return learnFrom[(offset + round - 1) % learnFrom.length] as ModuleId
+    }
+    if (round % 2 === 1) return focus
+    return others[(offset + Math.floor(round / 2) - 1 + others.length) % others.length] as ModuleId
+  }
 
   // Gelehrt wird nur mit Gegenstand: Das Major-System zu erklären und dann
   // keine einzige Zahl zu zeigen wäre Unterricht ohne Anlass.
@@ -523,6 +574,7 @@ export function planSession(input: PlanInput): SessionPlan {
 
   return {
     mode: input.mode,
+    ...(focus === undefined ? {} : { focus }),
     day: input.day,
     language: input.language,
     seed: input.seed,

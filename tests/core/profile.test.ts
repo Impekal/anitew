@@ -8,6 +8,8 @@ import {
   type DimensionId,
   dimensionOf,
   hasProfile,
+  learnableModules,
+  planSession,
   profileOf,
   weakest,
 } from '../../src/core/index.ts'
@@ -123,5 +125,86 @@ describe('die schwächste Achse (E5)', () => {
   it('schweigt, solange nur eine Achse überhaupt trägt', () => {
     // Ohne Vergleich gibt es keine schwächste — nur eine einzige.
     expect(weakest(profileOf({ words: full(40, 20) }))).toBeUndefined()
+  })
+})
+
+describe('der Schwerpunkt im Bauplan (E5)', () => {
+  const base = {
+    mode: 'extended' as const,
+    day: '2026-08-18',
+    language: 'de',
+    seed: 'schwerpunkt',
+  }
+  const many = (prefix: string) => Array.from({ length: 60 }, (_, index) => `${prefix}${index}`)
+  const pools = {
+    words: many('w'),
+    faces: many('f'),
+    numbers: many('9'),
+    missions: many('p'),
+    palace: many('home~'),
+  }
+
+  const modulesOf = (plan: ReturnType<typeof planSession>) =>
+    plan.blocks.filter((block) => block.kind === 'encode').map((block) => block.moduleId)
+
+  it('gibt dem Schwerpunkt jede zweite Runde', () => {
+    /*
+     * Nicht alle Runden: Eine Einheit, die nur noch das Schwächste übt, ist
+     * keine Personalisierung, sondern eine Strafe für eine Schwäche — und sie
+     * ließe alles andere verfallen, obwohl der Wiederholungsplan es weiter für
+     * fällig hält.
+     */
+    const plan = planSession({ ...base, pools, modules: ['words', 'faces', 'numbers'], focus: 'numbers' })
+    const rounds = modulesOf(plan)
+    expect(rounds.length).toBeGreaterThan(2)
+    rounds.forEach((moduleId, index) => {
+      if (index % 2 === 0) expect(moduleId).toBe('numbers')
+      else expect(moduleId).not.toBe('numbers')
+    })
+    expect(plan.focus).toBe('numbers')
+  })
+
+  it('lässt die anderen Module weiterlaufen', () => {
+    const plan = planSession({ ...base, pools, modules: ['words', 'faces', 'numbers'], focus: 'numbers' })
+    const others = modulesOf(plan).filter((moduleId) => moduleId !== 'numbers')
+    expect(new Set(others).size).toBeGreaterThan(1)
+  })
+
+  it('übergeht einen Schwerpunkt, der in dieser Zeit gar nicht vorkommt', () => {
+    /*
+     * Der Palast wird unter drei Minuten nicht gelernt (D-020). Ihn dann als
+     * Schwerpunkt zu setzen hieße, einen Schwerpunkt zu versprechen, den der
+     * Plan nicht einhält — deshalb benutzt der Startbildschirm dieselbe Regel
+     * (`learnableModules`) und kündigt ihn gar nicht erst an.
+     */
+    expect(learnableModules(60)).not.toContain('palace')
+    expect(learnableModules(300)).toContain('palace')
+    const plan = planSession({ ...base, mode: 'emergency', pools, focus: 'palace' })
+    expect(plan.focus).toBeUndefined()
+  })
+
+  it('lässt der Lektion den Vortritt', () => {
+    // Unterricht ohne Anwendung ist am nächsten Tag wieder weg (D5). Wer heute
+    // die erste Ziffer lernt, fängt mit Zahlen an, auch wenn Wörter schwächer
+    // sind.
+    const plan = planSession({
+      ...base,
+      mode: 'daily',
+      pools,
+      modules: ['words', 'numbers'],
+      taught: [],
+      focus: 'words',
+    })
+    expect(plan.blocks[0]?.kind).toBe('teach')
+    expect(modulesOf(plan)[0]).toBe('numbers')
+    expect(plan.focus).toBeUndefined()
+  })
+
+  it('plant ohne Schwerpunkt genauso wie bisher', () => {
+    // Die Gegenprobe: Ohne Profilaussage ändert sich am Plan nichts.
+    const plain = planSession({ ...base, pools, modules: ['words', 'faces', 'numbers'] })
+    expect(plain.focus).toBeUndefined()
+    const rounds = modulesOf(plain)
+    expect(new Set(rounds).size).toBeGreaterThan(1)
   })
 })

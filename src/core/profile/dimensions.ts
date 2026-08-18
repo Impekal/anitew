@@ -87,6 +87,12 @@ export const SOURCES: Readonly<Record<DimensionId, DimensionSource>> = {
   longTerm: { kind: 'benchmark' },
 }
 
+/** Das Modul, aus dem eine Achse ihre Zahlen zieht. */
+export function moduleForDimension(id: DimensionId): ModuleId | undefined {
+  const source = SOURCES[id]
+  return source.kind === 'module' ? source.moduleId : undefined
+}
+
 /** Die Achse, die zu einem Modul gehört. */
 export function dimensionOf(moduleId: ModuleId): DimensionId | undefined {
   return DIMENSIONS.find((id) => {

@@ -341,6 +341,23 @@ export const de = {
     notMeasured: 'Misst diese App nicht.',
     elsewhere: 'Das misst die Messung, nicht das Training.',
     weakest: 'Am wenigsten bleibt hier hängen:',
+    /*
+      E6: Die App erklärt ihre Entscheidung in einem Satz.
+
+      Zwei Sätze, und der zweite ist der wichtigere: Er sagt, **woran** es
+      hängt — und dass es sich ändert. Ein Schwerpunkt, der wie ein Urteil
+      über einen Menschen klingt, wäre genau die Diagnose, die D-021
+      ausschließt.
+    */
+    focus: 'Heute mit Schwerpunkt:',
+    focusWhy: 'Von dem, was zurückkam, ist dort am wenigsten geblieben. Ändert sich, sobald sich die Zahlen ändern.',
+    modules: {
+      words: 'Wörter',
+      faces: 'Gesichter',
+      numbers: 'Zahlen',
+      missions: 'Missionen',
+      palace: 'Palast',
+    },
     noWeakest: 'Kein Unterschied zwischen den Achsen, der sich vom Zufall trennen lässt.',
     empty: 'Noch nichts zu zeigen. Das Profil entsteht aus dem Training — nicht aus einem Test am Anfang.',
   },
