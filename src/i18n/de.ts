@@ -169,6 +169,63 @@ export const de = {
     series: 'Die Reihe',
     cycles: 'Ab der {n}. Messung wiederholen sich die Wörter. Ein Wort, das man vor Monaten einmal drei Minuten lang gesehen hat, verfälscht wenig — aber es verfälscht.',
   },
+  science: {
+    /*
+      Die Seite, die in dieser Branche fehlt (F6).
+
+      Zwei Dinge macht sie zugleich: Sie erklärt, warum ANITEW so gebaut ist,
+      wie es gebaut ist — und sie nennt die Stelle, an der das Wissen aufhört.
+      Der zweite Teil ist der wichtigere. Wer nur die stützenden Studien
+      zitiert, betreibt Werbung mit Fußnoten.
+
+      Der Stand einer Aussage steht nicht hier, sondern in `core/science.ts`:
+      Eine Übersetzung darf einen Satz umformulieren, aber aus „nicht belegt“
+      nicht „umstritten“ machen.
+    */
+    heading: 'Was belegt ist',
+    note: 'ANITEW steht auf ein paar Befunden, die seit Jahrzehnten halten — und lässt weg, was nur gut klingt. Beides steht hier, mit Quellen.',
+    standings: {
+      established: 'Gut belegt',
+      narrow: 'Belegt, aber nur dafür',
+      unsupported: 'Nicht belegt',
+      unmeasured: 'Nicht gemessen',
+    },
+    standingNotes: {
+      established: 'Vielfach wiederholt, in unabhängigen Arbeiten. Darauf ist die App gebaut.',
+      narrow: 'Der Effekt ist da — er gilt aber für das, was geübt wurde, und nicht darüber hinaus.',
+      unsupported: 'Wird von Gedächtnis-Apps regelmäßig behauptet und hält der Prüfung nicht stand. ANITEW behauptet es deshalb nicht.',
+      unmeasured: 'Niemand hat es gemessen. Auch wir nicht.',
+    },
+    claims: {
+      spacing: {
+        title: 'Verteiltes Üben schlägt Blockübung',
+        body: 'Derselbe Aufwand, über Tage verteilt, bringt deutlich mehr als am Stück. Deshalb plant ANITEW Wiederholungen, statt dich lange üben zu lassen.',
+      },
+      retrieval: {
+        title: 'Abrufen lernt, Ansehen nicht',
+        body: 'Etwas aus dem Kopf zu holen ist der Lernvorgang selbst — Wiederlesen fühlt sich besser an und bringt weniger. Deshalb fragt die App ab, statt vorzuzeigen.',
+      },
+      forgetting: {
+        title: 'Vergessen verläuft vorhersagbar',
+        body: 'Die Kurve ist alt und wurde 2015 sauber wiederholt. Vergessen ist kein Defekt, sondern der Grund, warum ein Termin überhaupt planbar ist.',
+      },
+      mnemonics: {
+        title: 'Merktechniken heben die Leistung — in der geübten Aufgabe',
+        body: 'Sechs Wochen Loci-Training verändern messbar, wie viele Wörter einer Liste jemand behält. Was daraus für Namen, Termine oder deinen Alltag folgt, ist damit **nicht** gezeigt. ANITEW bringt dir die Technik bei und behauptet über den Rest nichts.',
+      },
+      brainTraining: {
+        title: 'Gehirnjogging macht nicht allgemein klüger',
+        body: 'Große Untersuchungen finden dasselbe: Man wird besser in den Übungen und sonst nirgends. Ein Arbeitsgedächtnistraining hebt weder Intelligenz noch Alltagsleistung. ANITEW verspricht es deshalb nicht — und der Werbespruch heißt genau darum „Technik, kein Talent“.',
+      },
+      everyday: {
+        title: 'Ob ANITEW deinem Alltag hilft',
+        body: 'Dazu gibt es keine Studie, weil es diese App noch keine gibt. Was wir messen können, misst die Messung: wie viele von zwanzig Wörtern am Folgetag noch da sind. Alles darüber hinaus wäre geraten — und geraten wird hier nicht.',
+      },
+    },
+    sources: 'Quellen',
+    restsOn: 'Daran hängt in der App:',
+    nothingRests: 'Darauf ist in der App nichts gebaut.',
+  },
   streak: {
     /*
       Die Serie sagt, was war — mehr nicht (K7). Keine Drohung, kein

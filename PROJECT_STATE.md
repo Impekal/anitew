@@ -1187,3 +1187,84 @@ sechs Dateien kopiert liegt, ist sechs Fehler, die noch nicht passiert sind.**
 **Stand:** 203 Kerntests, 66 E2E-Läufe, Typecheck für App und Kern grün.
 Offen in M3: die Wissenschaftsseite (F6) und die Store-Texte (F7), die daran
 hängen.
+
+---
+
+## 2026-08-18 · Was belegt ist (F6, F7) — M3 ist fertig
+
+Die Messung sagt, was an *dir* gezählt wurde. Jetzt gibt es die Gegenprobe:
+worauf der Aufbau der App überhaupt beruht — und wo das Wissen aufhört.
+
+### Vier Stufen statt zwei
+
+Der interessante Fall liegt in der Mitte, und genau den lassen Gedächtnis-Apps
+üblicherweise weg:
+
+- **Gut belegt** — verteiltes Üben, Abrufen statt Ansehen, die
+  Vergessenskurve. Darauf ist die App gebaut.
+- **Belegt, aber nur dafür** — Merktechniken. Sechs Wochen Loci-Training
+  verändern messbar, wie viele Wörter einer Liste jemand behält. Über Namen,
+  Termine und Alltag sagt das nichts. ANITEW bringt die Technik bei und
+  behauptet den Rest nicht.
+- **Nicht belegt** — Gehirnjogging macht nicht allgemein klüger.
+- **Nicht gemessen** — ob ANITEW im Alltag hilft. Von niemandem, uns
+  eingeschlossen.
+
+Jede Aussage nennt, **was in der App auf ihr steht**. Bei den beiden unteren
+steht dort: nichts. Das ist der eigentliche Inhalt der Seite.
+
+### Aus einem Vorsatz wird ein Test (D-016)
+
+„Wir bauen nichts auf Unbelegtem“ ist als Satz wertlos, weil der Verstoß nie
+als Verstoß daherkommt. Niemand schreibt „diese Funktion beruht auf einer
+widerlegten Annahme“ — er schreibt einen Balken namens „Gedächtnisstärke“, und
+drei Monate später weiß keiner mehr, woher die Zahl kam.
+
+Deshalb ist die Bindung Struktur: `restsOn` muss bei `unsupported` und
+`unmeasured` leer sein, und ein Test macht daraus einen roten Balken statt
+einer Diskussion. Umgekehrt gilt für `unmeasured` das Gegenteil: Dort darf
+**keine** Quelle stehen. Eine fremde Studie unter „hilft es im Alltag?“ zu
+legen wäre der eleganteste Weg, R-2 zu brechen — der Satz bliebe wörtlich
+richtig und läse sich trotzdem wie ein Beleg.
+
+**Keine DOI.** Ich hätte sie aus dem Kopf schreiben müssen. Eine um eine Ziffer
+falsche DOI ist ein toter Link, ausgerechnet auf der Seite, die von
+Genauigkeit lebt. R-1 gilt auch für uns: Autor, Jahr, Titel, Journal — das
+lässt sich finden, ohne es zu erfinden.
+
+### F7: die Texte, und zwei Funde beim Aufräumen
+
+`docs/STORE.md` hält jetzt alles, was ANITEW über sich selbst sagt, wo der
+Nutzer die App noch nicht offen hat — in beiden Sprachen, mit einer Tabelle,
+die jede Aussage auf ihre Deckung zurückführt (Backlog-Kennung oder Eintrag
+aus `science.ts`). Was sich nicht zurückführen lässt, steht nicht drin.
+
+Der Test über die Marketingflächen hat sofort zwei Dinge gefunden:
+
+**`index.html` und das Manifest trugen noch den alten Spruch.** „Trainiere dein
+Gedächtnis. Miss deinen Fortschritt. Behalte mehr.“ — die App sagte innen
+längst etwas anderes. Zwei Selbstbeschreibungen sind der Anfang davon, dass
+eine davon nicht mehr stimmt; die Manifest-Zeile wandert obendrein beim
+Verpacken direkt in den Store-Eintrag.
+
+**Die Sperrliste zensierte sich selbst.** `docs/STORE.md` *muss* die verbotenen
+Ausdrücke nennen, sonst weiß beim Texten niemand, welche gemeint sind — der
+Test las sie und wurde rot. Geprüft wird jetzt alles vor der Liste. Eine
+Regel, die sich nicht aussprechen darf, ist keine Regel, sondern eine Falle.
+
+Und eine Feinheit, die fast einen falschen Test ergeben hätte: **„klüger“ und
+„smarter“ stehen in der App** — in dem Satz, dass Gehirnjogging genau das nicht
+bewirkt. Eine Sperrliste, die den Widerspruch nicht vom Versprechen
+unterscheidet, verbietet ausgerechnet die ehrlichste Stelle. Gesperrt ist
+deshalb nur, was sich gar nicht ehrlich verwenden lässt: Heilversprechen,
+„wissenschaftlich bewiesen“, Verdopplungsversprechen.
+
+### Damit ist M3 durch
+
+Zwei getrennte Zahlen, und die große ist gemessen (F1–F5). Eine Seite, die
+sagt, was belegt ist und was nicht (F6). Texte, die nichts behaupten, was
+nicht gedeckt ist (F7, R5). **Die Release-Sperre ist gefallen** — ANITEW darf
+jetzt öffentlich sagen, was es kann, weil es an jeder Stelle auch sagt, was es
+nicht kann.
+
+**Stand:** 219 Kerntests, 76 E2E-Läufe, Typecheck für App und Kern grün.

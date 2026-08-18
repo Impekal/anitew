@@ -1261,3 +1261,90 @@ body::before {
     transition-duration: 1ms !important;
   }
 }
+
+/* ── Wissenschaftsseite (F6) ────────────────────────────────────────────────
+   Vier Blöcke, und der Rand links sagt schon vor dem Lesen, in welchem man
+   ist: ruhig bei dem, was trägt, warm bei der Einschränkung, rot bei dem, was
+   nicht belegt ist. Farbe ist hier Struktur, nicht Stimmung — die beiden
+   unteren Blöcke sind der Grund, warum es die Seite gibt, und sie dürfen sich
+   nicht wie eine Fußnote lesen. */
+.science {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+.standing {
+  border-left: 2px solid var(--line);
+  padding-left: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.standing-established {
+  border-left-color: var(--calm);
+}
+
+.standing-narrow {
+  border-left-color: var(--accent);
+}
+
+.standing-unsupported,
+.standing-unmeasured {
+  border-left-color: var(--bad);
+}
+
+.standing h3 {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.claim {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+}
+
+.claim h4 {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 1.02rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ink);
+}
+
+.claim p {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+/* Der Weg von der Studie zur Funktion, in einer Zeile. Bei „nicht belegt“
+   steht hier, dass nichts daran hängt — das ist die eigentliche Aussage. */
+.claim .rests {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--ink-faint);
+}
+
+.citations {
+  margin: 0.4rem 0 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.citations li {
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--ink-faint);
+}

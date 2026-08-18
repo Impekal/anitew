@@ -134,8 +134,8 @@ Abruftraining. Hier entscheidet sich, ob die App wirkt.
 | F2b | Erste zwei Messungen als **Eichung** kennzeichnen (Gewöhnung ans Format), Ergebnis als Spanne solange die Datenlage dünn ist | ✅ 2026-08-18 | `CALIBRATION_RUNS = 2`. Vor der dritten Messung zeigt die App keine Veränderung, sondern erklärt, warum noch keine dasteht. Danach immer Wert **und** Spanne | M |
 | F4 | Kein behaupteter Alltagstransfer, der nicht gemessen wurde | ✅ 2026-08-18 | Der Erklärtext endet mit dem Satz, der dem ganzen Genre fehlt: „Über dein Gedächtnis im Alltag sagt es nichts, solange es niemand dort gemessen hat.“ | S |
 | F5 | Fortschritt in echten Zahlen: „Day 1: 8/20 · Day 7: 15/20 · Day 30: 18/20 — du erinnerst 10 Dinge mehr als am ersten Tag“ | ✅ 2026-08-18 | Die Reihe steht als Liste unter dem Ergebnis, jede Messung mit ihrem Tag und ihrem Zähler. Unvollständige Läufe stehen nicht darin | M |
-| F6 | Wissenschaftsseite in der App: was belegt ist (Spacing, Retrieval Practice), was nicht (allgemeine Intelligenzsteigerung), mit Quellen | ⬜ | offen. Der Erklärtext der Messung nimmt einen Teil davon vorweg, ersetzt die Seite aber nicht | M |
-| F7 | Alle Marketing- und Store-Texte an F1–F6 binden | ⬜ | offen, wartet auf F6. Der Slogan steht schon: „Gedächtnis ist Technik, kein Talent.“ | S |
+| F6 | Wissenschaftsseite in der App: was belegt ist (Spacing, Retrieval Practice), was nicht (allgemeine Intelligenzsteigerung), mit Quellen | ✅ 2026-08-18 | **D-016**. Vier Stufen statt zwei: belegt / belegt-aber-nur-dafür / nicht belegt / nicht gemessen. Jede Aussage nennt, was in der App auf ihr steht — bei den beiden unteren steht dort nichts, und ein Test hält das fest | M |
+| F7 | Alle Marketing- und Store-Texte an F1–F6 binden | ✅ 2026-08-18 | `docs/STORE.md`: Store-Texte in beiden Sprachen, jede Aussage mit ihrer Deckung in einer Tabelle. `index.html` und das Manifest tragen jetzt denselben Satz wie die App. Die Sperrliste (R5) ist ein Test über alle Marketingflächen, keine Absichtserklärung | S |
 
 ## G. Memory-Palace-Modus
 
@@ -263,7 +263,7 @@ Anforderung wie jede andere. Die acht Regeln G-1 bis G-8 stehen in
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | ✅ 2026-08-18 | 203 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Sessionplanung, Bewertung, Scheduler, Gesichtsgenerator und die ganze Messung sind abgedeckt | M |
+| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | ✅ 2026-08-18 | 219 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Sessionplanung, Bewertung, Scheduler, Gesichtsgenerator, die ganze Messung und die Wirkungsaussagen (R5) sind abgedeckt | M |
 | P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | ✅ 2026-08-18 | 66 Läufe in Chromium und im Telefonprofil, darunter eine Einheit von vorn bis hinten und der Abbruch mitten drin. Seit M4 **liest der Test ab, welches Modul kam, statt es vorherzusagen** (`tests/e2e/helpers.ts`) | M |
 | P3 | CI bei jedem Push: Typecheck (App **und** Kern getrennt), Tests, Build, E2E | ✅ 2026-08-17 | | S |
 | P4 | Performance: Kaltstart unter 2 s, Timer laufen ruckelfrei | ⬜ | | M |
@@ -292,7 +292,7 @@ Anforderung wie jede andere. Die acht Regeln G-1 bis G-8 stehen in
 | R2 | Lizenzen für Icons, Töne und Namenslisten dokumentieren | ⬜ | Gesichter erzeugen wir selbst (D14), damit entfällt der größte Teil | M |
 | R3 | Marken- und Namensrecherche für **ANITEW** | ⬜ | **D-001**. Vor Icon und Store-Eintrag, also vor den ersten Ausgaben. Keine Rechtsberatung, aber eine Prüfung, die vorher stattfinden muss | S |
 | R4 | Datenschutzerklärung — auch eine App ohne Server braucht eine | ⬜ | | S |
-| R5 | Wirkungsaussagen prüfen: keine Gesundheits- oder Heilversprechen (R-2, F7) | ⬜ | betrifft App-Texte und Store-Beschreibung gleichermaßen | S |
+| R5 | Wirkungsaussagen prüfen: keine Gesundheits- oder Heilversprechen (R-2, F7) | ✅ 2026-08-18 | `tests/core/claims.test.ts` liest `index.html`, das Manifest, `docs/STORE.md` und beide Wörterbücher. Gesperrt ist nur, was sich nicht ehrlich verwenden lässt — „klüger“ steht in der App, in dem Satz, dass Gehirnjogging das nicht bewirkt | S |
 
 ## S. Entscheidungen  ✅ 2026-08-17
 
@@ -327,7 +327,7 @@ Neu offen, entstanden aus den Antworten:
 | **M0** | Fundament | A1–A11, L1/L1a, P3 | ✅ **2026-08-17** — Push baut, App installiert sich, `src/core/` läuft ohne Browser und wird von der CI daran gehalten |
 | **M1** | Walking Skeleton | B1–B3, B5, B6, B9, C5, D4, D6, N1 | ✅ **2026-08-17** — Eine echte Einheit läuft täglich durch, überlebt eine Unterbrechung, und jede Antwort steht im Protokoll |
 | **M2** | Die Engine wird echt | C1–C9, D8, E1–E7, B4 | Die App entscheidet begründet, was du heute trainierst, und plant Wiederholungen persönlich |
-| **M3** | Ehrlichkeit | F1–F7, F2a, F2b | 🟨 **2026-08-18** — Die Messung läuft, die große Zahl ist gemessen und schweigt, wenn die Datenlage sie nicht trägt (F1–F5). Offen: Wissenschaftsseite (F6) und die Store-Texte (F7). **Vorher kein öffentlicher Release** |
+| **M3** | Ehrlichkeit | F1–F7, F2a, F2b | ✅ **2026-08-18** — Zwei getrennte Zahlen, und die große ist gemessen: Sie steht nur da, wenn ihre Spanne die Null nicht enthält. Daneben eine Seite, die sagt, was belegt ist und was nicht (F6), und Store-Texte, die jede Aussage auf ihre Deckung zurückführen (F7). **Die Release-Sperre ist gefallen** |
 | **M4** | Inhalt & Spiel | D5, D9–D16, G, H, K, J | 🟨 **2026-08-17** — Vier Module, die erste Merktechnik (D5), die Serie mit Schutztagen (K2). Offen: Palast (G), XP/Achievements (K1/K3/K4), weitere Vorlagen und Techniken |
 | **M5** | Sprachen | L1–L8 | Man kann heute auf Deutsch und morgen auf Japanisch trainieren |
 | **M6** | Echtes Leben | I, M | Eigene Präsentation rein, Wiederholungsplan raus |

@@ -567,3 +567,57 @@ Was daraus **nicht** folgt: dass es keine Freude geben darf. Töne, Leuchten,
 wechselnde Sätze, ein Ergebnis, das man gern ansieht — all das bleibt (G-7,
 G-9). Der Unterschied ist einfach: Freude entsteht aus der Sache, Druck aus
 ihrer Abwesenheit.
+
+---
+
+## D-016 · 2026-08-18 · Auf Unbelegtem wird nichts gebaut — und ein Test hält daran fest
+
+**Entscheidung:** Jede Aussage, auf der ANITEW aufbaut, steht mit ihrem Stand
+und ihren Quellen in `src/core/science.ts`. Aussagen mit dem Stand
+`unsupported` oder `unmeasured` haben ein leeres `restsOn` — auf ihnen darf
+keine Funktion der App stehen. Ein Test prüft das.
+
+**Warum das eine Entscheidung ist und keine Selbstverständlichkeit:** Weil der
+Verstoß nie als Verstoß daherkommt. Niemand schreibt „diese Funktion beruht
+auf einer widerlegten Annahme“. Er schreibt einen Fortschrittsbalken namens
+„Gedächtnisstärke“, und drei Monate später weiß niemand mehr, woher die Zahl
+kam. Die Bindung `restsOn` ist genau dagegen gerichtet: Sie zwingt beim
+Einbauen zu der Frage, worauf das hier eigentlich steht — und macht die
+Antwort nachlesbar.
+
+Vier Stufen statt zwei, weil der interessante Fall in der Mitte liegt:
+
+- **`established`** — vielfach unabhängig wiederholt. Darauf ist gebaut.
+- **`narrow`** — der Effekt ist da, gilt aber nur für das Geübte. Merktechniken
+  gehören hierher: Sechs Wochen Loci-Training verändern messbar, wie viele
+  Wörter einer Liste jemand behält — über Namen, Termine und Alltag sagt das
+  nichts. ANITEW bringt die Technik bei und behauptet den Rest nicht.
+- **`unsupported`** — wird behauptet und hält nicht. Gehirnjogging macht nicht
+  allgemein klüger.
+- **`unmeasured`** — hat niemand gemessen, wir eingeschlossen. Genau eine
+  Aussage steht hier: ob ANITEW im Alltag hilft.
+
+Für `unmeasured` gilt die **umgekehrte** Regel: Dort darf *keine* Quelle
+stehen. Eine fremde Studie unter die Aussage zu legen wäre der eleganteste Weg,
+R-2 zu brechen — der Satz bliebe wörtlich richtig und läse sich trotzdem wie
+ein Beleg. Auch das prüft der Test.
+
+**Keine DOI.** Eine um eine Ziffer falsche DOI ist ein toter Link, und zwar
+ausgerechnet auf der Seite, die von Genauigkeit lebt. Autor, Jahr, Titel und
+Journal reichen zum Auffinden und lassen sich prüfen, ohne dass irgendwer eine
+Ziffernfolge aus dem Gedächtnis rekonstruiert (R-1 gilt auch für uns).
+
+**Folge für die Texte (F7):** Die Store-Texte in `docs/STORE.md` führen jede
+Aussage auf ihre Deckung zurück — Backlog-Kennung oder Eintrag aus
+`science.ts`. Was sich nicht zurückführen lässt, steht nicht drin. Die
+Untergrenze davon ist wieder ein Test: Heilversprechen, „wissenschaftlich
+bewiesen“ und Verdopplungsversprechen dürfen auf keiner Marketingfläche
+auftauchen, in keiner Sprache.
+
+Dabei ist eine Feinheit aufgefallen, die fast einen falschen Test ergeben
+hätte: „klüger“ und „smarter“ **stehen** in der App — in dem Satz, dass
+Gehirnjogging genau das nicht bewirkt. Eine Sperrliste, die den Widerspruch
+nicht vom Versprechen unterscheidet, verbietet ausgerechnet die ehrlichste
+Stelle. Gesperrt ist deshalb nur, was sich gar nicht ehrlich verwenden lässt.
+Und `docs/STORE.md` darf seine eigene Sperrliste nennen — eine Regel, die sich
+nicht aussprechen darf, ist keine Regel, sondern eine Falle.

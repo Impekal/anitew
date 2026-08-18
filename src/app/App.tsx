@@ -33,6 +33,7 @@ import { abandonRun, beginRun, loadOpenRun, loadRuns } from '../data/benchmark.t
 import { loadTaught } from '../data/technique.ts'
 
 import { BackupPanel } from './BackupPanel.tsx'
+import { SciencePanel } from './SciencePanel.tsx'
 import { FoundationPanel } from './FoundationPanel.tsx'
 import { StreakLine } from './StreakLine.tsx'
 import { BenchmarkPanel } from './benchmark/BenchmarkPanel.tsx'
@@ -450,6 +451,19 @@ export function App() {
           ersten Bildschirm (D-011/G-2).
         */}
         <BenchmarkPanel runs={runs} language={language} dictionary={dictionary} />
+
+        {/*
+          Die Wissenschaftsseite steht direkt unter der Messung, weil sie
+          dieselbe Frage beantwortet — die Messung sagt, was an *dir* gezählt
+          wurde, diese Seite sagt, worauf der ganze Aufbau beruht und wo das
+          Wissen aufhört (F6). Zugeklappt, wie alles hier unten: Sie ist
+          nichts, was jemand täglich braucht, aber sie muss da sein, bevor die
+          App irgendwo behauptet, sie sei wissenschaftlich fundiert (R-2).
+        */}
+        <details className="details">
+          <summary>{dictionary.science.heading}</summary>
+          <SciencePanel dictionary={dictionary} />
+        </details>
 
         <details className="details">
           <summary>{dictionary.backup.heading}</summary>

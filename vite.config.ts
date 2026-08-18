@@ -28,8 +28,13 @@ export default defineConfig({
       manifest: {
         name: 'ANITEW',
         short_name: 'ANITEW',
+        // Diese Zeile wandert beim Verpacken in den Store-Eintrag und ist
+        // damit eine Marketingfläche (F7): Sie trägt denselben Werbespruch wie
+        // die App und dieselbe Zurückhaltung — gezählt wird, was am Folgetag
+        // noch da ist, versprochen wird nichts darüber hinaus (R-2).
+        // Der Wortlaut steht in docs/STORE.md, ein Test hält beide zusammen.
         description:
-          'Trainiere dein Gedächtnis. Miss deinen Fortschritt. Behalte mehr. 5 Minuten am Tag.',
+          'Gedächtnis ist Technik, kein Talent. Fünf Minuten Training am Tag — mit einer Messung, die zählt, was am Folgetag noch da ist.',
         // Der Manifest-Name ist die eine Zeichenkette, die Android beim
         // Verpacken als TWA übernimmt — deshalb steht hier schon der endgültige
         // Name (D-001) und kein Arbeitstitel.

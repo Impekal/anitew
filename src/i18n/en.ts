@@ -111,6 +111,51 @@ export const en: Dictionary = {
     series: 'The series',
     cycles: 'From measurement {n} onwards the words repeat. A word seen once for three minutes months ago distorts little — but it distorts.',
   },
+  science: {
+    heading: 'What is established',
+    note: 'ANITEW rests on a handful of findings that have held for decades — and leaves out what merely sounds good. Both are here, with sources.',
+    standings: {
+      established: 'Well established',
+      narrow: 'Established, but only for that',
+      unsupported: 'Not established',
+      unmeasured: 'Not measured',
+    },
+    standingNotes: {
+      established: 'Replicated many times, in independent work. The app is built on it.',
+      narrow: 'The effect is real — it holds for what was practised, and not beyond it.',
+      unsupported: 'Routinely claimed by memory apps and it does not survive scrutiny. So ANITEW does not claim it.',
+      unmeasured: 'Nobody has measured it. Us included.',
+    },
+    claims: {
+      spacing: {
+        title: 'Spaced practice beats massed practice',
+        body: 'The same effort spread over days does markedly more than the same effort in one sitting. That is why ANITEW schedules reviews instead of letting you drill.',
+      },
+      retrieval: {
+        title: 'Retrieval teaches, looking does not',
+        body: 'Pulling something out of your head is the learning event itself — rereading feels better and does less. That is why the app asks instead of showing.',
+      },
+      forgetting: {
+        title: 'Forgetting follows a predictable curve',
+        body: 'The curve is old and was cleanly replicated in 2015. Forgetting is not a defect; it is the reason a review date can be planned at all.',
+      },
+      mnemonics: {
+        title: 'Mnemonic training raises performance — in the task practised',
+        body: 'Six weeks of loci training measurably changes how many words of a list someone keeps. What follows from that for names, appointments or your everyday life is **not** shown by it. ANITEW teaches you the technique and claims nothing about the rest.',
+      },
+      brainTraining: {
+        title: 'Brain training does not make you generally smarter',
+        body: 'Large studies keep finding the same thing: you get better at the exercises and nowhere else. Working-memory training lifts neither intelligence nor everyday performance. So ANITEW does not promise it — and that is exactly why the tagline says "a skill, not a gift".',
+      },
+      everyday: {
+        title: 'Whether ANITEW helps your everyday life',
+        body: 'There is no study, because there is no study of this app yet. What we can measure, the measurement measures: how many of twenty words are still there the next day. Anything beyond that would be a guess — and guessing is not done here.',
+      },
+    },
+    sources: 'Sources',
+    restsOn: 'What rests on it in the app:',
+    nothingRests: 'Nothing in the app is built on it.',
+  },
   streak: {
     days: 'days in a row',
     day: 'day in a row',
