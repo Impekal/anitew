@@ -37,7 +37,17 @@ export const de = {
       behält seine eigenen Termine.
     */
     training: 'Trainingssprache',
-    trainingNote: 'Du kannst die App auf Deutsch bedienen und auf Englisch trainieren — Gedächtnis und Sprache in einem. Ein Wechsel verliert nichts: „Anker“ und „anchor“ sind zwei Gedächtnisinhalte, jeder mit eigenen Terminen.',
+    /*
+      Der Satz stand hier zuerst anders: „Du kannst die App auf Deutsch
+      bedienen und auf Englisch trainieren.“ Grammatisch hängt „die App“ auch
+      am zweiten Verb — da stand also wörtlich **„die App trainieren“**, und
+      genau so hat es jemand gelesen und gefragt, ob er die App anlernen muss.
+
+      Er hat recht gehabt. In einer App, deren ganzer Punkt ist, dass nichts
+      behauptet wird, was nicht stimmt, ist ein Satz, der sich falsch lesen
+      lässt, ein Fehler — auch wenn er sich richtig lesen lässt.
+    */
+    trainingNote: 'Bedienung auf Deutsch, geübt wird mit englischen Wörtern — Gedächtnis und Sprache in einem. Ein Wechsel verliert nichts: „Anker“ und „anchor“ sind zwei Gedächtnisinhalte, jeder mit eigenen Terminen.',
     trainingOnly: 'Zur Auswahl steht, wofür es eigene Wörter, Namen und Szenen gibt. Eine Sprache anzubieten und dann englische Wörter zu zeigen wäre keine Trainingssprache.',
   },
   /*
@@ -400,6 +410,25 @@ export const de = {
     dailyBody: 'Jetzt wären die fünf Minuten.',
     benchmarkTitle: 'Die Messung wartet',
     benchmarkBody: 'Zwanzig Minuten sind um. Was ist geblieben?',
+  },
+  privacy: {
+    /*
+      Datenschutz in der App (R4).
+
+      Die lange Fassung steht in `docs/PRIVACY.md` und im Store-Eintrag; hier
+      steht, was jemand wirklich wissen will, in fünf Zeilen. Der letzte
+      Punkt ist der unbequeme — und er gehört genau deshalb dazu.
+    */
+    heading: 'Datenschutz',
+    lead: 'ANITEW hat keinen Server.',
+    points: [
+      'Kein Konto, keine Anmeldung, keine Werbung, keine Tracker.',
+      'Alles, was beim Training entsteht, bleibt auf diesem Gerät.',
+      'Die Sicherung ist eine Datei, die du speicherst — wir laden sie nirgends hoch.',
+      'Erinnerungen entstehen auf dem Gerät. Es gibt keinen Push-Dienst.',
+      'Löschen heißt: Browserspeicher leeren oder die App entfernen. Danach ist es weg — auch für uns, denn wir hatten es nie.',
+    ],
+    honest: 'Was trotzdem passiert: Damit die App überhaupt auf dein Gerät kommt, wird sie einmal geladen. Der Anbieter, der sie ausliefert, sieht dabei das, was jeder Webserver sieht. Danach läuft ANITEW ohne Netz.',
   },
   streak: {
     /*

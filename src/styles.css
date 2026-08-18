@@ -1589,3 +1589,30 @@ body::before {
   max-width: 22rem;
   font-size: 0.82rem;
 }
+
+/* Datenschutz (R4). Fünf Zeilen, keine Wand aus Text — die lange Fassung
+   steht im Dokument. Der letzte Absatz ist der unbequeme und steht deshalb
+   nicht kleiner als der Rest, nur ruhiger. */
+.privacy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.privacy-lead {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  color: var(--ink);
+}
+
+.privacy-points {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}

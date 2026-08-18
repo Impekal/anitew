@@ -22,7 +22,7 @@ export const en: Dictionary = {
     },
     incomplete: 'Not translated yet — the app falls back to English.',
     training: 'Training language',
-    trainingNote: 'You can use the app in English and train in German — memory and a language at once. Switching loses nothing: "anchor" and "Anker" are two memories, each with its own schedule.',
+    trainingNote: 'The app speaks English, the words you memorise are German — memory and a language at once. Switching loses nothing: "anchor" and "Anker" are two memories, each with its own schedule.',
     trainingOnly: 'On offer is whatever has its own words, names and scenes. Offering a language and then showing English words would not be a training language.',
   },
   greetings: [
@@ -271,6 +271,18 @@ export const en: Dictionary = {
     dailyBody: 'Now would be the five minutes.',
     benchmarkTitle: 'The measurement is waiting',
     benchmarkBody: 'Twenty minutes are up. What stayed?',
+  },
+  privacy: {
+    heading: 'Privacy',
+    lead: 'ANITEW has no server.',
+    points: [
+      'No account, no sign-up, no ads, no trackers.',
+      'Everything the training produces stays on this device.',
+      'The backup is a file you save — we upload it nowhere.',
+      'Reminders are created on the device. There is no push service.',
+      'Deleting means: clear the browser storage or remove the app. Then it is gone — for us too, because we never had it.',
+    ],
+    honest: 'What does happen: for the app to reach your device at all, it is loaded once. The provider delivering it sees what any web server sees. After that ANITEW runs without a network.',
   },
   streak: {
     days: 'days in a row',

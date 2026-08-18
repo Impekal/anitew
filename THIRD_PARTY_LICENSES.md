@@ -7,7 +7,7 @@ baut**. Nur das Ausgelieferte landet auf dem Gerät des Nutzers und ist damit
 lizenzrechtlich relevant für die Verbreitung; Werkzeuge, die auf dem
 Buildrechner laufen, sind es nicht.
 
-Stand: 2026-08-17 (M0). Diese Datei wird mit jeder neuen Abhängigkeit
+Stand: 2026-08-18. Diese Datei wird mit jeder neuen Abhängigkeit
 fortgeschrieben.
 
 ---
@@ -62,6 +62,12 @@ Build-Werkzeugkette benutzt. Datensammlung, kein Code im Ergebnis.
 | Was | Herkunft | Anmerkung |
 |---|---|---|
 | `public/icons/icon.svg`, `icon-192.png`, `icon-512.png` | in diesem Projekt entstanden, erzeugt von `scripts/generate-icons.mjs` | vorläufig bis zur Markenrecherche (Backlog R3) |
+| **Töne** | keine Dateien — alles entsteht zur Laufzeit aus Sinusschwingungen (`platform/web/sound.ts`) | nichts zu lizenzieren. Der Grund war ursprünglich Gewicht und Offline-Betrieb; die Lizenzfreiheit ist der Nebengewinn |
+| **Gesichter** | gezeichnet aus dem Namen, kein Bildmaterial (`app/Face.tsx`, D-005) | umgeht neben dem Urheberrecht auch die Persönlichkeitsrechte, die ein „lizenzfreies“ Foto eines echten Menschen nicht abdeckt |
+| **Wortlisten** (`core/content/words.ts`) | für dieses Projekt zusammengestellt, je Sprache eigen und nicht übersetzt (L6) | einzelne Wörter sind keine schutzfähigen Werke; die **Auswahl und Anordnung** einer Liste kann es sein, deshalb ist sie hier eigene Arbeit und nicht aus einer fremden Sammlung übernommen |
+| **Namenslisten** (`core/content/names.ts`) | ebenso; Vornamen, keine realen Personen | ein Vorname ist niemandes Eigentum. Zusammengestellt nach Unterscheidbarkeit, nicht nach Häufigkeitsstatistiken Dritter |
+| **Missionsbausteine, Palastgegenstände, Quarantänewörter** | für dieses Projekt geschrieben | dieselbe Überlegung wie bei den Wortlisten |
+| **Quellen auf der Wissenschaftsseite** (`core/science.ts`) | Angaben zu veröffentlichten Arbeiten: Autor, Jahr, Titel, Journal | bibliografische Angaben sind Tatsachen und frei; **zitiert wird kein Text** aus diesen Arbeiten, und es wird auch keine PDF mitgeliefert oder verlinkt |
 
 ## Was noch kommt und hier landen wird
 

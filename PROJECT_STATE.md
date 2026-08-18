@@ -1809,3 +1809,65 @@ auch sämtliche Optionen, und ein genauer Vergleich passt auf nichts.
 Beide Felder haben jetzt einen eindeutigen Griff über die Klasse. Und die
 Lehre wird länger: **Ein Selektor, der aus dem sichtbaren Text abgeleitet ist,
 hängt an jedem Wort, das später irgendwo dazukommt.**
+
+---
+
+## 2026-08-18 · Ein Satz, der sich falsch lesen ließ — und der Weg nach draußen (R4, R2)
+
+### Zuerst der Satz
+
+Der Auftraggeber hat gefragt: *„Wer muss die App trainieren? Ich?“* — und
+damit einen Fehler gefunden, der sowohl in meiner Zusammenfassung als auch
+**in der App** stand:
+
+> „Du kannst die App auf Deutsch bedienen und auf Englisch trainieren.“
+
+Grammatisch hängt „die App“ auch am zweiten Verb. Da steht also wörtlich *„die
+App trainieren“*, und genau so hat es jemand gelesen. Gemeint war das
+Gegenteil: **Die App trainiert dich.** „Trainingssprache“ ist die Sprache der
+Wörter, Namen und Szenen, die man sich merkt — es gibt keinen Anlernschritt
+und nichts, was der Nutzer der App beibringen müsste.
+
+Er steht jetzt anders da: „Bedienung auf Deutsch, geübt wird mit englischen
+Wörtern.“ **In einer App, deren ganzer Punkt ist, dass nichts behauptet wird,
+was nicht stimmt, ist ein Satz, der sich falsch lesen lässt, ein Fehler — auch
+wenn er sich richtig lesen lässt.**
+
+### R4: eine Datenschutzerklärung, die auch das Unbequeme nennt
+
+`docs/PRIVACY.md`, plus fünf Zeilen in der App neben der Sicherung, weil beide
+dieselbe Frage beantworten: Wo liegen meine Daten?
+
+Der einfache Teil war schnell geschrieben — kein Konto, kein Server, keine
+Werbung, keine Tracker, alles in IndexedDB. Der Teil, auf den es ankommt, ist
+der andere:
+
+- **Damit die App überhaupt aufs Gerät kommt, wird sie einmal geladen**, und
+  der Anbieter, der sie ausliefert, sieht dabei das, was jeder Webserver sieht.
+  Darauf haben wir keinen Einfluss, und es zu verschweigen wäre bequem.
+- **Die Sicherung ist Klartext.** Wer die Datei hat, kann sie lesen. Wer sie
+  in eine fremde Cloud legt, sollte das wissen.
+- **Was sich ändern würde, bevor es kommt:** Cloud-Abgleich (N7) und KI mit
+  eigenem Schlüssel (M) wären beide eine Übertragung an Dritte. Sie stehen
+  schon in der Erklärung, mit der Zusage, dass sie freiwillig und benannt
+  wären.
+
+Drei Tests halten genau diese Stellen fest — sie sind die, die beim nächsten
+Umschreiben zuerst herausfallen würden. Und die Sperrliste aus R5 gilt auch
+hier: Ein Heilversprechen in einer Datenschutzerklärung wäre besonders absurd,
+und genau deshalb fiele es dort niemandem auf.
+
+### R2: Lizenzen, die es großenteils nicht braucht
+
+Der größte Teil entfällt, weil ANITEW seine Inhalte **erzeugt statt sie zu
+lizenzieren**: Töne aus Sinusschwingungen, Gesichter aus dem Namen, alle
+Listen selbst zusammengestellt. Was früher eine Entscheidung über Gewicht und
+Offline-Betrieb war, ist hier der Nebengewinn.
+
+Eine Feinheit steht jetzt ausdrücklich dabei: Bei einer Wortliste ist nicht
+das einzelne Wort schutzfähig, sondern **Auswahl und Anordnung**. Deshalb
+steht dort, dass die Listen eigene Arbeit sind und nicht aus einer fremden
+Sammlung übernommen. Und bei den Quellen der Wissenschaftsseite: Bibliografische
+Angaben sind Tatsachen und frei — zitiert wird kein Text, verlinkt keine PDF.
+
+**Stand:** 297 Kerntests, 138 E2E-Läufe, Typecheck für App und Kern grün.

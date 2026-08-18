@@ -263,8 +263,8 @@ Anforderung wie jede andere. Die acht Regeln G-1 bis G-8 stehen in
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | ✅ 2026-08-18 | 294 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Sessionplanung, Bewertung, Scheduler, Gesichtsgenerator, die ganze Messung und die Wirkungsaussagen (R5) sind abgedeckt | M |
-| P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | ✅ 2026-08-18 | 132 Läufe in Chromium und im Telefonprofil, darunter eine Einheit von vorn bis hinten und der Abbruch mitten drin. Seit M4 **liest der Test ab, welches Modul kam, statt es vorherzusagen** (`tests/e2e/helpers.ts`) | M |
+| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | ✅ 2026-08-18 | 296 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Sessionplanung, Bewertung, Scheduler, Gesichtsgenerator, die ganze Messung und die Wirkungsaussagen (R5) sind abgedeckt | M |
+| P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | ✅ 2026-08-18 | 138 Läufe in Chromium und im Telefonprofil, darunter eine Einheit von vorn bis hinten und der Abbruch mitten drin. Seit M4 **liest der Test ab, welches Modul kam, statt es vorherzusagen** (`tests/e2e/helpers.ts`) | M |
 | P3 | CI bei jedem Push: Typecheck (App **und** Kern getrennt), Tests, Build, E2E | ✅ 2026-08-17 | | S |
 | P4 | Performance: Kaltstart unter 2 s, Timer laufen ruckelfrei | ⬜ | | M |
 | P5 | Uhrmanipulation darf die Engine nicht zerstören (Streak-Betrug, Intervall-Chaos) | ⬜ | monotone Zeitquelle plus Plausibilitätsprüfung | M |
@@ -289,9 +289,9 @@ Anforderung wie jede andere. Die acht Regeln G-1 bis G-8 stehen in
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
 | R1 | `THIRD_PARTY_LICENSES.md` ab dem ersten Paket pflegen | ✅ 2026-08-17 | Ausgeliefertes vom nur Bauenden getrennt. Im ausgelieferten Stand kein Copyleft; die LGPL-Teile (sharp über wrangler) laufen nur auf dem Buildrechner | S |
-| R2 | Lizenzen für Icons, Töne und Namenslisten dokumentieren | ⬜ | Gesichter erzeugen wir selbst (D14), damit entfällt der größte Teil | M |
+| R2 | Lizenzen für Icons, Töne und Namenslisten dokumentieren | ✅ 2026-08-18 | In `THIRD_PARTY_LICENSES.md` unter „Eigene Bestandteile“. Der größte Teil entfällt, weil ANITEW seine Inhalte **erzeugt** statt sie zu lizenzieren: Töne aus Sinusschwingungen, Gesichter aus dem Namen, alle Listen selbst zusammengestellt. Bei den Wortlisten ist die **Auswahl und Anordnung** der schutzfähige Teil — deshalb steht dort, dass sie eigene Arbeit ist | M |
 | R3 | Marken- und Namensrecherche für **ANITEW** | ⬜ | **D-001**. Vor Icon und Store-Eintrag, also vor den ersten Ausgaben. Keine Rechtsberatung, aber eine Prüfung, die vorher stattfinden muss | S |
-| R4 | Datenschutzerklärung — auch eine App ohne Server braucht eine | ⬜ | | S |
+| R4 | Datenschutzerklärung — auch eine App ohne Server braucht eine | ✅ 2026-08-18 | `docs/PRIVACY.md`, plus fünf Zeilen in der App neben der Sicherung. Enthält ausdrücklich auch das Unbequeme: Damit die App aufs Gerät kommt, wird sie einmal geladen, und der Anbieter sieht dabei das, was jeder Webserver sieht. Und was sich ändern **würde**, falls Cloud-Abgleich (N7) oder KI (M) kommen | S |
 | R5 | Wirkungsaussagen prüfen: keine Gesundheits- oder Heilversprechen (R-2, F7) | ✅ 2026-08-18 | `tests/core/claims.test.ts` liest `index.html`, das Manifest, `docs/STORE.md` und beide Wörterbücher. Gesperrt ist nur, was sich nicht ehrlich verwenden lässt — „klüger“ steht in der App, in dem Satz, dass Gehirnjogging das nicht bewirkt | S |
 
 ## S. Entscheidungen  ✅ 2026-08-17

@@ -138,3 +138,43 @@ describe('was ANITEW über sich selbst sagt', () => {
     expect(textOf('src/i18n/de.ts')).toContain(tagline)
   })
 })
+
+describe('die Datenschutzerklärung (R4)', () => {
+  it('sagt, was gespeichert wird — und was nicht passiert', () => {
+    const privacy = textOf('docs/PRIVACY.md')
+    for (const promise of [
+      'kein Konto',
+      'keine Werbung',
+      'keine Tracker',
+      'IndexedDB',
+      'Sicherung',
+    ]) {
+      expect(privacy.toLowerCase(), `ohne „${promise}“`).toContain(promise.toLowerCase())
+    }
+  })
+
+  it('verschweigt das Unbequeme nicht', () => {
+    /*
+     * Zwei Stellen, an denen eine Datenschutzerklärung üblicherweise
+     * schweigt: dass beim Ausliefern der App Serverdaten anfallen, und was
+     * sich ändern würde, wenn geplante Funktionen kommen. Beides steht drin
+     * — und ein Test hält es fest, damit es beim nächsten Umschreiben nicht
+     * herausfällt.
+     */
+    const privacy = textOf('docs/PRIVACY.md')
+    expect(privacy).toContain('IP-Adresse')
+    expect(privacy).toContain('Klartext')
+    expect(privacy).toMatch(/Cloud-Abgleich/)
+    expect(privacy).toMatch(/KI-Funktionen/)
+  })
+
+  it('hält auch hier die Sperrliste ein (R5)', () => {
+    // Dieselbe Prüfung wie für die Marketingflächen: Ein Heilversprechen in
+    // einer Datenschutzerklärung wäre besonders absurd — und genau deshalb
+    // fällt es dort niemandem auf.
+    const privacy = textOf('docs/PRIVACY.md')
+    for (const pattern of FORBIDDEN) {
+      expect(pattern.test(privacy), `PRIVACY.md enthält ${pattern}`).toBe(false)
+    }
+  })
+})

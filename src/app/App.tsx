@@ -760,6 +760,25 @@ export function App() {
           <SciencePanel dictionary={dictionary} />
         </details>
 
+        {/*
+          Der Datenschutz steht bei der Sicherung, weil beides dieselbe Frage
+          beantwortet: Wo liegen meine Daten? Die lange Fassung steht in
+          `docs/PRIVACY.md` und im Store-Eintrag — hier die fünf Zeilen, die
+          jemand wirklich wissen will (R4).
+        */}
+        <details className="details">
+          <summary>{dictionary.privacy.heading}</summary>
+          <div className="privacy">
+            <p className="privacy-lead">{dictionary.privacy.lead}</p>
+            <ul className="privacy-points">
+              {dictionary.privacy.points.map((point) => (
+                <li key={point}>{point}</li>
+              ))}
+            </ul>
+            <p className="hint">{dictionary.privacy.honest}</p>
+          </div>
+        </details>
+
         <details className="details">
           <summary>{dictionary.backup.heading}</summary>
           <BackupPanel platform={platform} dictionary={dictionary} />
