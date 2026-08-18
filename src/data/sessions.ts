@@ -15,7 +15,7 @@
  * Fünf-Minuten-Einheit ein Drittel.
  */
 
-import type { Instant, RecallResult, SessionPlan } from '../core/index.ts'
+import type { DayKey, Instant, RecallResult, SessionPlan } from '../core/index.ts'
 import { type EventRow, db } from './db.ts'
 
 const ACTIVE_KEY = 'activeSession'
@@ -134,4 +134,25 @@ export async function abandonSession(sessionId: string, endedAt: Instant): Promi
 
 async function append(row: EventRow): Promise<void> {
   await db.events.add(row)
+}
+
+/**
+ * Die Tage, an denen eine Einheit **zu Ende gelaufen** ist (Backlog K2).
+ *
+ * Abgebrochene Einheiten zählen nicht, und das ist keine Strenge, sondern
+ * Ehrlichkeit: Ob jemand trainiert hat oder das Telefon in der Tasche lag,
+ * kann die App nicht unterscheiden. Die kürzeste Einheit dauert 60 Sekunden —
+ * genau das meint D-008 mit „ein Tag zählt ab 60 Sekunden“.
+ */
+export async function loadTrainingDays(): Promise<DayKey[]> {
+  /*
+   * Alle laden und hier filtern, nicht über den Index.
+   *
+   * `completed` ist ein Wahrheitswert, und Wahrheitswerte sind in IndexedDB
+   * keine gültigen Schlüssel — eine Abfrage darüber fände nichts, und zwar
+   * stillschweigend. Die Tabelle hat eine Zeile je Einheit; das sind nach
+   * einem Jahr täglichen Trainings ein paar hundert.
+   */
+  const rows = await db.sessions.toArray().catch(() => [])
+  return rows.filter((row) => row.completed).map((row) => row.day)
 }

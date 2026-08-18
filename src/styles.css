@@ -765,6 +765,57 @@ body::before {
   box-shadow: var(--glow);
 }
 
+/* ── Serie (K2) ───────────────────────────────────────────────────────── */
+
+/* Ruhig und klein. Die Serie ist eine Auskunft, kein Ansporn — sie steht
+   deshalb im Gewicht zwischen Anrede und Startknopf und nicht darüber. */
+.streak {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin: -1rem 0 -0.6rem;
+}
+
+.streak-line {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+}
+
+.streak-line strong {
+  font-family: var(--mono);
+  font-size: 1.15rem;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.streak-today {
+  color: var(--calm);
+}
+
+.streak-shields {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  color: var(--ink-faint);
+}
+
+/* Ein Punkt je Schutztag, in der ruhigen Farbe und nicht im Akzent: Er ist
+   kein Preis, den man gewonnen hat, sondern ein Puffer, den man hat. */
+.shield {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: var(--calm);
+  opacity: 0.55;
+}
+
+.streak-held {
+  margin: 0;
+}
+
 /* ── Missionen (H) ────────────────────────────────────────────────────── */
 
 /* Eine Szene, kein Formular: Gesicht, Name, darunter vier kurze Zeilen. Alles

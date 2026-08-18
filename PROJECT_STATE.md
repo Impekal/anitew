@@ -1042,3 +1042,64 @@ sonst.
 
 Das ist das zweite Mal in diesem Abschnitt, dass ein Test etwas gefunden hat,
 das ich für eine Geschmacksfrage gehalten hatte und das keine war.
+
+## 2026-08-17 · Die Serie (K2) — und ein Spruch, der nichts sagte
+
+### Zuerst der Spruch
+
+Der Auftraggeber hat die Begrüßungen abgelehnt, und er hatte recht. „Fünf
+Minuten gehören dir“, „Nimm dir den Moment“, „Schön, dass du da bist“ — das
+war freundlich und vollkommen austauschbar. **Dieselben Sätze stünden in jeder
+Meditations-App.** Sie sagten nichts darüber, was ANITEW ist.
+
+Der Werbespruch heißt jetzt **„Gedächtnis ist Technik, kein Talent.“** Er
+trifft den Kern in fünf Wörtern: Merken ist erlernbar, und die App bringt es
+bei (D5) — das ist der Unterschied zu jedem Gehirnjogging. Und er lädt ein,
+weil er dem Leser etwas zutraut, statt ihn zu beruhigen.
+
+Die täglichen Sätze sagen jetzt ebenfalls etwas: „Abrufen ist das Training.
+Nicht das Ansehen“ (C5), „Aus Ziffern werden Bilder“ (D5), „Vergessen ist kein
+Defekt. Es ist planbar“ (D-004). Kurz, mit Kante — und weiterhin ohne Lob und
+ohne Zahl, die nicht gemessen ist.
+
+### Die Serie
+
+Nach D-008 gebaut: Ein Tag zählt, sobald eine Einheit **zu Ende gelaufen** ist
+— die kürzeste dauert 60 Sekunden. Je sieben Trainingstage ein Schutztag,
+höchstens zwei auf Vorrat. Ein verpasster Tag verbraucht einen Schutztag,
+statt sechzig zu vernichten.
+
+**Gerechnet, nicht fortgeschrieben.** Die Serie ließe sich billiger führen,
+indem man beim Abschluss einen Zähler erhöht. Sie wird trotzdem jedes Mal aus
+den Trainingstagen neu berechnet, und der Grund ist R-1: Ein Zähler ist eine
+Behauptung, die von der Wirklichkeit abweichen kann — nach einem abgestürzten
+Schreibvorgang, nach einem eingelesenen Backup vom zweiten Gerät (N2), nach
+einer verstellten Uhr. Nebenbei macht genau das sie prüfbar: Der E2E-Test legt
+zehn Trainingstage in die Datenbank, statt zehn Tage zu warten.
+
+Ein Detail, das ohne Nachdenken falsch geworden wäre: **Der heutige Tag ist
+noch nicht vorbei.** Ohne diese Ausnahme wäre jeder Morgen ein verpasster Tag
+— die App verbrauchte beim Öffnen einen Schutztag, bevor der Nutzer überhaupt
+die Gelegenheit hatte zu trainieren.
+
+### K7 hat jetzt einen Namen (D-015)
+
+Die Anti-Dark-Pattern-Regel stand bisher nur im Backlog. Mit der Serie wird
+sie zum ersten Mal scharf — die Serie ist die Stelle, an der Gedächtnis-Apps
+üblicherweise anfangen zu drücken. Was daraus konkret folgt, steht jetzt als
+Entscheidung: kein Countdown, keine kaufbaren Schutztage, keine erfundenen
+Zahlen, und **keine Aufforderung, wo noch nichts ist** — bei einer Serie von
+null steht gar nichts da.
+
+### Eine Fixture, die in der falschen Zeitrechnung lag
+
+Der erste Bildschirmabzug zeigte neun statt zehn Tagen und keine
+Schutztag-Meldung. Der Fehler lag nicht in der App: Meine Prüfdaten rechneten
+den Tagesschlüssel in UTC, die App rechnet ihn in Ortszeit mit der Grenze um
+4 Uhr (D-008). Die gesetzten Tage lagen damit um einen verschoben, und „heute“
+fiel in die Zukunft — wo die Serie es zu Recht übergeht (P5).
+
+**Wer Testdaten setzt, muss dieselbe Zeitrechnung benutzen wie die App.** Der
+E2E-Test bildet den Tagesschlüssel deshalb genauso, mit der Vier-Uhr-Grenze.
+
+**Stand:** 182 Kerntests, 52 E2E-Läufe, Typecheck für App und Kern grün.

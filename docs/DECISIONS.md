@@ -532,3 +532,38 @@ Szenen mit demselben Zimmer eine einzige Information.
 Name nebeneinander: 314 und 341 sind nicht dasselbe Zimmer, „roter Kofer“ ist
 ein Tippfehler. Das ist D-012 eine Ebene tiefer — und der Grund, warum die
 Strenge dort nicht als globaler Schalter gebaut wurde.
+
+## D-015 · 2026-08-17 · Keine dunklen Muster — und was das konkret heißt
+
+K7 stand bisher nur im Backlog. Mit der Serie (K2) wird die Regel zum ersten
+Mal scharf, denn die Serie ist die Stelle, an der Gedächtnis-Apps üblicherweise
+anfangen zu drücken. Deshalb steht sie jetzt hier, mit Namen:
+
+**Kein Angstdruck.** Kein Countdown, der abläuft. Keine Meldung, die sagt, was
+gleich verloren geht. Kein rotes Ausrufezeichen auf einer Zahl. Die Serie sagt,
+was war — sie fordert nichts.
+
+**Keine künstliche Verknappung.** Schutztage sind nicht kaufbar und nicht durch
+Werbung zu verdienen (D-008). Das Muster „erst Angst erzeugen, dann gegen
+Aufmerksamkeit oder Geld lindern“ ist hier ausgeschlossen, nicht nur
+unerwünscht.
+
+**Keine erfundenen Zahlen.** Das ist Regel R-1, und in der Gamification wird
+sie am ehesten verletzt: XP, Level, Prozentbalken, „Gedächtnisstärke 78“. Was
+angezeigt wird, muss gezählt sein. Die Serie ist deshalb aus den
+Trainingstagen **gerechnet** und kein fortgeschriebener Zähler — ein Zähler
+ist eine Behauptung, die von der Wirklichkeit abweichen kann.
+
+**Keine Aufforderung, wo noch nichts ist.** Bei einer Serie von null steht gar
+nichts da. „Starte deine Serie!“ wäre ein leeres Feld, das nach Verpflichtung
+aussieht, bevor überhaupt etwas passiert ist.
+
+**Belohnt wird das Zurückkommen, nicht das Durchhalten.** Wer einen Tag
+verpasst, verliert nichts. Wer eine Woche verpasst, findet eine App vor, die
+nicht schimpft (G-5) — sondern eine Serie, die von vorn anfängt, und einen
+Wiederholungsplan, der weiß, was fällig ist.
+
+Was daraus **nicht** folgt: dass es keine Freude geben darf. Töne, Leuchten,
+wechselnde Sätze, ein Ergebnis, das man gern ansieht — all das bleibt (G-7,
+G-9). Der Unterschied ist einfach: Freude entsteht aus der Sache, Druck aus
+ihrer Abwesenheit.

@@ -14,15 +14,23 @@ import {
   numberPool,
   planSession,
   selectDue,
+  streakOf,
   wordPool,
 } from '../core/index.ts'
 import { createWebPlatform } from '../platform/web/index.ts'
 import { loadDue, moduleOf, wordOf } from '../data/items.ts'
-import { type SessionProgress, beginSession, clearProgress, loadProgress } from '../data/sessions.ts'
+import {
+  type SessionProgress,
+  beginSession,
+  clearProgress,
+  loadProgress,
+  loadTrainingDays,
+} from '../data/sessions.ts'
 import { loadTaught } from '../data/technique.ts'
 
 import { BackupPanel } from './BackupPanel.tsx'
 import { FoundationPanel } from './FoundationPanel.tsx'
+import { StreakLine } from './StreakLine.tsx'
 import { SessionScreen } from './session/SessionScreen.tsx'
 import { useLanguage } from './useLanguage.ts'
 import { useSoundSetting } from './useSoundSetting.ts'
@@ -37,9 +45,23 @@ export function App() {
   const [running, setRunning] = useState<SessionProgress | undefined>()
   const [resumable, setResumable] = useState<SessionProgress | undefined>()
   /*
+   * Die Trainingstage für die Serie (K2).
+   *
+   * Wie der Lernstand nach jeder Einheit neu gelesen — eine gerade beendete
+   * Einheit ist ein Tag mehr, und der soll sofort dastehen und nicht erst
+   * beim nächsten Öffnen.
+   */
+  const [trainingDays, setTrainingDays] = useState<readonly string[]>([])
+  useEffect(() => {
+    void loadTrainingDays()
+      .then(setTrainingDays)
+      .catch(() => undefined)
+  }, [running])
+
+  /*
    * Die schon gelehrten Ziffern des Major-Systems (D5).
    *
-   * Neu gelesen, sobald eine Einheit endet — die Lektion darin kann eine
+   * Ebenfalls nach jeder Einheit neu gelesen — die Lektion darin kann eine
    * dazugelegt haben. Ohne das zeigte die nächste Einheit desselben Besuchs
    * wieder dieselbe Ziffer.
    */
@@ -145,6 +167,8 @@ export function App() {
     return dayKeyOf(now, { offsetMinutes: platform.clock.offsetMinutes(now) })
   }, [platform])
 
+  const streak = useMemo(() => streakOf(trainingDays, today), [trainingDays, today])
+
   const greeting = useMemo(() => {
     const lines = dictionary.greetings
     return lines[createRng(today).int(lines.length)] ?? dictionary.app.tagline
@@ -178,6 +202,8 @@ export function App() {
         */}
         <p className="greeting">{greeting}</p>
       </header>
+
+      <StreakLine streak={streak} dictionary={dictionary} />
 
       {resumable !== undefined && (
         <section className="note" role="status">

@@ -187,12 +187,12 @@ Der Punkt, der aus einem Spiel einen Gedächtnistrainer macht.
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
 | K1 | XP und Level — an **Abrufleistung** gekoppelt, nicht an verbrachte Zeit | ⬜ | sonst belohnt die App Anwesenheit statt Lernen | M |
-| K2 | Streak inklusive Schutztag: einer pro Woche, bis zu zwei angespart, **nicht kaufbar und nicht durch Werbung verdienbar** | ⬜ | **D-008**. Sucht ja, Schuldgefühl nein — ein verpasster Tag darf nicht 60 Tage vernichten | M |
+| K2 | Streak inklusive Schutztag: einer pro Woche, bis zu zwei angespart, **nicht kaufbar und nicht durch Werbung verdienbar** | ✅ 2026-08-17 | **D-008**, **D-015**. Ein Tag zählt, sobald eine Einheit zu Ende gelaufen ist — die kürzeste dauert 60 Sekunden. Je sieben Trainingstage ein Schutztag, höchstens zwei. **Aus den Trainingstagen gerechnet, nicht fortgeschrieben:** ein Zähler wäre eine Behauptung, die nach einem Absturz oder einem eingelesenen Backup danebenliegen kann | M |
 | K3 | Achievements | ⬜ | | M |
 | K4 | Daily Missions und Memory Quests | ⬜ | | M |
-| K5 | Persönliche Rekorde | ⬜ | | S |
+| K5 | Persönliche Rekorde | 🟨 2026-08-17 | Die längste je erreichte Serie steht da, sobald sie etwas anderes sagt als die laufende. Weitere Rekorde (bester Abruf, längste Zahl) fehlen | S |
 | K6 | Unlockable Worlds — rein kosmetisch | ⬜ | | M |
-| K7 | **Anti-Dark-Pattern-Regel**: keine künstliche Verknappung, kein Angstdruck, keine erfundenen Zahlen | ⬜ | „nicht mit billigen Belohnungen“. Gehört als Regel in DECISIONS.md, nicht nur hierher | S |
+| K7 | **Anti-Dark-Pattern-Regel**: keine künstliche Verknappung, kein Angstdruck, keine erfundenen Zahlen | ✅ 2026-08-17 | **D-015** — jetzt eine bindende Regel mit Namen und nicht nur ein Vorsatz im Backlog | S |
 | K8 | Die wichtigste Belohnung ist F5: der Nutzer merkt selbst, dass er besser wird | ⬜ | | — |
 | K9 | Spendenweg: externer Link (Ko-fi / PayPal / GitHub Sponsors) im Web; Store-Regeln für Spenden getrennt prüfen, wenn wir dort ankommen | ⬜ | **D-002**. Kern bleibt dauerhaft kostenlos; ein späteres Pro darf nur Bequemlichkeit hinzufügen, nie Trainingsleistung | S |
 
@@ -263,8 +263,8 @@ Anforderung wie jede andere. Die acht Regeln G-1 bis G-8 stehen in
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | ✅ 2026-08-17 | 166 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Sessionplanung, Bewertung, Scheduler und Gesichtsgenerator sind abgedeckt | M |
-| P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | ✅ 2026-08-17 | 42 Läufe in Chromium und im Telefonprofil, darunter eine Einheit von vorn bis hinten und der Abbruch mitten drin. Seit M4 **liest der Test ab, welches Modul kam, statt es vorherzusagen** (`tests/e2e/helpers.ts`) | M |
+| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | ✅ 2026-08-17 | 182 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Sessionplanung, Bewertung, Scheduler und Gesichtsgenerator sind abgedeckt | M |
+| P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | ✅ 2026-08-17 | 52 Läufe in Chromium und im Telefonprofil, darunter eine Einheit von vorn bis hinten und der Abbruch mitten drin. Seit M4 **liest der Test ab, welches Modul kam, statt es vorherzusagen** (`tests/e2e/helpers.ts`) | M |
 | P3 | CI bei jedem Push: Typecheck (App **und** Kern getrennt), Tests, Build, E2E | ✅ 2026-08-17 | | S |
 | P4 | Performance: Kaltstart unter 2 s, Timer laufen ruckelfrei | ⬜ | | M |
 | P5 | Uhrmanipulation darf die Engine nicht zerstören (Streak-Betrug, Intervall-Chaos) | ⬜ | monotone Zeitquelle plus Plausibilitätsprüfung | M |
@@ -328,7 +328,7 @@ Neu offen, entstanden aus den Antworten:
 | **M1** | Walking Skeleton | B1–B3, B5, B6, B9, C5, D4, D6, N1 | ✅ **2026-08-17** — Eine echte Einheit läuft täglich durch, überlebt eine Unterbrechung, und jede Antwort steht im Protokoll |
 | **M2** | Die Engine wird echt | C1–C9, D8, E1–E7, B4 | Die App entscheidet begründet, was du heute trainierst, und plant Wiederholungen persönlich |
 | **M3** | Ehrlichkeit | F1–F7, F2a, F2b | Es gibt zwei getrennte Zahlen, und die große Prozentzahl ist gemessen. **Vorher kein öffentlicher Release** |
-| **M4** | Inhalt & Spiel | D5, D9–D16, G, H, K, J | 🟨 **2026-08-17** — Vier Module (Wörter, Gesichter, Zahlen, Missionen), die erste Merktechnik (D5). Offen: Palast (G), Gamification (K), weitere Vorlagen und Techniken |
+| **M4** | Inhalt & Spiel | D5, D9–D16, G, H, K, J | 🟨 **2026-08-17** — Vier Module, die erste Merktechnik (D5), die Serie mit Schutztagen (K2). Offen: Palast (G), XP/Achievements (K1/K3/K4), weitere Vorlagen und Techniken |
 | **M5** | Sprachen | L1–L8 | Man kann heute auf Deutsch und morgen auf Japanisch trainieren |
 | **M6** | Echtes Leben | I, M | Eigene Präsentation rein, Wiederholungsplan raus |
 | **M7** | Stores & Cloud | Q, R, N7–N10 | .aab im Play-Track; Drive-Abgleich läuft; iOS-Weg entschieden (S10) |

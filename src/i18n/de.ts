@@ -9,7 +9,7 @@
 export const de = {
   app: {
     name: 'ANITEW',
-    tagline: 'Trainiere dein Gedächtnis. Miss deinen Fortschritt. Behalte mehr.',
+    tagline: 'Gedächtnis ist Technik, kein Talent.',
   },
   language: {
     label: 'Sprache',
@@ -30,17 +30,31 @@ export const de = {
     },
     incomplete: 'Noch nicht übersetzt — die App zeigt Englisch.',
   },
-  // Jeden Tag eine andere — Abwechslung ist die zweite Quelle von Vergnügen
-  // (D-011/G-7). Kein Lob, keine Behauptung über den Nutzer, nur ein warmer
-  // Satz vor dem Anfang.
+  /*
+    Jeden Tag ein anderer Satz — Abwechslung ist die zweite Quelle von
+    Vergnügen (D-011/G-7).
+
+    Die erste Fassung war Wellness: „Fünf Minuten gehören dir“, „Nimm dir den
+    Moment“, „Schön, dass du da bist“. Freundlich und vollkommen austauschbar
+    — dieselben Sätze stünden in jeder Meditations-App. Der Auftraggeber hat
+    sie zu Recht abgelehnt.
+
+    Was hier steht, sagt stattdessen **was die App tut und warum sie wirkt**:
+    Abrufen statt Ansehen (C5), Technik statt Talent (D5), Wiederholung mit
+    Abstand (D-004). Kurz, mit Kante, und jeder Satz für sich verständlich.
+
+    Nach wie vor gilt R-1: kein Lob, keine Behauptung über den Nutzer und
+    keine Zahl, die nicht gemessen ist. „Du wirst besser“ steht hier nicht —
+    das sagt später der Benchmark oder niemand.
+  */
   greetings: [
-    'Fünf Minuten gehören dir.',
-    'Schön, dass du da bist.',
-    'Ein Wort nach dem anderen.',
-    'Nimm dir den Moment.',
-    'Heute ist ein guter Tag dafür.',
-    'Kein Druck. Nur Übung.',
-    'Fang einfach an.',
+    'Merken ist eine Technik. Du lernst sie hier.',
+    'Abrufen ist das Training. Nicht das Ansehen.',
+    'Was du herausholst, bleibt.',
+    'Namen vergisst man nicht. Man prägt sie nie ein.',
+    'Aus Ziffern werden Bilder. Bilder bleiben.',
+    'Kein Gehirnjogging. Training.',
+    'Vergessen ist kein Defekt. Es ist planbar.',
   ],
   start: {
     // Die Frage steht über den Knöpfen, nicht auf jedem einzelnen: „Ich habe
@@ -107,6 +121,21 @@ export const de = {
     recallNumbersPlaceholder: 'Eine Zahl pro Zeile',
     doneWithBlock: 'Fertig',
     abort: 'Abbrechen',
+  },
+  streak: {
+    /*
+      Die Serie sagt, was war — mehr nicht (K7). Keine Drohung, kein
+      Countdown, keine Aufforderung. Wer heute nicht kann, soll die App
+      schließen können, ohne ein schlechtes Gewissen mitzunehmen.
+    */
+    days: 'Tage in Folge',
+    day: 'Tag in Folge',
+    shields: 'Schutztage',
+    shield: 'Schutztag',
+    today: 'heute erledigt',
+    best: 'Bestmarke',
+    // Genau an dem Tag, an dem es zählt — und ohne Ausrufezeichen.
+    held: 'Gestern war nichts. Ein Schutztag hat die Serie gehalten.',
   },
   mission: {
     // Die Szene selbst. Kurze Zeilen, eine Tatsache je Zeile — eine Mission

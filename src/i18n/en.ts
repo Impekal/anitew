@@ -3,7 +3,7 @@ import type { Dictionary } from './index.ts'
 export const en: Dictionary = {
   app: {
     name: 'ANITEW',
-    tagline: 'Train your memory. Measure your progress. Remember more.',
+    tagline: 'Memory is a skill, not a gift.',
   },
   language: {
     label: 'Language',
@@ -23,13 +23,13 @@ export const en: Dictionary = {
     incomplete: 'Not translated yet — the app falls back to English.',
   },
   greetings: [
-    'Five minutes are yours.',
-    'Good to see you.',
-    'One word at a time.',
-    'Take the moment.',
-    'Today is a good day for this.',
-    'No pressure. Just practice.',
-    'Just begin.',
+    'Remembering is a skill. You learn it here.',
+    'Retrieval is the training. Not the looking.',
+    'What you pull out, stays.',
+    'You do not forget names. You never encode them.',
+    'Digits become pictures. Pictures stay.',
+    'Not brain games. Training.',
+    'Forgetting is not a defect. It is predictable.',
   ],
   start: {
     heading: 'How much time do you have?',
@@ -77,6 +77,15 @@ export const en: Dictionary = {
     recallNumbersPlaceholder: 'One number per line',
     doneWithBlock: 'Done',
     abort: 'Stop',
+  },
+  streak: {
+    days: 'days in a row',
+    day: 'day in a row',
+    shields: 'protected days',
+    shield: 'protected day',
+    today: 'done today',
+    best: 'best',
+    held: 'Yesterday was empty. A protected day held the streak.',
   },
   mission: {
     room: 'Room',
