@@ -33,6 +33,7 @@ export function BenchmarkScreen({
   runId,
   items,
   onDone,
+  onAbort,
 }: {
   platform: Platform
   dictionary: Dictionary
@@ -40,6 +41,8 @@ export function BenchmarkScreen({
   runId: string
   items: readonly string[]
   onDone: () => void
+  /** Raus, mitten in der Messung. Was das kostet, entscheidet `nextRunDue`. */
+  onAbort: () => void
 }) {
   const now = platform.clock.now()
   const today = dayKeyOf(now, { offsetMinutes: platform.clock.offsetMinutes(now) })
@@ -53,6 +56,7 @@ export function BenchmarkScreen({
         items={items}
         runId={runId}
         onDone={onDone}
+        onAbort={onAbort}
       />
     )
   }
@@ -65,6 +69,7 @@ export function BenchmarkScreen({
         phase={step.phase}
         runId={runId}
         onDone={onDone}
+        onAbort={onAbort}
       />
     )
   }
@@ -84,12 +89,14 @@ function Encode({
   items,
   runId,
   onDone,
+  onAbort,
 }: {
   dictionary: Dictionary
   platform: Platform
   items: readonly string[]
   runId: string
   onDone: () => void
+  onAbort: () => void
 }) {
   const [index, setIndex] = useState(0)
   const startedRef = useRef(platform.clock.elapsed())
@@ -112,6 +119,7 @@ function Encode({
         phase="immediate"
         runId={runId}
         onDone={onDone}
+        onAbort={onAbort}
       />
     )
   }
@@ -132,6 +140,16 @@ function Encode({
           ))}
         </div>
       </section>
+
+      {/*
+        Derselbe leise Knopf wie im Training — kein „bist du sicher?“.
+        Eine Rückfrage, die zum Weitermachen drängt, wäre genau das Muster,
+        das D-015 ausschließt. Was der Abbruch bedeutet, steht danach auf dem
+        Startbildschirm; dort liest es sich, statt im Weg zu stehen.
+      */}
+      <button type="button" className="quiet session-abort" onClick={onAbort}>
+        {dictionary.benchmark.abort}
+      </button>
     </main>
   )
 }
@@ -144,6 +162,7 @@ function Recall({
   phase,
   runId,
   onDone,
+  onAbort,
 }: {
   dictionary: Dictionary
   platform: Platform
@@ -151,6 +170,7 @@ function Recall({
   phase: BenchmarkPhase
   runId: string
   onDone: () => void
+  onAbort: () => void
 }) {
   const t = dictionary.benchmark
   const [entries, setEntries] = useState('')
@@ -219,6 +239,10 @@ function Recall({
           <span className="start-label">{dictionary.session.doneWithBlock}</span>
         </button>
       </section>
+
+      <button type="button" className="quiet session-abort" onClick={onAbort}>
+        {dictionary.benchmark.abort}
+      </button>
     </main>
   )
 }

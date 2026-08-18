@@ -120,8 +120,31 @@ export function isComplete(run: BenchmarkRun): boolean {
  * Vierzehn Tage nach der letzten — und die allererste sofort. Eine Messung,
  * die man erst nach zwei Wochen Training zum ersten Mal macht, hätte keinen
  * Tag 0 mehr, gegen den sie sich vergleichen ließe.
+ *
+ * ── Der abgebrochene Fall ─────────────────────────────────────────────────
+ *
+ * Eine Messung lässt sich jederzeit abbrechen; das ist keine Frage, sondern
+ * eine Selbstverständlichkeit (D-015). Was daraus folgt, hängt aber daran, ob
+ * schon **eine Zahl entstanden** ist:
+ *
+ * - **Noch keine** — abgebrochen im Einprägen oder vor dem ersten Abschicken.
+ *   Dann ist nichts gemessen worden, und die nächste ist sofort wieder
+ *   fällig. Jemanden vierzehn Tage warten zu lassen, weil das Telefon
+ *   geklingelt hat, wäre eine Strafe für nichts.
+ * - **Schon eine** — der erste Abruf steht in der Zeile. Dann gilt der übliche
+ *   Abstand, und zwar aus einem Grund, der wichtiger ist als die Bequemlichkeit:
+ *   **Wer eine begonnene Messung wiederholen kann, bis ihm das Gefühl dabei
+ *   gefällt, misst nicht mehr sein Gedächtnis.** Die Zahl selbst bekommt er
+ *   zwar nie zu sehen — aber schon die Möglichkeit, es „nochmal richtig“ zu
+ *   versuchen, macht aus einer Messung eine Bestleistung.
+ *
+ * Die Wörter des abgebrochenen Laufs sind in beiden Fällen verbraucht: Sie
+ * wurden gesehen. Die nächste Messung nimmt die nächsten zwanzig — und rückt
+ * damit näher an die Stelle, an der sich der Vorrat wiederholt. Auch das sagt
+ * die App, statt es zu verschlucken (`poolCycles`).
  */
 export function nextRunDue(lastRun: BenchmarkRun | undefined): DayKey | undefined {
   if (lastRun === undefined) return undefined
+  if (lastRun.immediate === undefined) return lastRun.day
   return addDays(lastRun.day, DAYS_BETWEEN_RUNS)
 }

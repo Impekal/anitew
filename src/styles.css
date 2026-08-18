@@ -1430,3 +1430,62 @@ body::before {
   line-height: 1.5;
   color: var(--ink-soft);
 }
+
+/* Der eigene Palast (G3): fünf nummerierte Zeilen und ein Name. Die Nummern
+   sind dieselben wie im Gang selbst — hier wird die Reihenfolge festgelegt,
+   und ohne sie füllt man die Felder als Liste aus statt als Weg. */
+.own-palace {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.own-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.own-field > span {
+  font-size: 0.78rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.own-stations {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.own-stations li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.own-palace input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 0.7rem;
+  background: var(--card);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 1rem;
+}
+
+.own-palace input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.own-palace button[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

@@ -47,8 +47,16 @@
 import { FALLBACK_LANGUAGE, type Language } from '../language.ts'
 import { createRng } from '../rng.ts'
 
-export const PALACES = ['home', 'street', 'body'] as const
+export const PALACES = ['home', 'street', 'body', 'own'] as const
 export type PalaceId = (typeof PALACES)[number]
+
+/**
+ * Die mitgelieferten Wege.
+ *
+ * `own` steht nicht dabei: Den gibt es erst, wenn jemand ihn angelegt hat
+ * (G3), und bis dahin darf ihn der Vorrat nicht ziehen.
+ */
+export const READY_PALACES: readonly PalaceId[] = ['home', 'street', 'body']
 
 /**
  * Die Stationen je Palast, in der Reihenfolge des Weges.
@@ -65,6 +73,17 @@ export const STATIONS: Readonly<Record<PalaceId, readonly string[]>> = {
   home: ['door', 'hall', 'kitchen', 'sofa', 'bed'],
   street: ['gate', 'mailbox', 'bench', 'crossing', 'kiosk'],
   body: ['head', 'shoulder', 'hand', 'knee', 'foot'],
+  /*
+   * Der eigene Palast hat **feste Kennungen und freie Beschriftungen** (G3).
+   *
+   * Das ist die entscheidende Trennung: In der Datenbank steht `own~7#own3`,
+   * und was auf `own3` draufsteht — „Balkon“, später vielleicht „Balkontür“ —
+   * liegt woanders. Stünde die Beschriftung in der Kennung, wäre jede
+   * Umbenennung ein stiller Datenverlust: Ein Gegenstand, der vor zwei Wochen
+   * auf dem Balkon abgelegt wurde, ließe sich nicht mehr erfragen. So ist es
+   * derselbe Ort, nur anders geschrieben.
+   */
+  own: ['own1', 'own2', 'own3', 'own4', 'own5'],
 }
 
 /** Wie viele Stationen ein Gang hat. Ein Palast wird ganz abgegangen. */
@@ -210,10 +229,72 @@ export function objectFor(item: string, language: Language): string | undefined 
  * eindeutig macht. Die Nummer ist zugleich der Grund, warum der Vorrat nie
  * ausgeht: Dieselbe Wohnung, andere Gegenstände.
  */
-export function walkPool(seed: string, count: number): readonly string[] {
+export function walkPool(
+  seed: string,
+  count: number,
+  palaces: readonly PalaceId[] = READY_PALACES,
+): readonly string[] {
   const rng = createRng(`palace-pool:${seed}`)
   const base = rng.int(1_000_000)
+  const wheel = palaces.length === 0 ? READY_PALACES : palaces
   return Array.from({ length: count }, (_, index) =>
-    walkId(PALACES[index % PALACES.length] as PalaceId, base + index),
+    walkId(wheel[index % wheel.length] as PalaceId, base + index),
   )
+}
+
+/**
+ * Ein selbst angelegter Palast (Backlog G3).
+ *
+ * Der Grund, warum es ihn geben muss, steht in der Literatur und inzwischen
+ * auch in der App: **Ein Palast, den man selbst kennt, trägt deutlich besser
+ * als ein fremder.** Die drei mitgelieferten Wege sind eine Krücke — sie
+ * raten, wie die Wohnung eines Fremden aussieht.
+ */
+export interface OwnPalace {
+  name: string
+  /** Die Beschriftungen, in der Reihenfolge des Weges. */
+  stations: readonly string[]
+}
+
+/** Wie lang eine Beschriftung höchstens sein darf. */
+export const LABEL_MAX = 24
+
+/**
+ * Ist das ein brauchbarer eigener Palast?
+ *
+ * Streng an genau drei Stellen, und jede hat einen Grund:
+ *
+ * - **Vollständig.** Fünf Stationen, keine leer. Ein Weg mit einer Lücke ist
+ *   kein Weg — und beim Abgehen stünde dort ein Schild ohne Aufschrift.
+ * - **Verschieden.** Zweimal „Küche“ ließe die Frage „was lag hier?“
+ *   unbeantwortbar werden; genau davor schützt schon der Gegenstandsvorrat.
+ * - **Kurz und ohne Trennzeichen.** `~` und `#` trennen in den Kennungen
+ *   Palast, Gang und Station. In einer Beschriftung stören sie zwar nicht —
+ *   sie steht ja nirgends in einer Kennung —, aber sie sehen nach einem
+ *   Fehler aus, und die Regel bleibt so leichter richtig.
+ */
+export function isOwnPalace(value: unknown): value is OwnPalace {
+  if (typeof value !== 'object' || value === null) return false
+  const candidate = value as Record<string, unknown>
+  if (typeof candidate['name'] !== 'string' || candidate['name'].trim() === '') return false
+  const stations = candidate['stations']
+  if (!Array.isArray(stations) || stations.length !== STATIONS_PER_WALK) return false
+
+  const seen = new Set<string>()
+  for (const station of stations) {
+    if (typeof station !== 'string') return false
+    const label = station.trim()
+    if (label === '' || label.length > LABEL_MAX) return false
+    if (label.includes(WALK_SEPARATOR) || label.includes(STATION_SEPARATOR)) return false
+    const key = label.toLocaleLowerCase()
+    if (seen.has(key)) return false
+    seen.add(key)
+  }
+  return true
+}
+
+/** Was auf dem Schild dieser Station steht. */
+export function ownLabelOf(own: OwnPalace, station: string): string | undefined {
+  const at = STATIONS.own.indexOf(station)
+  return at === -1 ? undefined : own.stations[at]?.trim()
 }

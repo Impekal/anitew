@@ -665,3 +665,36 @@ Derselbe Gang ergibt immer dieselben Gegenstände. In drei Wochen fragt die App
 **Was noch fehlt, und es wird gesagt:** Eigene Räume (G3). Ein Palast, den
 jemand selbst anlegt, trägt deutlich besser als ein fremder — die drei
 mitgelieferten Wege sind eine Krücke, und der Text in der App nennt sie auch so.
+
+---
+
+## D-018 · 2026-08-18 · Eine Messung darf man abbrechen — und was das kostet, hängt daran, ob schon gemessen wurde
+
+**Entscheidung:** Die Messung lässt sich jederzeit mit einem Tippen verlassen,
+auf jedem ihrer Bildschirme, ohne Rückfrage. Der abgebrochene Lauf zählt nie
+mit (F1). **Wann die nächste fällig ist**, hängt davon ab, ob schon eine Zahl
+entstanden ist:
+
+- **Noch keine** — abgebrochen im Einprägen oder vor dem ersten Abschicken:
+  Die nächste ist sofort wieder fällig. Jemanden vierzehn Tage warten zu
+  lassen, weil das Telefon geklingelt hat, wäre eine Strafe für nichts.
+- **Schon eine** — der erste Abruf steht in der Zeile: Es gilt der übliche
+  Abstand von vierzehn Tagen.
+
+**Warum die zweite Hälfte:** Ohne sie wird der Abbruch zum Einfallstor. **Wer
+eine begonnene Messung wiederholen kann, bis das Gefühl dabei stimmt, misst
+nicht mehr sein Gedächtnis, sondern seine beste Tagesform.** Die Zahl selbst
+bekommt er dabei nie zu sehen — aber schon die Möglichkeit, es „nochmal
+richtig“ zu versuchen, macht aus einer Messung eine Bestleistung. Und damit
+wäre die eine Zahl, für die es M3 überhaupt gab, still verdorben.
+
+**Warum ohne Rückfrage.** „Bist du sicher? Du verlierst deinen Fortschritt!“
+wäre genau das Muster, gegen das D-015 geschrieben ist: erst Angst, dann
+Erleichterung gegen Weitermachen. Was der Abbruch bedeutet, steht **danach**
+auf dem Startbildschirm, wo es sich lesen lässt, statt im Weg zu stehen.
+
+**Die Wörter sind verbraucht.** In beiden Fällen: Sie wurden gesehen. Die
+nächste Messung nimmt die nächsten zwanzig und rückt damit näher an die
+Stelle, an der sich der Quarantänevorrat wiederholt — was die App an dieser
+Stelle ohnehin sagt (`poolCycles`). Wer oft abbricht, kommt schneller dorthin;
+das ist der ehrliche Preis und keine Strafe.

@@ -1362,3 +1362,78 @@ besser als ein fremder — die App sagt das inzwischen selbst und nennt die drei
 fertigen Wege eine Krücke.
 
 **Stand:** 244 Kerntests, 80 E2E-Läufe, Typecheck für App und Kern grün.
+
+---
+
+## 2026-08-18 · Der Ausgang aus der Messung (D-018) und der eigene Palast (G3)
+
+### Man muss aus einer Messung herauskommen
+
+Der Auftraggeber hat es angemerkt, und er hatte recht: Wer „Messung beginnen“
+antippte, saß fest. Drei Minuten ohne Ausgang sind genau das Muster, gegen das
+D-015 geschrieben ist.
+
+Die Frage war nicht **ob**, sondern **was ein Abbruch kostet** — und da gibt
+es eine Stelle, an der es gefährlich wird:
+
+> Wer eine begonnene Messung wiederholen kann, bis das Gefühl dabei stimmt,
+> misst nicht mehr sein Gedächtnis, sondern seine beste Tagesform.
+
+Deshalb zwei Fälle statt einem:
+
+- **Noch keine Zahl entstanden** (abgebrochen im Einprägen): Die nächste ist
+  sofort wieder fällig. Jemanden zwei Wochen warten zu lassen, weil das
+  Telefon geklingelt hat, wäre eine Strafe für nichts.
+- **Der erste Abruf steht schon in der Zeile**: der übliche Abstand.
+
+Ohne Rückfrage, ohne „bist du sicher?“ — was der Abbruch bedeutet, steht
+danach auf dem Startbildschirm, wo man es lesen kann, statt im Weg zu stehen.
+Die Wörter sind in beiden Fällen verbraucht: Sie wurden gesehen. Das rückt
+näher an die Stelle, an der sich der Quarantänevorrat wiederholt — was die App
+ohnehin sagt.
+
+**Und der Test hat sofort eine Lüge gefunden:** Der Hinweis sagte „Du kannst
+sofort neu anfangen“, aber ich hatte die Einladung verdeckt, solange er stand.
+Ein Satz ohne Weg. Der Knopf steht jetzt im Hinweis selbst.
+
+### G3: der eigene Palast
+
+Die drei mitgelieferten Wege raten, wie die Wohnung eines Fremden aussieht.
+Jetzt kann man fünf eigene Orte eintragen — und das ist der Punkt der ganzen
+Technik, nicht ein Zusatz.
+
+**Die eine Entscheidung, die zählt: feste Kennungen, freie Beschriftungen.**
+In der Datenbank steht `own~7#own3`, das Schild liegt in den Einstellungen.
+Stünde die Beschriftung in der Kennung, wäre jede Umbenennung ein stiller
+Datenverlust — ein Gegenstand, den man vor zwei Wochen auf dem Balkon abgelegt
+hat, ließe sich nicht mehr erfragen, nur weil daraus „Balkontür“ wurde. So ist
+es derselbe Ort, anders geschrieben.
+
+Wer seinen Palast wegwirft, verliert seine Gänge trotzdem nicht: Sie bleiben
+stehen, werden aber übergangen statt ohne Schild gefragt. „Was lag hier?“ ohne
+das „hier“ ist keine Frage.
+
+### Zwei Fehler in Folge an derselben Stelle
+
+Beide im Formular, beide vom E2E gefunden, und zusammen eine kleine Lehre über
+React:
+
+1. Ich hängte einen `key` an den Namen des Palastes, damit sich die Felder
+   nach dem Laden füllen. Der Baustein wurde damit **beim Speichern**
+   ausgetauscht — und die Bestätigung verschwand genau in dem Moment, in dem
+   sie erscheinen sollte.
+2. Ohne `key` blieben die Felder nach einem Neuladen leer: Der gespeicherte
+   Weg trifft später ein als der erste Aufbau des Formulars.
+
+Beides zusammen geht nur mit dem Weg, den React dafür vorsieht — beim Wechsel
+des Wertes nachziehen, ohne neu zu montieren. **Ein `key`, der einen Baustein
+neu montiert, verwirft dessen Zustand; wenn dieser Zustand die Antwort auf die
+Handlung ist, verwirft man die Antwort.**
+
+Und der erste Anlauf des Tests würfelte, bis der Plan einen eigenen Gang zieht
+— bei fünf Modulen und vier Palästen ist das etwa jeder zwanzigste Versuch,
+und er lief in die Zeitgrenze. Jetzt wird stattdessen **ein Gang fällig
+gemacht**: Ein Wiedersehensblock entsteht für jedes Modul, für das etwas
+ansteht. Derselbe Weg wie im echten Betrieb, nur ohne die zwei Wochen.
+
+**Stand:** 252 Kerntests, 88 E2E-Läufe, Typecheck für App und Kern grün.

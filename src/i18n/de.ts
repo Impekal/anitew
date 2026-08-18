@@ -152,6 +152,15 @@ export const de = {
     missedTitle: 'Das Zeitfenster ist vorbei',
     missedNote: 'Eine Messung nach drei Stunden ist keine Messung nach zwanzig Minuten. Diese hier zählt deshalb nicht mit — die nächste beginnt von vorn.',
     discard: 'Verstanden',
+    // Der Ausgang. Er muss da sein — eine Messung, aus der man nicht
+    // herauskommt, wäre genau das Muster, das D-015 ausschließt.
+    abort: 'Messung abbrechen',
+    abortedTitle: 'Abgebrochen',
+    abortedNote: 'Diese Messung zählt nicht mit. Die nächste nimmt andere Wörter — die hier hast du gesehen.',
+    abortedAgain: 'Gemessen wurde noch nichts. Du kannst sofort neu anfangen.',
+    // Der ehrlichste Satz an dieser Stelle: Er erklärt eine Einschränkung mit
+    // dem Grund, aus dem es sie gibt, statt sie als Regel hinzustellen (R-1).
+    abortedLater: 'Der erste Abruf steht schon in der Zeile. Die nächste Messung ist deshalb erst in vierzehn Tagen dran: Wer eine begonnene Messung wiederholen kann, bis das Gefühl dabei stimmt, misst nicht mehr sein Gedächtnis.',
     // Die Ergebnisanzeige.
     resultTitle: 'Gemessen',
     ofItems: 'von 20',
@@ -271,7 +280,18 @@ export const de = {
       knee: 'Knie',
       foot: 'Fuß',
     },
-    ownNote: 'Drei fertige Wege sind eine Krücke. Ein Palast, den du selbst anlegst, trägt deutlich besser — den gibt es hier noch nicht.',
+    // G3 ist da: Der Satz sagt jetzt, wo es weitergeht, statt eine Lücke
+    // einzuräumen.
+    ownNote: 'Drei fertige Wege raten, wie deine Wohnung aussieht. Einen eigenen legst du unten an — der trägt deutlich besser.',
+    ownIntro: 'Fünf Orte auf einem Weg, den du blind gehen kannst. Immer dieselbe Richtung. Die Arbeit liegt nicht im Tippen, sondern im Überlegen.',
+    ownName: 'Wie heißt der Weg?',
+    ownNamePlaceholder: 'Meine Wohnung',
+    ownStation: 'Station',
+    ownStationPlaceholder: 'Ort',
+    ownSave: 'Weg merken',
+    ownDiscard: 'Weg verwerfen',
+    ownSaved: 'Gemerkt. Er kommt ab jetzt im Training vor.',
+    ownRule: 'Fünf Orte, alle verschieden, keiner leer — und ein Name für den Weg.',
   },
   streak: {
     /*

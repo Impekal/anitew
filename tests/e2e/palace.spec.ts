@@ -115,3 +115,95 @@ test('legt fünf Dinge auf einen Weg und geht ihn danach ab', async ({ page }) =
   const listed = await page.locator('.summary-words').first().allTextContents()
   for (const object of objects) expect(listed.join(' ')).toContain(object)
 })
+
+test('lässt einen eigenen Weg anlegen und benutzt ihn (G3)', async ({ page }) => {
+  test.setTimeout(180_000)
+
+  /*
+   * Der Punkt der ganzen Technik: Ein Palast, den man selbst kennt, trägt
+   * deutlich besser als ein geratener. Bis hierher waren die drei
+   * mitgelieferten Wege eine Krücke — und die App hat sie auch so genannt.
+   */
+  await page.goto('/')
+  await expect(startButton(page)).toBeVisible()
+  await page.getByText('Der Gedächtnispalast', { exact: true }).click()
+
+  const own = ['Wohnungstür', 'Bad', 'Balkon', 'Bücherregal', 'Nachttisch']
+  await page.getByLabel('Wie heißt der Weg?').fill('Meine Bude')
+  for (const [index, label] of own.entries()) {
+    await page.getByLabel(`Station ${index + 1}`).fill(label)
+  }
+
+  const save = page.getByRole('button', { name: 'Weg merken' })
+  await expect(save).toBeEnabled()
+  await save.click()
+  await expect(page.getByText(/Er kommt ab jetzt im Training vor/)).toBeVisible()
+
+  // Er bleibt liegen — er steht in denselben Einstellungen wie der Lernstand
+  // und wandert damit auch in die Sicherung (N2).
+  await page.reload()
+  await page.getByText('Der Gedächtnispalast', { exact: true }).click()
+  await expect(page.getByLabel('Station 3')).toHaveValue('Balkon')
+
+  /*
+   * Und jetzt das Entscheidende: **das eigene Schild beim Abgehen.**
+   *
+   * Statt zu würfeln, bis der Plan einen eigenen Gang zieht, wird einer
+   * fällig gemacht. Ein Wiedersehensblock entsteht für jedes Modul, für das
+   * etwas ansteht — der Weg dorthin ist damit derselbe wie im echten Betrieb,
+   * nur ohne die zwei Wochen Wartezeit.
+   */
+  await page.evaluate(async () => {
+    const open = indexedDB.open('anitew')
+    const database: IDBDatabase = await new Promise((resolve, reject) => {
+      open.onsuccess = () => resolve(open.result)
+      open.onerror = () => reject(open.error)
+    })
+    await new Promise<void>((resolve, reject) => {
+      const request = database
+        .transaction('itemStates', 'readwrite')
+        .objectStore('itemStates')
+        .put({
+          itemId: 'palace:de:own~5#own3',
+          moduleId: 'palace',
+          language: 'de',
+          createdAt: 1,
+          lastSeenAt: 1,
+          reviews: 1,
+          lapses: 0,
+          stability: 1,
+          difficulty: 5,
+          fsrsState: 2,
+          dueDay: '2000-01-01',
+        })
+      request.onsuccess = () => resolve()
+      request.onerror = () => reject(request.error)
+    })
+  })
+
+  await page.goto('/')
+  await page.getByRole('button', { name: '60 Sekunden' }).click()
+  await startButton(page).click()
+  await page.locator('.settle').click()
+
+  const mark = page.locator('.placemark-station')
+  await mark.waitFor({ timeout: 60_000 })
+  // Das dritte Schild trägt, was der Nutzer geschrieben hat — nicht „Küche“.
+  await expect(mark).toHaveText('Balkon')
+  await expect(page.locator('.placemark-palace')).toHaveText('Meine Bude')
+  await expect(page.locator('.prompted .hint').first()).toContainText('Was lag hier?')
+})
+
+test('nimmt keinen halben Weg an', async ({ page }) => {
+  await page.goto('/')
+  await expect(startButton(page)).toBeVisible()
+  await page.getByText('Der Gedächtnispalast', { exact: true }).click()
+
+  await page.getByLabel('Wie heißt der Weg?').fill('Halb')
+  await page.getByLabel('Station 1').fill('Bad')
+  // Zweimal derselbe Ort: „Was lag hier?“ hätte zwei Antworten.
+  await page.getByLabel('Station 2').fill('Bad')
+
+  await expect(page.getByRole('button', { name: 'Weg merken' })).toBeDisabled()
+  await expect(page.getByText(/Fünf Orte, alle verschieden, keiner leer/)).toBeVisible()
+})

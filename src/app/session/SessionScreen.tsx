@@ -11,7 +11,9 @@ import {
   factKindOf,
   helpsWith,
   isPrompted,
+  type OwnPalace,
   missionFor,
+  ownLabelOf,
   palaceOf,
   personOf,
   stationOf,
@@ -38,6 +40,8 @@ export function SessionScreen(props: {
   progress: SessionProgress
   /** Die schon gelehrten Ziffern des Major-Systems (D5). */
   taught: readonly number[]
+  /** Der selbst angelegte Palast, wenn es einen gibt (G3). */
+  own?: OwnPalace
   onLeave: () => void
 }) {
   const [settled, setSettled] = useState(false)
@@ -79,12 +83,14 @@ function RunningSession({
   dictionary,
   progress,
   taught,
+  own,
   onLeave,
 }: {
   platform: Platform
   dictionary: Dictionary
   progress: SessionProgress
   taught: readonly number[]
+  own?: OwnPalace
   onLeave: () => void
 }) {
   const { state, setEntries, submitPrompt, advance, leave } = useSessionRunner(
@@ -231,6 +237,7 @@ function RunningSession({
           dictionary={dictionary}
           walk={walkOf(block.items[0] ?? '')}
           language={state.plan.language}
+          own={own}
         />
       ) : block.kind === 'encode' && block.moduleId === 'missions' ? (
         /*
@@ -316,7 +323,7 @@ function RunningSession({
           */
           place={
             block.moduleId === 'palace'
-              ? placeOf(block.items[state.promptIndex] ?? '', dictionary)
+              ? placeOf(block.items[state.promptIndex] ?? '', dictionary, own)
               : undefined
           }
           /*
@@ -717,21 +724,22 @@ function Walk({
   dictionary,
   walk,
   language,
+  own,
 }: {
   dictionary: Dictionary
   walk: string
   language: string
+  own?: OwnPalace
 }) {
   const t = dictionary.palace
   const palace = palaceOf(walk)
   const placements = walkFor(walk, language as Language)
-  const stations: Record<string, string> = t.stations
 
   return (
     <section className="encode scene walk">
       <p className="hint">{dictionary.session.encodeHints.palace}</p>
       <p className="scene-person">
-        {t.walkLead} {palace === undefined ? '' : (t.names as Record<string, string>)[palace]}
+        {t.walkLead} {palaceName(palace, dictionary, own)}
       </p>
       <dl className="scene-facts">
         {placements.map((placement, index) => (
@@ -740,9 +748,7 @@ function Walk({
               <span className="walk-step" aria-hidden="true">
                 {index + 1}
               </span>
-              <span className="walk-station">
-                {stations[placement.station] ?? placement.station}
-              </span>
+              <span className="walk-station">{labelOf(placement.station, dictionary, own)}</span>
             </dt>
             <dd>{placement.object}</dd>
           </div>
@@ -752,18 +758,42 @@ function Walk({
   )
 }
 
+/**
+ * Was auf dem Schild einer Station steht.
+ *
+ * Beim eigenen Palast kommt es aus den Einstellungen und nicht aus `i18n`
+ * (G3) — die Beschriftung gehört dem Nutzer, nicht der Übersetzung. Fehlt sie
+ * (der Palast wurde weggeworfen), bleibt die nackte Kennung stehen; gefragt
+ * wird ein solcher Gang ohnehin nicht mehr, dafür sorgt die Auswahl der
+ * fälligen Einträge.
+ */
+function labelOf(station: string, dictionary: Dictionary, own?: OwnPalace): string {
+  if (own !== undefined) {
+    const label = ownLabelOf(own, station)
+    if (label !== undefined && label !== '') return label
+  }
+  const stations: Record<string, string> = dictionary.palace.stations
+  return stations[station] ?? station
+}
+
+function palaceName(palace: string | undefined, dictionary: Dictionary, own?: OwnPalace): string {
+  if (palace === undefined) return ''
+  if (palace === 'own') return own?.name ?? ''
+  return (dictionary.palace.names as Record<string, string>)[palace] ?? ''
+}
+
 /** Palast und Station einer Ablage, beschriftet. */
 function placeOf(
   item: string,
   dictionary: Dictionary,
+  own?: OwnPalace,
 ): { palace: string; station: string } | undefined {
   const palace = palaceOf(item)
   const station = stationOf(item)
   if (palace === undefined || station === undefined) return undefined
-  const stations: Record<string, string> = dictionary.palace.stations
   return {
-    palace: (dictionary.palace.names as Record<string, string>)[palace] ?? '',
-    station: stations[station] ?? station,
+    palace: palaceName(palace, dictionary, own),
+    station: labelOf(station, dictionary, own),
   }
 }
 

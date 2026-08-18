@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  LABEL_MAX,
   MIN_SECONDS_FOR_TEACHING,
   PALACES,
+  READY_PALACES,
   STATIONS,
   STATIONS_PER_WALK,
   type Pools,
@@ -12,7 +14,9 @@ import {
   isScene,
   itemsOf,
   leniencyFor,
+  isOwnPalace,
   objectFor,
+  ownLabelOf,
   palaceOf,
   planSession,
   sceneItemsOf,
@@ -52,8 +56,9 @@ const pools = (walks: readonly string[]): Pools => ({
 })
 
 describe('der Palast als Datenmodell (G1, G2)', () => {
-  it('hat drei Paläste mit je fünf Stationen', () => {
-    expect(PALACES).toHaveLength(3)
+  it('hat drei mitgelieferte Wege und einen eigenen, je fünf Stationen', () => {
+    expect(READY_PALACES).toHaveLength(3)
+    expect(PALACES).toHaveLength(4)
     for (const palace of PALACES) {
       expect(STATIONS[palace]).toHaveLength(STATIONS_PER_WALK)
     }
@@ -126,7 +131,7 @@ describe('was an den Stationen liegt (G4)', () => {
 describe('der Vorrat', () => {
   it('geht die Paläste reihum durch', () => {
     const walks = walkPool('seed', 6)
-    expect(walks.map((walk) => palaceOf(walk))).toEqual([...PALACES, ...PALACES])
+    expect(walks.map((walk) => palaceOf(walk))).toEqual([...READY_PALACES, ...READY_PALACES])
   })
 
   it('vergibt jeden Gang nur einmal', () => {
@@ -261,5 +266,66 @@ describe('die Lektion (G, D-013)', () => {
     })
     expect(plan.blocks[0]?.moduleId).toBe('palace')
     expect(plan.blocks.filter((block) => block.kind === 'teach')).toHaveLength(1)
+  })
+})
+
+describe('der eigene Palast (G3)', () => {
+  const good = { name: 'Meine Wohnung', stations: ['Tür', 'Bad', 'Balkon', 'Regal', 'Bett'] }
+
+  it('nimmt fünf verschiedene, nicht leere Orte mit Namen an', () => {
+    expect(isOwnPalace(good)).toBe(true)
+  })
+
+  it('weist ab, was beim Abgehen keine Frage ergäbe', () => {
+    expect(isOwnPalace({ ...good, name: '  ' })).toBe(false)
+    expect(isOwnPalace({ ...good, stations: ['Tür', '', 'Balkon', 'Regal', 'Bett'] })).toBe(false)
+    expect(isOwnPalace({ ...good, stations: good.stations.slice(0, 4) })).toBe(false)
+    // Zweimal derselbe Ort: „Was lag hier?“ hätte zwei Antworten.
+    expect(isOwnPalace({ ...good, stations: ['Bad', 'Bad', 'Balkon', 'Regal', 'Bett'] })).toBe(false)
+    expect(isOwnPalace({ ...good, stations: ['Bad', 'bad', 'Balkon', 'Regal', 'Bett'] })).toBe(false)
+    expect(isOwnPalace({ ...good, stations: ['x'.repeat(LABEL_MAX + 1), 'a', 'b', 'c', 'd'] })).toBe(
+      false,
+    )
+    expect(isOwnPalace(undefined)).toBe(false)
+    expect(isOwnPalace({ name: 'x' })).toBe(false)
+  })
+
+  it('hält die Trennzeichen der Kennungen aus den Schildern heraus', () => {
+    expect(isOwnPalace({ ...good, stations: ['Tür~1', 'Bad', 'Balkon', 'Regal', 'Bett'] })).toBe(
+      false,
+    )
+    expect(isOwnPalace({ ...good, stations: ['Tür#1', 'Bad', 'Balkon', 'Regal', 'Bett'] })).toBe(
+      false,
+    )
+  })
+
+  it('trennt Kennung und Beschriftung', () => {
+    /*
+     * Der Kern von G3: In der Datenbank steht `own~7#own3`, das Schild liegt
+     * woanders. Wer seinen Balkon später „Balkontür“ nennt, verliert damit
+     * **nicht**, was er dort abgelegt hat — es ist derselbe Ort, anders
+     * geschrieben.
+     */
+    expect(STATIONS.own).toEqual(['own1', 'own2', 'own3', 'own4', 'own5'])
+    expect(ownLabelOf(good, 'own3')).toBe('Balkon')
+    expect(ownLabelOf({ ...good, stations: ['Tür', 'Bad', 'Balkontür', 'Regal', 'Bett'] }, 'own3'))
+      .toBe('Balkontür')
+    expect(ownLabelOf(good, 'kitchen')).toBeUndefined()
+  })
+
+  it('kommt im Vorrat erst vor, wenn es ihn gibt', () => {
+    // Sonst führte ein Gang an Orte, die niemand benannt hat.
+    expect(walkPool('s', 9).map(palaceOf)).not.toContain('own')
+    expect(READY_PALACES).not.toContain('own')
+    const withOwn = walkPool('s', 8, [...READY_PALACES, 'own'])
+    expect(withOwn.map(palaceOf)).toContain('own')
+  })
+
+  it('baut einen Gang durch den eigenen Palast wie jeden anderen', () => {
+    const walk = walkId('own', 3)
+    expect(walkPlacements(walk)).toHaveLength(STATIONS_PER_WALK)
+    expect(walkFor(walk, 'de').map((entry) => entry.station)).toEqual([...STATIONS.own])
+    // Und er ist genauso verlässlich — sonst gäbe es kein Wiedersehen (G7).
+    expect(walkFor(walk, 'de')).toEqual(walkFor(walk, 'de'))
   })
 })

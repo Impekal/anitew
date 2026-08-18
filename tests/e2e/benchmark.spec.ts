@@ -191,3 +191,45 @@ test('erklärt auf Nachfrage, was gemessen wurde (F3, F4)', async ({ page }) => 
   // F4: kein behaupteter Alltagstransfer.
   await expect(page.getByText(/Über dein Gedächtnis im Alltag sagt es nichts/)).toBeVisible()
 })
+
+test('lässt sich abbrechen und sagt, was das kostet (D-015)', async ({ page }) => {
+  /*
+   * Eine Messung, aus der man nicht herauskommt, wäre genau das Muster, das
+   * D-015 ausschließt. Geprüft wird deshalb beides: **dass** es geht — und
+   * dass die App danach sagt, was passiert ist, statt es zu verschlucken.
+   */
+  await page.goto('/')
+  await expect(startButton(page)).toBeVisible()
+  await page.getByRole('button', { name: 'Messung beginnen' }).click()
+
+  // Mitten im Einprägen: Der Ausgang steht da, ohne dass man ihn suchen muss.
+  await expect(page.locator('.encode-word')).toBeVisible({ timeout: 30_000 })
+  await page.getByRole('button', { name: 'Messung abbrechen' }).click()
+
+  await expect(page.getByText('Abgebrochen')).toBeVisible()
+  await expect(page.getByText(/Diese Messung zählt nicht mit/)).toBeVisible()
+
+  /*
+   * Und weil noch keine Zahl entstanden ist: sofort wieder möglich. Das ist
+   * die Hälfte der Regel, die es überhaupt zu prüfen gibt — die andere
+   * (vierzehn Tage, sobald der erste Abruf dasteht) hängt an einer Uhr und
+   * steht deshalb im Kerntest.
+   */
+  await expect(page.getByText(/sofort neu anfangen/)).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Messung beginnen' })).toBeVisible()
+})
+
+test('nimmt nach einem Abbruch andere Wörter', async ({ page }) => {
+  // Die verbrauchten Wörter kommen nicht wieder: Sie wurden gesehen, und ein
+  // zweites Mal gemessen wären sie keine Messung mehr.
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Messung beginnen' }).click()
+  await expect(page.locator('.encode-word')).toBeVisible({ timeout: 30_000 })
+  const first = ((await page.locator('.encode-word').textContent()) ?? '').trim()
+  await page.getByRole('button', { name: 'Messung abbrechen' }).click()
+
+  await page.getByRole('button', { name: 'Messung beginnen' }).click()
+  await expect(page.locator('.encode-word')).toBeVisible({ timeout: 30_000 })
+  const second = ((await page.locator('.encode-word').textContent()) ?? '').trim()
+  expect(second).not.toBe(first)
+})

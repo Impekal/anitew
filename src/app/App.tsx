@@ -11,7 +11,10 @@ import {
   hasWordPool,
   type ModuleId,
   namePool,
+  READY_PALACES,
+  type OwnPalace,
   numberPool,
+  palaceOf,
   walkPool,
   type BenchmarkRun,
   nextRunDue,
@@ -31,9 +34,11 @@ import {
   loadTrainingDays,
 } from '../data/sessions.ts'
 import { abandonRun, beginRun, loadOpenRun, loadRuns } from '../data/benchmark.ts'
+import { loadOwnPalace } from '../data/palace.ts'
 import { loadPalaceTaught, loadTaught } from '../data/technique.ts'
 
 import { BackupPanel } from './BackupPanel.tsx'
+import { PalacePanel } from './PalacePanel.tsx'
 import { SciencePanel } from './SciencePanel.tsx'
 import { FoundationPanel } from './FoundationPanel.tsx'
 import { StreakLine } from './StreakLine.tsx'
@@ -108,6 +113,14 @@ export function App() {
    * weil die Datenbank beim Start eine Handbreit langsamer war als der
    * Finger. Der Planer lehrt ausdrücklich nur bei `false`.
    */
+  const [own, setOwn] = useState<OwnPalace | undefined>(undefined)
+  const reloadOwn = useCallback(() => {
+    void loadOwnPalace()
+      .then(setOwn)
+      .catch(() => undefined)
+  }, [])
+  useEffect(reloadOwn, [reloadOwn, running])
+
   const [palaceTaught, setPalaceTaught] = useState<boolean | undefined>(undefined)
   useEffect(() => {
     void loadPalaceTaught()
@@ -153,7 +166,16 @@ export function App() {
         const limit = dueLimitFor(Math.round(seconds * 0.15))
         for (const item of selectDue(tracked, day, limit)) {
           const moduleId = moduleOf(item.itemId) as ModuleId
-          ;(due[moduleId] ??= []).push(wordOf(item.itemId))
+          const word = wordOf(item.itemId)
+          /*
+           * Ein Gang durch einen eigenen Palast, den es nicht mehr gibt, wird
+           * übergangen statt gefragt (G3). Die Kennung `own~7#own3` bleibt
+           * gültig — nur steht auf dem Schild nichts mehr, und „Was lag hier?“
+           * ohne das „hier“ ist keine Frage. Gelöscht wird deshalb nichts: Wer
+           * seinen Palast neu anlegt, hat seine Gänge wieder.
+           */
+          if (moduleId === 'palace' && own === undefined && palaceOf(word) === 'own') continue
+          ;(due[moduleId] ??= []).push(word)
         }
       } catch {
         // Ohne Datenbank gibt es eben kein Wiedersehen. Die Einheit läuft
@@ -191,7 +213,7 @@ export function App() {
            * nie aus, und niemand läuft zweimal durch dieselbe Wohnung mit
            * denselben Dingen darin.
            */
-          palace: walkPool(seed, 30),
+          palace: walkPool(seed, 30, own === undefined ? undefined : [...READY_PALACES, 'own']),
         },
         due,
         taught,
@@ -209,7 +231,7 @@ export function App() {
       setRunning(progress)
       void beginSession(progress, day, now).catch(() => undefined)
     })()
-  }, [language, mode, platform, taught, palaceTaught])
+  }, [language, mode, platform, taught, palaceTaught, own])
 
   const leave = useCallback(() => setRunning(undefined), [])
 
@@ -238,7 +260,29 @@ export function App() {
     return nextStep(open.run, platform.clock.now(), today)
   }, [open, platform, runs, today])
 
+  /*
+   * Was nach einem Abbruch dasteht.
+   *
+   * `undefined`, solange keiner passiert ist. Danach die Auskunft, ob sofort
+   * wieder gemessen werden kann oder erst in vierzehn Tagen — das ist der
+   * einzige Unterschied, den ein Abbruch macht, und er gehört gesagt.
+   */
+  const [aborted, setAborted] = useState<'again' | 'later' | undefined>(undefined)
+
+  const abortBenchmark = useCallback(() => {
+    if (open === undefined) return
+    // Ob schon eine Zahl entstanden ist, steht in der Zeile selbst — genau
+    // daran hängt auch `nextRunDue`.
+    const measured = open.run.immediate !== undefined
+    setMeasuring(false)
+    setAborted(measured ? 'later' : 'again')
+    void abandonRun(open.id)
+      .catch(() => undefined)
+      .finally(reloadBenchmark)
+  }, [open, reloadBenchmark])
+
   const startBenchmark = useCallback(() => {
+    setAborted(undefined)
     void (async () => {
       const now = platform.clock.now()
       const day = dayKeyOf(now, { offsetMinutes: platform.clock.offsetMinutes(now) })
@@ -268,6 +312,7 @@ export function App() {
         runId={open.id}
         items={open.items}
         onDone={() => setMeasuring(false)}
+        onAbort={abortBenchmark}
       />
     )
   }
@@ -279,6 +324,7 @@ export function App() {
         dictionary={dictionary}
         progress={running}
         taught={taught}
+        own={own}
         onLeave={leave}
       />
     )
@@ -306,7 +352,37 @@ export function App() {
         Dauerbanner, kein Countdown — sie steht da, wenn sie dran ist, und
         sonst gar nicht.
       */}
-      {step.kind === 'invite' && (
+      {/*
+        Nach einem Abbruch: keine Ermahnung, keine Frage, ob man es sich nicht
+        doch anders überlegt (G-5, D-015). Nur was passiert ist und wie es
+        weitergeht.
+      */}
+      {aborted !== undefined && (
+        <section className="note" role="status">
+          <h3>{dictionary.benchmark.abortedTitle}</h3>
+          <p>{dictionary.benchmark.abortedNote}</p>
+          <p className="hint">
+            {aborted === 'again'
+              ? dictionary.benchmark.abortedAgain
+              : dictionary.benchmark.abortedLater}
+          </p>
+          {/*
+            „Du kannst sofort neu anfangen“ braucht den Knopf dazu.
+            Der erste Anlauf verdeckte die Einladung, solange der Hinweis
+            stand — der Satz war damit eine Behauptung ohne Weg, und ein
+            E2E-Lauf hat genau das getroffen.
+          */}
+          {aborted === 'again' && step.kind === 'invite' && (
+            <div className="note-actions">
+              <button type="button" className="quiet" onClick={startBenchmark}>
+                {dictionary.benchmark.start}
+              </button>
+            </div>
+          )}
+        </section>
+      )}
+
+      {step.kind === 'invite' && aborted === undefined && (
         <section className="note" role="status">
           <h3>{dictionary.benchmark.invite}</h3>
           <p>{dictionary.benchmark.inviteNote}</p>
@@ -482,6 +558,24 @@ export function App() {
           nichts, was jemand täglich braucht, aber sie muss da sein, bevor die
           App irgendwo behauptet, sie sei wissenschaftlich fundiert (R-2).
         */}
+        {/*
+          Der eigene Palast steht bei den anderen Einstellungen und nicht auf
+          dem Startbildschirm: Man legt ihn einmal an. Zugeklappt bleibt er
+          trotzdem erreichbar — und der Hinweis in der Lektion sagt, dass es
+          ihn gibt.
+        */}
+        <details className="details">
+          <summary>{dictionary.palace.heading}</summary>
+          {/*
+            Kein `key`, der den Baustein neu montiert: Der erste Anlauf hängte
+            ihn an den Namen des Palastes, und damit verschwand ausgerechnet
+            beim Speichern die Bestätigung — der Baustein wurde in dem Moment
+            ausgetauscht, in dem er sie zeigen sollte. Ein E2E-Lauf hat es
+            gefunden. Die Felder pflegt er selbst.
+          */}
+          <PalacePanel dictionary={dictionary} own={own} onChange={reloadOwn} />
+        </details>
+
         <details className="details">
           <summary>{dictionary.science.heading}</summary>
           <SciencePanel dictionary={dictionary} />

@@ -122,8 +122,30 @@ describe('der Ablauf einer Messung (F2)', () => {
   })
 
   it('setzt die nächste Messung vierzehn Tage später an', () => {
-    expect(nextRunDue({ ...base, day: '2026-08-17' })).toBe('2026-08-31')
+    expect(nextRunDue({ ...base, day: '2026-08-17', immediate: 14 })).toBe('2026-08-31')
     expect(nextRunDue(undefined)).toBeUndefined()
+  })
+
+  it('sperrt nichts, wenn nie eine Zahl entstanden ist', () => {
+    /*
+     * Abgebrochen im Einprägen: Es wurde nichts gemessen, also gibt es auch
+     * nichts zu schützen. Jemanden vierzehn Tage warten zu lassen, weil das
+     * Telefon geklingelt hat, wäre eine Strafe für nichts.
+     */
+    expect(nextRunDue({ ...base, day: '2026-08-17' })).toBe('2026-08-17')
+  })
+
+  it('hält den Abstand ein, sobald der erste Abruf dasteht', () => {
+    /*
+     * Der eigentliche Grund für die Unterscheidung: **Wer eine begonnene
+     * Messung wiederholen kann, bis das Gefühl dabei stimmt, misst nicht mehr
+     * sein Gedächtnis.** Ein abgebrochener Lauf mit Ergebnis wiegt deshalb so
+     * schwer wie ein vollständiger — für den Abstand, nicht für die Reihe:
+     * gezählt wird er nirgends (F1).
+     */
+    const aborted = { ...base, day: '2026-08-17', encodedAt: noon, immediate: 17 }
+    expect(nextRunDue(aborted)).toBe('2026-08-31')
+    expect(isComplete(aborted)).toBe(false)
   })
 })
 
