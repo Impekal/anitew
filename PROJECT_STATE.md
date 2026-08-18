@@ -2144,3 +2144,39 @@ erschummelt, betrügt niemanden als sich selbst um die einzige gemessene Zahl.
 
 **Stand:** 311 Kerntests, 177 E2E-Läufe (unverändert — diese Runde nur Kern
 und Doku), Typecheck für App und Kern grün.
+
+---
+
+## 2026-08-18 · Performance (P4) — nicht die Größe von heute, sondern die von morgen
+
+Der Kaltstart ist heute kein Problem: **126 KB gzip** JavaScript, 4,8 KB CSS —
+zusammen ~131 KB beim ersten Laden, danach nie wieder, weil der Service Worker
+alles hält. Der Hintergrund (`NeuralField`) war schon richtig gebaut: einmal
+gerechnet, in CSS animiert (Grafikkarte), 50 Knoten, steht bei „weniger
+Bewegung“ still. Kein Ruckelrisiko, kein Akku-Fresser.
+
+**Also war die eigentliche Arbeit nicht, etwas zu beschleunigen, sondern die
+Geschwindigkeit gegen die Zukunft zu sichern.** Die typische
+Kaltstart-Verschlechterung kommt nicht aus schlechtem Code, sondern aus einer
+dicken Abhängigkeit, die jemand achtlos hinzufügt — und die auf dem schnellen
+Buildrechner niemandem auffällt.
+
+Deshalb ein **Größenbudget als Wächter** (`scripts/size-budget.mjs`, in der
+CI nach dem Build): Er misst die gzip-Größe und bricht ab, wenn sie über die
+Grenze steigt (heute ~126 KB, Grenze 165 KB — Luft für ehrliches Wachstum,
+zu wenig für eine verdoppelte Abhängigkeit). Wer das Budget bewusst heben
+will, hebt es dort, mit einem Grund im Commit. Das ist der Punkt: **die
+Entscheidung sichtbar machen, statt sie schleichend geschehen zu lassen** —
+dieselbe Haltung wie beim Dateiformat (N6) und den erfundenen Zahlen (R-1).
+
+Dazu drei Messungen (`tests/e2e/performance.spec.ts`), mit großzügigen
+Schranken, weil der Buildrechner schneller ist als jedes Telefon und die Zeit
+im Test schwankt: früh bedienbar; **zweites Laden offline aus dem Cache** (der
+Alltag eines Nutzers); und **keine lange Aufgabe im Leerlauf** — die
+Gegenprobe dafür, dass sich der Hintergrund wirklich in CSS bewegt und nicht
+im Hauptthread, wo er die Uhr der Einheit stören würde.
+
+Damit ist die Qualitätsreihe P bis auf nichts durch: P1–P8 stehen.
+
+**Stand:** 311 Kerntests, 160 Funktionsläufe (3 neue), plus Layout-Matrix über
+sieben Geräte, Größenbudget in der CI, Typecheck für App und Kern grün.

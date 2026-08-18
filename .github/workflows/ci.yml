@@ -27,6 +27,8 @@ jobs:
         run: npm test
       - name: Build
         run: npm run build
+      - name: Kaltstart-Budget (P4)
+        run: npm run size
       - name: Browser für die E2E-Tests
         run: npx playwright install --with-deps chromium
       - name: Tests (die gebaute App im Browser)
