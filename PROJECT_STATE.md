@@ -2180,3 +2180,27 @@ Damit ist die Qualitätsreihe P bis auf nichts durch: P1–P8 stehen.
 
 **Stand:** 311 Kerntests, 160 Funktionsläufe (3 neue), plus Layout-Matrix über
 sieben Geräte, Größenbudget in der CI, Typecheck für App und Kern grün.
+
+---
+
+## 2026-08-18 · Barrierefreiheit (O4/O5/O6) — und die Restaufgaben nacheinander
+
+Der Auftraggeber hat gebeten, die übrigen Aufgaben nacheinander abzuarbeiten
+und die, die ihn brauchen, ans Ende zu legen. Erster Block: Barrierefreiheit.
+
+Der eigentliche Mangel war ein **fehlender Fokusring**: Auf dem dunklen Grund
+sah ein Tastatur- oder Switch-Nutzer nicht, wo er gerade steht. Jetzt trägt
+jedes bedienbare Element denselben deutlichen Ring, sobald es mit der Tastatur
+angesteuert wird (`:focus-visible`, nicht beim Antippen). `:where()` hält die
+Regel spezifitätsfrei, damit die Felder mit eigenem Glow-Fokus ihren behalten.
+
+Dazu die kleineren Hälften: die zwei häufigsten Knöpfe auf 44 px Mindesthöhe
+(O5, Daumenzone), und **Haptik am selben Schalter wie der Ton** (O6) — ein
+Schalter für beides, und nur bei den Wechseln, die zählen (Block zu Ende,
+Einheit geschafft), nicht bei jedem Wort. iOS kennt `vibrate` nicht; dort
+bleibt es ein stiller Verzicht.
+
+`tests/e2e/accessibility.spec.ts` nagelt fest, was unbemerkt kaputtginge: die
+Tastatur erreicht den Startknopf früh und sieht ihn, kein Bild ohne Namen oder
+`aria-hidden`, die Uhr der Einheit als lesbarer `progressbar`. Kontrast im Auge
+und Bewegung im Gefühl bleiben dem Gerätedurchgang.

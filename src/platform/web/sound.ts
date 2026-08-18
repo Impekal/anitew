@@ -88,6 +88,25 @@ function notesFor(cue: SoundCue, step: number): Note[] {
   }
 }
 
+/**
+ * Ein kurzer, weicher Stoß bei den Wechseln, die zählen (O6).
+ *
+ * Nicht bei jedem Wort — das wäre ein zappelndes Telefon. Nur wenn ein Block
+ * oder die Einheit zu Ende ist: eine Bestätigung, die man in der Tasche spürt.
+ */
+function buzz(cue: SoundCue): void {
+  const vibrate = (navigator as { vibrate?: (pattern: number | number[]) => boolean }).vibrate
+  if (typeof vibrate !== 'function') return
+  const pattern = cue === 'done' ? [16, 40, 16] : cue === 'block' ? [14] : undefined
+  if (pattern === undefined) return
+  try {
+    vibrate(pattern)
+  } catch {
+    // Manche Browser verlangen für `vibrate` eine vorangegangene Berührung.
+    // Dann fällt es aus — es war nie mehr als eine Beigabe.
+  }
+}
+
 export function createWebSound(enabled: boolean): Sound {
   let on = enabled
   let context: AudioContext | undefined
@@ -148,6 +167,14 @@ export function createWebSound(enabled: boolean): Sound {
       if (!on) return
       const ctx = ensure()
       if (ctx === undefined || master === undefined) return
+      /*
+       * Haptik hängt am selben Schalter wie der Ton (O6): „dezent und
+       * abschaltbar“ heißt hier ein Schalter für beides, nicht zwei. Nur bei
+       * den bedeutsamen Wechseln — nicht bei jedem Wort —, und nur, wo das
+       * Gerät es kann. iOS-Safari kennt `vibrate` nicht; dort bleibt es ein
+       * stiller Verzicht, kein Fehler.
+       */
+      buzz(cue)
       try {
         for (const note of notesFor(cue, step)) strike(ctx, master, note)
       } catch {
