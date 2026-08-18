@@ -20,13 +20,16 @@ import { startButton } from './helpers.ts'
 
 /** Startet neu, bis der Plan das Missionsmodul zieht. */
 async function startMission(page: Page): Promise<boolean> {
-  for (let attempt = 0; attempt < 14; attempt++) {
+  for (let attempt = 0; attempt < 25; attempt++) {
     await page.goto('/')
     await page.getByRole('button', { name: '60 Sekunden' }).click()
     await startButton(page).click()
     await page.locator('.settle').click()
     await expect(page.locator('.scene, .encode-word').first()).toBeVisible({ timeout: 30_000 })
-    if ((await page.locator('.scene').count()) > 0) return true
+    // `.scene` allein reicht seit dem Palast nicht mehr: Ein Gang ist
+    // ebenfalls eine Szene und benutzt dasselbe Raster (G). Gesucht ist hier
+    // die Mission, also die Szene **ohne** Weg.
+    if ((await page.locator('.scene:not(.walk)').count()) > 0) return true
     // Nicht getroffen: Spuren wegräumen, damit der nächste Versuch von vorn
     // beginnt und nicht auf einer halben Einheit aufsetzt.
     await page.evaluate(() => indexedDB.deleteDatabase('anitew'))
@@ -37,7 +40,7 @@ async function startMission(page: Page): Promise<boolean> {
 test('zeigt die Szene als Ganzes und fragt sie mit Anker ab', async ({ page }) => {
   test.setTimeout(180_000)
 
-  expect(await startMission(page), 'in vierzehn Anläufen kam keine Mission').toBe(true)
+  expect(await startMission(page), 'in fünfundzwanzig Anläufen kam keine Mission').toBe(true)
 
   /*
    * Alles auf einmal. Das ist der Unterschied zu jedem anderen Modul: Geübt

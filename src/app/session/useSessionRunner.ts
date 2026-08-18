@@ -13,7 +13,7 @@ import {
   splitEntries,
 } from '../../core/index.ts'
 import { recordOutcome } from '../../data/items.ts'
-import { markTaught } from '../../data/technique.ts'
+import { markPalaceTaught, markTaught } from '../../data/technique.ts'
 import {
   type RoundResult,
   type SessionProgress,
@@ -116,7 +116,10 @@ export function useSessionRunner(
      * sie ausliest, und beide sollen morgen die nächste bekommen.
      */
     if (block.kind === 'teach') {
-      void markTaught(Number(block.items[0])).catch(() => undefined)
+      // Zwei Techniken, zwei Merker: die Ziffer beim Major-System, ein
+      // schlichtes Ja beim Palast — der wird nur einmal erklärt (G).
+      if (block.moduleId === 'palace') void markPalaceTaught().catch(() => undefined)
+      else void markTaught(Number(block.items[0])).catch(() => undefined)
     }
 
     if (block.kind === 'recall' || block.kind === 'review') {

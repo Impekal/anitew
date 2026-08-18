@@ -34,3 +34,21 @@ export async function markTaught(digit: number): Promise<void> {
   if (taught.includes(digit)) return
   await db.settings.put({ key: KEY, value: [...taught, digit] })
 }
+
+/**
+ * Der Gedächtnispalast wird **einmal** erklärt (Backlog G).
+ *
+ * Kein Fortschritt wie bei den zehn Ziffern, nur ein Ja oder Nein: Die
+ * Technik ist in drei Schritten erzählt. Sie liegt aus demselben Grund in den
+ * Einstellungen — sie wandert mit der Sicherung, ohne dass jemand daran
+ * denken muss.
+ */
+const PALACE_KEY = 'technique.palace.taught'
+
+export async function loadPalaceTaught(): Promise<boolean> {
+  return (await db.settings.get(PALACE_KEY))?.value === true
+}
+
+export async function markPalaceTaught(): Promise<void> {
+  await db.settings.put({ key: PALACE_KEY, value: true })
+}

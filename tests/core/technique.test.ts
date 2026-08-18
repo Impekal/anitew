@@ -9,6 +9,7 @@ import {
   nextToTeach,
   taughtProgress,
 } from '../../src/core/technique/major.ts'
+import { walkPool } from '../../src/core/content/palace.ts'
 import {
   MIN_SECONDS_FOR_TEACHING,
   TEACH_SECONDS,
@@ -80,7 +81,13 @@ describe('die Lektion im Plan (D5)', () => {
   // gewählt bricht der Planer ab, und der Test misst dann den Vorrat statt
   // die Lektion.
   const many = (prefix: string) => Array.from({ length: 80 }, (_, index) => `${prefix}${index}`)
-  const pools: Pools = { words: many('w'), faces: many('f'), numbers: many('9'), missions: many('p') }
+  const pools: Pools = {
+  words: many('w'),
+  faces: many('f'),
+  numbers: many('9'),
+  missions: many('p'),
+  palace: walkPool('t', 12),
+}
   const base = { day: '2026-08-17', language: 'de', seed: 'lektion', pools }
   const teachBlock = (plan: ReturnType<typeof planSession>) =>
     plan.blocks.find((block) => block.kind === 'teach')

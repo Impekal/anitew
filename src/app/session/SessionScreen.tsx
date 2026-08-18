@@ -12,7 +12,11 @@ import {
   helpsWith,
   isPrompted,
   missionFor,
+  palaceOf,
   personOf,
+  stationOf,
+  walkFor,
+  walkOf,
   subjectOf,
   lettersFor,
   majorParts,
@@ -207,12 +211,26 @@ function RunningSession({
         <span style={{ width: `${Math.min(100, done * 100)}%` }} />
       </div>
 
-      {block.kind === 'teach' ? (
+      {block.kind === 'teach' && block.moduleId === 'palace' ? (
+        <PalaceLesson dictionary={dictionary} onDone={() => advance()} />
+      ) : block.kind === 'teach' ? (
         <Lesson
           dictionary={dictionary}
           digit={Number(block.items[0])}
           first={taught.length === 0}
           onDone={() => advance()}
+        />
+      ) : block.kind === 'encode' && block.moduleId === 'palace' ? (
+        /*
+          Ein Gang wird **als Ganzes** gezeigt, aus demselben Grund wie eine
+          Mission: Geübt wird die Bindung zwischen Ort und Ding, und die gibt
+          es nur, wenn die Reihenfolge sichtbar ist. Fünf Karten nacheinander
+          wären fünf Gegenstände und kein Weg.
+        */
+        <Walk
+          dictionary={dictionary}
+          walk={walkOf(block.items[0] ?? '')}
+          language={state.plan.language}
         />
       ) : block.kind === 'encode' && block.moduleId === 'missions' ? (
         /*
@@ -290,6 +308,17 @@ function RunningSession({
         <PromptedRecall
           key={`${block.id}-${state.promptIndex}`}
           face={subjectOf(block.moduleId, block.items[state.promptIndex] ?? '')}
+          /*
+            Beim Palast gibt es kein Gesicht — der Anker ist ein **Ort**. Statt
+            eines Porträts steht das Schild der Station da, mit dem Palast
+            darüber: „Deine Wohnung · Flur“. Das ist das Abgehen (G6), und es
+            ist genau die Frage, die die Technik stellt.
+          */
+          place={
+            block.moduleId === 'palace'
+              ? placeOf(block.items[state.promptIndex] ?? '', dictionary)
+              : undefined
+          }
           /*
             Bei der Mission steht der Name **unter** dem Gesicht — er ist hier
             nicht die Frage, sondern der Anker: „Elena — welches Zimmer?“
@@ -369,6 +398,7 @@ function RunningSession({
  */
 function PromptedRecall({
   face,
+  place,
   label,
   position,
   total,
@@ -379,6 +409,8 @@ function PromptedRecall({
   onSubmit,
 }: {
   face: string
+  /** Ein Ort statt eines Gesichts — beim Palast (G6). */
+  place?: { palace: string; station: string }
   /** Der Anker unter dem Gesicht — nur, wo der Name nicht die Antwort ist. */
   label?: string
   position: number
@@ -395,7 +427,14 @@ function PromptedRecall({
   return (
     <section className="prompted">
       <p className="hint">{hint}</p>
-      <Face name={face} size={168} />
+      {place !== undefined ? (
+        <div className="placemark">
+          <span className="placemark-palace">{place.palace}</span>
+          <span className="placemark-station">{place.station}</span>
+        </div>
+      ) : (
+        <Face name={face} size={168} />
+      )}
       {label !== undefined && <p className="prompted-anchor">{label}</p>}
       <form
         className="prompted-form"
@@ -637,6 +676,98 @@ function Scene({
 }
 
 /**
+ * Die Lektion zum Gedächtnispalast (Backlog G, D-013).
+ *
+ * Sie kommt genau einmal, vor dem ersten Gang. Anders als beim Major-System
+ * gibt es hier nichts auswendig zu lernen — die Technik ist in drei Schritten
+ * erzählt, alles Weitere ist Übung.
+ *
+ * Der letzte Satz ist der wichtigste und steht deshalb allein: **Das Bild
+ * baut der Nutzer.** Eine App, die „stell dir einen qualmenden Toaster vor“
+ * mitliefert, nimmt genau den Schritt ab, der wirkt (D-017).
+ */
+function PalaceLesson({ dictionary, onDone }: { dictionary: Dictionary; onDone: () => void }) {
+  const t = dictionary.palace
+
+  return (
+    <section className="lesson">
+      <p className="hint">{t.heading}</p>
+      <button type="button" className="lesson-card lesson-wide" onClick={onDone}>
+        <span className="lesson-intro">{t.lessonIntro}</span>
+        <ol className="lesson-steps">
+          {t.lessonSteps.map((step) => (
+            <li key={step}>{step}</li>
+          ))}
+        </ol>
+      </button>
+      <p className="lesson-hook">{t.lessonBuild}</p>
+      <p className="hint">{t.lessonReady}</p>
+    </section>
+  )
+}
+
+/**
+ * Ein Gang durch einen Palast (Backlog G1, G2, G6).
+ *
+ * Die Stationen stehen in der Reihenfolge des Weges, nummeriert — die
+ * Reihenfolge ist nicht Deko, sie ist die halbe Technik. Der Hinweis darüber
+ * sagt, was zu tun ist: hinlegen, nicht lesen.
+ */
+function Walk({
+  dictionary,
+  walk,
+  language,
+}: {
+  dictionary: Dictionary
+  walk: string
+  language: string
+}) {
+  const t = dictionary.palace
+  const palace = palaceOf(walk)
+  const placements = walkFor(walk, language as Language)
+  const stations: Record<string, string> = t.stations
+
+  return (
+    <section className="encode scene walk">
+      <p className="hint">{dictionary.session.encodeHints.palace}</p>
+      <p className="scene-person">
+        {t.walkLead} {palace === undefined ? '' : (t.names as Record<string, string>)[palace]}
+      </p>
+      <dl className="scene-facts">
+        {placements.map((placement, index) => (
+          <div key={placement.station}>
+            <dt>
+              <span className="walk-step" aria-hidden="true">
+                {index + 1}
+              </span>
+              <span className="walk-station">
+                {stations[placement.station] ?? placement.station}
+              </span>
+            </dt>
+            <dd>{placement.object}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+  )
+}
+
+/** Palast und Station einer Ablage, beschriftet. */
+function placeOf(
+  item: string,
+  dictionary: Dictionary,
+): { palace: string; station: string } | undefined {
+  const palace = palaceOf(item)
+  const station = stationOf(item)
+  if (palace === undefined || station === undefined) return undefined
+  const stations: Record<string, string> = dictionary.palace.stations
+  return {
+    palace: (dictionary.palace.names as Record<string, string>)[palace] ?? '',
+    station: stations[station] ?? station,
+  }
+}
+
+/**
  * Die Frage zur Stelle, an der der Abruf gerade steht.
  *
  * Beim Gesichtsmodul ist es immer dieselbe („Wer ist das?“), bei einer
@@ -652,6 +783,10 @@ function Scene({
  */
 function askFor(block: BlockPlan, index: number, dictionary: Dictionary): string {
   const t = dictionary.session
+  if (block.moduleId === 'palace') {
+    const ask = dictionary.palace.ask
+    return block.kind === 'review' ? `${t.reviewLead} ${ask}` : ask
+  }
   if (block.moduleId !== 'missions') {
     return block.kind === 'review' ? t.reviewPromptHint : t.promptHint
   }
@@ -662,6 +797,7 @@ function askFor(block: BlockPlan, index: number, dictionary: Dictionary): string
 
 function placeholderFor(block: BlockPlan, index: number, dictionary: Dictionary): string {
   const t = dictionary.session
+  if (block.moduleId === 'palace') return dictionary.palace.placeholder
   if (block.moduleId !== 'missions') return t.promptPlaceholder
   const kind = factKindOf(block.items[index] ?? '')
   return kind === undefined ? t.promptPlaceholder : t.missionPlaceholders[kind]

@@ -12,6 +12,7 @@ import {
   type ModuleId,
   namePool,
   numberPool,
+  walkPool,
   type BenchmarkRun,
   nextRunDue,
   nextStep,
@@ -30,7 +31,7 @@ import {
   loadTrainingDays,
 } from '../data/sessions.ts'
 import { abandonRun, beginRun, loadOpenRun, loadRuns } from '../data/benchmark.ts'
-import { loadTaught } from '../data/technique.ts'
+import { loadPalaceTaught, loadTaught } from '../data/technique.ts'
 
 import { BackupPanel } from './BackupPanel.tsx'
 import { SciencePanel } from './SciencePanel.tsx'
@@ -98,6 +99,19 @@ export function App() {
   useEffect(() => {
     void loadTaught()
       .then(setTaught)
+      .catch(() => undefined)
+  }, [running])
+
+  /*
+   * `undefined` heißt „noch nicht nachgesehen“ und nicht „noch nicht
+   * gelehrt“ — sonst bekäme jemand die Palastlektion ein zweites Mal, nur
+   * weil die Datenbank beim Start eine Handbreit langsamer war als der
+   * Finger. Der Planer lehrt ausdrücklich nur bei `false`.
+   */
+  const [palaceTaught, setPalaceTaught] = useState<boolean | undefined>(undefined)
+  useEffect(() => {
+    void loadPalaceTaught()
+      .then(setPalaceTaught)
       .catch(() => undefined)
   }, [running])
 
@@ -171,9 +185,17 @@ export function App() {
            * derselben Person, und in der Datenbank auch zwei Einträge.
            */
           missions: namePool(language),
+          /*
+           * Gänge durch einen Palast (G). Wie die Zahlen aus dem Seed
+           * erzeugt: Derselbe Palast, andere Gegenstände — der Vorrat geht
+           * nie aus, und niemand läuft zweimal durch dieselbe Wohnung mit
+           * denselben Dingen darin.
+           */
+          palace: walkPool(seed, 30),
         },
         due,
         taught,
+        palaceTaught,
       })
       const progress: SessionProgress = {
         sessionId,
@@ -187,7 +209,7 @@ export function App() {
       setRunning(progress)
       void beginSession(progress, day, now).catch(() => undefined)
     })()
-  }, [language, mode, platform, taught])
+  }, [language, mode, platform, taught, palaceTaught])
 
   const leave = useCallback(() => setRunning(undefined), [])
 

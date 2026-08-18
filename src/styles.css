@@ -1348,3 +1348,85 @@ body::before {
   line-height: 1.45;
   color: var(--ink-faint);
 }
+
+/* ── Gedächtnispalast (G) ───────────────────────────────────────────────────
+   Der Gang benutzt dasselbe Raster wie eine Missionsszene — beides sind
+   Bindungen, und sie sollen sich auch gleich anfühlen. Der Unterschied ist
+   die Nummer vor der Station: Die Reihenfolge ist bei einem Palast nicht
+   Zierde, sondern die halbe Technik. */
+.walk .scene-facts dt {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+}
+
+.walk-step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  color: var(--ink-faint);
+}
+
+/* Beim Abruf steht statt eines Gesichts ein Schild: der Palast klein, die
+   Station groß. Es ist die Frage „wo stehst du gerade?“ — und die muss man in
+   einem Blick beantworten können. */
+.placemark {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 1.6rem 2rem;
+  border: 1px solid var(--line);
+  border-radius: 1.5rem;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.placemark-palace {
+  font-size: 0.76rem;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.placemark-station {
+  font-family: var(--serif);
+  font-size: clamp(1.5rem, 7vw, 2rem);
+  line-height: 1.1;
+  color: var(--ink);
+  text-shadow: var(--glow-text);
+}
+
+/* Die Palastlektion ist ein Text und keine Karteikarte — sie darf breiter
+   sein als die Ziffernkarte des Major-Systems. */
+.lesson-wide {
+  align-items: flex-start;
+  gap: 0.9rem;
+  max-width: 24rem;
+  padding: 1.4rem 1.5rem;
+  text-align: left;
+}
+
+.lesson-intro {
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.lesson-steps {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}

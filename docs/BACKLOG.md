@@ -141,13 +141,13 @@ Abruftraining. Hier entscheidet sich, ob die App wirkt.
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| G1 | Palast-Datenmodell: Räume, Stationen, feste Reihenfolge | ⬜ | | M |
-| G2 | Vorgefertigte Paläste: Wohnung, Straße, Körper | ⬜ | Eingang · Wohnzimmer · Küche · Schlafzimmer · Bad | M |
-| G3 | Eigener Palast: Nutzer legt Räume und Stationen selbst an | ⬜ | eigene Räume wirken deutlich besser als fremde | M |
-| G4 | Automatische Zuordnung Item → Station | ⬜ | | M |
-| G5 | Merkbilder erzeugen — regelbasiert und offline; mit KI (M) nur besser, nicht nötig | ⬜ | „bizarre visuelle Geschichten“ | L |
-| G6 | Begehungsmodus als Abfrage: „Gehe durch dein Wohnzimmer“ → Sofa → 1884 | ⬜ | | M |
-| G7 | Palastinhalte hängen in der Spacing-Engine (C) wie jedes andere Item | ⬜ | sonst wird der Palast ein hübscher Nebenschauplatz | S |
+| G1 | Palast-Datenmodell: Räume, Stationen, feste Reihenfolge | ✅ 2026-08-18 | **D-017**. Ein Gang ist eine Szene wie eine Mission (D-014): Anker `home~3`, Stück `home~3#hall`. Fünf Stationen, feste Reihenfolge — die ist nicht Zierde, sondern die halbe Technik | M |
+| G2 | Vorgefertigte Paläste: Wohnung, Straße, Körper | ✅ 2026-08-18 | Drei Wege zu je fünf Stationen. Absichtlich die banalsten Orte der Welt: Ein Palast wirkt, weil man ihn kennt | M |
+| G3 | Eigener Palast: Nutzer legt Räume und Stationen selbst an | ⬜ | offen. Eigene Räume wirken deutlich besser als fremde — die App **sagt** das inzwischen selbst und nennt die drei fertigen Wege eine Krücke | M |
+| G4 | Automatische Zuordnung Item → Station | ✅ 2026-08-18 | Aus dem Anker gerechnet, ohne Zurücklegen. „Such dir selbst aus, was wohin gehört“ wäre eine Aufgabe vor der Aufgabe — Zuordnung ist Verwaltung, das Bild ist die Technik (D-017) | M |
+| G5 | Merkbilder erzeugen | ❗ **umgeschrieben** | **D-017**: Die App liefert **kein** Bild. Ein selbst gebautes sitzt besser als ein vorgesetztes — wer „qualmender Toaster“ vorgesetzt bekommt, hat einen Satz gelesen. Sie verlangt das Bild, sagt wie eins aussieht, das trägt, und gibt dem Palast dafür sechs Sekunden je Station statt vier | L |
+| G6 | Begehungsmodus als Abfrage: „Gehe durch dein Wohnzimmer“ → Sofa → 1884 | ✅ 2026-08-18 | Der Abruf ist gestützt und geht Station für Station: das Schild zeigt „Deine Wohnung · Flur“, die Frage lautet „Was lag hier?“ | M |
+| G7 | Palastinhalte hängen in der Spacing-Engine (C) wie jedes andere Item | ✅ 2026-08-18 | Fällt aus der Bauform ab: Ein Gang hat dieselbe Form wie eine Mission, also plant der Scheduler ihn wie alles andere. Möglich nur, weil ein Gang **gerechnet** und nicht gespeichert wird — dieselbe Frage hat in drei Wochen dieselbe Antwort | S |
 
 ## H. Memory Missions
 
@@ -263,8 +263,8 @@ Anforderung wie jede andere. Die acht Regeln G-1 bis G-8 stehen in
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | ✅ 2026-08-18 | 219 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Sessionplanung, Bewertung, Scheduler, Gesichtsgenerator, die ganze Messung und die Wirkungsaussagen (R5) sind abgedeckt | M |
-| P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | ✅ 2026-08-18 | 66 Läufe in Chromium und im Telefonprofil, darunter eine Einheit von vorn bis hinten und der Abbruch mitten drin. Seit M4 **liest der Test ab, welches Modul kam, statt es vorherzusagen** (`tests/e2e/helpers.ts`) | M |
+| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | ✅ 2026-08-18 | 244 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Sessionplanung, Bewertung, Scheduler, Gesichtsgenerator, die ganze Messung und die Wirkungsaussagen (R5) sind abgedeckt | M |
+| P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | ✅ 2026-08-18 | 80 Läufe in Chromium und im Telefonprofil, darunter eine Einheit von vorn bis hinten und der Abbruch mitten drin. Seit M4 **liest der Test ab, welches Modul kam, statt es vorherzusagen** (`tests/e2e/helpers.ts`) | M |
 | P3 | CI bei jedem Push: Typecheck (App **und** Kern getrennt), Tests, Build, E2E | ✅ 2026-08-17 | | S |
 | P4 | Performance: Kaltstart unter 2 s, Timer laufen ruckelfrei | ⬜ | | M |
 | P5 | Uhrmanipulation darf die Engine nicht zerstören (Streak-Betrug, Intervall-Chaos) | ⬜ | monotone Zeitquelle plus Plausibilitätsprüfung | M |
@@ -328,7 +328,7 @@ Neu offen, entstanden aus den Antworten:
 | **M1** | Walking Skeleton | B1–B3, B5, B6, B9, C5, D4, D6, N1 | ✅ **2026-08-17** — Eine echte Einheit läuft täglich durch, überlebt eine Unterbrechung, und jede Antwort steht im Protokoll |
 | **M2** | Die Engine wird echt | C1–C9, D8, E1–E7, B4 | Die App entscheidet begründet, was du heute trainierst, und plant Wiederholungen persönlich |
 | **M3** | Ehrlichkeit | F1–F7, F2a, F2b | ✅ **2026-08-18** — Zwei getrennte Zahlen, und die große ist gemessen: Sie steht nur da, wenn ihre Spanne die Null nicht enthält. Daneben eine Seite, die sagt, was belegt ist und was nicht (F6), und Store-Texte, die jede Aussage auf ihre Deckung zurückführen (F7). **Die Release-Sperre ist gefallen** |
-| **M4** | Inhalt & Spiel | D5, D9–D16, G, H, K, J | 🟨 **2026-08-17** — Vier Module, die erste Merktechnik (D5), die Serie mit Schutztagen (K2). Offen: Palast (G), XP/Achievements (K1/K3/K4), weitere Vorlagen und Techniken |
+| **M4** | Inhalt & Spiel | D5, D9–D16, G, H, K, J | 🟨 **2026-08-18** — Fünf Module, zwei Merktechniken (D5 Major, G Palast), die Serie mit Schutztagen (K2). Offen: eigene Paläste (G3), XP/Achievements (K1/K3/K4), weitere Missionsvorlagen |
 | **M5** | Sprachen | L1–L8 | Man kann heute auf Deutsch und morgen auf Japanisch trainieren |
 | **M6** | Echtes Leben | I, M | Eigene Präsentation rein, Wiederholungsplan raus |
 | **M7** | Stores & Cloud | Q, R, N7–N10 | .aab im Play-Track; Drive-Abgleich läuft; iOS-Weg entschieden (S10) |

@@ -42,10 +42,19 @@ async function seedTaught(page: Page, digits: readonly number[]) {
       open.onerror = () => reject(open.error)
     })
     await new Promise<void>((resolve, reject) => {
-      const request = database
-        .transaction('settings', 'readwrite')
-        .objectStore('settings')
-        .put({ key: 'technique.major.taught', value })
+      const store = database.transaction('settings', 'readwrite').objectStore('settings')
+      store.put({ key: 'technique.major.taught', value })
+      /*
+       * Und der Palast gilt als erklärt.
+       *
+       * Seit es ihn gibt, geht **seine** Lektion der ersten Ziffer vor (G,
+       * D-017) — auf einer frischen Datenbank kommt also nicht die Eins,
+       * sondern der Gedächtnispalast. Das ist richtig so und hat drei
+       * Prüfungen hier zu Recht rot gemacht: Sie handeln vom Major-System
+       * und beginnen deshalb in dem Zustand, in dem jemand den Palast schon
+       * kennt.
+       */
+      const request = store.put({ key: 'technique.palace.taught', value: true })
       request.onsuccess = () => resolve()
       request.onerror = () => reject(request.error)
     })
@@ -62,7 +71,7 @@ async function startShort(page: Page) {
 test('unterrichtet die Technik und lässt sie sofort anwenden', async ({ page }) => {
   test.setTimeout(120_000)
 
-  await page.goto('/')
+  await seedTaught(page, [])
   await startShort(page)
 
   // Die erste Lektion nennt den Zweck, danach nicht mehr (G-2).
@@ -170,7 +179,7 @@ test('zeigt nichts an, solange nichts gelehrt ist', async ({ page }) => {
 test('hält beim nächsten Mal die nächste Lektion', async ({ page }) => {
   test.setTimeout(120_000)
 
-  await page.goto('/')
+  await seedTaught(page, [])
   await startShort(page)
   await expect(page.locator('.lesson-digit')).toHaveText('1', { timeout: 30_000 })
   await page.locator('.lesson-card').click()

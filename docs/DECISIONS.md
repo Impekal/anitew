@@ -621,3 +621,47 @@ nicht vom Versprechen unterscheidet, verbietet ausgerechnet die ehrlichste
 Stelle. Gesperrt ist deshalb nur, was sich gar nicht ehrlich verwenden lässt.
 Und `docs/STORE.md` darf seine eigene Sperrliste nennen — eine Regel, die sich
 nicht aussprechen darf, ist keine Regel, sondern eine Falle.
+
+---
+
+## D-017 · 2026-08-18 · Der Palast stellt die Orte, das Bild stellt der Nutzer
+
+**Entscheidung:** ANITEW liefert die **Stationen** eines Gedächtnispalastes und
+legt an jede genau einen Gegenstand (G1, G2, G4). Was es ausdrücklich **nicht**
+liefert, ist das Merkbild — die Geschichte, die den Toaster im Flur
+unvergesslich macht. G5 im Backlog liest sich anders („bizarre visuelle
+Geschichten erzeugen“), und diese Entscheidung schreibt ihn um.
+
+**Warum:** Es ist derselbe Grund wie bei D-013 und beim Major-System. Ein
+selbst gebautes Bild sitzt besser als ein vorgesetztes; eine App, die
+„stell dir einen qualmenden Toaster vor“ mitliefert, nimmt genau den Schritt
+ab, der wirkt. Der Nutzer hat dann einen Satz gelesen, wo er ein Bild hätte
+bauen sollen — und beim Abruf fehlt ihm das, was er nie hergestellt hat.
+
+Was die App stattdessen tut: Sie **verlangt** das Bild und sagt, wie eins
+aussieht, das trägt. „Ein Toaster im Flur ist nichts — ein Toaster, der im
+Flur den Weg versperrt und qualmt, bleibt.“ Das ist eine Anleitung und kein
+Ersatz. Und sie gibt dem Palast als einzigem Modul sechs Sekunden je Station
+(gegen vier beim Wort), weil das Bauen Zeit braucht.
+
+**Was daraus für die Zuordnung folgt — und was nicht.** Welcher Gegenstand an
+welche Station kommt, entscheidet die App (G4). Das ist kein Widerspruch: „Such
+dir selbst aus, was wohin gehört“ wäre eine Aufgabe **vor** der Aufgabe, und
+sie hat mit Gedächtnis nichts zu tun. Die Zuordnung ist Verwaltung, das Bild
+ist die Technik.
+
+**Ein Gang ist eine Szene.** Der Aufbau ist derselbe wie bei den Memory
+Missions (D-014), und das ist kein Zufall: Beides sind **Bindungen**. Dort
+hängen vier Tatsachen an einer Person, hier hängt je ein Gegenstand an je einem
+Ort. Also dieselbe Bauform — Anker `wohnung~3`, Stück `wohnung~3#kueche` —, und
+damit fällt G7 fast von selbst ab: Ein Gang hängt in der Wiederholungsplanung
+wie jeder andere Gegenstand, weil er dieselbe Form hat. Ohne das wäre aus der
+stärksten Technik der App ein hübscher Nebenschauplatz geworden.
+
+Die Verlässlichkeit dafür kommt aus der Rechnung statt aus dem Speicher:
+Derselbe Gang ergibt immer dieselben Gegenstände. In drei Wochen fragt die App
+„was lag im Flur?“ und erwartet dieselbe Antwort wie heute.
+
+**Was noch fehlt, und es wird gesagt:** Eigene Räume (G3). Ein Palast, den
+jemand selbst anlegt, trägt deutlich besser als ein fremder — die drei
+mitgelieferten Wege sind eine Krücke, und der Text in der App nennt sie auch so.

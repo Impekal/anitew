@@ -1268,3 +1268,97 @@ jetzt öffentlich sagen, was es kann, weil es an jeder Stelle auch sagt, was es
 nicht kann.
 
 **Stand:** 219 Kerntests, 76 E2E-Läufe, Typecheck für App und Kern grün.
+
+---
+
+## 2026-08-18 · Der Gedächtnispalast (G)
+
+Die älteste Merktechnik, die es gibt — und die einzige, für die auf unserer
+eigenen Wissenschaftsseite eine Studie steht (`science.mnemonics`). Man legt,
+was man behalten will, an Orte, die man ohnehin auswendig kennt, und geht sie
+später ab.
+
+Drei Wege zu je fünf Stationen: die Wohnung, der Weg vor die Tür, der eigene
+Körper. Absichtlich die banalsten Orte der Welt — **ein Palast wirkt, weil man
+ihn kennt, nicht weil er schön ist.**
+
+### Der Bauplan war schon da
+
+Der Palast hat kaum neue Mechanik gebraucht, und das ist die interessante
+Beobachtung dieser Runde: Ein Gang hat **dieselbe Form wie eine Mission**
+(D-014). Dort hängen vier Tatsachen an einer Person, hier hängt je ein
+Gegenstand an je einem Ort. Beides sind Bindungen, keine Einzelstücke.
+
+    Anker  home~3         — ein Gang durch einen Palast
+    Stück  home~3#hall    — was im Flur lag
+
+Weil die Form dieselbe ist, fiel G7 fast von selbst ab: Ein Gang hängt im
+Wiederholungsplan wie jedes andere Item, ohne dass die Engine etwas davon
+wissen muss. Genau davor warnt der Backlog — „sonst wird der Palast ein
+hübscher Nebenschauplatz“. Der Preis dafür ist eine Bedingung: Ein Gang wird
+**gerechnet, nicht gespeichert.** In drei Wochen fragt die App „was lag im
+Flur?“ und erwartet dieselbe Antwort wie heute.
+
+Aus der Modulschnittstelle wurde dabei zum ersten Mal ein echtes Muster:
+`isScene`, `sceneItemsOf`, `subjectOf`, `targetOf`, `displayOf`,
+`leniencyFor`, `secondsPerItemFor`. Der Planer weiß von Palästen nichts — er
+fragt das Modul.
+
+### G5 wird umgeschrieben (D-017)
+
+Im Backlog steht bei G5 „bizarre visuelle Geschichten erzeugen“. **Das macht
+die App nicht.** Ein selbst gebautes Bild sitzt besser als ein vorgesetztes;
+wer „stell dir einen qualmenden Toaster vor“ geliefert bekommt, hat einen Satz
+gelesen, wo er ein Bild hätte bauen sollen — und beim Abruf fehlt ihm genau
+das, was er nie hergestellt hat. Derselbe Grund wie bei D-013 und beim
+Major-System.
+
+Was die App stattdessen tut: Sie **verlangt** das Bild und sagt, wie eins
+aussieht, das trägt — „Ein Toaster im Flur ist nichts; ein Toaster, der im Flur
+den Weg versperrt und qualmt, bleibt.“ Und sie gibt dem Palast als einzigem
+Modul sechs Sekunden je Station statt vier, weil Bauen länger dauert als
+Ansehen.
+
+Die **Zuordnung** Ding → Station macht dagegen die App (G4), und das ist kein
+Widerspruch: „Such dir aus, was wohin gehört“ wäre eine Aufgabe vor der
+Aufgabe. Zuordnung ist Verwaltung, das Bild ist die Technik.
+
+### Drei Funde
+
+**Der eigene Gegenstandsvorrat war es wert.** Der Test auf Überschneidung mit
+dem Wortvorrat wurde sofort rot: „hedgehog“ und „telescope“ standen in beiden
+Listen. Läge dasselbe Wort im Flur **und** im Wortmodul, bekäme der freie
+Abruf ein Wort geschenkt, das eigentlich woanders hängt (C6).
+
+**Der Typ hat jede Stelle gefunden, an der ein Vorrat gebaut wird.** Ein Modul
+zu `TRAINING_MODULES` hinzuzufügen ergab fünf Übersetzungsfehler — App, drei
+Testdateien, ein Bauplan. Keine davon hätte man beim Lesen gefunden, alle
+standen nach einer Minute fest.
+
+**Ein Gang ist eine Szene — auch für den Test.** `startMission()` suchte
+`.scene` und traf ab jetzt auch Paläste. Das ist kein Testfehler, sondern die
+Folge davon, dass die Formen wirklich gleich sind; gesucht ist dort die Szene
+**ohne** Weg (`.scene:not(.walk)`). Und die gemeinsamen Handgriffe mussten
+wieder an einer Stelle wachsen: `sceneOf` liest beim Gang die Station aus
+ihrem eigenen Element, weil vor ihr die Nummer steht, und `answerAt` liest
+beim Palast den Ort **vom Schild** statt die Reihenfolge des Weges
+vorherzusagen.
+
+Und noch einmal dieselbe Playwright-Falle wie bei „Beginnen“: **„5 Minuten“
+steckt in „15 Minuten“.** Zugängliche Namen werden als Teilzeichenkette
+verglichen.
+
+### Die Lektion geht vor
+
+Drei Prüfungen im Major-System wurden rot, und die App hatte recht: Seit es
+den Palast gibt, kommt auf einer frischen Datenbank **seine** Lektion zuerst.
+Ohne sie stehen fünf Orte und fünf Dinge da, und niemand weiß, was er damit
+soll — eine ungelehrte Major-Ziffer kostet dagegen nichts, Zahlen lassen sich
+auch ohne sie üben, nur mühsamer. Die Tests beginnen jetzt in dem Zustand, in
+dem jemand den Palast schon kennt.
+
+**Offen bleibt G3:** eigene Räume. Ein selbst angelegter Palast trägt deutlich
+besser als ein fremder — die App sagt das inzwischen selbst und nennt die drei
+fertigen Wege eine Krücke.
+
+**Stand:** 244 Kerntests, 80 E2E-Läufe, Typecheck für App und Kern grün.

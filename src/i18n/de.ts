@@ -88,6 +88,7 @@ export const de = {
       faces: 'Gesicht und Name gehören zusammen. Merke dir beides.',
       numbers: 'Eine Zahl nach der anderen. Sprich sie innerlich mit.',
       missions: 'Eine Szene. Was gehört zu wem?',
+      palace: 'Geh den Weg ab. Leg jedes Ding an seinen Platz — groß, im Weg, unübersehbar.',
     },
     recallHint: 'Was ist geblieben? Reihenfolge egal.',
     reviewHint: 'Und jetzt von früher: Woran erinnerst du dich noch?',
@@ -225,6 +226,52 @@ export const de = {
     sources: 'Quellen',
     restsOn: 'Daran hängt in der App:',
     nothingRests: 'Darauf ist in der App nichts gebaut.',
+  },
+  palace: {
+    /*
+      Der Gedächtnispalast (G).
+
+      Die Texte müssen hier mehr leisten als sonst: Bei den anderen Modulen
+      versteht man in zwei Sekunden, was zu tun ist. Hier steht ein Weg mit
+      fünf Orten da, und ohne die Technik dahinter ist das eine Liste mit
+      Extraschritten. Deshalb die Lektion — und deshalb sind die Sätze
+      Anweisungen und keine Beschreibungen.
+    */
+    heading: 'Der Gedächtnispalast',
+    lessonIntro: 'Orte kannst du auswendig, ohne sie je geübt zu haben. Deine Wohnung, den Weg vor die Tür, den eigenen Körper. Genau daran hängen wir jetzt Dinge auf.',
+    lessonSteps: [
+      'Geh einen Weg ab, den du kennst — immer denselben, immer in derselben Richtung.',
+      'An jeder Station liegt ein Ding. Sieh es dort liegen: zu groß, im Weg, absurd.',
+      'Später gehst du den Weg noch einmal. Die Dinge liegen da, wo du sie hingelegt hast.',
+    ],
+    lessonBuild: 'Das Bild musst du bauen, nicht lesen. Ein Toaster im Flur ist nichts — ein Toaster, der im Flur den Weg versperrt und qualmt, bleibt.',
+    lessonReady: 'Los geht’s.',
+    walkLead: 'Dein Weg:',
+    ask: 'Was lag hier?',
+    placeholder: 'Gegenstand',
+    names: {
+      home: 'Deine Wohnung',
+      street: 'Vor der Tür',
+      body: 'Dein Körper',
+    },
+    stations: {
+      door: 'Wohnungstür',
+      hall: 'Flur',
+      kitchen: 'Küche',
+      sofa: 'Sofa',
+      bed: 'Bett',
+      gate: 'Gartentor',
+      mailbox: 'Briefkasten',
+      bench: 'Bank',
+      crossing: 'Kreuzung',
+      kiosk: 'Kiosk',
+      head: 'Kopf',
+      shoulder: 'Schulter',
+      hand: 'Hand',
+      knee: 'Knie',
+      foot: 'Fuß',
+    },
+    ownNote: 'Drei fertige Wege sind eine Krücke. Ein Palast, den du selbst anlegst, trägt deutlich besser — den gibt es hier noch nicht.',
   },
   streak: {
     /*

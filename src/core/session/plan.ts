@@ -20,6 +20,7 @@ import { MODES, type TrainingMode } from '../modes.ts'
 import { createRng } from '../rng.ts'
 import type { DayKey } from '../time.ts'
 import { answerFor, factKindOf, missionFacts, personOf } from '../content/missions.ts'
+import { objectFor, walkOf, walkPlacements } from '../content/palace.ts'
 import type { Language } from '../language.ts'
 import { nextToTeach } from '../technique/major.ts'
 import type { Leniency } from './grading.ts'
@@ -78,7 +79,7 @@ export type BlockKind = 'teach' | 'encode' | 'recall' | 'review'
  * mischt sie. Was ein Modul *zeigt*, weiß er nicht — er kennt nur Kennungen,
  * Zeiten und die Frage, ob der Abruf frei oder gestützt ist.
  */
-export const TRAINING_MODULES = ['words', 'faces', 'numbers', 'missions'] as const
+export const TRAINING_MODULES = ['words', 'faces', 'numbers', 'missions', 'palace'] as const
 export type ModuleId = (typeof TRAINING_MODULES)[number]
 
 /**
@@ -93,7 +94,24 @@ export type ModuleId = (typeof TRAINING_MODULES)[number]
  * genau die Aufgabe, die im Alltag vorkommt.
  */
 export function isPrompted(moduleId: ModuleId): boolean {
-  return moduleId === 'faces' || moduleId === 'missions'
+  return moduleId === 'faces' || moduleId === 'missions' || moduleId === 'palace'
+}
+
+/**
+ * Module, deren Runde **eine Szene** ist und keine Reihe von Stücken.
+ *
+ * Zwei gibt es davon, und sie sind sich in der Bauform gleich (D-014): Eine
+ * Mission bindet vier Tatsachen an eine Person, ein Gang bindet fünf
+ * Gegenstände an fünf Orte. Beide würden zerfallen, wenn der Planer sie wie
+ * einen Vorrat behandelte und drei halbe Szenen abzählte.
+ */
+export function isScene(moduleId: ModuleId): boolean {
+  return moduleId === 'missions' || moduleId === 'palace'
+}
+
+/** Die Stücke einer Szene zu ihrem Anker. */
+export function sceneItemsOf(moduleId: ModuleId, anchor: string): readonly string[] {
+  return moduleId === 'palace' ? walkPlacements(anchor) : missionFacts(anchor)
 }
 
 /**
@@ -108,6 +126,13 @@ export function isPrompted(moduleId: ModuleId): boolean {
  * H6 im Backlog. Hier ist sie erst einmal eine Eigenschaft des Moduls.
  */
 export function secondsPerItemFor(moduleId: ModuleId): number {
+  /*
+   * Der Palast bekommt am meisten Zeit, und das ist der Kern der Technik:
+   * An dieser Stelle soll der Nutzer nicht lesen, sondern **ein Bild bauen**
+   * — den Toaster im Flur, groß, im Weg, unübersehbar. Das dauert länger als
+   * ein Wort anzusehen, und wer es nicht tut, hat nur eine Liste gelesen.
+   */
+  if (moduleId === 'palace') return 6
   return moduleId === 'missions' ? 5 : SECONDS_PER_ITEM
 }
 
@@ -123,6 +148,7 @@ export function secondsPerItemFor(moduleId: ModuleId): number {
  * kommen. Sonst prüfte das Wiedersehen eine Erinnerung von vor zwei Minuten.
  */
 export function subjectOf(moduleId: ModuleId, item: string): string {
+  if (moduleId === 'palace') return walkOf(item)
   return moduleId === 'missions' ? personOf(item) : item
 }
 
@@ -135,6 +161,7 @@ export function subjectOf(moduleId: ModuleId, item: string): string {
  * die Szene wird aus dem Anker neu erzeugt.
  */
 export function targetOf(moduleId: ModuleId, item: string, language: string): string {
+  if (moduleId === 'palace') return objectFor(item, language as Language) ?? item
   if (moduleId !== 'missions') return item
   return answerFor(item, language as Language) ?? item
 }
@@ -147,6 +174,14 @@ export function targetOf(moduleId: ModuleId, item: string, language: string): st
  * Datenbank es nennt.
  */
 export function displayOf(moduleId: ModuleId, item: string, language: string): string {
+  /*
+   * Beim Palast steht nur der Gegenstand da, ohne seine Station.
+   *
+   * Anders als bei einer Mission trägt er sich selbst: „314“ allein sagt
+   * nichts, „Toaster“ schon. Und in der Zusammenfassung steht, woran man sich
+   * erinnert hat — nicht, wo es lag.
+   */
+  if (moduleId === 'palace') return objectFor(item, language as Language) ?? item
   if (moduleId !== 'missions') return item
   const answer = answerFor(item, language as Language)
   return answer === undefined ? item : `${personOf(item)} · ${answer}`
@@ -224,6 +259,14 @@ export interface PlanInput {
    */
   taught?: readonly number[]
   /**
+   * Wurde der Gedächtnispalast schon erklärt (G)?
+   *
+   * Anders als beim Major-System ist das **eine** Lektion und keine zehn: Die
+   * Technik ist in vier Sätzen erzählt, der Rest ist Übung. Fehlt der Wert,
+   * wird nicht gelehrt — dieselbe Vorsicht wie bei `taught`.
+   */
+  palaceTaught?: boolean
+  /**
    * Welche Module dürfen heute vorkommen? Voreingestellt alle. Der Parameter
    * ist da, damit ein Test ein einzelnes Modul erzwingen kann, ohne dass der
    * Planer dafür eine Sonderregel bekommt.
@@ -278,19 +321,34 @@ export function planSession(input: PlanInput): SessionPlan {
    * Bartwurf im Gesichtsgenerator schon einmal.
    */
   const numbersAt = modules.indexOf('numbers')
+  const palaceAt = modules.indexOf('palace')
+  const hasTime = totalSeconds >= MIN_SECONDS_FOR_TEACHING
+
+  /*
+   * Der Palast wird **einmal** erklärt, und diese eine Lektion geht der
+   * ersten Ziffer vor.
+   *
+   * Nicht aus Vorliebe: Ohne die Erklärung ist ein Palastgang schlicht
+   * unverständlich — da stehen fünf Orte und fünf Gegenstände, und niemand
+   * weiß, was er damit soll. Eine ungelehrte Major-Ziffer kostet dagegen
+   * nichts; die Zahlen lassen sich auch ohne sie üben, nur eben mühsamer.
+   */
+  const teachesPalace = hasTime && input.palaceTaught === false && palaceAt >= 0
+
   const wantsLesson =
-    totalSeconds >= MIN_SECONDS_FOR_TEACHING &&
+    hasTime &&
+    !teachesPalace &&
     input.taught !== undefined &&
     nextToTeach(input.taught) !== undefined
   const teachesNumbers = wantsLesson && numbersAt >= 0
 
-  const offset = teachesNumbers ? numbersAt : drawn
+  const offset = teachesPalace ? palaceAt : teachesNumbers ? numbersAt : drawn
   const moduleForRound = (round: number): ModuleId =>
     modules[(offset + round - 1) % modules.length] as ModuleId
 
   // Gelehrt wird nur mit Gegenstand: Das Major-System zu erklären und dann
   // keine einzige Zahl zu zeigen wäre Unterricht ohne Anlass.
-  const teachSeconds = teachesNumbers ? TEACH_SECONDS : 0
+  const teachSeconds = teachesPalace || teachesNumbers ? TEACH_SECONDS : 0
   const roundBudgets = share(learnSeconds - teachSeconds, rounds)
   const blocks: BlockPlan[] = []
 
@@ -298,7 +356,22 @@ export function planSession(input: PlanInput): SessionPlan {
    * Die Lektion steht **vorn**, vor der ersten Runde: Eine Technik, die man
    * nach der Übung erklärt bekommt, hat man bei der Übung nicht gehabt.
    */
-  if (teachesNumbers) {
+  if (teachesPalace) {
+    blocks.push({
+      id: 'teach-palace',
+      kind: 'teach',
+      moduleId: 'palace',
+      round: 1,
+      seconds: teachSeconds,
+      /*
+       * Kein Gegenstand — die Lektion erklärt die Technik und nicht einen
+       * bestimmten Palast. Welcher gleich drankommt, entscheidet die erste
+       * Runde, und das ist auch die ehrlichere Reihenfolge: erst wissen,
+       * wozu, dann sehen, wo.
+       */
+      items: [],
+    })
+  } else if (teachesNumbers) {
     blocks.push({
       id: 'teach-major',
       kind: 'teach',
@@ -356,12 +429,12 @@ export function planSession(input: PlanInput): SessionPlan {
      * Uhrzeit, Ort. Gezogen wird deshalb **eine Person**, und ihre vier
      * Tatsachen sind die Gegenstände der Runde.
      */
-    const scene = moduleId === 'missions'
+    const scene = isScene(moduleId)
     if (scene && pool.length - used < 1) {
-      throw new RangeError('Der Personenvorrat reicht nicht für eine Mission')
+      throw new RangeError(`Der Vorrat reicht nicht für eine Szene (${moduleId})`)
     }
     const items = scene
-      ? missionFacts(pool[used] as string)
+      ? sceneItemsOf(moduleId, pool[used] as string)
       : pool.slice(used, used + itemsForRound(roundSeconds, pool.length - used))
     taken.set(moduleId, used + (scene ? 1 : items.length))
     const encodeSeconds = items.length * secondsPerItemFor(moduleId)

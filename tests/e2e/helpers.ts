@@ -64,10 +64,21 @@ export async function startEmergency(page: Page) {
   await page.locator('.settle').click()
 }
 
-/** Liest die Szene einer Mission, wenn gerade eine dasteht. */
+/**
+ * Liest die Szene, wenn gerade eine dasteht.
+ *
+ * Zwei Module bauen eine: die **Mission** (vier Tatsachen an einer Person)
+ * und der **Palast** (fünf Dinge an fünf Orten). Sie sehen im Aufbau gleich
+ * aus, und deshalb liest der Test sie auch gleich — mit einem Unterschied:
+ * Beim Gang steht vor jeder Station ihre Nummer. Die gehört zur Anzeige und
+ * nicht zum Etikett, also wird die Beschriftung dort aus ihrem eigenen
+ * Element gelesen statt aus dem ganzen `dt`.
+ */
 export async function sceneOf(page: Page): Promise<Map<string, string> | undefined> {
   if ((await page.locator('.scene').count()) === 0) return undefined
-  const labels = await page.locator('.scene-facts dt').allTextContents()
+  const stations = await page.locator('.walk-station').allTextContents()
+  const labels =
+    stations.length > 0 ? stations : await page.locator('.scene-facts dt').allTextContents()
   const values = await page.locator('.scene-facts dd').allTextContents()
   return new Map(labels.map((label, index) => [label.trim(), (values[index] ?? '').trim()]))
 }
@@ -158,6 +169,22 @@ export async function answerRecall(page: Page, learned: Learned, give: Give) {
 /** Die Antwort für die Stelle, an der der Abruf gerade steht. */
 async function answerAt(page: Page, learned: Learned, index: number): Promise<string> {
   if (learned.scene === undefined) return learned.items[index] ?? ''
+
+  /*
+   * Beim Palast steht die Frage nicht im Text, sondern auf dem Schild: „Was
+   * lag hier?“ ist bei allen fünf Stationen dieselbe Frage — welche gemeint
+   * ist, sagt der Ort darüber. Der Test liest ihn ab, statt die Reihenfolge
+   * des Weges vorherzusagen; dass sie hier tatsächlich stimmt, ist eine
+   * Eigenschaft der Technik und keine, auf die er sich stützen sollte.
+   */
+  const station = page.locator('.placemark-station')
+  if ((await station.count()) > 0) {
+    const where = ((await station.textContent()) ?? '').trim()
+    const object = learned.scene.get(where)
+    expect(object, `unbekannte Station: „${where}“`).toBeDefined()
+    return object as string
+  }
+
   const question = ((await page.locator('.prompted .hint').first().textContent()) ?? '').trim()
   // Im Wiedersehensblock steht ein Vorspann davor („Und von früher: …“) —
   // gesucht ist die Frage selbst.
