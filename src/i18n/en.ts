@@ -362,6 +362,11 @@ export const en: Dictionary = {
     replaced: 'filled in',
     dropped: 'unreadable',
     merges: 'Nothing here is lost. Backups are merged, not substituted.',
+    wipe: 'Delete everything',
+    wipeNote: 'Deletes the whole training history on this device — for good. Save a backup first if you want to keep it.',
+    wipeConfirm: 'Really delete everything? This cannot be undone.',
+    wipeCancel: 'Cancel',
+    wipeDone: 'Deleted. Like the first day.',
     failed: 'Loading did not go through. Nothing was changed.',
   },
   check: {

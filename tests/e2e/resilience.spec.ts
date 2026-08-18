@@ -111,3 +111,68 @@ test('bleibt heil, wenn Benachrichtigungen abgelehnt sind (P7)', async ({ page }
   // Und keine Uhrzeit-Einstellung, die ohnehin nicht griffe.
   await expect(page.locator('.reminder input[type="time"]')).toHaveCount(0)
 })
+
+test('löscht auf Wunsch alles — aber erst nach einer echten Rückfrage (N4)', async ({ page }) => {
+  /*
+   * Das Löschen ist der einzige Ort, an dem die App warnt statt beruhigt.
+   * Geprüft wird beides: dass ein einzelner Fehlgriff nichts anrichtet (die
+   * Rückfrage), und dass ein bewusster Griff wirklich alles nimmt.
+   */
+  await page.goto('/')
+  await expect(startButton(page)).toBeVisible()
+
+  // Erst etwas anlegen, das gelöscht werden kann.
+  await page.evaluate(async () => {
+    const open = indexedDB.open('anitew')
+    const database: IDBDatabase = await new Promise((resolve, reject) => {
+      open.onsuccess = () => resolve(open.result)
+      open.onerror = () => reject(open.error)
+    })
+    await new Promise<void>((resolve, reject) => {
+      const request = database
+        .transaction('itemStates', 'readwrite')
+        .objectStore('itemStates')
+        .put({ itemId: 'words:de:Anker', moduleId: 'words', language: 'de', createdAt: 1, reviews: 3, lapses: 0, dueDay: '2099-01-01' })
+      request.onsuccess = () => resolve()
+      request.onerror = () => reject(request.error)
+    })
+  })
+
+  await page.getByText('Sicherung', { exact: true }).click()
+
+  // Ein Klick auf „Allöschen“ löscht noch nichts — er fragt.
+  await page.locator('.wipe').getByRole('button', { name: 'Alles löschen' }).click()
+  await expect(page.getByText(/Wirklich alles löschen/)).toBeVisible()
+
+  // Abbrechen lässt alles stehen.
+  await page.getByRole('button', { name: 'Abbrechen' }).click()
+  const beforeCancel = await page.evaluate(() => {
+    return new Promise<number>((resolve) => {
+      const open = indexedDB.open('anitew')
+      open.onsuccess = () => {
+        const req = open.result.transaction('itemStates').objectStore('itemStates').count()
+        req.onsuccess = () => resolve(req.result)
+        req.onerror = () => resolve(-1)
+      }
+    })
+  })
+  expect(beforeCancel).toBe(1)
+
+  // Bewusst bestätigt: jetzt ist wirklich alles weg.
+  await page.locator('.wipe').getByRole('button', { name: 'Alles löschen' }).click()
+  await page.locator('.wipe-warn').waitFor()
+  await page.locator('.wipe-go').click()
+  await expect(page.getByText(/Gelöscht\. Wie am ersten Tag/)).toBeVisible()
+
+  const afterWipe = await page.evaluate(() => {
+    return new Promise<number>((resolve) => {
+      const open = indexedDB.open('anitew')
+      open.onsuccess = () => {
+        const req = open.result.transaction('itemStates').objectStore('itemStates').count()
+        req.onsuccess = () => resolve(req.result)
+        req.onerror = () => resolve(-1)
+      }
+    })
+  })
+  expect(afterWipe).toBe(0)
+})

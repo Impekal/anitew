@@ -556,6 +556,11 @@ export const de = {
     // Nichts geht verloren — das ist die Frage, die vor dem Antippen im Kopf
     // steht, also steht die Antwort daneben.
     merges: 'Vorhandenes bleibt. Zusammengeführt wird, nicht ersetzt.',
+    wipe: 'Alles löschen',
+    wipeNote: 'Löscht die ganze Trainingsgeschichte auf diesem Gerät — unwiderruflich. Vorher sichern, wenn du sie behalten willst.',
+    wipeConfirm: 'Wirklich alles löschen? Das lässt sich nicht rückgängig machen.',
+    wipeCancel: 'Abbrechen',
+    wipeDone: 'Gelöscht. Wie am ersten Tag.',
     failed: 'Das Einlesen ist nicht durchgelaufen. Es wurde nichts verändert.',
   },
   check: {

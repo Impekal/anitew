@@ -9,6 +9,7 @@ import {
 } from '../core/index.ts'
 import type { Dictionary } from '../i18n/index.ts'
 import { type ImportReport, exportBackup, importBackup, readBackupFile } from '../data/backup.ts'
+import { wipeEverything } from '../data/reset.ts'
 
 /**
  * Sicherung speichern und einlesen (Backlog N2).
@@ -32,6 +33,8 @@ export function BackupPanel({
   const fileInput = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState<string | undefined>()
+  // N4: Die einzige Rückfrage der App — weil das Löschen unwiderruflich ist.
+  const [confirmWipe, setConfirmWipe] = useState(false)
 
   const save = async () => {
     setBusy(true)
@@ -119,6 +122,51 @@ export function BackupPanel({
           {message}
         </p>
       )}
+
+      {/*
+        Alles löschen (N4). Absichtlich unten, hinter allem, und mit einer
+        echten Rückfrage: Das ist der eine Ort, an dem die App warnt statt
+        beruhigt — weil danach wirklich nichts mehr da ist. Der Hinweis rät
+        vorher zu sichern; die beiden Knöpfe darüber sind der Weg dazu.
+      */}
+      <div className="wipe">
+        {confirmWipe ? (
+          <>
+            <p className="hint wipe-warn">{t.wipeConfirm}</p>
+            <div className="backup-actions">
+              <button
+                type="button"
+                className="quiet wipe-go"
+                disabled={busy}
+                onClick={() => {
+                  setBusy(true)
+                  void wipeEverything()
+                    .then(() => {
+                      setMessage(t.wipeDone)
+                      setConfirmWipe(false)
+                    })
+                    .catch(() => setMessage(t.failed))
+                    .finally(() => setBusy(false))
+                }}
+              >
+                {t.wipe}
+              </button>
+              <button type="button" className="quiet" onClick={() => setConfirmWipe(false)}>
+                {t.wipeCancel}
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <p className="hint">{t.wipeNote}</p>
+            <div className="backup-actions">
+              <button type="button" className="quiet" onClick={() => setConfirmWipe(true)}>
+                {t.wipe}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
     </section>
   )
 }
