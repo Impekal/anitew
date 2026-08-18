@@ -205,9 +205,9 @@ Der Punkt, der aus einem Spiel einen Gedächtnistrainer macht.
 | L2 | Elf Sprachen: DE · EN · FR · ES · IT · PT · NL · TR · AR · ZH · JA | 🟨 2026-08-17 | alle elf sind als Sprache bekannt und wählbar; übersetzt sind DE und EN, die übrigen zeigen Englisch **und sagen das auch** | L |
 | L3 | RTL für Arabisch — Layout, nicht nur Text | 🟨 2026-08-17 | `dir` wird gesetzt; das Layout ist noch nicht daraufhin geprüft | M |
 | L4 | CJK: Schriftschnitte, Zeilenumbruch, Eingabemethoden bei freiem Abruf (C5) | ⬜ | freier Abruf auf Japanisch ist ein eigenes Problem | M |
-| L5 | Engine bleibt sprachunabhängig; Sprache ist ein Attribut am Item | ⬜ | Voraussetzung für L7 | M |
-| L6 | Inhaltspools je Sprache: Wörter, Namen, Orte — kulturell passend, nicht durchübersetzt | 🟨 2026-08-17 | Wörter **und Namen** für DE und EN stehen (je ~46 Namen, untereinander unähnlich). Für Sprachen ohne eigene Liste gibt es **bewusst keinen** automatischen Ersatz aus einer anderen — die App trainiert dann auf der Rückfallsprache und sagt das | L |
-| L7 | Trainingssprache getrennt von Oberflächensprache: „Train your memory in Japanese today“ | ⬜ | Gedächtnis- und Sprachtraining zugleich — ein echtes Alleinstellungsmerkmal | M |
+| L5 | Engine bleibt sprachunabhängig; Sprache ist ein Attribut am Item | ✅ 2026-08-18 | Steht seit M1 im Datenmodell (`words:de:Anker`) und wird jetzt auch benutzt: Eine E2E-Prüfung trainiert einmal auf Deutsch und einmal auf Englisch und liest zwei getrennte Reihen aus der Datenbank | M |
+| L6 | Inhaltspools je Sprache: Wörter, Namen, Orte — kulturell passend, nicht durchübersetzt | 🟨 2026-08-18 | Wörter **und Namen** für DE und EN stehen (je ~46 Namen, untereinander unähnlich). Für Sprachen ohne eigene Liste gibt es **bewusst keinen** automatischen Ersatz aus einer anderen — die App trainiert dann auf der Rückfallsprache und sagt das | L |
+| L7 | Trainingssprache getrennt von Oberflächensprache | ✅ 2026-08-18 | Eigene Auswahl neben der Oberflächensprache. **Angeboten wird nur, wofür es vollständigen eigenen Inhalt gibt** — Wörter, Namen, Szenen, Gänge und Quarantänewörter. Eine Sprache anzubieten und dann englische Wörter zu zeigen wäre keine Trainingssprache, sondern eine Zusage ohne Deckung (R-2). Heute also DE und EN; die App sagt, warum nicht mehr | M |
 | L8 | Übersetzungsprozess: Quelltexte **auf Deutsch**, von dort übersetzt; Pflege ohne Wildwuchs | ⬜ | **D-007** | S |
 
 ## M. KI (BYOK)
@@ -263,8 +263,8 @@ Anforderung wie jede andere. Die acht Regeln G-1 bis G-8 stehen in
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | ✅ 2026-08-18 | 288 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Sessionplanung, Bewertung, Scheduler, Gesichtsgenerator, die ganze Messung und die Wirkungsaussagen (R5) sind abgedeckt | M |
-| P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | ✅ 2026-08-18 | 126 Läufe in Chromium und im Telefonprofil, darunter eine Einheit von vorn bis hinten und der Abbruch mitten drin. Seit M4 **liest der Test ab, welches Modul kam, statt es vorherzusagen** (`tests/e2e/helpers.ts`) | M |
+| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | ✅ 2026-08-18 | 294 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Sessionplanung, Bewertung, Scheduler, Gesichtsgenerator, die ganze Messung und die Wirkungsaussagen (R5) sind abgedeckt | M |
+| P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | ✅ 2026-08-18 | 132 Läufe in Chromium und im Telefonprofil, darunter eine Einheit von vorn bis hinten und der Abbruch mitten drin. Seit M4 **liest der Test ab, welches Modul kam, statt es vorherzusagen** (`tests/e2e/helpers.ts`) | M |
 | P3 | CI bei jedem Push: Typecheck (App **und** Kern getrennt), Tests, Build, E2E | ✅ 2026-08-17 | | S |
 | P4 | Performance: Kaltstart unter 2 s, Timer laufen ruckelfrei | ⬜ | | M |
 | P5 | Uhrmanipulation darf die Engine nicht zerstören (Streak-Betrug, Intervall-Chaos) | ⬜ | monotone Zeitquelle plus Plausibilitätsprüfung | M |

@@ -29,6 +29,16 @@ export const de = {
       ja: '日本語',
     },
     incomplete: 'Noch nicht übersetzt — die App zeigt Englisch.',
+    /*
+      L7: Worin trainiert wird, ist nicht dasselbe wie worin die App spricht.
+
+      Der Hinweis darunter ist der wichtige Teil: Ein Wechsel **verliert
+      nichts**. „Anker“ und „anchor“ sind zwei Gedächtnisinhalte, und jeder
+      behält seine eigenen Termine.
+    */
+    training: 'Trainingssprache',
+    trainingNote: 'Du kannst die App auf Deutsch bedienen und auf Englisch trainieren — Gedächtnis und Sprache in einem. Ein Wechsel verliert nichts: „Anker“ und „anchor“ sind zwei Gedächtnisinhalte, jeder mit eigenen Terminen.',
+    trainingOnly: 'Zur Auswahl steht, wofür es eigene Wörter, Namen und Szenen gibt. Eine Sprache anzubieten und dann englische Wörter zu zeigen wäre keine Trainingssprache.',
   },
   /*
     Jeden Tag ein anderer Satz — Abwechslung ist die zweite Quelle von

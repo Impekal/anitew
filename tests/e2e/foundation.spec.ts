@@ -56,7 +56,7 @@ test('übernimmt beim ersten Start die Sprache des Geräts (D-007)', async ({ br
 
 test('merkt sich die gewählte Sprache über einen Neustart hinweg', async ({ page }) => {
   await page.goto('/')
-  await page.getByLabel('Sprache').selectOption('en')
+  await page.locator('.language:not(.language-training) select').selectOption('en')
   await expect(startButton(page).locator('.start-label')).toHaveText('Begin')
 
   /*

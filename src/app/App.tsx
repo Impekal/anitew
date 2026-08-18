@@ -8,7 +8,6 @@ import {
   createRng,
   dayKeyOf,
   dueLimitFor,
-  hasWordPool,
   type ModuleId,
   namePool,
   READY_PALACES,
@@ -23,6 +22,7 @@ import {
   learnableModules,
   moduleForDimension,
   numberPool,
+  trainingLanguages,
   profileOf,
   weakest,
   returnsOf,
@@ -62,6 +62,7 @@ import { BenchmarkPanel } from './benchmark/BenchmarkPanel.tsx'
 import { BenchmarkScreen } from './benchmark/BenchmarkScreen.tsx'
 import { SessionScreen } from './session/SessionScreen.tsx'
 import { useLanguage } from './useLanguage.ts'
+import { useTrainingLanguage } from './useTrainingLanguage.ts'
 import { useSoundSetting } from './useSoundSetting.ts'
 
 const MODE_ORDER: readonly TrainingMode[] = ['emergency', 'short', 'daily', 'extended']
@@ -69,6 +70,14 @@ const MODE_ORDER: readonly TrainingMode[] = ['emergency', 'short', 'daily', 'ext
 export function App() {
   const platform = useMemo(() => createWebPlatform(), [])
   const { language, dictionary, translated, ready, choose } = useLanguage(platform)
+  /*
+   * Worin trainiert wird, ist nicht dasselbe wie worin die App spricht (L7).
+   * Ab hier heißt `language` die Oberfläche und `training` der Inhalt — jede
+   * Stelle, die Wörter, Namen, Termine oder Messungen anfasst, nimmt
+   * `training`.
+   */
+  const { training, chooseTraining } = useTrainingLanguage(platform, language)
+  const trainable = trainingLanguages()
   const sound = useSoundSetting(platform)
   const [mode, setMode] = useState<TrainingMode>('daily')
   const [running, setRunning] = useState<SessionProgress | undefined>()
@@ -161,10 +170,10 @@ export function App() {
     Partial<Record<DimensionId, DimensionCounts>>
   >({})
   useEffect(() => {
-    void loadDimensionCounts(language)
+    void loadDimensionCounts(training)
       .then(setDimensionCounts)
       .catch(() => undefined)
-  }, [language, running])
+  }, [training, running])
 
   /*
    * Der Schwerpunkt des heutigen Trainings (E5, E6).
@@ -207,7 +216,7 @@ export function App() {
        */
       const due: Partial<Record<ModuleId, string[]>> = {}
       try {
-        const tracked = await loadDue(language)
+        const tracked = await loadDue(training)
         const limit = dueLimitFor(Math.round(seconds * 0.15))
         for (const item of selectDue(tracked, day, limit)) {
           const moduleId = moduleOf(item.itemId) as ModuleId
@@ -231,7 +240,7 @@ export function App() {
       const plan = planSession({
         mode,
         day,
-        language,
+        language: training,
         seed,
         /*
          * Zahlen kommen nicht aus einer Liste, sondern werden aus dem Seed
@@ -241,8 +250,8 @@ export function App() {
          * sich, was er braucht.
          */
         pools: {
-          words: wordPool(language),
-          faces: namePool(language),
+          words: wordPool(training),
+          faces: namePool(training),
           numbers: numberPool(seed, 60),
           /*
            * Missionen ziehen aus demselben Namensvorrat wie die Gesichter
@@ -251,7 +260,7 @@ export function App() {
            * ist kein Versehen — es sind zwei verschiedene Aufgaben zu
            * derselben Person, und in der Datenbank auch zwei Einträge.
            */
-          missions: namePool(language),
+          missions: namePool(training),
           /*
            * Gänge durch einen Palast (G). Wie die Zahlen aus dem Seed
            * erzeugt: Derselbe Palast, andere Gegenstände — der Vorrat geht
@@ -277,7 +286,7 @@ export function App() {
       setRunning(progress)
       void beginSession(progress, day, now).catch(() => undefined)
     })()
-  }, [language, mode, platform, taught, palaceTaught, own, focus])
+  }, [training, mode, platform, taught, palaceTaught, own, focus])
 
   const leave = useCallback(() => setRunning(undefined), [])
 
@@ -330,10 +339,10 @@ export function App() {
    */
   const [reviewed, setReviewed] = useState<readonly { reviews: number }[]>([])
   useEffect(() => {
-    void loadReviewed(language)
+    void loadReviewed(training)
       .then(setReviewed)
       .catch(() => undefined)
-  }, [language, running])
+  }, [training, running])
   const returns = useMemo(() => returnsOf(reviewed), [reviewed])
 
 
@@ -381,7 +390,7 @@ export function App() {
     void (async () => {
       const now = platform.clock.now()
       const day = dayKeyOf(now, { offsetMinutes: platform.clock.offsetMinutes(now) })
-      const started = await beginRun(day, now, language)
+      const started = await beginRun(day, now, training)
       setOpen({
         id: started.id,
         items: started.items,
@@ -389,7 +398,7 @@ export function App() {
       })
       setMeasuring(true)
     })()
-  }, [language, platform])
+  }, [training, platform])
 
 
   const greeting = useMemo(() => {
@@ -635,6 +644,26 @@ export function App() {
             ))}
           </select>
         </label>
+        {/*
+          Die Trainingssprache steht nur da, wenn es überhaupt eine Wahl gibt
+          (L7, G-2). Ein Auswahlfeld mit einem Eintrag wäre Möbel.
+        */}
+        {trainable.length > 1 && (
+          <label className="language language-training">
+            <span>{dictionary.language.training}</span>
+            <select
+              value={training}
+              onChange={(event) => chooseTraining(event.target.value as Language)}
+            >
+              {trainable.map((tag) => (
+                <option key={tag} value={tag}>
+                  {dictionary.language.names[tag]}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+
         <button
           type="button"
           className="sound-toggle"
@@ -650,8 +679,20 @@ export function App() {
           Rückfallsprache trainiert. Das ist eine Einschränkung und wird als
           solche gesagt, statt sie zu verstecken.
         */}
-        {(!translated || !hasWordPool(language)) && (
-          <p className="hint">{dictionary.language.incomplete}</p>
+        {!translated && <p className="hint">{dictionary.language.incomplete}</p>}
+
+        {/*
+          Der Satz zur Trainingssprache steht bei ihr und nicht bei der
+          Oberfläche — er erklärt, was ein Wechsel bedeutet, und dass er
+          nichts verliert.
+        */}
+        {trainable.length > 1 && (
+          <>
+            <p className="hint">{dictionary.language.trainingNote}</p>
+            {trainable.length < SUPPORTED_LANGUAGES.length && (
+              <p className="hint">{dictionary.language.trainingOnly}</p>
+            )}
+          </>
         )}
 
         {/*
@@ -666,7 +707,7 @@ export function App() {
           (N2). Zugeklappt bleibt sie trotzdem — sie gehört nicht auf den
           ersten Bildschirm (D-011/G-2).
         */}
-        <BenchmarkPanel runs={runs} language={language} dictionary={dictionary} />
+        <BenchmarkPanel runs={runs} language={training} dictionary={dictionary} />
 
         {/*
           Die Wissenschaftsseite steht direkt unter der Messung, weil sie

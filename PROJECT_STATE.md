@@ -1762,3 +1762,50 @@ ab.** Die Zeile hat jetzt eine Sekunde Frist. Die Frist von neunzig Sekunden,
 die ich der Schleife zwei Runden vorher gegeben hatte, hat übrigens nicht
 gegriffen — sie prüfte zwischen den Iterationen, und genau dort kam die
 Schleife ja nicht mehr an. Eine Frist an der falschen Stelle ist keine.
+
+---
+
+## 2026-08-18 · Trainingssprache getrennt von Oberflächensprache (L5, L7)
+
+Der Backlog nennt L7 „ein echtes Alleinstellungsmerkmal“, und ausnahmsweise
+war das Bauen die leichtere Hälfte: **Die Sprache hängt seit M1 am
+Gegenstand.** Die Kennung eines Items lautet `words:de:Anker`, und „Anker“ und
+„anchor“ sind darin zwei Gedächtnisinhalte, nicht zwei Schreibweisen von
+einem. Das war damals eine Entscheidung ohne unmittelbaren Nutzen — heute ist
+sie der ganze Grund, warum ein Sprachwechsel **nichts verliert**: Wer wechselt,
+fängt eine zweite Reihe an, und die erste wartet weiter auf ihre Termine.
+
+Man kann die App also auf Deutsch bedienen und auf Englisch trainieren —
+Gedächtnis und Sprache mit demselben Aufwand.
+
+### Die eine Regel, die zählt
+
+**Trainiert wird nur, wofür es vollständigen eigenen Inhalt gibt**: Wörter,
+Namen, Missionsbausteine, Palastgegenstände und Quarantänewörter. Alle, nicht
+die meisten — ein Modul, das mitten in einer Einheit auf Englisch umschaltet,
+wäre schlimmer als eines, das gar nicht kommt, und die Messung hinge an einem
+Vorrat, den es in dieser Sprache nicht gibt (F2a).
+
+Für die **Oberfläche** ist der Rückfall auf Englisch in Ordnung und wird
+angesagt; für den **Inhalt** ist er es nicht, weil der Inhalt die Übung ist.
+Heute stehen deshalb zwei Sprachen zur Wahl statt elf — und die App sagt,
+warum. Das ist dieselbe Regel wie bei den Erinnerungen (D-022): lieber weniger
+anbieten als etwas versprechen, das nicht gedeckt ist.
+
+Eine Kleinigkeit im Kern hatte ich zuerst falsch: Wer eine japanische
+Oberfläche hat, bekommt Englisch angezeigt — und sollte dann auch auf Englisch
+trainieren, nicht auf Deutsch, nur weil Deutsch in der Liste zufällig vorn
+steht. Der Test hat es gefunden, die Rückfallsprache ist jetzt dieselbe wie
+für die Oberfläche.
+
+### Und dieselbe Falle, zum fünften Mal — mit einer Feinheit
+
+`getByLabel('Sprache')` fand nach dieser Änderung **beide** Auswahlfelder:
+„Sprache“ steckt in „Trainingssprache“. Diesmal half `exact` aber **nicht**,
+sondern machte es schlimmer — der Selektor fand gar nichts mehr. Der Grund
+ist, dass das `<label>` das `<select>` umschließt: Sein Text enthält damit
+auch sämtliche Optionen, und ein genauer Vergleich passt auf nichts.
+
+Beide Felder haben jetzt einen eindeutigen Griff über die Klasse. Und die
+Lehre wird länger: **Ein Selektor, der aus dem sichtbaren Text abgeleitet ist,
+hängt an jedem Wort, das später irgendwo dazukommt.**

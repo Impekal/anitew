@@ -21,6 +21,9 @@ export const en: Dictionary = {
       ja: '日本語',
     },
     incomplete: 'Not translated yet — the app falls back to English.',
+    training: 'Training language',
+    trainingNote: 'You can use the app in English and train in German — memory and a language at once. Switching loses nothing: "anchor" and "Anker" are two memories, each with its own schedule.',
+    trainingOnly: 'On offer is whatever has its own words, names and scenes. Offering a language and then showing English words would not be a training language.',
   },
   greetings: [
     'Remembering is a skill. You learn it here.',
