@@ -40,6 +40,7 @@ import {
   selectDue,
   streakOf,
   achievementsOf,
+  spanPool,
   wordPool,
 } from '../core/index.ts'
 import { createWebPlatform } from '../platform/web/index.ts'
@@ -360,6 +361,14 @@ export function App() {
            * denselben Dingen darin.
            */
           palace: walkPool(seed, 30, own === undefined ? undefined : [...READY_PALACES, 'own']),
+          /*
+           * Rückwärts-Folgen (D7): wie die Zahlen aus dem Seed erzeugt und
+           * sprachfrei. Vierzig, nicht zwanzig — der Schwerpunkt kann dem
+           * Modul in der längsten Einheit jede zweite Runde geben (E5), und
+           * vier Runden à sechs Fragen sind vierundzwanzig. Der Planer nimmt
+           * sich, was er braucht.
+           */
+          reverse: spanPool(seed, 40),
         },
         due,
         taught,

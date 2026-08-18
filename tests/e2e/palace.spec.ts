@@ -32,7 +32,11 @@ async function startWalk(page: Page): Promise<boolean> {
     await page.locator('.settle').click()
     const lesson = page.locator('.lesson-card')
     if ((await lesson.count()) > 0) await lesson.click()
-    await expect(page.locator('.scene, .encode-word').first()).toBeVisible({ timeout: 30_000 })
+    // `.reveal-digits`: Eine Rückwärts-Runde (D7) hat weder Szene noch
+    // Einprägewort — ohne sie liefe die Suche in die Zeitgrenze.
+    await expect(
+      page.locator('.scene, .encode-word, .reveal-digits').first(),
+    ).toBeVisible({ timeout: 30_000 })
     if ((await page.locator('.walk').count()) > 0) return true
     await page.evaluate(() => indexedDB.deleteDatabase('anitew'))
   }
@@ -70,7 +74,9 @@ test('erklärt den Palast, bevor der erste Gang kommt — und nur einmal', async
   await page.getByRole('button', { name: '5 Minuten', exact: true }).click()
   await startButton(page).click()
   await page.locator('.settle').click()
-  await expect(page.locator('.walk, .encode-word, .scene').first()).toBeVisible({ timeout: 30_000 })
+  await expect(
+    page.locator('.walk, .encode-word, .scene, .reveal-digits').first(),
+  ).toBeVisible({ timeout: 30_000 })
   await expect(page.locator('.lesson').getByText('Der Gedächtnispalast')).toHaveCount(0)
 })
 

@@ -91,13 +91,54 @@ export async function leavePage(page: Page) {
   await page.locator('.challenge').waitFor()
 }
 
-/** Startet den Notfallmodus und überspringt das Ankommen. */
+/**
+ * Startet den Notfallmodus und überspringt das Ankommen.
+ *
+ * Und noch eines, seit es das Rückwärts-Modul gibt (D7): Fast alle
+ * Prüfungen, die hiermit starten, setzen voraus, dass die Einheit
+ * **Termine hinterlässt** — eine Rückwärts-Runde tut das absichtlich nicht
+ * (D-026) und würde sie zufällig rot machen, je nachdem, was der Seed
+ * zieht. Deshalb wird eine Rückwärts-Runde abgebrochen und neu gezogen;
+ * das Modul selbst hat seine eigene Prüfung (`reverse.spec.ts`).
+ */
 export async function startEmergency(page: Page) {
-  await page.getByRole('button', { name: '60 Sekunden' }).click()
-  await startButton(page).click()
-  // Das Ankommen (D-011/G-1) lässt sich antippen — im Test warten wir nicht
-  // drei Sekunden auf einen atmenden Kreis.
-  await page.locator('.settle').click()
+  for (let attempt = 0; attempt < 25; attempt++) {
+    await page.getByRole('button', { name: '60 Sekunden' }).click()
+    await startButton(page).click()
+    // Das Ankommen (D-011/G-1) lässt sich antippen — im Test warten wir
+    // nicht drei Sekunden auf einen atmenden Kreis.
+    await page.locator('.settle').click()
+
+    /*
+     * Entschieden wird am **positiven** Zeichen: Zurückgekehrt wird erst,
+     * wenn ein Einprägeblock wirklich sichtbar ist — genau das, worauf
+     * jeder Aufrufer als Nächstes wartet. Der erste Anlauf entschied an der
+     * Abwesenheit der Ziffernanzeige und hatte damit ein Schlupfloch: Ein
+     * einziger unglücklicher Lesezeitpunkt, und eine Rückwärts-Runde ging
+     * als Einprägerunde durch — ein voller Lauf hat genau einmal genau das
+     * getroffen. Die Ziffernanzeige wird über ihre **Anwesenheit** erkannt
+     * (`count`), nicht über Sichtbarkeit: Nach drei Sekunden ist sie
+     * verdeckt, aber noch da.
+     */
+    const learnable = page.locator('.encode-word, .scene')
+    const reveal = page.locator('.reveal-digits')
+    const deadline = Date.now() + 20_000
+    let backwards = false
+    for (;;) {
+      if (await learnable.first().isVisible().catch(() => false)) break
+      if ((await reveal.count()) > 0) {
+        backwards = true
+        break
+      }
+      expect(Date.now(), 'kein erster Block erschienen').toBeLessThan(deadline)
+      await page.waitForTimeout(100)
+    }
+    if (!backwards) return
+
+    await page.locator('.session-abort').click()
+    await expect(startButton(page)).toBeVisible()
+  }
+  throw new Error('in 25 Anläufen kam keine Runde mit Terminen')
 }
 
 /**
@@ -229,6 +270,19 @@ export async function answerRecall(page: Page, learned: Learned, give: Give) {
 
 /** Die Antwort für die Stelle, an der der Abruf gerade steht. */
 async function answerAt(page: Page, learned: Learned, index: number): Promise<string> {
+  /*
+   * Rückwärts (D7): Die Folge steht kurz da und wird dann nur unsichtbar,
+   * nicht entfernt — der Test liest sie ab (auch verdeckt liefert
+   * `textContent` den Text) und dreht sie um. Das Eintippen wartet von
+   * selbst, bis das Feld freigegeben ist: `fill` tippt nie in ein
+   * gesperrtes Feld.
+   */
+  const reveal = page.locator('.reveal-digits')
+  if ((await reveal.count()) > 0) {
+    const digits = ((await reveal.textContent()) ?? '').trim()
+    return [...digits].reverse().join('')
+  }
+
   if (learned.scene === undefined) return learned.items[index] ?? ''
 
   /*

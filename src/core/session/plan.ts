@@ -22,6 +22,7 @@ import type { DayKey } from '../time.ts'
 import { answerFor, factKindOf, missionFacts, personOf } from '../content/missions.ts'
 import { objectFor, walkOf, walkPlacements } from '../content/palace.ts'
 import type { Language } from '../language.ts'
+import { reversed } from '../content/spans.ts'
 import { nextToTeach } from '../technique/major.ts'
 import type { Leniency } from './grading.ts'
 
@@ -100,7 +101,7 @@ export type BlockKind = 'teach' | 'encode' | 'recall' | 'review'
  * mischt sie. Was ein Modul *zeigt*, weiß er nicht — er kennt nur Kennungen,
  * Zeiten und die Frage, ob der Abruf frei oder gestützt ist.
  */
-export const TRAINING_MODULES = ['words', 'faces', 'numbers', 'missions', 'palace'] as const
+export const TRAINING_MODULES = ['words', 'faces', 'numbers', 'missions', 'palace', 'reverse'] as const
 export type ModuleId = (typeof TRAINING_MODULES)[number]
 
 /**
@@ -115,8 +116,47 @@ export type ModuleId = (typeof TRAINING_MODULES)[number]
  * genau die Aufgabe, die im Alltag vorkommt.
  */
 export function isPrompted(moduleId: ModuleId): boolean {
-  return moduleId === 'faces' || moduleId === 'missions' || moduleId === 'palace'
+  return (
+    moduleId === 'faces' ||
+    moduleId === 'missions' ||
+    moduleId === 'palace' ||
+    moduleId === 'reverse'
+  )
 }
+
+/**
+ * Rechnet dieses Modul mit dem Wiederholungsplan ab? (D7 · D-026)
+ *
+ * Fast alle: Was heute eingeprägt wurde, kommt nach Tagen zurück — das ist
+ * das Behalten. **Das Arbeitsgedächtnis nicht**: Seine Aufgabe ist das
+ * Umbauen im Moment, nicht das Behalten. Eine Ziffernfolge von letzter
+ * Woche „rückwärts wiederzusehen“ wäre eine Langzeitfrage im Kostüm einer
+ * Arbeitsgedächtnisübung — und die Achse im Profil zählte dann das Falsche.
+ */
+export function entersReview(moduleId: ModuleId): boolean {
+  return moduleId !== 'reverse'
+}
+
+/**
+ * Fragt dieses Modul ohne eigene Einprägephase? (D7)
+ *
+ * Beim Rückwärts-Abruf gehören Zeigen und Fragen in einen Atemzug: Die
+ * Folge steht kurz da, verschwindet, und die Antwort ist sofort dran. Ein
+ * getrennter Einprägeblock hieße, mehrere Folgen erst zu lesen und später
+ * abzurufen — das prüfte das Langzeitgedächtnis, nicht das Umbauen.
+ */
+export function asksOnSight(moduleId: ModuleId): boolean {
+  return moduleId === 'reverse'
+}
+
+/**
+ * Sekunden je Rückwärts-Frage: kurz zeigen (siehe REVEAL_SECONDS in der
+ * Oberfläche), im Kopf drehen, eintippen. Fünfzehn sind bemessen, nicht
+ * gemessen — D2 (adaptive Schwierigkeit) wird sie später wandern lassen.
+ */
+export const SECONDS_PER_REVERSE_PROMPT = 15
+const MIN_REVERSE_PROMPTS = 2
+const MAX_REVERSE_PROMPTS = 6
 
 /**
  * Module, deren Runde **eine Szene** ist und keine Reihe von Stücken.
@@ -183,6 +223,8 @@ export function subjectOf(moduleId: ModuleId, item: string): string {
  */
 export function targetOf(moduleId: ModuleId, item: string, language: string): string {
   if (moduleId === 'palace') return objectFor(item, language as Language) ?? item
+  // Rückwärts: Die Kennung ist die gezeigte Folge, gesucht ist ihr Spiegel.
+  if (moduleId === 'reverse') return reversed(item)
   if (moduleId !== 'missions') return item
   return answerFor(item, language as Language) ?? item
 }
@@ -195,6 +237,11 @@ export function targetOf(moduleId: ModuleId, item: string, language: string): st
  * Datenbank es nennt.
  */
 export function displayOf(moduleId: ModuleId, item: string, language: string): string {
+  /*
+   * Rückwärts zeigt die Zusammenfassung die **gesuchte** Folge — das ist,
+   * was jemand geleistet hat. Die gezeigte stünde da wie eine fremde Zahl.
+   */
+  if (moduleId === 'reverse') return reversed(item)
   /*
    * Beim Palast steht nur der Gegenstand da, ohne seine Station.
    *
@@ -221,7 +268,8 @@ export function displayOf(moduleId: ModuleId, item: string, language: string): s
  * eine Aussage über den **Gegenstand** ist und nicht über das Verfahren.
  */
 export function leniencyFor(moduleId: ModuleId, item?: string): Leniency {
-  if (moduleId === 'numbers') return 'exact'
+  // Ziffern beidesmal: vertauscht ist falsch — genau das ist hier die Übung.
+  if (moduleId === 'numbers' || moduleId === 'reverse') return 'exact'
   if (moduleId === 'missions') {
     /*
      * Innerhalb einer Mission ist die Strenge **je Tatsache** verschieden, und
@@ -527,18 +575,31 @@ export function planSession(input: PlanInput): SessionPlan {
     }
     const items = scene
       ? sceneItemsOf(moduleId, pool[used] as string)
-      : pool.slice(used, used + itemsForRound(roundSeconds, pool.length - used))
+      : pool.slice(
+          used,
+          used +
+            (asksOnSight(moduleId)
+              ? promptsForRound(roundSeconds, pool.length - used)
+              : itemsForRound(roundSeconds, pool.length - used)),
+        )
     taken.set(moduleId, used + (scene ? 1 : items.length))
-    const encodeSeconds = items.length * secondsPerItemFor(moduleId)
+    /*
+     * Ein Modul, das auf Sicht fragt (D7), hat keinen Einprägeblock: Zeigen
+     * und Fragen geschehen im Abruf selbst, Frage für Frage. Das ganze
+     * Rundenbudget gehört dem Abruf — die Summe bleibt exakt.
+     */
+    const encodeSeconds = asksOnSight(moduleId) ? 0 : items.length * secondsPerItemFor(moduleId)
 
-    blocks.push({
-      id: `r${round}-encode`,
-      kind: 'encode',
-      moduleId,
-      round,
-      seconds: encodeSeconds,
-      items,
-    })
+    if (encodeSeconds > 0) {
+      blocks.push({
+        id: `r${round}-encode`,
+        kind: 'encode',
+        moduleId,
+        round,
+        seconds: encodeSeconds,
+        items,
+      })
+    }
     blocks.push({
       id: `r${round}-recall`,
       kind: 'recall',
@@ -581,6 +642,16 @@ export function planSession(input: PlanInput): SessionPlan {
     totalSeconds,
     blocks,
   }
+}
+
+/** Wie viele Rückwärts-Fragen in eine Runde passen. */
+function promptsForRound(roundSeconds: number, available: number): number {
+  const byTime = Math.floor(roundSeconds / SECONDS_PER_REVERSE_PROMPT)
+  const wanted = Math.min(MAX_REVERSE_PROMPTS, Math.max(MIN_REVERSE_PROMPTS, byTime))
+  if (available < MIN_REVERSE_PROMPTS) {
+    throw new RangeError(`Der Vorrat reicht nicht für eine Runde (${available} übrig)`)
+  }
+  return Math.min(wanted, available)
 }
 
 function itemsForRound(roundSeconds: number, available: number): number {

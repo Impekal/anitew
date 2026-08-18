@@ -331,6 +331,9 @@ function RunningSession({
               ? placeOf(block.items[state.promptIndex] ?? '', dictionary, own)
               : undefined
           }
+          reveal={
+            block.moduleId === 'reverse' ? (block.items[state.promptIndex] ?? '') : undefined
+          }
           /*
             Bei der Mission steht der Name **unter** dem Gesicht — er ist hier
             nicht die Frage, sondern der Anker: „Elena — welches Zimmer?“
@@ -408,9 +411,18 @@ function RunningSession({
  * stünde die vorige Antwort noch da, und der Nutzer müsste sie löschen, bevor
  * er die nächste tippen kann.
  */
+/**
+ * Wie lange die Rückwärts-Folge zu sehen ist (D7): lang genug zum Lesen,
+ * zu kurz zum Aufschreiben. Je Ziffer bemessen, mit Untergrenze — fünf
+ * Ziffern stehen drei Sekunden.
+ */
+const REVEAL_MS_PER_DIGIT = 600
+const REVEAL_MS_MIN = 2000
+
 function PromptedRecall({
   face,
   place,
+  reveal,
   label,
   position,
   total,
@@ -423,6 +435,12 @@ function PromptedRecall({
   face: string
   /** Ein Ort statt eines Gesichts — beim Palast (G6). */
   place?: { palace: string; station: string }
+  /**
+   * Eine Ziffernfolge, die kurz gezeigt und dann verdeckt wird (D7).
+   * Solange sie steht, ist das Feld gesperrt — sonst ließe sie sich einfach
+   * von rechts nach links abtippen, und geübt wäre nichts.
+   */
+  reveal?: string
   /** Der Anker unter dem Gesicht — nur, wo der Name nicht die Antwort ist. */
   label?: string
   position: number
@@ -435,11 +453,33 @@ function PromptedRecall({
   onSubmit: (answer: string) => void
 }) {
   const [answer, setAnswer] = useState('')
+  const [showing, setShowing] = useState(reveal !== undefined)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (reveal === undefined) return
+    const ms = Math.max(REVEAL_MS_MIN, reveal.length * REVEAL_MS_PER_DIGIT)
+    const timer = setTimeout(() => setShowing(false), ms)
+    return () => clearTimeout(timer)
+  }, [reveal])
+
+  // Erst wenn die Folge verdeckt ist, bekommt das Feld den Fokus — vorher
+  // ist es gesperrt, und ein gesperrtes Feld kann keinen tragen.
+  useEffect(() => {
+    if (reveal !== undefined && !showing) inputRef.current?.focus()
+  }, [reveal, showing])
 
   return (
     <section className="prompted">
       <p className="hint">{hint}</p>
-      {place !== undefined ? (
+      {reveal !== undefined ? (
+        /*
+          Verdeckt heißt unsichtbar, nicht entfernt: `visibility` lässt die
+          Zeile stehen, damit nichts springt — und die Prüfungen können
+          ablesen, was gefragt war, statt es zu raten.
+        */
+        <p className={showing ? 'reveal-digits' : 'reveal-digits reveal-hidden'}>{reveal}</p>
+      ) : place !== undefined ? (
         <div className="placemark">
           <span className="placemark-palace">{place.palace}</span>
           <span className="placemark-station">{place.station}</span>
@@ -456,12 +496,14 @@ function PromptedRecall({
         }}
       >
         <input
+          ref={inputRef}
           className="recall-input prompted-input"
           value={answer}
           onChange={(event) => setAnswer(event.target.value)}
           placeholder={placeholder}
           inputMode={numeric === true ? 'numeric' : 'text'}
-          autoFocus
+          disabled={reveal !== undefined && showing}
+          autoFocus={reveal === undefined}
           autoCapitalize="words"
           autoCorrect="off"
           spellCheck={false}
@@ -831,6 +873,9 @@ function placeOf(
  */
 function askFor(block: BlockPlan, index: number, dictionary: Dictionary): string {
   const t = dictionary.session
+  // Rückwärts gibt es nur als Sofortfrage — ein Wiedersehen hat das Modul
+  // nicht (D-026), also braucht die Frage keinen Vorspann.
+  if (block.moduleId === 'reverse') return t.reverseAsk
   if (block.moduleId === 'palace') {
     const ask = dictionary.palace.ask
     return block.kind === 'review' ? `${t.reviewLead} ${ask}` : ask
@@ -845,6 +890,7 @@ function askFor(block: BlockPlan, index: number, dictionary: Dictionary): string
 
 function placeholderFor(block: BlockPlan, index: number, dictionary: Dictionary): string {
   const t = dictionary.session
+  if (block.moduleId === 'reverse') return t.reversePlaceholder
   if (block.moduleId === 'palace') return dictionary.palace.placeholder
   if (block.moduleId !== 'missions') return t.promptPlaceholder
   const kind = factKindOf(block.items[index] ?? '')
@@ -853,6 +899,7 @@ function placeholderFor(block: BlockPlan, index: number, dictionary: Dictionary)
 
 /** Zimmernummer und Uhrzeit sind Zahlen — dann die Zifferntastatur. */
 function numericFor(block: BlockPlan, index: number): boolean {
+  if (block.moduleId === 'reverse') return true
   if (block.moduleId !== 'missions') return false
   const kind = factKindOf(block.items[index] ?? '')
   return kind === 'room' || kind === 'time'

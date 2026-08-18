@@ -115,12 +115,22 @@ export const de = {
       numbers: 'Eine Zahl nach der anderen. Sprich sie innerlich mit.',
       missions: 'Eine Szene. Was gehört zu wem?',
       palace: 'Geh den Weg ab. Leg jedes Ding an seinen Platz — groß, im Weg, unübersehbar.',
+      // Wird nie gezeigt — Rückwärts fragt ohne Einprägephase (D7). Der
+      // Schlüssel existiert, weil das Wörterbuch je Modul vollständig ist.
+      reverse: 'Gleich rückwärts gefragt.',
     },
     recallHint: 'Was ist geblieben? Reihenfolge egal.',
     reviewHint: 'Und jetzt von früher: Woran erinnerst du dich noch?',
     promptHint: 'Wer ist das?',
     reviewPromptHint: 'Und von früher: Wer ist das?',
     promptPlaceholder: 'Name',
+    /*
+      Rückwärts (D7): Die Folge steht kurz da und verschwindet — die Frage
+      muss deshalb VOR dem Verschwinden verstanden sein: kurz, imperativ,
+      keine Nebensätze.
+    */
+    reverseAsk: 'Merk dir die Ziffern — gib sie rückwärts ein.',
+    reversePlaceholder: 'Rückwärts',
     /*
       Die Fragen einer Mission (H1).
 
@@ -365,6 +375,7 @@ export const de = {
     chancesSoFar: 'bisher',
     of15: 'von 15',
     notMeasured: 'Misst diese App nicht.',
+    immediate: 'sofort, nicht nach Tagen',
     elsewhere: 'Das misst die Messung, nicht das Training.',
     weakest: 'Am wenigsten bleibt hier hängen:',
     /*
@@ -386,6 +397,7 @@ export const de = {
       numbers: 'Zahlen',
       missions: 'Missionen',
       palace: 'Palast',
+      reverse: 'Rückwärts',
     },
     noWeakest: 'Kein Unterschied zwischen den Achsen, der sich vom Zufall trennen lässt.',
     empty: 'Noch nichts zu zeigen. Das Profil entsteht aus dem Training — nicht aus einem Test am Anfang.',

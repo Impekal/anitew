@@ -33,7 +33,9 @@ test('läuft ohne jede Datenbank weiter (privater Modus)', async ({ page }) => {
   await page.getByRole('button', { name: '60 Sekunden' }).click()
   await startButton(page).click()
   await page.locator('.settle').click()
-  await expect(page.locator('.encode-word, .scene, .lesson').first()).toBeVisible({ timeout: 30_000 })
+  await expect(
+    page.locator('.encode-word, .scene, .lesson, .reveal-digits').first(),
+  ).toBeVisible({ timeout: 30_000 })
 
   expect(errors, `ungefangene Fehler: ${errors.join(' | ')}`).toEqual([])
 })

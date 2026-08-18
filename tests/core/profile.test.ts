@@ -65,11 +65,33 @@ describe('was das Profil sagt — und was nicht', () => {
     const results = profileOf({})
     const words = results.find((result) => result.id === 'words')
     expect(words?.kind).toBe('tooFew')
-    // Und drei Achsen misst diese App überhaupt nicht — dort steht das, statt
+    // Und zwei Achsen misst diese App überhaupt nicht — dort steht das, statt
     // eines leeren Balkens mit Hoffnung daneben (D-016).
-    for (const id of ['visual', 'attention', 'working'] as DimensionId[]) {
+    for (const id of ['visual', 'attention'] as DimensionId[]) {
       expect(results.find((result) => result.id === id)?.kind).toBe('notMeasured')
     }
+    // Das Arbeitsgedächtnis ist seit D7 messbar — als Sofort-Achse (D-026):
+    // ohne Daten „zu wenig“, nicht „nicht gemessen“.
+    expect(results.find((result) => result.id === 'working')?.kind).toBe('tooFew')
+  })
+
+  it('nennt eine Sofort-Achse nie als schwächste — zwei Währungen (D-026)', () => {
+    /*
+     * Arbeitsgedächtnis 50 % sofort, Wörter 90 % nach Tagen: Die Spannen
+     * lägen weit auseinander, aber die Zahlen messen Verschiedenes. „Am
+     * wenigsten bleibt hier hängen“ wäre über die Sofort-Achse gelogen —
+     * dort bleibt gar nichts hängen, dort wird umgebaut.
+     */
+    const results = profileOf({
+      working: full(60, 30),
+      words: full(60, 6),
+      faces: full(60, 8),
+    })
+    const weak = weakest(results)
+    expect(weak).not.toBe('working')
+    // Zwischen den beiden Wiedersehens-Achsen darf weiterhin entschieden
+    // werden — hier überlappen sich ihre Spannen aber, also schweigt sie.
+    expect(weak === undefined || weak === 'words' || weak === 'faces').toBe(true)
   })
 
   it('überlässt den langfristigen Abruf der Messung (F1)', () => {
@@ -142,6 +164,7 @@ describe('der Schwerpunkt im Bauplan (E5)', () => {
     numbers: many('9'),
     missions: many('p'),
     palace: many('home~'),
+    reverse: ['48293', '17546', '90287', '35761', '82154', '46029'],
   }
 
   const modulesOf = (plan: ReturnType<typeof planSession>) =>

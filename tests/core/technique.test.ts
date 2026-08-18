@@ -87,6 +87,7 @@ describe('die Lektion im Plan (D5)', () => {
   numbers: many('9'),
   missions: many('p'),
   palace: walkPool('t', 12),
+  reverse: ['48293', '17546', '90287', '35761', '82154', '46029'],
 }
   const base = { day: '2026-08-17', language: 'de', seed: 'lektion', pools }
   const teachBlock = (plan: ReturnType<typeof planSession>) =>

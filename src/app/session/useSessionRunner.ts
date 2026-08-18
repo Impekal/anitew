@@ -2,15 +2,16 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 import {
   type BlockPlan,
-  type Platform,
-  SECONDS_PER_ITEM,
-  type SessionPlan,
+  entersReview,
   gradeRecall,
   isPrompted,
   leniencyFor,
+  type Platform,
   promptedHits,
-  targetOf,
+  secondsPerItemFor,
+  type SessionPlan,
   splitEntries,
+  targetOf,
 } from '../../core/index.ts'
 import { recordOutcome } from '../../data/items.ts'
 import { markPalaceTaught, markTaught } from '../../data/technique.ts'
@@ -161,6 +162,9 @@ export function useSessionRunner(
         graded,
         duration,
         block.kind,
+        // Das echte Modul, nicht die Blockart — daraus zählen die
+        // Sofort-Achsen des Profils (D-026).
+        block.moduleId,
       ).catch(() => undefined)
 
       /*
@@ -170,11 +174,18 @@ export function useSessionRunner(
        * bekommt seinen ersten Termin, ein wiedergesehenes seinen nächsten.
        * Für den Scheduler ist das derselbe Vorgang — nur der Vorzustand
        * unterscheidet sich, und den kennt er selbst.
+       *
+       * **Außer beim Arbeitsgedächtnis** (D7 · D-026): Umbauen im Moment ist
+       * kein Behalten — eine Rückwärts-Folge bekommt keinen Termin, sonst
+       * fragte das Wiedersehen nach Tagen etwas, das nie zum Merken gedacht
+       * war.
        */
-      void recordOutcome(block.moduleId, plan.language, plan.day, at, {
-        recalled: graded.correct,
-        missed: graded.missed,
-      }).catch(() => undefined)
+      if (entersReview(block.moduleId)) {
+        void recordOutcome(block.moduleId, plan.language, plan.day, at, {
+          recalled: graded.correct,
+          missed: graded.missed,
+        }).catch(() => undefined)
+      }
 
       setResults(nextResults)
     }
@@ -206,7 +217,12 @@ export function useSessionRunner(
       setRemaining(Math.ceil(left))
 
       if (block.kind === 'encode') {
-        const index = Math.min(block.items.length - 1, Math.floor(elapsed / SECONDS_PER_ITEM))
+        // Der Takt des Moduls, nicht die Wort-Konstante: Eine Szene gibt
+        // ihren Stücken mehr Sekunden, und die Anzeige soll dem Plan folgen.
+        const index = Math.min(
+          block.items.length - 1,
+          Math.floor(elapsed / secondsPerItemFor(block.moduleId)),
+        )
         setItemIndex(index)
       }
       if (left <= 0) advance()

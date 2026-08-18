@@ -113,7 +113,7 @@ test('bleibt beim Einprägen im Rahmen', async ({ page }) => {
   await startButton(page).click()
   await page.locator('.settle').click()
 
-  const shown = page.locator('.encode-word, .scene, .lesson').first()
+  const shown = page.locator('.encode-word, .scene, .lesson, .reveal-digits').first()
   await expect(shown).toBeVisible({ timeout: 30_000 })
   await noHorizontalOverflow(page)
   await withinViewport(page, shown, 'der Einprägeteil')

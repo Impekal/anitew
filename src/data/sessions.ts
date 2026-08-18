@@ -97,12 +97,14 @@ export async function logRecall(
   result: RecallResult,
   blockDurationMs: number,
   moduleId = 'recall',
+  module?: string,
 ): Promise<void> {
   const rows: EventRow[] = [
     ...result.correct.map((item) => ({
       sessionId,
       at,
       moduleId,
+      ...(module === undefined ? {} : { module }),
       itemId: item,
       kind: 'answered' as const,
       correct: true,
@@ -112,6 +114,7 @@ export async function logRecall(
       sessionId,
       at,
       moduleId,
+      ...(module === undefined ? {} : { module }),
       itemId: item,
       kind: 'answered' as const,
       correct: false,

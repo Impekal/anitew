@@ -1024,3 +1024,35 @@ zehn Dinge.
 ausgebaut) — besser auffindbar als die Fächer, aber immer noch zehn Dinge
 auf einem Bildschirm; und ein Router mit URLs je Seite — eine Ebene
 Navigation braucht keinen, und die App bleibt eine Datei Zustand.
+
+## D-026 · 2026-08-18 · Arbeitsgedächtnis: sofort gezählt, nie terminiert
+
+**Entscheidung:** Das Rückwärts-Modul (D7) prüft das Arbeitsgedächtnis als
+das, was es ist — Umbauen im Moment. Daraus folgen vier Abweichungen von
+allen anderen Modulen, und jede ist eine Entscheidung:
+
+- **Kein Einprägeblock.** Die Folge steht kurz da (je Ziffer bemessen),
+  verschwindet, und die Antwort ist sofort dran. Ein getrennter
+  Einprägeblock prüfte Behalten statt Umbauen. Solange die Folge steht, ist
+  das Eingabefeld gesperrt — sonst ließe sie sich von rechts nach links
+  abtippen, und geübt wäre nichts. Verdeckt heißt unsichtbar, nicht
+  entfernt (`visibility`): Nichts springt, und die Prüfungen lesen ab statt
+  zu raten.
+- **Kein Termin.** Eine Rückwärts-Folge kommt nie ins Wiedersehen
+  (`entersReview` = falsch). Eine „Rückwärts-Frage nach Tagen“ wäre eine
+  Langzeitfrage im Kostüm einer Arbeitsgedächtnisübung.
+- **Die Achse zählt sofort.** Das Profil zählt für „Arbeitsgedächtnis“
+  Antworten aus dem Ereignisprotokoll (eine neue, rein additive
+  `module`-Spalte an den Antwortzeilen — alte Zeilen behalten ihre
+  Bedeutung) statt Wiedersehen aus den Terminen. Die Zeile sagt es dazu:
+  „sofort, nicht nach Tagen“. Ohne den Zusatz stünde eine andere Zahl im
+  selben Gewand (R-1).
+- **Nie „am schwächsten“.** Eine Sofort-Quote mit einer Wiedersehens-Quote
+  zu vergleichen wäre ein Vergleich zweier Währungen. `weakest` lässt
+  Sofort-Achsen aus; der Schwerpunkt bleibt eine Aussage über das
+  Behalten. Ein Kerntest verankert das.
+
+**Ausdrücklich unverändert:** Die Wissenschaftsseite verspricht weiterhin
+keinen Transfer („Arbeitsgedächtnistraining hebt weder Intelligenz noch
+Alltagsleistung“) — das Modul trainiert und misst die Übung selbst, mehr
+behauptet niemand (R-2).

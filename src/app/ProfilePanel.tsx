@@ -1,11 +1,4 @@
-import {
-  type DimensionResult,
-  hasProfile,
-  profileOf,
-  weakest,
-  type DimensionCounts,
-  type DimensionId,
-} from '../core/index.ts'
+import { type DimensionCounts, type DimensionId, type DimensionResult, hasProfile, isImmediate, profileOf, weakest } from '../core/index.ts'
 import type { Dictionary } from '../i18n/index.ts'
 
 /**
@@ -50,7 +43,16 @@ export function ProfilePanel({
       <ul className="axes">
         {results.map((result) => (
           <li key={result.id} className={`axis axis-${result.kind}`}>
-            <span className="axis-name">{names[result.id]}</span>
+            <span className="axis-name">
+              {names[result.id]}
+              {/*
+                Sofort-Achsen (D-026) sagen dazu, was sie zählen: Antworten
+                im Moment, kein Wiedersehen nach Tagen. Ohne den Zusatz läse
+                sich die Zeile wie alle anderen — und wäre eine andere Zahl
+                im selben Gewand (R-1).
+              */}
+              {isImmediate(result.id) && <span className="axis-note"> · {t.immediate}</span>}
+            </span>
             <span className="axis-value">{valueOf(result, dictionary)}</span>
           </li>
         ))}

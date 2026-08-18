@@ -25,13 +25,19 @@
  * Fehlschlag am Lerntag zählt bei beiden nicht mit — dort ist die Information
  * noch im Lernen und nicht im Behalten.
  *
- * ── Warum drei Achsen leer bleiben ────────────────────────────────────────
+ * ── Warum zwei Achsen leer bleiben ────────────────────────────────────────
  *
- * E2 nennt acht Dimensionen. Für **Visuell**, **Aufmerksamkeit** und
- * **Arbeitsgedächtnis** gibt es in ANITEW kein Modul, das sie misst — also
- * steht dort nichts. Nicht „noch keine Daten“ mit einem hoffnungsvollen
- * Balken daneben, sondern: **nicht gemessen.** Dieselbe Ehrlichkeit wie auf
- * der Wissenschaftsseite (D-016).
+ * E2 nennt acht Dimensionen. Für **Visuell** und **Aufmerksamkeit** gibt es
+ * in ANITEW noch kein Modul, das sie misst — also steht dort nichts. Nicht
+ * „noch keine Daten“ mit einem hoffnungsvollen Balken daneben, sondern:
+ * **nicht gemessen.** Dieselbe Ehrlichkeit wie auf der Wissenschaftsseite
+ * (D-016).
+ *
+ * **Arbeitsgedächtnis** ist der zweite Sonderfall (D7 · D-026): Es zählt
+ * nicht Wiedersehen nach Tagen, sondern **sofortige** Antworten — behalten
+ * und gleichzeitig umbauen ist seinem Wesen nach eine Sache des Moments.
+ * Ein „Wiedersehen“ gäbe es dort gar nicht (nichts wird eingeplant), und
+ * die Achse sagt in der Anzeige dazu, was sie zählt.
  *
  * **Langfristiger Abruf** ist ein Sonderfall: Er wird gemessen — aber von der
  * Messung (M3) und nicht vom Training. Ihn hier noch einmal aus
@@ -57,12 +63,15 @@ export type DimensionId = (typeof DIMENSIONS)[number]
 /**
  * Woher eine Achse ihre Zahlen bekommt.
  *
- * - `module` — aus den Terminen dieses Moduls.
+ * - `module` — aus den Terminen dieses Moduls (Wiedersehen nach Tagen).
+ * - `immediate` — aus den sofortigen Antworten dieses Moduls (D-026);
+ *   Termine gibt es dort nicht, weil nichts eingeplant wird.
  * - `benchmark` — aus der Messung, nicht aus dem Training (F1).
  * - `none` — es gibt nichts, was sie misst.
  */
 export type DimensionSource =
   | { kind: 'module'; moduleId: ModuleId }
+  | { kind: 'immediate'; moduleId: ModuleId }
   | { kind: 'benchmark' }
   | { kind: 'none' }
 
@@ -83,20 +92,25 @@ export const SOURCES: Readonly<Record<DimensionId, DimensionSource>> = {
   binding: { kind: 'module', moduleId: 'missions' },
   visual: { kind: 'none' },
   attention: { kind: 'none' },
-  working: { kind: 'none' },
+  working: { kind: 'immediate', moduleId: 'reverse' },
   longTerm: { kind: 'benchmark' },
 }
 
 /** Das Modul, aus dem eine Achse ihre Zahlen zieht. */
 export function moduleForDimension(id: DimensionId): ModuleId | undefined {
   const source = SOURCES[id]
-  return source.kind === 'module' ? source.moduleId : undefined
+  return source.kind === 'module' || source.kind === 'immediate' ? source.moduleId : undefined
 }
 
 /** Die Achse, die zu einem Modul gehört. */
 export function dimensionOf(moduleId: ModuleId): DimensionId | undefined {
   return DIMENSIONS.find((id) => {
     const source = SOURCES[id]
-    return source.kind === 'module' && source.moduleId === moduleId
+    return (source.kind === 'module' || source.kind === 'immediate') && source.moduleId === moduleId
   })
+}
+
+/** Zählt diese Achse sofortige Antworten statt Wiedersehen? (D-026) */
+export function isImmediate(id: DimensionId): boolean {
+  return SOURCES[id].kind === 'immediate'
 }

@@ -2248,3 +2248,44 @@ und liegt live.
 **Stand:** 322 Kerntests, rund 200 Browserläufe (Funktion + Layout-Matrix +
 Fehlertoleranz + Barrierefreiheit + Performance), Größenbudget in der CI,
 Typecheck für App und Kern grün.
+
+## 2026-08-18 · Kurswechsel: ANITEW wird das volle System — und die erste neue Achse steht
+
+Der Auftraggeber hat die Richtung neu gesetzt: nicht mehr „Restausbau“,
+sondern **alles aus dem ursprünglichen Konzept** — mehr Gedächtnis-Domänen,
+Encoding-Techniken, adaptive Schwierigkeit, später KI-Coach mit eigenem
+Schlüssel, eigene Inhalte, Google-Drive-Abgleich (Daten im eigenen Drive,
+kein eigener Server, R-3 hält). Die ehrlichen Grenzen bleiben ausdrücklich:
+keine erfundenen Zahlen, Fähigkeitszahlen nur aus Messung.
+
+Seitdem gebaut und gepusht: das **Kennenlernen** (B10/D-024 — freiwillige
+Fragen werden Vorschläge und Anrede, das Altersband bewirkt strukturell
+nichts), das **Menü als Schublade mit einer Seite je Punkt** (O2a/D-025 —
+die Klappfächer hatte niemand gefunden; die Systemgeste „Zurück“ schließt
+die Seite statt der App), und das **Arbeitsgedächtnis-Modul** (D7/D-026 —
+Rückwärts-Ziffernspanne: kurz zeigen, Feld gesperrt, verdeckt, rückwärts
+eingeben; kein Einprägeblock, kein Termin, die Profil-Achse zählt sofortige
+Antworten und sagt das dazu). Vorbereitet mit grünen Kerntests: die
+Zwillingspaare (Interferenz, drei Sprachen, Kollisionsfreiheit gegen alle
+Vorräte per Test erzwungen) und die Bilder mit Einzelheiten (visuelle
+Szenen aus der Kennung erzeugt, zehn selbst gezeichnete, auf Erkennbarkeit
+geprüfte Dinge).
+
+### Zwei Fehler, die Regeln wert sind
+
+**Ein Modul, das anders abrechnet, bricht jede Prüfung, die „eine Einheit
+hinterlässt Termine“ angenommen hat.** Nach dem Rückwärts-Modul wurden
+Prüfungen seed-abhängig rot (Sicherung, Missionssuche): je nachdem, was der
+Plan zog, gab es keine Termine oder keinen Einprägeblock. Der Helfer
+`startEmergency` garantiert seither eine Termin-Runde — das Modul selbst
+hat seine eigene Prüfung.
+
+**Entschieden wird am positiven Zeichen, nicht an der Abwesenheit des
+negativen.** Die erste Fassung dieser Garantie kehrte zurück, sobald die
+Ziffernanzeige *nicht da* war — ein einziger unglücklicher Lesezeitpunkt,
+und eine Rückwärts-Runde ging als Einprägerunde durch; ein voller Lauf
+(216 Läufe) traf genau einmal genau das. Jetzt kehrt der Helfer erst
+zurück, wenn ein Einprägeblock **sichtbar ist** — genau das, worauf jeder
+Aufrufer als Nächstes wartet. Anwesenheit prüft man mit `count` (auch
+Verdecktes zählt), Brauchbarkeit mit Sichtbarkeit — und wer zurückkehrt,
+verspricht dem Aufrufer einen Zustand, nicht das Fehlen eines anderen.

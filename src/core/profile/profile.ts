@@ -12,7 +12,7 @@
  * an seinem eigenen Platz (F1).
  */
 
-import { DIMENSIONS, type DimensionId, SOURCES } from './dimensions.ts'
+import { type DimensionId, DIMENSIONS, isImmediate, SOURCES } from './dimensions.ts'
 
 /**
  * Ab wie vielen Gelegenheiten eine Achse etwas sagt.
@@ -109,7 +109,14 @@ export function hasProfile(results: readonly DimensionResult[]): boolean {
 export function weakest(results: readonly DimensionResult[]): DimensionId | undefined {
   const measured = results.filter(
     (result): result is Extract<DimensionResult, { kind: 'measured' }> =>
-      result.kind === 'measured',
+      /*
+       * Sofort-Achsen (D-026) bleiben draußen — nicht weil sie weniger
+       * zählen, sondern weil sie anderes zählen: Eine Sofort-Quote mit einer
+       * Wiedersehens-Quote zu vergleichen und das Ergebnis „am schwächsten“
+       * zu nennen wäre ein Vergleich zweier Währungen (R-1). Der Schwerpunkt
+       * bleibt eine Aussage über das Behalten.
+       */
+      result.kind === 'measured' && !isImmediate(result.id),
   )
   if (measured.length < 2) return undefined
 

@@ -10,11 +10,14 @@ import {
   type DayKey,
   type DimensionCounts,
   type DimensionId,
-  type ModuleId,
   dimensionOf,
-  type Instant,
-  type Memory,
+  DIMENSIONS,
   type DueItem,
+  type Instant,
+  isImmediate,
+  type Memory,
+  moduleForDimension,
+  type ModuleId,
   newMemory,
   review,
 } from '../core/index.ts'
@@ -128,10 +131,31 @@ export async function loadDimensionCounts(
 
   for (const row of rows) {
     const dimension = dimensionOf(row.moduleId as ModuleId)
-    if (dimension === undefined) continue
+    if (dimension === undefined || isImmediate(dimension)) continue
     const entry = (counts[dimension] ??= { chances: 0, lost: 0 })
     entry.chances += Math.max(0, row.reviews - 1)
     entry.lost += row.lapses
+  }
+
+  /*
+   * Die Sofort-Achsen (D-026) zählen aus dem Ereignisprotokoll: eine
+   * Gelegenheit je Antwort, verloren je falscher. Absichtlich **ohne**
+   * Sprachfilter — Ziffern sind in jeder Trainingssprache dieselbe Übung,
+   * und das Protokoll kennt ohnehin keine Sprache. Alte Zeilen ohne
+   * `module`-Feld fallen heraus; sie stammen aus einer Zeit, in der es
+   * diese Module nicht gab.
+   */
+  for (const dimension of DIMENSIONS) {
+    if (!isImmediate(dimension)) continue
+    const moduleId = moduleForDimension(dimension)
+    const answered = await db.events
+      .filter((event) => event.kind === 'answered' && event.module === moduleId)
+      .toArray()
+    if (answered.length === 0) continue
+    counts[dimension] = {
+      chances: answered.length,
+      lost: answered.filter((event) => event.correct === false).length,
+    }
   }
 
   return counts

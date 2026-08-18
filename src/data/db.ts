@@ -72,6 +72,17 @@ export interface EventRow {
   moduleId: string
   itemId?: string
   kind: 'shown' | 'answered' | 'skipped' | 'timeout'
+  /**
+   * Das Trainingsmodul der Antwort (z. B. `reverse`).
+   *
+   * Nachträglich dazugekommen (D-026): `moduleId` trägt bei Antworten
+   * historisch die Blockart (`recall`/`review`), nicht das Modul — das zu
+   * ändern hieße, alte Zeilen umzudeuten. Ein neues Feld statt einer neuen
+   * Bedeutung; alte Zeilen haben es nicht und fallen bei modulbezogenen
+   * Zählungen ehrlich heraus. Kein Index nötig, also keine neue
+   * Schemaversion.
+   */
+  module?: string
   correct?: boolean
   /** Antwortzeit in Millisekunden, gemessen mit der monotonen Uhr. */
   latencyMs?: number

@@ -169,9 +169,11 @@ test('zeigt nichts an, solange nichts gelehrt ist', async ({ page }) => {
   await startButton(page).click()
   await page.locator('.settle').click()
 
-  // Eine Mission zeigt statt einzelner Stücke ihre Szene — beides zählt als
-  // „das Einprägen läuft“.
-  await expect(page.locator('.encode-word, .scene').first()).toBeVisible({ timeout: 30_000 })
+  // Eine Mission zeigt ihre Szene, Rückwärts (D7) seine Ziffernfolge —
+  // alles drei zählt als „die Einheit läuft, ohne Lektion davor“.
+  await expect(
+    page.locator('.encode-word, .scene, .reveal-digits').first(),
+  ).toBeVisible({ timeout: 30_000 })
   await expect(page.locator('.lesson')).toBeHidden()
   await expect(page.locator('.major-letters')).toBeHidden()
 })

@@ -25,7 +25,12 @@ async function startMission(page: Page): Promise<boolean> {
     await page.getByRole('button', { name: '60 Sekunden' }).click()
     await startButton(page).click()
     await page.locator('.settle').click()
-    await expect(page.locator('.scene, .encode-word').first()).toBeVisible({ timeout: 30_000 })
+    // `.reveal-digits` gehört seit D7 dazu: Eine Rückwärts-Runde hat weder
+    // Szene noch Einprägewort — ohne den Selektor liefe die Suche hier in
+    // die Zeitgrenze statt zum nächsten Versuch.
+    await expect(
+      page.locator('.scene, .encode-word, .reveal-digits').first(),
+    ).toBeVisible({ timeout: 30_000 })
     // `.scene` allein reicht seit dem Palast nicht mehr: Ein Gang ist
     // ebenfalls eine Szene und benutzt dasselbe Raster (G). Gesucht ist hier
     // die Mission, also die Szene **ohne** Weg.

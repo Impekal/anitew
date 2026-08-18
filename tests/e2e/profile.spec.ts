@@ -79,12 +79,17 @@ test('zeigt Gemessenes mit seiner Spanne', async ({ page }) => {
   await expect(faces).toContainText('Spanne')
 })
 
-test('sagt bei drei Achsen offen, dass sie nichts misst', async ({ page }) => {
+test('sagt bei zwei Achsen offen, dass sie nichts misst', async ({ page }) => {
   await seed(page, [{ module: 'words', reviews: 21, lapses: 3 }])
 
-  for (const name of ['Visuell', 'Aufmerksamkeit', 'Arbeitsgedächtnis']) {
+  // Seit D7 misst das Arbeitsgedächtnis — als Sofort-Achse (D-026). Übrig
+  // bleiben zwei ehrliche Lücken, bis ihre Module gebaut sind.
+  for (const name of ['Visuell', 'Aufmerksamkeit']) {
     await expect(page.locator('.axis', { hasText: name })).toContainText('Misst diese App nicht.')
   }
+  await expect(page.locator('.axis', { hasText: 'Arbeitsgedächtnis' })).toContainText(
+    'Noch zu wenige Gelegenheiten',
+  )
   // Und den langfristigen Abruf überlässt sie der Messung (F1).
   await expect(page.locator('.axis', { hasText: 'Langfristiger Abruf' })).toContainText(
     'Das misst die Messung',
@@ -115,6 +120,56 @@ test('hält den Trainingsscore heraus (F1)', async ({ page }) => {
    */
   await seed(page, [{ module: 'words', reviews: 21, lapses: 3 }])
   await expect(page.getByText(/das ist Übung, nicht Gedächtnis/)).toBeVisible()
+})
+
+test('zeigt die Sofort-Achse als das, was sie ist (D7, D-026)', async ({ page }) => {
+  /*
+   * Das Arbeitsgedächtnis zählt sofortige Antworten, kein Wiedersehen — die
+   * Zeile muss das sagen, sonst stünde eine andere Zahl im selben Gewand
+   * (R-1). Gezählt wird aus dem Ereignisprotokoll; hier werden zwanzig
+   * Antworten hineingelegt, fünf davon daneben.
+   */
+  await visit(page)
+  await expect(startButton(page)).toBeVisible()
+  await page.evaluate(async () => {
+    const open = indexedDB.open('anitew')
+    const database: IDBDatabase = await new Promise((resolve, reject) => {
+      open.onsuccess = () => resolve(open.result)
+      open.onerror = () => reject(open.error)
+    })
+    await new Promise<void>((resolve, reject) => {
+      const transaction = database.transaction('events', 'readwrite')
+      const store = transaction.objectStore('events')
+      for (let index = 0; index < 20; index++) {
+        store.put({
+          sessionId: 's-seed',
+          at: 1000 + index,
+          moduleId: 'recall',
+          module: 'reverse',
+          itemId: `9137${index}`,
+          kind: 'answered',
+          correct: index >= 5,
+          latencyMs: 900,
+        })
+      }
+      transaction.oncomplete = () => resolve()
+      transaction.onerror = () => reject(transaction.error)
+    })
+  })
+  await page.reload()
+  await expect(startButton(page)).toBeVisible()
+  await openPage(page, 'Dein Profil')
+
+  const working = page.locator('.axis', { hasText: 'Arbeitsgedächtnis' })
+  await expect(working).toContainText('sofort, nicht nach Tagen')
+  // 15 von 20 gehalten — mit Spanne, wie jede Achse.
+  await expect(working).toContainText('15')
+  await expect(working).toContainText('20')
+
+  // Und als schwächste wird sie nie genannt — zwei Währungen (D-026):
+  // Der Startbildschirm kündigt keinen Schwerpunkt aus ihr an.
+  await leavePage(page)
+  await expect(page.locator('.focus')).toHaveCount(0)
 })
 
 test('kündigt einen Schwerpunkt an und sagt, warum (E5, E6)', async ({ page }) => {
