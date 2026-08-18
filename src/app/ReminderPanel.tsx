@@ -21,16 +21,22 @@ export function ReminderPanel({
   platform,
   dictionary,
   daily,
+  suggested,
   onChange,
 }: {
   platform: Platform
   dictionary: Dictionary
   daily: TimeOfDay | undefined
+  /**
+   * Die Tageszeit aus dem Ankommen als Vorbelegung des Uhrzeitfelds — mehr
+   * nicht. Eingeschaltet wird die Erinnerung weiterhin nur von Hand (D-015).
+   */
+  suggested?: TimeOfDay
   onChange: () => void
 }) {
   const t = dictionary.reminder
   const [permission, setPermission] = useState(platform.reminders.permission())
-  const [time, setTime] = useState<string>(daily ?? '19:30')
+  const [time, setTime] = useState<string>(daily ?? suggested ?? '19:30')
   const [said, setSaid] = useState<'saved' | 'cleared' | undefined>(undefined)
 
   const [loaded, setLoaded] = useState(daily)

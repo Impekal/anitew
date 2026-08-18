@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { answerRecall, collectItems, recallKind, sceneOf, startButton } from './helpers.ts'
+import { answerRecall, collectItems, recallKind, sceneOf, startButton, visit } from './helpers.ts'
 
 /**
  * Eine Trainingseinheit von vorn bis hinten (Backlog B1–B3, B5, D4, D6).
@@ -10,7 +10,7 @@ import { answerRecall, collectItems, recallKind, sceneOf, startButton } from './
  */
 
 async function startEmergency(page: Page) {
-  await page.goto('/')
+  await visit(page)
   await page.getByRole('button', { name: '60 Sekunden' }).click()
   await startButton(page).click()
   // Das Ankommen (D-011/G-1) lässt sich antippen — im Test warten wir nicht

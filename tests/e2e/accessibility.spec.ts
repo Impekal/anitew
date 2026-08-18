@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-import { startButton } from './helpers.ts'
+import { startButton, visit } from './helpers.ts'
 
 /**
  * Barrierefreiheit (Backlog O4, O5).
@@ -13,7 +13,7 @@ import { startButton } from './helpers.ts'
  */
 
 test('führt die Tastatur zum Startknopf und zeigt den Fokus', async ({ page }) => {
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
 
   // Vom Seitenanfang aus tabben, bis der Startknopf den Fokus hat — er muss
@@ -36,7 +36,7 @@ test('führt die Tastatur zum Startknopf und zeigt den Fokus', async ({ page }) 
 })
 
 test('benennt jedes Bild oder blendet es aus', async ({ page }) => {
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
 
   /*
@@ -49,7 +49,7 @@ test('benennt jedes Bild oder blendet es aus', async ({ page }) => {
 })
 
 test('macht die Uhr der Einheit für einen Screenreader lesbar', async ({ page }) => {
-  await page.goto('/')
+  await visit(page)
   await page.getByRole('button', { name: '60 Sekunden' }).click()
   await startButton(page).click()
   await page.locator('.settle').click()

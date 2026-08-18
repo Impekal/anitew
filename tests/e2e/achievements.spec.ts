@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { startButton } from './helpers.ts'
+import { startButton, visit } from './helpers.ts'
 
 /**
  * Erreichtes (Backlog K3 · D-019).
@@ -11,7 +11,7 @@ import { startButton } from './helpers.ts'
 
 /** Legt genug Trainingstage und Termine an, dass Tatsachen wahr werden. */
 async function seedReached(page: Page) {
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
   await page.evaluate(async () => {
     const open = indexedDB.open('anitew')
@@ -34,7 +34,7 @@ async function seedReached(page: Page) {
 }
 
 test('sagt am Anfang gar nichts (K7)', async ({ page }) => {
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
   // Kein „Erreicht“-Fach, solange nichts erreicht ist.
   await expect(page.getByText('Erreicht', { exact: true })).toHaveCount(0)

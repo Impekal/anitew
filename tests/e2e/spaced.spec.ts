@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { answerRecall, collectItems, recallKind, startEmergency } from './helpers.ts'
+import { answerRecall, collectItems, recallKind, startEmergency, visit } from './helpers.ts'
 
 /**
  * Das Versprechen aus D-004, im Browser nachgeprüft: **Was du heute lernst,
@@ -86,7 +86,7 @@ async function makeEverythingDueToday(page: Page, expected: number) {
 test('holt gelernte Wörter an einem späteren Tag zurück (D8)', async ({ page }) => {
   test.setTimeout(180_000)
 
-  await page.goto('/')
+  await visit(page)
   const learned = await runEmergencySession(page, 'all')
   expect(learned.items.length).toBeGreaterThanOrEqual(3)
 
@@ -157,7 +157,7 @@ test('holt gelernte Wörter an einem späteren Tag zurück (D8)', async ({ page 
 
 test('zeigt kein Wiedersehen, wenn nichts fällig ist', async ({ page }) => {
   test.setTimeout(120_000)
-  await page.goto('/')
+  await visit(page)
   await runEmergencySession(page, 'all')
 
   // Nichts vordatiert: Das frisch Gelernte ist erst in Tagen dran.

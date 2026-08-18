@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-import { startButton } from './helpers.ts'
+import { startButton, visit } from './helpers.ts'
 
 /**
  * Die Wissenschaftsseite, im Browser nachgeprüft (Backlog F6, R-2, R5).
@@ -11,7 +11,7 @@ import { startButton } from './helpers.ts'
  */
 
 async function openScience(page: import('@playwright/test').Page) {
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
   await page.getByText('Was belegt ist', { exact: true }).click()
 }
@@ -61,7 +61,7 @@ test('trennt „wirkt“ von „wirkt auf alles“', async ({ page }) => {
 })
 
 test('hält den ersten Bildschirm davon frei (D-011/G-2)', async ({ page }) => {
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
 
   // Zugeklappt: erreichbar, aber nichts, was den Start bedrängt.

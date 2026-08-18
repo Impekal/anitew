@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { startButton } from './helpers.ts'
+import { startButton, visit } from './helpers.ts'
 
 /** Der Systemcheck liegt zusammengeklappt am Fuß (D-011/G-2). */
 async function openFoundation(page: Page) {
@@ -24,7 +24,7 @@ test('startet ohne Fehler in der Konsole', async ({ page }) => {
   })
   page.on('pageerror', (error) => problems.push(error.message))
 
-  await page.goto('/')
+  await visit(page)
   await expect(page.getByRole('heading', { name: 'ANITEW', level: 1 })).toBeVisible()
   expect(problems).toEqual([])
 })
@@ -34,10 +34,10 @@ test('übernimmt beim ersten Start die Sprache des Geräts (D-007)', async ({ br
   const englishPage = await (await browser.newContext({ locale: 'en-GB' })).newPage()
   const germanPage = await german.newPage()
 
-  await germanPage.goto('/')
+  await visit(germanPage)
   await expect(startButton(germanPage)).toBeVisible()
 
-  await englishPage.goto('/')
+  await visit(englishPage)
   /*
    * Über die Beschriftung des Startknopfes, nicht über seinen Rollennamen:
    * „Begin“ steckt als Teilzeichenkette in „Messung beginnen“, und Playwright
@@ -50,12 +50,12 @@ test('übernimmt beim ersten Start die Sprache des Geräts (D-007)', async ({ br
 
   // Eine Sprache, die wir nicht anbieten, landet auf Englisch — nicht auf leer.
   const swedishPage = await (await browser.newContext({ locale: 'sv-SE' })).newPage()
-  await swedishPage.goto('/')
+  await visit(swedishPage)
   await expect(startButton(swedishPage).locator('.start-label')).toHaveText('Begin')
 })
 
 test('merkt sich die gewählte Sprache über einen Neustart hinweg', async ({ page }) => {
-  await page.goto('/')
+  await visit(page)
   await page.locator('.language:not(.language-training) select').selectOption('en')
   await expect(startButton(page).locator('.start-label')).toHaveText('Begin')
 
@@ -94,7 +94,7 @@ test('merkt sich die gewählte Sprache über einen Neustart hinweg', async ({ pa
 })
 
 test('schreibt auf das Gerät und liest zurück', async ({ page }) => {
-  await page.goto('/')
+  await visit(page)
   await openFoundation(page)
   const storage = page.locator('.foundation .row', { hasText: 'Speicher auf dem Gerät' })
   await expect(storage.locator('dd')).toHaveText('bereit')
@@ -108,7 +108,7 @@ test('schreibt auf das Gerät und liest zurück', async ({ page }) => {
 })
 
 test('kennt den Trainingstag, mit der Grenze um 4 Uhr', async ({ page }) => {
-  await page.goto('/')
+  await visit(page)
   await openFoundation(page)
   const day = page.locator('.foundation .row', { hasText: 'Trainingstag' }).locator('dd')
   await expect(day).toHaveText(/^\d{4}-\d{2}-\d{2}$/)
@@ -117,13 +117,13 @@ test('kennt den Trainingstag, mit der Grenze um 4 Uhr', async ({ page }) => {
 test('hält den ersten Bildschirm frei von Technik', async ({ page }) => {
   // D-011/G-2: Der Systemcheck aus M0 ist erreichbar, aber er beherrscht den
   // Einstieg nicht mehr. Wer die App öffnet, sieht ein Angebot, kein Protokoll.
-  await page.goto('/')
+  await visit(page)
   await expect(page.locator('.foundation')).toBeHidden()
   await expect(startButton(page)).toBeVisible()
 })
 
 test('ist als App installierbar', async ({ page, request }) => {
-  await page.goto('/')
+  await visit(page)
 
   const manifestHref = await page.locator('link[rel="manifest"]').getAttribute('href')
   expect(manifestHref).toBeTruthy()
@@ -150,7 +150,7 @@ test('ist als App installierbar', async ({ page, request }) => {
 test('lässt sich der Ton abschalten, und die Wahl bleibt', async ({ page }) => {
   // D-011/G-9: Ton ist voreingestellt an — sonst wüsste niemand, dass es ihn
   // gibt. Abschalten muss dafür an Ort und Stelle möglich sein und halten.
-  await page.goto('/')
+  await visit(page)
   const toggle = page.getByRole('button', { name: /Ton (an|aus)/ })
   await expect(toggle).toHaveAttribute('aria-pressed', 'true')
 

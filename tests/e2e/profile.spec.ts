@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { startButton } from './helpers.ts'
+import { startButton, visit } from './helpers.ts'
 
 /**
  * Das Gedächtnisprofil im Browser (Backlog E3, E4, E7 · D-021).
@@ -11,7 +11,7 @@ import { startButton } from './helpers.ts'
 
 /** Legt Termine mit Abfragen und Rückfällen je Modul in die Datenbank. */
 async function seed(page: Page, rows: readonly { module: string; reviews: number; lapses: number }[]) {
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
   await page.evaluate(async (list) => {
     const open = indexedDB.open('anitew')

@@ -36,7 +36,7 @@ Phase mit Entscheidungen, die dir gehören.
 |---|---|
 | **KI mit eigenem Schlüssel** (M, Milestone M6) | Welche Anbieter? Die App bleibt ohne KI vollständig — KI verbessert nur (Merkbilder, Extraktion aus eigenem Material). Jede KI-Funktion braucht einen Offline-Rückfall. Große Fläche, viele kleine Entscheidungen |
 | **Eigene Inhalte** (I, Milestone M6) | „Ich treffe morgen 6 Kollegen“ → daraus ein Training. Text/Foto/Diktat rein, Fakten raus, Merkbilder, Wiederholungsplan. Hängt teils an M, teils an einem eigenen Editor. Datenschutz dafür steht schon vorbereitet in `PRIVACY.md` §9 |
-| **Cloud-Abgleich** (N7/N8/N10, Milestone M7) | Google-Drive-App-Ordner (OAuth/PKCE, kein Backend) und/oder iCloud (erst mit nativer iOS-App). Ausdrückliche Wahl, nie Voreinstellung. Braucht dein Google-Freigabeverfahren (N10) |
+| **Cloud-Abgleich** (N7/N8/N10, Milestone M7) | **Entschieden 2026-08-18: wird gebaut** — Google-Anmeldung mit Ablage im eigenen Google-Drive-App-Ordner (OAuth/PKCE, kein eigener Server, R-3 bleibt). Reihenfolge ebenfalls entschieden: erst Optik + Kennenlernen, dann der Abgleich. Live gehen kann er erst mit deinem Google-Cloud-OAuth-Client und der Domain (Gruppe 1) |
 | **Fotorealistische Porträts** (D16), **CC0-Icon-Satz** (D15) | Asset- und Lizenzentscheidung. Heute erzeugt die App Gesichter selbst (D-005) — bewusst, und es funktioniert |
 | **Französische Oberfläche** (fr.ts) | Die Prosa braucht eine muttersprachliche Durchsicht, bevor sie öffentlich geht. **Französisch als Trainingssprache** ist dagegen fertig und geprüft (L6/L7) |
 

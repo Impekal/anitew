@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { startButton } from './helpers.ts'
+import { startButton, visit } from './helpers.ts'
 
 /**
  * Erinnerungen im Browser (Backlog B8 · D-022).
@@ -13,7 +13,7 @@ import { startButton } from './helpers.ts'
  */
 
 async function openReminders(page: Page) {
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
   await page.getByText('Erinnerung', { exact: true }).click()
 }
@@ -79,7 +79,7 @@ test('fragt nicht beim ersten Start nach Benachrichtigungen', async ({ page }) =
    * Ablehnung lässt sich von der App aus nie wieder zurücknehmen. Gefragt
    * wird erst dort, wo jemand eine Erinnerung wirklich will.
    */
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
   await expect(page.getByRole('button', { name: 'Benachrichtigungen erlauben' })).toBeHidden()
 })

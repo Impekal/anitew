@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { startButton } from './helpers.ts'
+import { startButton, visit } from './helpers.ts'
 
 /**
  * Die Messung, im Browser nachgeprüft (Backlog F1, F2, F2a, F2b, F3, F5).
@@ -72,7 +72,7 @@ async function seedRuns(page: Page, runs: readonly SeedRun[]) {
 }
 
 test('lädt zur ersten Messung ein und sagt, warum sie zählt', async ({ page }) => {
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
 
   // Die allererste Messung ist sofort fällig: Ohne Tag 0 gäbe es später
@@ -84,7 +84,7 @@ test('lädt zur ersten Messung ein und sagt, warum sie zählt', async ({ page })
 test('misst mit Wörtern, die es im Training nicht gibt (F2a)', async ({ page }) => {
   test.setTimeout(180_000)
 
-  await page.goto('/')
+  await visit(page)
   await page.getByRole('button', { name: 'Messung beginnen' }).click()
 
   // Zwanzig Punkte, einer je Wort — der Aufbau ist immer derselbe (D-006).
@@ -112,7 +112,7 @@ test('misst mit Wörtern, die es im Training nicht gibt (F2a)', async ({ page })
 })
 
 test('sagt vor der dritten Messung keine Veränderung (F2b)', async ({ page }) => {
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
 
   await seedRuns(page, [
@@ -128,7 +128,7 @@ test('sagt vor der dritten Messung keine Veränderung (F2b)', async ({ page }) =
 })
 
 test('verkauft ein Wort mehr nicht als Fortschritt (F3, R-1)', async ({ page }) => {
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
 
   /*
@@ -147,7 +147,7 @@ test('verkauft ein Wort mehr nicht als Fortschritt (F3, R-1)', async ({ page }) 
 })
 
 test('nennt einen deutlichen Unterschied mit seiner Spanne (F3)', async ({ page }) => {
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
 
   await seedRuns(page, [
@@ -163,7 +163,7 @@ test('nennt einen deutlichen Unterschied mit seiner Spanne (F3)', async ({ page 
 })
 
 test('lässt eine unvollständige Messung draußen (F1)', async ({ page }) => {
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
 
   /*
@@ -182,7 +182,7 @@ test('lässt eine unvollständige Messung draußen (F1)', async ({ page }) => {
 })
 
 test('erklärt auf Nachfrage, was gemessen wurde (F3, F4)', async ({ page }) => {
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
   await seedRuns(page, [{ ordinal: 1, day: dayKey(-14), nextDay: 8, complete: true }])
 
@@ -198,7 +198,7 @@ test('lässt sich abbrechen und sagt, was das kostet (D-015)', async ({ page }) 
    * D-015 ausschließt. Geprüft wird deshalb beides: **dass** es geht — und
    * dass die App danach sagt, was passiert ist, statt es zu verschlucken.
    */
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
   await page.getByRole('button', { name: 'Messung beginnen' }).click()
 
@@ -222,7 +222,7 @@ test('lässt sich abbrechen und sagt, was das kostet (D-015)', async ({ page }) 
 test('nimmt nach einem Abbruch andere Wörter', async ({ page }) => {
   // Die verbrauchten Wörter kommen nicht wieder: Sie wurden gesehen, und ein
   // zweites Mal gemessen wären sie keine Messung mehr.
-  await page.goto('/')
+  await visit(page)
   await page.getByRole('button', { name: 'Messung beginnen' }).click()
   await expect(page.locator('.encode-word')).toBeVisible({ timeout: 30_000 })
   const first = ((await page.locator('.encode-word').textContent()) ?? '').trim()

@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { answerRecall, collectItems, startButton } from './helpers.ts'
+import { answerRecall, collectItems, startButton, visit } from './helpers.ts'
 
 /**
  * Der Gedächtnispalast, im Browser nachgeprüft (Backlog G1, G2, G4, G6).
@@ -26,7 +26,7 @@ import { answerRecall, collectItems, startButton } from './helpers.ts'
  */
 async function startWalk(page: Page): Promise<boolean> {
   for (let attempt = 0; attempt < 25; attempt++) {
-    await page.goto('/')
+    await visit(page)
     await page.getByRole('button', { name: '3 Minuten' }).click()
     await startButton(page).click()
     await page.locator('.settle').click()
@@ -47,7 +47,7 @@ test('erklärt den Palast, bevor der erste Gang kommt — und nur einmal', async
    * Technik ungelehrt ist, stellt der Planer sie nach vorn. Deshalb reicht
    * hier ein Anlauf, wo die anderen Palasttests würfeln müssen.
    */
-  await page.goto('/')
+  await visit(page)
   // `exact`, weil „5 Minuten“ auch in „15 Minuten“ steckt — dieselbe Falle
   // wie bei „Beginnen“, und Playwright vergleicht Namen von Haus aus als
   // Teilzeichenkette.
@@ -66,7 +66,7 @@ test('erklärt den Palast, bevor der erste Gang kommt — und nur einmal', async
   await expect(page.locator('.walk')).toBeVisible({ timeout: 30_000 })
 
   // Zweite Einheit: keine Lektion mehr.
-  await page.goto('/')
+  await visit(page)
   await page.getByRole('button', { name: '5 Minuten', exact: true }).click()
   await startButton(page).click()
   await page.locator('.settle').click()
@@ -135,7 +135,7 @@ test('lässt einen eigenen Weg anlegen und benutzt ihn (G3)', async ({ page }) =
    * deutlich besser als ein geratener. Bis hierher waren die drei
    * mitgelieferten Wege eine Krücke — und die App hat sie auch so genannt.
    */
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
   await page.getByText('Der Gedächtnispalast', { exact: true }).click()
 
@@ -192,7 +192,7 @@ test('lässt einen eigenen Weg anlegen und benutzt ihn (G3)', async ({ page }) =
     })
   })
 
-  await page.goto('/')
+  await visit(page)
   await page.getByRole('button', { name: '60 Sekunden' }).click()
   await startButton(page).click()
   await page.locator('.settle').click()
@@ -225,7 +225,7 @@ test('lässt einen eigenen Weg anlegen und benutzt ihn (G3)', async ({ page }) =
 })
 
 test('nimmt keinen halben Weg an', async ({ page }) => {
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
   await page.getByText('Der Gedächtnispalast', { exact: true }).click()
 

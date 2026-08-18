@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-import { answerRecall, collectItems, startButton } from './helpers.ts'
+import { answerRecall, collectItems, startButton, visit } from './helpers.ts'
 
 /**
  * Fehlertoleranz (Backlog P7).
@@ -24,7 +24,7 @@ test('läuft ohne jede Datenbank weiter (privater Modus)', async ({ page }) => {
   const errors: string[] = []
   page.on('pageerror', (error) => errors.push(String(error)))
 
-  await page.goto('/')
+  await visit(page)
 
   // Kein weißer Bildschirm: Der Startknopf ist da.
   await expect(startButton(page)).toBeVisible({ timeout: 30_000 })
@@ -48,7 +48,7 @@ test('sagt im privaten Modus, dass nichts gespeichert wird (P7, N2)', async ({ p
     Object.defineProperty(window, 'indexedDB', { get: () => undefined })
   })
 
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible({ timeout: 30_000 })
   await expect(page.getByText(/Dieses Gerät speichert gerade nichts/)).toBeVisible()
   // Mit Ausweg, nicht nur Diagnose.
@@ -59,7 +59,7 @@ test('schweigt, wo gespeichert wird', async ({ page }) => {
   // Die Gegenprobe: Auf einem gewöhnlichen Gerät darf die Warnung nie
   // erscheinen — sonst wäre sie ein Fehlalarm, und Fehlalarme lehrt man sich
   // zu übersehen.
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
   await expect(page.getByText(/Dieses Gerät speichert gerade nichts/)).toHaveCount(0)
 })
@@ -79,7 +79,7 @@ test('führt eine ganze Einheit ohne Datenbank zu Ende (voller Speicher)', async
   const errors: string[] = []
   page.on('pageerror', (error) => errors.push(String(error)))
 
-  await page.goto('/')
+  await visit(page)
   await page.getByRole('button', { name: '60 Sekunden' }).click()
   await startButton(page).click()
   await page.locator('.settle').click()
@@ -101,7 +101,7 @@ test('bleibt heil, wenn Benachrichtigungen abgelehnt sind (P7)', async ({ page }
     Object.defineProperty(Notification, 'permission', { get: () => 'denied' })
   })
 
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
   await page.getByText('Erinnerung', { exact: true }).click()
 
@@ -118,7 +118,7 @@ test('löscht auf Wunsch alles — aber erst nach einer echten Rückfrage (N4)',
    * Geprüft wird beides: dass ein einzelner Fehlgriff nichts anrichtet (die
    * Rückfrage), und dass ein bewusster Griff wirklich alles nimmt.
    */
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
 
   // Erst etwas anlegen, das gelöscht werden kann.
@@ -180,7 +180,7 @@ test('löscht auf Wunsch alles — aber erst nach einer echten Rückfrage (N4)',
 test('zeigt, wie viel Platz belegt ist (N5)', async ({ page }) => {
   // Gemessen, nicht erfunden — und mit „etwa“, weil der Browser den Wert grob
   // hält. Nach einer Einheit steht dort eine echte Größe.
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
   await page.getByText('Sicherung', { exact: true }).click()
   await expect(page.getByText(/Auf diesem Gerät belegt: etwa/)).toBeVisible()

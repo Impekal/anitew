@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-import { startButton } from './helpers.ts'
+import { startButton, visit } from './helpers.ts'
 
 /**
  * Datenschutz in der App (Backlog R4).
@@ -10,7 +10,7 @@ import { startButton } from './helpers.ts'
  * Datenschutzerklärung, die nur das Angenehme nennt, ist eine Werbeseite.
  */
 test('sagt in fünf Zeilen, wo die Daten liegen', async ({ page }) => {
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
   await page.getByText('Datenschutz', { exact: true }).click()
 
@@ -25,7 +25,7 @@ test('nennt auch das Unbequeme', async ({ page }) => {
    * der Anbieter sieht dabei, was jeder Webserver sieht. Das zu verschweigen
    * wäre bequem und falsch (R-2).
    */
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
   await page.getByText('Datenschutz', { exact: true }).click()
 
@@ -34,7 +34,7 @@ test('nennt auch das Unbequeme', async ({ page }) => {
 })
 
 test('hält den ersten Bildschirm davon frei (D-011/G-2)', async ({ page }) => {
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
   await expect(page.locator('.privacy-lead')).toBeHidden()
 })

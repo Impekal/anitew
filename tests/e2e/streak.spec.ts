@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { answerRecall, collectItems, startButton, startEmergency } from './helpers.ts'
+import { answerRecall, collectItems, startButton, startEmergency, visit } from './helpers.ts'
 
 /**
  * Die Serie, im Browser nachgeprüft (Backlog K2, K5, K7 · D-008).
@@ -59,7 +59,7 @@ test('sagt nichts, solange nichts trainiert wurde (K7)', async ({ page }) => {
    * ausschließt — und ein leeres Feld, das nach Verpflichtung aussieht,
    * bevor überhaupt etwas passiert ist.
    */
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
   await expect(page.locator('.streak')).toBeHidden()
 })
@@ -67,7 +67,7 @@ test('sagt nichts, solange nichts trainiert wurde (K7)', async ({ page }) => {
 test('zählt einen Tag, sobald eine Einheit zu Ende gelaufen ist', async ({ page }) => {
   test.setTimeout(120_000)
 
-  await page.goto('/')
+  await visit(page)
   await startEmergency(page)
   const learned = await collectItems(page, 8)
   await answerRecall(page, learned, 'all')
@@ -81,7 +81,7 @@ test('zählt einen Tag, sobald eine Einheit zu Ende gelaufen ist', async ({ page
 })
 
 test('hält die Serie über einen verpassten Tag hinweg (D-008)', async ({ page }) => {
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
 
   /*
@@ -101,7 +101,7 @@ test('hält die Serie über einen verpassten Tag hinweg (D-008)', async ({ page 
 })
 
 test('zeigt die Schutztage, die auf Vorrat sind', async ({ page }) => {
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
 
   // Vierzehn Tage am Stück: zwei Schutztage, und mehr lassen sich nicht
@@ -118,7 +118,7 @@ test('zeigt die Schutztage, die auf Vorrat sind', async ({ page }) => {
 })
 
 test('nennt die Bestmarke erst, wenn sie etwas anderes sagt (K5, G-2)', async ({ page }) => {
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
 
   // Eine laufende Serie ohne Bruch: Bestmarke und laufende Serie wären

@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-import { startButton } from './helpers.ts'
+import { startButton, visit } from './helpers.ts'
 
 /**
  * Kaltstart und ruckelfreie Timer (Backlog P4).
@@ -30,7 +30,7 @@ test('lädt beim zweiten Mal aus dem Cache und bleibt bedienbar (offline)', asyn
    * Worker, ohne Netz. Genau das prüft dieser Fall — erst warmlaufen lassen,
    * dann das Netz kappen und neu laden.
    */
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
   // Dem Service Worker einen Moment geben, die Kontrolle zu übernehmen.
   await page.waitForFunction(() => navigator.serviceWorker?.controller != null, { timeout: 30_000 })
@@ -51,7 +51,7 @@ test('hält den Hauptthread frei — keine lange Aufgabe im Leerlauf', async ({ 
    * Einheit stockte. Geprüft wird deshalb, dass in einer Sekunde Ruhe **keine**
    * lange Aufgabe (über 50 ms am Stück) anfällt.
    */
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
 
   const longTasks = await page.evaluate(async () => {

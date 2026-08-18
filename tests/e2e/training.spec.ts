@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { answerRecall, collectItems, startButton } from './helpers.ts'
+import { answerRecall, collectItems, startButton, visit } from './helpers.ts'
 
 /**
  * Trainingssprache getrennt von Oberflächensprache (Backlog L5, L7).
@@ -43,7 +43,7 @@ async function itemLanguages(page: Page): Promise<string[]> {
 test('lässt die Oberfläche deutsch und den Inhalt englisch werden', async ({ page }) => {
   test.setTimeout(180_000)
 
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
 
   // Die Oberfläche bleibt, wie sie ist — nur der Inhalt wechselt.
@@ -62,7 +62,7 @@ test('legt für jede Trainingssprache eine eigene Reihe an (L5)', async ({ page 
    * einer Einheit auf Deutsch und einer auf Englisch stehen zwei Reihen
    * nebeneinander, jede mit eigenen Terminen.
    */
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
   await trainOnce(page)
   expect(await itemLanguages(page)).toEqual(['de'])
@@ -73,7 +73,7 @@ test('legt für jede Trainingssprache eine eigene Reihe an (L5)', async ({ page 
 })
 
 test('sagt, warum nicht alle elf Sprachen zur Auswahl stehen', async ({ page }) => {
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
 
   // Angeboten wird nur, wofür es eigenen Inhalt gibt — und die App sagt das,

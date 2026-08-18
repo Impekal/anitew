@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import {
   MODES,
@@ -23,6 +23,9 @@ import {
   moduleForDimension,
   installAdvice,
   isComplete,
+  focusForGoal,
+  reminderTimeFor,
+  suggestedMode,
   numberPool,
   trainingLanguages,
   profileOf,
@@ -52,7 +55,9 @@ import { loadOwnPalace } from '../data/palace.ts'
 import { loadDailyTime } from '../data/reminders.ts'
 import { loadPalaceTaught, loadTaught } from '../data/technique.ts'
 
+import { AboutPanel } from './AboutPanel.tsx'
 import { BackupPanel } from './BackupPanel.tsx'
+import { OnboardingScreen } from './onboarding/OnboardingScreen.tsx'
 import { PalacePanel } from './PalacePanel.tsx'
 import { ProfilePanel } from './ProfilePanel.tsx'
 import { ReminderPanel } from './ReminderPanel.tsx'
@@ -65,6 +70,7 @@ import { BenchmarkPanel } from './benchmark/BenchmarkPanel.tsx'
 import { BenchmarkScreen } from './benchmark/BenchmarkScreen.tsx'
 import { SessionScreen } from './session/SessionScreen.tsx'
 import { useLanguage } from './useLanguage.ts'
+import { useProfile } from './useProfile.ts'
 import { useStoragePersists } from './useStoragePersists.ts'
 import { useTrainingLanguage } from './useTrainingLanguage.ts'
 import { useSoundSetting } from './useSoundSetting.ts'
@@ -96,7 +102,26 @@ export function App() {
     ),
   )
   const sound = useSoundSetting(platform)
+  /*
+   * Das Ankommens-Profil (Onboarding).
+   *
+   * `undefined` nach dem Laden heißt: noch nie gefragt — dann kommt das
+   * Ankommen. Ein gespeichertes leeres Objekt heißt: gefragt und
+   * übersprungen — dann kommt es nie wieder (D-015: einmal Nein ist Nein).
+   */
+  const { profile, ready: profileReady, save: saveProfile } = useProfile(platform)
   const [mode, setMode] = useState<TrainingMode>('daily')
+  /*
+   * Der Startmodus aus dem Profil — einmal gesetzt, wenn der Speicher
+   * gelesen ist, und nie wieder: Ab dann gehört die Wahl dem Finger auf den
+   * Pillen, nicht der Antwort von damals.
+   */
+  const modeSeeded = useRef(false)
+  useEffect(() => {
+    if (!profileReady || modeSeeded.current) return
+    modeSeeded.current = true
+    setMode(suggestedMode(profile))
+  }, [profileReady, profile])
   const [running, setRunning] = useState<SessionProgress | undefined>()
   const [resumable, setResumable] = useState<SessionProgress | undefined>()
   /*
@@ -203,12 +228,20 @@ export function App() {
    * einhält.
    */
   const focus = useMemo(() => {
+    /*
+     * Zwei Quellen, eine klare Rangfolge (R-1): Erst die Zählung — nur wenn
+     * sie **nichts** sagt, darf das selbst genannte Ziel aus dem Ankommen
+     * einen Schwerpunkt vorschlagen. Die Quelle wird mitgeführt, weil die
+     * Ansage dazu eine andere ist: „dort blieb am wenigsten“ wäre gelogen,
+     * wenn in Wahrheit nur der Wunsch spricht.
+     */
     const weak = weakest(profileOf(dimensionCounts))
-    if (weak === undefined) return undefined
-    const moduleId = moduleForDimension(weak)
+    const measured = weak === undefined ? undefined : moduleForDimension(weak)
+    const moduleId = measured ?? focusForGoal(profile?.goal)
     if (moduleId === undefined) return undefined
-    return learnableModules(MODES[mode].seconds).includes(moduleId) ? moduleId : undefined
-  }, [dimensionCounts, mode])
+    if (!learnableModules(MODES[mode].seconds).includes(moduleId)) return undefined
+    return { moduleId, source: measured !== undefined ? ('measured' as const) : ('goal' as const) }
+  }, [dimensionCounts, mode, profile])
 
   const start = useCallback(() => {
     // Der erste Ton der Einheit, ausgelöst vom Fingertipp — genau die Geste,
@@ -289,7 +322,7 @@ export function App() {
         due,
         taught,
         palaceTaught,
-        focus,
+        focus: focus?.moduleId,
       })
       const progress: SessionProgress = {
         sessionId,
@@ -433,10 +466,35 @@ export function App() {
 
   const greeting = useMemo(() => {
     const lines = dictionary.greetings
-    return lines[createRng(today).int(lines.length)] ?? dictionary.app.tagline
-  }, [dictionary, today])
+    const line = lines[createRng(today).int(lines.length)] ?? dictionary.app.tagline
+    // Der Rufname aus dem Ankommen macht aus dem Tagessatz eine Anrede.
+    // Mehr Personalisierung gibt es nicht — der Satz bleibt derselbe für alle.
+    const name = profile?.name
+    return name === undefined ? line : `${dictionary.onboarding.hello} ${name}. ${line}`
+  }, [dictionary, today, profile])
 
-  if (!ready) return null
+  if (!ready || !profileReady) return null
+
+  /*
+   * Das Ankommen — nur beim allerersten Öffnen (dann ist im Speicher noch
+   * gar kein Profil, auch kein leeres). Es steht vor allen anderen
+   * Bildschirmen: Wer es je beantwortet oder übersprungen hat, sieht es nie
+   * wieder.
+   */
+  if (profile === undefined) {
+    return (
+      <OnboardingScreen
+        dictionary={dictionary}
+        onDone={(answers) => {
+          saveProfile(answers)
+          // Die Zeit-Antwort wird sofort zur Voreinstellung — nicht erst
+          // beim nächsten Öffnen. `modeSeeded` ist damit erledigt.
+          modeSeeded.current = true
+          setMode(suggestedMode(answers))
+        }}
+      />
+    )
+  }
 
   if (measuring && open !== undefined) {
     return (
@@ -653,15 +711,22 @@ export function App() {
           <>
             <p className="focus">
               {dictionary.profile.focus}{' '}
-              <strong>{(dictionary.profile.modules as Record<string, string>)[focus]}</strong>
+              <strong>
+                {(dictionary.profile.modules as Record<string, string>)[focus.moduleId]}
+              </strong>
             </p>
             {/*
-              Der Grund gehört dazu, sonst ist es eine Behauptung (E6). Und der
-              zweite Halbsatz gehört auch dazu: Ein Schwerpunkt, der wie ein
-              Urteil über einen Menschen klingt, wäre die Diagnose, die D-021
-              ausschließt — er ändert sich, sobald sich die Zahlen ändern.
+              Der Grund gehört dazu, sonst ist es eine Behauptung (E6). Und
+              zwar der **richtige** Grund: Kommt der Schwerpunkt aus der
+              Zählung, steht da die Zählung; kommt er nur aus dem selbst
+              genannten Ziel, steht da das Ziel — „dort blieb am wenigsten“
+              wäre sonst eine erfundene Messung (R-1).
             */}
-            <p className="hint focus-why">{dictionary.profile.focusWhy}</p>
+            <p className="hint focus-why">
+              {focus.source === 'measured'
+                ? dictionary.profile.focusWhy
+                : dictionary.profile.focusWhyGoal}
+            </p>
           </>
         )}
 
@@ -782,6 +847,7 @@ export function App() {
             platform={platform}
             dictionary={dictionary}
             daily={daily}
+            suggested={profile?.dayPart === undefined ? undefined : reminderTimeFor(profile.dayPart)}
             onChange={reloadDaily}
           />
         </details>
@@ -791,6 +857,17 @@ export function App() {
         <details className="details">
           <summary>{dictionary.profile.heading}</summary>
           <ProfilePanel counts={dimensionCounts} dictionary={dictionary} />
+        </details>
+
+        {/*
+          „Über dich“ — die Antworten aus dem Ankommen, jederzeit änderbar.
+          Direkt unter dem Gedächtnisprofil, und die Trennung ist dieselbe wie
+          dort (F1): Hier steht, was jemand über sich *gesagt* hat; darüber
+          steht, was gezählt wurde. Die beiden mischen sich nie.
+        */}
+        <details className="details">
+          <summary>{dictionary.onboarding.editHeading}</summary>
+          <AboutPanel dictionary={dictionary} profile={profile} onSave={saveProfile} />
         </details>
 
         <details className="details">

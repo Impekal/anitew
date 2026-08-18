@@ -3,7 +3,7 @@ import { join } from 'node:path'
 
 import { expect, test, type Page, type TestInfo } from '@playwright/test'
 
-import { answerRecall, collectItems, startEmergency } from './helpers.ts'
+import { answerRecall, collectItems, startEmergency, visit } from './helpers.ts'
 
 /**
  * Die Sicherung, im Browser nachgeprüft (Backlog N2, N6).
@@ -66,7 +66,7 @@ test('trägt die Trainingshistorie auf ein zweites Gerät', async ({ browser }, 
   // ── Gerät 1: einmal trainieren, dann sichern ────────────────────────────
   const first = await browser.newContext()
   const page = await first.newPage()
-  await page.goto('/')
+  await visit(page)
   await startEmergency(page)
   const learned = await collectItems(page, 8)
   await answerRecall(page, learned, 'all')
@@ -94,7 +94,8 @@ test('trägt die Trainingshistorie auf ein zweites Gerät', async ({ browser }, 
   // ── Gerät 2: leer, liest die Datei ein ──────────────────────────────────
   const second = await browser.newContext()
   const fresh = await second.newPage()
-  await fresh.goto('/')
+  // Auch das zweite Gerät sieht zuerst das Kennenlernen — und überspringt es.
+  await visit(fresh)
   expect((await countStored(fresh)).itemStates).toBe(0)
 
   await openBackupPanel(fresh)
@@ -120,7 +121,7 @@ test('trägt die Trainingshistorie auf ein zweites Gerät', async ({ browser }, 
 test('sagt bei einer fremden Datei, was los ist — und schimpft nicht', async ({
   page,
 }, testInfo) => {
-  await page.goto('/')
+  await visit(page)
   await openBackupPanel(page)
 
   const foreign = fixturePath(testInfo, 'fremd.json')

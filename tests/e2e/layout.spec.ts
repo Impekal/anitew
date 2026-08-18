@@ -1,6 +1,6 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
 
-import { startButton } from './helpers.ts'
+import { startButton, visit } from './helpers.ts'
 
 /**
  * Auf jedem Gerät fehlerfrei (Backlog P6).
@@ -44,7 +44,7 @@ async function withinViewport(page: Page, locator: Locator, name: string) {
 }
 
 test('der Startbildschirm passt, ohne seitlich zu schieben', async ({ page }) => {
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
 
   await noHorizontalOverflow(page)
@@ -61,7 +61,7 @@ test('der Startbildschirm passt, ohne seitlich zu schieben', async ({ page }) =>
 })
 
 test('hält die Breite, wenn alle Klappfächer offen stehen', async ({ page }) => {
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
 
   // Jedes Detail am Fuß aufklappen — dort steckt der meiste Text, und ein zu
@@ -75,8 +75,27 @@ test('hält die Breite, wenn alle Klappfächer offen stehen', async ({ page }) =
   await noHorizontalOverflow(page)
 })
 
-test('bleibt beim Einprägen im Rahmen', async ({ page }) => {
+test('das Kennenlernen passt auf jedes Gerät', async ({ page }) => {
+  // Absichtlich ohne `visit`: Hier soll genau der allererste Bildschirm
+  // stehen, den `visit` sonst übergeht.
   await page.goto('/')
+  await expect(page.locator('.arrival')).toBeVisible()
+  await noHorizontalOverflow(page)
+  await withinViewport(page, startButton(page), 'der Los-geht’s-Knopf')
+
+  // Und die längste Antwortliste (das Ziel) ragt ebenfalls nirgends hinaus.
+  await startButton(page).click()
+  await page.locator('.arrival-next').click()
+  const choices = page.locator('.choice')
+  await expect(choices).toHaveCount(5)
+  for (let index = 0; index < 5; index++) {
+    await withinViewport(page, choices.nth(index), `Antwort ${index + 1}`)
+  }
+  await noHorizontalOverflow(page)
+})
+
+test('bleibt beim Einprägen im Rahmen', async ({ page }) => {
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
 
   // Kürzester Weg zu einem Einprägeblock, ohne echte Sekunden abzuwarten.
@@ -95,7 +114,7 @@ test('bleibt beim Einprägen im Rahmen', async ({ page }) => {
 })
 
 test('zentriert den Inhalt auf breiten Schirmen, statt ihn zu strecken', async ({ page }) => {
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
 
   const size = page.viewportSize()

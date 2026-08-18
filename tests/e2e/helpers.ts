@@ -55,6 +55,25 @@ export function startButton(page: Page): Locator {
   return page.locator('button.start')
 }
 
+/**
+ * Öffnet die App und überspringt das Kennenlernen (Onboarding), falls es
+ * dasteht. Beim allerersten Öffnen stellt die App ihre Fragen; fast alle
+ * Prüfungen wollen aber den Startbildschirm — und ein zweites Öffnen im
+ * selben Durchlauf zeigt die Fragen nicht mehr, weil die Antwort (auch die
+ * leere) gespeichert ist. Geprüft wird, was da ist, nicht was da sein müsste.
+ */
+export async function visit(page: Page) {
+  await page.goto('/')
+  await page.locator('.arrival, .challenge').first().waitFor()
+  if ((await page.locator('.arrival').count()) > 0) {
+    // Der „Ohne Fragen anfangen“-Knopf ist der einzige stille auf dem
+    // Willkommensschritt — über die Klasse gefunden, nicht über den Namen
+    // (die alte Teilzeichenketten-Falle).
+    await page.locator('.arrival .quiet').click()
+    await page.locator('.challenge').waitFor()
+  }
+}
+
 /** Startet den Notfallmodus und überspringt das Ankommen. */
 export async function startEmergency(page: Page) {
   await page.getByRole('button', { name: '60 Sekunden' }).click()

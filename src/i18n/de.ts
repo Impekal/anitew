@@ -371,6 +371,9 @@ export const de = {
     */
     focus: 'Heute mit Schwerpunkt:',
     focusWhy: 'Von dem, was zurückkam, ist dort am wenigsten geblieben. Ändert sich, sobald sich die Zahlen ändern.',
+    // E6/R-1: Wenn nur der Wunsch spricht, steht da der Wunsch — nicht eine
+    // Messung, die es nie gab.
+    focusWhyGoal: 'Weil du dir das vorgenommen hast. Sobald deine eigenen Zahlen etwas sagen, zählen die.',
     modules: {
       words: 'Wörter',
       faces: 'Gesichter',
@@ -605,5 +608,55 @@ export const de = {
     openCount: 'Bisher geöffnet',
     times: 'mal',
     version: 'Fassung',
+  },
+  onboarding: {
+    /*
+      Das Ankommen (Onboarding).
+
+      Fünf Fragen, alle freiwillig — und jede Antwort tut genau das, was ihr
+      Begleitsatz sagt, nicht mehr. Kein Satz hier verspricht etwas über das
+      Gedächtnis (R-1/R-2): Ein Ziel wird ein Vorschlag, ein Zeitbudget eine
+      Voreinstellung, die Tageszeit ein Erinnerungs-Angebot, das Altersband
+      gar nichts. Der Text sagt das offen, damit niemand mehr vermutet.
+    */
+    welcomeTitle: 'Schön, dass du da bist.',
+    welcomeNote: 'Ein paar kurze Fragen, damit sich die App nach dir richtet. Alles ist freiwillig — was du nicht sagen willst, überspringst du.',
+    begin: 'Los geht’s',
+    skipAll: 'Ohne Fragen anfangen',
+    skip: 'Überspringen',
+    next: 'Weiter',
+    nameQuestion: 'Wie dürfen wir dich nennen?',
+    namePlaceholder: 'Dein Rufname',
+    nameNote: 'Bleibt auf diesem Gerät, wie alles hier.',
+    goalQuestion: 'Was willst du dir besser merken?',
+    goals: {
+      names: 'Namen & Gesichter',
+      numbers: 'Zahlen & PINs',
+      everyday: 'Alltag — Einkäufe, Termine, Wege',
+      learning: 'Lernstoff & Vokabeln',
+      fit: 'Einfach in Übung bleiben',
+    },
+    goalNote: 'Dein Ziel wird ein Schwerpunkt-Vorschlag. Sobald deine eigenen Zahlen etwas sagen, zählen die.',
+    timeQuestion: 'Wie viel Zeit hast du an einem normalen Tag?',
+    timeNote: 'Nur die Voreinstellung. Vor jeder Einheit wählst du neu.',
+    dayQuestion: 'Wann passt Üben am besten in deinen Tag?',
+    dayParts: {
+      morning: 'Morgens',
+      midday: 'Mittags',
+      evening: 'Abends',
+    },
+    dayNote: 'Daraus wird nur ein Vorschlag für die Erinnerung — eingeschaltet wird sie erst, wenn du es tust.',
+    ageQuestion: 'Wie alt bist du ungefähr?',
+    ageBands: {
+      under16: 'Unter 16',
+      upTo29: '16 bis 29',
+      upTo49: '30 bis 49',
+      from50: '50 oder älter',
+    },
+    ageNote: 'Nur Kontext. Die Übungen bleiben für alle gleich — angepasst wird nach deinen Ergebnissen, nicht nach deinem Alter.',
+    editHeading: 'Über dich',
+    editNote: 'Deine Antworten vom Anfang. Ändern oder leeren — beides jederzeit.',
+    hello: 'Hallo',
+    unanswered: 'Nicht beantwortet',
   },
 } as const

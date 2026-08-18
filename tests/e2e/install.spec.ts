@@ -1,6 +1,6 @@
 import { devices, expect, test } from '@playwright/test'
 
-import { startButton } from './helpers.ts'
+import { startButton, visit } from './helpers.ts'
 
 /**
  * Der Weg auf den Startbildschirm (Backlog Q5).
@@ -14,7 +14,7 @@ test('sagt auf dem iPhone, warum der Startbildschirm zählt', async ({ browser }
   const context = await browser.newContext({ ...devices['iPhone 13'] })
   const page = await context.newPage()
 
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
   await page.getByText('Auf den Startbildschirm', { exact: true }).click()
 
@@ -32,7 +32,7 @@ test('schweigt auf Android und am Schreibtisch', async ({ page }) => {
    * Dort bleibt der Speicher auch im Tab. Ein Hinweis wäre eine Aufforderung
    * ohne Anlass — und der Browser lädt ohnehin selbst zur Installation ein.
    */
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
   await expect(page.getByText('Auf den Startbildschirm', { exact: true })).toHaveCount(0)
 })
@@ -41,7 +41,7 @@ test('hält den ersten Bildschirm auch auf dem iPhone frei (D-011/G-2)', async (
   const context = await browser.newContext({ ...devices['iPhone 13'] })
   const page = await context.newPage()
 
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
   // Zugeklappt: erreichbar, aber nichts, was den Start bedrängt.
   await expect(page.getByText(/sieben Tage lang nicht benutzt wurde/)).toBeHidden()

@@ -948,3 +948,43 @@ App für den ehrlichen Nutzer schlechter, der schlicht die richtige Uhrzeit auf
 seinem Telefon hat. Die Serie ist ohnehin so gebaut, dass sich Betrug nicht
 lohnt: Sie belohnt Wiederkommen, und wer sich eine Serie erschummelt, betrügt
 niemanden als sich selbst um die einzige gemessene Zahl (die Messung, F1).
+
+## D-024 · 2026-08-18 · Das Kennenlernen fragt — und macht aus Antworten nie Aussagen
+
+**Entscheidung:** Beim allerersten Öffnen stellt die App fünf freiwillige
+Fragen: Rufname, Ziel, Zeitbudget, bevorzugte Tageszeit, Altersband. Jede ist
+überspringbar, und der Ausstieg („Ohne Fragen anfangen“) ist ein
+gleichwertiger Knopf auf dem ersten Schritt — kein grauer Kleintext-Link.
+Einmal beantwortet oder übersprungen, kommt keine Frage je wieder; ein leeres
+Profil ist ein vollständiges Profil. Nachträglich ist alles unter „Über dich“
+änderbar und leerbar.
+
+**Was die Antworten dürfen — und was nicht:**
+
+- **Der Name** wird Anrede. Sonst nichts.
+- **Das Ziel** wird ein Schwerpunkt-**Vorschlag** — aber nur, solange die
+  Zählung nichts sagt. Sobald `weakest` aus gemessenen Achsen einen
+  Schwerpunkt begründet, regiert die Zählung. Die Begründung unter der
+  Ansage nennt die echte Quelle: „dort blieb am wenigsten“ nur bei einer
+  Messung, „weil du dir das vorgenommen hast“ beim Ziel. Alles andere wäre
+  eine erfundene Messung (R-1).
+- **Das Zeitbudget** wird die Voreinstellung des Startbildschirms — dieselben
+  vier Modi, keine eigene Zeitrechnung. Danach gehört die Wahl dem Finger.
+- **Die Tageszeit** wird die Vorbelegung des Uhrzeitfelds der Erinnerung.
+  Eingeschaltet wird die Erinnerung weiterhin nur von Hand (D-022, D-015).
+- **Das Altersband** wird gespeichert und bewirkt **nichts**. Grobe Bänder
+  statt Geburtsjahr (Datenschutz, Minderjährige); und jede „für dein
+  Alter“-Anpassung wäre eine Behauptung ohne Messung (R-2). Ein Kerntest
+  (`tests/core/onboarding.test.ts`) prüft strukturell, dass mit Band und ohne
+  dasselbe herauskommt — wer das je ändern will, muss zuerst den Test ändern
+  und damit die Entscheidung sichtbar treffen.
+
+**Warum kein Erstdiagnose-Test daraus wurde:** D-021 gilt unverändert. Das
+Kennenlernen misst nichts und behauptet nichts — es fragt nach Wünschen, nicht
+nach Fähigkeiten. Das Gedächtnisprofil wächst weiter ausschließlich aus dem
+Training, die Messung bleibt die einzige Auskunft über das Gedächtnis (F1).
+
+**Abgrenzung zu O2 (kein Onboarding-Wall):** Ein Wall ist ein Zwang. Das
+Kennenlernen ist ein Angebot mit sichtbarem Ausgang nach einem Tap — und der
+E2E-Test öffnet die App genau so, wie es alle Prüfungen tun: erst fragen
+lassen, dann übergehen.

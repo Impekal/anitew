@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { startButton } from './helpers.ts'
+import { startButton, visit } from './helpers.ts'
 
 /**
  * Memory Missions, im Browser nachgeprüft (Backlog H1, H2, H4).
@@ -21,7 +21,7 @@ import { startButton } from './helpers.ts'
 /** Startet neu, bis der Plan das Missionsmodul zieht. */
 async function startMission(page: Page): Promise<boolean> {
   for (let attempt = 0; attempt < 25; attempt++) {
-    await page.goto('/')
+    await visit(page)
     await page.getByRole('button', { name: '60 Sekunden' }).click()
     await startButton(page).click()
     await page.locator('.settle').click()

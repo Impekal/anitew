@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { startButton } from './helpers.ts'
+import { startButton, visit } from './helpers.ts'
 
 /**
  * Die Merktechnik, im Browser nachgeprüft (Backlog D5).
@@ -32,7 +32,7 @@ const TEACH_ORDER = [1, 2, 3, 4, 5, 9, 7, 8, 0, 6]
  * ist die Prüfung vollständig, egal welche Zahl gezogen wird.
  */
 async function seedTaught(page: Page, digits: readonly number[]) {
-  await page.goto('/')
+  await visit(page)
   // Erst nach dem ersten Laden gibt es das Schema, in das geschrieben wird.
   await expect(startButton(page)).toBeVisible()
   await page.evaluate(async (value) => {
@@ -164,7 +164,7 @@ test('zeigt nichts an, solange nichts gelehrt ist', async ({ page }) => {
    *
    * Im Notfallmodus wird nicht unterrichtet, es bleibt also alles ungelehrt.
    */
-  await page.goto('/')
+  await visit(page)
   await page.getByRole('button', { name: '60 Sekunden' }).click()
   await startButton(page).click()
   await page.locator('.settle').click()

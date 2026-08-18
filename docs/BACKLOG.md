@@ -71,6 +71,7 @@ unter „Nicht-Ziele“.
 | B7 | Weitermachen nach der Tages-Challenge: freies Training, zählt für Fortschritt, aber ohne Druck | ✅ 2026-08-18 | „Noch eine Runde“ am Abschluss, **neben „Zurück“, nicht darüber**, ohne Ausrufezeichen. Ein Tap beginnt eine frische Einheit (neuer `key`, damit der Runner wirklich neu aufsetzt); sie zählt wie jede andere für Serie und Wiedersehen. Wer aufhören will, hört auf. `tests/e2e/session.spec.ts` | S |
 | B8 | Tageserinnerung als **lokale** Benachrichtigung, opt-in, feste Uhrzeit wählbar | 🟨 2026-08-18 | **D-022**. Der Mechanismus steht und die Uhrzeit wird gemerkt — aber das Web kann eine Benachrichtigung nicht für später einplanen (`TimestampTrigger` gibt es nirgends dauerhaft, und ein Server-Push kommt nicht in Frage). Die App **sagt das**, vor der Einstellung. Zugesagt werden kann es erst als App aus dem Store (Q) | M |
 | B9 | Session-Log: jede Antwort mit Item-ID, richtig/falsch, Latenz, Kontext | ✅ 2026-08-17 | ein Ereignis **je Wort**, nicht „6 von 8“ — ohne diese Auflösung gäbe es später keine Vergessenskurve pro Information. Nur anhängen, nie ändern | M |
+| B10 | Kennenlernen (Onboarding): Name, Ziel, Zeitbudget, Tageszeit, Altersband — alles freiwillig | ✅ 2026-08-18 | **D-024**. Fünf Fragen, eine je Bildschirm, jede überspringbar; „Ohne Fragen anfangen“ ist ein echter Knopf auf dem ersten Schritt. Antworten werden Anrede und **Vorschläge** (Startmodus, Schwerpunkt-Fallback, Erinnerungs-Uhrzeit), nie Aussagen (R-1). Nachträglich änderbar unter „Über dich“. `tests/e2e/onboarding.spec.ts` | M |
 
 ## C. Memory Engine — Spacing & Retrieval
 
@@ -244,7 +245,7 @@ Anforderung wie jede andere. Die acht Regeln G-1 bis G-8 stehen in
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
 | O1 | Vom Öffnen zum laufenden Training: ein Tap, unter zwei Sekunden | ✅ 2026-08-17 | | M |
-| O2 | Kein Onboarding-Wall, keine Registrierung, kein Einwilligungslabyrinth | ✅ 2026-08-17 | | S |
+| O2 | Kein Onboarding-Wall, keine Registrierung, kein Einwilligungslabyrinth | ✅ 2026-08-17 | Das Kennenlernen (B10) ist kein Wall: ein Tap („Ohne Fragen anfangen“) und man ist drin — geprüft im E2E | S |
 | O3 | Hell/Dunkel nach Systemeinstellung | ✅ 2026-08-17 | warmes Papier im Hellen, warmes Dunkel im Dunklen — nirgends reines Weiß oder Schwarz (G-4) | S |
 | O4 | Barrierefreiheit: Kontrast, große Schrift, Screenreader, Fokusreihenfolge, reduzierte Bewegung | ✅ 2026-08-18 | „weniger Bewegung“ schaltet alles still (`prefers-reduced-motion`). **Sichtbarer Fokusring auf jedem bedienbaren Element** (`:focus-visible`, deutlich auf Dunkel), Bilder benannt oder `aria-hidden`, die Uhr der Einheit als `progressbar` mit Werten. Große Schrift: relative Einheiten, Browser-Zoom trägt. `tests/e2e/accessibility.spec.ts` | M |
 | O5 | Einhändig bedienbar, alles Wichtige in der Daumenzone | ✅ 2026-08-18 | Startknopf mittig-groß, „Fertig“/„Zurück“ am unteren Rand, Abbruch unten. Die zwei häufigsten Knöpfe (Zeitwahl, „Beginnen“) auf 44 px Mindesthöhe angehoben | M |

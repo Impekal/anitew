@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { startButton } from './helpers.ts'
+import { startButton, visit } from './helpers.ts'
 
 /**
  * Die Wiedersehen auf dem Startbildschirm (Backlog K1, K5, K7 · D-019).
@@ -12,7 +12,7 @@ import { startButton } from './helpers.ts'
 
 /** Legt Termine mit einer bestimmten Zahl von Abfragen in die Datenbank. */
 async function seedReviews(page: Page, counts: readonly number[]) {
-  await page.goto('/')
+  await visit(page)
   await expect(startButton(page)).toBeVisible()
   await page.evaluate(async (list) => {
     const open = indexedDB.open('anitew')
