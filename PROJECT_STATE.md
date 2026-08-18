@@ -1939,3 +1939,43 @@ hat, und datiert erst dann vor. Zwölf Läufe hintereinander grün.
 **Die Lehre:** Wenn eine Wartezeit nicht reicht, ist die erste Frage nicht „wie
 lange noch“, sondern **„worauf warte ich eigentlich, und kann es überhaupt
 noch kommen?“**
+
+---
+
+## 2026-08-18 · Markenrecherche (R3) — eine Prüfung, die ihre eigene Grenze nennt
+
+R3 ist die Aufgabe, bei der es am meisten darauf ankommt, **nichts zu
+behaupten, was nicht geprüft ist** — eine erfundene „Markenfreiheit“ wäre die
+teuerste erfundene Zahl von allen, weil auf ihr echtes Geld ausgegeben wird.
+
+Was die Vorprüfung ergeben hat (`docs/TRADEMARK.md`):
+
+- **Keine gleichnamige App** in Apple- und Play-Store. Der Markt ist voll von
+  „Memory Trainer“, „Memory Training“, „memoryOS“ — genau den generischen
+  Namen, die D-001 bewusst gemieden hat. Der schwierigere Name zahlt sich hier
+  aus.
+- **Kein exakter Markentreffer.** Nächstliegend ANIKEW (US, Haushaltswaren,
+  Klasse 21) — andere Schreibweise, andere Klasse.
+- **Domains** `anitew.com` und `anitew.app` lösen nicht auf, kein aktiver
+  Auftritt.
+- **Ein Fund, der in D-001 fehlte:** „anitew“ ist ein echtes Wort im Twi
+  (Akan, Ghana), belegt in Kirchenliedern und Bibeltexten. Kein
+  Markenhindernis — aber die D-001-Annahme „sagt zunächst nichts“ stimmt nur
+  für Menschen ohne Twi. Ich habe das als Nachtrag in D-001 korrigiert, statt
+  es unbemerkt weiterleben zu lassen.
+
+Und die **harte Grenze**, die den Ausschlag für den Status gibt: Die
+Markenregister selbst — Justia und TMview/EUIPO — sind aus dieser Umgebung vom
+Egress-Proxy blockiert. Die eigentliche Recherche in den Klassen 9 (Software)
+und 41 (Training) ist damit **nicht gemacht.** Genau deshalb steht R3 auf 🟨
+und nicht auf ✅, und `TRADEMARK.md` sagt in der ersten Zeile, dass es keine
+Freigabe ist. Der Name darf für die Entwicklung weiterlaufen; bevor Geld für
+Icon, Domain oder Anmeldung fließt, ist die Register-Recherche nachzuholen.
+
+**Die Haltung dahinter:** Eine Vorprüfung, die ihre eigene Lücke benennt, ist
+mehr wert als eine, die „alles frei“ meldet und die halbe Arbeit verschweigt.
+Das ist dieselbe Regel wie bei der Messung und beim Profil — nur diesmal über
+den eigenen Namen.
+
+**Stand:** unverändert 303 Kerntests, 144 E2E-Läufe (nur Dokumentation
+geändert).

@@ -28,6 +28,16 @@ Offen bleibt die Markenrecherche (Backlog R3), bevor Icon und Store-Eintrag
 entstehen. Das ist keine Rechtsberatung, sondern eine Prüfung, die vor Geld­
 ausgaben stattfinden sollte.
 
+**Nachtrag 2026-08-18 (R3-Vorprüfung, `docs/TRADEMARK.md`):** Der Satz „ANITEW
+sagt zunächst nichts“ stimmt nicht ganz. **„anitew“ ist ein Wort im Twi
+(Akan, Ghana)** und kommt dort in Kirchenliedern und Bibeltexten vor — für
+Twi-Sprechende ist der Name also nicht leer. Am Ergebnis von D-001 ändert das
+nichts: Er ist im Zielmarkt (DE/EU) unbesetzt, auffindbar und trägt keine
+generische Bedeutung, die die Eintragung erschwerte — eher im Gegenteil. Aber
+die Begründung wird hiermit korrigiert, damit eine falsche Annahme nicht
+unbemerkt weiterlebt. Die eigentliche Freigabe (Register-Recherche) steht
+weiter aus.
+
 ## D-002 · 2026-08-17 · Kostenlos, mit Spende. Pro bleibt möglich, aber gebunden
 
 Die App ist kostenlos. Wer will, kann spenden. Ein späteres Pro-Angebot wird
