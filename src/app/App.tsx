@@ -21,6 +21,7 @@ import {
   reminderDay,
   learnableModules,
   moduleForDimension,
+  installAdvice,
   numberPool,
   trainingLanguages,
   profileOf,
@@ -78,6 +79,17 @@ export function App() {
    */
   const { training, chooseTraining } = useTrainingLanguage(platform, language)
   const trainable = trainingLanguages()
+  /*
+   * Einmal beim Aufbau ermittelt: Weder die Browserkennung noch der
+   * Startmodus ändern sich, solange die Seite läuft.
+   */
+  const [advice] = useState(() =>
+    installAdvice(
+      navigator.userAgent,
+      window.matchMedia('(display-mode: standalone)').matches ||
+        (navigator as { standalone?: boolean }).standalone === true,
+    ),
+  )
   const sound = useSoundSetting(platform)
   const [mode, setMode] = useState<TrainingMode>('daily')
   const [running, setRunning] = useState<SessionProgress | undefined>()
@@ -759,6 +771,28 @@ export function App() {
           <summary>{dictionary.science.heading}</summary>
           <SciencePanel dictionary={dictionary} />
         </details>
+
+        {/*
+          Der Weg auf den Startbildschirm steht **über** dem Datenschutz und
+          der Sicherung, weil er auf iOS dieselbe Gefahr betrifft: Im Browser
+          kann der Speicher nach sieben Tagen ohne Benutzung weggeräumt werden
+          (Q5). Anderswo steht hier nichts — dort ist es ein Angebot und keine
+          Warnung, und die Einladung des Browsers reicht.
+        */}
+        {advice.kind === 'ios' && (
+          <details className="details">
+            <summary>{dictionary.install.heading}</summary>
+            <div className="privacy">
+              <p className="privacy-lead">{dictionary.install.why}</p>
+              <ol className="privacy-points">
+                {dictionary.install.steps.map((step) => (
+                  <li key={step}>{step}</li>
+                ))}
+              </ol>
+              <p className="hint">{dictionary.install.orBackup}</p>
+            </div>
+          </details>
+        )}
 
         {/*
           Der Datenschutz steht bei der Sicherung, weil beides dieselbe Frage

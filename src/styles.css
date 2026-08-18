@@ -170,7 +170,17 @@ body::before {
 .app {
   max-width: 34rem;
   margin: 0 auto;
-  padding: 2.5rem 1.35rem calc(2rem + env(safe-area-inset-bottom));
+  /*
+    Sichere Ränder auf allen vier Seiten (Q5).
+
+    Unten stand das schon — dort sitzt der Streifen der Home-Geste. Oben
+    fehlte es: Mit `viewport-fit=cover` und der durchscheinenden Statusleiste
+    läuft der Hintergrund bis unter die Uhr, und ohne diesen Abstand liefe der
+    Titel mit hinein. Links und rechts betrifft es das quer gehaltene iPhone,
+    wo die Kerbe in den Textbereich ragt.
+  */
+  padding: calc(2.5rem + env(safe-area-inset-top)) calc(1.35rem + env(safe-area-inset-right))
+    calc(2rem + env(safe-area-inset-bottom)) calc(1.35rem + env(safe-area-inset-left));
   display: flex;
   flex-direction: column;
   gap: 2rem;

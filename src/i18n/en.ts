@@ -284,6 +284,16 @@ export const en: Dictionary = {
     ],
     honest: 'What does happen: for the app to reach your device at all, it is loaded once. The provider delivering it sees what any web server sees. After that ANITEW runs without a network.',
   },
+  install: {
+    heading: 'Add to the home screen',
+    why: 'In the browser, iOS clears the storage of a site that has not been used for seven days — and your training history with it. Started from the home screen, that does not happen.',
+    steps: [
+      'Tap the share icon in the bar at the bottom.',
+      'Choose "Add to Home Screen".',
+      'Start ANITEW from there.',
+    ],
+    orBackup: 'If you would rather not, save a backup regularly. The file then lives with you and survives any clean-up.',
+  },
   streak: {
     days: 'days in a row',
     day: 'day in a row',

@@ -27,8 +27,40 @@ async function runEmergencySession(page: Page, answer: 'all' | 'none') {
   return learned
 }
 
-/** Zieht alle Termine so weit vor, dass sie heute fällig sind. */
-async function makeEverythingDueToday(page: Page) {
+/**
+ * Zieht alle Termine so weit vor, dass sie heute fällig sind.
+ *
+ * **Erst warten, bis alles geschrieben ist.** Die Termine entstehen nach der
+ * Einheit, und sie werden nebenläufig geschrieben — die Zusammenfassung steht
+ * schon da, während der letzte Eintrag noch unterwegs ist. Wer in dieser Lücke
+ * vordatiert, bekommt seine Änderung von einem nachziehenden Schreibvorgang
+ * überschrieben: Der Termin steht dann wieder in der Zukunft, es ist nichts
+ * fällig, und es kommt kein Wiedersehen.
+ *
+ * Genau das ist zweimal passiert, und beide Male sah es nach einer zu kurzen
+ * Wartezeit aus — der Bildschirmabzug zeigte aber eine **fertige Einheit ohne
+ * Wiedersehensblock**. Nicht zu langsam, sondern zu früh.
+ */
+async function makeEverythingDueToday(page: Page, expected: number) {
+  await expect
+    .poll(
+      () =>
+        page.evaluate(async () => {
+          const open = indexedDB.open('anitew')
+          const database: IDBDatabase = await new Promise((resolve, reject) => {
+            open.onsuccess = () => resolve(open.result)
+            open.onerror = () => reject(open.error)
+          })
+          return new Promise<number>((resolve) => {
+            const request = database.transaction('itemStates').objectStore('itemStates').count()
+            request.onsuccess = () => resolve(request.result)
+            request.onerror = () => resolve(0)
+          })
+        }),
+      { timeout: 30_000 },
+    )
+    .toBeGreaterThanOrEqual(expected)
+
   const count = await page.evaluate(async () => {
     const open = indexedDB.open('anitew')
     const database: IDBDatabase = await new Promise((resolve, reject) => {
@@ -59,7 +91,7 @@ test('holt gelernte Wörter an einem späteren Tag zurück (D8)', async ({ page 
   expect(learned.items.length).toBeGreaterThanOrEqual(3)
 
   // Der Sprung in die Zukunft.
-  await makeEverythingDueToday(page)
+  await makeEverythingDueToday(page, learned.items.length)
   await page.reload()
 
   await startEmergency(page)

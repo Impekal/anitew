@@ -430,6 +430,28 @@ export const de = {
     ],
     honest: 'Was trotzdem passiert: Damit die App überhaupt auf dein Gerät kommt, wird sie einmal geladen. Der Anbieter, der sie ausliefert, sieht dabei das, was jeder Webserver sieht. Danach läuft ANITEW ohne Netz.',
   },
+  install: {
+    /*
+      Der Hinweis auf iOS (Q5).
+
+      **Keine Werbung für eine Installation, sondern eine Auskunft über eine
+      Gefahr.** Safari räumt den Speicher einer Webseite auf, die sieben Tage
+      lang nicht benutzt wurde — für eine App aus Terminen über Wochen ist
+      das der Totalverlust. Vom Startbildschirm aus gilt das nicht.
+
+      Deshalb steht der Grund vor der Anleitung. Ein „Installiere die App!“
+      ohne Grund wäre die Aufforderung, die D-015 ausschließt.
+    */
+    heading: 'Auf den Startbildschirm',
+    why: 'Im Browser räumt iOS den Speicher einer Seite auf, die sieben Tage lang nicht benutzt wurde — mit ihm deine Trainingsgeschichte. Vom Startbildschirm aus passiert das nicht.',
+    steps: [
+      'Unten in der Leiste auf das Teilen-Zeichen tippen.',
+      '„Zum Home-Bildschirm“ wählen.',
+      'ANITEW von dort starten.',
+    ],
+    // Der zweite Weg, und er gilt immer: Die Datei gehört dir.
+    orBackup: 'Wer das nicht will, sollte regelmäßig eine Sicherung speichern. Die Datei liegt dann bei dir und überlebt jedes Aufräumen.',
+  },
   streak: {
     /*
       Die Serie sagt, was war — mehr nicht (K7). Keine Drohung, kein

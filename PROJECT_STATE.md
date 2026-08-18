@@ -1871,3 +1871,71 @@ Sammlung übernommen. Und bei den Quellen der Wissenschaftsseite: Bibliografisch
 Angaben sind Tatsachen und frei — zitiert wird kein Text, verlinkt keine PDF.
 
 **Stand:** 297 Kerntests, 138 E2E-Läufe, Typecheck für App und Kern grün.
+
+---
+
+## 2026-08-18 · Der Weg auf den Startbildschirm (Q5)
+
+Q5 stand im Backlog als Kleinigkeit: „funktioniert heute schon und ist Phase
+1“. Beim Hinsehen war es das Gegenteil — **auf iOS entscheidet sich hier, ob
+jemand seine Trainingsgeschichte behält.**
+
+Safari räumt den Speicher einer Webseite auf, die sieben Tage lang nicht
+benutzt wurde. Für eine App, die aus Terminen über Wochen besteht (D-004), ist
+das kein Detail, sondern der Totalverlust — und genau der Fall, der dieses
+Projekt einmal getroffen hat und weshalb es die Sicherung überhaupt gibt (N2).
+Vom Startbildschirm aus gestartet gilt die Räumung nicht.
+
+Deshalb ist der Hinweis in der App **keine Werbung für eine Installation,
+sondern eine Auskunft über eine Gefahr**:
+
+- Er steht **nur auf iPhone und iPad im Browser**. Auf Android und am
+  Schreibtisch bleibt der Speicher auch im Tab — dort wäre er eine
+  Aufforderung ohne Anlass, und die schließt K7 aus.
+- Er verschwindet, sobald die App vom Startbildschirm läuft.
+- **Der Grund steht vor der Anleitung.** Ein „Installiere die App!“ ohne Grund
+  ist die Aufforderung, gegen die D-015 geschrieben ist. Ein Test hält die
+  Reihenfolge sogar im Dokument fest.
+- Und daneben steht der zweite Weg für alle, die nicht wollen: regelmäßig eine
+  Sicherung speichern. Niemand soll ohne Ausweg dastehen.
+
+Die Erkennung liegt im Kern (`core/install.ts`) und nimmt die Browserkennung
+als Zeichenkette entgegen, statt sie selbst zu lesen. Eine Regel, die auf
+Gerätemerkmalen beruht, ließe sich sonst nur auf einem echten iPhone prüfen —
+so prüft sie ein Test in Node (D-010). Nebenbei ist dabei die Feinheit
+festgehalten, dass **das iPad sich seit iPadOS 13 als „Macintosh“ meldet** und
+nur noch daran zu erkennen ist, dass es Berührungen kennt; ein echter Mac
+fällt heraus, und das ist richtig.
+
+Dazu die zwei Handgriffe, die eine Web-App auf iOS erst wie eine App aussehen
+lassen: Vollbild ohne Adressleiste (beide Metaangaben, die alte und die neue),
+durchscheinende Statusleiste — und **sichere Ränder auf allen vier Seiten**.
+Unten stand das schon, weil dort der Streifen der Home-Geste sitzt; oben
+fehlte es, und mit der durchscheinenden Statusleiste wäre der Titel unter die
+Uhr gelaufen.
+
+**Stand:** 303 Kerntests, 144 E2E-Läufe, Typecheck für App und Kern grün.
+
+### Nicht zu langsam — zu früh
+
+Eine Prüfung fiel zweimal um, und beide Male sah es nach einer zu kurzen
+Wartezeit aus: Der Wiedersehensblock kam nicht innerhalb von 60, dann nicht
+innerhalb von 100 Sekunden. Ich hatte beim ersten Mal die Frist erhöht — das
+war die falsche Antwort.
+
+Der Bildschirmabzug zeigte nämlich etwas anderes: eine **fertige Einheit ohne
+Wiedersehensblock**. Es kam nicht zu spät, es kam gar nicht.
+
+Der Grund liegt in der Vorbereitung des Tests. Er lässt eine Einheit laufen und
+zieht dann alle Termine auf heute vor. Die Termine entstehen aber **nebenläufig
+nach** der Einheit — die Zusammenfassung steht schon da, während der letzte
+Eintrag noch geschrieben wird. Wer in dieser Lücke vordatiert, bekommt seine
+Änderung von einem nachziehenden Schreibvorgang überschrieben: Der Termin steht
+wieder in der Zukunft, es ist nichts fällig, und es kommt kein Wiedersehen.
+
+Der Test wartet jetzt, bis so viele Einträge da sind, wie die Einheit gelernt
+hat, und datiert erst dann vor. Zwölf Läufe hintereinander grün.
+
+**Die Lehre:** Wenn eine Wartezeit nicht reicht, ist die erste Frage nicht „wie
+lange noch“, sondern **„worauf warte ich eigentlich, und kann es überhaupt
+noch kommen?“**

@@ -263,8 +263,8 @@ Anforderung wie jede andere. Die acht Regeln G-1 bis G-8 stehen in
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | ✅ 2026-08-18 | 296 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Sessionplanung, Bewertung, Scheduler, Gesichtsgenerator, die ganze Messung und die Wirkungsaussagen (R5) sind abgedeckt | M |
-| P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | ✅ 2026-08-18 | 138 Läufe in Chromium und im Telefonprofil, darunter eine Einheit von vorn bis hinten und der Abbruch mitten drin. Seit M4 **liest der Test ab, welches Modul kam, statt es vorherzusagen** (`tests/e2e/helpers.ts`) | M |
+| P1 | Unit-Tests für den Kern: Scheduler, Scoring, Sessionplanung — deterministisch | ✅ 2026-08-18 | 303 Tests laufen in Node, ganz ohne Browser — was zugleich D-010 belegt. Sessionplanung, Bewertung, Scheduler, Gesichtsgenerator, die ganze Messung und die Wirkungsaussagen (R5) sind abgedeckt | M |
+| P2 | E2E gegen den **gebauten** Stand, nicht gegen den Dev-Server | ✅ 2026-08-18 | 144 Läufe in Chromium und im Telefonprofil, darunter eine Einheit von vorn bis hinten und der Abbruch mitten drin. Seit M4 **liest der Test ab, welches Modul kam, statt es vorherzusagen** (`tests/e2e/helpers.ts`) | M |
 | P3 | CI bei jedem Push: Typecheck (App **und** Kern getrennt), Tests, Build, E2E | ✅ 2026-08-17 | | S |
 | P4 | Performance: Kaltstart unter 2 s, Timer laufen ruckelfrei | ⬜ | | M |
 | P5 | Uhrmanipulation darf die Engine nicht zerstören (Streak-Betrug, Intervall-Chaos) | ⬜ | monotone Zeitquelle plus Plausibilitätsprüfung | M |
@@ -280,7 +280,7 @@ Anforderung wie jede andere. Die acht Regeln G-1 bis G-8 stehen in
 | Q2 | Digital Asset Links vorbereiten (assetlinks.json, Signaturfingerprint) | ⬜ | | S |
 | Q3 | Bubblewrap → .aab → Play Console, Signierung, Test-Track | ⬜ | Phase 2 | M |
 | Q4 | Play: Datenschutzerklärung, Data-Safety-Formular, Altersfreigabe | ⬜ | | M |
-| Q5 | iOS: „Zum Home-Bildschirm → als Web-App öffnen“ dokumentieren und den Weg optimieren | ⬜ | funktioniert heute schon und ist Phase 1 | S |
+| Q5 | iOS: „Zum Home-Bildschirm → als Web-App öffnen“ dokumentieren und den Weg optimieren | ✅ 2026-08-18 | `docs/INSTALL.md` und ein Hinweis **nur auf iPhone/iPad im Browser**: Dort kann Safari den Speicher nach sieben Tagen ohne Benutzung räumen — für eine App aus Terminen über Wochen der Totalverlust. Der Grund steht vor der Anleitung; anderswo steht gar nichts, weil es dort ein Angebot wäre und keine Warnung (K7). Dazu Vollbild-Metaangaben und sichere Ränder auf allen vier Seiten | S |
 | Q6 | iOS App Store: Apple lehnt reine Website-Verpackungen ab — eigenständiger Mehrwert / native Funktionen nötig | ❗ | Phase 2, eigene Entscheidung. Nicht „Website in einen Container stecken“ | L |
 | Q7 | Icon, Screenshots, Store-Texte — in allen Sprachen aus L2 | ⬜ | | M |
 

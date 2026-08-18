@@ -178,3 +178,32 @@ describe('die Datenschutzerklärung (R4)', () => {
     }
   })
 })
+
+describe('die Installationsanleitung (Q5)', () => {
+  it('nennt den Grund vor dem Weg', () => {
+    /*
+     * Ein „Installiere die App!“ ohne Grund wäre die Aufforderung, die K7
+     * ausschließt. Der Grund ist eine Tatsache über iOS und keine Werbung —
+     * und er steht in der Anleitung vor den Schritten.
+     */
+    const install = textOf('docs/INSTALL.md')
+    const reason = install.indexOf('sieben Tagen')
+    const steps = install.indexOf('Zum Home-Bildschirm')
+    expect(reason).toBeGreaterThan(-1)
+    expect(steps).toBeGreaterThan(reason)
+  })
+
+  it('nennt die Sicherung als den zweiten Weg', () => {
+    // Wer nicht installieren will, soll nicht ohne Ausweg dastehen.
+    expect(textOf('docs/INSTALL.md')).toMatch(/Sicherung ist der zweite Weg/)
+  })
+
+  it('verspricht durch die Installation nichts, was sie nicht tut', () => {
+    const install = textOf('docs/INSTALL.md')
+    expect(install).toMatch(/Sie legt kein Konto an/)
+    expect(install).toMatch(/Es gibt keinen Server/)
+    for (const pattern of FORBIDDEN) {
+      expect(pattern.test(install), `INSTALL.md enthält ${pattern}`).toBe(false)
+    }
+  })
+})
