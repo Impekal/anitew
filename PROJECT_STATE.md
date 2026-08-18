@@ -2089,3 +2089,58 @@ das schon verweigert ist, kein Uhrzeit-Feld, das ohnehin nicht griffe.
 
 **Stand:** 303 Kerntests, 154 Funktionsläufe (5 neue Fehlertoleranz-Prüfungen)
 plus Layout-Matrix über sieben Geräte, Typecheck für App und Kern grün.
+
+---
+
+## 2026-08-18 · Reisen und verstellte Uhren (P5, P6) — beweisen statt behaupten
+
+Eine Gedächtnis-App, deren Tagesgrenze und Serie an der Uhr hängen, muss „was
+ist heute?“ auch dann richtig beantworten, wenn jemand über Zeitzonen fliegt
+oder die Geräteuhr verstellt. Der Kern war dafür schon gebaut — diese Runde
+hat es **bewiesen** und die Antwort als Entscheidung festgeschrieben (D-023).
+
+### Die Antwort auf „was ist heute?“
+
+**Der lokale Kalendertag, an dem du gerade bist.** Nicht der Tag am Ort des
+letzten Trainings, nicht UTC. `dayKeyOf` bekommt bei jedem Aufruf den Versatz
+des Geräts zum aktuellen Moment — ich habe nachgesehen: **jede** der elf
+Aufrufstellen tut das, keine rechnet mit einem alten Versatz. Es gibt also
+keinen Drift-Bug, obwohl der Kern browserfrei ist.
+
+### Der Fund, der keiner war
+
+Beim Durchprobieren fiel auf: Eine Reise nach Osten lässt in ~27 echten
+Stunden **zwei** Tagesschlüssel vergehen (Berlin 17. → Tokio 19.). Der erste
+Reflex war „Bug“. Er ist keiner: In Tokio *ist* der 19., und ein Mensch dort
+würde zustimmen. Die richtige Federung dafür steht längst da — der
+**Schutztag**. Wer eine Woche geübt hat, verliert die Serie durch die Reise
+nicht; ein ganz neuer Nutzer verliert einen Ein-Tages-Lauf, und das ist wenig.
+
+Das ist die Lehre der Runde: **Nicht jede Überraschung ist ein Fehler.** Die
+ehrliche Reaktion war, das Verhalten zu verstehen, als richtig zu erkennen und
+als Test festzuschreiben — nicht, hektisch eine „Korrektur“ einzubauen, die
+den ehrlichen Reisenden schlechter behandelte.
+
+### Was jetzt festgenagelt ist
+
+`tests/core/travel.test.ts`, acht Prüfungen:
+
+- Derselbe Moment ist je nach Ort ein anderer Tag — beide haben recht.
+- Die 4-Uhr-Grenze gilt in jeder Zeitzone.
+- Ostreise: Schutztag hält die Serie. Westreise: der doppelte Tag zählt einmal.
+- Vorgestellte Uhr erzeugt keine Serie; echte Serie bleibt neben Zukunftstagen.
+- Das 20-Minuten-Fenster der Messung ist absolut-zeitlich und damit gegen
+  Zeitzonen immun; eine Reise, die den Folgetag überspringt, macht die Messung
+  **verpasst** und nicht falsch (F1).
+
+Und die Dauern selbst: Ein Block misst über `elapsed()` (`performance.now()`,
+monoton). Ein Uhrsprung mitten in der Einheit verkürzt oder verlängert keinen
+Block — Zeitumstellung, Netzabgleich, Betrugsversuch, alles egal.
+
+**Was nicht gebaut wird:** eine app-eigene, vom Gerät entkoppelte Zeit. Das
+wäre die einzige wirklich betrugssichere Lösung und machte die App für den
+ehrlichen Nutzer schlechter. Die Serie belohnt Wiederkommen; wer sich eine
+erschummelt, betrügt niemanden als sich selbst um die einzige gemessene Zahl.
+
+**Stand:** 311 Kerntests, 177 E2E-Läufe (unverändert — diese Runde nur Kern
+und Doku), Typecheck für App und Kern grün.

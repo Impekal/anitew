@@ -902,3 +902,49 @@ dem ersten Abruf läuft ein Fenster von 15 bis 45 Minuten, und wer es verpasst,
 hat eine Messung umsonst gemacht (F1). Erinnert wird nach **zwanzig** Minuten
 — in der ersten Hälfte des Fensters, damit fünfundzwanzig Minuten Luft
 bleiben.
+
+---
+
+## D-023 · 2026-08-18 · „Heute“ ist der Ort, an dem du gerade bist
+
+**Entscheidung:** Der Trainingstag ist der **lokale Kalendertag am aktuellen
+Standort** — nicht der Tag am Ort des letzten Trainings, nicht UTC. `dayKeyOf`
+bekommt bei jedem Aufruf den Versatz des Geräts zum aktuellen Moment
+(`platform.clock.offsetMinutes(now)`), und die 4-Uhr-Grenze (D-008) gilt in
+dieser Ortszeit.
+
+**Warum:** Es ist die einzige Antwort, die sich mit dem deckt, was ein Mensch
+als „heute“ empfindet. Wer in Tokio aufwacht, für den ist heute der Tag, den
+sein Telefon dort anzeigt — alles andere (der Berliner Tag von gestern Abend,
+oder UTC) verwirrte mehr, als es hülfe.
+
+**Was daraus folgt, und wie es gefangen ist (P5, P6, `tests/core/travel.test.ts`):**
+
+- **Nach Osten reisen lässt den Kalender vorspringen.** In ~27 echten Stunden
+  können zwei Tagesschlüssel vergehen (Berlin 17. → Tokio 19.). Das ist kein
+  Fehler, sondern die Wirklichkeit: In Tokio *ist* der 19. Der **Schutztag**
+  (D-008) ist genau die Federung dafür — wer eine Woche geübt hat, verliert die
+  Serie durch die Reise nicht. Ein ganz neuer Nutzer, der einen Ein-Tages-Lauf
+  durch eine Reise verliert, verliert wenig.
+- **Nach Westen reisen wiederholt einen Tag.** Zwei Einheiten an „demselben“
+  Kalendertag bleiben ein Tag — die Serie zählt Tage, keine Einheiten.
+- **Eine verstellte Uhr erzeugt keine Serie.** `streakOf` übergeht jeden Tag
+  nach „heute“. Wer die Uhr vorstellt, trainiert und zurückstellt, hat lauter
+  Zukunftstage in der Datenbank, die nirgends mitzählen.
+- **Dauern hängen nicht an der Wanduhr.** Ein 60-Sekunden-Block misst über
+  `clock.elapsed()` (`performance.now()`, monoton), nicht über `Date.now()`.
+  Ein Uhrsprung mitten in der Einheit — Zeitumstellung, Netzabgleich,
+  Betrugsversuch — verkürzt oder verlängert keinen Block.
+- **Die Messung trennt beides sauber.** Das 20-Minuten-Fenster hängt an der
+  **absoluten** Zeit (`now − encodedAt`) und ist damit gegen Zeitzonen immun;
+  der Folgetag-Abruf hängt am **Tagesschlüssel** und ist damit an die Ortszeit
+  gebunden — beides richtig so. Eine Reise, die den Folgetag überspringt, macht
+  die Messung **„verpasst“** und nicht stillschweigend falsch: Eine Messung
+  zwei Tage später ist keine Messung „am Folgetag“ (F1).
+
+**Was ausdrücklich nicht gebaut wird:** eine App-eigene, vom Gerät entkoppelte
+Zeit. Das wäre die einzige wirklich betrugssichere Lösung — und sie machte die
+App für den ehrlichen Nutzer schlechter, der schlicht die richtige Uhrzeit auf
+seinem Telefon hat. Die Serie ist ohnehin so gebaut, dass sich Betrug nicht
+lohnt: Sie belohnt Wiederkommen, und wer sich eine Serie erschummelt, betrügt
+niemanden als sich selbst um die einzige gemessene Zahl (die Messung, F1).
