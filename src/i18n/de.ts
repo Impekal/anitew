@@ -543,6 +543,7 @@ export const de = {
     save: 'Sicherung speichern',
     load: 'Sicherung einlesen',
     saved: 'Gespeichert:',
+    usage: 'Auf diesem Gerät belegt: etwa',
     records: 'Datensätze',
     // G-5: Die App schimpft nicht. Auch nicht, wenn die falsche Datei kommt.
     unreadable: 'Diese Datei lässt sich nicht lesen. Vielleicht war es eine andere?',

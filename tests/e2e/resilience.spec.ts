@@ -176,3 +176,13 @@ test('löscht auf Wunsch alles — aber erst nach einer echten Rückfrage (N4)',
   })
   expect(afterWipe).toBe(0)
 })
+
+test('zeigt, wie viel Platz belegt ist (N5)', async ({ page }) => {
+  // Gemessen, nicht erfunden — und mit „etwa“, weil der Browser den Wert grob
+  // hält. Nach einer Einheit steht dort eine echte Größe.
+  await page.goto('/')
+  await expect(startButton(page)).toBeVisible()
+  await page.getByText('Sicherung', { exact: true }).click()
+  await expect(page.getByText(/Auf diesem Gerät belegt: etwa/)).toBeVisible()
+  await expect(page.getByText(/etwa \d+([.,]\d+)? (B|KB|MB)/)).toBeVisible()
+})

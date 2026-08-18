@@ -352,6 +352,7 @@ export const en: Dictionary = {
     save: 'Save a backup',
     load: 'Load a backup',
     saved: 'Saved:',
+    usage: 'Used on this device: about',
     records: 'records',
     unreadable: 'This file cannot be read. Perhaps it was a different one?',
     foreign: 'That is not an ANITEW backup.',

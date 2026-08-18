@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import {
   type Platform,
@@ -35,6 +35,28 @@ export function BackupPanel({
   const [message, setMessage] = useState<string | undefined>()
   // N4: Die einzige Rückfrage der App — weil das Löschen unwiderruflich ist.
   const [confirmWipe, setConfirmWipe] = useState(false)
+  /*
+   * Wie viel Platz belegt ist (N5). Gemessen über navigator.storage, nicht
+   * geschätzt — und „etwa“, weil der Browser den Wert bewusst grob hält.
+   * Nach dem Löschen oder Einlesen neu, deshalb hängt es an `message`.
+   */
+  const [usage, setUsage] = useState<string | undefined>()
+  useEffect(() => {
+    let cancelled = false
+    void (async () => {
+      const estimate = navigator.storage?.estimate
+      if (typeof estimate !== 'function') return
+      try {
+        const { usage: bytes } = await navigator.storage.estimate()
+        if (!cancelled && typeof bytes === 'number') setUsage(formatBytes(bytes))
+      } catch {
+        // Kann der Browser es nicht sagen, sagt die App auch nichts.
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [message])
 
   const save = async () => {
     setBusy(true)
@@ -117,6 +139,11 @@ export function BackupPanel({
         }}
       />
       <p className="hint">{t.merges}</p>
+      {usage !== undefined && (
+        <p className="hint">
+          {t.usage} {usage}
+        </p>
+      )}
       {message !== undefined && (
         <p className="hint" role="status">
           {message}
@@ -184,4 +211,12 @@ function describe(report: ImportReport, dropped: number, t: Dictionary['backup']
   if (report.replaced > 0) parts.push(`${report.replaced} ${t.replaced}`)
   if (dropped > 0) parts.push(`${dropped} ${t.dropped}`)
   return `${t.imported} ${parts.join(' · ')}`
+}
+
+/** Bytes als kurze, lesbare Größe — KB oder MB, eine Nachkommastelle. */
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`
+  const kb = bytes / 1024
+  if (kb < 1024) return `${kb.toFixed(0)} KB`
+  return `${(kb / 1024).toFixed(1)} MB`
 }
