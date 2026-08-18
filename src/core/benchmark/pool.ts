@@ -56,7 +56,18 @@ const en = [
   'trombone', 'walnut', 'wheelbarrow', 'yardstick',
 ]
 
-const POOLS: Partial<Record<Language, readonly string[]>> = { de, en }
+const fr = [
+  'abricot', 'aiguille', 'ardoise', 'balcon', 'bambou', 'biscuit', 'bouchon', 'brocoli',
+  'cadenas', 'carotte', 'ceinture', 'chaussette', 'citron', 'comète', 'coude', 'cravate',
+  'crayon', 'domino', 'écrou', 'épingle', 'escargot', 'étoile', 'fauteuil', 'flamant',
+  'fossile', 'fourmi', 'framboise', 'grenouille', 'hublot', 'kiwi', 'losange', 'manteau',
+  'menotte', 'moufle', 'noisette', 'oignon', 'ortie', 'palette', 'parasol', 'pastèque',
+  'pédale', 'pelle', 'perruque', 'punaise', 'piston', 'poêle', 'poulie', 'râteau',
+  'rideau', 'robinet', 'ruche', 'sardine', 'savon', 'tabouret', 'tiroir', 'toboggan',
+  'trèfle', 'tulipe', 'valise', 'yaourt',
+]
+
+const POOLS: Partial<Record<Language, readonly string[]>> = { de, en, fr }
 
 /** Wörter je Messung. Zwanzig — die Zahl aus F5 („Day 1: 8/20“). */
 export const BENCHMARK_ITEMS = 20

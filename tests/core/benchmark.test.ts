@@ -26,7 +26,7 @@ describe('der Quarantäne-Vorrat (F2a)', () => {
      * sie hieße nichts. Deshalb ist das hier geprüft und nicht bloß beim
      * Schreiben beachtet.
      */
-    for (const language of ['de', 'en'] as const) {
+    for (const language of ['de', 'en', 'fr'] as const) {
       const quarantine = new Set(benchmarkPool(language))
       for (const word of wordPool(language)) expect(quarantine.has(word), word).toBe(false)
       for (const name of namePool(language)) expect(quarantine.has(name), name).toBe(false)
@@ -34,7 +34,7 @@ describe('der Quarantäne-Vorrat (F2a)', () => {
   })
 
   it('enthält keine Wörter doppelt', () => {
-    for (const language of ['de', 'en'] as const) {
+    for (const language of ['de', 'en', 'fr'] as const) {
       const pool = benchmarkPool(language)
       expect(new Set(pool).size).toBe(pool.length)
     }

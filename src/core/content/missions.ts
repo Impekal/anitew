@@ -62,12 +62,18 @@ export interface Mission {
 const COLOURS: Partial<Record<Language, readonly string[]>> = {
   de: ['roter', 'blauer', 'grüner', 'gelber', 'schwarzer', 'weißer', 'grauer', 'brauner'],
   en: ['red', 'blue', 'green', 'yellow', 'black', 'white', 'grey', 'brown'],
+  // Im Französischen steht die Farbe **nach** dem Substantiv (siehe unten),
+  // und die Gegenstände sind maskulin — deshalb die maskuline Grundform.
+  fr: ['rouge', 'bleu', 'vert', 'jaune', 'noir', 'blanc', 'gris', 'brun'],
 }
 
 /** Gegenstände, die jemand bei sich trägt. Im Deutschen alle männlich. */
 const OBJECTS: Partial<Record<Language, readonly string[]>> = {
   de: ['Koffer', 'Schirm', 'Mantel', 'Hut', 'Rucksack', 'Schal', 'Becher', 'Schlüssel'],
   en: ['suitcase', 'umbrella', 'coat', 'hat', 'backpack', 'scarf', 'mug', 'key'],
+  // Alle maskulin und einwortig — dieselbe Vereinfachung wie im Deutschen,
+  // damit die Farbe ohne Grammatik-Engine passt.
+  fr: ['sac', 'manteau', 'chapeau', 'foulard', 'gobelet', 'carnet', 'ballon', 'parapluie'],
 }
 
 /**
@@ -80,6 +86,7 @@ const OBJECTS: Partial<Record<Language, readonly string[]>> = {
 const PLACES: Partial<Record<Language, readonly string[]>> = {
   de: ['Luna', 'Kastanie', 'Orion', 'Feldhof', 'Sirene', 'Anker', 'Zeder', 'Morgenrot'],
   en: ['Luna', 'Chestnut', 'Orion', 'Fieldhouse', 'Siren', 'Anchor', 'Cedar', 'Daybreak'],
+  fr: ['Luna', 'Marronnier', 'Orion', 'Bergerie', 'Sirène', 'Ancre', 'Cèdre', 'Aurore'],
 }
 
 function listFor(pools: Partial<Record<Language, readonly string[]>>, language: Language) {
@@ -102,12 +109,25 @@ export function hasMissionPool(language: Language): boolean {
  * Deutsch und auf Englisch **verschiedene** Szenen. Sie sind auch verschiedene
  * Gedächtnisinhalte — genauso wie „Anker“ und „anchor“ (siehe `data/items.ts`).
  */
+/** Sprachen, in denen die Farbe hinter dem Substantiv steht. */
+const ADJECTIVE_AFTER_NOUN: ReadonlySet<Language> = new Set<Language>(['fr'])
+
 export function missionFor(person: string, language: Language): Mission {
   const rng = createRng(`mission:${language}:${person}`)
 
   // Zimmer: dreistellig, erste Ziffer nie null — eine „014“ gibt es nicht.
   const room = String(100 + rng.int(900))
-  const object = `${rng.pick(listFor(COLOURS, language))} ${rng.pick(listFor(OBJECTS, language))}`
+  /*
+   * Die Farbe wird zuerst gezogen und das Substantiv danach — diese
+   * Reihenfolge bleibt, sonst änderten sich alle bestehenden deutschen und
+   * englischen Szenen. **Zusammengesetzt** wird sprachabhängig: Im
+   * Französischen steht die Farbe hinter dem Substantiv („sac rouge“), sonst
+   * davor („roter Koffer“). Das ist kein Grammatik-Engine, sondern eine
+   * einzige Regel für eine einzige Wortstellung.
+   */
+  const colour = rng.pick(listFor(COLOURS, language))
+  const noun = rng.pick(listFor(OBJECTS, language))
+  const object = ADJECTIVE_AFTER_NOUN.has(language) ? `${noun} ${colour}` : `${colour} ${noun}`
   // Uhrzeit im Fünf-Minuten-Raster zwischen 6 und 23 Uhr: „18:43“ wäre eine
   // Ziffernfolge, „18:40“ ist eine Uhrzeit.
   const hour = 6 + rng.int(18)

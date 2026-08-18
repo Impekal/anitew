@@ -46,7 +46,17 @@ const en = [
   'turtle', 'umbrella', 'volcano', 'waterfall', 'whistle', 'windmill', 'wreath', 'zipper',
 ]
 
-const POOLS: Partial<Record<Language, readonly string[]>> = { de, en }
+const fr = [
+  'ancre', 'ampoule', 'balançoire', 'bougie', 'boussole', 'cactus', 'canoë', 'cerf-volant',
+  'chameau', 'cheminée', 'cloche', 'coquillage', 'couronne', 'échelle', 'écureuil', 'éléphant',
+  'entonnoir', 'éventail', 'flèche', 'flûte', 'fontaine', 'fourche', 'girafe', 'glacier',
+  'hache', 'hamac', 'harpe', 'igloo', 'lanterne', 'lasso', 'marteau', 'montgolfière',
+  'moulin', 'oreiller', 'panier', 'phare', 'pinceau', 'pyramide', 'radeau', 'sablier',
+  'tambour', 'tente', 'tonneau', 'tortue', 'trompette', 'volcan', 'violon', 'brouette',
+  'écharpe', 'enclume',
+]
+
+const POOLS: Partial<Record<Language, readonly string[]>> = { de, en, fr }
 
 /**
  * Der Wortvorrat einer Sprache.

@@ -122,6 +122,15 @@ const OBJECTS: Partial<Record<Language, readonly string[]>> = {
     'toaster', 'toothbrush', 'trampoline', 'treasurechest', 'trombone',
     'turntable', 'typewriter', 'vacuumcleaner', 'watermelon', 'wigstand',
   ],
+  fr: [
+    'accordéon', 'aquarium', 'armure', 'banjo', 'bilboquet', 'bocal', 'xylophone', 'cage',
+    'casque', 'chandelier', 'cocotte', 'dentier', 'échiquier', 'trottinette', 'épouvantail', 'girouette',
+    'globe', 'gramophone', 'grille-pain', 'hérisson', 'horloge', 'jumelles', 'lampadaire', 'lampe',
+    'mannequin', 'manivelle', 'microscope', 'mobylette', 'télescope', 'trampoline', 'tourne-disque', 'aspirateur',
+    'balai', 'baignoire', 'brasero', 'cactus-géant', 'cerceau', 'coffre', 'crâne', 'diapason',
+    'échasses', 'fanfare', 'guéridon', 'harpon', 'lustre', 'maracas', 'paravent', 'pendule',
+    'squelette', 'trombone',
+  ],
 }
 
 function listFor(language: Language): readonly string[] {

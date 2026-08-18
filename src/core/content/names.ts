@@ -82,12 +82,25 @@ function interleave(a: readonly string[], b: readonly string[]): readonly string
   return out
 }
 
+const frFeminine = [
+  'Amandine', 'Bérénice', 'Coralie', 'Delphine', 'Émeline', 'Fanny', 'Gaëlle', 'Hortense',
+  'Inès', 'Joséphine', 'Léonie', 'Margaux', 'Noémie', 'Ombeline', 'Pauline', 'Rachel',
+  'Solène', 'Tiphaine', 'Violette', 'Yseult', 'Capucine', 'Élodie', 'Maëlys', 'Sidonie',
+]
+
+const frMasculine = [
+  'Aurélien', 'Baptiste', 'Corentin', 'Damien', 'Émile', 'Fabrice', 'Gaspard', 'Hugo',
+  'Isidore', 'Joachim', 'Ludovic', 'Maxime', 'Nicolas', 'Octave', 'Pascal', 'Quentin',
+  'Rémi', 'Sylvain', 'Thibault', 'Valentin', 'Xavier', 'Yann', 'Basile', 'Côme',
+]
+
 const POOLS: Partial<Record<Language, readonly string[]>> = {
   de: interleave(deMasculine, deFeminine),
   en: interleave(enMasculine, enFeminine),
+  fr: interleave(frMasculine, frFeminine),
 }
 
-const FEMININE: ReadonlySet<string> = new Set([...deFeminine, ...enFeminine])
+const FEMININE: ReadonlySet<string> = new Set([...deFeminine, ...enFeminine, ...frFeminine])
 
 export function namePool(language: Language): readonly string[] {
   return POOLS[language] ?? (POOLS[FALLBACK_LANGUAGE] as readonly string[])

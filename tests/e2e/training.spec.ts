@@ -79,7 +79,7 @@ test('sagt, warum nicht alle elf Sprachen zur Auswahl stehen', async ({ page }) 
   // Angeboten wird nur, wofür es eigenen Inhalt gibt — und die App sagt das,
   // statt eine Sprache zu versprechen, in der sie englische Wörter zeigt.
   const options = await page.locator('.language-training select').locator('option').allTextContents()
-  expect(options).toEqual(['Deutsch', 'English'])
+  expect(options).toEqual(['Deutsch', 'English', 'Français'])
   await expect(page.getByText(/Eine Sprache anzubieten und dann englische Wörter/)).toBeVisible()
 
   /*

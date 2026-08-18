@@ -145,7 +145,7 @@ describe('der Vorrat', () => {
      * im Wortmodul, bekäme der freie Abruf ein Wort geschenkt, das
      * eigentlich woanders hängt.
      */
-    for (const language of ['de', 'en'] as const) {
+    for (const language of ['de', 'en', 'fr'] as const) {
       const words = new Set(wordPool(language).map((word) => word.toLowerCase()))
       const objects = walkPool('x', 30).flatMap((walk) =>
         walkFor(walk, language).map((entry) => entry.object.toLowerCase()),
