@@ -2501,4 +2501,4 @@ Prüfverfahren nötig — verbindlich sagt es die Konsole beim
 Veröffentlichen, und genau dieser Klick gehört dem Kontoinhaber
 (Schritte in OFFEN.md).
 
-**Stand:** 413 Kerntests, Budget unverändert.
+**Stand:** 410 Kerntests, Budget unverändert. (Zuerst stand hier 413 — falsch gezählt, korrigiert.)
