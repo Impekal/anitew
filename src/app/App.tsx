@@ -63,6 +63,7 @@ import {
   moduleOf,
   wordOf,
 } from '../data/items.ts'
+import { loadOwnPool } from '../data/own.ts'
 import {
   type SessionProgress,
   beginSession,
@@ -91,6 +92,7 @@ import { SciencePanel } from './SciencePanel.tsx'
 import { FoundationPanel } from './FoundationPanel.tsx'
 import { AchievementsLine } from './AchievementsLine.tsx'
 import { CoachPanel } from './CoachPanel.tsx'
+import { OwnPanel } from './OwnPanel.tsx'
 import { ReturnsLine } from './ReturnsLine.tsx'
 import { StreakLine } from './StreakLine.tsx'
 import { BenchmarkPanel } from './benchmark/BenchmarkPanel.tsx'
@@ -465,6 +467,12 @@ export function App() {
            * beim Wiedersehen dasselbe Bild.
            */
           gaze: gazePool(seed, 24),
+          /*
+           * Eigene Inhalte (I · D-032): Der Vorrat sind die Paare des
+           * Menschen ohne Termin. Ist er leer — bei den meisten —, nimmt
+           * der Vorratsfilter das Modul still aus der Lernrotation.
+           */
+          facts: await loadOwnPool(training).catch(() => []),
         },
         due,
         taught,
@@ -754,6 +762,10 @@ export function App() {
             dictionary={dictionary}
           />
         ),
+      },
+      contents: {
+        title: dictionary.own.heading,
+        body: <OwnPanel language={training} dictionary={dictionary} />,
       },
       about: {
         title: dictionary.onboarding.editHeading,
@@ -1209,6 +1221,10 @@ export function App() {
               <button type="button" className="drawer-item" onClick={() => openPage('coach')}>
                 <MenuIcon kind="coach" />
                 <span>{dictionary.coach.heading}</span>
+              </button>
+              <button type="button" className="drawer-item" onClick={() => openPage('contents')}>
+                <MenuIcon kind="contents" />
+                <span>{dictionary.own.heading}</span>
               </button>
               <button type="button" className="drawer-item" onClick={() => openPage('about')}>
                 <MenuIcon kind="about" />

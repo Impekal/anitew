@@ -120,6 +120,7 @@ export const de = {
       reverse: 'Gleich rückwärts gefragt.',
       twins: 'Sieh genau hin — gleich steht ein Zwilling daneben.',
       gaze: 'Sieh das Bild an. Jedes Ding hat seine Farbe — merk dir beides zusammen.',
+      facts: 'Deine Karte: Frage und Antwort. Bau eine Brücke — ein Bild, in dem beide vorkommen.',
     },
     recallHint: 'Was ist geblieben? Reihenfolge egal.',
     reviewHint: 'Und jetzt von früher: Woran erinnerst du dich noch?',
@@ -417,6 +418,7 @@ export const de = {
       reverse: 'Rückwärts',
       twins: 'Unterscheiden',
       gaze: 'Bilder',
+      facts: 'Eigenes',
     },
     noWeakest: 'Kein Unterschied zwischen den Achsen, der sich vom Zufall trennen lässt.',
     empty: 'Noch nichts zu zeigen. Das Profil entsteht aus dem Training — nicht aus einem Test am Anfang.',
@@ -538,6 +540,25 @@ export const de = {
       sawDetails: 'Fünfundzwanzig Einzelheiten aus Bildern nach Tagen zurückgeholt.',
       namesHeld: 'Fünfundzwanzig Namen nach Tagen noch gewusst.',
     },
+  },
+  own: {
+    /*
+      Eigene Inhalte (I · D-032). Die Erklärung sagt die Form („eine Zeile,
+      ein Paar“), die Vorschau zeigt, was daraus würde — übernommen wird
+      erst auf Fingertipp (I4: halbautomatisch, der Mensch bestätigt).
+      Nicht Erkanntes steht sichtbar da, statt zu verschwinden.
+    */
+    heading: 'Eigene Inhalte',
+    intro: 'Eigener Stoff wird zu Karten: eine Zeile, ein Paar aus Frage und Antwort — getrennt durch „–“, Doppelpunkt oder Tabulator. Die Karten gehen denselben Weg wie alles hier: einprägen, abrufen, Wiedersehen nach Tagen. Alles bleibt auf diesem Gerät.',
+    placeholder: 'Hauptstadt von Portugal – Lissabon\nfr: die Ampel – le feu\nNotrufnummer: 112',
+    preview: 'Das würden Karten:',
+    rejected: 'Keine Karte (keine Trennung erkannt):',
+    save: 'Karten übernehmen',
+    listHeading: 'Deine Karten',
+    remove: 'Entfernen',
+    empty: 'Noch keine Karten. Was du oben einfügst, landet hier — und von hier im Training.',
+    scheduled: 'im Wiederholungsplan',
+    fresh: 'kommt in die nächste Einheit',
   },
   coach: {
     /*

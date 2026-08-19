@@ -20,6 +20,7 @@ import { MODES, type TrainingMode } from '../modes.ts'
 import { createRng } from '../rng.ts'
 import type { DayKey } from '../time.ts'
 import { answerFor, factKindOf, missionFacts, personOf } from '../content/missions.ts'
+import { factAnswer, factPrompt } from '../content/own.ts'
 import { objectFor, walkOf, walkPlacements } from '../content/palace.ts'
 import type { Language } from '../language.ts'
 import { reversed } from '../content/spans.ts'
@@ -122,6 +123,13 @@ export const TRAINING_MODULES = [
   'reverse',
   'twins',
   'gaze',
+  /*
+   * Eigene Inhalte (I · D-032): Frage-Antwort-Paare aus eigenem Stoff.
+   * Der Vorrat kommt vom Menschen, nicht aus einem Generator — ist er
+   * leer, fällt das Modul über den Vorratsfilter (D-027) still aus der
+   * Lernrotation; das Wiedersehen terminierter Paare bleibt unberührt.
+   */
+  'facts',
 ] as const
 export type ModuleId = (typeof TRAINING_MODULES)[number]
 
@@ -143,7 +151,10 @@ export function isPrompted(moduleId: ModuleId): boolean {
     moduleId === 'palace' ||
     moduleId === 'reverse' ||
     moduleId === 'twins' ||
-    moduleId === 'gaze'
+    moduleId === 'gaze' ||
+    // Eigene Paare: Die Frage steht da, gesucht ist die Antwort — wie beim
+    // Gesicht ist das die Aufgabe, die im Alltag vorkommt (D-032).
+    moduleId === 'facts'
   )
 }
 
@@ -221,7 +232,11 @@ export function secondsPerItemFor(moduleId: ModuleId): number {
   if (moduleId === 'palace') return 6
   // Ein Bild (gaze) wie eine Mission: Vier Dinge und ihre Farben sollen
   // **zusammen** gesehen werden, nicht nacheinander gelesen.
-  return moduleId === 'missions' || moduleId === 'gaze' ? 5 : SECONDS_PER_ITEM
+  // Ein eigenes Paar (facts) ebenso: Frage und Antwort sollen zu einer
+  // Brücke werden, nicht zwei gelesene Wörter bleiben (D-032).
+  return moduleId === 'missions' || moduleId === 'gaze' || moduleId === 'facts'
+    ? 5
+    : SECONDS_PER_ITEM
 }
 
 /**
@@ -266,6 +281,8 @@ export function targetOf(moduleId: ModuleId, item: string, language: string): st
   if (moduleId === 'twins') return twinShown(item)
   // Bild: Gesucht ist die Farbe des Dings, in der Trainingssprache benannt.
   if (moduleId === 'gaze') return gazeAnswer(item, language as Language) ?? item
+  // Eigenes Paar: Die Kennung trägt beide Seiten, gesucht ist die Antwort.
+  if (moduleId === 'facts') return factAnswer(item)
   if (moduleId !== 'missions') return item
   return answerFor(item, language as Language) ?? item
 }
@@ -299,6 +316,9 @@ export function displayOf(moduleId: ModuleId, item: string, language: string): s
    * erinnert hat — nicht, wo es lag.
    */
   if (moduleId === 'palace') return objectFor(item, language as Language) ?? item
+  // Eigenes Paar: „Frage · Antwort“ — lesbar, nicht die Kennung mit dem
+  // unsichtbaren Trennzeichen.
+  if (moduleId === 'facts') return `${factPrompt(item)} · ${factAnswer(item)}`
   if (moduleId !== 'missions') return item
   const answer = answerFor(item, language as Language)
   return answer === undefined ? item : `${personOf(item)} · ${answer}`
@@ -325,6 +345,15 @@ export function leniencyFor(moduleId: ModuleId, item?: string): Leniency {
    * die Aufgabe wäre abgeschafft, während sie Punkte vergibt.
    */
   if (moduleId === 'twins') return 'exact'
+  /*
+   * Eigene Paare: Die Strenge folgt dem **Gegenstand** (dieselbe Überlegung
+   * wie bei den Missionen): Ist die Antwort eine Zahl — PIN, Jahreszahl,
+   * Hausnummer —, sind vertauschte Ziffern eine andere Antwort. Sonst ist
+   * ein Tippfehler ein Tippfehler.
+   */
+  if (moduleId === 'facts') {
+    return /^\d+$/.test(factAnswer(item ?? '')) ? 'exact' : 'typos'
+  }
   if (moduleId === 'missions') {
     /*
      * Innerhalb einer Mission ist die Strenge **je Tatsache** verschieden, und
@@ -697,8 +726,30 @@ export function planSession(input: PlanInput): SessionPlan {
     taken.set(moduleId, 0)
   }
 
+  /** Reicht der **Rest** des Vorrats noch für eine Runde dieses Moduls? */
+  const hasStockLeft = (moduleId: ModuleId): boolean => {
+    const left = (remaining.get(moduleId)?.length ?? 0) - (taken.get(moduleId) ?? 0)
+    return isScene(moduleId) ? left >= 1 : left >= MIN_ITEMS_PER_ROUND
+  }
+
   for (let round = 1; round <= rounds; round++) {
-    const moduleId = moduleForRound(round)
+    /*
+     * Der Vorratsfilter oben sah den Vorrat **vor** der Einheit — ein
+     * endlicher Vorrat (Zwillinge, Eigenes · D-032) kann aber mitten in
+     * ihr zur Neige gehen: Runde 1 nimmt acht Karten, Runde 3 desselben
+     * Moduls stünde vor nichts. Dann übernimmt das nächste Modul der
+     * Reihe die Runde — still, wie beim Filter; ein Kerntest zu D-032
+     * hat genau diesen Wurf gefunden. Nur ein erzwungenes Einzelmodul
+     * scheitert weiterhin laut am beschreibenden Fehler unten.
+     */
+    let moduleId = moduleForRound(round)
+    if (!hasStockLeft(moduleId) && learnFrom.length > 1) {
+      const at = learnFrom.indexOf(moduleId)
+      const substitute = learnFrom
+        .map((_, step) => learnFrom[(at + step + 1) % learnFrom.length] as ModuleId)
+        .find(hasStockLeft)
+      if (substitute !== undefined) moduleId = substitute
+    }
     const pool = remaining.get(moduleId) as string[]
     const used = taken.get(moduleId) as number
 

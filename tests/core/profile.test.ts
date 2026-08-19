@@ -27,12 +27,20 @@ import { en } from '../../src/i18n/en.ts'
 const full = (chances: number, lost: number) => ({ chances, lost })
 
 describe('die Achsen', () => {
-  it('hat für jedes Trainingsmodul genau eine Achse', () => {
-    for (const moduleId of TRAINING_MODULES) {
+  it('hat für jedes Trainingsmodul genau eine Achse — außer für Eigenes', () => {
+    /*
+     * Eigene Inhalte (D-032) sind die eine Ausnahme, mit Absicht: Der Stoff
+     * dort ist **gewählt**, nicht erzeugt — wer schwere Vokabeln einträgt,
+     * hat kein schlechteres Gedächtnis als jemand mit leichten. Eine Achse
+     * daraus wäre ein Vergleich zweier Währungen (R-1).
+     */
+    const measured = TRAINING_MODULES.filter((moduleId) => moduleId !== 'facts')
+    for (const moduleId of measured) {
       expect(dimensionOf(moduleId), `${moduleId} ohne Achse`).toBeDefined()
     }
-    const mapped = TRAINING_MODULES.map(dimensionOf)
-    expect(new Set(mapped).size).toBe(TRAINING_MODULES.length)
+    expect(dimensionOf('facts')).toBeUndefined()
+    const mapped = measured.map(dimensionOf)
+    expect(new Set(mapped).size).toBe(measured.length)
   })
 
   it('nennt für jede Achse, woher sie ihre Zahlen hat', () => {
@@ -170,7 +178,7 @@ describe('der Schwerpunkt im Bauplan (E5)', () => {
     palace: many('home~'),
     reverse: ['48293', '17546', '90287', '35761', '82154', '46029'],
     twins: ['Kirche%Kirsche', 'Mantel%Mangel', 'Fliege%Fliese', 'Karte%Kante', 'Bogen%Boden', 'Wolke%Wolle'],
-    gaze: ['bild~1', 'bild~2', 'bild~3', 'bild~4', 'bild~5', 'bild~6'],
+    gaze: ['bild~1', 'bild~2', 'bild~3', 'bild~4', 'bild~5', 'bild~6'], facts: [],
   }
 
   const modulesOf = (plan: ReturnType<typeof planSession>) =>

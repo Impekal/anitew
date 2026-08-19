@@ -55,7 +55,7 @@ const pools = (walks: readonly string[]): Pools => ({
   palace: walks,
   reverse: [],
   twins: [],
-  gaze: [],
+  gaze: [], facts: [],
 })
 
 describe('der Palast als Datenmodell (G1, G2)', () => {

@@ -34,7 +34,7 @@ const pools: Pools = {
   // zu 48 Folgen — mehr, als der echte Betrieb je verlangt.
   reverse: spanPool('probe', 60),
   twins: [],
-  gaze: [],
+  gaze: [], facts: [],
 }
 
 const base = { day: '2026-08-18', language: 'de', seed: 'probe', pools } as const

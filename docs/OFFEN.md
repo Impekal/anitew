@@ -1,6 +1,8 @@
 # Was noch offen ist — und wer es tun muss
 
-**Stand: 2026-08-18**
+**Stand: 2026-08-19** (nach dem großen Ausbau: acht Trainingsmodule plus
+Eigene Inhalte, vier gelehrte Techniken, adaptive Schwierigkeit,
+Fähigkeitsbaum, Coach mit eigenem Schlüssel)
 
 Dieses Dokument ist die ehrliche Bestandsaufnahme nach dem großen Durchgang:
 Alles, was **ohne dich** machbar war, ist gemacht und liegt live unter
@@ -34,8 +36,8 @@ Phase mit Entscheidungen, die dir gehören.
 
 | Was | Die offene Frage |
 |---|---|
-| **KI mit eigenem Schlüssel** (M, Milestone M6) | Welche Anbieter? Die App bleibt ohne KI vollständig — KI verbessert nur (Merkbilder, Extraktion aus eigenem Material). Jede KI-Funktion braucht einen Offline-Rückfall. Große Fläche, viele kleine Entscheidungen |
-| **Eigene Inhalte** (I, Milestone M6) | „Ich treffe morgen 6 Kollegen“ → daraus ein Training. Text/Foto/Diktat rein, Fakten raus, Merkbilder, Wiederholungsplan. Hängt teils an M, teils an einem eigenen Editor. Datenschutz dafür steht schon vorbereitet in `PRIVACY.md` §9 |
+| **KI mit eigenem Schlüssel** (M, Milestone M6) | **Erster Ausbau fertig 2026-08-19 (D-031):** Der Coach spricht aus den eigenen Zahlen (ohne Netz) und beantwortet freie Fragen mit eigenem Anthropic-Schlüssel. Offen: weitere Anbieter (erst wenn jemand sie braucht) und KI-Extraktion aus eigenem Material (I3, mit Freigabe pro Vorgang, I6) |
+| **Eigene Inhalte** (I, Milestone M6) | **Erster Ausbau fertig 2026-08-19 (D-032):** Text einfügen → Karten-Vorschau → eigenes Trainingsmodul samt FSRS-Wiedersehen, ohne KI, alles lokal. Offen: Foto/Diktat (I1), Termin-Items „das Treffen ist morgen um 9“ (I5), KI-Extraktion (I3) |
 | **Cloud-Abgleich** (N7/N8/N10, Milestone M7) | **Entschieden 2026-08-18: wird gebaut** — Google-Anmeldung mit Ablage im eigenen Google-Drive-App-Ordner (OAuth/PKCE, kein eigener Server, R-3 bleibt). Reihenfolge ebenfalls entschieden: erst Optik + Kennenlernen, dann der Abgleich. Live gehen kann er erst mit deinem Google-Cloud-OAuth-Client und der Domain (Gruppe 1) |
 | **Fotorealistische Porträts** (D16), **CC0-Icon-Satz** (D15) | Asset- und Lizenzentscheidung. Heute erzeugt die App Gesichter selbst (D-005) — bewusst, und es funktioniert |
 | **Französische Oberfläche** (fr.ts) | Die Prosa braucht eine muttersprachliche Durchsicht, bevor sie öffentlich geht. **Französisch als Trainingssprache** ist dagegen fertig und geprüft (L6/L7) |
@@ -66,13 +68,17 @@ Wesentlichen blieb:
 
 ## Was fertig ist
 
-Damit klar ist, wogegen sich „offen“ abhebt: Kern, Engine, alle fünf Module,
-zwei Merktechniken, die Messung, das Gedächtnisprofil mit begründeter
-Tagesplanung, die Serie, das Wiedersehen, Erreichtes, die
-Wissenschaftsseite, Sicherung, Löschen, Erinnerungen, drei Trainingssprachen
-— und die ganze Qualitätsreihe: Barrierefreiheit, Fehlertoleranz, Uhr- und
-Reisefestigkeit, Performance mit Größenbudget, Layout über sieben Geräte,
-322 Kerntests und rund 200 Browserläufe.
+Damit klar ist, wogegen sich „offen“ abhebt: Kern, Engine, **neun
+Trainingsmodule** (Wörter, Gesichter, Zahlen, Missionen, Palast, Rückwärts,
+Unterscheiden, Bilder, Eigene Inhalte), **vier gelehrte Merktechniken**
+(Major, Loci, Geschichte, Verknüpfung), adaptive Schwierigkeit, die
+Messung, das Gedächtnisprofil mit allen neun Achsen und begründeter
+Tagesplanung, das Ankommen, die Serie, das Wiedersehen, der
+Fähigkeitsbaum, der Coach (offline und mit eigenem Schlüssel), die
+Wissenschaftsseite, Sicherung, Löschen, Erinnerungen, drei
+Trainingssprachen — und die ganze Qualitätsreihe: Barrierefreiheit,
+Fehlertoleranz, Uhr- und Reisefestigkeit, Performance mit Größenbudget,
+Layout über sieben Geräte, 404 Kerntests und rund 230 Browserläufe.
 
 Die Meilensteine M0, M1, M3 sind abgeschlossen, M2 im Kern, M4 weit, M5
 begonnen (Französisch). Offen sind die Phasen, die Entscheidungen oder

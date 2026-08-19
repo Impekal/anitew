@@ -90,7 +90,7 @@ describe('die Lektion im Plan (D5)', () => {
   palace: walkPool('t', 12),
   reverse: ['48293', '17546', '90287', '35761', '82154', '46029'],
   twins: ['Kirche%Kirsche', 'Mantel%Mangel', 'Fliege%Fliese', 'Karte%Kante', 'Bogen%Boden', 'Wolke%Wolle'],
-  gaze: ['bild~1', 'bild~2', 'bild~3', 'bild~4', 'bild~5', 'bild~6'],
+  gaze: ['bild~1', 'bild~2', 'bild~3', 'bild~4', 'bild~5', 'bild~6'], facts: [],
 }
   const base = { day: '2026-08-17', language: 'de', seed: 'lektion', pools }
   const teachBlock = (plan: ReturnType<typeof planSession>) =>
@@ -202,7 +202,7 @@ describe('Geschichte und Verknüpfung im Bauplan (D5 · D-013)', () => {
     palace: walkPool('e', 12),
     reverse: ['48293', '17546', '90287'],
     twins: ['Kirche%Kirsche', 'Mantel%Mangel', 'Fliege%Fliese', 'Karte%Kante'],
-    gaze: ['bild~1', 'bild~2', 'bild~3'],
+    gaze: ['bild~1', 'bild~2', 'bild~3'], facts: [],
   }
   const encBase = {
     day: '2026-08-19',

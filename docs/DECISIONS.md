@@ -1218,3 +1218,46 @@ Sprachmodell, mit dem eigenen Anthropic-Schlüssel des Menschen (BYOK).
 - **Ein Modell, keine Auswahl:** `claude-opus-5`. Eine Modellauswahl im
   Menü wäre eine Frage an den Menschen, die die App beantworten kann.
   Weitere Anbieter (M1) erst, wenn jemand sie braucht.
+
+## D-032 · 2026-08-19 · Eigene Inhalte: Karten gehen denselben Weg wie alles andere
+
+**Entscheidung:** Eigener Stoff wird zu Frage-Antwort-Karten und die
+Karten zu einem gewöhnlichen Trainingsmodul (`facts`): einprägen im
+Rundenlauf, gestützter Abruf, Wiedersehen nach Tagen über FSRS. Kein
+eigener „Lernmodus“ daneben — der Weg, der das Behalten ausmacht,
+existiert schon, und eigener Stoff verdient keinen schlechteren.
+
+**Die tragenden Regeln:**
+
+- **Halbautomatisch, ohne KI** (I4): Der Parser versteht die Formen, die
+  beim Einfügen wirklich entstehen — „Frage – Antwort“, „Begriff:
+  Bedeutung“, Tabulator aus einer Tabelle — und rät nicht darüber
+  hinaus. Was nicht bricht, steht **sichtbar** unter „keine Karte“;
+  übernommen wird erst auf Fingertipp. „19:30 – Abfahrt“ bricht am
+  Strich, nicht in der Uhrzeit: Die Striche kommen vor dem Doppelpunkt.
+- **Lokal** (I6): Die Paare liegen als eine Zeile je Trainingssprache in
+  den Einstellungen — damit wandern sie mit der Sicherung (N2) mit,
+  wie der Lehr-Stand der Technik. Gesendet wird nichts.
+- **Der Vorrat ist endlich, und der Planer weiß es jetzt wirklich:** Der
+  Vorratsfilter (D-027) sah den Vorrat nur **vor** der Einheit; acht
+  Karten überstanden ihn und Runde drei desselben Moduls stand vor
+  nichts — der Kerntest zu D-032 hat den Wurf gefunden. Geht ein Vorrat
+  mitten in der Einheit zur Neige, übernimmt jetzt das nächste Modul
+  der Reihe die Runde, still wie beim Filter.
+- **Strenge nach dem Gegenstand** (wie D-012): Ist die Antwort eine
+  Zahl — PIN, Jahreszahl —, sind vertauschte Ziffern eine andere
+  Antwort; sonst ist ein Tippfehler ein Tippfehler.
+- **Keine Profil-Achse** für Eigenes, mit Absicht: Der Stoff ist
+  **gewählt**, nicht erzeugt. Wer schwere Vokabeln einträgt, hat kein
+  schlechteres Gedächtnis als jemand mit leichten — eine Achse daraus
+  wäre ein Vergleich zweier Währungen (R-1). Ein Kerntest hält die
+  Ausnahme fest.
+- **Löschen löscht den Termin mit:** Eine entfernte Karte, die nach
+  Tagen als Frage wiederkäme, wäre die unangenehmste Überraschung.
+- **Die Kennung trägt beide Seiten**, getrennt durch U+001F — das kann
+  in keiner Seite vorkommen, weil die Eingabe-Wäsche Steuerzeichen
+  entfernt (dieselbe wie beim Namen im Ankommen).
+
+Doppelte Fragen bleiben **eine** Karte: Wer dieselbe Frage erneut
+einfügt, behält die bestehende samt ihrer Termine — still eine zweite
+daneben zu legen hieße, dieselbe Frage zweimal zu prüfen.

@@ -119,7 +119,7 @@ describe('die Zwillinge im Bauplan (D-027)', () => {
     palace: [],
     reverse: [],
     twins,
-    gaze: [],
+    gaze: [], facts: [],
   })
 
   it('fragt exakt und sucht die gezeigte Seite', () => {

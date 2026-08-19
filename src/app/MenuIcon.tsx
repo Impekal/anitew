@@ -12,6 +12,7 @@ export type MenuIconKind =
   | 'reached'
   | 'profile'
   | 'coach'
+  | 'contents'
   | 'about'
   | 'palace'
   | 'reminder'
@@ -28,6 +29,8 @@ const PATHS: Readonly<Record<MenuIconKind, string>> = {
   profile: 'M4 20h16M7 20v-6M12 20V9M17 20v-3.5',
   // Die Sprechblase: jemand, der antwortet.
   coach: 'M4.5 5.5h15v10h-8.5L7 19v-3.5H4.5zM8 9.5h8M8 12.5h5',
+  // Zwei Karten, leicht versetzt: der eigene Stapel.
+  contents: 'M7.5 4.5h12v11h-12zM7.5 7.5h12M4.5 8.5v11h12',
   // Kopf und Schultern.
   about: 'M12 5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7zM5 20c1.4-3.4 3.9-5 7-5s5.6 1.6 7 5',
   // Giebel und Säulen.

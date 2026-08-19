@@ -17,6 +17,8 @@ import {
   majorParts,
   missionFor,
   type ModuleId,
+  factAnswer,
+  factPrompt,
   ownLabelOf,
   type OwnPalace,
   palaceOf,
@@ -304,7 +306,17 @@ function RunningSession({
             Buchstaben stehen daneben und nicht darin, sonst läse jeder, der
             das Element ausliest, „4r7k“ statt „47“.
           */}
-          {parts !== undefined ? (
+          {block.moduleId === 'facts' ? (
+            /*
+              Ein eigenes Paar (D-032): Die Frage klein darüber, die Antwort
+              als das große Wort — eingeprägt wird die Brücke zwischen
+              beiden, nicht zwei Zeilen nacheinander.
+            */
+            <div className="fact-pair" key={block.id + state.itemIndex} aria-live="polite">
+              <p className="fact-prompt">{factPrompt(state.currentItem ?? '')}</p>
+              <p className="encode-word fact-answer">{factAnswer(state.currentItem ?? '')}</p>
+            </div>
+          ) : parts !== undefined ? (
             <div className="major" style={{ '--cells': parts.length } as CSSProperties}>
               <p className="encode-word major-row" key={block.id + state.itemIndex} aria-live="polite">
                 {parts.map((part, index) => (
@@ -364,6 +376,15 @@ function RunningSession({
           choices={
             block.moduleId === 'twins'
               ? twinChoices(block.items[state.promptIndex] ?? '')
+              : undefined
+          }
+          /*
+            Eigene Paare (D-032): Die Frage des Menschen ist die Frage — sie
+            steht groß da, wo sonst das Gesicht stünde.
+          */
+          question={
+            block.moduleId === 'facts'
+              ? factPrompt(block.items[state.promptIndex] ?? '')
               : undefined
           }
           gazeCue={
@@ -465,6 +486,7 @@ function PromptedRecall({
   reveal,
   gazeCue,
   choices,
+  question,
   label,
   position,
   total,
@@ -495,6 +517,8 @@ function PromptedRecall({
    * entfernt; gewählt ist die Aufgabe genau die Unterscheidung.
    */
   choices?: readonly [string, string]
+  /** Die eigene Frage statt eines Gesichts (D-032). */
+  question?: string
   /** Der Anker unter dem Gesicht — nur, wo der Name nicht die Antwort ist. */
   label?: string
   position: number
@@ -540,6 +564,8 @@ function PromptedRecall({
         </div>
       ) : gazeCue !== undefined ? (
         <GazeScene sceneId={gazeCue.sceneId} ask={gazeCue.ask} />
+      ) : question !== undefined ? (
+        <p className="prompted-question">{question}</p>
       ) : choices !== undefined ? null : (
         <Face name={face} size={168} />
       )}

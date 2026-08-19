@@ -167,12 +167,12 @@ Der Punkt, der aus einem Spiel einen Gedächtnistrainer macht.
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| I1 | Eigene Inhalte eingeben: Text, Foto, Diktat | ⬜ | | M |
+| I1 | Eigene Inhalte eingeben: Text, Foto, Diktat | 🟨 2026-08-19 | **D-032**. Text steht: einfügen → Paar-Vorschau (Nicht-Erkanntes sichtbar) → übernehmen → Modul `facts` im normalen Rundenlauf samt FSRS-Wiedersehen. Foto und Diktat offen | M |
 | I2 | „Ich treffe morgen 6 neue Kollegen“ → daraus wird ein Training | ⬜ | | L |
 | I3 | MEMORY MODE für eigenes Material: Fakten extrahieren → strukturieren → Merkbilder → Retrieval-Fragen → Wiederholungsplan | ⬜ | die fünf Schritte aus dem Gespräch, in dieser Reihenfolge | L |
-| I4 | Funktioniert auch **ohne** KI: halbautomatisch, mit Nutzerbestätigung | ⬜ | KI ist ein Verstärker, keine Voraussetzung (M2) | M |
+| I4 | Funktioniert auch **ohne** KI: halbautomatisch, mit Nutzerbestätigung | ✅ 2026-08-19 | **D-032**. Der Parser schlägt vor (Strich, Doppelpunkt, Tabulator), der Mensch bestätigt; keine KI im Spiel | M |
 | I5 | Termingebundene Items: „Das Treffen ist morgen um 9“ → Wiederholungen davor legen, nicht danach | ⬜ | für Prüfungen und Präsentationen das eigentlich Wertvolle | M |
-| I6 | Eigene Inhalte bleiben lokal. Versand an eine KI nur nach ausdrücklicher Freigabe pro Vorgang | ⬜ | | S |
+| I6 | Eigene Inhalte bleiben lokal. Versand an eine KI nur nach ausdrücklicher Freigabe pro Vorgang | ✅ 2026-08-19 | **D-032**. Lokal in den Einstellungen (wandert mit der Sicherung, N2); es gibt keinen Codepfad, der Karten ins Netz trägt — auch der Coach bekommt sie nicht | S |
 
 ## J. Zeitmodi (Emergency Mode)
 

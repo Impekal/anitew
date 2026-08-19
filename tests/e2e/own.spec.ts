@@ -1,0 +1,42 @@
+import { expect, test } from '@playwright/test'
+
+import { leavePage, openPage, visit } from './helpers.ts'
+
+/**
+ * Eigene Inhalte (Backlog I · D-032).
+ *
+ * Geprüft wird der Weg des Stoffes: einfügen → Vorschau (samt sichtbar
+ * Abgelehntem) → übernehmen → Liste — und dass eine entfernte Karte
+ * wirklich verschwindet. Alles lokal (I6); die Einheit selbst prüfen die
+ * Kerntests des Planers.
+ */
+
+test('macht aus eingefügtem Text Karten — und zeigt, was keine wurde', async ({ page }) => {
+  await visit(page)
+  await openPage(page, 'Eigene Inhalte')
+
+  await page
+    .locator('.own-input')
+    .fill('Hauptstadt von Portugal – Lissabon\nNotruf: 112\nnur ein Wort')
+
+  // Die Vorschau: zwei Karten, eine sichtbar abgelehnte Zeile.
+  await expect(page.locator('.own-preview li')).toHaveCount(2)
+  await expect(page.locator('.own-rejected li')).toHaveText(['nur ein Wort'])
+
+  await page.getByRole('button', { name: 'Karten übernehmen' }).click()
+  await expect(page.locator('.own-list li')).toHaveCount(2)
+  // Neue Karten sind noch nicht terminiert — sie kommen in die nächste Einheit.
+  await expect(page.locator('.own-card-state').first()).toHaveText('kommt in die nächste Einheit')
+
+  // Die Karten überleben das Neuladen (Einstellungen, nicht Arbeitsspeicher).
+  await page.reload()
+  await openPage(page, 'Eigene Inhalte')
+  await expect(page.locator('.own-list li')).toHaveCount(2)
+
+  // Entfernen wirkt: eine weg, eine bleibt.
+  await page.locator('.own-card', { hasText: 'Notruf' }).getByRole('button').click()
+  await expect(page.locator('.own-list li')).toHaveCount(1)
+  await expect(page.locator('.own-list')).toContainText('Lissabon')
+
+  await leavePage(page)
+})

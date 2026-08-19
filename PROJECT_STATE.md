@@ -2411,3 +2411,29 @@ stehen) traf zwei volle Läufe in Folge, ließ sich aber weder isoliert
 des Einzugs (`settle-in`) — bleibt unbelegt. Beschluss: beobachten;
 beim nächsten Auftreten liegt der Trace automatisch vor, sobald mit
 `--trace retain-on-failure` gelaufen wird.
+
+## 2026-08-19 · Eigene Inhalte (I) — der eigene Stoff geht den normalen Weg
+
+Der Punkt, der aus einem Spiel einen Gedächtnistrainer macht (**D-032**):
+Eigener Stoff — Vokabeln, Nummern, Fakten — wird zu Frage-Antwort-Karten
+und die Karten zu einem gewöhnlichen Trainingsmodul (`facts`). Kein
+eigener Lernmodus daneben: einprägen im Rundenlauf (Frage klein, Antwort
+groß — die Brücke ist die Übung), gestützter Abruf mit der eigenen Frage
+an der Stelle des Gesichts, Wiedersehen nach Tagen über FSRS.
+
+Der Weg hinein ist halbautomatisch ohne KI (I4): einfügen, der Parser
+schlägt Paare vor (Strich, Doppelpunkt, Tabulator — „19:30 – Abfahrt“
+bricht am Strich, nicht in der Uhrzeit), Nicht-Erkanntes steht sichtbar
+da, übernommen wird auf Fingertipp. Alles bleibt lokal in den
+Einstellungen und wandert mit der Sicherung (I6/N2). Löschen löscht den
+Termin mit. Keine Profil-Achse für Eigenes — der Stoff ist gewählt,
+nicht erzeugt; eine Achse daraus wäre ein Währungsvergleich (R-1).
+
+Der Planer hat dabei eine echte Lücke preisgegeben: Der Vorratsfilter
+(D-027) sah endliche Vorräte nur **vor** der Einheit — acht Karten
+überstanden ihn, und die dritte Runde desselben Moduls stand vor nichts.
+Jetzt übernimmt in dem Fall still das nächste Modul der Reihe; der
+Kerntest zu D-032 hat den Wurf gefunden, bevor je ein Mensch ihn sah.
+
+**Stand:** 404 Kerntests, Eigene-Inhalte-E2E grün, Budget 145,5 KB von
+180 KB.
