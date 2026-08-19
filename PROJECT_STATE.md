@@ -2437,3 +2437,53 @@ Kerntest zu D-032 hat den Wurf gefunden, bevor je ein Mensch ihn sah.
 
 **Stand:** 404 Kerntests, Eigene-Inhalte-E2E grün, Budget 145,5 KB von
 180 KB.
+
+## 2026-08-19 · Der Drive-Abgleich (N7) — gebaut, wartet nur noch auf die Kennung
+
+Der Abgleich über den app-privaten Ordner des eigenen Google Drive steht
+(**D-033**), und sein Kern ist ein einziger Satz: **Der Abgleich ist die
+Sicherung.** Herunterladen, nach den Sicherungsregeln einmischen (N9:
+nie löschen, die längere Geschichte gewinnt), die Vereinigung hochladen
+— idempotent, und „gleichzeitig geändert“ ist derselbe Fall wie
+„getrennt gelaufen“. Eine Datei, die keine ANITEW-Sicherung ist, wird
+nie ersetzt; Kern- und E2E-Test halten das fest.
+
+Der Zugriff ist der engste, den Google kennt (`drive.appdata`), das
+Identity-Skript lädt erst beim Fingertipp auf der Abgleich-Seite, die
+Drive-Aufrufe sind drei rohe `fetch`. Nach dem ersten gewollten
+Abgleich versucht die App ihn beim Start still zu wiederholen — und
+scheitert leise, statt ein Google-Fenster aufzureißen (D-015). Die
+E2E-Tests ersetzen Google an der Netzkante: erster Abgleich, fremder
+Stand kommt an, unlesbare Datei bleibt unangetastet — 4/4.
+
+Live gehen kann der Abgleich erst mit der Client-Kennung aus der
+Google-Cloud-Konsole (`VITE_GOOGLE_CLIENT_ID` beim Bauen); bis dahin
+sagt die Seite ehrlich „noch nicht eingerichtet“. Die Anleitung steht
+in OFFEN.md.
+
+**Stand:** 407 Kerntests, Abgleich-E2E 4/4, Budget 148,4 KB von 180 KB.
+
+## 2026-08-19 · Coach-Anbieterwahl (D-034) — fünf Drähte, ein Muster
+
+Auf Wunsch spricht der Coach jetzt mit fünf Anbietern statt einem:
+**Gemini (empfohlen)**, Anthropic, Groq, OpenRouter, Mistral. Neben dem
+Auswahlfeld steht je Anbieter die Kurzanleitung zur Schlüssel-Erstellung
+mit Direktlink auf dessen Schlüssel-Seite und einem ehrlichen Satz zu
+Kosten oder Grenzen — die Empfehlung Gemini kommt daher, dass der
+Schlüssel dort in zwei Minuten angelegt und kostenlos nutzbar ist.
+
+Ein Anbieter ist eine Tabellenzeile (Adresse, festes Modell, Kopfzeilen,
+Antwortform); Groq, OpenRouter und Mistral teilen sich die
+OpenAI-kompatible Form. Der Schlüssel gehört zum Anbieter — wer
+wechselt, verliert nichts, und der Anthropic-Schlüssel aus D-031-Zeiten
+zählt weiter. Die Datenschutzerklärung nennt alle fünf; ein Kerntest
+erzwingt, dass ein sechster auch dort ankäme.
+
+Nachtrag zur Flake-Jagd: Die zweite Onboarding-Flake („Über dich“ →
+Neuladen) ist gelöst und war **kein** Timing der Anzeige, sondern ein
+verlorener Schreibvorgang: Der Test lud neu, bevor die Antwort asynchron
+in den Einstellungen lag — unter Volllast gewann der Reload, und der
+Schwerpunkt fehlte danach zu Recht. Der Test liest jetzt erst die
+persistierte Antwort (Poll auf die Einstellungszeile), dann lädt er neu —
+ablesen statt wetten, wie bei der Modul-Erkennung. Die Überspringen-Flake
+(Klick verpufft) bleibt dagegen unreproduziert und beobachtet.

@@ -1261,3 +1261,69 @@ existiert schon, und eigener Stoff verdient keinen schlechteren.
 Doppelte Fragen bleiben **eine** Karte: Wer dieselbe Frage erneut
 einfügt, behält die bestehende samt ihrer Termine — still eine zweite
 daneben zu legen hieße, dieselbe Frage zweimal zu prüfen.
+
+## D-033 · 2026-08-19 · Der Abgleich ist die Sicherung — in deinem eigenen Drive
+
+**Entscheidung:** Geräteübergreifender Abgleich (N7) über den
+app-privaten Ordner des **eigenen** Google Drive. Kein eigener Server,
+kein Konto bei uns (R-3): Das Gerät spricht direkt mit Google, und was
+im Drive liegt, ist exakt die Sicherungsdatei (N2), die es schon gibt.
+
+**Die tragenden Regeln:**
+
+- **Ein Mischwerk, keine zwei.** Der Abgleich ist herunterladen →
+  einmischen nach den Sicherungsregeln (N9: nie löschen, die längere
+  Geschichte gewinnt) → die Vereinigung hochladen. Damit ist er
+  idempotent, „gleichzeitig geändert“ ist derselbe Fall wie „getrennt
+  gelaufen“, und er ist genau so vertrauenswürdig wie die Sicherung —
+  weil er sie **ist**.
+- **Der engste Zugriff, den Google kennt:** `drive.appdata` — die App
+  sieht nur ihren eigenen Ordner, nichts sonst im Drive. Googles
+  Identity-Skript wird erst geladen, wenn der Mensch den Abgleich
+  anfasst (das Kaltstart-Budget P4 bleibt unberührt); die Drive-Aufrufe
+  sind drei rohe `fetch` (dieselbe Begründung wie D-031).
+- **Eine unlesbare Datei wird nie ersetzt.** Liegt im Ordner etwas, das
+  keine ANITEW-Sicherung ist, bricht der Abgleich benannt ab — die
+  Datei könnte der einzige Stand eines anderen Geräts sein, und ein
+  Abgleich, der bei Zweifel löscht, wäre keiner. Ein Kerntest und ein
+  E2E-Test halten das fest.
+- **Still nur, wenn gewollt:** Der Start-Abgleich läuft erst, nachdem
+  der erste auf der Abgleich-Seite ausdrücklich angestoßen wurde — und
+  er scheitert leise: Ein App-Start, der ein Google-Fenster aufreißt,
+  wäre die Überraschung, die D-015 ausschließt.
+- **Kein Google in den Prüfungen:** Identity-Skript und Drive werden an
+  der Netzkante ersetzt; die Client-Kennung kommt zur Bauzeit
+  (`VITE_GOOGLE_CLIENT_ID`) und darf für Prüfpfad und Selbst-Hoster aus
+  den Einstellungen übersteuert werden. Ohne Kennung sagt die Seite
+  ehrlich „noch nicht eingerichtet“ — nichts sieht kaputt aus.
+
+Der Kern (`core/sync/drive.ts`) kennt weder Netz noch Google — nur den
+Ablauf hinter vier Schnittstellen (D-010). iCloud (N8) bleibt eine
+eigene Stufe und hängt an der nativen iOS-App.
+
+## D-034 · 2026-08-19 · Der Coach spricht mit fünf Anbietern — Gemini als Empfehlung
+
+**Entscheidung** (auf Wunsch, und sie ersetzt den letzten Punkt von
+D-031): Der Coach kennt fünf Anbieter — **Google Gemini (empfohlen)**,
+Anthropic, Groq, OpenRouter, Mistral. Neben dem Auswahlfeld steht je
+Anbieter die Kurzanleitung zur Schlüssel-Erstellung samt **Direktlink**
+auf dessen Schlüssel-Seite, und ein ehrlicher Satz zu Kosten oder
+Grenzen (Gemini und Groq: kostenlos mit Tagesgrenzen — daher die
+Empfehlung Gemini; Anthropic, OpenRouter, Mistral: Guthaben bzw. Konto).
+
+**Die tragenden Regeln:**
+
+- **Ein Anbieter ist eine Tabellenzeile:** Adresse, festes Modell,
+  Kopfzeilen, Antwortform. Groq, OpenRouter und Mistral sprechen
+  dieselbe (OpenAI-kompatible) Form und teilen sich einen Bauer; Gemini
+  und Anthropic haben je ihre eigene. Weiter rohes `fetch` — fünf SDKs
+  wären fünfmal die dicke Abhängigkeit (P4).
+- **Je Anbieter ein festes Modell**, keine Modellauswahl (das bleibt aus
+  D-031): das solide Alltagsmodell des Anbieters, nicht sein teuerstes.
+- **Der Schlüssel gehört zum Anbieter** (`coach.key.<anbieter>`): Wer
+  wechselt, verliert nichts; der Anthropic-Schlüssel aus D-031-Zeiten
+  zählt weiter. Alles Übrige gilt unverändert: Schlüssel bleibt auf dem
+  Gerät, geht in genau einen Header, Fehlerfälle benannt, der
+  Offline-Pflichtteil läuft immer (M2/R-3).
+- **Die Datenschutzerklärung nennt alle fünf** — ein Kerntest erzwingt,
+  dass ein sechster Anbieter auch dort ankommt, nicht nur im Code.

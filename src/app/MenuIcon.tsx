@@ -20,6 +20,7 @@ export type MenuIconKind =
   | 'install'
   | 'privacy'
   | 'backup'
+  | 'sync'
   | 'check'
 
 const PATHS: Readonly<Record<MenuIconKind, string>> = {
@@ -45,6 +46,8 @@ const PATHS: Readonly<Record<MenuIconKind, string>> = {
   privacy: 'M12 3.5 18.5 6v5.2c0 4.3-2.7 7.6-6.5 9.3-3.8-1.7-6.5-5-6.5-9.3V6z',
   // Die Kiste mit Deckel.
   backup: 'M4.5 8.5h15V19h-15zM4.5 8.5 6.7 5h10.6l2.2 3.5M9.5 12.5h5',
+  // Zwei Pfeile im Kreis: hin und zurück.
+  sync: 'M6.5 7.5A7 7 0 0 1 18 9M18 4.5V9h-4.5M17.5 16.5A7 7 0 0 1 6 15M6 19.5V15h4.5',
   // Der Puls.
   check: 'M3 13h4l2-5.5 4.5 10L15.5 13H21',
 }

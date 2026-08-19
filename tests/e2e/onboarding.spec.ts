@@ -84,6 +84,40 @@ test('macht die Antworten unter „Über dich“ änderbar — und die Änderung
   await openPage(page, 'Über dich')
   await page.locator('.about-field select').first().selectOption('names')
 
+  /*
+   * Erst neuladen, wenn die Antwort wirklich **geschrieben** ist. Das
+   * Speichern läuft asynchron in die Einstellungen; ein sofortiges
+   * Neuladen konnte es unter Suite-Volllast überholen — dann fehlte das
+   * Ziel nach dem Neuladen zu Recht, und der Test wartete auf einen
+   * Schwerpunkt, den es nie geben würde. Ablesen der persistierten
+   * Wahrheit statt Wette aufs Timing — dieselbe Lehre wie bei der
+   * Modul-Erkennung (pollFirstModule).
+   */
+  await expect
+    .poll(
+      () =>
+        page.evaluate(async () => {
+          const open = indexedDB.open('anitew')
+          const database: IDBDatabase = await new Promise((resolve, reject) => {
+            open.onsuccess = () => resolve(open.result)
+            open.onerror = () => reject(open.error)
+          })
+          const row: { value?: { goal?: string } } | undefined = await new Promise(
+            (resolve, reject) => {
+              const request = database
+                .transaction('settings', 'readonly')
+                .objectStore('settings')
+                .get('profile.onboarding')
+              request.onsuccess = () => resolve(request.result)
+              request.onerror = () => reject(request.error)
+            },
+          )
+          return row?.value?.goal
+        }),
+      { timeout: 10_000 },
+    )
+    .toBe('names')
+
   // Die Änderung überlebt das Neuladen und wird zum Vorschlag. Nach dem
   // Neuladen liest die App Profil und Zählungen erst asynchron — unter
   // Suite-Volllast hat das die 5-Sekunden-Standardfrist einmal gerissen.

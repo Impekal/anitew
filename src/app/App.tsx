@@ -93,6 +93,8 @@ import { FoundationPanel } from './FoundationPanel.tsx'
 import { AchievementsLine } from './AchievementsLine.tsx'
 import { CoachPanel } from './CoachPanel.tsx'
 import { OwnPanel } from './OwnPanel.tsx'
+import { SyncPanel } from './SyncPanel.tsx'
+import { SYNC_AT_SETTING, SYNC_ON_SETTING, resolveClientId, runDriveSync } from './driveSync.ts'
 import { ReturnsLine } from './ReturnsLine.tsx'
 import { StreakLine } from './StreakLine.tsx'
 import { BenchmarkPanel } from './benchmark/BenchmarkPanel.tsx'
@@ -139,6 +141,25 @@ export function App() {
    * übersprungen — dann kommt es nie wieder (D-015: einmal Nein ist Nein).
    */
   const { profile, ready: profileReady, save: saveProfile } = useProfile(platform)
+
+  /*
+   * Der stille Abgleich beim Start (D-033) — nur, wenn er je gewollt wurde
+   * (erster Abgleich auf der Abgleich-Seite), und ohne jede Rückfrage:
+   * Verlangt Google eine neue Anmeldung, scheitert er leise und wartet auf
+   * den nächsten Fingertipp dort. Ein Start, der ein Google-Fenster
+   * aufreißt, wäre genau die Überraschung, die D-015 ausschließt.
+   */
+  useEffect(() => {
+    void (async () => {
+      const on = await platform.settings.read<boolean>(SYNC_ON_SETTING).catch(() => undefined)
+      if (on !== true) return
+      const clientId = await resolveClientId(platform.settings)
+      if (clientId === undefined) return
+      const now = platform.clock.now()
+      await runDriveSync(clientId, true, now)
+      await platform.settings.write(SYNC_AT_SETTING, now)
+    })().catch(() => undefined)
+  }, [platform])
   const [mode, setMode] = useState<TrainingMode>('daily')
   /*
    * Der Startmodus aus dem Profil — einmal gesetzt, wenn der Speicher
@@ -829,6 +850,10 @@ export function App() {
         title: dictionary.backup.heading,
         body: <BackupPanel platform={platform} dictionary={dictionary} />,
       },
+      sync: {
+        title: dictionary.sync.heading,
+        body: <SyncPanel platform={platform} dictionary={dictionary} />,
+      },
       check: {
         title: dictionary.check.heading,
         body: <FoundationPanel platform={platform} dictionary={dictionary} />,
@@ -1258,6 +1283,10 @@ export function App() {
               <button type="button" className="drawer-item" onClick={() => openPage('backup')}>
                 <MenuIcon kind="backup" />
                 <span>{dictionary.backup.heading}</span>
+              </button>
+              <button type="button" className="drawer-item" onClick={() => openPage('sync')}>
+                <MenuIcon kind="sync" />
+                <span>{dictionary.sync.heading}</span>
               </button>
               <button type="button" className="drawer-item" onClick={() => openPage('check')}>
                 <MenuIcon kind="check" />

@@ -164,8 +164,18 @@ describe('die Datenschutzerklärung (R4)', () => {
     const privacy = textOf('docs/PRIVACY.md')
     expect(privacy).toContain('IP-Adresse')
     expect(privacy).toContain('Klartext')
-    expect(privacy).toMatch(/Cloud-Abgleich/)
-    expect(privacy).toMatch(/KI-Funktionen/)
+    /*
+     * Seit D-031/D-033 sind die zwei Übertragungen keine Pläne mehr,
+     * sondern Wirklichkeit — die Erklärung muss beide benennen, samt
+     * Empfänger und der Zusage, dass nichts davon Voreinstellung ist.
+     */
+    expect(privacy).toMatch(/Drive-Abgleich/)
+    // Alle wählbaren Coach-Anbieter (D-034) müssen benannt sein — wer
+    // einen ergänzt, ergänzt ihn auch hier.
+    for (const provider of ['Gemini', 'Anthropic', 'Groq', 'OpenRouter', 'Mistral']) {
+      expect(privacy, `ohne ${provider}`).toContain(provider)
+    }
+    expect(privacy).toMatch(/aus,\s*bis du sie anfasst/)
   })
 
   it('hält auch hier die Sperrliste ein (R5)', () => {

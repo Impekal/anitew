@@ -464,9 +464,9 @@ export const de = {
     heading: 'Datenschutz',
     lead: 'ANITEW hat keinen Server.',
     points: [
-      'Kein Konto, keine Anmeldung, keine Werbung, keine Tracker.',
-      'Alles, was beim Training entsteht, bleibt auf diesem Gerät.',
-      'Die Sicherung ist eine Datei, die du speicherst — wir laden sie nirgends hoch.',
+      'Kein Konto bei uns, keine Werbung, keine Tracker.',
+      'Alles, was beim Training entsteht, bleibt auf diesem Gerät — bis du selbst etwas anderes wählst: den Abgleich mit deinem eigenen Google Drive oder eine Coach-Frage mit eigenem Schlüssel. Beides ist aus, bis du es anfasst.',
+      'Die Sicherung ist eine Datei, die du speicherst; der Abgleich legt dieselbe Datei in deinen eigenen Drive-App-Ordner. Zu uns fließt in beiden Fällen nichts.',
       'Erinnerungen entstehen auf dem Gerät. Es gibt keinen Push-Dienst.',
       'Löschen heißt: Browserspeicher leeren oder die App entfernen. Danach ist es weg — auch für uns, denn wir hatten es nie.',
     ],
@@ -560,6 +560,33 @@ export const de = {
     scheduled: 'im Wiederholungsplan',
     fresh: 'kommt in die nächste Einheit',
   },
+  sync: {
+    /*
+      Der Drive-Abgleich (N7/N8/N10 · D-033). Jeder Satz hier trägt R-3:
+      wessen Konto, wessen Ordner, wer nichts sieht. Und der Fehlerfall
+      „fremde Datei“ sagt ausdrücklich, dass nichts angerührt wurde —
+      ein Abgleich, der bei Zweifel löscht, wäre keiner.
+    */
+    heading: 'Abgleich',
+    intro: 'Deine Daten wandern in einen App-Ordner in deinem eigenen Google Drive — dieselbe Datei wie die Sicherung. Kein Konto bei uns, kein Server dazwischen: Dieses Gerät spricht direkt mit Google, und im Drive sieht die App nur ihren eigenen Ordner.',
+    how: 'Abgleichen heißt: Erst wird geholt, was dort liegt, und nach den Regeln der Sicherung eingemischt — nichts wird gelöscht. Dann wird der vereinigte Stand hochgelegt. Zwei Geräte, die getrennt liefen, haben danach beide alles.',
+    start: 'Mit Google anmelden und abgleichen',
+    again: 'Jetzt abgleichen',
+    autoNote: 'Nach dem ersten Abgleich versucht die App ihn beim Öffnen still zu wiederholen. Verlangt Google eine neue Anmeldung, wartet der Abgleich einfach auf den nächsten Fingertipp hier.',
+    stop: 'Nicht mehr automatisch abgleichen',
+    running: 'Gleicht ab …',
+    pulledSome: '{n} Datensätze kamen neu auf dieses Gerät. Der vereinigte Stand liegt jetzt in deinem Drive.',
+    pulledNone: 'Von dort kam nichts Neues. Der aktuelle Stand liegt jetzt in deinem Drive.',
+    firstTime: 'Im Drive lag noch nichts — deine Sicherung liegt jetzt dort.',
+    lastAt: 'Zuletzt abgeglichen:',
+    errors: {
+      denied: 'Die Anmeldung kam nicht zustande. Beim nächsten Versuch fragt Google erneut.',
+      offline: 'Keine Verbindung zu Google. Später noch einmal — trainieren geht ohne.',
+      drive: 'Google Drive hat nicht geantwortet, wie es sollte. Später noch einmal.',
+      'remote-invalid': 'Im App-Ordner liegt eine Datei, die keine ANITEW-Sicherung ist. Sie wurde nicht angerührt. Bitte sieh sie dir an, bevor wieder abgeglichen wird.',
+    },
+    notConfigured: 'Der Abgleich ist in dieser Installation noch nicht eingerichtet — es fehlt ihre Google-Kennung. Sicherung und Training sind davon unberührt.',
+  },
   coach: {
     /*
       Der Coach (M · D-031). Zwei Hälften, eine Haltung: Der obere Teil
@@ -579,10 +606,28 @@ export const de = {
     askHeading: 'Freie Fragen',
     /*
       R-3 in einem Absatz: wo der Schlüssel liegt, wohin er geht, was es
-      kostet. Vor der Eingabe, nicht als Fußnote danach (D-015).
+      kostet. Vor der Eingabe, nicht als Fußnote danach (D-015). Seit
+      D-034 stehen fünf Anbieter zur Wahl — je mit dem Direktlink zur
+      Schlüssel-Seite und dem ehrlichen Satz zu Kosten oder Grenzen.
     */
-    keyNote: 'Mit einem eigenen Anthropic-Schlüssel kannst du dem Coach freie Fragen stellen. Der Schlüssel bleibt auf diesem Gerät und geht mit jeder Frage nur an api.anthropic.com — einen Server dazwischen gibt es nicht. Jede Frage kostet dort ein paar Cent von deinem eigenen Guthaben.',
-    keyPlaceholder: 'Anthropic-Schlüssel (sk-ant-…)',
+    keyNote: 'Mit einem eigenen Schlüssel eines KI-Anbieters kannst du dem Coach freie Fragen stellen. Der Schlüssel bleibt auf diesem Gerät und geht mit jeder Frage nur an den gewählten Anbieter — einen Server dazwischen gibt es nicht. Kosten oder Grenzen regelt dein Konto dort.',
+    providerLabel: 'Anbieter',
+    providers: {
+      gemini: 'Google Gemini — empfohlen',
+      anthropic: 'Anthropic (Claude)',
+      groq: 'Groq',
+      openrouter: 'OpenRouter',
+      mistral: 'Mistral',
+    },
+    keySteps: {
+      gemini: 'Mit deinem Google-Konto bei Google AI Studio anmelden, dort „Create API key“ tippen, den Schlüssel kopieren und unten einfügen. Kostenlos mit großzügigen Tagesgrenzen — darum die Empfehlung.',
+      anthropic: 'In der Anthropic-Konsole anmelden und unter „API keys“ einen Schlüssel anlegen, kopieren, unten einfügen. Braucht hinterlegtes Guthaben; jede Frage kostet wenige Cent.',
+      groq: 'Bei Groq anmelden, unter „API Keys“ einen Schlüssel anlegen, kopieren, unten einfügen. Kostenlos mit Tagesgrenzen.',
+      openrouter: 'Bei OpenRouter anmelden, unter „Keys“ einen Schlüssel anlegen, kopieren, unten einfügen. Ein Schlüssel für viele Modelle; kleines Guthaben nötig.',
+      mistral: 'In der Mistral-Konsole anmelden und unter „API keys“ einen Schlüssel anlegen, kopieren, unten einfügen. Braucht ein Konto auf „La Plateforme“ (eine kostenlose Stufe gibt es).',
+    },
+    keyLink: 'Schlüssel-Seite öffnen',
+    keyPlaceholder: 'Schlüssel hier einfügen',
     keySave: 'Schlüssel speichern',
     keyRemove: 'Schlüssel entfernen',
     keyPresent: 'Ein Schlüssel ist hinterlegt.',
@@ -595,8 +640,8 @@ export const de = {
     */
     errors: {
       'no-key': 'Ohne Schlüssel keine freien Fragen. Die Hinweise oben kommen ohne aus.',
-      'bad-key': 'Der Schlüssel wurde nicht angenommen. Prüfe ihn in der Anthropic-Konsole — oder entferne ihn hier.',
-      offline: 'Keine Verbindung zu api.anthropic.com. Später noch einmal — die Hinweise oben funktionieren ohne Netz.',
+      'bad-key': 'Der Schlüssel wurde nicht angenommen. Prüfe ihn beim Anbieter — oder entferne ihn hier.',
+      offline: 'Keine Verbindung zum Anbieter. Später noch einmal — die Hinweise oben funktionieren ohne Netz.',
       refused: 'Auf diese Frage antwortet das Modell nicht. Anders gestellt klappt es oft.',
       failed: 'Die Antwort kam nicht an. Später noch einmal.',
     },

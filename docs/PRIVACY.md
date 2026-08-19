@@ -1,6 +1,6 @@
 # Datenschutzerklärung
 
-**Stand: 2026-08-18** · Backlog R4
+**Stand: 2026-08-19** · Backlog R4
 
 > Der kurze Teil zuerst: **ANITEW hat keinen Server.** Es gibt kein Konto,
 > keine Anmeldung, keine Werbung, keine Analyse-Dienste und keine Tracker.
@@ -38,8 +38,10 @@ keinen Zählwert, mit dem sich Geräte oder Sitzungen verknüpfen ließen.
 
 ## 3. Was ANITEW **nicht** tut
 
-- Keine Übertragung deiner Trainingsdaten an uns oder an Dritte — es gibt
-  keine Stelle, an die sie gehen könnten.
+- Keine Übertragung deiner Trainingsdaten an uns — es gibt keine Stelle
+  bei uns, an die sie gehen könnten. An Dritte gehen Daten nur in den
+  zwei Fällen aus Abschnitt 9, beide auf deine ausdrückliche Wahl und
+  keiner voreingestellt.
 - Keine Werbung, keine Werbe-IDs, kein Profiling für Werbung.
 - Keine Analyse-Dienste, kein Crash-Reporting, keine Nutzungsstatistik.
 - Keine Cookies. Der Browserspeicher wird für die Funktion gebraucht, nicht
@@ -93,20 +95,31 @@ ANITEW richtet sich an niemanden bestimmten und sammelt nichts. Es gibt keine
 Chatfunktion, keine Bestenliste, keinen Kontakt zu anderen Nutzern und keine
 Inhalte von Dritten.
 
-## 9. Was sich ändern wird, bevor es kommt
+## 9. Die zwei freiwilligen Übertragungen — und was genau dabei fließt
 
-Zwei geplante Funktionen würden diese Erklärung berühren, und sie stehen
-deshalb schon hier:
+Beide Funktionen sind seit dem 2026-08-19 in der App, beide sind **aus,
+bis du sie anfasst**, und beide laufen ohne uns dazwischen:
 
-- **Cloud-Abgleich (Backlog N7/N8)** — falls er kommt, dann als *ausdrückliche
-  Wahl* mit dem Speicher, der dir gehört (etwa deinem eigenen Drive), nicht
-  als Voreinstellung und nicht auf unseren Servern.
-- **KI-Funktionen mit eigenem Schlüssel (Backlog M)** — dabei gingen Inhalte an
-  den Anbieter, dessen Schlüssel du einträgst. Das wäre eine Übertragung an
-  Dritte, sie wäre freiwillig, sie würde vorher benannt, und ohne Schlüssel
-  passiert nichts.
+- **Drive-Abgleich (Backlog N7).** Wenn du auf der Abgleich-Seite „Mit
+  Google anmelden und abgleichen“ wählst, spricht dein Gerät direkt mit
+  Google und legt deine Sicherungsdatei (Abschnitt 5) in einen
+  App-Ordner **deines eigenen Google Drive**. Die App sieht dort nur
+  ihren eigenen Ordner, nichts sonst in deinem Drive; wir sehen gar
+  nichts. Nach dem ersten Abgleich wiederholt die App ihn beim Öffnen
+  still — das lässt sich auf derselben Seite jederzeit beenden. Für den
+  Umgang mit deinem Google-Konto gilt Googles Datenschutzerklärung.
+- **Coach mit eigenem Schlüssel (Backlog M).** Wenn du bei einem
+  KI-Anbieter deiner Wahl — Google Gemini, Anthropic, Groq, OpenRouter
+  oder Mistral — einen eigenen Schlüssel anlegst, ihn hinterlegst und
+  eine Frage stellst, gehen diese Frage und ein Zahlenkontext aus deinem
+  Training (Serie, Quoten je Achse, Lehr-Stand — nicht der Inhalt deiner
+  eigenen Karten) direkt an den **gewählten** Anbieter, z. B.
+  `api.anthropic.com`. Der Schlüssel bleibt auf diesem Gerät und lässt
+  sich dort jederzeit entfernen; ohne Schlüssel wird nichts gesendet.
+  Es gilt die Datenschutzerklärung des gewählten Anbieters.
 
-Solange beides nicht in der App ist, gilt Abschnitt 3 ohne Einschränkung.
+Nichts davon ist Voreinstellung, nichts läuft über unsere Server — und
+ohne deine Handlung gilt Abschnitt 3 ohne Einschränkung.
 
 ## 10. Änderungen
 

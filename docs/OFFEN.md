@@ -23,6 +23,26 @@ Das kann kein Code erledigen. Reihenfolge wie im Gespräch: Geld zuletzt.
 | **Google Play** (Q1–Q4) | Entwicklerkonto ($25 einmalig), dein Signierschlüssel, Play-Console-Formulare. Ich baue Bubblewrap-Konfig und `assetlinks.json` vor; du gibst mir den Fingerprint | $25 einmalig |
 | **iOS App Store** (Q6) | Apple-Konto ($99/Jahr) **und** die Entscheidung, welchen eigenständigen Mehrwert die App über die Web-Version hinaus bietet (Apple lehnt reine Verpackungen ab) | $99/Jahr |
 | **Spendenweg** (K9) | Ko-fi/PayPal/GitHub-Sponsors-Konto auf deinen Namen | — |
+| **Google-Client-Kennung für den Abgleich** (N7) | Der Drive-Abgleich ist fertig gebaut und geprüft — er wartet nur auf die Kennung aus **deiner** Google-Cloud-Konsole. Schritte siehe unten | 15 Min, kostenlos |
+
+### Die Client-Kennung für den Drive-Abgleich anlegen
+
+1. [console.cloud.google.com](https://console.cloud.google.com) → neues Projekt (Name z. B. „ANITEW“).
+2. **APIs & Dienste → Bibliothek** → „Google Drive API“ aktivieren.
+3. **APIs & Dienste → OAuth-Zustimmungsbildschirm**: extern, App-Name
+   ANITEW, deine Mail. Unter Datenzugriff/Scopes den Scope
+   `…/auth/drive.appdata` hinzufügen. Solange die App im Status
+   „Testing“ ist, dich selbst als Testnutzer eintragen — für dich
+   funktioniert alles sofort; Googles Freigabeverfahren für alle (N10)
+   kann später folgen.
+4. **Anmeldedaten → Anmeldedaten erstellen → OAuth-Client-ID**: Typ
+   „Webanwendung“. Bei „Autorisierte JavaScript-Quellen“
+   `https://anitew.impekaltech.workers.dev` eintragen (und später die
+   eigene Domain). Weiterleitungs-URIs braucht es nicht.
+5. Die Client-ID (endet auf `.apps.googleusercontent.com`) entweder mir
+   geben — oder selbst in Cloudflare unter *Workers & Pages → Projekt →
+   Einstellungen → Variablen* als `VITE_GOOGLE_CLIENT_ID` setzen und neu
+   bauen lassen. Danach zeigt der Menüpunkt „Abgleich“ den Anmeldeknopf.
 
 **Für den reinen Test brauchst du nichts davon** außer 20 Minuten mit deinen
 Geräten. Die App ist schon online.
@@ -38,7 +58,7 @@ Phase mit Entscheidungen, die dir gehören.
 |---|---|
 | **KI mit eigenem Schlüssel** (M, Milestone M6) | **Erster Ausbau fertig 2026-08-19 (D-031):** Der Coach spricht aus den eigenen Zahlen (ohne Netz) und beantwortet freie Fragen mit eigenem Anthropic-Schlüssel. Offen: weitere Anbieter (erst wenn jemand sie braucht) und KI-Extraktion aus eigenem Material (I3, mit Freigabe pro Vorgang, I6) |
 | **Eigene Inhalte** (I, Milestone M6) | **Erster Ausbau fertig 2026-08-19 (D-032):** Text einfügen → Karten-Vorschau → eigenes Trainingsmodul samt FSRS-Wiedersehen, ohne KI, alles lokal. Offen: Foto/Diktat (I1), Termin-Items „das Treffen ist morgen um 9“ (I5), KI-Extraktion (I3) |
-| **Cloud-Abgleich** (N7/N8/N10, Milestone M7) | **Entschieden 2026-08-18: wird gebaut** — Google-Anmeldung mit Ablage im eigenen Google-Drive-App-Ordner (OAuth/PKCE, kein eigener Server, R-3 bleibt). Reihenfolge ebenfalls entschieden: erst Optik + Kennenlernen, dann der Abgleich. Live gehen kann er erst mit deinem Google-Cloud-OAuth-Client und der Domain (Gruppe 1) |
+| **Cloud-Abgleich** (N7/N8/N10, Milestone M7) | **Gebaut 2026-08-19 (D-033)**, gegen gemocktes Google geprüft: Anmeldung, Abgleich in den eigenen Drive-App-Ordner (kein Server, R-3 bleibt), stiller Wiederholungsversuch beim Start. Live gehen kann er erst mit deiner Client-Kennung (Anleitung in Gruppe 1). Offen bleiben Googles Freigabeverfahren für alle Nutzer (N10) und iCloud (N8, hängt an der nativen iOS-App) |
 | **Fotorealistische Porträts** (D16), **CC0-Icon-Satz** (D15) | Asset- und Lizenzentscheidung. Heute erzeugt die App Gesichter selbst (D-005) — bewusst, und es funktioniert |
 | **Französische Oberfläche** (fr.ts) | Die Prosa braucht eine muttersprachliche Durchsicht, bevor sie öffentlich geht. **Französisch als Trainingssprache** ist dagegen fertig und geprüft (L6/L7) |
 

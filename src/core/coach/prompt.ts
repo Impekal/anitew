@@ -28,12 +28,6 @@ export interface CoachRequest {
   readonly question: string
 }
 
-/**
- * Das Modell des Coaches. Eines, nicht wählbar: Eine Modellauswahl im Menü
- * wäre eine Frage an den Menschen, die die App beantworten kann.
- */
-export const COACH_MODEL = 'claude-opus-5'
-
 /** Länger als ein Absatz soll keine Coach-Antwort sein. */
 export const COACH_MAX_TOKENS = 1024
 

@@ -1740,6 +1740,34 @@ body::before {
   color: var(--ink-soft);
 }
 
+/* Die Anbieterwahl (D-034): ein leises Auswahlfeld, kein Markenlogo-Zoo. */
+.coach-provider {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+  width: 100%;
+}
+
+.coach-provider select {
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.92rem;
+}
+
+/* Die Schlüssel-Anleitung samt Direktlink — vor dem Feld (D-015). */
+.coach-key-help {
+  margin: 0.5rem 0 0;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
 .coach-key,
 .coach-ask {
   display: flex;
@@ -1853,6 +1881,33 @@ body::before {
 .own-card-state {
   display: block;
   font-size: 0.78rem;
+  color: var(--ink-faint);
+}
+
+/* ── Der Abgleich (N7/N8 · D-033) ─────────────────────────────────────── */
+
+.sync {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  align-items: flex-start;
+}
+
+.sync-report {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.sync-failure,
+.sync-note {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.sync-note {
   color: var(--ink-faint);
 }
 
