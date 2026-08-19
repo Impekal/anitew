@@ -2560,3 +2560,38 @@ Prüfungen zugleich. Die Beschriftung ist zurück, als Teil des Designs
 statt als sein Opfer. Außerdem injiziert die Schicht keine englischen
 Sätze mehr per CSS (`content: 'TODAY / …'`): Texte kommen aus dem
 Wörterbuch, und Pseudo-Inhalte liest ein Screenreader mit.
+
+
+## V2, zweiter Zug: Das Organ bekommt Kreislauf und Gesicht (2026-08-19)
+
+Nach dem Durchstich kamen die Aufgaben 5–13 des V2-Auftrags — alle auf
+`anitew-redesign-v2`, je als eigener grüner Commit:
+
+- **KI-Architekt (D-037 eingelöst):** `architectSystem`/`parseArchitectAnswer`
+  im Kern, `createWebArchitect` auf dem vorhandenen CoachPort. Im Panel
+  ein zweiter Knopf, nur mit Schlüssel, mit Vorab-Hinweis, wohin der
+  Text geht; KI-Vorschläge tragen ihre Herkunft und gehen durch dieselbe
+  Bestätigungstür.
+- **Grabsteine (D-038):** `MemoryGraph.removed` — die Vereinigung lässt
+  Entferntes nicht auferstehen; ein jüngeres Lebenszeichen räumt den
+  Grabstein weg. Nötig geworden, **bevor** der Abgleich unsichtbar wurde.
+- **Identität & unsichtbarer Abgleich (D-038):** `openid email` nur beim
+  bewussten Verbinden („Verbunden als …“, geht beim Beenden);
+  `scheduleDriveSync` entprellt nach Einheit, Bestätigen, Entfernen.
+  PRIVACY §9 nennt beides — und den KI-Textversand — beim Namen.
+- **Today (V2-8):** Zwei wahre Zeilen über dem Start — fällige
+  Wiedersehen aus derselben Auswahl wie die Einheit, schwächster Anker
+  mit Mechanik-Satz statt Vorhersage. Dazu die Entdeckungszeile: einmal,
+  bis gesehen (`memory.visited`).
+- **Trainingsbilanz (V2-9):** `trainingFootprint` — acht
+  Sieben-Tage-Fenster als Balken ohne Soll-Linie, klar getrennt von der
+  Messung.
+- **Feinschliff (D-039):** Klang-Cue `remember`, Motion-Tokens,
+  Konstellations-Zeichen (SVG → PNGs per Chromium gerastert; maskable
+  als eigene Volldeckungs-Datei — der Zuschnitt hätte sonst Ecken
+  gefressen).
+
+**Gelernt:** Union-Merge und ein Entfernen-Knopf vertragen sich nur mit
+Grabsteinen — die Lücke fiel erst auf, als der Abgleich unsichtbar
+werden sollte. Und: Werkzeug-Ausgaben mit Steuerzeichen (Regex-Klassen)
+weiter über Python-Ersetzungen schreiben, nie direkt.
