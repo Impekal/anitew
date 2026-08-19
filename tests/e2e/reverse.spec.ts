@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-import { startButton, visit } from './helpers.ts'
+import { pollFirstModule, startButton, visit } from './helpers.ts'
 
 /**
  * Das Arbeitsgedächtnis im Browser (D7 · D-026).
@@ -19,29 +19,24 @@ test('zeigt die Ziffern kurz, sperrt das Feld und zählt die Umkehr ehrlich', as
   await expect(startButton(page)).toBeVisible()
 
   let digits = ''
-  for (let attempt = 0; attempt < 20 && digits === ''; attempt++) {
+  for (let attempt = 0; attempt < 50 && digits === ''; attempt++) {
     await page.getByRole('button', { name: '60 Sekunden' }).click()
     await startButton(page).click()
     await page.locator('.settle').click()
 
-    // Entweder beginnt sofort der Rückwärts-Abruf — oder irgendein anderes
-    // Modul prägt ein. Der Test liest ab, was da ist (Lehre aus M4).
-    const reveal = page.locator('.reveal-digits')
-    const other = page.locator('.encode-word, .scene, .recall-input')
-    await expect(reveal.or(other).first()).toBeVisible({ timeout: 15_000 })
-
-    if ((await reveal.count()) > 0) {
+    // Welches Modul die Runde hat, sagt der persistierte Plan — kein
+    // Bildschirm-Raten (dieselbe Lehre wie in `startEmergency`).
+    if ((await pollFirstModule(page)) === 'reverse') {
+      const reveal = page.locator('.reveal-digits')
+      await reveal.waitFor({ timeout: 15_000 })
       digits = ((await reveal.textContent()) ?? '').trim()
       break
     }
 
-    // Nicht das gesuchte Modul: abbrechen und neu ziehen (neuer Seed).
-    // `.session-abort` verlässt die Einheit direkt — derselbe Knopf, den
-    // ein Mensch hat.
     await page.locator('.session-abort').click()
-    await expect(startButton(page)).toBeVisible()
+    await expect(page.locator('.challenge')).toBeVisible()
   }
-  expect(digits, 'in zwanzig Anläufen kam keine Rückwärts-Runde').toMatch(/^\d{5}$/)
+  expect(digits, 'in fünfzig Anläufen kam keine Rückwärts-Runde').toMatch(/^\d{5}$/)
 
   // Solange die Folge steht, ist das Feld gesperrt — sonst ließe sie sich
   // einfach von rechts nach links abtippen.

@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { startButton, visit } from './helpers.ts'
+import { pollFirstModule, startButton, visit } from './helpers.ts'
 
 /**
  * Memory Missions, im Browser nachgeprüft (Backlog H1, H2, H4).
@@ -20,21 +20,17 @@ import { startButton, visit } from './helpers.ts'
 
 /** Startet neu, bis der Plan das Missionsmodul zieht. */
 async function startMission(page: Page): Promise<boolean> {
-  for (let attempt = 0; attempt < 25; attempt++) {
+  for (let attempt = 0; attempt < 60; attempt++) {
     await visit(page)
     await page.getByRole('button', { name: '60 Sekunden' }).click()
     await startButton(page).click()
     await page.locator('.settle').click()
-    // `.reveal-digits` gehört seit D7 dazu: Eine Rückwärts-Runde hat weder
-    // Szene noch Einprägewort — ohne den Selektor liefe die Suche hier in
-    // die Zeitgrenze statt zum nächsten Versuch.
-    await expect(
-      page.locator('.scene, .encode-word, .reveal-digits').first(),
-    ).toBeVisible({ timeout: 30_000 })
-    // `.scene` allein reicht seit dem Palast nicht mehr: Ein Gang ist
-    // ebenfalls eine Szene und benutzt dasselbe Raster (G). Gesucht ist hier
-    // die Mission, also die Szene **ohne** Weg.
-    if ((await page.locator('.scene:not(.walk)').count()) > 0) return true
+    // Welches Modul die Runde hat, sagt der persistierte Plan — kein
+    // Bildschirm-Raten (dieselbe Lehre wie in `startEmergency`).
+    if ((await pollFirstModule(page)) === 'missions') {
+      await page.locator('.scene').first().waitFor({ timeout: 30_000 })
+      return true
+    }
     // Nicht getroffen: Spuren wegräumen, damit der nächste Versuch von vorn
     // beginnt und nicht auf einer halben Einheit aufsetzt.
     await page.evaluate(() => indexedDB.deleteDatabase('anitew'))
@@ -43,9 +39,9 @@ async function startMission(page: Page): Promise<boolean> {
 }
 
 test('zeigt die Szene als Ganzes und fragt sie mit Anker ab', async ({ page }) => {
-  test.setTimeout(180_000)
+  test.setTimeout(360_000)
 
-  expect(await startMission(page), 'in fünfundzwanzig Anläufen kam keine Mission').toBe(true)
+  expect(await startMission(page), 'in sechzig Anläufen kam keine Mission').toBe(true)
 
   /*
    * Alles auf einmal. Das ist der Unterschied zu jedem anderen Modul: Geübt

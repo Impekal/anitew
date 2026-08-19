@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { answerRecall, collectItems, openPage, startButton, visit } from './helpers.ts'
+import { answerRecall, collectItems, openPage, pollFirstModule, startButton, visit } from './helpers.ts'
 
 /**
  * Der Gedächtnispalast, im Browser nachgeprüft (Backlog G1, G2, G4, G6).
@@ -25,26 +25,27 @@ import { answerRecall, collectItems, openPage, startButton, visit } from './help
  * weggetippt, sie ist an anderer Stelle geprüft.
  */
 async function startWalk(page: Page): Promise<boolean> {
-  for (let attempt = 0; attempt < 25; attempt++) {
+  for (let attempt = 0; attempt < 60; attempt++) {
     await visit(page)
     await page.getByRole('button', { name: '3 Minuten' }).click()
     await startButton(page).click()
     await page.locator('.settle').click()
-    const lesson = page.locator('.lesson-card')
-    if ((await lesson.count()) > 0) await lesson.click()
-    // `.reveal-digits`: Eine Rückwärts-Runde (D7) hat weder Szene noch
-    // Einprägewort — ohne sie liefe die Suche in die Zeitgrenze.
-    await expect(
-      page.locator('.scene, .encode-word, .reveal-digits').first(),
-    ).toBeVisible({ timeout: 30_000 })
-    if ((await page.locator('.walk').count()) > 0) return true
+    // Welches Modul die Runde hat, sagt der persistierte Plan — kein
+    // Bildschirm-Raten (dieselbe Lehre wie in `startEmergency`).
+    if ((await pollFirstModule(page)) === 'palace') {
+      // Die Palastlektion kann davorstehen — wegtippen, dann steht der Gang.
+      const lesson = page.locator('.lesson-card')
+      if ((await lesson.count()) > 0) await lesson.click()
+      await page.locator('.walk').waitFor({ timeout: 30_000 })
+      return true
+    }
     await page.evaluate(() => indexedDB.deleteDatabase('anitew'))
   }
   return false
 }
 
 test('erklärt den Palast, bevor der erste Gang kommt — und nur einmal', async ({ page }) => {
-  test.setTimeout(180_000)
+  test.setTimeout(360_000)
 
   /*
    * Auf einer frischen Datenbank ist das keine Frage des Zufalls: Solange die
@@ -81,9 +82,9 @@ test('erklärt den Palast, bevor der erste Gang kommt — und nur einmal', async
 })
 
 test('legt fünf Dinge auf einen Weg und geht ihn danach ab', async ({ page }) => {
-  test.setTimeout(180_000)
+  test.setTimeout(360_000)
 
-  expect(await startWalk(page), 'in fünfundzwanzig Anläufen kam kein Gang').toBe(true)
+  expect(await startWalk(page), 'in sechzig Anläufen kam kein Gang').toBe(true)
 
   // Der Weg steht als Ganzes da — mit seinem Palast darüber.
   const lead = ((await page.locator('.scene-person').textContent()) ?? '').trim()
@@ -134,7 +135,7 @@ test('legt fünf Dinge auf einen Weg und geht ihn danach ab', async ({ page }) =
 })
 
 test('lässt einen eigenen Weg anlegen und benutzt ihn (G3)', async ({ page }) => {
-  test.setTimeout(180_000)
+  test.setTimeout(360_000)
 
   /*
    * Der Punkt der ganzen Technik: Ein Palast, den man selbst kennt, trägt

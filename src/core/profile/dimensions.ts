@@ -25,12 +25,12 @@
  * Fehlschlag am Lerntag zählt bei beiden nicht mit — dort ist die Information
  * noch im Lernen und nicht im Behalten.
  *
- * ── Warum eine Achse leer bleibt ──────────────────────────────────────────
+ * ── Jede Achse hat eine Quelle ────────────────────────────────────────────
  *
- * E2 nennt acht Dimensionen. Für **Visuell** gibt es in ANITEW noch kein
- * Modul, das sie misst — also steht dort nichts. Nicht „noch keine Daten“
- * mit einem hoffnungsvollen Balken daneben, sondern: **nicht gemessen.**
- * Dieselbe Ehrlichkeit wie auf der Wissenschaftsseite (D-016).
+ * Lange stand hier, warum Achsen leer bleiben. Seit dem Bild-Modul (Achse
+ * „Visuell“) hat jede der neun eine echte Quelle — der Fall `none` bleibt
+ * im Code, weil die nächste Achse ohne Modul wieder ehrlich „nicht
+ * gemessen“ sagen soll statt einen leeren Balken zu zeigen (D-016).
  *
  * **Aufmerksamkeit** zählt seit den Zwillingen (C6/D-027) das, was ihr Name
  * in der Anzeige sagt: Ähnliches auseinanderhalten — Wiedersehen nach
@@ -93,7 +93,7 @@ export const SOURCES: Readonly<Record<DimensionId, DimensionSource>> = {
   numbers: { kind: 'module', moduleId: 'numbers' },
   spatial: { kind: 'module', moduleId: 'palace' },
   binding: { kind: 'module', moduleId: 'missions' },
-  visual: { kind: 'none' },
+  visual: { kind: 'module', moduleId: 'gaze' },
   attention: { kind: 'module', moduleId: 'twins' },
   working: { kind: 'immediate', moduleId: 'reverse' },
   longTerm: { kind: 'benchmark' },

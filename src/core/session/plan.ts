@@ -24,6 +24,12 @@ import { objectFor, walkOf, walkPlacements } from '../content/palace.ts'
 import type { Language } from '../language.ts'
 import { reversed } from '../content/spans.ts'
 import { twinChoices, twinShown } from '../content/twins.ts'
+import {
+  gazeAnswer,
+  gazeObjectName,
+  gazePlacements,
+  gazeSceneOf,
+} from '../content/gaze.ts'
 import { nextToTeach } from '../technique/major.ts'
 import type { Leniency } from './grading.ts'
 
@@ -102,7 +108,16 @@ export type BlockKind = 'teach' | 'encode' | 'recall' | 'review'
  * mischt sie. Was ein Modul *zeigt*, weiß er nicht — er kennt nur Kennungen,
  * Zeiten und die Frage, ob der Abruf frei oder gestützt ist.
  */
-export const TRAINING_MODULES = ['words', 'faces', 'numbers', 'missions', 'palace', 'reverse', 'twins'] as const
+export const TRAINING_MODULES = [
+  'words',
+  'faces',
+  'numbers',
+  'missions',
+  'palace',
+  'reverse',
+  'twins',
+  'gaze',
+] as const
 export type ModuleId = (typeof TRAINING_MODULES)[number]
 
 /**
@@ -122,7 +137,8 @@ export function isPrompted(moduleId: ModuleId): boolean {
     moduleId === 'missions' ||
     moduleId === 'palace' ||
     moduleId === 'reverse' ||
-    moduleId === 'twins'
+    moduleId === 'twins' ||
+    moduleId === 'gaze'
   )
 }
 
@@ -169,12 +185,14 @@ const MAX_REVERSE_PROMPTS = 6
  * einen Vorrat behandelte und drei halbe Szenen abzählte.
  */
 export function isScene(moduleId: ModuleId): boolean {
-  return moduleId === 'missions' || moduleId === 'palace'
+  return moduleId === 'missions' || moduleId === 'palace' || moduleId === 'gaze'
 }
 
 /** Die Stücke einer Szene zu ihrem Anker. */
 export function sceneItemsOf(moduleId: ModuleId, anchor: string): readonly string[] {
-  return moduleId === 'palace' ? walkPlacements(anchor) : missionFacts(anchor)
+  if (moduleId === 'palace') return walkPlacements(anchor)
+  if (moduleId === 'gaze') return gazePlacements(anchor)
+  return missionFacts(anchor)
 }
 
 /**
@@ -196,7 +214,9 @@ export function secondsPerItemFor(moduleId: ModuleId): number {
    * ein Wort anzusehen, und wer es nicht tut, hat nur eine Liste gelesen.
    */
   if (moduleId === 'palace') return 6
-  return moduleId === 'missions' ? 5 : SECONDS_PER_ITEM
+  // Ein Bild (gaze) wie eine Mission: Vier Dinge und ihre Farben sollen
+  // **zusammen** gesehen werden, nicht nacheinander gelesen.
+  return moduleId === 'missions' || moduleId === 'gaze' ? 5 : SECONDS_PER_ITEM
 }
 
 /**
@@ -220,6 +240,8 @@ export function subjectOf(moduleId: ModuleId, item: string): string {
    * Antworten auf dieselbe Frage (D-027).
    */
   if (moduleId === 'twins') return twinChoices(item).join('%')
+  // Beim Bild ist der Anker die Szene: `bild~7#umbrella` gehört zu `bild~7`.
+  if (moduleId === 'gaze') return gazeSceneOf(item)
   return moduleId === 'missions' ? personOf(item) : item
 }
 
@@ -237,6 +259,8 @@ export function targetOf(moduleId: ModuleId, item: string, language: string): st
   if (moduleId === 'reverse') return reversed(item)
   // Zwillinge: Gezeigt war die erste Seite der Kennung — sie ist die Antwort.
   if (moduleId === 'twins') return twinShown(item)
+  // Bild: Gesucht ist die Farbe des Dings, in der Trainingssprache benannt.
+  if (moduleId === 'gaze') return gazeAnswer(item, language as Language) ?? item
   if (moduleId !== 'missions') return item
   return answerFor(item, language as Language) ?? item
 }
@@ -256,6 +280,12 @@ export function displayOf(moduleId: ModuleId, item: string, language: string): s
   if (moduleId === 'reverse') return reversed(item)
   // Zwillinge: In der Zusammenfassung steht das Wort, das dastand.
   if (moduleId === 'twins') return twinShown(item)
+  // Bild: „Schirm · Rot“ — woran man sich erinnert hat, lesbar.
+  if (moduleId === 'gaze') {
+    const object = gazeObjectName(item, language as Language)
+    const answer = gazeAnswer(item, language as Language)
+    return object !== undefined && answer !== undefined ? `${object} · ${answer}` : item
+  }
   /*
    * Beim Palast steht nur der Gegenstand da, ohne seine Station.
    *

@@ -2289,3 +2289,51 @@ zurück, wenn ein Einprägeblock **sichtbar ist** — genau das, worauf jeder
 Aufrufer als Nächstes wartet. Anwesenheit prüft man mit `count` (auch
 Verdecktes zählt), Brauchbarkeit mit Sichtbarkeit — und wer zurückkehrt,
 verspricht dem Aufrufer einen Zustand, nicht das Fehlen eines anderen.
+
+### Die dritte Fassung liest die Wahrheit statt des Bildschirms
+
+Die Modul-Erkennung der Prüfhelfer hat drei Anläufe gebraucht, und die
+Reihe ist eine Lehre für sich: (1) Abwesenheit des Negativen — Schlupfloch.
+(2) Anwesenheit des Positiven mit Doppelbestätigung — engeres Schlupfloch,
+wieder von genau einem Lauf getroffen. (3) **Gar nicht mehr am Bildschirm
+raten**: Die App schreibt ihren Plan beim Start in die Einstellungen (B5) —
+`pollFirstModule` liest das Modul des ersten Blocks von dort,
+deterministisch, für alle fünf Sucher gleich. Wo es eine persistierte
+Wahrheit gibt, ist jedes Ablesen der Oberfläche eine Wette auf Timing.
+
+Aus derselben Familie: Der Zwillings-Klick der Helfer wählte die Antwort
+nach **Position** (learned[index]) — im Wiedersehensblock kommen die Fragen
+aber in Fälligkeits-, nicht in Lernreihenfolge. Ein Lauf suchte einen
+Knopf, den es an dieser Frage nie gab, drei Minuten lang. Jetzt liest der
+Helfer, was die Knöpfe anbieten, und wählt das Wort, das beim Einprägen
+dastand — ablesen statt vorhersagen, zum wievielten Mal.
+
+### Der Geist in der Maschine war ein Cache — nein: ein Namensduplikat
+
+**Korrektur, einen Abend später:** Der Cache war unschuldig (die Räumung in
+`test:e2e` ist wieder ausgebaut). `session.spec.ts` trug eine **lokale
+Funktion `startEmergency`** aus alter Zeit, die den gleichnamigen
+Helfer-Import überschattete — diese eine Datei lief immer mit der
+Ur-Version ohne Modulerkennung, alle Härtungen griffen dort nie. Gefunden,
+als die Suche nach Doppeldefinitionen endlich dem Trace-Befund folgte
+(„der laufende Code kennt den Poll nicht“) statt ihn wegzuerklären. Die
+Lehre unten bleibt wörtlich richtig — nur der Mechanismus war ein anderer:
+kein stale Cache, sondern Shadowing. Beides hat dieselbe Signatur: Der
+gelesene Code ist nicht der laufende.
+
+#### Ursprünglicher Eintrag (Mechanismus falsch, Lehre richtig)
+
+Die „unerklärlichen“ Durchrutscher der Modulerkennung — drei Fassungen,
+jede logisch wasserdicht, jede von genau einem Lauf widerlegt — hatten am
+Ende **gar keinen Logikfehler**: Der Playwright-Transform-Cache
+(`/tmp/playwright-transform-cache-0`) lieferte zeitweise **veraltete
+Helfer**. Der Beweis kam aus dem Trace eines Fehl-Laufs: Zwischen
+Settle-Klick und Test-Erwartung fehlte jede Aktion des neuen Helfers — der
+Lauf führte Code aus, den es in der Datei längst nicht mehr gab. Seither
+räumt `npm run test:e2e` den Cache vor jedem Lauf.
+
+Zwei Lehren. **Erstens**: Wenn eine wasserdichte Erklärung zum zweiten Mal
+platzt, prüfe nicht die Logik ein drittes Mal — prüfe, ob der Code, den du
+liest, der Code ist, der läuft. **Zweitens**: Der Trace hat in Minuten
+entschieden, worüber Hypothesen Stunden verhandelt hatten. Erst schauen,
+dann denken.

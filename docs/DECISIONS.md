@@ -1089,3 +1089,33 @@ neutraler (alphabetischer) Reihenfolge: „Welches stand da?“
   Schwerpunkt mit (anders als die Sofort-Achse aus D-026).
 - **Kein Zwilling läuft in einem anderen Vorrat mit** (C6, F2a) — per
   Kerntest erzwungen, gegen Wörter, Quarantäne und Palastdinge.
+
+## D-028 · 2026-08-19 · Bilder: Die Kennung erzeugt die Szene, und die Frage zeigt das Bild in Tinte
+
+**Entscheidung:** Das visuelle Modul (Achse „Visuell“) zeigt Bilder aus vier
+einfachen, selbst gezeichneten Dingen (D-005) in vier von sechs klaren
+Farben. Eingeprägt wird das Bild als Ganzes; gefragt wird die Einzelheit:
+„Der Schirm — welche Farbe?“
+
+**Die tragenden Regeln:**
+
+- **Die Kennung erzeugt die Szene.** `bild~7` ergibt heute, morgen und beim
+  Wiedersehen in zwei Wochen dieselben vier Dinge in denselben Farben —
+  gespeichert wird kein Bild, nur die Kennung (dasselbe Muster wie die
+  Gänge, D-017). Der Vorrat ist damit praktisch unerschöpflich.
+- **Die Frage trägt ihren Anker.** Zwei gelernte Bilder können dasselbe
+  Ding tragen — „Der Schirm — welche Farbe?“ ohne Kontext fragte ins
+  Leere. Beim Abruf steht darum dasselbe Bild in **Tinte** da (alle
+  Zeichnungen ohne Farbe), das gefragte Ding hervorgehoben: Das Bild sagt,
+  welches gemeint ist, und verrät nichts.
+- **Sechs Farben, keine Zwischentöne.** „War das türkis oder petrol?“
+  prüfte Farbwissen, nicht Gedächtnis. Rot, Blau, Grün, Gelb, Lila,
+  Orange — kräftig gezeichnet, denn hier ist Farbe **Inhalt**, nicht
+  Gestaltung.
+- **Wörter nur außerhalb der Quarantäne** (F2a, per Kerntest erzwungen).
+  Überschneidung mit dem Wortmodul ist dagegen erlaubt: Dort ist das Wort
+  die Antwort, hier die Frage — zwei Aufgaben, wie „Elena“ bei Gesicht und
+  Mission (H1).
+
+Damit hat **jede der neun Profil-Achsen eine echte Quelle**; der
+`none`-Zweig bleibt im Code für die nächste Achse ohne Modul (D-016).

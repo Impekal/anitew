@@ -2018,3 +2018,34 @@ body::before {
 .twin-choice:active {
   transform: translateY(1px);
 }
+
+/* ── Bilder (Achse „Visuell“) ─────────────────────────────────────────── */
+
+.gaze-scene {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.9rem;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  padding: 1.2rem;
+  box-shadow: var(--shadow);
+  justify-items: center;
+}
+
+.gaze-cell {
+  display: flex;
+  padding: 0.35rem;
+  border-radius: 0.9rem;
+}
+
+/* Beim Abruf steht das Bild in Tinte — es sagt, WELCHES Bild gemeint ist,
+   ohne die Antwort zu tragen. Das gefragte Ding bekommt den Rahmen. */
+.gaze-neutral {
+  color: var(--ink-faint);
+}
+
+.gaze-neutral .gaze-asked {
+  color: var(--ink);
+  border: 2px solid var(--accent);
+}

@@ -64,13 +64,18 @@ describe('was das Profil sagt — und was nicht', () => {
     const results = profileOf({})
     const words = results.find((result) => result.id === 'words')
     expect(words?.kind).toBe('tooFew')
-    // Und eine Achse misst diese App überhaupt nicht — dort steht das, statt
-    // eines leeren Balkens mit Hoffnung daneben (D-016). Aufmerksamkeit
-    // misst seit den Zwillingen (D-027), Arbeitsgedächtnis seit D7.
-    expect(results.find((result) => result.id === 'visual')?.kind).toBe('notMeasured')
+    /*
+     * Seit dem Bild-Modul hat jede der neun Achsen eine echte Quelle —
+     * keine sagt mehr „misst diese App nicht“. Der `none`-Zweig bleibt im
+     * Code für die nächste Achse ohne Modul (D-016); solange es keine
+     * gibt, ist „nicht gemessen“ nirgends die Antwort — und „zu wenig“
+     * bleibt scharf von „schlecht“ getrennt.
+     */
+    for (const result of results) {
+      expect(result.kind, result.id).not.toBe('notMeasured')
+    }
+    expect(results.find((result) => result.id === 'visual')?.kind).toBe('tooFew')
     expect(results.find((result) => result.id === 'attention')?.kind).toBe('tooFew')
-    // Das Arbeitsgedächtnis ist seit D7 messbar — als Sofort-Achse (D-026):
-    // ohne Daten „zu wenig“, nicht „nicht gemessen“.
     expect(results.find((result) => result.id === 'working')?.kind).toBe('tooFew')
   })
 
@@ -165,6 +170,7 @@ describe('der Schwerpunkt im Bauplan (E5)', () => {
     palace: many('home~'),
     reverse: ['48293', '17546', '90287', '35761', '82154', '46029'],
     twins: ['Kirche%Kirsche', 'Mantel%Mangel', 'Fliege%Fliese', 'Karte%Kante', 'Bogen%Boden', 'Wolke%Wolle'],
+    gaze: ['bild~1', 'bild~2', 'bild~3', 'bild~4', 'bild~5', 'bild~6'],
   }
 
   const modulesOf = (plan: ReturnType<typeof planSession>) =>

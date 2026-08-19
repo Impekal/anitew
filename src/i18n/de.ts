@@ -119,6 +119,7 @@ export const de = {
       // Schlüssel existiert, weil das Wörterbuch je Modul vollständig ist.
       reverse: 'Gleich rückwärts gefragt.',
       twins: 'Sieh genau hin — gleich steht ein Zwilling daneben.',
+      gaze: 'Sieh das Bild an. Jedes Ding hat seine Farbe — merk dir beides zusammen.',
     },
     recallHint: 'Was ist geblieben? Reihenfolge egal.',
     reviewHint: 'Und jetzt von früher: Woran erinnerst du dich noch?',
@@ -135,6 +136,13 @@ export const de = {
     // Zwillinge (D-027): Die Frage steht über zwei Knöpfen — kurz, weil die
     // beiden Wörter selbst die ganze Frage sind.
     twinAsk: 'Welches stand da?',
+    /*
+      Bild (Achse „Visuell“): Die Frage nennt das Ding, das Bild in Tinte
+      zeigt, WELCHES Bild gemeint ist — zwei gelernte Bilder können dasselbe
+      Ding tragen, und ohne den Anker fragte die App ins Leere.
+    */
+    gazeAsk: '{object} — welche Farbe?',
+    gazePlaceholder: 'Farbe',
     /*
       Die Fragen einer Mission (H1).
 
@@ -408,6 +416,7 @@ export const de = {
       palace: 'Palast',
       reverse: 'Rückwärts',
       twins: 'Unterscheiden',
+      gaze: 'Bilder',
     },
     noWeakest: 'Kein Unterschied zwischen den Achsen, der sich vom Zufall trennen lässt.',
     empty: 'Noch nichts zu zeigen. Das Profil entsteht aus dem Training — nicht aus einem Test am Anfang.',

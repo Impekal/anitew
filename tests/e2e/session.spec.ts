@@ -1,6 +1,14 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { answerRecall, collectItems, recallKind, sceneOf, startButton, visit } from './helpers.ts'
+import {
+  answerRecall,
+  collectItems,
+  recallKind,
+  sceneOf,
+  startButton,
+  startEmergency as startGuardedEmergency,
+  visit,
+} from './helpers.ts'
 
 /**
  * Eine Trainingseinheit von vorn bis hinten (Backlog B1–B3, B5, D4, D6).
@@ -9,13 +17,19 @@ import { answerRecall, collectItems, recallKind, sceneOf, startButton, visit } f
  * alles vorkommt, kurz genug, dass der Test nicht fünf Minuten wartet.
  */
 
+/*
+ * Delegiert an den gemeinsamen Helfer — und der Name dieser Hülle ist eine
+ * Narbe: Hier stand eine **lokale Kopie** gleichen Namens aus der Zeit vor
+ * den neuen Modulen. Sie überschattete den Helfer-Import, bekam keine
+ * seiner Härtungen mit, und ließ diese Datei seed-abhängig rot werden —
+ * während drei Fassungen der Helfer-Erkennung „unerklärlich“ platzten und
+ * sogar der Transform-Cache verdächtigt wurde. Der Code, den man liest,
+ * muss der Code sein, der läuft — und ein Duplikat mit gleichem Namen ist
+ * die leiseste Art, das zu verhindern.
+ */
 async function startEmergency(page: Page) {
   await visit(page)
-  await page.getByRole('button', { name: '60 Sekunden' }).click()
-  await startButton(page).click()
-  // Das Ankommen (D-011/G-1) lässt sich antippen — im Test warten wir nicht
-  // drei Sekunden auf einen atmenden Kreis.
-  await page.locator('.settle').click()
+  await startGuardedEmergency(page)
 }
 
 test('führt durch Einprägen und Abrufen und zählt ehrlich', async ({ page }) => {
@@ -59,7 +73,7 @@ test('führt durch Einprägen und Abrufen und zählt ehrlich', async ({ page }) 
       welche, war schon zweimal der Fehler.
     */
     await expect(
-      page.getByText(/Eine Szene\. Was gehört zu wem\?|Geh den Weg ab\./),
+      page.getByText(/Eine Szene\. Was gehört zu wem\?|Geh den Weg ab\.|Sieh das Bild an\./),
     ).toBeVisible()
   }
 

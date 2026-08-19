@@ -41,6 +41,7 @@ import {
   streakOf,
   achievementsOf,
   spanPool,
+  gazePool,
   twinChoices,
   twinPairs,
   twinPool,
@@ -407,6 +408,12 @@ export function App() {
           twins: twinPool(training, seed).filter(
             (item) => !twinsDone.has(twinChoices(item).join('%')),
           ),
+          /*
+           * Bilder (Achse „Visuell“): aus dem Seed erzeugt wie Zahlen und
+           * Gänge — der Vorrat geht nie aus, und dieselbe Kennung ergibt
+           * beim Wiedersehen dasselbe Bild.
+           */
+          gaze: gazePool(seed, 24),
         },
         due,
         taught,

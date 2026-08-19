@@ -31,6 +31,19 @@ export interface Learned {
   scene?: Map<string, string>
 }
 
+/**
+ * Farbschlüssel → deutscher Name, wie die App sie abfragt. Die Zeichnung
+ * trägt den Schlüssel als `data-color`; geantwortet wird mit dem Namen.
+ */
+const GAZE_COLOR_NAME = new Map([
+  ['red', 'Rot'],
+  ['blue', 'Blau'],
+  ['green', 'Grün'],
+  ['yellow', 'Gelb'],
+  ['purple', 'Lila'],
+  ['orange', 'Orange'],
+])
+
 /** Die Frage einer Mission und das Etikett, unter dem ihre Antwort steht. */
 const MISSION_LABEL_OF_QUESTION = new Map([
   ['Welche Zimmernummer?', 'Zimmer'],
@@ -110,53 +123,54 @@ export async function startEmergency(page: Page) {
     await page.locator('.settle').click()
 
     /*
-     * Entschieden wird am **positiven** Zeichen: Zurückgekehrt wird erst,
-     * wenn ein Einprägeblock wirklich sichtbar ist — genau das, worauf
-     * jeder Aufrufer als Nächstes wartet. Der erste Anlauf entschied an der
-     * Abwesenheit der Ziffernanzeige und hatte damit ein Schlupfloch: Ein
-     * einziger unglücklicher Lesezeitpunkt, und eine Rückwärts-Runde ging
-     * als Einprägerunde durch — ein voller Lauf hat genau einmal genau das
-     * getroffen. Die Ziffernanzeige wird über ihre **Anwesenheit** erkannt
-     * (`count`), nicht über Sichtbarkeit: Nach drei Sekunden ist sie
-     * verdeckt, aber noch da.
+     * Welches Modul die Runde hat, steht **im persistierten Plan** — die
+     * App schreibt ihn beim Start in die Einstellungen (B5). Von dort zu
+     * lesen ist deterministisch; zwei Anläufe, es am Bildschirm zu erraten,
+     * hatten je ein Schlupfloch, und je ein voller Lauf hat es getroffen.
      */
-    const learnable = page.locator('.encode-word, .scene')
-    const reveal = page.locator('.reveal-digits')
-    const deadline = Date.now() + 20_000
-    let backwards = false
-    for (;;) {
-      // Anwesenheit zuerst: Die Ziffernanzeige zählt auch verdeckt.
-      if ((await reveal.count()) > 0) {
-        backwards = true
-        break
-      }
-      if (await learnable.first().isVisible().catch(() => false)) {
-        /*
-         * Und noch einmal, einen Wimpernschlag später: Zwei volle Läufe
-         * haben je genau einen Fall getroffen, in dem hier trotz einer
-         * Rückwärts-Runde ein Treffer gemeldet wurde — ein Flackern beim
-         * Blockaufbau, das eine Momentaufnahme für bare Münze nahm. Erst
-         * wenn der Einprägeblock **stehen bleibt** und keine Ziffernanzeige
-         * dazukommt, gilt er.
-         */
-        await page.waitForTimeout(250)
-        if (
-          (await reveal.count()) === 0 &&
-          (await learnable.first().isVisible().catch(() => false))
-        ) {
-          break
-        }
-        continue
-      }
-      expect(Date.now(), 'kein erster Block erschienen').toBeLessThan(deadline)
-      await page.waitForTimeout(100)
+    const moduleId = await pollFirstModule(page)
+    if (moduleId !== 'reverse') {
+      // Und erst zurück, wenn der Einprägeblock wirklich steht — das ist,
+      // worauf jeder Aufrufer als Nächstes wartet.
+      await expect(page.locator('.encode-word, .scene').first()).toBeVisible({
+        timeout: 15_000,
+      })
+      return
     }
-    if (!backwards) return
 
     await page.locator('.session-abort').click()
-    await expect(startButton(page)).toBeVisible()
+    await expect(page.locator('.challenge')).toBeVisible()
   }
   throw new Error('in 25 Anläufen kam keine Runde mit Terminen')
+}
+
+/** Das Modul des ersten Blocks, aus dem persistierten Plan gelesen. */
+export async function pollFirstModule(page: Page): Promise<string> {
+  const deadline = Date.now() + 15_000
+  for (;;) {
+    const moduleId = await page.evaluate(() => {
+      return new Promise<string | undefined>((resolve) => {
+        const open = indexedDB.open('anitew')
+        open.onsuccess = () => {
+          const request = open.result
+            .transaction('settings')
+            .objectStore('settings')
+            .get('activeSession')
+          request.onsuccess = () => {
+            const value = request.result?.value as
+              | { plan?: { blocks?: { moduleId?: string }[] } }
+              | undefined
+            resolve(value?.plan?.blocks?.[0]?.moduleId)
+          }
+          request.onerror = () => resolve(undefined)
+        }
+        open.onerror = () => resolve(undefined)
+      })
+    })
+    if (moduleId !== undefined) return moduleId
+    expect(Date.now(), 'kein Plan im Speicher erschienen').toBeLessThan(deadline)
+    await page.waitForTimeout(100)
+  }
 }
 
 /**
@@ -171,6 +185,22 @@ export async function startEmergency(page: Page) {
  */
 export async function sceneOf(page: Page): Promise<Map<string, string> | undefined> {
   if ((await page.locator('.scene').count()) === 0) return undefined
+  /*
+   * Ein Bild (Achse „Visuell“) hat keine Etiketten — es hat Zeichnungen.
+   * Gelesen wird über die Datenattribute: Ding-Schlüssel → Farbname.
+   */
+  const glyphs = page.locator('.gaze-scene .gaze-glyph')
+  if ((await glyphs.count()) > 0) {
+    const pairs = new Map<string, string>()
+    for (const glyph of await glyphs.all()) {
+      const object = (await glyph.getAttribute('data-object')) ?? ''
+      const color = (await glyph.getAttribute('data-color')) ?? ''
+      const name = GAZE_COLOR_NAME.get(color)
+      expect(name, `unbekannte Farbe: „${color}“`).toBeDefined()
+      pairs.set(object, name as string)
+    }
+    return pairs
+  }
   const stations = await page.locator('.walk-station').allTextContents()
   const labels =
     stations.length > 0 ? stations : await page.locator('.scene-facts dt').allTextContents()
@@ -294,8 +324,15 @@ export async function answerRecall(page: Page, learned: Learned, give: Give) {
      * Verwechseln ähnlich, das ist ihr Beruf.
      */
     if ((await choice.count()) > 0) {
-      const right = await answerAt(page, learned, index)
+      /*
+       * Nicht nach Position raten: Im Wiedersehensblock kommen die Fragen
+       * in der Reihenfolge der Fälligkeit, nicht des Lernens — ein voller
+       * Lauf hat den Klick auf einen Knopf gesucht, den es an dieser Frage
+       * nie gab. Gelesen wird stattdessen, was die Knöpfe anbieten, und
+       * gewählt das Wort, das beim Einprägen dastand.
+       */
       const words = (await choice.allTextContents()).map((word) => word.trim())
+      const right = words.find((word) => learned.items.includes(word)) ?? words[0] ?? ''
       const wrong = words.find((word) => word !== right) ?? right
       await page
         .locator('.twin-choices')
@@ -333,6 +370,15 @@ async function answerAt(page: Page, learned: Learned, index: number): Promise<st
    * des Weges vorherzusagen; dass sie hier tatsächlich stimmt, ist eine
    * Eigenschaft der Technik und keine, auf die er sich stützen sollte.
    */
+  // Beim Bild sagt die Hervorhebung, welches Ding gefragt ist.
+  const askedGlyph = page.locator('.gaze-asked .gaze-glyph')
+  if ((await askedGlyph.count()) > 0) {
+    const object = (await askedGlyph.getAttribute('data-object')) ?? ''
+    const color = learned.scene.get(object)
+    expect(color, `unbekanntes Ding: „${object}“`).toBeDefined()
+    return color as string
+  }
+
   const station = page.locator('.placemark-station')
   if ((await station.count()) > 0) {
     const where = ((await station.textContent()) ?? '').trim()

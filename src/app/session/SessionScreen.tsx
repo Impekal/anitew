@@ -5,6 +5,10 @@ import {
   displayOf,
   type FactKind,
   factKindOf,
+  type GazeObject,
+  gazeObjectName,
+  gazeObjectOf,
+  gazeSceneOf,
   helpsWith,
   isPrompted,
   type Language,
@@ -29,6 +33,7 @@ import {
 import type { RoundResult, SessionProgress } from '../../data/sessions.ts'
 import type { Dictionary } from '../../i18n/index.ts'
 import { Face } from '../Face.tsx'
+import { GazeScene } from '../GazeScene.tsx'
 import { useCountUp } from '../useCountUp.ts'
 
 import { useSessionRunner } from './useSessionRunner.ts'
@@ -246,6 +251,16 @@ function RunningSession({
           language={state.plan.language}
           own={own}
         />
+      ) : block.kind === 'encode' && block.moduleId === 'gaze' ? (
+        /*
+          Ein Bild wird als Ganzes gezeigt (Achse „Visuell“): vier Dinge,
+          vier Farben, ein Blick. Keine Wortliste daneben — gemerkt werden
+          soll, was man **sieht**, nicht was man liest.
+        */
+        <section className="encode scene gaze-encode">
+          <p className="hint">{t.encodeHints.gaze}</p>
+          <GazeScene sceneId={gazeSceneOf(block.items[0] ?? '')} />
+        </section>
       ) : block.kind === 'encode' && block.moduleId === 'missions' ? (
         /*
           Eine Mission wird **als Ganzes** gezeigt und nicht Stück für Stück
@@ -345,6 +360,14 @@ function RunningSession({
               ? twinChoices(block.items[state.promptIndex] ?? '')
               : undefined
           }
+          gazeCue={
+            block.moduleId === 'gaze'
+              ? {
+                  sceneId: gazeSceneOf(block.items[state.promptIndex] ?? ''),
+                  ask: gazeObjectOf(block.items[state.promptIndex] ?? '') ?? 'umbrella',
+                }
+              : undefined
+          }
           /*
             Bei der Mission steht der Name **unter** dem Gesicht — er ist hier
             nicht die Frage, sondern der Anker: „Elena — welches Zimmer?“
@@ -358,7 +381,7 @@ function RunningSession({
           }
           position={state.promptIndex + 1}
           total={block.items.length}
-          hint={askFor(block, state.promptIndex, dictionary)}
+          hint={askFor(block, state.promptIndex, dictionary, state.plan.language as Language)}
           placeholder={placeholderFor(block, state.promptIndex, dictionary)}
           numeric={numericFor(block, state.promptIndex)}
           action={t.doneWithBlock}
@@ -434,6 +457,7 @@ function PromptedRecall({
   face,
   place,
   reveal,
+  gazeCue,
   choices,
   label,
   position,
@@ -453,6 +477,12 @@ function PromptedRecall({
    * von rechts nach links abtippen, und geübt wäre nichts.
    */
   reveal?: string
+  /**
+   * Das Bild als Anker beim Abruf (Achse „Visuell“): in Tinte, das
+   * gefragte Ding hervorgehoben. Zwei gelernte Bilder können dasselbe Ding
+   * tragen — ohne das Bild fragte die App ins Leere.
+   */
+  gazeCue?: { sceneId: string; ask: GazeObject }
   /**
    * Zwei Wörter zur Wahl (Zwillinge, D-027): Die Knöpfe sind die Antwort —
    * kein Feld, kein Tippen. Getippt läge der Köder eine Tippfehler-Nachsicht
@@ -502,6 +532,8 @@ function PromptedRecall({
           <span className="placemark-palace">{place.palace}</span>
           <span className="placemark-station">{place.station}</span>
         </div>
+      ) : gazeCue !== undefined ? (
+        <GazeScene sceneId={gazeCue.sceneId} ask={gazeCue.ask} />
       ) : choices !== undefined ? null : (
         <Face name={face} size={168} />
       )}
@@ -900,13 +932,23 @@ function placeOf(
  * wird, ist eine Auskunft, die dem Nutzer zusteht — und nicht bloß eine
  * Höflichkeitsfloskel.
  */
-function askFor(block: BlockPlan, index: number, dictionary: Dictionary): string {
+function askFor(
+  block: BlockPlan,
+  index: number,
+  dictionary: Dictionary,
+  language: Language,
+): string {
   const t = dictionary.session
   // Rückwärts gibt es nur als Sofortfrage — ein Wiedersehen hat das Modul
   // nicht (D-026), also braucht die Frage keinen Vorspann.
   if (block.moduleId === 'reverse') return t.reverseAsk
   if (block.moduleId === 'twins') {
     return block.kind === 'review' ? `${t.reviewLead} ${t.twinAsk}` : t.twinAsk
+  }
+  if (block.moduleId === 'gaze') {
+    const object = gazeObjectName(block.items[index] ?? '', language) ?? ''
+    const ask = t.gazeAsk.replace('{object}', object)
+    return block.kind === 'review' ? `${t.reviewLead} ${ask}` : ask
   }
   if (block.moduleId === 'palace') {
     const ask = dictionary.palace.ask
@@ -923,6 +965,7 @@ function askFor(block: BlockPlan, index: number, dictionary: Dictionary): string
 function placeholderFor(block: BlockPlan, index: number, dictionary: Dictionary): string {
   const t = dictionary.session
   if (block.moduleId === 'reverse') return t.reversePlaceholder
+  if (block.moduleId === 'gaze') return t.gazePlaceholder
   if (block.moduleId === 'palace') return dictionary.palace.placeholder
   if (block.moduleId !== 'missions') return t.promptPlaceholder
   const kind = factKindOf(block.items[index] ?? '')
