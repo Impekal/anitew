@@ -2487,3 +2487,18 @@ Schwerpunkt fehlte danach zu Recht. Der Test liest jetzt erst die
 persistierte Antwort (Poll auf die Einstellungszeile), dann lädt er neu —
 ablesen statt wetten, wie bei der Modul-Erkennung. Die Überspringen-Flake
 (Klick verpufft) bleibt dagegen unreproduziert und beobachtet.
+
+## 2026-08-19 · N10 vorbereitet — die Datenschutz-Seite kommt aus einer Quelle
+
+Für Googles Zustimmungsbildschirm gibt es jetzt eine öffentliche
+Datenschutz-URL: `/datenschutz.html`, bei jedem Build aus
+`docs/PRIVACY.md` erzeugt (ein fünfzig-zeiliger Wandler in
+`scripts/privacy-page.mjs` statt eines Markdown-Pakets — F7: eine
+Quelle, keine zwei Fassungen; drei Kerntests halten Vollständigkeit und
+Auszeichnungsreste fest). `drive.appdata` ist nach Kenntnisstand ein
+nicht-sensibler Scope; dann ist für „Testing → In Produktion“ kein
+Prüfverfahren nötig — verbindlich sagt es die Konsole beim
+Veröffentlichen, und genau dieser Klick gehört dem Kontoinhaber
+(Schritte in OFFEN.md).
+
+**Stand:** 413 Kerntests, Budget unverändert.

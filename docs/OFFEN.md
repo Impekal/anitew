@@ -44,6 +44,28 @@ Das kann kein Code erledigen. Reihenfolge wie im Gespräch: Geld zuletzt.
    Einstellungen → Variablen* als `VITE_GOOGLE_CLIENT_ID` setzen und neu
    bauen lassen. Danach zeigt der Menüpunkt „Abgleich“ den Anmeldeknopf.
 
+**Erledigt 2026-08-19:** Client angelegt, Kennung im Deploy — der
+Abgleich läuft für die eingetragenen Testnutzer.
+
+### Den Abgleich für **alle** freischalten (N10)
+
+Solange die OAuth-App im Status „Testing“ steht, funktioniert der
+Abgleich nur für eingetragene Testnutzer. Für alle anderen:
+
+1. [console.cloud.google.com/auth/audience](https://console.cloud.google.com/auth/audience)
+   → **„App veröffentlichen“ / „In Produktion übergeben“**.
+2. `drive.appdata` ist nach Kenntnisstand ein **nicht-sensibler** Scope —
+   dann verlangt Google **kein** Prüfverfahren, und der Schritt wirkt
+   sofort. Verbindlich sagt es der Dialog an dieser Stelle selbst: Steht
+   dort „Verifizierung erforderlich“, melde den Wortlaut, dann bereite
+   ich die Einreichung vor.
+3. Unter *Branding* die öffentliche Datenschutzerklärung eintragen:
+   `https://anitew.impekaltech.workers.dev/datenschutz.html` — die Seite
+   wird bei jedem Build aus `docs/PRIVACY.md` erzeugt und ist damit
+   immer die aktuelle Fassung. Als Startseite die App-Adresse selbst.
+   (Ein Logo erst später hochladen: Ein Logo löst bei Google die
+   Marken-Verifizierung aus, die ohne Not niemand braucht.)
+
 **Für den reinen Test brauchst du nichts davon** außer 20 Minuten mit deinen
 Geräten. Die App ist schon online.
 
