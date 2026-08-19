@@ -339,6 +339,28 @@ export const en: Dictionary = {
     restaurant: 'Restaurant',
   },
   technique: {
+    story: {
+      heading: 'New technique',
+      intro: 'The story method',
+      steps: [
+        'Take the words in order.',
+        'Join each pair into a little scene — the more absurd, the firmer it holds.',
+        'At recall, just keep telling: each image pulls the next.',
+      ],
+      build: 'Build your own story — pre-chewed ones don’t hold.',
+      ready: 'Tap — the first round belongs to it.',
+    },
+    link: {
+      heading: 'New technique',
+      intro: 'The link',
+      steps: [
+        'Find the feature of the face that strikes you first.',
+        'Turn the name into an image — a “Rose” blooms, a “Stone” weighs.',
+        'Hang the image on the feature: big, unmissable, moving.',
+      ],
+      build: 'Your image, your hook — borrowed ones don’t hold.',
+      ready: 'Tap — the first face is waiting.',
+    },
     heading: 'Technique',
     majorName: 'The Major System',
     intro: 'Digits are hard to hold, pictures are not. Every digit gets a sound — the sounds make a word, and a word stays.',

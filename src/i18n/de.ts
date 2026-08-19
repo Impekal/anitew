@@ -545,6 +545,33 @@ export const de = {
   },
   technique: {
     /*
+      Geschichte und Verknüpfung (D5 · D-013): je eine Lektion, drei
+      Schritte, imperativ. Kein Beispiel-Merkbild von uns — selbst gebaute
+      sitzen besser (dieselbe Entscheidung wie beim Major-System).
+    */
+    story: {
+      heading: 'Neue Technik',
+      intro: 'Die Geschichten-Methode',
+      steps: [
+        'Nimm die Wörter der Reihe nach.',
+        'Verbinde je zwei zu einer kleinen Handlung — je absurder, desto fester.',
+        'Beim Abruf erzählst du einfach weiter: Ein Bild zieht das nächste.',
+      ],
+      build: 'Bau deine eigene Geschichte — vorgekaute hält nicht.',
+      ready: 'Tippen — die erste Runde gehört ihr.',
+    },
+    link: {
+      heading: 'Neue Technik',
+      intro: 'Die Verknüpfung',
+      steps: [
+        'Such am Gesicht das Merkmal, das dir zuerst auffällt.',
+        'Mach aus dem Namen ein Bild — eine „Rose“ blüht, ein „Stein“ wiegt.',
+        'Häng das Bild an das Merkmal: groß, unübersehbar, in Bewegung.',
+      ],
+      build: 'Dein Bild, dein Haken — fremde halten nicht.',
+      ready: 'Tippen — das erste Gesicht wartet.',
+    },
+    /*
       D5 — die Technik wird beigebracht, nicht nur abgefragt. Das ist der
       Unterschied zu jeder Brain-Game-App, und deshalb steht hier Prosa und
       kein Etikett.

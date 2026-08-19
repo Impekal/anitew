@@ -10,6 +10,7 @@ import {
   taughtProgress,
 } from '../../src/core/technique/major.ts'
 import { walkPool } from '../../src/core/content/palace.ts'
+import { MODES } from '../../src/core/modes.ts'
 import {
   MIN_SECONDS_FOR_TEACHING,
   TEACH_SECONDS,
@@ -190,3 +191,76 @@ describe('die Lektion im Plan (D5)', () => {
     expect(teachBlock(plan)?.round).toBe(1)
   })
 })
+
+describe('Geschichte und Verknüpfung im Bauplan (D5 · D-013)', () => {
+  const many = (prefix: string) => Array.from({ length: 80 }, (_, index) => `${prefix}${index}`)
+  const encPools: Pools = {
+    words: many('w'),
+    faces: many('f'),
+    numbers: many('9'),
+    missions: many('p'),
+    palace: walkPool('e', 12),
+    reverse: ['48293', '17546', '90287'],
+    twins: ['Kirche%Kirsche', 'Mantel%Mangel', 'Fliege%Fliese', 'Karte%Kante'],
+    gaze: ['bild~1', 'bild~2', 'bild~3'],
+  }
+  const encBase = {
+    day: '2026-08-19',
+    language: 'de',
+    seed: 'enc',
+    pools: encPools,
+    taught: [] as number[],
+    palaceTaught: true,
+  }
+
+  const teachOf = (plan: ReturnType<typeof planSession>) =>
+    plan.blocks.find((block) => block.kind === 'teach')
+
+  it('lehrt die Geschichte vor der ersten Major-Ziffer', () => {
+    const plan = planSession({ ...encBase, mode: 'daily', storyTaught: false, linkTaught: false })
+    const teach = teachOf(plan)
+    expect(teach?.id).toBe('teach-story')
+    // Und die erste Runde gehört dem Anwendungsmodul (D5).
+    const firstEncode = plan.blocks.find((block) => block.kind === 'encode')
+    expect(firstEncode?.moduleId).toBe('words')
+  })
+
+  it('lehrt danach die Verknüpfung — vor dem Gesicht', () => {
+    const plan = planSession({ ...encBase, mode: 'daily', storyTaught: true, linkTaught: false })
+    expect(teachOf(plan)?.id).toBe('teach-link')
+    expect(plan.blocks.find((block) => block.kind === 'encode')?.moduleId).toBe('faces')
+  })
+
+  it('lässt dem Palast den Vortritt — ohne Erklärung ist ein Gang unverständlich', () => {
+    const plan = planSession({
+      ...encBase,
+      mode: 'daily',
+      palaceTaught: false,
+      storyTaught: false,
+      linkTaught: false,
+    })
+    expect(teachOf(plan)?.id).toBe('teach-palace')
+  })
+
+  it('gibt nach beiden die Bühne an die Major-Ziffern zurück', () => {
+    const plan = planSession({ ...encBase, mode: 'daily', storyTaught: true, linkTaught: true })
+    expect(teachOf(plan)?.id).toBe('teach-major')
+  })
+
+  it('lehrt im Notfallmodus nicht — wie jede Lektion', () => {
+    const plan = planSession({ ...encBase, mode: 'emergency', storyTaught: false, linkTaught: false })
+    expect(teachOf(plan)).toBeUndefined()
+  })
+
+  it('lehrt ohne Angabe nicht — dieselbe Vorsicht wie beim Palast', () => {
+    const plan = planSession({ ...encBase, mode: 'daily', taught: undefined })
+    expect(teachOf(plan)).toBeUndefined()
+  })
+
+  it('hält das Budget exakt, Lektion einbegriffen', () => {
+    const plan = planSession({ ...encBase, mode: 'daily', storyTaught: false, linkTaught: false })
+    const total = plan.blocks.reduce((sum, block) => sum + block.seconds, 0)
+    expect(total).toBe(MODES.daily.seconds)
+  })
+})
+

@@ -66,7 +66,12 @@ import {
 import { abandonRun, beginRun, loadOpenRun, loadRuns } from '../data/benchmark.ts'
 import { loadOwnPalace } from '../data/palace.ts'
 import { loadDailyTime } from '../data/reminders.ts'
-import { loadPalaceTaught, loadTaught } from '../data/technique.ts'
+import {
+  loadLinkTaught,
+  loadPalaceTaught,
+  loadStoryTaught,
+  loadTaught,
+} from '../data/technique.ts'
 
 import { AboutPanel } from './AboutPanel.tsx'
 import { BackupPanel } from './BackupPanel.tsx'
@@ -249,6 +254,19 @@ export function App() {
       .catch(() => undefined)
   }, [running])
 
+  // Geschichte und Verknüpfung (D5): dieselbe Vorsicht wie beim Palast —
+  // `undefined` heißt „noch nicht nachgesehen“, und dann lehrt der Planer nicht.
+  const [storyTaught, setStoryTaught] = useState<boolean | undefined>(undefined)
+  const [linkTaught, setLinkTaught] = useState<boolean | undefined>(undefined)
+  useEffect(() => {
+    void loadStoryTaught()
+      .then(setStoryTaught)
+      .catch(() => undefined)
+    void loadLinkTaught()
+      .then(setLinkTaught)
+      .catch(() => undefined)
+  }, [running])
+
   // Eine unterbrochene Einheit steht beim nächsten Start wieder da (B5).
   useEffect(() => {
     void loadProgress()
@@ -418,6 +436,8 @@ export function App() {
         due,
         taught,
         palaceTaught,
+        storyTaught,
+        linkTaught,
         focus: focus?.moduleId,
       })
       const progress: SessionProgress = {
@@ -432,7 +452,7 @@ export function App() {
       setRunning(progress)
       void beginSession(progress, day, now).catch(() => undefined)
     })()
-  }, [training, mode, platform, taught, palaceTaught, own, focus])
+  }, [training, mode, platform, taught, palaceTaught, storyTaught, linkTaught, own, focus])
 
   const leave = useCallback(() => setRunning(undefined), [])
 

@@ -81,8 +81,10 @@ test('macht die Antworten unter „Über dich“ änderbar — und die Änderung
   await openPage(page, 'Über dich')
   await page.locator('.about-field select').first().selectOption('names')
 
-  // Die Änderung überlebt das Neuladen und wird zum Vorschlag.
+  // Die Änderung überlebt das Neuladen und wird zum Vorschlag. Nach dem
+  // Neuladen liest die App Profil und Zählungen erst asynchron — unter
+  // Suite-Volllast hat das die 5-Sekunden-Standardfrist einmal gerissen.
   await page.reload()
-  await expect(page.locator('.focus')).toContainText('Gesichter')
+  await expect(page.locator('.focus')).toContainText('Gesichter', { timeout: 15_000 })
   await expect(page.locator('.focus-why')).toContainText('vorgenommen')
 })

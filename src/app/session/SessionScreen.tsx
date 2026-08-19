@@ -229,7 +229,13 @@ function RunningSession({
         <span style={{ width: `${Math.min(100, done * 100)}%` }} />
       </div>
 
-      {block.kind === 'teach' && block.moduleId === 'palace' ? (
+      {block.kind === 'teach' && (block.id === 'teach-story' || block.id === 'teach-link') ? (
+        <EncodingLessonView
+          dictionary={dictionary}
+          lesson={block.id === 'teach-story' ? 'story' : 'link'}
+          onDone={() => advance()}
+        />
+      ) : block.kind === 'teach' && block.moduleId === 'palace' ? (
         <PalaceLesson dictionary={dictionary} onDone={() => advance()} />
       ) : block.kind === 'teach' ? (
         <Lesson
@@ -814,6 +820,39 @@ function Scene({
  * baut der Nutzer.** Eine App, die „stell dir einen qualmenden Toaster vor“
  * mitliefert, nimmt genau den Schritt ab, der wirkt (D-017).
  */
+/**
+ * Geschichte und Verknüpfung (D5 · D-013) — dieselbe ruhige Karte wie die
+ * Palastlektion: Überschrift, drei Schritte, ein Satz zum Anpacken. Kein
+ * Beispiel-Merkbild von uns — selbst gebaute sitzen besser (D-013).
+ */
+function EncodingLessonView({
+  dictionary,
+  lesson,
+  onDone,
+}: {
+  dictionary: Dictionary
+  lesson: 'story' | 'link'
+  onDone: () => void
+}) {
+  const t = lesson === 'story' ? dictionary.technique.story : dictionary.technique.link
+
+  return (
+    <section className="lesson">
+      <p className="hint">{t.heading}</p>
+      <button type="button" className="lesson-card lesson-wide" onClick={onDone}>
+        <span className="lesson-intro">{t.intro}</span>
+        <ol className="lesson-steps">
+          {t.steps.map((step) => (
+            <li key={step}>{step}</li>
+          ))}
+        </ol>
+      </button>
+      <p className="lesson-hook">{t.build}</p>
+      <p className="hint">{t.ready}</p>
+    </section>
+  )
+}
+
 function PalaceLesson({ dictionary, onDone }: { dictionary: Dictionary; onDone: () => void }) {
   const t = dictionary.palace
 

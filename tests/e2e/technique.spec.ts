@@ -54,7 +54,15 @@ async function seedTaught(page: Page, digits: readonly number[]) {
        * und beginnen deshalb in dem Zustand, in dem jemand den Palast schon
        * kennt.
        */
-      const request = store.put({ key: 'technique.palace.taught', value: true })
+      store.put({ key: 'technique.palace.taught', value: true })
+      /*
+       * Und Geschichte wie Verknüpfung ebenso: Seit D5 gehen beide der
+       * ersten Ziffer vor — diese Prüfungen handeln vom Major-System und
+       * beginnen im Zustand, in dem die Einpräge-Lektionen schon gehalten
+       * sind. Ihre eigenen Prüfungen haben sie im Kern.
+       */
+      store.put({ key: 'technique.story.taught', value: true })
+      const request = store.put({ key: 'technique.link.taught', value: true })
       request.onsuccess = () => resolve()
       request.onerror = () => reject(request.error)
     })
@@ -67,6 +75,44 @@ async function startShort(page: Page) {
   await startButton(page).click()
   await page.locator('.settle').click()
 }
+
+test('unterrichtet die Geschichten-Methode vor der ersten Ziffer (D5)', async ({ page }) => {
+  test.setTimeout(120_000)
+
+  // Nur der Palast gilt als erklärt — Geschichte und Verknüpfung nicht:
+  // Genau dann gehört die erste Lektion der Geschichte, nicht der Eins.
+  await visit(page)
+  await expect(startButton(page)).toBeVisible()
+  await page.evaluate(async () => {
+    const open = indexedDB.open('anitew')
+    const database: IDBDatabase = await new Promise((resolve, reject) => {
+      open.onsuccess = () => resolve(open.result)
+      open.onerror = () => reject(open.error)
+    })
+    await new Promise<void>((resolve, reject) => {
+      const request = database
+        .transaction('settings', 'readwrite')
+        .objectStore('settings')
+        .put({ key: 'technique.palace.taught', value: true })
+      request.onsuccess = () => resolve()
+      request.onerror = () => reject(request.error)
+    })
+  })
+  await page.reload()
+  await expect(startButton(page)).toBeVisible()
+  await startShort(page)
+
+  await expect(page.locator('.lesson')).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByText('Die Geschichten-Methode')).toBeVisible()
+  await expect(page.getByText(/je absurder, desto fester/)).toBeVisible()
+
+  // Antippen — und die erste Runde gehört den Wörtern: Unterricht mit
+  // sofortiger Anwendung.
+  await page.locator('.lesson-card').click()
+  await expect(page.locator('.encode-word')).toBeVisible({ timeout: 30_000 })
+  const hint = ((await page.locator('.encode .hint').first().textContent()) ?? '').trim()
+  expect(hint).toContain('Ein Wort nach dem anderen')
+})
 
 test('unterrichtet die Technik und lässt sie sofort anwenden', async ({ page }) => {
   test.setTimeout(120_000)

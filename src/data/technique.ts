@@ -52,3 +52,28 @@ export async function loadPalaceTaught(): Promise<boolean> {
 export async function markPalaceTaught(): Promise<void> {
   await db.settings.put({ key: PALACE_KEY, value: true })
 }
+
+/**
+ * Die Einpräge-Lektionen: Geschichte und Verknüpfung (D5 · D-013).
+ *
+ * Wie beim Palast je ein Ja/Nein — und aus demselben Grund in den
+ * Einstellungen: Sie wandern mit der Sicherung.
+ */
+const STORY_KEY = 'technique.story.taught'
+const LINK_KEY = 'technique.link.taught'
+
+export async function loadStoryTaught(): Promise<boolean> {
+  return (await db.settings.get(STORY_KEY))?.value === true
+}
+
+export async function markStoryTaught(): Promise<void> {
+  await db.settings.put({ key: STORY_KEY, value: true })
+}
+
+export async function loadLinkTaught(): Promise<boolean> {
+  return (await db.settings.get(LINK_KEY))?.value === true
+}
+
+export async function markLinkTaught(): Promise<void> {
+  await db.settings.put({ key: LINK_KEY, value: true })
+}

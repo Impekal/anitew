@@ -14,7 +14,7 @@ import {
   targetOf,
 } from '../../core/index.ts'
 import { recordOutcome } from '../../data/items.ts'
-import { markPalaceTaught, markTaught } from '../../data/technique.ts'
+import { markLinkTaught, markPalaceTaught, markStoryTaught, markTaught } from '../../data/technique.ts'
 import {
   type RoundResult,
   type SessionProgress,
@@ -117,9 +117,16 @@ export function useSessionRunner(
      * sie ausliest, und beide sollen morgen die nächste bekommen.
      */
     if (block.kind === 'teach') {
-      // Zwei Techniken, zwei Merker: die Ziffer beim Major-System, ein
-      // schlichtes Ja beim Palast — der wird nur einmal erklärt (G).
-      if (block.moduleId === 'palace') void markPalaceTaught().catch(() => undefined)
+      /*
+       * Vier Techniken, vier Merker: die Ziffer beim Major-System, je ein
+       * schlichtes Ja bei Palast, Geschichte und Verknüpfung — die drei
+       * werden nur einmal erklärt (G, D5). Geschichte/Verknüpfung erkennt
+       * man an der Block-Kennung, nicht am Modul: Ihr Modul ist das
+       * Anwendungsmodul (words/faces), und das lehrt auch Ziffern nie.
+       */
+      if (block.id === 'teach-story') void markStoryTaught().catch(() => undefined)
+      else if (block.id === 'teach-link') void markLinkTaught().catch(() => undefined)
+      else if (block.moduleId === 'palace') void markPalaceTaught().catch(() => undefined)
       else void markTaught(Number(block.items[0])).catch(() => undefined)
     }
 

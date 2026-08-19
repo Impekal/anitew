@@ -31,6 +31,11 @@ import {
   gazeSceneOf,
 } from '../content/gaze.ts'
 import { nextToTeach } from '../technique/major.ts'
+import {
+  type EncodingLesson,
+  encodingModuleOf,
+  nextEncodingLesson,
+} from '../technique/encodings.ts'
 import type { Leniency } from './grading.ts'
 
 /** Sekunden, die ein einzelnes Wort beim Einprägen bekommt. */
@@ -388,6 +393,13 @@ export interface PlanInput {
    */
   palaceTaught?: boolean
   /**
+   * Wurden Geschichte und Verknüpfung schon erklärt (D5 · D-013)?
+   * Je eine Lektion, dieselbe Vorsicht wie beim Palast: Fehlt der Wert,
+   * wird nicht gelehrt.
+   */
+  storyTaught?: boolean
+  linkTaught?: boolean
+  /**
    * Das Modul, das heute Vorrang bekommt (Backlog E5).
    *
    * Kommt aus dem Gedächtnisprofil und **nur dann**, wenn sich zwei Achsen
@@ -523,14 +535,38 @@ export function planSession(input: PlanInput): SessionPlan {
    */
   const teachesPalace = hasTime && input.palaceTaught === false && palaceAt >= 0
 
+  /*
+   * Nach dem Palast kommen Geschichte und Verknüpfung (D5) — **vor** den
+   * zehn Major-Ziffern: Wer erst zehn Einheiten lang Ziffern lernt, sieht
+   * die Geschichten-Methode in Woche zwei, dabei trägt sie vom ersten Wort
+   * an. Der Palast bleibt davor, denn ohne seine Erklärung ist ein Gang
+   * unverständlich; eine ungelehrte Einpräge-Technik kostet nur Kraft.
+   */
+  const encodingLesson: EncodingLesson | undefined =
+    hasTime && !teachesPalace
+      ? nextEncodingLesson(
+          { storyTaught: input.storyTaught, linkTaught: input.linkTaught },
+          learnFrom,
+        )
+      : undefined
+  const encodingAt =
+    encodingLesson === undefined ? -1 : learnFrom.indexOf(encodingModuleOf(encodingLesson))
+
   const wantsLesson =
     hasTime &&
     !teachesPalace &&
+    encodingLesson === undefined &&
     input.taught !== undefined &&
     nextToTeach(input.taught) !== undefined
   const teachesNumbers = wantsLesson && numbersAt >= 0
 
-  const offset = teachesPalace ? palaceAt : teachesNumbers ? numbersAt : drawn
+  const offset = teachesPalace
+    ? palaceAt
+    : encodingLesson !== undefined
+      ? encodingAt
+      : teachesNumbers
+        ? numbersAt
+        : drawn
 
   /*
    * Der Schwerpunkt bekommt **jede zweite Runde** (E5).
@@ -545,7 +581,11 @@ export function planSession(input: PlanInput): SessionPlan {
    * Anwendung ist am nächsten Tag wieder weg (D5).
    */
   const focus =
-    input.focus !== undefined && learnFrom.includes(input.focus) && !teachesPalace && !teachesNumbers
+    input.focus !== undefined &&
+    learnFrom.includes(input.focus) &&
+    !teachesPalace &&
+    !teachesNumbers &&
+    encodingLesson === undefined
       ? input.focus
       : undefined
   const others = focus === undefined ? learnFrom : learnFrom.filter((id) => id !== focus)
@@ -560,7 +600,8 @@ export function planSession(input: PlanInput): SessionPlan {
 
   // Gelehrt wird nur mit Gegenstand: Das Major-System zu erklären und dann
   // keine einzige Zahl zu zeigen wäre Unterricht ohne Anlass.
-  const teachSeconds = teachesPalace || teachesNumbers ? TEACH_SECONDS : 0
+  const teachSeconds =
+    teachesPalace || teachesNumbers || encodingLesson !== undefined ? TEACH_SECONDS : 0
   const roundBudgets = share(learnSeconds - teachSeconds, rounds)
   const blocks: BlockPlan[] = []
 
@@ -581,6 +622,18 @@ export function planSession(input: PlanInput): SessionPlan {
        * Runde, und das ist auch die ehrlichere Reihenfolge: erst wissen,
        * wozu, dann sehen, wo.
        */
+      items: [],
+    })
+  } else if (encodingLesson !== undefined) {
+    blocks.push({
+      id: `teach-${encodingLesson}`,
+      kind: 'teach',
+      // Das Modul, in dem die Technik gleich angewandt wird — die erste
+      // Runde gehört ihm (Versatz oben).
+      moduleId: encodingModuleOf(encodingLesson),
+      round: 1,
+      seconds: teachSeconds,
+      // Kein Gegenstand — die Lektion erklärt die Technik.
       items: [],
     })
   } else if (teachesNumbers) {
