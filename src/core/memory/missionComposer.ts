@@ -1,42 +1,87 @@
-import type { MemoryGraph, MemoryNode } from './memoryGraph.ts'
+/**
+ * Der Missions-Komponist (D-036) — angeschlossen, nicht daneben.
+ *
+ * Er entscheidet, **was** trainiert wird: die schwächsten Erinnerungen
+ * zuerst. **Wie** trainiert wird, macht die bestehende Session-Engine —
+ * und **wann** etwas wiederkommt, bleibt FSRS. Keine zweite Engine.
+ *
+ * Die fünf Schritte der Memory-Mission liegen auf der vorhandenen
+ * Maschinerie, statt sie zu doppeln:
+ *
+ *   ENCODE          → der Einprägeblock der Runde (Szene: Anker + Dinge)
+ *   DISTRACTOR      → die Runde eines anderen Moduls dazwischen (Rotation)
+ *   RECALL          → der gestützte Abruf derselben Runde
+ *   ASSOCIATION     → die Frageform selbst: „Anker — was gehört dazu?“
+ *   DELAYED RECALL  → das Wiedersehen nach Tagen — das ist FSRS, und es
+ *                     ist der einzige ehrliche „delayed recall“
+ *
+ * Eine Szene wird als **eine Zeichenkette** kodiert (Anker + Dinge,
+ * getrennt durch U+001F; jedes abfragbare Stück als Anker U+001E Ding).
+ * Dadurch ist jeder Termin selbsttragend: Auch wenn der Graph sich
+ * ändert, weiß das Wiedersehen noch, was gefragt war — dieselbe
+ * Eigenschaft wie bei den eigenen Karten (D-032). Steuerzeichen können
+ * in keiner Beschriftung vorkommen; die Extraktion wäscht sie heraus.
+ */
 
-export type MissionStepKind = 'encode' | 'distractor' | 'recall' | 'association' | 'delayed-recall'
+import { type MemoryGraph, edgesFrom, nodeById, nodesByStrength } from './memoryGraph.ts'
 
-export type MissionStep = {
-  id: string
-  kind: MissionStepKind
-  nodeIds: string[]
-  durationSeconds: number
-  prompt: string
+/** Trennt Anker und Dinge in der Szenen-Kennung. */
+export const MEMORY_SCENE_SEPARATOR = '\u001f'
+/** Trennt Anker und Ding in der Stück-Kennung. */
+export const MEMORY_ITEM_SEPARATOR = '\u001e'
+
+/** Mehr Szenen je Einheit wären Beschäftigung — der Rest kommt morgen. */
+export const MAX_MEMORY_SCENES = 6
+/** Mehr als vier Dinge je Anker zerfallen — dann lieber zwei Szenen. */
+export const MAX_ITEMS_PER_SCENE = 4
+
+/** Der Anker einer Szenen- oder Stück-Kennung. */
+export function memorySubjectOf(item: string): string {
+  const end = Math.min(
+    ...[item.indexOf(MEMORY_SCENE_SEPARATOR), item.indexOf(MEMORY_ITEM_SEPARATOR)]
+      .filter((at) => at >= 0)
+      .concat(item.length),
+  )
+  return item.slice(0, end)
 }
 
-export type MemoryMission = {
-  id: string
-  title: string
-  durationSeconds: number
-  steps: MissionStep[]
+/** Die abfragbaren Stücke einer Szenen-Kennung. */
+export function memorySceneItems(anchor: string): readonly string[] {
+  const [subject, ...targets] = anchor.split(MEMORY_SCENE_SEPARATOR)
+  if (subject === undefined || subject === '') return []
+  return targets
+    .filter((target) => target !== '')
+    .map((target) => `${subject}${MEMORY_ITEM_SEPARATOR}${target}`)
 }
 
-function weakest(nodes: MemoryNode[], count: number): MemoryNode[] {
-  return [...nodes].sort((a, b) => a.strength - b.strength).slice(0, count)
+/** Die gesuchte Antwort eines Stücks. */
+export function memoryTargetOf(item: string): string {
+  const at = item.indexOf(MEMORY_ITEM_SEPARATOR)
+  return at >= 0 ? item.slice(at + MEMORY_ITEM_SEPARATOR.length) : item
 }
 
-export function composeMemoryMission(graph: MemoryGraph, durationSeconds = 300): MemoryMission {
-  const targets = weakest(graph.nodes, Math.min(6, Math.max(2, Math.ceil(graph.nodes.length / 4))))
-  const ids = targets.map((node) => node.id)
-  const safeDuration = Math.max(60, durationSeconds)
-  const steps: MissionStep[] = [
-    { id: 'encode', kind: 'encode', nodeIds: ids, durationSeconds: Math.round(safeDuration * 0.22), prompt: 'Build a clear mental picture of these memories.' },
-    { id: 'distractor', kind: 'distractor', nodeIds: [], durationSeconds: Math.round(safeDuration * 0.16), prompt: 'Hold what you learned while your attention shifts.' },
-    { id: 'recall', kind: 'recall', nodeIds: ids, durationSeconds: Math.round(safeDuration * 0.27), prompt: 'Retrieve the information without looking.' },
-    { id: 'association', kind: 'association', nodeIds: ids, durationSeconds: Math.round(safeDuration * 0.18), prompt: 'Strengthen the links between memories.' },
-    { id: 'delayed', kind: 'delayed-recall', nodeIds: ids.slice(0, Math.max(1, Math.ceil(ids.length / 2))), durationSeconds: Math.round(safeDuration * 0.17), prompt: 'One final retrieval. What stayed with you?' },
-  ]
+/** Anker und Ding eines Stücks, als Beschriftungen. */
+export function memoryLabelsOf(item: string): { subject: string; target: string } {
+  return { subject: memorySubjectOf(item), target: memoryTargetOf(item) }
+}
 
-  return {
-    id: `mission:${Date.now()}`,
-    title: targets.length ? 'Strengthen your weakest memories' : 'Build your memory system',
-    durationSeconds: steps.reduce((sum, step) => sum + step.durationSeconds, 0),
-    steps,
+/**
+ * Der Vorrat des Memory-Moduls für den Planer: die schwächsten Anker
+ * zuerst, jeder mit seinen schwächsten Dingen. Anker ohne Verbindungen
+ * tragen keine Frage („Daniel — was gehört dazu?“ ohne Dazu) und bleiben
+ * draußen, bis der Mensch ihnen etwas anheftet.
+ */
+export function composeMemoryPool(graph: MemoryGraph, maxScenes = MAX_MEMORY_SCENES): string[] {
+  const scenes: string[] = []
+  for (const subject of nodesByStrength(graph)) {
+    if (scenes.length >= maxScenes) break
+    const connected = edgesFrom(graph, subject.id)
+      .map((edge) => nodeById(graph, edge.to))
+      .filter((node): node is NonNullable<typeof node> => node !== undefined)
+      .sort((a, b) => a.strength - b.strength)
+      .slice(0, MAX_ITEMS_PER_SCENE)
+    if (connected.length === 0) continue
+    scenes.push([subject.label, ...connected.map((node) => node.label)].join(MEMORY_SCENE_SEPARATOR))
   }
+  return scenes
 }

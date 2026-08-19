@@ -19,6 +19,8 @@ import {
   type ModuleId,
   factAnswer,
   factPrompt,
+  memorySubjectOf,
+  memoryTargetOf,
   ownLabelOf,
   type OwnPalace,
   palaceOf,
@@ -259,6 +261,22 @@ function RunningSession({
           language={state.plan.language}
           own={own}
         />
+      ) : block.kind === 'encode' && block.moduleId === 'memory' ? (
+        /*
+          Eine Erinnerung wird **als Ganzes** gezeigt (D-036): der Anker
+          und alles, was zu ihm gehört — wie eine Mission, nur dass die
+          Szene aus dem Leben des Menschen stammt statt aus einem
+          Generator. Nacheinander gezeigt wären es Vokabeln.
+        */
+        <section className="encode scene memory-encode">
+          <p className="hint">{t.encodeHints.memory}</p>
+          <p className="memory-anchor">{memorySubjectOf(block.items[0] ?? '')}</p>
+          <ul className="memory-scene">
+            {block.items.map((item) => (
+              <li key={item}>{memoryTargetOf(item)}</li>
+            ))}
+          </ul>
+        </section>
       ) : block.kind === 'encode' && block.moduleId === 'gaze' ? (
         /*
           Ein Bild wird als Ganzes gezeigt (Achse „Visuell“): vier Dinge,
@@ -385,7 +403,9 @@ function RunningSession({
           question={
             block.moduleId === 'facts'
               ? factPrompt(block.items[state.promptIndex] ?? '')
-              : undefined
+              : block.moduleId === 'memory'
+                ? memorySubjectOf(block.items[state.promptIndex] ?? '')
+                : undefined
           }
           gazeCue={
             block.moduleId === 'gaze'
@@ -1019,6 +1039,11 @@ function askFor(
     const ask = dictionary.palace.ask
     return block.kind === 'review' ? `${t.reviewLead} ${ask}` : ask
   }
+  if (block.moduleId === 'memory') {
+    // Die Frage nennt den Anker — „Daniel — was gehört dazu?“ (D-036).
+    const ask = t.memoryAsk.replace('{subject}', memorySubjectOf(block.items[index] ?? ''))
+    return block.kind === 'review' ? `${t.reviewLead} ${ask}` : ask
+  }
   if (block.moduleId !== 'missions') {
     return block.kind === 'review' ? t.reviewPromptHint : t.promptHint
   }
@@ -1032,6 +1057,7 @@ function placeholderFor(block: BlockPlan, index: number, dictionary: Dictionary)
   if (block.moduleId === 'reverse') return t.reversePlaceholder
   if (block.moduleId === 'gaze') return t.gazePlaceholder
   if (block.moduleId === 'palace') return dictionary.palace.placeholder
+  if (block.moduleId === 'memory') return t.memoryPlaceholder
   if (block.moduleId !== 'missions') return t.promptPlaceholder
   const kind = factKindOf(block.items[index] ?? '')
   return kind === undefined ? t.promptPlaceholder : t.missionPlaceholders[kind]
@@ -1040,6 +1066,8 @@ function placeholderFor(block: BlockPlan, index: number, dictionary: Dictionary)
 /** Zimmernummer und Uhrzeit sind Zahlen — dann die Zifferntastatur. */
 function numericFor(block: BlockPlan, index: number): boolean {
   if (block.moduleId === 'reverse') return true
+  // Memory (D-036): Ist die gesuchte Antwort eine Zahl, kommt die Zifferntastatur.
+  if (block.moduleId === 'memory') return /^\d+$/.test(memoryTargetOf(block.items[index] ?? ''))
   if (block.moduleId !== 'missions') return false
   const kind = factKindOf(block.items[index] ?? '')
   return kind === 'room' || kind === 'time'

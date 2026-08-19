@@ -121,6 +121,7 @@ export const de = {
       twins: 'Sieh genau hin — gleich steht ein Zwilling daneben.',
       gaze: 'Sieh das Bild an. Jedes Ding hat seine Farbe — merk dir beides zusammen.',
       facts: 'Deine Karte: Frage und Antwort. Bau eine Brücke — ein Bild, in dem beide vorkommen.',
+      memory: 'Deine Erinnerung. Sieh alles zusammen — ein Bild, in dem alles am Anker hängt.',
     },
     recallHint: 'Was ist geblieben? Reihenfolge egal.',
     reviewHint: 'Und jetzt von früher: Woran erinnerst du dich noch?',
@@ -167,6 +168,10 @@ export const de = {
       time: 'z. B. 18:40',
       place: 'Name',
     },
+    // Memory (D-036): Die Frage nennt den Anker — ohne ihn wäre „was
+    // gehört dazu?“ nach Tagen keine beantwortbare Frage.
+    memoryAsk: '{subject} — was gehört dazu?',
+    memoryPlaceholder: 'Was dazugehört',
     recallPlaceholder: 'Ein Wort pro Zeile',
     recallNumbersPlaceholder: 'Eine Zahl pro Zeile',
     doneWithBlock: 'Fertig',
@@ -419,6 +424,7 @@ export const de = {
       twins: 'Unterscheiden',
       gaze: 'Bilder',
       facts: 'Eigenes',
+      memory: 'Erinnerungen',
     },
     noWeakest: 'Kein Unterschied zwischen den Achsen, der sich vom Zufall trennen lässt.',
     empty: 'Noch nichts zu zeigen. Das Profil entsteht aus dem Training — nicht aus einem Test am Anfang.',
@@ -540,6 +546,43 @@ export const de = {
       sawDetails: 'Fünfundzwanzig Einzelheiten aus Bildern nach Tagen zurückgeholt.',
       namesHeld: 'Fünfundzwanzig Namen nach Tagen noch gewusst.',
     },
+  },
+  memory: {
+    /*
+      Der Memory-Bereich (D-036). Der wichtigste Satz ist der über die
+      Stärke: Sie ist ein **Übungsstand**, keine Gedächtnismessung — die
+      Messung bleibt die einzige Quelle für Aussagen über das Gedächtnis
+      (R-1). Und nichts wird gespeichert, was nicht bestätigt wurde.
+    */
+    heading: 'Mein Gedächtnis',
+    intro: 'Was du behalten willst, wird hier ein Netz: Menschen, Orte, Fakten aus deinem Leben — verbunden, trainierbar, mit Wiedersehen nach Tagen.',
+    counts: '{nodes} Erinnerungen · {edges} Verbindungen',
+    empty: 'Noch ist hier nichts. Der erste Satz unten wird deine erste Erinnerung.',
+    strongest: 'Am festesten',
+    weakest: 'Braucht Zuwendung',
+    latest: 'Zuletzt gemerkt',
+    strengthNote: 'Die Stärke ist dein Übungsstand mit dieser Erinnerung — keine Messung deines Gedächtnisses. Die macht weiterhin nur die Messung.',
+    trainNote: 'Trainiert wird im normalen Training: Die Runde zeigt den Anker mit allem, was dazugehört, fragt dann am Anker — und das Wiedersehen kommt nach Tagen über den Wiederholungsplan.',
+    rememberHeading: 'Etwas merken',
+    rememberIntro: 'Schreib, was du behalten willst — ein Satz genügt. ANITEW schlägt vor, was daraus wird; gespeichert wird erst, was du bestätigst.',
+    rememberPlaceholder: 'Daniel arbeitet im Museum, kommt aus Madrid und spielt Gitarre.',
+    suggest: 'Vorschläge ansehen',
+    suggestionsNodes: 'Das würden Erinnerungen — abwählen, was nicht stimmt:',
+    suggestionsEdges: 'Und das ihre Verbindungen:',
+    nothingFound: 'Daraus ließ sich nichts machen — ein anderer Satz?',
+    confirm: 'Bestätigen und merken',
+    cancel: 'Verwerfen',
+    saved: 'Gemerkt. Die nächste Einheit nimmt die schwächsten zuerst.',
+    types: {
+      person: 'Person',
+      place: 'Ort',
+      fact: 'Fakt',
+      number: 'Zahl',
+      date: 'Datum',
+      concept: 'Begriff',
+      custom: 'Eigenes',
+    },
+    remove: 'Entfernen',
   },
   own: {
     /*

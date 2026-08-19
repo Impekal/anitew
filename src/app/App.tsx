@@ -40,6 +40,8 @@ import {
   selectDue,
   streakOf,
   achievementsOf,
+  composeMemoryPool,
+  createMemoryGraph,
   adviceOf,
   type CoachContext,
   spanPool,
@@ -63,6 +65,7 @@ import {
   moduleOf,
   wordOf,
 } from '../data/items.ts'
+import { loadMemoryGraph } from '../data/memoryStore.ts'
 import { loadOwnPool } from '../data/own.ts'
 import {
   type SessionProgress,
@@ -92,6 +95,7 @@ import { SciencePanel } from './SciencePanel.tsx'
 import { FoundationPanel } from './FoundationPanel.tsx'
 import { AchievementsLine } from './AchievementsLine.tsx'
 import { CoachPanel } from './CoachPanel.tsx'
+import { MemoryPanel } from './MemoryPanel.tsx'
 import { OwnPanel } from './OwnPanel.tsx'
 import { SyncPanel } from './SyncPanel.tsx'
 import { SYNC_AT_SETTING, SYNC_ON_SETTING, resolveClientId, runDriveSync } from './driveSync.ts'
@@ -494,6 +498,13 @@ export function App() {
            * der Vorratsfilter das Modul still aus der Lernrotation.
            */
           facts: await loadOwnPool(training).catch(() => []),
+          /*
+           * Der Memory-Graph (D-036): Der Missions-Komponist wählt die
+           * schwächsten Anker mit ihren Dingen — FSRS bleibt die Wahrheit
+           * über das Wann; hier steht nur das Was. Leer bei den meisten:
+           * Der Vorratsfilter nimmt das Modul dann still heraus.
+           */
+          memory: composeMemoryPool(await loadMemoryGraph().catch(() => createMemoryGraph())),
         },
         due,
         taught,
@@ -787,6 +798,10 @@ export function App() {
       contents: {
         title: dictionary.own.heading,
         body: <OwnPanel language={training} dictionary={dictionary} />,
+      },
+      memories: {
+        title: dictionary.memory.heading,
+        body: <MemoryPanel platform={platform} dictionary={dictionary} />,
       },
       about: {
         title: dictionary.onboarding.editHeading,
@@ -1246,6 +1261,10 @@ export function App() {
               <button type="button" className="drawer-item" onClick={() => openPage('coach')}>
                 <MenuIcon kind="coach" />
                 <span>{dictionary.coach.heading}</span>
+              </button>
+              <button type="button" className="drawer-item" onClick={() => openPage('memories')}>
+                <MenuIcon kind="memories" />
+                <span>{dictionary.memory.heading}</span>
               </button>
               <button type="button" className="drawer-item" onClick={() => openPage('contents')}>
                 <MenuIcon kind="contents" />

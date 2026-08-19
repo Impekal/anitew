@@ -72,7 +72,7 @@ describe('die Verschiebung im Bauplan (D2)', () => {
     palace: [],
     reverse: [],
     twins: [],
-    gaze: [], facts: [],
+    gaze: [], facts: [], memory: [],
   }
   const base = { day: '2026-08-19', language: 'de', seed: 'd2', pools, modules: ['words'] as const }
 

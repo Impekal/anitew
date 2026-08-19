@@ -21,6 +21,12 @@ import { createRng } from '../rng.ts'
 import type { DayKey } from '../time.ts'
 import { answerFor, factKindOf, missionFacts, personOf } from '../content/missions.ts'
 import { factAnswer, factPrompt } from '../content/own.ts'
+import {
+  memoryLabelsOf,
+  memorySceneItems,
+  memorySubjectOf,
+  memoryTargetOf,
+} from '../memory/missionComposer.ts'
 import { objectFor, walkOf, walkPlacements } from '../content/palace.ts'
 import type { Language } from '../language.ts'
 import { reversed } from '../content/spans.ts'
@@ -130,6 +136,13 @@ export const TRAINING_MODULES = [
    * Lernrotation; das Wiedersehen terminierter Paare bleibt unberührt.
    */
   'facts',
+  /*
+   * Der Memory-Graph als Modul (D-036): Szenen aus den **eigenen**
+   * Erinnerungen — der Anker und das, was zu ihm gehört. Der Vorrat
+   * kommt vom Missions-Komponisten (schwächste zuerst); leer heißt wie
+   * überall: still aus der Lernrotation, Wiedersehen unberührt.
+   */
+  'memory',
 ] as const
 export type ModuleId = (typeof TRAINING_MODULES)[number]
 
@@ -154,7 +167,9 @@ export function isPrompted(moduleId: ModuleId): boolean {
     moduleId === 'gaze' ||
     // Eigene Paare: Die Frage steht da, gesucht ist die Antwort — wie beim
     // Gesicht ist das die Aufgabe, die im Alltag vorkommt (D-032).
-    moduleId === 'facts'
+    moduleId === 'facts' ||
+    // Memory-Szenen fragen am Anker: „Daniel — was gehört dazu?“ (D-036).
+    moduleId === 'memory'
   )
 }
 
@@ -201,13 +216,15 @@ const MAX_REVERSE_PROMPTS = 6
  * einen Vorrat behandelte und drei halbe Szenen abzählte.
  */
 export function isScene(moduleId: ModuleId): boolean {
-  return moduleId === 'missions' || moduleId === 'palace' || moduleId === 'gaze'
+  return moduleId === 'missions' || moduleId === 'palace' || moduleId === 'gaze' || moduleId === 'memory'
 }
 
 /** Die Stücke einer Szene zu ihrem Anker. */
 export function sceneItemsOf(moduleId: ModuleId, anchor: string): readonly string[] {
   if (moduleId === 'palace') return walkPlacements(anchor)
   if (moduleId === 'gaze') return gazePlacements(anchor)
+  // Memory (D-036): Die Kennung trägt die ganze Szene — Anker und Dinge.
+  if (moduleId === 'memory') return memorySceneItems(anchor)
   return missionFacts(anchor)
 }
 
@@ -230,6 +247,9 @@ export function secondsPerItemFor(moduleId: ModuleId): number {
    * ein Wort anzusehen, und wer es nicht tut, hat nur eine Liste gelesen.
    */
   if (moduleId === 'palace') return 6
+  // Eine echte Erinnerung (D-036) bekommt dieselbe Zeit wie ein Palastort:
+  // Hier soll ein Bild entstehen, das Daniel und Madrid zusammenhält.
+  if (moduleId === 'memory') return 6
   // Ein Bild (gaze) wie eine Mission: Vier Dinge und ihre Farben sollen
   // **zusammen** gesehen werden, nicht nacheinander gelesen.
   // Ein eigenes Paar (facts) ebenso: Frage und Antwort sollen zu einer
@@ -262,6 +282,8 @@ export function subjectOf(moduleId: ModuleId, item: string): string {
   if (moduleId === 'twins') return twinChoices(item).join('%')
   // Beim Bild ist der Anker die Szene: `bild~7#umbrella` gehört zu `bild~7`.
   if (moduleId === 'gaze') return gazeSceneOf(item)
+  // Memory: Anker der Szene — „Daniel“, ob Kennung oder Stück (D-036).
+  if (moduleId === 'memory') return memorySubjectOf(item)
   return moduleId === 'missions' ? personOf(item) : item
 }
 
@@ -283,6 +305,8 @@ export function targetOf(moduleId: ModuleId, item: string, language: string): st
   if (moduleId === 'gaze') return gazeAnswer(item, language as Language) ?? item
   // Eigenes Paar: Die Kennung trägt beide Seiten, gesucht ist die Antwort.
   if (moduleId === 'facts') return factAnswer(item)
+  // Memory: gesucht ist das Ding am Anker (D-036).
+  if (moduleId === 'memory') return memoryTargetOf(item)
   if (moduleId !== 'missions') return item
   return answerFor(item, language as Language) ?? item
 }
@@ -319,6 +343,11 @@ export function displayOf(moduleId: ModuleId, item: string, language: string): s
   // Eigenes Paar: „Frage · Antwort“ — lesbar, nicht die Kennung mit dem
   // unsichtbaren Trennzeichen.
   if (moduleId === 'facts') return `${factPrompt(item)} · ${factAnswer(item)}`
+  // Memory: „Daniel · Madrid“ — woran man sich erinnert hat (D-036).
+  if (moduleId === 'memory') {
+    const labels = memoryLabelsOf(item)
+    return `${labels.subject} · ${labels.target}`
+  }
   if (moduleId !== 'missions') return item
   const answer = answerFor(item, language as Language)
   return answer === undefined ? item : `${personOf(item)} · ${answer}`
@@ -353,6 +382,10 @@ export function leniencyFor(moduleId: ModuleId, item?: string): Leniency {
    */
   if (moduleId === 'facts') {
     return /^\d+$/.test(factAnswer(item ?? '')) ? 'exact' : 'typos'
+  }
+  // Memory (D-036): dieselbe Regel — eine Zahl als Antwort ist exakt.
+  if (moduleId === 'memory') {
+    return /^\d+$/.test(memoryTargetOf(item ?? '')) ? 'exact' : 'typos'
   }
   if (moduleId === 'missions') {
     /*

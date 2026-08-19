@@ -8,12 +8,15 @@ import {
   leniencyFor,
   type Platform,
   promptedHits,
+  promptedSetHits,
   secondsPerItemFor,
+  subjectOf,
   type SessionPlan,
   splitEntries,
   targetOf,
 } from '../../core/index.ts'
 import { recordOutcome } from '../../data/items.ts'
+import { applyMemoryOutcome } from '../../data/memoryStore.ts'
 import { markLinkTaught, markPalaceTaught, markStoryTaught, markTaught } from '../../data/technique.ts'
 import {
   type RoundResult,
@@ -147,11 +150,25 @@ export function useSessionRunner(
       const graded = isPrompted(block.moduleId)
         ? (() => {
             const targets = block.items.map((item) => targetOf(block.moduleId, item, plan.language))
-            const hits = promptedHits(
-              finalAnswers ?? answers,
-              targets,
-              block.items.map((item) => leniencyFor(block.moduleId, item)),
-            )
+            /*
+             * Memory (D-036): Am selben Anker stellen alle Fragen dieselbe
+             * Frage — gewertet wird deshalb als Menge je Anker, nicht
+             * Position für Position: Die Reihenfolge, in der jemandem
+             * Madrid und Museum einfallen, ist keine Gedächtnisleistung.
+             */
+            const hits =
+              block.moduleId === 'memory'
+                ? promptedSetHits(
+                    finalAnswers ?? answers,
+                    targets,
+                    block.items.map((item) => leniencyFor(block.moduleId, item)),
+                    (index) => subjectOf(block.moduleId, block.items[index] ?? ''),
+                  )
+                : promptedHits(
+                    finalAnswers ?? answers,
+                    targets,
+                    block.items.map((item) => leniencyFor(block.moduleId, item)),
+                  )
             return {
               correct: block.items.filter((_, index) => hits[index] === true),
               missed: block.items.filter((_, index) => hits[index] !== true),
@@ -192,6 +209,18 @@ export function useSessionRunner(
           recalled: graded.correct,
           missed: graded.missed,
         }).catch(() => undefined)
+      }
+
+      /*
+       * Der Memory-Graph (D-036) bekommt dasselbe Ergebnis als **Auswahl**-
+       * Signal: richtig hebt die Stärke, falsch senkt sie — die nächste
+       * Einheit nimmt die schwächsten zuerst. Der Termin läuft weiter
+       * ausschließlich über `recordOutcome` (FSRS bleibt die Wahrheit).
+       */
+      if (block.moduleId === 'memory') {
+        void applyMemoryOutcome({ correct: graded.correct, missed: graded.missed }, at).catch(
+          () => undefined,
+        )
       }
 
       setResults(nextResults)

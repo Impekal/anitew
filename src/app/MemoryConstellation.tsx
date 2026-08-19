@@ -1,66 +1,96 @@
 import { useMemo } from 'react'
 
-export type MemoryConstellationProps = {
-  connections?: number
-  strength?: number
-  active?: boolean
+import type { MemoryGraph } from '../core/index.ts'
+
+/**
+ * Die Memory-Constellation (D-036) — echte Daten, kein Dekor.
+ *
+ * Jeder Punkt ist eine Erinnerung des Menschen, jede Linie eine bestätigte
+ * Verbindung. Die Anordnung ist **deterministisch** aus der Reihenfolge
+ * des Merkens gerechnet (goldener Winkel um die Mitte): Dieselben
+ * Erinnerungen stehen morgen am selben Ort — eine Konstellation, die bei
+ * jedem Öffnen anders stünde, wäre keine.
+ *
+ * Die Stärke einer Erinnerung ist ihre Helligkeit — Übungsstand, keine
+ * Gedächtnisaussage (R-1). Namen stehen an den Ankern (Knoten mit
+ * ausgehenden Verbindungen); alles andere bleibt Punkt, sonst wird der
+ * Himmel eine Tabelle.
+ */
+
+const GOLDEN_ANGLE = 137.50776405003785
+
+interface Placed {
+  readonly id: string
+  readonly label: string
+  readonly x: number
+  readonly y: number
+  readonly strength: number
+  readonly anchor: boolean
 }
 
-const NODES = [
-  [50, 18],
-  [23, 35],
-  [77, 35],
-  [15, 67],
-  [50, 56],
-  [85, 67],
-  [32, 86],
-  [68, 86],
-] as const
+function layout(graph: MemoryGraph): Placed[] {
+  const anchors = new Set(graph.edges.map((edge) => edge.from))
+  const ordered = [...graph.nodes].sort((a, b) => a.createdAt - b.createdAt)
+  return ordered.map((node, index) => {
+    const angle = ((index * GOLDEN_ANGLE) % 360) * (Math.PI / 180)
+    // Wurzel-Spirale: gleichmäßige Dichte, die Mitte gehört den Ältesten.
+    const radius = 8 + 38 * Math.sqrt((index + 0.4) / Math.max(1, ordered.length))
+    return {
+      id: node.id,
+      label: node.label,
+      x: 50 + radius * Math.cos(angle),
+      y: 50 + radius * Math.sin(angle),
+      strength: node.strength,
+      anchor: anchors.has(node.id),
+    }
+  })
+}
 
-const EDGES = [
-  [0, 1], [0, 2], [1, 3], [1, 4], [2, 4], [2, 5],
-  [3, 6], [4, 6], [4, 7], [5, 7], [6, 7],
-] as const
+export function MemoryConstellation({ graph }: { graph: MemoryGraph }) {
+  const placed = useMemo(() => layout(graph), [graph])
+  const byId = useMemo(() => new Map(placed.map((node) => [node.id, node])), [placed])
 
-export function MemoryConstellation({
-  connections = 0,
-  strength = 0.55,
-  active = true,
-}: MemoryConstellationProps) {
-  const intensity = Math.max(0.25, Math.min(1, strength))
-  const seed = useMemo(() => Math.max(0, connections), [connections])
+  if (placed.length === 0) return null
 
   return (
-    <div className={`constellation ${active ? 'constellation-active' : ''}`} aria-hidden="true">
+    <div className="constellation" aria-hidden="true">
       <svg viewBox="0 0 100 100" role="presentation">
-        <defs>
-          <radialGradient id="anitew-core-glow">
-            <stop offset="0%" stopColor="currentColor" stopOpacity=".9" />
-            <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
-          </radialGradient>
-        </defs>
-        {EDGES.map(([a, b], index) => (
-          <line
-            key={`${a}-${b}`}
-            x1={NODES[a][0]}
-            y1={NODES[a][1]}
-            x2={NODES[b][0]}
-            y2={NODES[b][1]}
-            pathLength="1"
-            className="constellation-edge"
-            style={{ animationDelay: `${(index * 180) % 1400}ms`, opacity: 0.18 + intensity * 0.42 }}
-          />
-        ))}
-        <circle cx="50" cy="56" r="18" className="constellation-glow" />
-        {NODES.map(([x, y], index) => (
-          <circle
-            key={`${x}-${y}`}
-            cx={x}
-            cy={y}
-            r={index === 4 ? 2.5 : 1.45}
-            className={index === 4 ? 'constellation-node constellation-node-core' : 'constellation-node'}
-            style={{ animationDelay: `${(index * 110 + seed * 7) % 1200}ms` }}
-          />
+        {graph.edges.map((edge, index) => {
+          const from = byId.get(edge.from)
+          const to = byId.get(edge.to)
+          if (from === undefined || to === undefined) return null
+          return (
+            <line
+              key={edge.id}
+              x1={from.x}
+              y1={from.y}
+              x2={to.x}
+              y2={to.y}
+              className="constellation-edge"
+              style={{ animationDelay: `${(index * 240) % 1800}ms` }}
+            />
+          )
+        })}
+        {placed.map((node, index) => (
+          <g key={node.id}>
+            <circle
+              cx={node.x}
+              cy={node.y}
+              r={node.anchor ? 2.1 : 1.3}
+              className={
+                node.anchor ? 'constellation-node constellation-node-anchor' : 'constellation-node'
+              }
+              style={{
+                animationDelay: `${(index * 130) % 1600}ms`,
+                opacity: 0.45 + node.strength * 0.55,
+              }}
+            />
+            {node.anchor && (
+              <text x={node.x} y={node.y - 3.4} className="constellation-label" textAnchor="middle">
+                {node.label}
+              </text>
+            )}
+          </g>
         ))}
       </svg>
     </div>

@@ -18,6 +18,8 @@ import {
   keepSession,
   makeBackup,
   readBackup,
+  mergeMemoryGraph,
+  readMemoryGraph,
 } from '../core/index.ts'
 
 import { db } from './db.ts'
@@ -93,6 +95,28 @@ export async function importBackup(file: BackupFile): Promise<ImportReport> {
        * ob etwas angekommen ist.
        */
       for (const setting of file.tables.settings) {
+        /*
+         * Der Memory-Graph (D-036) ist die eine Einstellung, die **keine**
+         * Vorliebe ist, sondern Geschichte: „Datei gewinnt“ hieße hier,
+         * die Erinnerungen des einen Geräts mit denen des anderen zu
+         * überschreiben. Er wird deshalb vereinigt (N9) — dieselbe Regel
+         * wie bei Terminen und Ereignissen.
+         */
+        if (setting.key === 'memory.graph') {
+          const mine = await db.settings.get(setting.key)
+          const merged = mergeMemoryGraph(
+            readMemoryGraph(mine?.value),
+            readMemoryGraph(setting.value),
+          )
+          if (mine === undefined) added['settings'] = (added['settings'] as number) + 1
+          else if (JSON.stringify(mine.value) !== JSON.stringify(merged)) replaced++
+          else {
+            kept++
+            continue
+          }
+          await db.settings.put({ key: setting.key, value: merged })
+          continue
+        }
         const mine = await db.settings.get(setting.key)
         if (mine === undefined) {
           await db.settings.put(setting)

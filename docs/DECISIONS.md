@@ -1327,3 +1327,71 @@ Empfehlung Gemini; Anthropic, OpenRouter, Mistral: Guthaben bzw. Konto).
   Offline-Pflichtteil läuft immer (M2/R-3).
 - **Die Datenschutzerklärung nennt alle fünf** — ein Kerntest erzwingt,
   dass ein sechster Anbieter auch dort ankommt, nicht nur im Code.
+
+## D-035 · 2026-08-19 · Eine Identität: „Ancient Memory × Future Technology“
+
+**Entscheidung:** ANITEW bekennt sich zu **einem** Erscheinungsbild —
+tiefer Grund, warmes Gold, kühles Salbeigrün, Serife für das, was dem
+Menschen gehört, Mono für Gemessenes. Die Erlebnisschicht
+(`anitew-redesign.css`) legt dafür die App-Token auf diese Palette, für
+helles wie dunkles Systemschema: Ein futuristisch-dunkler Rahmen, in dem
+im hellen Modus dunkle Tinte auf dunklem Grund stünde, wäre keine
+Identität, sondern ein Fehler. Kontraste geprüft (Text ≥ 4.5:1). Die
+Träger-Architektur (Token in `styles.css`, D-011/G-Regeln) bleibt — die
+Identität ist eine Schicht darüber, kein Umbau darunter.
+
+## D-036 · 2026-08-19 · Der Memory-Graph: echtes Leben, ein Mischpult, keine zweite Engine
+
+**Entscheidung:** ANITEW wird ein persönliches Memory-System. Echte
+Informationen („Daniel arbeitet im Museum, kommt aus Madrid …“) werden
+zu einem **Graphen** aus Knoten (Person, Ort, Fakt, Zahl, Datum,
+Begriff) und bestätigten Verbindungen — und dieser Graph wird mit genau
+der Maschinerie trainiert, die es schon gibt.
+
+**Die tragenden Regeln:**
+
+- **Bestätigen vor Speichern.** Die Extraktion (deterministisch,
+  de/en-fähig; Subjekt als Anker, Orte an Präpositionen, Jahre, Zahlen,
+  Zitate) macht **Vorschläge**; gespeichert wird, was der Mensch
+  bestätigt. Abgewählte Knoten reißen ihre Kanten still mit.
+- **Zwei Währungen (R-1).** Die `strength` eines Knotens ist ein
+  **Übungsstand** (richtig hebt, falsch senkt stärker) — sie steuert nur
+  die Auswahl der nächsten Einheit und ist keine Gedächtnisaussage. Die
+  macht weiterhin allein die Messung.
+- **FSRS bleibt die Wahrheit über das Wann.** Der Missions-Komponist
+  entscheidet das **Was** (schwächste Anker zuerst, als Szenen: Anker +
+  bis vier Dinge); die Termine laufen unverändert über `recordOutcome`.
+  Die fünf Missions-Schritte liegen auf der vorhandenen Engine: ENCODE =
+  Einprägeblock, DISTRACTOR = Rotationsrunde dazwischen, RECALL =
+  gestützter Abruf, ASSOCIATION = die Frageform am Anker, DELAYED RECALL
+  = das FSRS-Wiedersehen — der einzige ehrliche „delayed recall“.
+- **Mengen-Wertung am Anker.** Drei Fragen „Daniel — was gehört dazu?“
+  positionsweise zu werten wäre ein Ratespiel über interne Reihenfolge.
+  Eine Antwort löst irgendein offenes Ziel **desselben Ankers** ein,
+  jede höchstens einmal; zwischen Ankern wird nichts verrechnet
+  (`promptedSetHits`, Kerntest).
+- **Kennungen sind selbsttragend** (Anker U+001E Ding; Szene mit
+  U+001F): Auch wenn der Graph sich ändert, weiß das Wiedersehen, was
+  gefragt war — dieselbe Eigenschaft wie bei den eigenen Karten (D-032).
+- **Persistenz ohne Schema-Sprung:** Der Graph liegt als eine
+  Einstellungszeile und wandert mit Sicherung (N2) und Drive-Abgleich
+  (D-033) mit. Er ist die eine Einstellung, die Geschichte statt
+  Vorliebe ist — der Sicherungs-Import **vereinigt** ihn deshalb (N9:
+  längere Geschichte gewinnt) statt ihn zu ersetzen.
+- **Keine Profil-Achse** — gewählter Stoff, dieselbe Begründung wie
+  D-032. Und die Constellation ist kein Dekor: Sie zeichnet die echten
+  Knoten und Kanten, deterministisch angeordnet (goldener Winkel in
+  Merk-Reihenfolge) — dieselben Erinnerungen stehen morgen am selben Ort.
+
+## D-037 · 2026-08-19 · Der KI-Architekt: Vorschläge in Hausform, nie Schreibzugriff
+
+**Entscheidung:** KI darf die Extraktion anreichern — über genau **eine**
+Schnittstelle: Text rein, `RememberSuggestions` raus. Eine
+Anbieter-Antwort ist Fremdmaterial und wird gewaschen wie eine
+Sicherungsdatei (`sanitizeArchitectSuggestions`: unbekannte Typen →
+`custom`, Beschriftungen gedeckelt, Kanten ohne Enden fliegen). **KI
+schreibt nie in den Graphen** — dieselbe Bestätigungsoberfläche
+entscheidet, ob mit oder ohne KI. Bis ein Anbieter angeschlossen ist
+(dieselben Drähte wie beim Coach, D-034), *ist* die deterministische
+Extraktion der Architekt: kein KI-Pflichtpfad (M2), kein zweiter
+Datenweg.

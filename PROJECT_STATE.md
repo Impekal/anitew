@@ -2516,3 +2516,47 @@ beim ersten Tippen auf iOS, Safaris eigene Zeit- und Datei-Felder
 (Erinnerung, Sicherung einlesen) — und das Google-Anmeldefenster des
 Abgleichs in der **installierten** App, der heikelste Punkt der Liste.
 Der Abgleich war zuvor schon im Browser bestätigt worden.
+
+## 2026-08-19 · V2: Der Memory-Graph steht — der Durchstich läuft
+
+Der Umbau zum persönlichen Memory-System hat seinen ersten tragenden
+Stand (Zweig `anitew-redesign-v2`, D-035/D-036/D-037). Der Ablauf aus
+dem Auftrag funktioniert Ende zu Ende und ist als E2E-Test festgehalten:
+Etwas merken → deterministische Vorschläge (das Auftragsbeispiel
+„Daniel arbeitet im Museum, kommt aus Madrid und spielt Gitarre.“ ergibt
+wörtlich Daniel/Museum/Madrid/Gitarre samt drei Beziehungen) →
+Bestätigen → Graph gespeichert (Einstellungszeile; wandert mit Sicherung
+und Drive-Abgleich, der Import **vereinigt** statt zu ersetzen) → die
+Constellation zeichnet die echten Knoten und Kanten → die Mission nimmt
+die schwächsten Anker als Szene ins normale Training → Mengen-Wertung am
+Anker → drei FSRS-Termine in itemStates. Keine zweite Engine: Modul
+`memory` ist das zehnte Modul derselben Maschinerie.
+
+Aufgeräumt wurde davor: Das Gerüst trug zwei Generationen von Bausteinen
+(PascalCase- neben camelCase-Dateien — eine Groß-/Kleinschreibungs-
+Kollision, die auf case-insensitiven Dateisystemen jeden Build bricht),
+eine parallele App-Schale (AppV2/main-v2, englischsprachig) und einen
+index.html-Umbau, der den Ehrlichkeits-Wächter riss. Die benannten
+Keeper (memoryGraph, rememberThis, memoryArchitect, missionComposer,
+MemoryConstellation) wurden gehärtet statt ersetzt: Zeit wird
+hereingereicht statt gezogen (D-010), Steuerzeichen-Wäsche, deutsche
+Hausform. Die Identitätsschicht (anitew-redesign.css) blieb und wurde
+tragfähig gemacht: Die App-Token liegen jetzt in beiden Systemschemata
+auf der „Ancient × Future“-Palette — vorher stand im hellen Modus
+dunkle Tinte auf dunklem Grund.
+
+**Stand:** 426 Kerntests, Memory-Durchstich-E2E 2/2, Budget 157,2 KB
+von 180 KB.
+
+Die Suite hat vor dem ersten Push zwei ernste Fehler der neuen
+Identitätsschicht gefangen — beide aus derselben Familie „Dekor, das
+sich wie Bedienung benimmt“: (1) Die Leucht-Scheibe (`.app::before`)
+malte als positioniertes Element **über** den statischen Knöpfen und
+fing jeden Klick — „Fertig“ hing, bis der Block ablief; der Trace hat
+es in Minuten entschieden. Dekor bekommt seither ausnahmslos
+`pointer-events: none`. (2) `.start-label { display: none }` versteckte
+die Beschriftung **aller** Hauptknöpfe — namenlos für Screenreader und
+Prüfungen zugleich. Die Beschriftung ist zurück, als Teil des Designs
+statt als sein Opfer. Außerdem injiziert die Schicht keine englischen
+Sätze mehr per CSS (`content: 'TODAY / …'`): Texte kommen aus dem
+Wörterbuch, und Pseudo-Inhalte liest ein Screenreader mit.

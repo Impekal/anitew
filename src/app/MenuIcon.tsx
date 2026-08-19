@@ -13,6 +13,7 @@ export type MenuIconKind =
   | 'profile'
   | 'coach'
   | 'contents'
+  | 'memories'
   | 'about'
   | 'palace'
   | 'reminder'
@@ -32,6 +33,8 @@ const PATHS: Readonly<Record<MenuIconKind, string>> = {
   coach: 'M4.5 5.5h15v10h-8.5L7 19v-3.5H4.5zM8 9.5h8M8 12.5h5',
   // Zwei Karten, leicht versetzt: der eigene Stapel.
   contents: 'M7.5 4.5h12v11h-12zM7.5 7.5h12M4.5 8.5v11h12',
+  // Drei verbundene Sterne: die Konstellation.
+  memories: 'M6 8.5l6.5-3 5.5 5-4.5 8-6-2.5zM6 8.5l7.5 9.5M12.5 5.5l-1 9.5',
   // Kopf und Schultern.
   about: 'M12 5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7zM5 20c1.4-3.4 3.9-5 7-5s5.6 1.6 7 5',
   // Giebel und Säulen.

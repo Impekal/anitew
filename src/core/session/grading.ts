@@ -198,6 +198,51 @@ export function promptedHits(
 }
 
 /**
+ * Gestützter Abruf **als Menge** je Gruppe (D-036).
+ *
+ * Beim Memory-Modul stellen drei Fragen am selben Anker dieselbe Frage:
+ * „Daniel — was gehört dazu?“ Welche der drei Antworten „zuerst gemeint“
+ * war, ist keine Gedächtnisleistung — Position für Position gewertet wäre
+ * die Aufgabe ein Ratespiel über die interne Reihenfolge. Hier zählt eine
+ * Antwort deshalb für **irgendein** noch offenes Ziel derselben Gruppe
+ * (der Anker ist die Gruppe); jede Antwort wird höchstens einmal
+ * verbraucht. Zwischen Gruppen wird nichts verrechnet: „Anna — was gehört
+ * dazu?“ kann keine Daniel-Antwort einlösen.
+ */
+export function promptedSetHits(
+  answers: readonly string[],
+  targets: readonly string[],
+  leniency: Leniency | readonly Leniency[],
+  groupOf: (index: number) => string,
+): boolean[] {
+  const hits = targets.map(() => false)
+  const groups = new Map<string, number[]>()
+  targets.forEach((_, index) => {
+    const key = groupOf(index)
+    groups.set(key, [...(groups.get(key) ?? []), index])
+  })
+
+  for (const indices of groups.values()) {
+    const unused = indices
+      .map((index) => normalizeWord(answers[index] ?? ''))
+      .filter((answer) => answer !== '')
+    for (const index of indices) {
+      const target = normalizeWord(targets[index] as string)
+      const here = Array.isArray(leniency) ? leniency[index] ?? 'typos' : leniency
+      const at = unused.findIndex(
+        (answer) =>
+          answer === target ||
+          (here !== 'exact' && target.length >= 5 && withinOneEdit(target, answer)),
+      )
+      if (at < 0) continue
+      unused.splice(at, 1)
+      hits[index] = true
+    }
+  }
+  return hits
+}
+
+/**
  * Bewertung für den **gestützten** Abruf (Backlog D9).
  *
  * Beim Gesicht steht die Frage schon da; gesucht ist genau eine Antwort. Die

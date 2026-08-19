@@ -51,11 +51,17 @@ body::before {
 .app::before {
   content: '';
   position: absolute;
-  width: 420px;
+  /* Nie breiter als die Spalte: 420 feste Pixel schoben auf dem Telefon
+     die ganze Seite seitlich — die Layout-Matrix hat es gefangen. */
+  width: min(420px, 100%);
   height: 420px;
   left: 50%;
   top: 150px;
   transform: translateX(-50%);
+  /* Dekor fängt keine Klicks: Als positioniertes Element malt die Scheibe
+     ÜBER den statischen Knöpfen — ohne diese Zeile hing jeder Klick auf
+     „Fertig“ fest. Ein E2E-Trace hat es gefunden. */
+  pointer-events: none;
   border-radius: 50%;
   background:
     radial-gradient(circle, rgba(140,207,192,.09) 0 1px, transparent 2px),
@@ -63,7 +69,11 @@ body::before {
   background-size: 37px 37px, 61px 61px;
   opacity: .65;
   pointer-events: none;
-  animation: constellation-drift 22s linear infinite;
+  /* Drift über die Rasterposition, nicht per Rotation: Eine rotierende
+     Layout-Box ragt diagonal über den Rahmen und schiebt die Seite
+     seitlich — die Layout-Matrix hat es gefangen. Die Rasterweiten (37/61)
+     machen die Schleife nahtlos. */
+  animation: dot-drift 60s linear infinite;
 }
 
 .brand {
@@ -124,13 +134,12 @@ body::before {
 }
 
 .challenge::before {
-  content: 'TODAY / ADAPTIVE MEMORY MISSION';
+  content: '';
   display: block;
-  margin-bottom: 30px;
-  color: var(--an-cyan);
-  font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: .18em;
+  margin-bottom: 26px;
+  height: 1px;
+  width: 64px;
+  background: linear-gradient(90deg, var(--an-cyan), transparent);
 }
 
 .challenge::after {
@@ -165,6 +174,7 @@ body::before {
 .start::before {
   content: '';
   position: absolute;
+  pointer-events: none;
   width: 120px;
   height: 120px;
   border-radius: 50%;
@@ -172,8 +182,9 @@ body::before {
   animation: pulse-orbit 4.5s ease-in-out infinite;
 }
 .start::after {
-  content: 'BEGIN';
+  content: '';
   position: absolute;
+  pointer-events: none;
   bottom: 18px;
   color: var(--an-gold);
   font-family: var(--mono);
@@ -198,7 +209,20 @@ body::before {
   letter-spacing: -.06em;
   text-shadow: 0 0 34px rgba(216,168,90,.22);
 }
-.start-label { display: none; }
+/* Die Beschriftung bleibt sichtbar — sie zu verstecken machte ALLE
+   Hauptknöpfe (auch »Fertig« im Abruf) namenlos: unlesbar für Menschen
+   mit Screenreader und unauffindbar für die Prüfungen. Der große Knopf
+   trägt seinen Namen; das ist keine Schwäche des Designs, sondern seine
+   Ehrlichkeit. */
+.start-label {
+  position: relative;
+  z-index: 1;
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--an-gold);
+}
 
 .focus {
   position: relative;
@@ -293,9 +317,9 @@ body::before {
   0%, 100% { transform: scale(.82); opacity: .24; }
   50% { transform: scale(1.08); opacity: .65; }
 }
-@keyframes constellation-drift {
-  from { transform: translateX(-50%) rotate(0deg); }
-  to { transform: translateX(-50%) rotate(360deg); }
+@keyframes dot-drift {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: 37px 74px, -61px 61px; }
 }
 
 @media (max-width: 560px) {
@@ -308,4 +332,264 @@ body::before {
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+}
+
+/* ── Eine Identität, beide Systemschemata (D-035) ─────────────────────────
+   ANITEW bekennt sich zu **einem** Erscheinungsbild („Ancient Memory ×
+   Future Technology“): tiefer Grund, warmes Gold, kühles Salbeigrün. Damit
+   das trägt, werden die App-Token hier auf diese Palette gelegt — für
+   helles wie dunkles Systemschema, sonst stünde im hellen Modus dunkle
+   Tinte auf dunklem Grund. Kontraste geprüft: Text ≥ 4.5:1 auf --paper. */
+:root {
+  --paper: #0a100e;
+  --paper-glow: #101815;
+  --card: #121b18;
+  --line: #24322c;
+  --ink: #f0eee4;
+  --ink-soft: #b4bfb4;
+  --ink-faint: #8a978c;
+  --accent: #d8a85a;
+  --accent-soft: #33291a;
+  --accent-ink: #14100a;
+  --calm: #8ccfc0;
+  --bad: #e0715f;
+  --shadow: 0 1px 2px rgb(0 0 0 / 30%), 0 8px 24px -12px rgb(0 0 0 / 55%);
+  --shadow-lift: 0 2px 4px rgb(0 0 0 / 35%), 0 18px 40px -18px rgb(0 0 0 / 65%);
+}
+
+/* ── Der Memory-Bereich (D-036) ───────────────────────────────────────── */
+
+.memoryzone {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.memory-empty {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  color: var(--an-muted);
+}
+
+/* Die Constellation: echte Knoten, echte Kanten — ruhig atmend. */
+.constellation {
+  border: 1px solid var(--an-line);
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(140, 207, 192, 0.07), transparent 60%),
+    linear-gradient(160deg, rgba(16, 24, 21, 0.9), rgba(9, 14, 12, 0.94));
+  overflow: hidden;
+}
+
+.constellation svg {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+}
+
+.constellation-edge {
+  stroke: var(--an-cyan);
+  stroke-width: 0.25;
+  opacity: 0.35;
+  animation: edge-breathe 6s ease-in-out infinite;
+}
+
+.constellation-node {
+  fill: var(--an-text);
+  animation: node-glimmer 5s ease-in-out infinite;
+}
+
+.constellation-node-anchor {
+  fill: var(--an-gold);
+}
+
+.constellation-label {
+  fill: var(--an-muted);
+  font-size: 3.2px;
+  font-family: var(--mono);
+  letter-spacing: 0.06em;
+}
+
+@keyframes edge-breathe {
+  0%, 100% { opacity: 0.22; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes node-glimmer {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.25); }
+}
+
+.memory-counts {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  color: var(--an-muted);
+}
+
+.memory-lists {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 1rem;
+}
+
+.memory-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.memory-list li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 0.15rem 0.6rem;
+  font-size: 0.92rem;
+}
+
+.memory-label {
+  color: var(--ink);
+}
+
+/* Der Übungsstand als leiser Balken — keine Zahl, kein Rang. */
+.memory-strength {
+  grid-column: 1 / -1;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--an-cyan), var(--an-gold));
+  opacity: 0.55;
+}
+
+.memory-type {
+  color: var(--ink-faint);
+}
+
+.memory-remove {
+  padding: 0;
+  font-size: 0.78rem;
+}
+
+/* ── „Etwas merken“ (D-036) ───────────────────────────────────────────── */
+
+.remember {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  align-items: flex-start;
+}
+
+.remember-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper-glow);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.95rem;
+  resize: vertical;
+}
+
+.remember-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.remember-nodes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Ein Vorschlag ist ein Knopf: an oder abgewählt — kein Formular. */
+.remember-node {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid var(--an-line-strong);
+  border-radius: 12px;
+  background: var(--an-cyan-soft);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+  transition: opacity var(--step) var(--ease), border-color var(--step) var(--ease);
+}
+
+.remember-node small {
+  color: var(--ink-faint);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.remember-node-off {
+  opacity: 0.38;
+  border-style: dashed;
+  background: transparent;
+}
+
+.remember-edges {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+
+.remember-actions {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.remember-saved {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--an-cyan);
+}
+
+/* ── Die Memory-Szene in der Einheit (D-036) ─────────────────────────── */
+
+.memory-encode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.memory-anchor {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: clamp(1.4rem, 5vw, 2rem);
+  color: var(--an-gold);
+}
+
+.memory-scene {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+.memory-scene li {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--an-line-strong);
+  border-radius: 12px;
+  font-size: 1.05rem;
+  animation: word-in 460ms var(--ease) both;
 }
