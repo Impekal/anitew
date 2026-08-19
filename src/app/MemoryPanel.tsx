@@ -8,7 +8,7 @@ import {
   latestNodes,
   nodesByStrength,
 } from '../core/index.ts'
-import { loadMemoryGraph, saveMemoryGraph } from '../data/memoryStore.ts'
+import { loadMemoryGraph, saveMemoryGraph, MEMORY_VISITED_KEY } from '../data/memoryStore.ts'
 import { removeMemoryNode } from '../core/index.ts'
 import type { Dictionary } from '../i18n/index.ts'
 
@@ -41,6 +41,10 @@ export function MemoryPanel({
       .catch(() => undefined)
   }, [])
   useEffect(() => reload(), [reload])
+  // Wer hier war, braucht die Entdeckungszeile auf dem Startbildschirm nicht mehr.
+  useEffect(() => {
+    void platform.settings.write(MEMORY_VISITED_KEY, true).catch(() => undefined)
+  }, [platform])
 
   const remove = (nodeId: string) => {
     void (async () => {

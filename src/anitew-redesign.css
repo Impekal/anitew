@@ -73,7 +73,7 @@ body::before {
      Layout-Box ragt diagonal über den Rahmen und schiebt die Seite
      seitlich — die Layout-Matrix hat es gefangen. Die Rasterweiten (37/61)
      machen die Schleife nahtlos. */
-  animation: dot-drift 60s linear infinite;
+  animation: dot-drift var(--motion-drift) linear infinite;
 }
 
 .brand {
@@ -179,7 +179,7 @@ body::before {
   height: 120px;
   border-radius: 50%;
   border: 1px solid rgba(216,168,90,.18);
-  animation: pulse-orbit 4.5s ease-in-out infinite;
+  animation: pulse-orbit calc(var(--motion-breathe) * 0.75) ease-in-out infinite;
 }
 .start::after {
   content: '';
@@ -341,6 +341,12 @@ body::before {
    helles wie dunkles Systemschema, sonst stünde im hellen Modus dunkle
    Tinte auf dunklem Grund. Kontraste geprüft: Text ≥ 4.5:1 auf --paper. */
 :root {
+  /* Motion-Tokens (V2): drei Tempi, eine Sprache. „quick" für Eintritte,
+     „breathe" für lebendige Ruhe, „drift" für Hintergründe. Reduced Motion
+     (G-3) stutzt alle drei global — siehe oben. */
+  --motion-quick: 460ms;
+  --motion-breathe: 6s;
+  --motion-drift: 60s;
   --paper: #0a100e;
   --paper-glow: #101815;
   --card: #121b18;
@@ -392,12 +398,12 @@ body::before {
   stroke: var(--an-cyan);
   stroke-width: 0.25;
   opacity: 0.35;
-  animation: edge-breathe 6s ease-in-out infinite;
+  animation: edge-breathe var(--motion-breathe) ease-in-out infinite;
 }
 
 .constellation-node {
   fill: var(--an-text);
-  animation: node-glimmer 5s ease-in-out infinite;
+  animation: node-glimmer calc(var(--motion-breathe) * 0.85) ease-in-out infinite;
 }
 
 .constellation-node-anchor {
@@ -591,7 +597,7 @@ body::before {
   border: 1px solid var(--an-line-strong);
   border-radius: 12px;
   font-size: 1.05rem;
-  animation: word-in 460ms var(--ease) both;
+  animation: word-in var(--motion-quick) var(--ease) both;
 }
 
 /* Der Blick auf heute (V2) — eine ruhige Karte mit wahren Zeilen. */
@@ -629,4 +635,18 @@ body::before {
   border-radius: 3px 3px 0 0;
   background: linear-gradient(180deg, var(--accent), var(--accent-soft));
   opacity: 0.85;
+}
+
+/* Die Entdeckungszeile — einmal gesagt, dann nie wieder (D-011/G-2). */
+.today-invite {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.8rem;
+}
+.today-invite .today-line {
+  flex: 1 1 220px;
+}
+.today-invite-open {
+  font-size: 0.85rem;
 }

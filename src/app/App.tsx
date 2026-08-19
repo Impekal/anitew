@@ -949,7 +949,13 @@ export function App() {
 
       <StreakLine streak={streak} dictionary={dictionary} />
       <ReturnsLine returns={returns} dictionary={dictionary} />
-      <TodayLine dictionary={dictionary} training={training} today={today} />
+      <TodayLine
+        platform={platform}
+        dictionary={dictionary}
+        training={training}
+        today={today}
+        onOpenMemories={() => openPage('memories')}
+      />
 
       {/*
         Die Messung meldet sich nur, wenn sie etwas will (D-011/G-2). Kein

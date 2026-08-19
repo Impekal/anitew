@@ -119,6 +119,8 @@ export function RememberThisPanel({
       setSuggestions(undefined)
       setFromAi(false)
       setSaved(true)
+      // Der Ton der Klangsprache fürs Aufheben — leise, kein Jubel (G-1).
+      platform.sound.play('remember')
       scheduleDriveSync(platform)
       onSaved()
     })().catch(() => undefined)

@@ -49,7 +49,12 @@ export default defineConfig({
           { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png' },
           {
-            src: 'icons/icon-512.png',
+            /*
+              Maskable braucht Grund bis in die Ecken und das Zeichen in
+              der 80%-Schutzzone — das abgerundete Normal-Icon würde beim
+              Android-Zuschnitt Ecken verlieren (D-039).
+            */
+            src: 'icons/icon-maskable-512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable',

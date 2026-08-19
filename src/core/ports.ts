@@ -52,6 +52,8 @@ export type SoundCue =
   | 'word'
   /** Ein getipptes Wort ist gelandet. */
   | 'type'
+  /** Eine Erinnerung ist bestätigt und gehört jetzt zum Graphen (D-036). */
+  | 'remember'
   /** Ein Block ist zu Ende. */
   | 'block'
   /** Die Einheit ist geschafft. */

@@ -24,6 +24,8 @@ import {
 import { db } from './db.ts'
 
 export const MEMORY_GRAPH_KEY = 'memory.graph'
+/** Ob „Mein Gedächtnis“ je geöffnet wurde — für die Entdeckungszeile. */
+export const MEMORY_VISITED_KEY = 'memory.visited'
 
 /** Der gespeicherte Graph — bei jedem Fehler ehrlich der leere. */
 export async function loadMemoryGraph(): Promise<MemoryGraph> {

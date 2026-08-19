@@ -17,6 +17,17 @@ test('merkt echte Information: Vorschläge, Bestätigung, Constellation, Neulade
   page,
 }) => {
   await visit(page)
+
+  // Die Entdeckungszeile: Solange nichts gemerkt und die Seite nie offen
+  // war, sagt der Startbildschirm einmal, dass es sie gibt — und ihre Tür
+  // führt hinein.
+  await expect(page.locator('.today-invite')).toBeVisible()
+  await page.locator('.today-invite-open').click()
+  await expect(page.locator('.memory-empty')).toBeVisible()
+  await leavePage(page)
+  // Gesehen heißt gesehen: Die Zeile kommt nicht wieder.
+  await expect(page.locator('.today-invite')).toHaveCount(0)
+
   await openPage(page, 'Mein Gedächtnis')
   await expect(page.locator('.memory-empty')).toBeVisible()
 

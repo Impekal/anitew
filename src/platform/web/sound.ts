@@ -76,6 +76,13 @@ function notesFor(cue: SoundCue, step: number): Note[] {
         { step: 4, at: 0, decay: 0.8, gain: 0.34 },
         { step: 2, at: 0.11, decay: 1.2, gain: 0.3 },
       ]
+    case 'remember':
+      // Zwei ruhige Töne aufwärts mit langem Ausklingen: etwas ist
+      // aufgehoben. Kleiner als „done" — Merken ist ein Anfang, kein Finale.
+      return [
+        { step: 2, at: 0, decay: 1.2, gain: 0.36 },
+        { step: 7, at: 0.14, decay: 1.8, gain: 0.32 },
+      ]
     case 'done':
       // Der einzige Moment, der etwas ausholen darf.
       return [

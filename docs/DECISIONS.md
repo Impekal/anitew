@@ -1442,3 +1442,27 @@ Rauschen, Google-Kontingente); Tombstone-freies „Entfernen gilt nur
 diesem Gerät“ (unehrlich gegenüber dem Entfernen-Knopf); die E-Mail im
 Backup (sie ist Geräteschmuck, keine Trainingsgeschichte — sie reist
 absichtlich **nicht** mit).
+
+## D-039 · 2026-08-19 · Feinschliff der Identität: Klang, Tempo, Entdeckung, Zeichen
+
+**Entscheidung:** Vier kleine Stücke, ein Maß — nichts davon lärmt.
+
+1. **Klang:** Die Klangsprache (D-011/G-9) bekommt den Cue `remember` —
+   zwei ruhige Töne aufwärts, kleiner als `done`, denn Merken ist ein
+   Anfang, kein Finale. Er klingt beim Bestätigen einer Erinnerung.
+2. **Tempo:** Drei Motion-Tokens im Identitäts-Layer
+   (`--motion-quick` 460 ms für Eintritte, `--motion-breathe` 6 s für
+   lebendige Ruhe, `--motion-drift` 60 s für Hintergründe). Alle
+   Animationen der Identität hängen daran; Reduced Motion (G-3) stutzt
+   weiterhin global.
+3. **Entdeckung:** Der Blick auf heute sagt **einmal**, dass es „Mein
+   Gedächtnis“ gibt — solange dort nichts liegt und die Seite nie offen
+   war (`memory.visited`). Gesehen heißt gesehen (D-011/G-2): kein
+   Banner, kein Badge, keine Wiederholung.
+4. **Zeichen:** Die Wiederholungskurve (D-004) wird zur Konstellation —
+   ein Zweig geht ab, denn seit D-036 ist ANITEW ein Graph, nicht nur
+   eine Kurve. Palette der einen Identität (D-035). Die PNGs sind aus
+   dem SVG gerastert (Chromium); **maskable** bekam eine eigene Datei
+   mit Grund bis in die Ecken und dem Zeichen in der 80%-Schutzzone —
+   das abgerundete Normal-Icon verlöre beim Android-Zuschnitt die
+   Ecken. Weiterhin vorläufig bis zur Markenrecherche (R3).

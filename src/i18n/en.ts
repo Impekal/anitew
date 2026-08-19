@@ -351,6 +351,8 @@ export const en: Dictionary = {
     dueOne: 'One review is due today — the session will pick it up.',
     dueNone: 'No reviews due — today is for new ground.',
     weakest: '“{label}” is weakest right now — missions train weak memories first.',
+    invite: 'New: ANITEW can remember real things from your life — and train them with you.',
+    inviteOpen: 'Open “My memory”',
   },
   memory: {
     heading: 'My memory',

@@ -561,6 +561,8 @@ export const de = {
     dueOne: 'Ein Wiedersehen ist heute fällig — die Einheit nimmt es mit.',
     dueNone: 'Kein Wiedersehen fällig — heute wächst Neues.',
     weakest: '„{label}“ steht am schwächsten — Missionen üben Schwaches zuerst.',
+    invite: 'Neu: ANITEW kann sich echte Dinge aus deinem Leben merken — und sie mit dir trainieren.',
+    inviteOpen: '„Mein Gedächtnis“ ansehen',
   },
   memory: {
     /*
