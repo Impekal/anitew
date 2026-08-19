@@ -1465,4 +1465,5 @@ absichtlich **nicht** mit).
    dem SVG gerastert (Chromium); **maskable** bekam eine eigene Datei
    mit Grund bis in die Ecken und dem Zeichen in der 80%-Schutzzone —
    das abgerundete Normal-Icon verlöre beim Android-Zuschnitt die
-   Ecken. Weiterhin vorläufig bis zur Markenrecherche (R3).
+   Ecken. Die Markenrecherche (R3) ist bestätigt abgeschlossen — das
+   Zeichen ist damit endgültig, kein Vorbehalt mehr.

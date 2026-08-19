@@ -22,7 +22,7 @@ on:
       # Der Zweig, an dem gerade gearbeitet wird. Ohne ihn bleibt die
       # Live-Fassung stumm auf dem letzten Stand, während auf dem Telefon die
       # Vergangenheit getestet wird.
-      - claude/anitew-aufgabenliste-tn9buk
+      - anitew-redesign-v2
   workflow_dispatch:
 
 # Zwei Veröffentlichungen dürfen sich nie überholen.

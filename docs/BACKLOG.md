@@ -54,7 +54,7 @@ unter „Nicht-Ziele“.
 | A6 | Datenschicht: Dexie-Schema **mit Migrationen ab Version 1** | ✅ 2026-08-17 | Version 1 ist festgeschrieben und wird nie bearbeitet — die Regel steht oben in `src/data/db.ts`. Benchmarks liegen in einer **eigenen** Tabelle, damit eine spätere Auswertung sie nicht mit Trainingsdaten vermischen kann (R-1 bis ins Schema) | M |
 | A7 | Deployment: Auto-Build bei Push, statisches Hosting, kein Backend | ✅ 2026-08-17 | **Live: https://anitew.impekaltech.workers.dev** — jeder Push auf den Zweig veröffentlicht. Account ID fest in `deploy.yml`, Token als Repo-Secret | S |
 | A8 | Projektgedächtnis: `PROJECT_STATE.md`, `docs/DECISIONS.md`, diese Liste | ✅ 2026-08-17 | | S |
-| A9 | App-Identität: Icon, Splash, Theme-Farben, Statusleiste, Name im Manifest | 🟨 2026-08-17 | Zeichen ist **vorläufig** (fünf Punkte mit wachsenden Abständen — die Wiederholungskurve aus D-004), endgültig erst nach R3 | S |
+| A9 | App-Identität: Icon, Splash, Theme-Farben, Statusleiste, Name im Manifest | ✅ 2026-08-19 | Zeichen **endgültig** (D-039): die Wiederholungskurve als Konstellation mit Zweig, Palette der einen Identität (D-035); R3 bestätigt abgeschlossen. Maskable mit eigener Volldeckungs-Datei | S |
 | A10 | Kein Tracking, keine Analytics-Dritte. Nutzungsstatistik nur lokal auf dem Gerät | ✅ 2026-08-17 | keine einzige Abhängigkeit, die nach außen funkt | S |
 | A11 | Kein `Math.random()` irgendwo — aller Zufall kommt aus `createRng(seed)` | ✅ 2026-08-17 | ohne Determinismus ist ein Fehlerbericht wertlos und der Simulator (C9) beweist nichts | S |
 
