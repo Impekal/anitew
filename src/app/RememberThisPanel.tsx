@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import {
   type NodeSuggestion,
@@ -8,6 +8,17 @@ import {
 } from '../core/index.ts'
 import { loadMemoryGraph, saveMemoryGraph } from '../data/memoryStore.ts'
 import { applyRememberedSuggestions } from '../core/index.ts'
+import { createWebArchitect } from '../platform/web/architect.ts'
+import {
+  COACH_PROVIDERS,
+  COACH_PROVIDER_NAMES,
+  COACH_PROVIDER_SETTING,
+  CoachError,
+  type CoachFailure,
+  type CoachProvider,
+  LEGACY_COACH_KEY_SETTING,
+  coachKeySettingFor,
+} from '../platform/web/coach.ts'
 import type { Dictionary } from '../i18n/index.ts'
 
 /**
@@ -36,11 +47,52 @@ export function RememberThisPanel({
   const [dropped, setDropped] = useState<ReadonlySet<string>>(new Set())
   const [saved, setSaved] = useState(false)
 
+  // Der KI-Weg (D-037) ist ein Angebot, kein Pflichtpfad (M2): Er erscheint
+  // nur, wenn beim gewählten Coach-Anbieter ein eigener Schlüssel liegt.
+  const [aiProvider, setAiProvider] = useState<CoachProvider | undefined>(undefined)
+  const [aiBusy, setAiBusy] = useState(false)
+  const [aiFailure, setAiFailure] = useState<CoachFailure | undefined>(undefined)
+  const [fromAi, setFromAi] = useState(false)
+
+  useEffect(() => {
+    void (async () => {
+      const stored = await platform.settings.read<CoachProvider>(COACH_PROVIDER_SETTING)
+      const provider =
+        stored !== undefined && COACH_PROVIDERS.includes(stored) ? stored : COACH_PROVIDERS[0]
+      const key =
+        (await platform.settings.read<string>(coachKeySettingFor(provider))) ??
+        (provider === 'anthropic'
+          ? await platform.settings.read<string>(LEGACY_COACH_KEY_SETTING)
+          : undefined)
+      setAiProvider(key !== undefined && key.trim() !== '' ? provider : undefined)
+    })().catch(() => undefined)
+  }, [platform])
+
   const propose = () => {
     const next = suggestMemories({ text: draft })
     setSuggestions(next)
     setDropped(new Set())
     setSaved(false)
+    setFromAi(false)
+    setAiFailure(undefined)
+  }
+
+  const proposeWithAi = () => {
+    setAiBusy(true)
+    setAiFailure(undefined)
+    void (async () => {
+      try {
+        const next = await createWebArchitect(platform.coach).suggest(draft.trim())
+        setSuggestions(next)
+        setDropped(new Set())
+        setSaved(false)
+        setFromAi(true)
+      } catch (error) {
+        setAiFailure(error instanceof CoachError ? error.reason : 'failed')
+      } finally {
+        setAiBusy(false)
+      }
+    })()
   }
 
   const toggle = (id: string) => {
@@ -64,6 +116,7 @@ export function RememberThisPanel({
       )
       setDraft('')
       setSuggestions(undefined)
+      setFromAi(false)
       setSaved(true)
       onSaved()
     })().catch(() => undefined)
@@ -88,14 +141,35 @@ export function RememberThisPanel({
           setSaved(false)
         }}
       />
-      <button
-        type="button"
-        className="quiet remember-suggest"
-        onClick={propose}
-        disabled={draft.trim() === ''}
-      >
-        {texts.suggest}
-      </button>
+      <div className="remember-actions">
+        <button
+          type="button"
+          className="quiet remember-suggest"
+          onClick={propose}
+          disabled={draft.trim() === '' || aiBusy}
+        >
+          {texts.suggest}
+        </button>
+        {aiProvider !== undefined && (
+          <button
+            type="button"
+            className="quiet remember-ai"
+            onClick={proposeWithAi}
+            disabled={draft.trim() === '' || aiBusy}
+          >
+            {texts.aiSuggest}
+          </button>
+        )}
+      </div>
+      {aiProvider !== undefined && (
+        <p className="hint remember-ainote">
+          {texts.aiNote.replace('{provider}', COACH_PROVIDER_NAMES[aiProvider])}
+        </p>
+      )}
+      {aiBusy && <p className="hint remember-aibusy">{texts.aiBusy}</p>}
+      {aiFailure !== undefined && (
+        <p className="coach-failure remember-failure">{dictionary.coach.errors[aiFailure]}</p>
+      )}
 
       {suggestions !== undefined && suggestions.nodes.length === 0 && (
         <p className="hint">{texts.nothingFound}</p>
@@ -103,6 +177,7 @@ export function RememberThisPanel({
 
       {suggestions !== undefined && suggestions.nodes.length > 0 && (
         <div className="remember-preview">
+          {fromAi && <p className="hint remember-aisource">{texts.aiSource}</p>}
           <p className="hint">{texts.suggestionsNodes}</p>
           <div className="remember-nodes">
             {suggestions.nodes.map((node) => (

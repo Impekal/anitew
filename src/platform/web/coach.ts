@@ -35,6 +35,15 @@ export function coachKeySettingFor(provider: CoachProvider): string {
 /** Die alte Zeile aus D-031-Zeiten: ein Anthropic-Schlüssel ohne Anbieter. */
 export const LEGACY_COACH_KEY_SETTING = 'coach.key'
 
+/** Die Anzeigenamen — Eigennamen, keine Übersetzungen. */
+export const COACH_PROVIDER_NAMES: Readonly<Record<CoachProvider, string>> = {
+  gemini: 'Google Gemini',
+  anthropic: 'Anthropic (Claude)',
+  groq: 'Groq',
+  openrouter: 'OpenRouter',
+  mistral: 'Mistral',
+}
+
 /** Wo der Schlüssel entsteht — der Direktlink je Anbieter. */
 export const COACH_KEY_URLS: Readonly<Record<CoachProvider, string>> = {
   gemini: 'https://aistudio.google.com/apikey',

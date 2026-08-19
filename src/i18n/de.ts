@@ -567,6 +567,15 @@ export const de = {
     rememberIntro: 'Schreib, was du behalten willst — ein Satz genügt. ANITEW schlägt vor, was daraus wird; gespeichert wird erst, was du bestätigst.',
     rememberPlaceholder: 'Daniel arbeitet im Museum, kommt aus Madrid und spielt Gitarre.',
     suggest: 'Vorschläge ansehen',
+    /*
+      Der KI-Weg (D-037): ein Angebot neben dem eingebauten, kein
+      Pflichtpfad. Der Hinweis sagt vor dem Fingertipp, wohin der Text
+      geht (R-3) — und die Quelle der Vorschläge wird beim Prüfen genannt.
+    */
+    aiSuggest: 'Mit KI vorschlagen',
+    aiNote: 'Dafür geht dein Text mit deinem Schlüssel direkt an {provider} — sonst nirgendwohin.',
+    aiBusy: 'Die KI liest …',
+    aiSource: 'Diese Vorschläge kommen von der KI. Prüfe sie — gespeichert wird nur, was du bestätigst.',
     suggestionsNodes: 'Das würden Erinnerungen — abwählen, was nicht stimmt:',
     suggestionsEdges: 'Und das ihre Verbindungen:',
     nothingFound: 'Daraus ließ sich nichts machen — ein anderer Satz?',

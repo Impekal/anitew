@@ -117,3 +117,68 @@ test('trainiert die Erinnerung in der Einheit — und FSRS bekommt die Termine',
   })
   expect(tracked).toBe(3)
 })
+
+test('schlägt mit KI vor — nur mit Schlüssel, Anbieter gestubbt, bestätigt wird von Hand', async ({
+  page,
+}) => {
+  // Kein Test ruft wirklich hinaus: Gemini antwortet aus der Route (D-037).
+  await page.route('https://generativelanguage.googleapis.com/**', (route) =>
+    route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        candidates: [
+          {
+            content: {
+              parts: [
+                {
+                  text: JSON.stringify({
+                    nodes: [
+                      { type: 'person', label: 'Mira' },
+                      { type: 'concept', label: 'Cello' },
+                    ],
+                    edges: [{ from: 'Mira', to: 'Cello' }],
+                  }),
+                },
+              ],
+            },
+          },
+        ],
+      }),
+    }),
+  )
+
+  await visit(page)
+
+  // Ohne Schlüssel gibt es den KI-Knopf nicht — kein Pflichtpfad (M2).
+  await openPage(page, 'Mein Gedächtnis')
+  await expect(page.locator('.remember-suggest')).toBeVisible()
+  await expect(page.locator('.remember-ai')).toHaveCount(0)
+  await leavePage(page)
+
+  // Der Schlüssel kommt dort hin, wo er hingehört: zum Coach.
+  await openPage(page, 'Coach')
+  await page.locator('.coach-key-input').fill('AIza-test-nicht-echt')
+  await page.getByRole('button', { name: 'Schlüssel speichern' }).click()
+  await leavePage(page)
+
+  // Jetzt steht der KI-Weg offen — und sagt vorher, wohin der Text geht.
+  await openPage(page, 'Mein Gedächtnis')
+  await expect(page.locator('.remember-ainote')).toContainText('Google Gemini')
+  await page.locator('.remember-input').fill('Mira spielt Cello.')
+  await page.getByRole('button', { name: 'Mit KI vorschlagen' }).click()
+
+  // Die Vorschläge tragen ihre Herkunft — und dieselbe Bestätigungstür.
+  await expect(page.locator('.remember-aisource')).toBeVisible()
+  await expect(page.locator('.remember-node')).toHaveCount(2)
+  await expect(page.locator('.remember-edges li')).toHaveText(['Mira → Cello'])
+  await page.getByRole('button', { name: 'Bestätigen und merken' }).click()
+  await expect(page.locator('.memory-counts')).toContainText('2 Erinnerungen')
+
+  // Fällt das Netz, sagt die Stelle es mit den Coach-Worten — nichts hängt.
+  await page.unroute('https://generativelanguage.googleapis.com/**')
+  await page.route('https://generativelanguage.googleapis.com/**', (route) => route.abort())
+  await page.locator('.remember-input').fill('Noch ein Satz für später.')
+  await page.getByRole('button', { name: 'Mit KI vorschlagen' }).click()
+  await expect(page.locator('.remember-failure')).toContainText('Keine Verbindung')
+  await leavePage(page)
+})

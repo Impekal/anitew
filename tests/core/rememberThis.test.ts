@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { sanitizeArchitectSuggestions } from '../../src/core/memory/memoryArchitect.ts'
+import {
+  architectSystem,
+  parseArchitectAnswer,
+  sanitizeArchitectSuggestions,
+} from '../../src/core/memory/memoryArchitect.ts'
 import { createMemoryGraph, memoryNodeId } from '../../src/core/memory/memoryGraph.ts'
 import {
   composeMemoryPool,
@@ -106,6 +110,42 @@ describe('das Behalten-Wollen', () => {
     expect(washed.nodes.map((node) => node.label)).toEqual(['Daniel', 'Madrid'])
     expect(washed.nodes[1]?.type).toBe('custom')
     expect(washed.edges).toHaveLength(1)
+  })
+})
+
+describe('der KI-Architekt liest Antworten wie Fremdmaterial (D-037)', () => {
+  it('schält JSON aus dem Markdown-Zaun und übersetzt Label-Kanten in IDs', () => {
+    const answer = [
+      'Hier ist das Ergebnis:',
+      '```json',
+      '{"nodes":[{"type":"person","label":"Daniel"},{"type":"place","label":"Museum"}],',
+      ' "edges":[{"from":"daniel","to":"Museum"},{"from":"Daniel","to":"Unbekannt"}]}',
+      '```',
+    ].join('\n')
+    const parsed = parseArchitectAnswer(answer)
+    expect(parsed?.nodes.map((node) => node.label)).toEqual(['Daniel', 'Museum'])
+    // „daniel" trifft „Daniel" — Groß/klein ist keine andere Erinnerung;
+    // die Kante ins Nirgendwo („Unbekannt") fliegt still.
+    expect(parsed?.edges).toEqual([
+      {
+        from: memoryNodeId('person', 'Daniel'),
+        to: memoryNodeId('place', 'Museum'),
+        relation: 'association',
+      },
+    ])
+  })
+
+  it('meldet Unlesbares als Fehler — leer ist dagegen ein Ergebnis', () => {
+    expect(parseArchitectAnswer('tut mir leid, dazu kann ich nichts sagen')).toBeUndefined()
+    expect(parseArchitectAnswer('{kaputt')).toBeUndefined()
+    expect(parseArchitectAnswer('{"nodes":[],"edges":[]}')).toEqual({ nodes: [], edges: [] })
+  })
+
+  it('trägt die Hausform in der Anweisung: JSON, die Typen, nichts erfinden', () => {
+    const system = architectSystem()
+    expect(system).toContain('JSON')
+    expect(system).toContain('person')
+    expect(system).toContain('Erfinde nichts')
   })
 })
 

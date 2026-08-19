@@ -1395,3 +1395,15 @@ entscheidet, ob mit oder ohne KI. Bis ein Anbieter angeschlossen ist
 (dieselben Drähte wie beim Coach, D-034), *ist* die deterministische
 Extraktion der Architekt: kein KI-Pflichtpfad (M2), kein zweiter
 Datenweg.
+
+**Eingelöst (gleicher Tag):** Der Anbieter-Architekt spricht über den
+vorhandenen `CoachPort` (gleicher Anbieter, gleicher Schlüssel, gleiche
+Fehlerworte — kein neuer Netzpfad). Der Kern baut die Anweisung
+(`architectSystem`: nur JSON, nur die Haus-Typen, nichts erfinden,
+Kanten nennen Labels) und liest die Antwort (`parseArchitectAnswer`:
+JSON aus dem Markdown-Zaun schälen, Labels → IDs übersetzen, dann
+`sanitizeArchitectSuggestions`; Unlesbares ist ein Fehler, Leeres ein
+Ergebnis). Im Panel ist der KI-Weg ein **zweiter** Knopf, der nur mit
+hinterlegtem Coach-Schlüssel erscheint, vorher sagt, wohin der Text geht
+(R-3), und die Herkunft der Vorschläge beim Prüfen nennt. Bestätigen
+bleibt die einzige Tür zum Graphen.
