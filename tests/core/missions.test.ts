@@ -138,6 +138,7 @@ describe('die Mission im Plan (H1)', () => {
     missions: people,
     palace: [],
     reverse: [],
+    twins: [],
   }
   const base = { day: '2026-08-17', language: 'de', seed: 'mission', pools }
 

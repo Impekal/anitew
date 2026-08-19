@@ -48,7 +48,7 @@ test('führt durch Einprägen und Abrufen und zählt ehrlich', async ({ page }) 
     // gehören Bild und Name zusammen, Zahlen spricht man innerlich mit.
     await expect(
       page.getByText(
-        /Ein Wort nach dem anderen\.|Gesicht und Name gehören zusammen\.|Eine Zahl nach der anderen\./,
+        /Ein Wort nach dem anderen\.|Gesicht und Name gehören zusammen\.|Eine Zahl nach der anderen\.|gleich steht ein Zwilling daneben\./,
       ),
     ).toBeVisible()
   } else {
@@ -140,7 +140,11 @@ test('hält das Zeitbudget ein, auch wenn niemand etwas tut', async ({ page }) =
   // Anfang der Trainingszeit.
   await expect(page.locator('.encode-word, .scene').first()).toBeVisible({ timeout: 15_000 })
   const started = Date.now()
-  await expect(page.getByRole('textbox')).toBeVisible({ timeout: 60_000 })
+  // Der Abruf beginnt mit einem Feld — oder mit den zwei Knöpfen der
+  // Zwillinge (D-027). Beides heißt: Die Uhr der Runde läuft.
+  await expect(page.locator('.recall-input, .twin-choice').first()).toBeVisible({
+    timeout: 60_000,
+  })
 
   // Nichts eintippen, nichts drücken — die Einheit muss trotzdem enden.
   await expect(page.getByRole('heading', { name: 'Geblieben' })).toBeVisible({ timeout: 90_000 })
@@ -218,5 +222,9 @@ test('lässt nach der Einheit weitermachen — noch eine Runde (B7)', async ({ p
   await page.getByRole('button', { name: 'Noch eine Runde' }).click()
   await expect(page.locator('.settle')).toBeVisible({ timeout: 30_000 })
   await page.locator('.settle').click()
-  await expect(page.locator('.encode-word, .scene, .lesson').first()).toBeVisible({ timeout: 30_000 })
+  // Auch die frische Einheit kann jede Sorte ziehen — Rückwärts (D7)
+  // eingeschlossen, das ohne Einprägeblock direkt fragt.
+  await expect(
+    page.locator('.encode-word, .scene, .lesson, .reveal-digits').first(),
+  ).toBeVisible({ timeout: 30_000 })
 })

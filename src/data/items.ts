@@ -161,6 +161,19 @@ export async function loadDimensionCounts(
   return counts
 }
 
+/**
+ * Alle schon terminierten Kennungen eines Moduls (D-027).
+ *
+ * Gebraucht von den Zwillingen: Deren Vorrat ist endlich, und ein Paar,
+ * das schon einen Termin hat, darf nie wieder als „neu“ kommen — sonst
+ * hätte dieselbe Unterscheidung zwei Termine mit womöglich gegensätzlichen
+ * Antworten.
+ */
+export async function loadTrackedWords(moduleId: string, language: string): Promise<string[]> {
+  const rows = await db.itemStates.where('language').equals(language).toArray()
+  return rows.filter((row) => row.moduleId === moduleId).map((row) => wordOf(row.itemId))
+}
+
 /** Wie viele Informationen warten insgesamt auf ihren nächsten Termin? */
 export async function countTracked(language: string): Promise<number> {
   return db.itemStates.where('language').equals(language).count()

@@ -125,10 +125,28 @@ export async function startEmergency(page: Page) {
     const deadline = Date.now() + 20_000
     let backwards = false
     for (;;) {
-      if (await learnable.first().isVisible().catch(() => false)) break
+      // Anwesenheit zuerst: Die Ziffernanzeige zählt auch verdeckt.
       if ((await reveal.count()) > 0) {
         backwards = true
         break
+      }
+      if (await learnable.first().isVisible().catch(() => false)) {
+        /*
+         * Und noch einmal, einen Wimpernschlag später: Zwei volle Läufe
+         * haben je genau einen Fall getroffen, in dem hier trotz einer
+         * Rückwärts-Runde ein Treffer gemeldet wurde — ein Flackern beim
+         * Blockaufbau, das eine Momentaufnahme für bare Münze nahm. Erst
+         * wenn der Einprägeblock **stehen bleibt** und keine Ziffernanzeige
+         * dazukommt, gilt er.
+         */
+        await page.waitForTimeout(250)
+        if (
+          (await reveal.count()) === 0 &&
+          (await learnable.first().isVisible().catch(() => false))
+        ) {
+          break
+        }
+        continue
       }
       expect(Date.now(), 'kein erster Block erschienen').toBeLessThan(deadline)
       await page.waitForTimeout(100)
@@ -190,7 +208,10 @@ export async function collectItems(page: Page, limit = 12): Promise<Learned> {
    */
   const deadline = Date.now() + 90_000
   while (seen.length < limit) {
-    if ((await page.locator('.recall-input').count()) > 0) break
+    // Der Abruf beginnt mit einem Feld — oder, bei den Zwillingen (D-027),
+    // mit zwei Knöpfen. Wer nur auf das Feld wartet, sitzt dort die ganze
+    // Runde ab, bis die Einheit über ihn hinweg zu Ende geht.
+    if ((await page.locator('.recall-input, .twin-choice').count()) > 0) break
     expect(Date.now(), 'der Abruf hat nicht begonnen').toBeLessThan(deadline)
     /*
      * Mit **kurzer** Frist, und das ist der eigentliche Fehler, den zwei
@@ -213,7 +234,7 @@ export async function collectItems(page: Page, limit = 12): Promise<Learned> {
 
 /** Welche Sorte Abruf steht gerade an? */
 export async function recallKind(page: Page): Promise<'prompted' | 'free'> {
-  await page.locator('.recall-input').first().waitFor({ timeout: 60_000 })
+  await page.locator('.recall-input, .twin-choice').first().waitFor({ timeout: 60_000 })
   return (await page.locator('.prompted').count()) > 0 ? 'prompted' : 'free'
 }
 
@@ -261,8 +282,28 @@ export async function answerRecall(page: Page, learned: Learned, give: Give) {
 
   for (let index = 0; index < total; index++) {
     const input = page.locator('.prompted-input')
-    await input.waitFor({ timeout: 30_000 })
+    const choice = page.locator('.twin-choice')
+    await input.or(choice).first().waitFor({ timeout: 30_000 })
     const skip = give === 'none' || (give === 'allButLast' && index === total - 1)
+
+    /*
+     * Zwillinge (D-027) antworten per Knopf, nicht per Feld. „Nicht
+     * antworten“ gibt es dort als Geste nicht — wer nichts weiß, rät. Der
+     * Test bildet das ab: `skip` drückt den **falschen** Knopf. Exakter
+     * Name, nicht Teilzeichenkette — die beiden Wörter sind einander zum
+     * Verwechseln ähnlich, das ist ihr Beruf.
+     */
+    if ((await choice.count()) > 0) {
+      const right = await answerAt(page, learned, index)
+      const words = (await choice.allTextContents()).map((word) => word.trim())
+      const wrong = words.find((word) => word !== right) ?? right
+      await page
+        .locator('.twin-choices')
+        .getByRole('button', { name: skip ? wrong : right, exact: true })
+        .click()
+      continue
+    }
+
     if (!skip) await input.fill(await answerAt(page, learned, index))
     await page.getByRole('button', { name: 'Fertig' }).click()
   }

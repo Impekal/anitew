@@ -118,6 +118,7 @@ export const de = {
       // Wird nie gezeigt — Rückwärts fragt ohne Einprägephase (D7). Der
       // Schlüssel existiert, weil das Wörterbuch je Modul vollständig ist.
       reverse: 'Gleich rückwärts gefragt.',
+      twins: 'Sieh genau hin — gleich steht ein Zwilling daneben.',
     },
     recallHint: 'Was ist geblieben? Reihenfolge egal.',
     reviewHint: 'Und jetzt von früher: Woran erinnerst du dich noch?',
@@ -131,6 +132,9 @@ export const de = {
     */
     reverseAsk: 'Merk dir die Ziffern — gib sie rückwärts ein.',
     reversePlaceholder: 'Rückwärts',
+    // Zwillinge (D-027): Die Frage steht über zwei Knöpfen — kurz, weil die
+    // beiden Wörter selbst die ganze Frage sind.
+    twinAsk: 'Welches stand da?',
     /*
       Die Fragen einer Mission (H1).
 
@@ -363,7 +367,12 @@ export const de = {
       spatial: 'Räumlich',
       binding: 'Zusammenhänge',
       visual: 'Visuell',
-      attention: 'Aufmerksamkeit',
+      /*
+        Seit den Zwillingen (D-027) sagt der Name, was gezählt wird: nicht
+        „Aufmerksamkeit“ im Lehrbuchsinn, sondern die Alltagsfähigkeit, zwei
+        ähnliche Einträge nicht ineinanderlaufen zu lassen.
+      */
+      attention: 'Ähnliches auseinanderhalten',
       working: 'Arbeitsgedächtnis',
       longTerm: 'Langfristiger Abruf',
     },
@@ -398,6 +407,7 @@ export const de = {
       missions: 'Missionen',
       palace: 'Palast',
       reverse: 'Rückwärts',
+      twins: 'Unterscheiden',
     },
     noWeakest: 'Kein Unterschied zwischen den Achsen, der sich vom Zufall trennen lässt.',
     empty: 'Noch nichts zu zeigen. Das Profil entsteht aus dem Training — nicht aus einem Test am Anfang.',

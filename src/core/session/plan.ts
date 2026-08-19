@@ -23,6 +23,7 @@ import { answerFor, factKindOf, missionFacts, personOf } from '../content/missio
 import { objectFor, walkOf, walkPlacements } from '../content/palace.ts'
 import type { Language } from '../language.ts'
 import { reversed } from '../content/spans.ts'
+import { twinChoices, twinShown } from '../content/twins.ts'
 import { nextToTeach } from '../technique/major.ts'
 import type { Leniency } from './grading.ts'
 
@@ -101,7 +102,7 @@ export type BlockKind = 'teach' | 'encode' | 'recall' | 'review'
  * mischt sie. Was ein Modul *zeigt*, weiß er nicht — er kennt nur Kennungen,
  * Zeiten und die Frage, ob der Abruf frei oder gestützt ist.
  */
-export const TRAINING_MODULES = ['words', 'faces', 'numbers', 'missions', 'palace', 'reverse'] as const
+export const TRAINING_MODULES = ['words', 'faces', 'numbers', 'missions', 'palace', 'reverse', 'twins'] as const
 export type ModuleId = (typeof TRAINING_MODULES)[number]
 
 /**
@@ -120,7 +121,8 @@ export function isPrompted(moduleId: ModuleId): boolean {
     moduleId === 'faces' ||
     moduleId === 'missions' ||
     moduleId === 'palace' ||
-    moduleId === 'reverse'
+    moduleId === 'reverse' ||
+    moduleId === 'twins'
   )
 }
 
@@ -210,6 +212,14 @@ export function secondsPerItemFor(moduleId: ModuleId): number {
  */
 export function subjectOf(moduleId: ModuleId, item: string): string {
   if (moduleId === 'palace') return walkOf(item)
+  /*
+   * Bei den Zwillingen ist der Anker das **Paar**, nicht die Orientierung:
+   * `Kirche%Kirsche` und `Kirsche%Kirche` sind dieselbe Unterscheidung.
+   * Ohne das könnte ein Paar, dessen eine Seite heute fällig ist, mit der
+   * anderen Seite als „neu“ kommen — zwei Termine mit gegensätzlichen
+   * Antworten auf dieselbe Frage (D-027).
+   */
+  if (moduleId === 'twins') return twinChoices(item).join('%')
   return moduleId === 'missions' ? personOf(item) : item
 }
 
@@ -225,6 +235,8 @@ export function targetOf(moduleId: ModuleId, item: string, language: string): st
   if (moduleId === 'palace') return objectFor(item, language as Language) ?? item
   // Rückwärts: Die Kennung ist die gezeigte Folge, gesucht ist ihr Spiegel.
   if (moduleId === 'reverse') return reversed(item)
+  // Zwillinge: Gezeigt war die erste Seite der Kennung — sie ist die Antwort.
+  if (moduleId === 'twins') return twinShown(item)
   if (moduleId !== 'missions') return item
   return answerFor(item, language as Language) ?? item
 }
@@ -242,6 +254,8 @@ export function displayOf(moduleId: ModuleId, item: string, language: string): s
    * was jemand geleistet hat. Die gezeigte stünde da wie eine fremde Zahl.
    */
   if (moduleId === 'reverse') return reversed(item)
+  // Zwillinge: In der Zusammenfassung steht das Wort, das dastand.
+  if (moduleId === 'twins') return twinShown(item)
   /*
    * Beim Palast steht nur der Gegenstand da, ohne seine Station.
    *
@@ -270,6 +284,12 @@ export function displayOf(moduleId: ModuleId, item: string, language: string): s
 export function leniencyFor(moduleId: ModuleId, item?: string): Leniency {
   // Ziffern beidesmal: vertauscht ist falsch — genau das ist hier die Übung.
   if (moduleId === 'numbers' || moduleId === 'reverse') return 'exact'
+  /*
+   * Zwillinge exakt — zwingend: Der Köder liegt genau eine Schreibabweichung
+   * entfernt. Mit Tippfehler-Nachsicht träfe „Kirche“ auch „Kirsche“, und
+   * die Aufgabe wäre abgeschafft, während sie Punkte vergibt.
+   */
+  if (moduleId === 'twins') return 'exact'
   if (moduleId === 'missions') {
     /*
      * Innerhalb einer Mission ist die Strenge **je Tatsache** verschieden, und
@@ -394,13 +414,35 @@ export function planSession(input: PlanInput): SessionPlan {
    * ist, kommt zurück (D-004); dort wird nichts eingeprägt, es sind nur die
    * Fragen.
    */
-  const learnFrom = learnableModules(totalSeconds, modules)
+  const learnFromByTime = learnableModules(totalSeconds, modules)
 
   // Nur Module, für die heute wirklich etwas fällig ist. Ein leerer
   // Wiederholungsblock wäre eine Frage ohne Gegenstand.
   const dueByModule = modules
     .map((moduleId) => ({ moduleId, items: input.due?.[moduleId] ?? [] }))
     .filter((entry) => entry.items.length > 0)
+
+  /*
+   * Und aus dem, was übrig ist, nur Module mit **genug Vorrat** (D-027).
+   *
+   * Neu seit den Zwillingen: Deren Vorrat ist endlich — fünfzehn Paare, und
+   * wer alle gelernt hat, lernt dort nichts Neues mehr. Ein Modul mit
+   * leerem Vorrat in der Rotation zu lassen hieße mitten in der Einheit zu
+   * scheitern; es stillschweigend zu ziehen und leer zu zeigen wäre
+   * schlimmer. Es fällt aus der **Lern**-Rotation — das Wiedersehen bleibt
+   * unberührt, denn dort wird nichts aus dem Vorrat gezogen (D-004).
+   */
+  const learnFrom =
+    learnFromByTime.length === 1
+      ? // Ein erzwungenes Einzelmodul (Tests) fällt nicht still heraus —
+        // es soll unten am beschreibenden Fehler scheitern, wenn der
+        // Vorrat wirklich nicht reicht.
+        learnFromByTime
+      : learnFromByTime.filter((moduleId) => {
+          const stock = (input.pools[moduleId] ?? []).length
+          if (isScene(moduleId)) return stock >= 1
+          return stock >= MIN_ITEMS_PER_ROUND
+        })
 
   // Erst das Wiedersehen abzweigen, dann den Rest in Runden teilen. Anders
   // herum bliebe für die Wiederholung übrig, was zufällig übrig ist — und
@@ -548,7 +590,19 @@ export function planSession(input: PlanInput): SessionPlan {
     )
     remaining.set(
       moduleId,
-      rng.shuffle((input.pools[moduleId] ?? []).filter((entry) => !dueSubjects.has(entry))),
+      rng.shuffle(
+        /*
+         * Auch der Vorratseintrag über seinen **Anker**, nicht roh: Bei den
+         * Zwillingen (D-027) heißt das fällige Paar `Kirche%Kirsche`, im
+         * Vorrat kann es gedreht als `Kirsche%Kirche` stehen — roh
+         * verglichen wäre es „ein anderes“ und käme als neu. Der Kerntest
+         * zu D-027 hat genau das gefangen. Überall sonst ist der Anker der
+         * Eintrag selbst, und nichts ändert sich.
+         */
+        (input.pools[moduleId] ?? []).filter(
+          (entry) => !dueSubjects.has(subjectOf(moduleId, entry)),
+        ),
+      ),
     )
     taken.set(moduleId, 0)
   }

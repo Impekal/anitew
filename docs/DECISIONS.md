@@ -1056,3 +1056,36 @@ allen anderen Modulen, und jede ist eine Entscheidung:
 keinen Transfer („Arbeitsgedächtnistraining hebt weder Intelligenz noch
 Alltagsleistung“) — das Modul trainiert und misst die Übung selbst, mehr
 behauptet niemand (R-2).
+
+## D-027 · 2026-08-18 · Zwillinge: Der Köder kommt erst mit der Frage — und ein Paar hat einen Termin
+
+**Entscheidung:** Das Interferenz-Modul (C6/D3) arbeitet mit kuratierten
+Zwillingspaaren — je zwei echte, zum Verwechseln ähnliche Wörter. Eingeprägt
+wird **eines** (das Einprägen sieht aus wie das Wortmodul, nur der Hinweis
+kündigt den Zwilling an); gefragt wird mit **beiden**, als zwei Knöpfe in
+neutraler (alphabetischer) Reihenfolge: „Welches stand da?“
+
+**Die Regeln, die Entscheidungen sind:**
+
+- **Geantwortet wird per Knopf, nicht per Feld.** Der Köder liegt eine
+  Tippfehler-Nachsicht neben der Antwort — getippt und mild verglichen wäre
+  die Aufgabe abgeschafft, während sie Punkte vergibt. Verglichen wird
+  deshalb auch intern exakt.
+- **Ein Paar ist eine Unterscheidung und hat höchstens einen Termin.** Der
+  Anker (`subjectOf`) ist das kanonische Paar, nicht die Orientierung —
+  `Kirche%Kirsche` und `Kirsche%Kirche` sind dasselbe. Der Vorratsfilter
+  des Planers vergleicht seither generell über den Anker (ein Kerntest hat
+  den rohen Vergleich gefangen); die App nimmt schon terminierte Paare aus
+  dem Vorrat.
+- **Der Vorrat ist endlich, und das ist in Ordnung.** Fünfzehn Paare je
+  Sprache, jede sitzt oder kommt wieder. Sind weniger als drei übrig, fällt
+  das Modul aus der **Lern**-Rotation (neue Planer-Regel: Module ohne
+  tragfähigen Vorrat werden nicht gezogen; das Wiedersehen bleibt
+  unberührt). Der Startbildschirm kündigt dann auch keinen Schwerpunkt aus
+  ihm an — dieselbe Regel an beiden Orten.
+- **Die Achse heißt, was sie zählt.** „Aufmerksamkeit“ wäre geborgt;
+  angezeigt wird „Ähnliches auseinanderhalten“ — Wiedersehen nach Tagen,
+  dieselbe Währung wie die anderen Modul-Achsen, darum zählt sie beim
+  Schwerpunkt mit (anders als die Sofort-Achse aus D-026).
+- **Kein Zwilling läuft in einem anderen Vorrat mit** (C6, F2a) — per
+  Kerntest erzwungen, gegen Wörter, Quarantäne und Palastdinge.

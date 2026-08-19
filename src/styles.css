@@ -1984,3 +1984,37 @@ body::before {
   color: var(--ink-faint);
   font-size: 0.78rem;
 }
+
+/* ── Zwillinge (D-027): zwei Wörter, ein Tipp ─────────────────────────── */
+
+.twin-choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.7rem;
+  width: 100%;
+  max-width: 22rem;
+}
+
+.twin-choice {
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--ink);
+  border-radius: 1rem;
+  padding: 1.1rem 0.6rem;
+  /* Die Wörter sind der Inhalt — Serife, wie alles, was gemerkt wird (G-8). */
+  font-family: var(--serif);
+  font-size: 1.25rem;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: border-color var(--step) var(--ease), box-shadow var(--step) var(--ease),
+    transform var(--step) var(--ease);
+}
+
+.twin-choice:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-lift);
+}
+
+.twin-choice:active {
+  transform: translateY(1px);
+}

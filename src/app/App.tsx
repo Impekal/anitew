@@ -41,10 +41,20 @@ import {
   streakOf,
   achievementsOf,
   spanPool,
+  twinChoices,
+  twinPairs,
+  twinPool,
   wordPool,
 } from '../core/index.ts'
 import { createWebPlatform } from '../platform/web/index.ts'
-import { loadDimensionCounts, loadDue, loadReviewed, moduleOf, wordOf } from '../data/items.ts'
+import {
+  loadDimensionCounts,
+  loadDue,
+  loadReviewed,
+  loadTrackedWords,
+  moduleOf,
+  wordOf,
+} from '../data/items.ts'
 import {
   type SessionProgress,
   beginSession,
@@ -249,6 +259,19 @@ export function App() {
       .catch(() => undefined)
   }, [])
 
+  /*
+   * Die schon terminierten Zwillingspaare (D-027), kanonisch als
+   * `A%B`-Menge. Der Vorrat ist endlich: Was einen Termin hat, kommt nie
+   * wieder als neu — und sind weniger als drei Paare übrig, fällt das
+   * Modul aus der Lernrotation (der Planer prüft dieselbe Regel am Vorrat).
+   */
+  const [twinsDone, setTwinsDone] = useState<ReadonlySet<string>>(new Set())
+  useEffect(() => {
+    void loadTrackedWords('twins', training)
+      .then((words) => setTwinsDone(new Set(words.map((word) => twinChoices(word).join('%')))))
+      .catch(() => undefined)
+  }, [training, running])
+
   // Das Profil (E). Wie die Serie und die Wiedersehen: aus den Terminen
   // gerechnet, nach jeder Einheit neu gelesen.
   const [dimensionCounts, setDimensionCounts] = useState<
@@ -283,8 +306,14 @@ export function App() {
     const moduleId = measured ?? focusForGoal(profile?.goal)
     if (moduleId === undefined) return undefined
     if (!learnableModules(MODES[mode].seconds).includes(moduleId)) return undefined
+    /*
+     * Zwillinge mit erschöpftem Vorrat (D-027): Der Planer ließe den
+     * Schwerpunkt still fallen — dann darf er hier auch nicht angekündigt
+     * werden. Dieselbe Regel an beiden Orten, sonst zwei Wahrheiten.
+     */
+    if (moduleId === 'twins' && twinPairs(training).length - twinsDone.size < 3) return undefined
     return { moduleId, source: measured !== undefined ? ('measured' as const) : ('goal' as const) }
-  }, [dimensionCounts, mode, profile])
+  }, [dimensionCounts, mode, profile, training, twinsDone])
 
   const start = useCallback(() => {
     // Der erste Ton der Einheit, ausgelöst vom Fingertipp — genau die Geste,
@@ -369,6 +398,15 @@ export function App() {
            * sich, was er braucht.
            */
           reverse: spanPool(seed, 40),
+          /*
+           * Zwillinge (D-027): endlicher, kuratierter Vorrat — gefiltert um
+           * alles, was schon einen Termin hat (in beliebiger Orientierung).
+           * Reicht der Rest nicht für eine Runde, nimmt der Planer das
+           * Modul selbst aus der Lernrotation.
+           */
+          twins: twinPool(training, seed).filter(
+            (item) => !twinsDone.has(twinChoices(item).join('%')),
+          ),
         },
         due,
         taught,

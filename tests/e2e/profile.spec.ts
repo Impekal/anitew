@@ -79,14 +79,18 @@ test('zeigt Gemessenes mit seiner Spanne', async ({ page }) => {
   await expect(faces).toContainText('Spanne')
 })
 
-test('sagt bei zwei Achsen offen, dass sie nichts misst', async ({ page }) => {
+test('sagt bei der letzten ungemessenen Achse offen, dass sie nichts misst', async ({ page }) => {
   await seed(page, [{ module: 'words', reviews: 21, lapses: 3 }])
 
-  // Seit D7 misst das Arbeitsgedächtnis — als Sofort-Achse (D-026). Übrig
-  // bleiben zwei ehrliche Lücken, bis ihre Module gebaut sind.
-  for (const name of ['Visuell', 'Aufmerksamkeit']) {
-    await expect(page.locator('.axis', { hasText: name })).toContainText('Misst diese App nicht.')
-  }
+  // Seit D7 misst das Arbeitsgedächtnis (Sofort-Achse, D-026), seit den
+  // Zwillingen das Auseinanderhalten (D-027). Übrig bleibt eine ehrliche
+  // Lücke: Visuell — bis sein Modul gebaut ist.
+  await expect(page.locator('.axis', { hasText: 'Visuell' })).toContainText(
+    'Misst diese App nicht.',
+  )
+  await expect(page.locator('.axis', { hasText: 'Ähnliches auseinanderhalten' })).toContainText(
+    'Noch zu wenige Gelegenheiten',
+  )
   await expect(page.locator('.axis', { hasText: 'Arbeitsgedächtnis' })).toContainText(
     'Noch zu wenige Gelegenheiten',
   )

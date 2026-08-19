@@ -25,13 +25,16 @@
  * Fehlschlag am Lerntag zählt bei beiden nicht mit — dort ist die Information
  * noch im Lernen und nicht im Behalten.
  *
- * ── Warum zwei Achsen leer bleiben ────────────────────────────────────────
+ * ── Warum eine Achse leer bleibt ──────────────────────────────────────────
  *
- * E2 nennt acht Dimensionen. Für **Visuell** und **Aufmerksamkeit** gibt es
- * in ANITEW noch kein Modul, das sie misst — also steht dort nichts. Nicht
- * „noch keine Daten“ mit einem hoffnungsvollen Balken daneben, sondern:
- * **nicht gemessen.** Dieselbe Ehrlichkeit wie auf der Wissenschaftsseite
- * (D-016).
+ * E2 nennt acht Dimensionen. Für **Visuell** gibt es in ANITEW noch kein
+ * Modul, das sie misst — also steht dort nichts. Nicht „noch keine Daten“
+ * mit einem hoffnungsvollen Balken daneben, sondern: **nicht gemessen.**
+ * Dieselbe Ehrlichkeit wie auf der Wissenschaftsseite (D-016).
+ *
+ * **Aufmerksamkeit** zählt seit den Zwillingen (C6/D-027) das, was ihr Name
+ * in der Anzeige sagt: Ähnliches auseinanderhalten — Wiedersehen nach
+ * Tagen, dieselbe Währung wie die anderen Modul-Achsen.
  *
  * **Arbeitsgedächtnis** ist der zweite Sonderfall (D7 · D-026): Es zählt
  * nicht Wiedersehen nach Tagen, sondern **sofortige** Antworten — behalten
@@ -91,7 +94,7 @@ export const SOURCES: Readonly<Record<DimensionId, DimensionSource>> = {
   spatial: { kind: 'module', moduleId: 'palace' },
   binding: { kind: 'module', moduleId: 'missions' },
   visual: { kind: 'none' },
-  attention: { kind: 'none' },
+  attention: { kind: 'module', moduleId: 'twins' },
   working: { kind: 'immediate', moduleId: 'reverse' },
   longTerm: { kind: 'benchmark' },
 }

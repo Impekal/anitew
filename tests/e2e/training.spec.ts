@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { answerRecall, collectItems, startButton, visit } from './helpers.ts'
+import { answerRecall, collectItems, startButton, startEmergency, visit } from './helpers.ts'
 
 /**
  * Trainingssprache getrennt von Oberflächensprache (Backlog L5, L7).
@@ -13,9 +13,10 @@ import { answerRecall, collectItems, startButton, visit } from './helpers.ts'
  */
 
 async function trainOnce(page: Page) {
-  await page.getByRole('button', { name: '60 Sekunden' }).click()
-  await startButton(page).click()
-  await page.locator('.settle').click()
+  // Über den Helfer, nicht roh: Er garantiert eine Runde, die Termine
+  // hinterlässt — eine Rückwärts-Runde (D7) täte das absichtlich nicht,
+  // und dieser Test zählt genau die Termine.
+  await startEmergency(page)
   const learned = await collectItems(page, 8)
   await answerRecall(page, learned, 'all')
   await expect(page.getByRole('heading', { name: 'Geblieben' })).toBeVisible({ timeout: 60_000 })

@@ -33,6 +33,7 @@ const pools: Pools = {
   // Sechzig: Die erzwungene Nur-Rückwärts-Einheit in „extended“ zieht bis
   // zu 48 Folgen — mehr, als der echte Betrieb je verlangt.
   reverse: spanPool('probe', 60),
+  twins: [],
 }
 
 const base = { day: '2026-08-18', language: 'de', seed: 'probe', pools } as const

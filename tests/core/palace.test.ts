@@ -54,6 +54,7 @@ const pools = (walks: readonly string[]): Pools => ({
   missions: [],
   palace: walks,
   reverse: [],
+  twins: [],
 })
 
 describe('der Palast als Datenmodell (G1, G2)', () => {

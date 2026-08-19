@@ -2,27 +2,29 @@ import { type CSSProperties, useEffect, useMemo, useRef, useState } from 'react'
 
 import {
   type BlockPlan,
-  type FactKind,
-  type Language,
-  type MajorPart,
-  type ModuleId,
-  type Platform,
   displayOf,
+  type FactKind,
   factKindOf,
   helpsWith,
   isPrompted,
-  type OwnPalace,
+  type Language,
+  lettersFor,
+  type MajorPart,
+  majorParts,
   missionFor,
+  type ModuleId,
   ownLabelOf,
+  type OwnPalace,
   palaceOf,
   personOf,
+  type Platform,
+  splitEntries,
   stationOf,
+  subjectOf,
+  twinChoices,
+  twinShown,
   walkFor,
   walkOf,
-  subjectOf,
-  lettersFor,
-  majorParts,
-  splitEntries,
 } from '../../core/index.ts'
 import type { RoundResult, SessionProgress } from '../../data/sessions.ts'
 import type { Dictionary } from '../../i18n/index.ts'
@@ -296,7 +298,11 @@ function RunningSession({
             </div>
           ) : (
             <p className="encode-word" key={block.id + state.itemIndex} aria-live="polite">
-              {state.currentItem}
+              {/* Zwillinge (D-027): Die Kennung trägt beide Wörter — gezeigt
+                  wird nur, was dastand. Der Köder kommt erst bei der Frage. */}
+              {block.moduleId === 'twins'
+                ? twinShown(state.currentItem ?? '')
+                : state.currentItem}
             </p>
           )}
           {parts !== undefined && <p className="hint">{dictionary.technique.hint}</p>}
@@ -333,6 +339,11 @@ function RunningSession({
           }
           reveal={
             block.moduleId === 'reverse' ? (block.items[state.promptIndex] ?? '') : undefined
+          }
+          choices={
+            block.moduleId === 'twins'
+              ? twinChoices(block.items[state.promptIndex] ?? '')
+              : undefined
           }
           /*
             Bei der Mission steht der Name **unter** dem Gesicht — er ist hier
@@ -423,6 +434,7 @@ function PromptedRecall({
   face,
   place,
   reveal,
+  choices,
   label,
   position,
   total,
@@ -441,6 +453,12 @@ function PromptedRecall({
    * von rechts nach links abtippen, und geübt wäre nichts.
    */
   reveal?: string
+  /**
+   * Zwei Wörter zur Wahl (Zwillinge, D-027): Die Knöpfe sind die Antwort —
+   * kein Feld, kein Tippen. Getippt läge der Köder eine Tippfehler-Nachsicht
+   * entfernt; gewählt ist die Aufgabe genau die Unterscheidung.
+   */
+  choices?: readonly [string, string]
   /** Der Anker unter dem Gesicht — nur, wo der Name nicht die Antwort ist. */
   label?: string
   position: number
@@ -484,11 +502,21 @@ function PromptedRecall({
           <span className="placemark-palace">{place.palace}</span>
           <span className="placemark-station">{place.station}</span>
         </div>
-      ) : (
+      ) : choices !== undefined ? null : (
         <Face name={face} size={168} />
       )}
       {label !== undefined && <p className="prompted-anchor">{label}</p>}
-      <form
+      {choices !== undefined && (
+        <div className="twin-choices">
+          {choices.map((word) => (
+            <button key={word} type="button" className="twin-choice" onClick={() => onSubmit(word)}>
+              {word}
+            </button>
+          ))}
+        </div>
+      )}
+      {choices === undefined && (
+        <form
         className="prompted-form"
         onSubmit={(event) => {
           event.preventDefault()
@@ -509,10 +537,11 @@ function PromptedRecall({
           spellCheck={false}
           aria-label={hint}
         />
-        <button type="submit" className="start">
-          <span className="start-label">{action}</span>
-        </button>
-      </form>
+          <button type="submit" className="start">
+            <span className="start-label">{action}</span>
+          </button>
+        </form>
+      )}
       <p className="hint">
         {position} / {total}
       </p>
@@ -876,6 +905,9 @@ function askFor(block: BlockPlan, index: number, dictionary: Dictionary): string
   // Rückwärts gibt es nur als Sofortfrage — ein Wiedersehen hat das Modul
   // nicht (D-026), also braucht die Frage keinen Vorspann.
   if (block.moduleId === 'reverse') return t.reverseAsk
+  if (block.moduleId === 'twins') {
+    return block.kind === 'review' ? `${t.reviewLead} ${t.twinAsk}` : t.twinAsk
+  }
   if (block.moduleId === 'palace') {
     const ask = dictionary.palace.ask
     return block.kind === 'review' ? `${t.reviewLead} ${ask}` : ask

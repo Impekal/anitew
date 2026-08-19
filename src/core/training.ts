@@ -29,6 +29,7 @@ import { hasBenchmarkPool } from './benchmark/pool.ts'
 import { hasMissionPool } from './content/missions.ts'
 import { hasNamePool } from './content/names.ts'
 import { hasPalacePool } from './content/palace.ts'
+import { hasTwinPool } from './content/twins.ts'
 import { hasWordPool } from './content/words.ts'
 import { FALLBACK_LANGUAGE, SUPPORTED_LANGUAGES, type Language } from './language.ts'
 
@@ -46,6 +47,7 @@ export function canTrainIn(language: Language): boolean {
     hasNamePool(language) &&
     hasMissionPool(language) &&
     hasPalacePool(language) &&
+    hasTwinPool(language) &&
     hasBenchmarkPool(language)
   )
 }

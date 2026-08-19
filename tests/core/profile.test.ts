@@ -5,7 +5,6 @@ import {
   MIN_CHANCES,
   SOURCES,
   TRAINING_MODULES,
-  type DimensionId,
   dimensionOf,
   hasProfile,
   learnableModules,
@@ -65,11 +64,11 @@ describe('was das Profil sagt — und was nicht', () => {
     const results = profileOf({})
     const words = results.find((result) => result.id === 'words')
     expect(words?.kind).toBe('tooFew')
-    // Und zwei Achsen misst diese App überhaupt nicht — dort steht das, statt
-    // eines leeren Balkens mit Hoffnung daneben (D-016).
-    for (const id of ['visual', 'attention'] as DimensionId[]) {
-      expect(results.find((result) => result.id === id)?.kind).toBe('notMeasured')
-    }
+    // Und eine Achse misst diese App überhaupt nicht — dort steht das, statt
+    // eines leeren Balkens mit Hoffnung daneben (D-016). Aufmerksamkeit
+    // misst seit den Zwillingen (D-027), Arbeitsgedächtnis seit D7.
+    expect(results.find((result) => result.id === 'visual')?.kind).toBe('notMeasured')
+    expect(results.find((result) => result.id === 'attention')?.kind).toBe('tooFew')
     // Das Arbeitsgedächtnis ist seit D7 messbar — als Sofort-Achse (D-026):
     // ohne Daten „zu wenig“, nicht „nicht gemessen“.
     expect(results.find((result) => result.id === 'working')?.kind).toBe('tooFew')
@@ -165,6 +164,7 @@ describe('der Schwerpunkt im Bauplan (E5)', () => {
     missions: many('p'),
     palace: many('home~'),
     reverse: ['48293', '17546', '90287', '35761', '82154', '46029'],
+    twins: ['Kirche%Kirsche', 'Mantel%Mangel', 'Fliege%Fliese', 'Karte%Kante', 'Bogen%Boden', 'Wolke%Wolle'],
   }
 
   const modulesOf = (plan: ReturnType<typeof planSession>) =>
