@@ -215,11 +215,11 @@ Der Punkt, der aus einem Spiel einen Gedächtnistrainer macht.
 
 | # | Aufgabe | Status | Notizen | Aufwand |
 |---|---|---|---|---|
-| M1 | Bring-your-own-key: Gemini, Anthropic, OpenAI, Mistral, Groq, OpenRouter | ⬜ | wie in RReader; Text geht vom Gerät direkt zum Anbieter, nie über uns | M |
-| M2 | Die App ist ohne KI vollständig benutzbar | ⬜ | harte Regel, sonst kostet jeder Nutzer Geld oder Netz | S |
-| M3 | Schlüssel bleiben lokal, standardmäßig nur für die Sitzung | ⬜ | | S |
-| M4 | KI-Aufgaben: Merkbilder (G5), Missionen (H4), Extraktion aus eigenem Material (I3), Erklärungen | ⬜ | | M |
-| M5 | Offline-Fallback für jede einzelne KI-Funktion | ⬜ | | M |
+| M1 | Bring-your-own-key: Gemini, Anthropic, OpenAI, Mistral, Groq, OpenRouter | 🟨 2026-08-19 | **D-031**. Anthropic steht: Schlüssel aufs Gerät, jede Frage direkt an api.anthropic.com, kein Server dazwischen. Weitere Anbieter erst, wenn jemand sie braucht — jeder ist ein eigener Draht | M |
+| M2 | Die App ist ohne KI vollständig benutzbar | ✅ 2026-08-19 | harte Regel, eingehalten: Der Coach hat einen Pflichtteil aus den eigenen Zahlen (R-1), der ohne Schlüssel und ohne Netz spricht; alles andere in der App war nie KI-abhängig | S |
+| M3 | Schlüssel bleiben lokal, standardmäßig nur für die Sitzung | 🟨 2026-08-19 | lokal: ja (IndexedDB, geht nirgendwohin außer in den einen Header). **Bewusst dauerhaft statt sitzungsweise** (D-031): ein erklärter Schlüssel mit sichtbarem Entfernen-Knopf statt stillem Wiederverlangen bei jedem Öffnen | S |
+| M4 | KI-Aufgaben: Merkbilder (G5), Missionen (H4), Extraktion aus eigenem Material (I3), Erklärungen | 🟨 2026-08-19 | Erklärungen laufen (freie Fragen mit Zahlenkontext). Merkbilder bleiben ausgeschlossen — die Anweisung verbietet sie ausdrücklich (D-013: selbst gebaute sitzen besser). Extraktion kommt mit I | M |
+| M5 | Offline-Fallback für jede einzelne KI-Funktion | ✅ 2026-08-19 | für die einzige KI-Funktion: Die Hinweise aus den Zahlen stehen immer, jeder Fehlerfall sagt das dazu | M |
 
 ## N. Daten, Offline, Export
 

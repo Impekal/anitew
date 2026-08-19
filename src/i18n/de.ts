@@ -539,6 +539,47 @@ export const de = {
       namesHeld: 'Fünfundzwanzig Namen nach Tagen noch gewusst.',
     },
   },
+  coach: {
+    /*
+      Der Coach (M · D-031). Zwei Hälften, eine Haltung: Der obere Teil
+      sagt nur, was die eigenen Zahlen hergeben (R-1), der untere braucht
+      den eigenen Schlüssel — und jeder Satz dazu sagt ehrlich, wohin der
+      Schlüssel geht und wohin nicht (R-3).
+    */
+    heading: 'Coach',
+    adviceHeading: 'Aus deinen Zahlen',
+    advice: {
+      focusWeakest: 'Von dem, was zurückkam, blieb bei „{axis}“ am wenigsten. Wenn du magst, gib diesem Bereich in nächster Zeit den Vortritt — der Schwerpunkt schlägt ihn ohnehin vor.',
+      smallerRounds: 'Bei „{module}“ sind die Runden gerade ein Stück kleiner eingestellt. Das ist keine Note: Kleinere Runden halten die Quote im Korridor, in dem Behalten am besten wächst.',
+      largerRounds: 'Bei „{module}“ trägst du gerade mehr je Runde — deine letzten Antworten geben das her.',
+      benchmarkDue: 'Die nächste Messung ist fällig. Sie ist die einzige Quelle für den langfristigen Abruf — aus dem Training allein lässt er sich nicht ablesen.',
+      firstSteps: 'Noch geben deine Zahlen keinen Rat her. Ein paar Einheiten, und hier steht, was sich daraus ablesen lässt — nicht mehr und nicht weniger.',
+    },
+    askHeading: 'Freie Fragen',
+    /*
+      R-3 in einem Absatz: wo der Schlüssel liegt, wohin er geht, was es
+      kostet. Vor der Eingabe, nicht als Fußnote danach (D-015).
+    */
+    keyNote: 'Mit einem eigenen Anthropic-Schlüssel kannst du dem Coach freie Fragen stellen. Der Schlüssel bleibt auf diesem Gerät und geht mit jeder Frage nur an api.anthropic.com — einen Server dazwischen gibt es nicht. Jede Frage kostet dort ein paar Cent von deinem eigenen Guthaben.',
+    keyPlaceholder: 'Anthropic-Schlüssel (sk-ant-…)',
+    keySave: 'Schlüssel speichern',
+    keyRemove: 'Schlüssel entfernen',
+    keyPresent: 'Ein Schlüssel ist hinterlegt.',
+    askPlaceholder: 'Deine Frage an den Coach …',
+    askButton: 'Fragen',
+    thinking: 'Der Coach überlegt …',
+    /*
+      Jeder Fehlerfall sagt, was der Mensch tun kann — und dass die
+      Hinweise oben ohne Netz und Schlüssel weiterlaufen.
+    */
+    errors: {
+      'no-key': 'Ohne Schlüssel keine freien Fragen. Die Hinweise oben kommen ohne aus.',
+      'bad-key': 'Der Schlüssel wurde nicht angenommen. Prüfe ihn in der Anthropic-Konsole — oder entferne ihn hier.',
+      offline: 'Keine Verbindung zu api.anthropic.com. Später noch einmal — die Hinweise oben funktionieren ohne Netz.',
+      refused: 'Auf diese Frage antwortet das Modell nicht. Anders gestellt klappt es oft.',
+      failed: 'Die Antwort kam nicht an. Später noch einmal.',
+    },
+  },
   streak: {
     /*
       Die Serie sagt, was war — mehr nicht (K7). Keine Drohung, kein

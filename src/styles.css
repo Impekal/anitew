@@ -1709,6 +1709,88 @@ body::before {
   color: var(--ink-faint);
 }
 
+/* ── Der Coach (M · D-031) ────────────────────────────────────────────── */
+
+/* Zwei ruhige Abschnitte: Hinweise aus den Zahlen, dann die freien Fragen.
+   Dieselben leisen Etiketten wie im Fähigkeitsbaum — der Coach ist Auskunft,
+   kein eigenes Möbelstück. */
+.coach {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+.coach-source {
+  margin: 0 0 0.4rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.coach-advice {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.coach-key,
+.coach-ask {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+  margin-top: 0.6rem;
+}
+
+.coach-key-input,
+.coach-question {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.92rem;
+}
+
+.coach-question {
+  resize: vertical;
+}
+
+.coach-key-present {
+  margin: 0.6rem 0 0;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+}
+
+.coach-key-remove {
+  padding: 0;
+}
+
+.coach-answer {
+  margin: 0.4rem 0 0;
+  padding: 0.7rem 0.85rem;
+  border-left: 2px solid var(--line);
+  font-size: 0.95rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.coach-failure {
+  margin: 0.4rem 0 0;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+}
+
 /* ── Das Ankommen (Onboarding) ────────────────────────────────────────── */
 
 /* Eine Frage pro Bildschirm, mittig, mit Luft — derselbe Griff wie beim

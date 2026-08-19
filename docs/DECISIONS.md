@@ -1183,3 +1183,38 @@ Die Zuordnung ist bewusst **eine je Tatsache**: „Alle zehn Ziffern des
 Major-Systems“ steht unter Abruf, nicht unter einer eigenen
 Zahlen-Fähigkeit — ein zweiter Ort für dieselbe Zeile wäre Inventar ohne
 Auskunft.
+
+## D-031 · 2026-08-19 · Der Coach: Pflicht aus Zahlen, Kür mit eigenem Schlüssel
+
+**Entscheidung:** ANITEW bekommt einen Coach mit zwei Hälften. Der
+**Pflichtteil** spricht immer — ohne Schlüssel, ohne Netz — und sagt nur,
+was die eigenen Zahlen hergeben: Schwerpunkt, D2-Verschiebungen, fällige
+Messung, höchstens drei Hinweise. Die **Kür** sind freie Fragen an ein
+Sprachmodell, mit dem eigenen Anthropic-Schlüssel des Menschen (BYOK).
+
+**Die tragenden Regeln:**
+
+- **Ohne KI vollständig** (M2, harte Regel): Der Pflichtteil ist kein
+  Platzhalter, sondern dieselbe Sorte Auskunft wie der Schwerpunkt (E5) —
+  gerechnet, mit Quelle, keine Erfindung (R-1). Jeder Fehlerfall der Kür
+  sagt dazu, dass der Pflichtteil weiterläuft.
+- **Kein Server dazwischen** (R-3): Der Schlüssel liegt in den lokalen
+  Einstellungen dieses Geräts und geht mit jeder Frage in genau einen
+  Header an `api.anthropic.com`. Der Absatz darüber steht **vor** der
+  Eingabe (D-015), samt der Wahrheit, dass jede Frage dort ein paar Cent
+  kostet. Bewusst **dauerhaft statt sitzungsweise** gespeichert: ein
+  erklärter Schlüssel mit sichtbarem Entfernen-Knopf, der sofort wirkt,
+  statt stillem Wiederverlangen bei jedem Öffnen.
+- **Die Hausregeln reisen mit:** Die Anweisung an das Modell verbietet
+  erfundene Werte, Vergleiche mit anderen, Druck (K7), unbelegtes Lob und
+  vorgefertigte Merkbilder (D-013) — und verlangt, Unwissen zu sagen.
+  Mitgegeben werden nur die Zahlen, die die App ohnehin hat; Achsen ohne
+  Zahlen fehlen im Kontext, statt als Null verkleidet zu werden.
+- **Der Kern bleibt netzfrei** (D-010): Er baut Anweisung und Kontext als
+  Text (`core/coach/`) und kennt eine einzige Schnittstelle („eine Frage,
+  eine Antwort“). Der Draht selbst — rohes `fetch` statt SDK, denn das
+  Kaltstart-Budget (P4) zählt jede Abhängigkeit — liegt in der Plattform,
+  und kein Prüflauf ruft wirklich hinaus.
+- **Ein Modell, keine Auswahl:** `claude-opus-5`. Eine Modellauswahl im
+  Menü wäre eine Frage an den Menschen, die die App beantworten kann.
+  Weitere Anbieter (M1) erst, wenn jemand sie braucht.

@@ -11,6 +11,7 @@
 export type MenuIconKind =
   | 'reached'
   | 'profile'
+  | 'coach'
   | 'about'
   | 'palace'
   | 'reminder'
@@ -25,6 +26,8 @@ const PATHS: Readonly<Record<MenuIconKind, string>> = {
   reached: 'M9 6.5h11M9 12h11M9 17.5h11M4 6.5l1.2 1.2L7.4 5.5M4 12l1.2 1.2L7.4 11M4 17.5l1.2 1.2 2.2-2.2',
   // Drei Balken auf einer Grundlinie: die Achsen des Profils.
   profile: 'M4 20h16M7 20v-6M12 20V9M17 20v-3.5',
+  // Die Sprechblase: jemand, der antwortet.
+  coach: 'M4.5 5.5h15v10h-8.5L7 19v-3.5H4.5zM8 9.5h8M8 12.5h5',
   // Kopf und Schultern.
   about: 'M12 5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7zM5 20c1.4-3.4 3.9-5 7-5s5.6 1.6 7 5',
   // Giebel und Säulen.

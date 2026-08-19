@@ -12,6 +12,7 @@
  * ohne 60 Tage zu warten.
  */
 
+import type { CoachPort } from './coach/prompt.ts'
 import type { Instant } from './time.ts'
 
 export interface Clock {
@@ -113,4 +114,6 @@ export interface Platform {
   settings: SettingsStore
   sound: Sound
   reminders: Reminders
+  /** Der Draht des Coaches (D-031) — die einzige Netzstelle für Inhalte. */
+  coach: CoachPort
 }

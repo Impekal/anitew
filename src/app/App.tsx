@@ -40,6 +40,8 @@ import {
   selectDue,
   streakOf,
   achievementsOf,
+  adviceOf,
+  type CoachContext,
   spanPool,
   DIFFICULTY_WINDOW,
   itemsDeltaFor,
@@ -88,6 +90,7 @@ import { ReminderPanel } from './ReminderPanel.tsx'
 import { SciencePanel } from './SciencePanel.tsx'
 import { FoundationPanel } from './FoundationPanel.tsx'
 import { AchievementsLine } from './AchievementsLine.tsx'
+import { CoachPanel } from './CoachPanel.tsx'
 import { ReturnsLine } from './ReturnsLine.tsx'
 import { StreakLine } from './StreakLine.tsx'
 import { BenchmarkPanel } from './benchmark/BenchmarkPanel.tsx'
@@ -703,6 +706,31 @@ export function App() {
    */
   if (pageId !== undefined) {
     const reached = achievementsOf(achievementInput)
+    /*
+     * Der Coach (M · D-031): keine eigene Rechnung, sondern dieselben
+     * Befunde, die die App ohnehin hat — Schwerpunkt, D2-Verschiebungen,
+     * fällige Messung — als Sätze mit Quelle. Erst hier gerechnet, weil
+     * nur die geöffnete Seite sie braucht.
+     */
+    const coachDeltas = Object.fromEntries(
+      TRAINING_MODULES.map((moduleId) => [
+        moduleId,
+        itemsDeltaFor({ recent: recentByModule[moduleId] ?? [] }),
+      ]),
+    )
+    const coachAdvice = adviceOf({
+      weakest: weakest(profileOf(dimensionCounts)),
+      deltas: coachDeltas,
+      benchmarkDue: step.kind === 'invite',
+    })
+    const coachContext: CoachContext = {
+      language: training,
+      streak: { current: streak.length, best: streak.best },
+      counts: dimensionCounts,
+      deltas: coachDeltas,
+      taughtDigits: taught.length,
+      hasPalace: own !== undefined,
+    }
     const pages: Partial<Record<MenuIconKind, { title: string; body: ReactNode }>> = {
       ...(reached.length > 0
         ? {
@@ -715,6 +743,17 @@ export function App() {
       profile: {
         title: dictionary.profile.heading,
         body: <ProfilePanel counts={dimensionCounts} dictionary={dictionary} />,
+      },
+      coach: {
+        title: dictionary.coach.heading,
+        body: (
+          <CoachPanel
+            advice={coachAdvice}
+            context={coachContext}
+            platform={platform}
+            dictionary={dictionary}
+          />
+        ),
       },
       about: {
         title: dictionary.onboarding.editHeading,
@@ -1166,6 +1205,10 @@ export function App() {
               <button type="button" className="drawer-item" onClick={() => openPage('profile')}>
                 <MenuIcon kind="profile" />
                 <span>{dictionary.profile.heading}</span>
+              </button>
+              <button type="button" className="drawer-item" onClick={() => openPage('coach')}>
+                <MenuIcon kind="coach" />
+                <span>{dictionary.coach.heading}</span>
               </button>
               <button type="button" className="drawer-item" onClick={() => openPage('about')}>
                 <MenuIcon kind="about" />

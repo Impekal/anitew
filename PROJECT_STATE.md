@@ -2380,3 +2380,34 @@ immer leer bleiben kann — ein unerreichbarer Ast wäre gelogen. Der Kern
 stehen im Wörterbuch, die Anordnung in der Erreicht-Seite.
 
 **Stand:** 389 Kerntests, Typecheck für App und Kern grün.
+
+## 2026-08-19 · Der Coach (M) — Pflicht aus Zahlen, Kür mit eigenem Schlüssel
+
+Der Coach steht als eigene Menüseite (**D-031**), in zwei Hälften. Der
+Pflichtteil spricht ohne Schlüssel und ohne Netz: höchstens drei Hinweise
+aus den eigenen Zahlen — Schwerpunkt, D2-Verschiebungen, fällige
+Messung — jede Zeile mit Quelle (R-1), und ohne Befund genau ein
+ehrlicher Satz. Die Kür sind freie Fragen an `claude-opus-5` mit dem
+eigenen Anthropic-Schlüssel: Er bleibt in den lokalen Einstellungen und
+geht mit jeder Frage in genau einen Header an api.anthropic.com — kein
+Server dazwischen (R-3), und der Absatz dazu steht vor der Eingabe.
+
+Die Anweisung an das Modell trägt die Hausregeln: keine erfundenen
+Werte, kein Druck (K7), kein unbelegtes Lob, keine vorgefertigten
+Merkbilder (D-013), Unwissen wird gesagt. Der Kern baut nur Text
+(`core/coach/`, netzfrei, D-010); der Draht ist rohes `fetch` in der
+Plattform — das SDK wäre genau die dicke Abhängigkeit, vor der der
+Budget-Wächter (P4) warnt. Kein Prüflauf ruft wirklich hinaus: Der
+E2E-Test kappt die API-Route und verlangt, dass die Seite „keine
+Verbindung“ sagt statt zu schweigen.
+
+**Stand:** 396 Kerntests, Coach-E2E 2/2, Budget 143,6 KB von 180 KB.
+
+Nebenbefund desselben Tages: Die Onboarding-Lastflake („lässt alles
+überspringen“ — der Überspringen-Klick verpufft, das Ankommen bleibt
+stehen) traf zwei volle Läufe in Folge, ließ sich aber weder isoliert
+(40/40 grün) noch im vollen Lauf mit scharfer Trace-Aufzeichnung
+(226/226) reproduzieren. Der Verdacht — Klick während einer Bewegung
+des Einzugs (`settle-in`) — bleibt unbelegt. Beschluss: beobachten;
+beim nächsten Auftreten liegt der Trace automatisch vor, sobald mit
+`--trace retain-on-failure` gelaufen wird.
