@@ -2337,3 +2337,27 @@ platzt, prüfe nicht die Logik ein drittes Mal — prüfe, ob der Code, den du
 liest, der Code ist, der läuft. **Zweitens**: Der Trace hat in Minuten
 entschieden, worüber Hypothesen Stunden verhandelt hatten. Erst schauen,
 dann denken.
+
+## 2026-08-19 · Adaptive Schwierigkeit (D2) — gerechnet, nicht fortgeschrieben
+
+Die Rundengröße passt sich jetzt der Trefferquote an (**D-029**): ab 90 %
+der letzten 20 Antworten → ein Stück mehr, unter 65 % → ein Stück weniger,
+dazwischen Ruhe — ~80 % ist das Ziel, kein Fehler. Die Rückwärtsspanne
+wandert nach derselben Regel zwischen 4 und 6 Ziffern. Kein gespeicherter
+Schwierigkeitsstand: Bei jedem Planen wird frisch aus dem Ereignislog
+gerechnet (D-021), unter zehn Antworten passiert nichts (die E7-Vorsicht).
+
+Die Arbeitsteilung bleibt die von D-010: `core/session/difficulty.ts`
+rechnet (fensterrein, ohne DOM und Datenbank), die Datenschicht lädt die
+letzten Antworten je Modul (`loadRecentOutcomes`), die App reicht dem
+Planer nur die fertige Verschiebung (`difficulty`-Eingabe, ±1 je Modul).
+
+Eine Falle steckte im Detail: Die erste Fassung addierte das Stück **vor**
+dem Stutzen auf den Korridor 3–8 — lag die Zeit über der Decke (9 Stücke
+rechnerisch, 8 erlaubt), wurde „eines weniger“ verschluckt (9−1=8 = Decke).
+Der Kerntest, der beide Richtungen gegen den planlosen Lauf prüft, hat es
+gefangen. Jetzt wird erst gestutzt, dann verschoben, dann wieder gestutzt —
+die Verschiebung beißt immer, die Grenzen halten immer.
+
+**Stand:** 385 Kerntests, Typecheck für App und Kern grün, Budget 139,6 KB
+von 180 KB.

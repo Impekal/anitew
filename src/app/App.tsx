@@ -41,6 +41,10 @@ import {
   streakOf,
   achievementsOf,
   spanPool,
+  DIFFICULTY_WINDOW,
+  itemsDeltaFor,
+  spanLengthFor,
+  TRAINING_MODULES,
   gazePool,
   twinChoices,
   twinPairs,
@@ -50,6 +54,7 @@ import {
 import { createWebPlatform } from '../platform/web/index.ts'
 import {
   loadDimensionCounts,
+  loadRecentOutcomes,
   loadDue,
   loadReviewed,
   loadTrackedWords,
@@ -291,6 +296,25 @@ export function App() {
       .catch(() => undefined)
   }, [training, running])
 
+  /*
+   * Die letzten Antworten je Modul — Futter für die adaptive Schwierigkeit
+   * (D2): gerechnet, nie fortgeschrieben, nach jeder Einheit neu gelesen.
+   */
+  const [recentByModule, setRecentByModule] = useState<
+    Partial<Record<ModuleId, readonly boolean[]>>
+  >({})
+  useEffect(() => {
+    void (async () => {
+      const entries = await Promise.all(
+        TRAINING_MODULES.map(
+          async (moduleId) =>
+            [moduleId, await loadRecentOutcomes(moduleId, DIFFICULTY_WINDOW)] as const,
+        ),
+      )
+      setRecentByModule(Object.fromEntries(entries))
+    })().catch(() => undefined)
+  }, [running])
+
   // Das Profil (E). Wie die Serie und die Wiedersehen: aus den Terminen
   // gerechnet, nach jeder Einheit neu gelesen.
   const [dimensionCounts, setDimensionCounts] = useState<
@@ -416,7 +440,13 @@ export function App() {
            * vier Runden à sechs Fragen sind vierundzwanzig. Der Planer nimmt
            * sich, was er braucht.
            */
-          reverse: spanPool(seed, 40),
+          reverse: spanPool(
+            seed,
+            40,
+            // Die Spannenlänge wandert mit der eigenen Quote (D2): vier als
+            // Boden, sechs als Decke, fünf der Anfang.
+            spanLengthFor({ recent: recentByModule['reverse'] ?? [] }),
+          ),
           /*
            * Zwillinge (D-027): endlicher, kuratierter Vorrat — gefiltert um
            * alles, was schon einen Termin hat (in beliebiger Orientierung).
@@ -438,6 +468,17 @@ export function App() {
         palaceTaught,
         storyTaught,
         linkTaught,
+        /*
+         * D2: ein Stück mehr oder weniger je Modul, aus der eigenen
+         * Trefferquote gerechnet. Keine Anzeige — Planung, keine Aussage
+         * über den Menschen (R-1).
+         */
+        difficulty: Object.fromEntries(
+          TRAINING_MODULES.map((moduleId) => [
+            moduleId,
+            itemsDeltaFor({ recent: recentByModule[moduleId] ?? [] }),
+          ]),
+        ),
         focus: focus?.moduleId,
       })
       const progress: SessionProgress = {
@@ -452,7 +493,7 @@ export function App() {
       setRunning(progress)
       void beginSession(progress, day, now).catch(() => undefined)
     })()
-  }, [training, mode, platform, taught, palaceTaught, storyTaught, linkTaught, own, focus])
+  }, [training, mode, platform, taught, palaceTaught, storyTaught, linkTaught, own, focus, recentByModule])
 
   const leave = useCallback(() => setRunning(undefined), [])
 

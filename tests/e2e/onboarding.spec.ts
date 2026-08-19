@@ -57,13 +57,16 @@ test('lässt alles überspringen — und fragt danach nie wieder', async ({ page
   await expect(page.locator('.arrival')).toBeVisible()
 
   // Der Ausgang ist ein echter Knopf auf dem ersten Schritt (D-015).
+  // Der Startbildschirm baut sich nach dem Klick asynchron auf — unter
+  // Suite-Volllast hat das die 5-Sekunden-Standardfrist einmal gerissen
+  // (dieselbe Familie wie der Neulade-Fall unten bei „Über dich“).
   await page.locator('.arrival .quiet').click()
-  await expect(page.locator('.challenge')).toBeVisible()
+  await expect(page.locator('.challenge')).toBeVisible({ timeout: 15_000 })
 
   // Auch ein leeres Profil ist eine Antwort: Beim nächsten Öffnen steht
   // sofort der Startbildschirm.
   await page.reload()
-  await expect(page.locator('.challenge')).toBeVisible()
+  await expect(page.locator('.challenge')).toBeVisible({ timeout: 15_000 })
   await expect(page.locator('.arrival')).toHaveCount(0)
 })
 

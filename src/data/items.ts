@@ -174,6 +174,23 @@ export async function loadTrackedWords(moduleId: string, language: string): Prom
   return rows.filter((row) => row.moduleId === moduleId).map((row) => wordOf(row.itemId))
 }
 
+/**
+ * Die letzten Antworten eines Moduls, älteste zuerst — nur richtig/falsch.
+ *
+ * Futter für die adaptive Schwierigkeit (D2): gerechnet, nie gespeichert.
+ * Nur Zeilen mit `module`-Feld zählen (das gibt es seit D-026); ältere
+ * kennen ihr Modul nicht und fallen ehrlich heraus.
+ */
+export async function loadRecentOutcomes(moduleId: string, limit: number): Promise<boolean[]> {
+  const rows = await db.events
+    .filter((event) => event.kind === 'answered' && event.module === moduleId)
+    .toArray()
+  return rows
+    .sort((a, b) => a.at - b.at)
+    .slice(-limit)
+    .map((row) => row.correct === true)
+}
+
 /** Wie viele Informationen warten insgesamt auf ihren nächsten Termin? */
 export async function countTracked(language: string): Promise<number> {
   return db.itemStates.where('language').equals(language).count()

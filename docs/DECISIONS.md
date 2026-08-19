@@ -1119,3 +1119,36 @@ Farben. Eingeprägt wird das Bild als Ganzes; gefragt wird die Einzelheit:
 
 Damit hat **jede der neun Profil-Achsen eine echte Quelle**; der
 `none`-Zweig bleibt im Code für die nächste Achse ohne Modul (D-016).
+
+## D-029 · 2026-08-19 · Schwierigkeit: gerechnet aus dem Fenster, verschoben um ein Stück
+
+**Entscheidung:** Die Rundengröße eines Moduls passt sich der Trefferquote
+an (D2): Sitzen neun von zehn der letzten 20 Antworten, wird die Runde um
+**ein** Stück größer; geht mehr als ein Drittel verloren, um eines kleiner.
+Dazwischen —
+~80 % ist das Ziel, kein Fehler — bleibt alles, wie es ist. Die
+Rückwärtsspanne wandert nach derselben Regel zwischen 4 und 6 Ziffern.
+
+**Die tragenden Regeln:**
+
+- **Gerechnet, nicht fortgeschrieben.** Es gibt keinen gespeicherten
+  „Schwierigkeitsstand“, der driften könnte: Die Anpassung wird bei jedem
+  Planen frisch aus den letzten 20 Antworten des Ereignislogs gerechnet
+  (dasselbe Log wie das Profil, D-021). Gleiche Antworten, gleiche
+  Anpassung — und ein Gerätewechsel nimmt sie über das Backup einfach mit.
+- **Erst ab zehn Antworten** (die E7-Vorsicht): Wer neu ist, spielt in der
+  Grundgröße. Drei Zufallstreffer sollen keine Decke einziehen.
+- **Ein Stück, nie ein Sprung.** ±1 je Runde, innerhalb der bestehenden
+  Grenzen 3–8. Und die Verschiebung greift **nach** dem Stutzen der Zeit
+  auf den Korridor — sonst würde „eines weniger“ verschluckt, sobald die
+  Zeit mehr hergäbe als die Decke erlaubt.
+- **Je Modul, nicht global.** Wer Wörter mühelos hält und bei Gesichtern
+  kämpft, bekommt mehr Wörter und weniger Gesichter — die Achsen bleiben
+  getrennte Währungen (R-1).
+- **Der Planer bleibt rein:** Er bekommt die fertige Verschiebung als
+  Eingabe (`difficulty`), nicht das Log. Rechnen tut `core/session/
+  difficulty.ts`, laden tut die Datenschicht — dieselbe Arbeitsteilung
+  wie überall (D-010).
+
+Das Budget bleibt exakt: Die Verschiebung ändert, wie viele Stücke in eine
+Runde passen, nie, wie lange sie dauert.

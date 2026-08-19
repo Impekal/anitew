@@ -400,6 +400,13 @@ export interface PlanInput {
   storyTaught?: boolean
   linkTaught?: boolean
   /**
+   * Die adaptive Verschiebung je Modul (D2): ein Stück mehr, eines
+   * weniger, oder nichts — gerechnet aus den letzten Antworten
+   * (`itemsDeltaFor`), nie gespeichert. Die Grenzen der Runde halten
+   * trotzdem; fehlt der Wert, bleibt alles beim Alten.
+   */
+  difficulty?: Partial<Record<ModuleId, -1 | 0 | 1>>
+  /**
    * Das Modul, das heute Vorrang bekommt (Backlog E5).
    *
    * Kommt aus dem Gedächtnisprofil und **nur dann**, wenn sich zwei Achsen
@@ -710,14 +717,15 @@ export function planSession(input: PlanInput): SessionPlan {
     if (scene && pool.length - used < 1) {
       throw new RangeError(`Der Vorrat reicht nicht für eine Szene (${moduleId})`)
     }
+    const delta = input.difficulty?.[moduleId] ?? 0
     const items = scene
       ? sceneItemsOf(moduleId, pool[used] as string)
       : pool.slice(
           used,
           used +
             (asksOnSight(moduleId)
-              ? promptsForRound(roundSeconds, pool.length - used)
-              : itemsForRound(roundSeconds, pool.length - used)),
+              ? promptsForRound(roundSeconds, pool.length - used, delta)
+              : itemsForRound(roundSeconds, pool.length - used, delta)),
         )
     taken.set(moduleId, used + (scene ? 1 : items.length))
     /*
@@ -782,18 +790,24 @@ export function planSession(input: PlanInput): SessionPlan {
 }
 
 /** Wie viele Rückwärts-Fragen in eine Runde passen. */
-function promptsForRound(roundSeconds: number, available: number): number {
+function promptsForRound(roundSeconds: number, available: number, delta = 0): number {
   const byTime = Math.floor(roundSeconds / SECONDS_PER_REVERSE_PROMPT)
-  const wanted = Math.min(MAX_REVERSE_PROMPTS, Math.max(MIN_REVERSE_PROMPTS, byTime))
+  // Die Verschiebung (D2) greift **nach** dem Stutzen auf den Korridor —
+  // sonst würde „ein Stück weniger" verschluckt, sobald die Zeit über der
+  // Decke liegt. Boden und Decke gelten trotzdem.
+  const base = Math.min(MAX_REVERSE_PROMPTS, Math.max(MIN_REVERSE_PROMPTS, byTime))
+  const wanted = Math.min(MAX_REVERSE_PROMPTS, Math.max(MIN_REVERSE_PROMPTS, base + delta))
   if (available < MIN_REVERSE_PROMPTS) {
     throw new RangeError(`Der Vorrat reicht nicht für eine Runde (${available} übrig)`)
   }
   return Math.min(wanted, available)
 }
 
-function itemsForRound(roundSeconds: number, available: number): number {
+function itemsForRound(roundSeconds: number, available: number, delta = 0): number {
   const byTime = Math.floor((roundSeconds * ENCODE_SHARE) / SECONDS_PER_ITEM)
-  const wanted = Math.min(MAX_ITEMS_PER_ROUND, Math.max(MIN_ITEMS_PER_ROUND, byTime))
+  // Wie bei den Rückwärts-Runden: erst stutzen, dann verschieben (D2).
+  const base = Math.min(MAX_ITEMS_PER_ROUND, Math.max(MIN_ITEMS_PER_ROUND, byTime))
+  const wanted = Math.min(MAX_ITEMS_PER_ROUND, Math.max(MIN_ITEMS_PER_ROUND, base + delta))
   if (available < MIN_ITEMS_PER_ROUND) {
     throw new RangeError(`Der Wortvorrat reicht nicht für eine Runde (${available} übrig)`)
   }
