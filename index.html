@@ -4,35 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>ANITEW</title>
-    <meta
-      name="description"
-      content="Gedächtnis ist Technik, kein Talent. Fünf Minuten Training am Tag — mit einer Messung, die zählt, was am Folgetag noch da ist."
-    />
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f4f2ee" />
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f1218" />
-    <!--
-      Vom Startbildschirm aus **ohne** Browserleiste starten. Beides gesetzt:
-      `mobile-web-app-capable` ist der heutige Name, `apple-…` der, den iOS
-      weiterhin liest. Eines von beiden wegzulassen kostet auf einer der
-      Seiten die Vollbilddarstellung.
-    -->
+    <meta name="description" content="Train your memory. Measure your progress. Remember more." />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f4f1ea" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0a0d12" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="ANITEW" />
-    <!--
-      Die Statusleiste übernimmt den Seitenhintergrund, statt einen eigenen
-      Balken zu setzen. Zusammen mit `viewport-fit=cover` und den sicheren
-      Rändern im Stylesheet läuft der Hintergrund bis unter die Uhr durch —
-      und der Text bleibt trotzdem unter der Kerbe (Q5).
-    -->
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
-    <!-- iOS skaliert selbst; 192 ist groß genug für die 180 Punkte, die es
-         auf dem Startbildschirm zeichnet. -->
     <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192.png" />
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <script type="module" src="/src/main-v2.tsx"></script>
   </body>
 </html>
