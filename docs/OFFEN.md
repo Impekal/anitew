@@ -47,7 +47,7 @@ Das kann kein Code erledigen. Reihenfolge wie im Gespräch: Geld zuletzt.
 **Erledigt 2026-08-19:** Client angelegt, Kennung im Deploy — der
 Abgleich läuft für die eingetragenen Testnutzer.
 
-### Den Abgleich für **alle** freischalten (N10)
+### Den Abgleich für **alle** freischalten (N10) — ✅ erledigt 2026-08-19
 
 Solange die OAuth-App im Status „Testing“ steht, funktioniert der
 Abgleich nur für eingetragene Testnutzer. Für alle anderen:

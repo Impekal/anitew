@@ -2502,3 +2502,7 @@ Veröffentlichen, und genau dieser Klick gehört dem Kontoinhaber
 (Schritte in OFFEN.md).
 
 **Stand:** 410 Kerntests, Budget unverändert. (Zuerst stand hier 413 — falsch gezählt, korrigiert.)
+Nachtrag, gleicher Tag: Die OAuth-App ist veröffentlicht (Status „In
+Produktion“, ohne Prüfverfahren — wie erwartet für den nicht-sensiblen
+Scope). Der Drive-Abgleich steht damit jedem Google-Konto offen; N10
+ist abgeschlossen.
