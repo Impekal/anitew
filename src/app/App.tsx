@@ -98,7 +98,7 @@ import { CoachPanel } from './CoachPanel.tsx'
 import { MemoryPanel } from './MemoryPanel.tsx'
 import { OwnPanel } from './OwnPanel.tsx'
 import { SyncPanel } from './SyncPanel.tsx'
-import { SYNC_AT_SETTING, SYNC_ON_SETTING, resolveClientId, runDriveSync } from './driveSync.ts'
+import { SYNC_AT_SETTING, SYNC_ON_SETTING, resolveClientId, runDriveSync, scheduleDriveSync } from './driveSync.ts'
 import { ReturnsLine } from './ReturnsLine.tsx'
 import { StreakLine } from './StreakLine.tsx'
 import { BenchmarkPanel } from './benchmark/BenchmarkPanel.tsx'
@@ -538,7 +538,11 @@ export function App() {
     })()
   }, [training, mode, platform, taught, palaceTaught, storyTaught, linkTaught, own, focus, recentByModule])
 
-  const leave = useCallback(() => setRunning(undefined), [])
+  const leave = useCallback(() => {
+    setRunning(undefined)
+    // Eine Einheit hat den Stand verändert — der Abgleich folgt still (D-038).
+    scheduleDriveSync(platform)
+  }, [platform])
 
   const today = useMemo(() => {
     const now = platform.clock.now()

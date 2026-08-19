@@ -105,9 +105,14 @@ bis du sie anfasst**, und beide laufen ohne uns dazwischen:
   Google und legt deine Sicherungsdatei (Abschnitt 5) in einen
   App-Ordner **deines eigenen Google Drive**. Die App sieht dort nur
   ihren eigenen Ordner, nichts sonst in deinem Drive; wir sehen gar
-  nichts. Nach dem ersten Abgleich wiederholt die App ihn beim Öffnen
-  still — das lässt sich auf derselben Seite jederzeit beenden. Für den
-  Umgang mit deinem Google-Konto gilt Googles Datenschutzerklärung.
+  nichts. Beim Verbinden fragt die App Google außerdem einmal nach der
+  **E-Mail-Adresse** deines Kontos — nur, um dir auf der Abgleich-Seite
+  zu zeigen, als wer du verbunden bist. Sie bleibt auf diesem Gerät,
+  geht nirgendwohin und wird gelöscht, sobald du den Abgleich beendest.
+  Nach dem ersten Abgleich wiederholt die App ihn still — beim Öffnen
+  und nach Änderungen (einer Trainingseinheit, einer neuen Erinnerung);
+  das lässt sich auf derselben Seite jederzeit beenden. Für den Umgang
+  mit deinem Google-Konto gilt Googles Datenschutzerklärung.
 - **Coach mit eigenem Schlüssel (Backlog M).** Wenn du bei einem
   KI-Anbieter deiner Wahl — Google Gemini, Anthropic, Groq, OpenRouter
   oder Mistral — einen eigenen Schlüssel anlegst, ihn hinterlegst und
@@ -116,7 +121,11 @@ bis du sie anfasst**, und beide laufen ohne uns dazwischen:
   eigenen Karten) direkt an den **gewählten** Anbieter, z. B.
   `api.anthropic.com`. Der Schlüssel bleibt auf diesem Gerät und lässt
   sich dort jederzeit entfernen; ohne Schlüssel wird nichts gesendet.
-  Es gilt die Datenschutzerklärung des gewählten Anbieters.
+  Es gilt die Datenschutzerklärung des gewählten Anbieters. Dasselbe
+  gilt für „Mit KI vorschlagen“ im Bereich „Mein Gedächtnis“: Der Text,
+  den du dort eingibst, geht — erst auf deinen Fingertipp, nie von
+  allein — an den gewählten Anbieter, damit er Erinnerungs-Vorschläge
+  daraus macht. Gespeichert wird davon nur, was du danach bestätigst.
 
 Nichts davon ist Voreinstellung, nichts läuft über unsere Server — und
 ohne deine Handlung gilt Abschnitt 3 ohne Einschränkung.

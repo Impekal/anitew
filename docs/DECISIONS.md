@@ -1407,3 +1407,38 @@ Ergebnis). Im Panel ist der KI-Weg ein **zweiter** Knopf, der nur mit
 hinterlegtem Coach-Schlüssel erscheint, vorher sagt, wohin der Text geht
 (R-3), und die Herkunft der Vorschläge beim Prüfen nennt. Bestätigen
 bleibt die einzige Tür zum Graphen.
+
+## D-038 · 2026-08-19 · Ein Konto, ein stiller Abgleich — und Grabsteine gegen die Auferstehung
+
+**Entscheidung:** Der Drive-Abgleich (D-033) wird unsichtbare
+Infrastruktur, das Google-Konto wird die sichtbare Identität dahinter —
+und der Memory-Graph bekommt Grabsteine, damit das zusammen ehrlich ist.
+
+1. **Grabsteine.** `MemoryGraph.removed` (Kennung → Zeitpunkt). Ohne sie
+   brächte die Vereinigung (N9) jedes bewusst Entfernte vom anderen
+   Gerät zurück — genau dann, wenn niemand mehr zusieht, weil der
+   Abgleich still läuft. Regel: Ein Grabstein schlägt jedes **ältere**
+   Lebenszeichen (Entfernen war eine bewusste Tat; bei Gleichstand
+   gewinnt das Entfernen), und ein **jüngeres** Lebenszeichen — neu
+   gemerkt oder danach abgerufen — räumt ihn weg. Ältere Sicherungen
+   ohne das Feld lesen sich als „keine Grabsteine“.
+2. **Identität.** Beim bewussten Verbinden (nie im stillen Weg) bittet
+   die App zusätzlich um `openid email` — Googles schmalste Auskunft —
+   und zeigt auf der Abgleich-Seite, **als wer** man verbunden ist.
+   Schmuck, kein Tragwerk: Scheitert die Auskunft, fehlt nur die Zeile.
+   Die Adresse liegt in `sync.account` auf diesem Gerät, geht
+   nirgendwohin und geht mit dem Beenden des Abgleichs.
+3. **Unsichtbar.** `scheduleDriveSync` — entprellt (4 s), still, ein
+   Lauf zur Zeit — hängt an den Stellen, die den Stand wirklich ändern:
+   Einheit verlassen, Erinnerung bestätigt, Erinnerung entfernt.
+   Scheitert er, passiert nichts Sichtbares; der nächste Anlass oder
+   Start versucht es wieder, die Abgleich-Seite bleibt der hörbare Weg.
+   PRIVACY §9 nennt beides beim Namen (E-Mail-Zeile, Abgleich nach
+   Änderungen) — und seit demselben Datum auch, dass „Mit KI
+   vorschlagen“ den eingegebenen Text zum gewählten Anbieter trägt.
+
+**Verworfen:** Abgleich bei jedem Einstellungs-Schreiben (zu viel
+Rauschen, Google-Kontingente); Tombstone-freies „Entfernen gilt nur
+diesem Gerät“ (unehrlich gegenüber dem Entfernen-Knopf); die E-Mail im
+Backup (sie ist Geräteschmuck, keine Trainingsgeschichte — sie reist
+absichtlich **nicht** mit).

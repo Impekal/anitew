@@ -47,6 +47,13 @@ export interface MemoryEdge {
 export interface MemoryGraph {
   readonly nodes: readonly MemoryNode[]
   readonly edges: readonly MemoryEdge[]
+  /**
+   * Grabsteine: Kennung → Zeitpunkt des Entfernens. Ohne sie brächte die
+   * Vereinigung (N9) jedes bewusst Entfernte vom anderen Gerät zurück.
+   * Ein Grabstein weicht nur einem **jüngeren** Lebenszeichen — wer etwas
+   * nach dem Entfernen neu merkt oder abruft, hat es zurückgeholt.
+   */
+  readonly removed: Readonly<Record<string, number>>
 }
 
 const clamp = (value: number) => Math.max(0, Math.min(1, value))
@@ -59,7 +66,7 @@ export const REINFORCE_STEP = 0.12
 export const WEAKEN_STEP = 0.18
 
 export function createMemoryGraph(): MemoryGraph {
-  return { nodes: [], edges: [] }
+  return { nodes: [], edges: [], removed: {} }
 }
 
 /** Eine stabile Kennung aus Art und Beschriftung — zweimal „Daniel“ ist einmal Daniel. */
@@ -81,7 +88,10 @@ export function addMemoryNode(
     createdAt: now,
     strength: clamp(input.strength ?? INITIAL_STRENGTH),
   }
-  return { ...graph, nodes: [...graph.nodes, node] }
+  // Neu gemerkt hebt den Grabstein auf — der Mensch hat es zurückgeholt.
+  const removed = { ...graph.removed }
+  delete removed[input.id]
+  return { ...graph, nodes: [...graph.nodes, node], removed }
 }
 
 export function connectMemoryNodes(
@@ -109,11 +119,16 @@ export function connectMemoryNodes(
   return { ...graph, edges: [...graph.edges, edge] }
 }
 
-/** Entfernt einen Knoten **und** alle seine Kanten — halbe Kanten gibt es nicht. */
-export function removeMemoryNode(graph: MemoryGraph, nodeId: string): MemoryGraph {
+/**
+ * Entfernt einen Knoten **und** alle seine Kanten — halbe Kanten gibt es
+ * nicht. Zurück bleibt ein Grabstein, damit die Vereinigung mit einem
+ * anderen Gerät das Entfernte nicht wieder hereinträgt.
+ */
+export function removeMemoryNode(graph: MemoryGraph, nodeId: string, now: number): MemoryGraph {
   return {
     nodes: graph.nodes.filter((node) => node.id !== nodeId),
     edges: graph.edges.filter((edge) => edge.from !== nodeId && edge.to !== nodeId),
+    removed: { ...graph.removed, [nodeId]: now },
   }
 }
 
@@ -169,12 +184,21 @@ export function latestNodes(graph: MemoryGraph, count: number): readonly MemoryN
 }
 
 /**
- * Vereinigung zweier Graphen — die Regel der Sicherung (N9): nie löschen,
- * bei zwei Fassungen desselben Knotens gewinnt die **längere Geschichte**
- * (ältestes createdAt, jüngstes lastRecalledAt, höhere Stärke). Zwei
- * Geräte, die getrennt liefen, haben beide recht.
+ * Vereinigung zweier Graphen — die Regel der Sicherung (N9): nie stumm
+ * löschen, bei zwei Fassungen desselben Knotens gewinnt die **längere
+ * Geschichte** (ältestes createdAt, jüngstes lastRecalledAt, höhere
+ * Stärke). Zwei Geräte, die getrennt liefen, haben beide recht — mit
+ * einer Ausnahme: Ein Grabstein schlägt jedes **ältere** Lebenszeichen
+ * (Entfernen war eine bewusste Tat), und ein jüngeres Lebenszeichen —
+ * neu gemerkt oder nach dem Entfernen abgerufen — räumt den Grabstein weg.
  */
 export function mergeMemoryGraph(mine: MemoryGraph, theirs: MemoryGraph): MemoryGraph {
+  const removed = new Map<string, number>()
+  for (const [id, at] of [...Object.entries(mine.removed), ...Object.entries(theirs.removed)]) {
+    const existing = removed.get(id)
+    removed.set(id, existing === undefined ? at : Math.max(existing, at))
+  }
+
   const nodes = new Map<string, MemoryNode>()
   for (const node of [...mine.nodes, ...theirs.nodes]) {
     const existing = nodes.get(node.id)
@@ -195,6 +219,15 @@ export function mergeMemoryGraph(mine: MemoryGraph, theirs: MemoryGraph): Memory
     })
   }
 
+  // Grabstein gegen Lebenszeichen: Bei Gleichstand gewinnt das Entfernen.
+  for (const [id, at] of removed) {
+    const node = nodes.get(id)
+    if (node === undefined) continue
+    const lastSign = Math.max(node.createdAt, node.lastRecalledAt ?? 0)
+    if (lastSign > at) removed.delete(id)
+    else nodes.delete(id)
+  }
+
   const edges = new Map<string, MemoryEdge>()
   for (const edge of [...mine.edges, ...theirs.edges]) {
     if (!nodes.has(edge.from) || !nodes.has(edge.to)) continue
@@ -207,7 +240,11 @@ export function mergeMemoryGraph(mine: MemoryGraph, theirs: MemoryGraph): Memory
     )
   }
 
-  return { nodes: [...nodes.values()], edges: [...edges.values()] }
+  return {
+    nodes: [...nodes.values()],
+    edges: [...edges.values()],
+    removed: Object.fromEntries(removed),
+  }
 }
 
 /**
@@ -217,7 +254,7 @@ export function mergeMemoryGraph(mine: MemoryGraph, theirs: MemoryGraph): Memory
  */
 export function readMemoryGraph(raw: unknown): MemoryGraph {
   if (typeof raw !== 'object' || raw === null) return createMemoryGraph()
-  const candidate = raw as { nodes?: unknown; edges?: unknown }
+  const candidate = raw as { nodes?: unknown; edges?: unknown; removed?: unknown }
   const nodes = (Array.isArray(candidate.nodes) ? candidate.nodes : []).filter(
     (node): node is MemoryNode =>
       typeof node === 'object' &&
@@ -240,5 +277,14 @@ export function readMemoryGraph(raw: unknown): MemoryGraph {
       known.has((edge as MemoryEdge).from) &&
       known.has((edge as MemoryEdge).to),
   )
-  return { nodes, edges }
+  // Ältere Stände (vor den Grabsteinen) tragen keine — das ist ein leeres Feld.
+  const removed =
+    typeof candidate.removed === 'object' && candidate.removed !== null
+      ? Object.fromEntries(
+          Object.entries(candidate.removed as Record<string, unknown>).filter(
+            (entry): entry is [string, number] => typeof entry[1] === 'number',
+          ),
+        )
+      : {}
+  return { nodes, edges, removed }
 }

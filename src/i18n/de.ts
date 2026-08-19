@@ -631,6 +631,7 @@ export const de = {
     pulledNone: 'Von dort kam nichts Neues. Der aktuelle Stand liegt jetzt in deinem Drive.',
     firstTime: 'Im Drive lag noch nichts — deine Sicherung liegt jetzt dort.',
     lastAt: 'Zuletzt abgeglichen:',
+    account: 'Verbunden als {account}.',
     errors: {
       denied: 'Die Anmeldung kam nicht zustande. Beim nächsten Versuch fragt Google erneut.',
       offline: 'Keine Verbindung zu Google. Später noch einmal — trainieren geht ohne.',

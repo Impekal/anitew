@@ -13,6 +13,7 @@ import { removeMemoryNode } from '../core/index.ts'
 import type { Dictionary } from '../i18n/index.ts'
 
 import { MemoryConstellation } from './MemoryConstellation.tsx'
+import { scheduleDriveSync } from './driveSync.ts'
 import { RememberThisPanel } from './RememberThisPanel.tsx'
 
 /**
@@ -43,9 +44,10 @@ export function MemoryPanel({
 
   const remove = (nodeId: string) => {
     void (async () => {
-      const next = removeMemoryNode(await loadMemoryGraph(), nodeId)
+      const next = removeMemoryNode(await loadMemoryGraph(), nodeId, platform.clock.now())
       await saveMemoryGraph(next)
       setGraph(next)
+      scheduleDriveSync(platform)
     })().catch(() => undefined)
   }
 

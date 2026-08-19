@@ -9,6 +9,7 @@ import {
 import { loadMemoryGraph, saveMemoryGraph } from '../data/memoryStore.ts'
 import { applyRememberedSuggestions } from '../core/index.ts'
 import { createWebArchitect } from '../platform/web/architect.ts'
+import { scheduleDriveSync } from './driveSync.ts'
 import {
   COACH_PROVIDERS,
   COACH_PROVIDER_NAMES,
@@ -118,6 +119,7 @@ export function RememberThisPanel({
       setSuggestions(undefined)
       setFromAi(false)
       setSaved(true)
+      scheduleDriveSync(platform)
       onSaved()
     })().catch(() => undefined)
   }

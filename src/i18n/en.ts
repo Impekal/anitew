@@ -404,6 +404,7 @@ export const en: Dictionary = {
     pulledNone: 'Nothing new from there. The current state now lies in your Drive.',
     firstTime: 'Drive held nothing yet — your backup now lies there.',
     lastAt: 'Last synced:',
+    account: 'Connected as {account}.',
     errors: {
       denied: 'The sign-in did not go through. Google will ask again on the next try.',
       offline: 'No connection to Google. Try again later — training works without it.',

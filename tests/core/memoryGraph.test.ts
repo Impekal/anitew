@@ -80,9 +80,31 @@ describe('der Memory-Graph', () => {
     graph = addMemoryNode(graph, { id: 'a', type: 'fact', label: 'Anker' }, at)
     graph = addMemoryNode(graph, { id: 'b', type: 'fact', label: 'Blatt' }, at)
     graph = connectMemoryNodes(graph, { from: 'a', to: 'b', relation: 'association' }, at)
-    graph = removeMemoryNode(graph, 'b')
+    graph = removeMemoryNode(graph, 'b', at + 1)
     expect(graph.nodes).toHaveLength(1)
     expect(graphConnectionCount(graph)).toBe(0)
+    // Zurück bleibt der Grabstein — und neu Merken räumt ihn wieder weg.
+    expect(graph.removed['b']).toBe(at + 1)
+    graph = addMemoryNode(graph, { id: 'b', type: 'fact', label: 'Blatt' }, at + 2)
+    expect(graph.removed['b']).toBeUndefined()
+  })
+
+  it('lässt Entferntes im Merge nicht auferstehen — außer nach jüngerem Lebenszeichen', () => {
+    let shared = createMemoryGraph()
+    shared = addMemoryNode(shared, { id: 'x', type: 'fact', label: 'X' }, 10)
+    // Gerät A entfernt bei 100 — Gerät B hält die alte Fassung (Abruf bei 80).
+    const a = removeMemoryNode(shared, 'x', 100)
+    const b = reinforceMemoryNode(shared, 'x', 80)
+    const merged = mergeMemoryGraph(a, b)
+    expect(merged.nodes).toHaveLength(0)
+    expect(merged.removed['x']).toBe(100)
+
+    // Gerät B merkt es sich später NEU (150) — das Lebenszeichen gewinnt.
+    let bAgain = mergeMemoryGraph(createMemoryGraph(), merged)
+    bAgain = addMemoryNode(bAgain, { id: 'x', type: 'fact', label: 'X' }, 150)
+    const revived = mergeMemoryGraph(merged, bAgain)
+    expect(revived.nodes).toHaveLength(1)
+    expect(revived.removed['x']).toBeUndefined()
   })
 
   it('sortiert nach Zuwendungsbedarf und nach Frische', () => {
@@ -114,7 +136,7 @@ describe('der Memory-Graph', () => {
   })
 
   it('liest Unbekanntes streng: Kaputtes fällt, Kanten ohne Enden auch', () => {
-    expect(readMemoryGraph('quatsch')).toEqual({ nodes: [], edges: [] })
+    expect(readMemoryGraph('quatsch')).toEqual({ nodes: [], edges: [], removed: {} })
     const read = readMemoryGraph({
       nodes: [
         { id: 'a', type: 'fact', label: 'Anker', createdAt: 1, strength: 0.5 },

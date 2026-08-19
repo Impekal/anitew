@@ -87,17 +87,31 @@ async function loadGis(): Promise<GisOauth2> {
   return loaded
 }
 
+/*
+ * Wer verbunden ist, darf einen Namen haben (V2: das Google-Konto als
+ * Identität). `openid email` sind Googles schmalste Auskunftsrechte —
+ * sie werden nur beim **bewussten** Verbinden erbeten, nie im stillen
+ * Start-Abgleich: Dort reicht das längst gewährte `drive.appdata`, und
+ * eine stille Anfrage nach mehr würde Google zu Recht ablehnen.
+ */
+const IDENTITY_SCOPE = 'openid email'
+
 /**
  * Holt ein Zugriffstoken. `silent` versucht es ohne Rückfrage — für den
  * stillen Abgleich beim Start; scheitert das (kein Google-Sitzung, Popup
- * unterdrückt), ist das ein leises `denied`, kein Drama.
+ * unterdrückt), ist das ein leises `denied`, kein Drama. `withIdentity`
+ * bittet zusätzlich um die Konto-Auskunft — nur im hörbaren Weg.
  */
-export async function requestDriveToken(clientId: string, silent: boolean): Promise<string> {
+export async function requestDriveToken(
+  clientId: string,
+  silent: boolean,
+  withIdentity = false,
+): Promise<string> {
   const oauth2 = await loadGis()
   return new Promise<string>((resolve, reject) => {
     const client = oauth2.initTokenClient({
       client_id: clientId,
-      scope: DRIVE_SCOPE,
+      scope: withIdentity ? `${DRIVE_SCOPE} ${IDENTITY_SCOPE}` : DRIVE_SCOPE,
       callback: (response) => {
         if (response.access_token !== undefined && response.access_token !== '') {
           resolve(response.access_token)
@@ -122,6 +136,24 @@ async function driveFetch(token: string, url: string, init?: RequestInit): Promi
   if (response.status === 401 || response.status === 403) throw new DriveError('denied')
   if (!response.ok) throw new DriveError('drive')
   return response
+}
+
+/**
+ * Wessen Konto das ist — die E-Mail aus Googles Auskunft. Schmuck, kein
+ * Tragwerk: Scheitert die Auskunft, scheitert **nicht** der Abgleich,
+ * darum gibt es hier `undefined` statt Fehlern.
+ */
+export async function fetchAccountEmail(token: string): Promise<string | undefined> {
+  try {
+    const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { authorization: `Bearer ${token}` },
+    })
+    if (!response.ok) return undefined
+    const body = (await response.json()) as { email?: unknown }
+    return typeof body.email === 'string' && body.email !== '' ? body.email : undefined
+  } catch {
+    return undefined
+  }
 }
 
 const FILES = 'https://www.googleapis.com/drive/v3/files'

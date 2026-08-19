@@ -4,7 +4,13 @@ import { SyncError, type Platform, type SyncReport } from '../core/index.ts'
 import { DriveError } from '../platform/web/drive.ts'
 import type { Dictionary } from '../i18n/index.ts'
 
-import { SYNC_AT_SETTING, SYNC_ON_SETTING, resolveClientId, runDriveSync } from './driveSync.ts'
+import {
+  SYNC_ACCOUNT_SETTING,
+  SYNC_AT_SETTING,
+  SYNC_ON_SETTING,
+  connectDriveSync,
+  resolveClientId,
+} from './driveSync.ts'
 
 type SyncFailureText = 'denied' | 'offline' | 'drive' | 'remote-invalid'
 
@@ -26,6 +32,7 @@ export function SyncPanel({ platform, dictionary }: { platform: Platform; dictio
   const [busy, setBusy] = useState(false)
   const [report, setReport] = useState<SyncReport | undefined>(undefined)
   const [failure, setFailure] = useState<SyncFailureText | undefined>(undefined)
+  const [account, setAccount] = useState<string | undefined>(undefined)
 
   useEffect(() => {
     void resolveClientId(platform.settings).then((id) => {
@@ -40,6 +47,10 @@ export function SyncPanel({ platform, dictionary }: { platform: Platform; dictio
       .read<number>(SYNC_AT_SETTING)
       .then(setLastAt)
       .catch(() => undefined)
+    void platform.settings
+      .read<string>(SYNC_ACCOUNT_SETTING)
+      .then(setAccount)
+      .catch(() => undefined)
   }, [platform])
 
   const sync = () => {
@@ -48,13 +59,18 @@ export function SyncPanel({ platform, dictionary }: { platform: Platform; dictio
     setFailure(undefined)
     setReport(undefined)
     const now = platform.clock.now()
-    void runDriveSync(clientId, false, now)
+    void connectDriveSync(clientId, now)
       .then((result) => {
-        setReport(result)
+        setReport(result.report)
         setAuto(true)
         setLastAt(now)
         void platform.settings.write(SYNC_ON_SETTING, true).catch(() => undefined)
         void platform.settings.write(SYNC_AT_SETTING, now).catch(() => undefined)
+        // Die Konto-Zeile ist Anzeige, kein Tragwerk: fehlt sie, fehlt sie.
+        if (result.account !== undefined) {
+          setAccount(result.account)
+          void platform.settings.write(SYNC_ACCOUNT_SETTING, result.account).catch(() => undefined)
+        }
       })
       .catch((error: unknown) => {
         if (error instanceof SyncError) setFailure(error.reason)
@@ -66,7 +82,9 @@ export function SyncPanel({ platform, dictionary }: { platform: Platform; dictio
 
   const stop = () => {
     setAuto(false)
+    setAccount(undefined)
     void platform.settings.write(SYNC_ON_SETTING, false).catch(() => undefined)
+    void platform.settings.remove(SYNC_ACCOUNT_SETTING).catch(() => undefined)
   }
 
   if (!checked) return null
@@ -100,6 +118,9 @@ export function SyncPanel({ platform, dictionary }: { platform: Platform; dictio
       )}
       {failure !== undefined && <p className="sync-failure">{texts.errors[failure]}</p>}
 
+      {account !== undefined && (
+        <p className="sync-note sync-account">{texts.account.replace('{account}', account)}</p>
+      )}
       {lastAt !== undefined && (
         <p className="sync-note">
           {texts.lastAt} {new Date(lastAt).toLocaleString()}
