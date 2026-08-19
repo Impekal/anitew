@@ -23,7 +23,7 @@ Das kann kein Code erledigen. Reihenfolge wie im Gespräch: Geld zuletzt.
 | **Google Play** (Q1–Q4) | Entwicklerkonto ($25 einmalig), dein Signierschlüssel, Play-Console-Formulare. Ich baue Bubblewrap-Konfig und `assetlinks.json` vor; du gibst mir den Fingerprint | $25 einmalig |
 | **iOS App Store** (Q6) | Apple-Konto ($99/Jahr) **und** die Entscheidung, welchen eigenständigen Mehrwert die App über die Web-Version hinaus bietet (Apple lehnt reine Verpackungen ab) | $99/Jahr |
 | **Spendenweg** (K9) | Ko-fi/PayPal/GitHub-Sponsors-Konto auf deinen Namen | — |
-| **Google-Client-Kennung für den Abgleich** (N7) | Der Drive-Abgleich ist fertig gebaut und geprüft — er wartet nur auf die Kennung aus **deiner** Google-Cloud-Konsole. Schritte siehe unten | 15 Min, kostenlos |
+| **Google-Client-Kennung für den Abgleich** (N7) | ✅ erledigt 2026-08-19 — Kennung angelegt, im Deploy, App veröffentlicht: Der Abgleich läuft für alle | — |
 
 ### Die Client-Kennung für den Drive-Abgleich anlegen
 
@@ -80,7 +80,7 @@ Phase mit Entscheidungen, die dir gehören.
 |---|---|
 | **KI mit eigenem Schlüssel** (M, Milestone M6) | **Erster Ausbau fertig 2026-08-19 (D-031):** Der Coach spricht aus den eigenen Zahlen (ohne Netz) und beantwortet freie Fragen mit eigenem Anthropic-Schlüssel. Offen: weitere Anbieter (erst wenn jemand sie braucht) und KI-Extraktion aus eigenem Material (I3, mit Freigabe pro Vorgang, I6) |
 | **Eigene Inhalte** (I, Milestone M6) | **Erster Ausbau fertig 2026-08-19 (D-032):** Text einfügen → Karten-Vorschau → eigenes Trainingsmodul samt FSRS-Wiedersehen, ohne KI, alles lokal. Offen: Foto/Diktat (I1), Termin-Items „das Treffen ist morgen um 9“ (I5), KI-Extraktion (I3) |
-| **Cloud-Abgleich** (N7/N8/N10, Milestone M7) | **Gebaut 2026-08-19 (D-033)**, gegen gemocktes Google geprüft: Anmeldung, Abgleich in den eigenen Drive-App-Ordner (kein Server, R-3 bleibt), stiller Wiederholungsversuch beim Start. Live gehen kann er erst mit deiner Client-Kennung (Anleitung in Gruppe 1). Offen bleiben Googles Freigabeverfahren für alle Nutzer (N10) und iCloud (N8, hängt an der nativen iOS-App) |
+| **Cloud-Abgleich** (N7/N8/N10, Milestone M7) | **Gebaut 2026-08-19 (D-033)**, gegen gemocktes Google geprüft: Anmeldung, Abgleich in den eigenen Drive-App-Ordner (kein Server, R-3 bleibt), stiller Wiederholungsversuch beim Start. **Live seit 2026-08-19 für alle** (Kennung im Deploy, OAuth-App veröffentlicht, N10 ✅). Offen bleibt nur iCloud (N8, hängt an der nativen iOS-App) |
 | **Fotorealistische Porträts** (D16), **CC0-Icon-Satz** (D15) | Asset- und Lizenzentscheidung. Heute erzeugt die App Gesichter selbst (D-005) — bewusst, und es funktioniert |
 | **Französische Oberfläche** (fr.ts) | Die Prosa braucht eine muttersprachliche Durchsicht, bevor sie öffentlich geht. **Französisch als Trainingssprache** ist dagegen fertig und geprüft (L6/L7) |
 
