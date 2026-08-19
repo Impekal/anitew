@@ -17,7 +17,7 @@ Das kann kein Code erledigen. Reihenfolge wie im Gespräch: Geld zuletzt.
 
 | Was | Warum nur du | Aufwand |
 |---|---|---|
-| **Gerätedurchgang** (P8) | Nur dein echtes iPhone/iPad bestätigt zwei Dinge, die der Buildrechner nicht kann: **Ton beim ersten Tippen** und **„Zum Home-Bildschirm“ + Flugmodus**. Anleitung: `docs/DEVICES.md` | 20 Min, kostenlos |
+| **Gerätedurchgang** (P8) | ✅ erledigt 2026-08-19 — auf echter Hardware durchgeführt, Befund „alles sauber“, samt Abgleich in der installierten App | — |
 | **Endgültiges Icon & Screenshots** (A9, Q7) | Design-Entscheidung und Handarbeit. Das vorläufige Zeichen (fünf Punkte) steht; Store-Texte sind fertig in `docs/STORE.md` | — |
 | **Domain** (optional) | Kauf auf deinen Namen, deine Karte. Erst nach Zufriedenheit | ~10–20 €/Jahr |
 | **Google Play** (Q1–Q4) | Entwicklerkonto ($25 einmalig), dein Signierschlüssel, Play-Console-Formulare. Ich baue Bubblewrap-Konfig und `assetlinks.json` vor; du gibst mir den Fingerprint | $25 einmalig |

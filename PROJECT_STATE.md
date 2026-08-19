@@ -2506,3 +2506,13 @@ Nachtrag, gleicher Tag: Die OAuth-App ist veröffentlicht (Status „In
 Produktion“, ohne Prüfverfahren — wie erwartet für den nicht-sensiblen
 Scope). Der Drive-Abgleich steht damit jedem Google-Konto offen; N10
 ist abgeschlossen.
+
+## 2026-08-19 · Gerätedurchgang (P8) — alles sauber
+
+Der Durchgang auf echter Hardware ist gemacht, Befund: **alles sauber.**
+Damit sind auch die drei Punkte bestätigt, die nur ein echtes Gerät
+zeigen kann und über die kein automatischer Lauf etwas sagt: der Ton
+beim ersten Tippen auf iOS, Safaris eigene Zeit- und Datei-Felder
+(Erinnerung, Sicherung einlesen) — und das Google-Anmeldefenster des
+Abgleichs in der **installierten** App, der heikelste Punkt der Liste.
+Der Abgleich war zuvor schon im Browser bestätigt worden.
