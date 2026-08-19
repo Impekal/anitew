@@ -547,6 +547,19 @@ export const de = {
       namesHeld: 'Fünfundzwanzig Namen nach Tagen noch gewusst.',
     },
   },
+  today: {
+    /*
+      Der Blick auf heute (V2): zwei Zeilen, beide aus echten Zahlen —
+      die Wiedersehen zählt derselbe Wiederholungsplan, der sie auch
+      holt, und der Satz zur schwächsten Erinnerung beschreibt den
+      Mechanismus, keine Vorhersage (R-1).
+    */
+    heading: 'Heute',
+    dueMany: '{n} Wiedersehen sind heute fällig — die Einheit nimmt sich die dringendsten.',
+    dueOne: 'Ein Wiedersehen ist heute fällig — die Einheit nimmt es mit.',
+    dueNone: 'Kein Wiedersehen fällig — heute wächst Neues.',
+    weakest: '„{label}“ steht am schwächsten — Missionen üben Schwaches zuerst.',
+  },
   memory: {
     /*
       Der Memory-Bereich (D-036). Der wichtigste Satz ist der über die

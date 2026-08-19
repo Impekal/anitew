@@ -343,6 +343,13 @@ export const en: Dictionary = {
       namesHeld: 'Still knew twenty-five names after days.',
     },
   },
+  today: {
+    heading: 'Today',
+    dueMany: '{n} reviews are due today — the session takes the most urgent first.',
+    dueOne: 'One review is due today — the session will pick it up.',
+    dueNone: 'No reviews due — today is for new ground.',
+    weakest: '“{label}” is weakest right now — missions train weak memories first.',
+  },
   memory: {
     heading: 'My memory',
     intro: 'What you want to keep becomes a network here: people, places, facts from your life — connected, trainable, with reunions after days.',

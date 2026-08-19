@@ -593,3 +593,20 @@ body::before {
   font-size: 1.05rem;
   animation: word-in 460ms var(--ease) both;
 }
+
+/* Der Blick auf heute (V2) — eine ruhige Karte mit wahren Zeilen. */
+.today {
+  margin: 0 0 1.1rem;
+  padding: 0.7rem 0.95rem;
+  border-left: 2px solid var(--accent);
+  background: var(--card);
+  border-radius: 0 10px 10px 0;
+}
+.today-line {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+}
+.today-line + .today-line {
+  margin-top: 0.4rem;
+}

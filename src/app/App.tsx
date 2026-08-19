@@ -100,6 +100,7 @@ import { OwnPanel } from './OwnPanel.tsx'
 import { SyncPanel } from './SyncPanel.tsx'
 import { SYNC_AT_SETTING, SYNC_ON_SETTING, resolveClientId, runDriveSync, scheduleDriveSync } from './driveSync.ts'
 import { ReturnsLine } from './ReturnsLine.tsx'
+import { TodayLine } from './TodayLine.tsx'
 import { StreakLine } from './StreakLine.tsx'
 import { BenchmarkPanel } from './benchmark/BenchmarkPanel.tsx'
 import { BenchmarkScreen } from './benchmark/BenchmarkScreen.tsx'
@@ -941,6 +942,7 @@ export function App() {
 
       <StreakLine streak={streak} dictionary={dictionary} />
       <ReturnsLine returns={returns} dictionary={dictionary} />
+      <TodayLine dictionary={dictionary} training={training} today={today} />
 
       {/*
         Die Messung meldet sich nur, wenn sie etwas will (D-011/G-2). Kein
