@@ -18,6 +18,10 @@ const NONE: AchievementInput = {
   taughtCount: 0,
   completedBenchmarks: 0,
   hasOwnPalace: false,
+  heldBackTotal: 0,
+  toldApartTotal: 0,
+  detailsHeldTotal: 0,
+  namesHeldTotal: 0,
 }
 
 describe('Erreichtes', () => {
@@ -48,6 +52,15 @@ describe('Erreichtes', () => {
     expect(achievementsOf({ ...NONE, hasOwnPalace: true })).toContain('ownPalace')
   })
 
+  it('kennt die Modul-Tatsachen erst ab ihrer Schwelle (D-030)', () => {
+    expect(achievementsOf({ ...NONE, heldBackTotal: 49 })).not.toContain('heldBackwards')
+    expect(achievementsOf({ ...NONE, heldBackTotal: 50 })).toContain('heldBackwards')
+    expect(achievementsOf({ ...NONE, toldApartTotal: 25 })).toContain('toldApart')
+    expect(achievementsOf({ ...NONE, detailsHeldTotal: 25 })).toContain('sawDetails')
+    expect(achievementsOf({ ...NONE, namesHeldTotal: 24 })).not.toContain('namesHeld')
+    expect(achievementsOf({ ...NONE, namesHeldTotal: 25 })).toContain('namesHeld')
+  })
+
   it('hält eine feste, vollständige Reihenfolge', () => {
     const all: AchievementInput = {
       returnsTotal: 100,
@@ -56,6 +69,10 @@ describe('Erreichtes', () => {
       taughtCount: 10,
       completedBenchmarks: 2,
       hasOwnPalace: true,
+      heldBackTotal: 50,
+      toldApartTotal: 25,
+      detailsHeldTotal: 25,
+      namesHeldTotal: 25,
     }
     expect(achievementsOf(all)).toEqual([...ACHIEVEMENTS])
   })

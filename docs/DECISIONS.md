@@ -1152,3 +1152,34 @@ Rückwärtsspanne wandert nach derselben Regel zwischen 4 und 6 Ziffern.
 
 Das Budget bleibt exakt: Die Verschiebung ändert, wie viele Stücke in eine
 Runde passen, nie, wie lange sie dauert.
+
+## D-030 · 2026-08-19 · Der Fähigkeitsbaum: Überschriften über Tatsachen, keine Äste
+
+**Entscheidung:** „Erreicht“ (K3 · D-019) wird zum Fähigkeitsbaum
+ausgebaut — aber einer nach den Regeln dieses Hauses: Die belegten
+Tatsachen werden **nach Fähigkeit gruppiert** (Dranbleiben, Abruf,
+Arbeitsgedächtnis, Unterscheiden, Bilder, Räume, Menschen, Gemessen),
+und das ist alles, was der Baum tut.
+
+**Die tragenden Regeln:**
+
+- **Kein Ast zum Freischalten.** Eine Fähigkeit ohne belegte Tatsache
+  steht nicht ausgegraut da — sie steht gar nicht da (K7). Ein leerer
+  Ast wäre eine Aufforderung, und Aufforderungen erzeugen Druck.
+- **Kein Rang, kein Gewicht.** Die „Größe“ einer Fähigkeit ist ihre
+  Zeilenanzahl, mehr Rechnung gibt es nicht. Nichts sagt „Stufe 3“,
+  nichts vergleicht Fähigkeiten miteinander (R-1).
+- **Jede Fähigkeit ist erreichbar.** Vier neue Tatsachen aus Zahlen, die
+  es ohnehin gibt (dieselben Achsen-Zählungen wie das Profil, E3):
+  fünfzig richtige Rückwärtsfolgen (Arbeitsgedächtnis), fünfundzwanzig
+  gehaltene Zwillings-, Bild- und Gesichter-Wiedersehen (Unterscheiden,
+  Bilder, Menschen). Ein Kerntest erzwingt, dass keine Fähigkeit für
+  immer leer bleiben kann — ein unerreichbarer Ast wäre gelogen.
+- **Der Kern gruppiert, die App zeigt.** `core/progress/tree.ts` kennt
+  nur Kennungen und ihre Zuordnung (total, per Typ erzwungen); Namen und
+  Anordnung liegen im Wörterbuch und in der Erreicht-Seite (D-010).
+
+Die Zuordnung ist bewusst **eine je Tatsache**: „Alle zehn Ziffern des
+Major-Systems“ steht unter Abruf, nicht unter einer eigenen
+Zahlen-Fähigkeit — ein zweiter Ort für dieselbe Zeile wäre Inventar ohne
+Auskunft.

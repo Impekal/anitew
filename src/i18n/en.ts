@@ -312,6 +312,16 @@ export const en: Dictionary = {
   },
   achievements: {
     heading: 'Reached',
+    domains: {
+      practice: 'Showing up',
+      recall: 'Recall',
+      working: 'Working memory',
+      distinguish: 'Telling apart',
+      visual: 'Images',
+      spatial: 'Places',
+      people: 'People',
+      measured: 'Measured',
+    },
     facts: {
       firstReturn: 'Brought something back after days for the first time.',
       week: 'Trained a week straight.',
@@ -321,6 +331,10 @@ export const en: Dictionary = {
       calibrated: 'Finished calibrating the measurement.',
       majorLearned: 'Learned all ten digits of the Major System.',
       ownPalace: 'Laid out your own memory palace.',
+      heldBackwards: 'Reproduced fifty digit sequences backwards.',
+      toldApart: 'Told similar things apart twenty-five times after days.',
+      sawDetails: 'Brought back twenty-five picture details after days.',
+      namesHeld: 'Still knew twenty-five names after days.',
     },
   },
   streak: {

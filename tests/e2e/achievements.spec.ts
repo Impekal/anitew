@@ -44,6 +44,10 @@ test('nennt eine Tatsache, sobald sie zutrifft', async ({ page }) => {
   await seedReached(page)
   await openPage(page, 'Erreicht')
   await expect(page.getByText(/Zum ersten Mal etwas nach Tagen zurückgeholt/)).toBeVisible()
+  // Die Tatsache steht unter ihrer Fähigkeit (D-030) — und nur belegte
+  // Fähigkeiten stehen im Baum: kein „Arbeitsgedächtnis“ ohne Tatsache.
+  await expect(page.locator('.skill h3', { hasText: 'Abruf' })).toBeVisible()
+  await expect(page.locator('.skill h3', { hasText: 'Arbeitsgedächtnis' })).toHaveCount(0)
   // Und nur das Erreichte — keine gesperrten, ausgegrauten Zeilen.
   const count = await page.locator('.reached li').count()
   expect(count).toBeGreaterThan(0)

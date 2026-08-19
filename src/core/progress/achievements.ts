@@ -30,6 +30,10 @@ export const ACHIEVEMENTS = [
   'calibrated',
   'majorLearned',
   'ownPalace',
+  'heldBackwards',
+  'toldApart',
+  'sawDetails',
+  'namesHeld',
 ] as const
 export type AchievementId = (typeof ACHIEVEMENTS)[number]
 
@@ -47,6 +51,14 @@ export interface AchievementInput {
   completedBenchmarks: number
   /** Gibt es einen selbst angelegten Palast? (G3) */
   hasOwnPalace: boolean
+  /** Richtige sofortige Rückwärtsfolgen (D-026: Gelegenheiten − Verlorene). */
+  heldBackTotal: number
+  /** Zwillings-Wiedersehen ohne Verlust — Ähnliches blieb getrennt (D-027). */
+  toldApartTotal: number
+  /** Bild-Wiedersehen ohne Verlust — die Einzelheit saß noch (D-028). */
+  detailsHeldTotal: number
+  /** Gesichter-Wiedersehen ohne Verlust — der Name saß noch. */
+  namesHeldTotal: number
 }
 
 /**
@@ -65,5 +77,9 @@ export function achievementsOf(input: AchievementInput): readonly AchievementId[
   if (input.completedBenchmarks >= 2) reached.push('calibrated')
   if (input.taughtCount >= 10) reached.push('majorLearned')
   if (input.hasOwnPalace) reached.push('ownPalace')
+  if (input.heldBackTotal >= 50) reached.push('heldBackwards')
+  if (input.toldApartTotal >= 25) reached.push('toldApart')
+  if (input.detailsHeldTotal >= 25) reached.push('sawDetails')
+  if (input.namesHeldTotal >= 25) reached.push('namesHeld')
   return reached
 }

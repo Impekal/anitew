@@ -552,18 +552,27 @@ export function App() {
   }, [training, running])
   const returns = useMemo(() => returnsOf(reviewed), [reviewed])
 
-  // Erreichtes (K3): aus den Zahlen gerechnet, die es ohnehin gibt.
-  const achievementInput = useMemo(
-    () => ({
+  // Erreichtes (K3): aus den Zahlen gerechnet, die es ohnehin gibt. Die
+  // Modul-Tatsachen (D-030) zählen Gelegenheiten ohne Verlust — dieselben
+  // Zahlen, aus denen auch das Profil besteht (E3), nur anders gefragt.
+  const achievementInput = useMemo(() => {
+    const heldOf = (dimension: DimensionId) => {
+      const counts = dimensionCounts[dimension]
+      return counts === undefined ? 0 : counts.chances - counts.lost
+    }
+    return {
       returnsTotal: returns.total,
       returnsLongest: returns.longest,
       streakBest: streak.best,
       taughtCount: taught.length,
       completedBenchmarks: runs.filter(isComplete).length,
       hasOwnPalace: own !== undefined,
-    }),
-    [returns, streak.best, taught.length, runs, own],
-  )
+      heldBackTotal: heldOf('working'),
+      toldApartTotal: heldOf('attention'),
+      detailsHeldTotal: heldOf('visual'),
+      namesHeldTotal: heldOf('faces'),
+    }
+  }, [returns, streak.best, taught.length, runs, own, dimensionCounts])
 
 
   /*

@@ -509,6 +509,21 @@ export const de = {
       gezählt ist. Was noch nicht ist, steht gar nicht da.
     */
     heading: 'Erreicht',
+    /*
+      Die Fähigkeiten des Baums (D-030): nur Überschriften über belegten
+      Tatsachen, keine Äste zum Freischalten. Eine Fähigkeit ohne Tatsache
+      taucht nicht auf.
+    */
+    domains: {
+      practice: 'Dranbleiben',
+      recall: 'Abruf',
+      working: 'Arbeitsgedächtnis',
+      distinguish: 'Unterscheiden',
+      visual: 'Bilder',
+      spatial: 'Räume',
+      people: 'Menschen',
+      measured: 'Gemessen',
+    },
     facts: {
       firstReturn: 'Zum ersten Mal etwas nach Tagen zurückgeholt.',
       week: 'Eine Woche am Stück trainiert.',
@@ -518,6 +533,10 @@ export const de = {
       calibrated: 'Die Eichung der Messung abgeschlossen.',
       majorLearned: 'Alle zehn Ziffern des Major-Systems gelernt.',
       ownPalace: 'Einen eigenen Gedächtnispalast angelegt.',
+      heldBackwards: 'Fünfzig Ziffernfolgen rückwärts wiedergegeben.',
+      toldApart: 'Fünfundzwanzigmal Ähnliches nach Tagen auseinandergehalten.',
+      sawDetails: 'Fünfundzwanzig Einzelheiten aus Bildern nach Tagen zurückgeholt.',
+      namesHeld: 'Fünfundzwanzig Namen nach Tagen noch gewusst.',
     },
   },
   streak: {

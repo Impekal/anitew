@@ -2361,3 +2361,22 @@ die Verschiebung beißt immer, die Grenzen halten immer.
 
 **Stand:** 385 Kerntests, Typecheck für App und Kern grün, Budget 139,6 KB
 von 180 KB.
+
+## 2026-08-19 · Der Fähigkeitsbaum (K3-Ausbau) — Überschriften, keine Äste
+
+„Erreicht“ gruppiert seine Tatsachen jetzt nach Fähigkeit (**D-030**):
+Dranbleiben, Abruf, Arbeitsgedächtnis, Unterscheiden, Bilder, Räume,
+Menschen, Gemessen. Der Baum bleibt, was K3 versprochen hat — kein
+gesperrter Ast, kein Rang, kein Balken: Eine Fähigkeit ohne belegte
+Tatsache steht gar nicht da, und die „Größe“ einer Fähigkeit ist ihre
+Zeilenanzahl.
+
+Vier neue Tatsachen machen jede Fähigkeit erreichbar, alle aus Zahlen,
+die es ohnehin gibt (die Achsen-Zählungen des Profils): fünfzig richtige
+Rückwärtsfolgen, je fünfundzwanzig gehaltene Zwillings-, Bild- und
+Gesichter-Wiedersehen. Ein Kerntest erzwingt, dass keine Fähigkeit für
+immer leer bleiben kann — ein unerreichbarer Ast wäre gelogen. Der Kern
+(`core/progress/tree.ts`) kennt nur die Zuordnung, total per Typ; Namen
+stehen im Wörterbuch, die Anordnung in der Erreicht-Seite.
+
+**Stand:** 389 Kerntests, Typecheck für App und Kern grün.

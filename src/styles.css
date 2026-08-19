@@ -1691,6 +1691,24 @@ body::before {
   color: var(--ink-soft);
 }
 
+/* Der Fähigkeitsbaum (D-030): Überschriften über belegten Tatsachen. Die
+   Überschrift ist ein leises Etikett, keine Trophäenkategorie — und eine
+   Fähigkeit ohne Tatsache steht gar nicht im Baum. */
+.skills {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.skill h3 {
+  margin: 0 0 0.4rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
 /* ── Das Ankommen (Onboarding) ────────────────────────────────────────── */
 
 /* Eine Frage pro Bildschirm, mittig, mit Luft — derselbe Griff wie beim
