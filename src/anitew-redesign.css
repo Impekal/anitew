@@ -610,3 +610,23 @@ body::before {
 .today-line + .today-line {
   margin-top: 0.4rem;
 }
+
+/* Die Trainingsbilanz — Balken ohne Soll-Linie (K7). */
+.footprint {
+  margin: 0 0 1.2rem;
+}
+.footprint-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.45rem;
+  height: 56px;
+  padding: 0 0 0.2rem;
+  border-bottom: 1px solid var(--line);
+  max-width: 260px;
+}
+.footprint-bar {
+  flex: 1;
+  border-radius: 3px 3px 0 0;
+  background: linear-gradient(180deg, var(--accent), var(--accent-soft));
+  opacity: 0.85;
+}

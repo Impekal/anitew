@@ -364,6 +364,8 @@ export const de = {
     times: 'mal',
   },
   profile: {
+    footprintHeading: 'Trainierte Tage',
+    footprintNote: 'Je Balken sieben Tage, ganz rechts die laufenden — zusammen {days} Trainingstage in acht Wochen. Das ist Übungsstand, keine Gedächtnismessung.',
     /*
       Das Gedächtnisprofil (E · D-021).
 

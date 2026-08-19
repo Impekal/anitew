@@ -1,3 +1,4 @@
+import { trainingFootprint } from '../../src/core/progress/footprint.ts'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -246,5 +247,34 @@ describe('der Schwerpunkt im Bauplan (E5)', () => {
     expect(plain.focus).toBeUndefined()
     const rounds = modulesOf(plain)
     expect(new Set(rounds).size).toBeGreaterThan(1)
+  })
+})
+
+describe('die Trainingsbilanz (V2)', () => {
+  it('zählt Tage je Sieben-Tage-Fenster — dedupliziert, Zukunft und Uraltes fallen', () => {
+    const bars = trainingFootprint(
+      [
+        '2026-08-19', // heute → letztes Fenster
+        '2026-08-19', // doppelt → zählt einmal
+        '2026-08-13', // 6 Tage zurück → noch letztes Fenster
+        '2026-08-12', // 7 Tage zurück → vorletztes Fenster
+        '2026-08-20', // Zukunft → fällt
+        '2026-01-01', // vor dem Zeitraum → fällt
+      ],
+      '2026-08-19',
+      8,
+    )
+    expect(bars).toHaveLength(8)
+    // Lesereihenfolge: das älteste zuerst, ganz rechts die laufende Woche.
+    expect(bars[7]?.daysTrained).toBe(2)
+    expect(bars[6]?.daysTrained).toBe(1)
+    expect(bars.slice(0, 6).every((week) => week.daysTrained === 0)).toBe(true)
+  })
+
+  it('bleibt bei leerem Verlauf leer — und bei null Fenstern still', () => {
+    expect(trainingFootprint([], '2026-08-19', 4).every((week) => week.daysTrained === 0)).toBe(
+      true,
+    )
+    expect(trainingFootprint(['2026-08-19'], '2026-08-19', 0)).toHaveLength(0)
   })
 })

@@ -787,7 +787,14 @@ export function App() {
         : {}),
       profile: {
         title: dictionary.profile.heading,
-        body: <ProfilePanel counts={dimensionCounts} dictionary={dictionary} />,
+        body: (
+          <ProfilePanel
+            counts={dimensionCounts}
+            trained={trainingDays}
+            today={today}
+            dictionary={dictionary}
+          />
+        ),
       },
       coach: {
         title: dictionary.coach.heading,

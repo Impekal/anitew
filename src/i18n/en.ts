@@ -232,6 +232,8 @@ export const en: Dictionary = {
     times: 'times',
   },
   profile: {
+    footprintHeading: 'Days trained',
+    footprintNote: 'Each bar is seven days, the current ones on the right — {days} training days across eight weeks. This is practice volume, not a memory measurement.',
     heading: 'Your profile',
     note: 'Only returns are counted: how often a piece of information came back after days and was still there. How well you do on the day you learn it is deliberately not here — that is practice, not memory.',
     names: {

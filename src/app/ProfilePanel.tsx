@@ -1,4 +1,4 @@
-import { type DimensionCounts, type DimensionId, type DimensionResult, hasProfile, isImmediate, profileOf, weakest } from '../core/index.ts'
+import { type DayKey, type DimensionCounts, type DimensionId, type DimensionResult, hasProfile, isImmediate, profileOf, trainingFootprint, weakest } from '../core/index.ts'
 import type { Dictionary } from '../i18n/index.ts'
 
 /**
@@ -17,27 +17,65 @@ import type { Dictionary } from '../i18n/index.ts'
  */
 export function ProfilePanel({
   counts,
+  trained,
+  today,
   dictionary,
 }: {
   counts: Partial<Record<DimensionId, DimensionCounts>>
+  trained: readonly DayKey[]
+  today: DayKey
   dictionary: Dictionary
 }) {
   const t = dictionary.profile
   const results = profileOf(counts)
   const names: Record<string, string> = t.names
 
+  /*
+    Die Trainingsbilanz (V2): acht Sieben-Tage-Fenster, ganz rechts die
+    laufenden Tage. Übungsstand, keine Gedächtnisaussage (R-1) — und ohne
+    Soll-Linie: Balken sagen, was war, nicht, was hätte sein sollen (K7).
+    Sie steht auch vor dem ersten Achsen-Befund: Trainiert wurde ja schon.
+  */
+  const bars = trainingFootprint(trained, today, 8)
+  const footprint = bars.some((week) => week.daysTrained > 0) && (
+    <div className="footprint">
+      <h3 className="coach-source">{t.footprintHeading}</h3>
+      <div className="footprint-bars" aria-hidden="true">
+        {bars.map((week, index) => (
+          <span
+            key={index}
+            className="footprint-bar"
+            style={{ height: `${6 + (week.daysTrained / 7) * 94}%` }}
+          />
+        ))}
+      </div>
+      <p className="hint">
+        {t.footprintNote.replace(
+          '{days}',
+          String(bars.reduce((sum, week) => sum + week.daysTrained, 0)),
+        )}
+      </p>
+    </div>
+  )
+
   if (!hasProfile(results)) {
     /*
       Vor der ersten Aussage steht ein Satz und keine Liste aus neun leeren
       Zeilen. Neun Achsen ohne Zahl sähen aus wie neun Defizite (G-2, R-1).
     */
-    return <p className="hint">{t.empty}</p>
+    return (
+      <div className="profile">
+        {footprint}
+        <p className="hint">{t.empty}</p>
+      </div>
+    )
   }
 
   const weak = weakest(results)
 
   return (
     <div className="profile">
+      {footprint}
       <p className="hint">{t.note}</p>
 
       <ul className="axes">
