@@ -15,6 +15,7 @@
 import {
   type MemoryGraph,
   memoryLabelsOf,
+  memoryNodeIdOfItem,
   mergeMemoryGraph,
   readMemoryGraph,
   reinforceMemoryNode,
@@ -74,11 +75,11 @@ export async function applyMemoryOutcome(
   if (graph.nodes.length === 0) return
   const byLabel = new Map(graph.nodes.map((node) => [node.label, node.id]))
   for (const item of outcome.correct) {
-    const id = byLabel.get(memoryLabelsOf(item).target)
+    const id = memoryNodeIdOfItem(item) ?? byLabel.get(memoryLabelsOf(item).target)
     if (id !== undefined) graph = reinforceMemoryNode(graph, id, now)
   }
   for (const item of outcome.missed) {
-    const id = byLabel.get(memoryLabelsOf(item).target)
+    const id = memoryNodeIdOfItem(item) ?? byLabel.get(memoryLabelsOf(item).target)
     if (id !== undefined) graph = weakenMemoryNode(graph, id, now)
   }
   await saveMemoryGraph(graph)

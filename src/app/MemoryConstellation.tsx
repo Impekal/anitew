@@ -28,9 +28,36 @@ interface Placed {
   readonly anchor: boolean
 }
 
-function layout(graph: MemoryGraph): Placed[] {
+export const MAX_VISIBLE_MEMORY_NODES = 72
+
+function visibleNodeIds(graph: MemoryGraph, selectedId?: string): Set<string> {
+  if (graph.nodes.length <= MAX_VISIBLE_MEMORY_NODES) return new Set(graph.nodes.map((node) => node.id))
+
+  const neighborhood = new Set<string>(selectedId === undefined ? [] : [selectedId])
+  if (selectedId !== undefined) {
+    for (const edge of graph.edges) {
+      if (edge.from === selectedId) neighborhood.add(edge.to)
+      if (edge.to === selectedId) neighborhood.add(edge.from)
+    }
+  }
+  const degree = new Map<string, number>()
+  for (const edge of graph.edges) {
+    degree.set(edge.from, (degree.get(edge.from) ?? 0) + 1)
+    degree.set(edge.to, (degree.get(edge.to) ?? 0) + 1)
+  }
+  const ranked = [...graph.nodes].sort(
+    (a, b) =>
+      Number(neighborhood.has(b.id)) - Number(neighborhood.has(a.id)) ||
+      (degree.get(b.id) ?? 0) - (degree.get(a.id) ?? 0) ||
+      b.createdAt - a.createdAt,
+  )
+  return new Set(ranked.slice(0, MAX_VISIBLE_MEMORY_NODES).map((node) => node.id))
+}
+
+function layout(graph: MemoryGraph, selectedId?: string): Placed[] {
   const anchors = new Set(graph.edges.map((edge) => edge.from))
-  const ordered = [...graph.nodes].sort((a, b) => a.createdAt - b.createdAt)
+  const visible = visibleNodeIds(graph, selectedId)
+  const ordered = graph.nodes.filter((node) => visible.has(node.id)).sort((a, b) => a.createdAt - b.createdAt)
   return ordered.map((node, index) => {
     const angle = ((index * GOLDEN_ANGLE) % 360) * (Math.PI / 180)
     // Wurzel-Spirale: gleichmäßige Dichte, die Mitte gehört den Ältesten.
@@ -46,15 +73,35 @@ function layout(graph: MemoryGraph): Placed[] {
   })
 }
 
-export function MemoryConstellation({ graph }: { graph: MemoryGraph }) {
-  const placed = useMemo(() => layout(graph), [graph])
+export function MemoryConstellation({
+  graph,
+  selectedId,
+  onSelect,
+  selectLabel,
+  newNodeIds = new Set(),
+  ariaLabel,
+  recalledNodeIds = new Set(),
+}: {
+  graph: MemoryGraph
+  selectedId?: string
+  onSelect?: (id: string) => void
+  selectLabel?: (label: string) => string
+  newNodeIds?: ReadonlySet<string>
+  ariaLabel?: string
+  recalledNodeIds?: ReadonlySet<string>
+}) {
+  const placed = useMemo(() => layout(graph, selectedId), [graph, selectedId])
   const byId = useMemo(() => new Map(placed.map((node) => [node.id, node])), [placed])
 
   if (placed.length === 0) return null
 
   return (
-    <div className="constellation" aria-hidden="true">
-      <svg viewBox="0 0 100 100" role="presentation">
+    <div className="constellation">
+      <svg
+        viewBox="0 0 100 100"
+        aria-hidden={onSelect === undefined ? true : undefined}
+        aria-label={onSelect === undefined ? undefined : ariaLabel}
+      >
         {graph.edges.map((edge, index) => {
           const from = byId.get(edge.from)
           const to = byId.get(edge.to)
@@ -66,13 +113,26 @@ export function MemoryConstellation({ graph }: { graph: MemoryGraph }) {
               y1={from.y}
               x2={to.x}
               y2={to.y}
-              className="constellation-edge"
+              className={newNodeIds.has(edge.from) || newNodeIds.has(edge.to) ? 'constellation-edge constellation-edge-new' : 'constellation-edge'}
               style={{ animationDelay: `${(index * 240) % 1800}ms` }}
             />
           )
         })}
         {placed.map((node, index) => (
-          <g key={node.id}>
+          <g
+            key={node.id}
+            className={`${node.id === selectedId ? 'constellation-memory constellation-memory-selected' : 'constellation-memory'}${newNodeIds.has(node.id) ? ' constellation-memory-new' : ''}${recalledNodeIds.has(node.id) ? ' constellation-memory-recalled' : ''}`}
+            role={onSelect === undefined ? undefined : 'button'}
+            tabIndex={onSelect === undefined ? undefined : 0}
+            aria-label={selectLabel?.(node.label) ?? node.label}
+            onClick={() => onSelect?.(node.id)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault()
+                onSelect?.(node.id)
+              }
+            }}
+          >
             <circle
               cx={node.x}
               cy={node.y}
@@ -93,6 +153,11 @@ export function MemoryConstellation({ graph }: { graph: MemoryGraph }) {
           </g>
         ))}
       </svg>
+      {graph.nodes.length > placed.length && (
+        <span className="constellation-window" aria-live="polite">
+          {placed.length} / {graph.nodes.length}
+        </span>
+      )}
     </div>
   )
 }

@@ -2595,3 +2595,24 @@ Nach dem Durchstich kamen die Aufgaben 5–13 des V2-Auftrags — alle auf
 Grabsteinen — die Lücke fiel erst auf, als der Abgleich unsichtbar
 werden sollte. Und: Werkzeug-Ausgaben mit Steuerzeichen (Regex-Klassen)
 weiter über Python-Ersetzungen schreiben, nie direkt.
+
+## 2026-08-19 · WOW Phase 1 geschlossen: System statt Startknopf
+
+Der zweite Polish-Block schließt die Lücke zwischen dem technischen
+Memory-Durchstich und der Produktoberfläche. Today beginnt jetzt mit **DEIN
+GEDÄCHTNISSYSTEM**, einer realen Tagesmission, der gewählten Dauer und — wenn
+vorhanden — der echten Constellation. Serie und Wiedersehen bleiben wahr, sind
+aber Historie unter der Mission statt Dashboard-Möbel davor.
+
+„Etwas merken“ ist ein prüfbarer Ablauf: deterministische oder optionale
+KI-Analyse, editierbare Knoten, einzeln entfernbare Beziehungen, menschliche
+Bestätigung, erst dann Speicherung. Neue Knoten entstehen sichtbar, neue
+Linien werden gezeichnet; ein Recall sendet ein Signal am bestehenden Knoten,
+und eine abgeschlossene Einheit lässt das System einmal reagieren. Reduced
+Motion stutzt weiterhin jede dieser Bewegungen global.
+
+Die wichtigste technische Korrektur ist D-040: Memory-FSRS-Items tragen stabile
+Graph-IDs. Die Detailansicht vergleicht Kennung mit Kennung, nicht mehr
+Beschriftungsfragmente. Klanglich heißen die Ereignisse nun Start, Encoded,
+Connection, Recall und Complete; alle bleiben kurze synthetische Offline-Cues
+auf dem vorhandenen Sound-Port, ohne Reward-Jingle und ohne Netzdatei.

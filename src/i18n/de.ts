@@ -557,6 +557,10 @@ export const de = {
       Mechanismus, keine Vorhersage (R-1).
     */
     heading: 'Heute',
+    systemHeading: 'DEIN GEDÄCHTNISSYSTEM',
+    missionHeading: 'Deine Mission heute',
+    duration: '{duration} · angepasst an das, was jetzt ansteht',
+    quietMission: 'Heute wartet noch nichts Altes — die Mission legt neue Spuren an.',
     dueMany: '{n} Wiedersehen sind heute fällig — die Einheit nimmt sich die dringendsten.',
     dueOne: 'Ein Wiedersehen ist heute fällig — die Einheit nimmt es mit.',
     dueNone: 'Kein Wiedersehen fällig — heute wächst Neues.',
@@ -609,6 +613,20 @@ export const de = {
       custom: 'Eigenes',
     },
     remove: 'Entfernen',
+    exclude: '{label} nicht übernehmen',
+    include: '{label} wieder übernehmen',
+    editLabel: 'Beschriftung {label} bearbeiten',
+    removeConnection: 'Verbindung entfernen',
+    select: 'Erinnerung {label} öffnen',
+    constellationLabel: 'Deine Erinnerungen und ihre Verbindungen',
+    connected: 'Verbunden mit',
+    lastRecalled: 'Zuletzt abgerufen',
+    nextReview: 'Wiedersehen',
+    none: 'Noch keine Verbindung',
+    notYet: 'Noch nicht abgerufen',
+    dueSoon: 'Jetzt im FSRS-Wiederholungsplan fällig',
+    fsrsScheduled: 'FSRS plant den nächsten passenden Zeitpunkt',
+    close: 'Detail schließen',
   },
   own: {
     /*

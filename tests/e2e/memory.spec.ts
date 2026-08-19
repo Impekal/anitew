@@ -41,9 +41,9 @@ test('merkt echte Information: Vorschläge, Bestätigung, Constellation, Neulade
   await expect(page.locator('.remember-edges li').first()).toContainText('Daniel → Museum')
 
   // Ein Vorschlag lässt sich abwählen — und seine Verbindung geht still mit.
-  await page.locator('.remember-node', { hasText: 'Museum' }).click()
+  await page.locator('.remember-node', { hasText: 'Museum' }).locator('.remember-node-toggle').click()
   await expect(page.locator('.remember-edges li')).toHaveCount(2)
-  await page.locator('.remember-node', { hasText: 'Museum' }).click()
+  await page.locator('.remember-node', { hasText: 'Museum' }).locator('.remember-node-toggle').click()
   await expect(page.locator('.remember-edges li')).toHaveCount(3)
 
   await page.getByRole('button', { name: 'Bestätigen und merken' }).click()

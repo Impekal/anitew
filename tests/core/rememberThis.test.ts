@@ -9,6 +9,7 @@ import { createMemoryGraph, memoryNodeId } from '../../src/core/memory/memoryGra
 import {
   composeMemoryPool,
   memoryLabelsOf,
+  memoryNodeIdOfItem,
   memorySceneItems,
   memorySubjectOf,
 } from '../../src/core/memory/missionComposer.ts'
@@ -84,6 +85,7 @@ describe('das Behalten-Wollen', () => {
     const items = memorySceneItems(anchor)
     expect(items).toHaveLength(3)
     expect(memoryLabelsOf(items[0] as string)).toEqual({ subject: 'Daniel', target: 'Museum' })
+    expect(memoryNodeIdOfItem(items[0] as string)).toBe(memoryNodeId('place', 'Museum'))
 
     // Ein Anker ohne Verbindungen trägt keine Frage und bleibt draußen.
     const lonely = applyRememberedSuggestions(
@@ -92,6 +94,27 @@ describe('das Behalten-Wollen', () => {
       1_000,
     )
     expect(composeMemoryPool(lonely)).toHaveLength(0)
+  })
+
+  it('trägt stabile Graph-IDs im FSRS-Item statt Beschriftungen unscharf zu vergleichen', () => {
+    const graph = applyRememberedSuggestions(
+      createMemoryGraph(),
+      {
+        nodes: [
+          { id: 'person:anna', type: 'person', label: 'Anna' },
+          { id: 'place:museum', type: 'place', label: 'Museum' },
+        ],
+        edges: [{ from: 'person:anna', to: 'place:museum', relation: 'association' }],
+      },
+      1_000,
+    )
+    const item = memorySceneItems(composeMemoryPool(graph)[0] ?? '')[0]
+    expect(item).toBeDefined()
+    expect(memoryNodeIdOfItem(item ?? '')).toBe('place:museum')
+    expect(memoryLabelsOf(item ?? '')).toEqual({ subject: 'Anna', target: 'Museum' })
+
+    // Alttermine ohne ID bleiben lesbar, geben aber keine erfundene Zuordnung vor.
+    expect(memoryNodeIdOfItem('Anna\u001eMuseum')).toBeUndefined()
   })
 
   it('wäscht KI-Vorschläge wie Fremdmaterial (D-037)', () => {

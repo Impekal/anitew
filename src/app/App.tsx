@@ -218,6 +218,7 @@ export function App() {
     return () => window.removeEventListener('keydown', onKey)
   }, [menuOpen])
   const [running, setRunning] = useState<SessionProgress | undefined>()
+  const [systemPulse, setSystemPulse] = useState(0)
   const [resumable, setResumable] = useState<SessionProgress | undefined>()
   /*
    * Die Trainingstage für die Serie (K2).
@@ -739,6 +740,7 @@ export function App() {
         taught={taught}
         own={own}
         onLeave={leave}
+        onComplete={() => setSystemPulse((value) => value + 1)}
         onAgain={start}
       />
     )
@@ -813,7 +815,15 @@ export function App() {
       },
       memories: {
         title: dictionary.memory.heading,
-        body: <MemoryPanel platform={platform} dictionary={dictionary} />,
+        body: (
+          <MemoryPanel
+            platform={platform}
+            dictionary={dictionary}
+            training={training}
+            language={language}
+            today={today}
+          />
+        ),
       },
       about: {
         title: dictionary.onboarding.editHeading,
@@ -947,14 +957,14 @@ export function App() {
         </section>
       )}
 
-      <StreakLine streak={streak} dictionary={dictionary} />
-      <ReturnsLine returns={returns} dictionary={dictionary} />
       <TodayLine
         platform={platform}
         dictionary={dictionary}
         training={training}
         today={today}
         onOpenMemories={() => openPage('memories')}
+        duration={label}
+        refreshKey={systemPulse}
       />
 
       {/*
@@ -1143,6 +1153,11 @@ export function App() {
           ))}
         </div>
       </section>
+
+      <div className="today-history" aria-label={dictionary.today.heading}>
+        <StreakLine streak={streak} dictionary={dictionary} />
+        <ReturnsLine returns={returns} dictionary={dictionary} />
+      </div>
 
       <footer className="footer">
         <label className="language">

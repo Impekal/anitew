@@ -3,13 +3,16 @@ import { useEffect, useState } from 'react'
 import {
   type DayKey,
   type Platform,
+  type MemoryGraph,
   composeMemoryPool,
+  createMemoryGraph,
   memorySubjectOf,
   selectDue,
 } from '../core/index.ts'
 import { loadDue } from '../data/items.ts'
 import { MEMORY_VISITED_KEY, loadMemoryGraph } from '../data/memoryStore.ts'
 import type { Dictionary } from '../i18n/index.ts'
+import { MemoryConstellation } from './MemoryConstellation.tsx'
 
 /**
  * Der Blick auf heute (V2: Today-Experience) — zwei Zeilen, beide wahr,
@@ -32,12 +35,16 @@ export function TodayLine({
   training,
   today,
   onOpenMemories,
+  duration,
+  refreshKey,
 }: {
   platform: Platform
   dictionary: Dictionary
   training: string
   today: DayKey
   onOpenMemories: () => void
+  duration: string
+  refreshKey: number
 }) {
   const texts = dictionary.today
 
@@ -45,6 +52,7 @@ export function TodayLine({
   const [due, setDue] = useState<number | undefined>(undefined)
   const [weakest, setWeakest] = useState<string | undefined>(undefined)
   const [invite, setInvite] = useState(false)
+  const [graph, setGraph] = useState<MemoryGraph>(createMemoryGraph())
 
   useEffect(() => {
     void (async () => {
@@ -54,6 +62,7 @@ export function TodayLine({
       // gezählt, denn die Zeile sagt, was ansteht, nicht, was hineinpasst.
       setDue(selectDue(items, today, Number.MAX_SAFE_INTEGER).length)
       const graph = await loadMemoryGraph()
+      setGraph(graph)
       const pool = composeMemoryPool(graph)
       setWeakest(pool.length > 0 ? memorySubjectOf(pool[0] as string) : undefined)
       /*
@@ -71,13 +80,17 @@ export function TodayLine({
         setInvite(false)
       }
     })().catch(() => undefined)
-  }, [platform, training, today])
+  }, [platform, training, today, refreshKey])
 
   const showDue = tracked > 0 && due !== undefined
-  if (!showDue && weakest === undefined && !invite) return null
-
   return (
-    <section className="today" aria-label={texts.heading}>
+    <section className={refreshKey > 0 ? 'today today-resolved' : 'today'} aria-label={texts.heading}>
+      <p className="today-system">{texts.systemHeading}</p>
+      {graph.nodes.length > 0 && <MemoryConstellation graph={graph} />}
+      <div className="today-mission">
+        <p className="today-mission-label">{texts.missionHeading}</p>
+        <p className="today-duration">{texts.duration.replace('{duration}', duration)}</p>
+      </div>
       {showDue && (
         <p className="today-line today-due">
           {due === 0
@@ -90,6 +103,7 @@ export function TodayLine({
       {weakest !== undefined && (
         <p className="today-line today-memory">{texts.weakest.replace('{label}', weakest)}</p>
       )}
+      {!showDue && weakest === undefined && <p className="today-line">{texts.quietMission}</p>}
       {invite && (
         <div className="today-invite">
           <p className="today-line">{texts.invite}</p>

@@ -83,14 +83,21 @@ function notesFor(cue: SoundCue, step: number): Note[] {
         { step: 2, at: 0, decay: 1.2, gain: 0.36 },
         { step: 7, at: 0.14, decay: 1.8, gain: 0.32 },
       ]
-    case 'done':
-      // Der einzige Moment, der etwas ausholen darf.
+    case 'connection':
+      // Zwei nahe, ineinandergreifende Stimmen: eine Beziehung entsteht.
       return [
-        { step: 0, at: 0, decay: 1.2, gain: 0.42 },
-        { step: 2, at: 0.11, decay: 1.2, gain: 0.42 },
-        { step: 4, at: 0.22, decay: 1.4, gain: 0.42 },
-        { step: 7, at: 0.33, decay: 2.2, gain: 0.46 },
-        { step: 9, at: 0.44, decay: 2.6, gain: 0.32 },
+        { step: 1, at: 0.45, decay: 1.1, gain: 0.25 },
+        { step: 2, at: 0.53, decay: 1.35, gain: 0.25 },
+      ]
+    case 'recall':
+      // Ein einzelner warmer Impuls: aufgelöst, aber nicht als Sieg verkauft.
+      return [{ step: 4, at: 0, decay: 0.75, gain: 0.28 }]
+    case 'done':
+      // Ein warmer Schluss, kein Sieges-Jingle: drei tiefe Atemzüge.
+      return [
+        { step: 0, at: 0, decay: 1.3, gain: 0.34 },
+        { step: 2, at: 0.13, decay: 1.5, gain: 0.32 },
+        { step: 4, at: 0.27, decay: 2.1, gain: 0.3 },
       ]
   }
 }

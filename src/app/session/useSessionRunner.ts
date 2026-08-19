@@ -218,6 +218,7 @@ export function useSessionRunner(
        * ausschließlich über `recordOutcome` (FSRS bleibt die Wahrheit).
        */
       if (block.moduleId === 'memory') {
+        platform.sound.play('recall')
         void applyMemoryOutcome({ correct: graded.correct, missed: graded.missed }, at).catch(
           () => undefined,
         )

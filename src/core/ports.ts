@@ -54,6 +54,10 @@ export type SoundCue =
   | 'type'
   /** Eine Erinnerung ist bestätigt und gehört jetzt zum Graphen (D-036). */
   | 'remember'
+  /** Eine bestätigte Beziehung ist im persönlichen Graphen entstanden. */
+  | 'connection'
+  /** Ein Abruf wurde aufgelöst; richtig oder falsch bleibt visuell, nicht musikalisch gewertet. */
+  | 'recall'
   /** Ein Block ist zu Ende. */
   | 'block'
   /** Die Einheit ist geschafft. */

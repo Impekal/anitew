@@ -1467,3 +1467,19 @@ absichtlich **nicht** mit).
    das abgerundete Normal-Icon verlöre beim Android-Zuschnitt die
    Ecken. Die Markenrecherche (R3) ist bestätigt abgeschlossen — das
    Zeichen ist damit endgültig, kein Vorbehalt mehr.
+
+## D-040 · 2026-08-19 · Graph-Kennungen reisen im FSRS-Item
+
+**Entscheidung:** Ein Memory-Termin trägt neben den sichtbaren Beschriftungen
+die stabilen Kennungen von Anker und Ziel im bereits vorhandenen Item-String.
+Die Trennung erfolgt mit U+001D, neben den bestehenden U+001E/U+001F-Trennern.
+Damit findet ein FSRS-Termin exakt den Graph-Knoten, auch wenn zwei Knoten
+dieselbe Beschriftung tragen. FSRS bleibt unverändert die einzige Wahrheit
+über den Zeitpunkt; der Graph liefert weiterhin nur Inhalt und Beziehungen.
+
+Alte Termine ohne Kennungen bleiben les- und trainierbar. Beim Rückfluss eines
+alten Ergebnisses gilt aus Migrationsgründen der bisherige exakte Label-Weg;
+die Oberfläche behauptet für solche Alttermine jedoch keinen knotengenauen
+Fälligkeitsstatus. Jeder neu erzeugte oder erneut geplante Memory-Termin trägt
+die Kennungen. Verworfen wurde unscharfes `includes`-Matching: „Anna“ darf nie
+den Termin von „Annabel“ übernehmen.

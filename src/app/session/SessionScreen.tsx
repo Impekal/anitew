@@ -54,6 +54,7 @@ export function SessionScreen(props: {
   /** Der selbst angelegte Palast, wenn es einen gibt (G3). */
   own?: OwnPalace
   onLeave: () => void
+  onComplete: () => void
   /** „Noch eine Runde“ vom Abschluss aus (B7). */
   onAgain: () => void
 }) {
@@ -99,6 +100,7 @@ function RunningSession({
   own,
   onLeave,
   onAgain,
+  onComplete,
 }: {
   platform: Platform
   dictionary: Dictionary
@@ -107,6 +109,7 @@ function RunningSession({
   own?: OwnPalace
   onLeave: () => void
   onAgain: () => void
+  onComplete: () => void
 }) {
   const { state, setEntries, submitPrompt, advance, leave } = useSessionRunner(
     platform,
@@ -188,8 +191,14 @@ function RunningSession({
         dictionary={dictionary}
         results={state.results}
         language={state.plan.language}
-        onLeave={leave}
-        onAgain={onAgain}
+        onLeave={() => {
+          onComplete()
+          leave()
+        }}
+        onAgain={() => {
+          onComplete()
+          onAgain()
+        }}
       />
     )
   }

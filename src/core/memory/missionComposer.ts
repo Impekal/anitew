@@ -29,6 +29,8 @@ import { type MemoryGraph, edgesFrom, nodeById, nodesByStrength } from './memory
 export const MEMORY_SCENE_SEPARATOR = '\u001f'
 /** Trennt Anker und Ding in der Stück-Kennung. */
 export const MEMORY_ITEM_SEPARATOR = '\u001e'
+/** Trennt die sichtbare Beschriftung von stabilen Graph-Kennungen. */
+export const MEMORY_ID_SEPARATOR = '\u001d'
 
 /** Mehr Szenen je Einheit wären Beschäftigung — der Rest kommt morgen. */
 export const MAX_MEMORY_SCENES = 6
@@ -57,7 +59,14 @@ export function memorySceneItems(anchor: string): readonly string[] {
 /** Die gesuchte Antwort eines Stücks. */
 export function memoryTargetOf(item: string): string {
   const at = item.indexOf(MEMORY_ITEM_SEPARATOR)
-  return at >= 0 ? item.slice(at + MEMORY_ITEM_SEPARATOR.length) : item
+  const target = at >= 0 ? item.slice(at + MEMORY_ITEM_SEPARATOR.length) : item
+  return target.split(MEMORY_ID_SEPARATOR)[0] ?? target
+}
+
+/** Stabile Graph-Kennung des abgefragten Knotens; bei alten Terminen nicht vorhanden. */
+export function memoryNodeIdOfItem(item: string): string | undefined {
+  const parts = item.split(MEMORY_ID_SEPARATOR)
+  return parts.length >= 3 ? parts[2] || undefined : undefined
 }
 
 /** Anker und Ding eines Stücks, als Beschriftungen. */
@@ -81,7 +90,15 @@ export function composeMemoryPool(graph: MemoryGraph, maxScenes = MAX_MEMORY_SCE
       .sort((a, b) => a.strength - b.strength)
       .slice(0, MAX_ITEMS_PER_SCENE)
     if (connected.length === 0) continue
-    scenes.push([subject.label, ...connected.map((node) => node.label)].join(MEMORY_SCENE_SEPARATOR))
+    scenes.push(
+      [
+        subject.label,
+        ...connected.map(
+          (node) =>
+            `${node.label}${MEMORY_ID_SEPARATOR}${subject.id}${MEMORY_ID_SEPARATOR}${node.id}`,
+        ),
+      ].join(MEMORY_SCENE_SEPARATOR),
+    )
   }
   return scenes
 }

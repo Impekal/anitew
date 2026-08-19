@@ -4,6 +4,7 @@ import {
   type NodeSuggestion,
   type Platform,
   type RememberSuggestions,
+  memoryNodeId,
   suggestMemories,
 } from '../core/index.ts'
 import { loadMemoryGraph, saveMemoryGraph } from '../data/memoryStore.ts'
@@ -39,7 +40,7 @@ export function RememberThisPanel({
 }: {
   platform: Platform
   dictionary: Dictionary
-  onSaved: () => void
+  onSaved: (newNodeIds: readonly string[]) => void
 }) {
   const texts = dictionary.memory
 
@@ -103,26 +104,63 @@ export function RememberThisPanel({
     setDropped(next)
   }
 
+  const editNode = (id: string, label: string) => {
+    if (suggestions === undefined) return
+    const source = suggestions.nodes.find((node) => node.id === id)
+    if (source === undefined) return
+    const clean = label.replace(/\s+/gu, ' ').slice(0, 80)
+    const nextId = memoryNodeId(source.type, clean)
+    setSuggestions({
+      nodes: suggestions.nodes.map((node) =>
+        node.id === id ? { ...node, id: nextId, label: clean } : node,
+      ),
+      edges: suggestions.edges.map((edge) => ({
+        ...edge,
+        from: edge.from === id ? nextId : edge.from,
+        to: edge.to === id ? nextId : edge.to,
+      })),
+    })
+    if (dropped.has(id)) {
+      const next = new Set(dropped)
+      next.delete(id)
+      next.add(nextId)
+      setDropped(next)
+    }
+  }
+
+  const removeEdge = (from: string, to: string) => {
+    if (suggestions === undefined) return
+    setSuggestions({
+      ...suggestions,
+      edges: suggestions.edges.filter((edge) => edge.from !== from || edge.to !== to),
+    })
+  }
+
   const confirm = () => {
     if (suggestions === undefined) return
     const confirmed: RememberSuggestions = {
-      nodes: suggestions.nodes.filter((node) => !dropped.has(node.id)),
+      nodes: suggestions.nodes.filter(
+        (node) => !dropped.has(node.id) && node.label.trim().length >= 2,
+      ),
       edges: suggestions.edges,
     }
     if (confirmed.nodes.length === 0) return
     void (async () => {
       const graph = await loadMemoryGraph()
-      await saveMemoryGraph(
-        applyRememberedSuggestions(graph, confirmed, platform.clock.now()),
-      )
+      const next = applyRememberedSuggestions(graph, confirmed, platform.clock.now())
+      const existing = new Set(graph.nodes.map((node) => node.id))
+      const newNodeIds = next.nodes.filter((node) => !existing.has(node.id)).map((node) => node.id)
+      const newConnections = next.edges.length - graph.edges.length
+      await saveMemoryGraph(next)
       setDraft('')
       setSuggestions(undefined)
       setFromAi(false)
       setSaved(true)
       // Der Ton der Klangsprache fürs Aufheben — leise, kein Jubel (G-1).
       platform.sound.play('remember')
+      if (newConnections > 0) platform.sound.play('connection')
       scheduleDriveSync(platform)
-      onSaved()
+      onSaved(newNodeIds)
     })().catch(() => undefined)
   }
 
@@ -183,18 +221,36 @@ export function RememberThisPanel({
         <div className="remember-preview">
           {fromAi && <p className="hint remember-aisource">{texts.aiSource}</p>}
           <p className="hint">{texts.suggestionsNodes}</p>
-          <div className="remember-nodes">
-            {suggestions.nodes.map((node) => (
-              <button
-                key={node.id}
-                type="button"
+          <div className="remember-nodes" aria-label={texts.suggestionsNodes}>
+            {suggestions.nodes.map((node, index) => (
+              <div
+                key={`${node.type}:${index}`}
                 className={kept(node) ? 'remember-node' : 'remember-node remember-node-off'}
-                aria-pressed={kept(node)}
                 onClick={() => toggle(node.id)}
               >
-                <strong>{node.label}</strong>
-                <small>{texts.types[node.type]}</small>
-              </button>
+                <button
+                  type="button"
+                  className="remember-node-toggle"
+                  aria-pressed={kept(node)}
+                  aria-label={kept(node) ? texts.exclude.replace('{label}', node.label) : texts.include.replace('{label}', node.label)}
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    toggle(node.id)
+                  }}
+                >
+                  <span aria-hidden="true">{kept(node) ? '●' : '○'}</span>
+                </button>
+                <label>
+                  <small>{texts.types[node.type]}</small>
+                  <input
+                    value={node.label}
+                    disabled={!kept(node)}
+                    onChange={(event) => editNode(node.id, event.target.value)}
+                    aria-label={texts.editLabel.replace('{label}', node.label)}
+                    onClick={(event) => event.stopPropagation()}
+                  />
+                </label>
+              </div>
             ))}
           </div>
 
@@ -206,7 +262,8 @@ export function RememberThisPanel({
                   .filter((edge) => !dropped.has(edge.from) && !dropped.has(edge.to))
                   .map((edge) => (
                     <li key={`${edge.from}→${edge.to}`}>
-                      {labelOf(edge.from)} → {labelOf(edge.to)}
+                      <span>{labelOf(edge.from)} → {labelOf(edge.to)}</span>
+                      <button type="button" className="quiet" onClick={() => removeEdge(edge.from, edge.to)} aria-label={texts.removeConnection}>{texts.removeConnection}</button>
                     </li>
                   ))}
               </ul>
