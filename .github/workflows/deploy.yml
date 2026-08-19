@@ -36,6 +36,12 @@ jobs:
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || vars.CLOUDFLARE_ACCOUNT_ID || '07613ddfc3f70bf92e9df8a9f9530552' }}
+      # Die Google-Client-Kennung für den Drive-Abgleich (D-033). Wie die
+      # Account-ID ist sie **kein** Geheimnis, sondern eine Kennung: Sie
+      # steht ohnehin im ausgelieferten JavaScript jeder Web-App, und Google
+      # akzeptiert sie nur von den eingetragenen JavaScript-Quellen. Ein
+      # Secret oder eine Variable gleichen Namens sticht sie trotzdem.
+      VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID || vars.VITE_GOOGLE_CLIENT_ID || '360791045103-jvbjtv7mdatp4f5svtcfj7uabjm7jdok.apps.googleusercontent.com' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
