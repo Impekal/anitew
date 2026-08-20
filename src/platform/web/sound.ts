@@ -112,13 +112,21 @@ function notesFor(cue: SoundCue, step: number): Note[] {
 /**
  * Ein kurzer, weicher Stoß bei den Wechseln, die zählen (O6).
  *
- * Nicht bei jedem Wort — das wäre ein zappelndes Telefon. Nur wenn ein Block
- * oder die Einheit zu Ende ist: eine Bestätigung, die man in der Tasche spürt.
+ * Nicht bei jedem Wort — das wäre ein zappelndes Telefon. Nur wenn ein Block,
+ * eine echte Wiederbegegnung oder die Einheit zu Ende ist: eine Bestätigung,
+ * die man in der Tasche spürt. RETURN ist bewusst zweiteilig: „da“ — „wieder“.
  */
 function buzz(cue: SoundCue): void {
   const vibrate = (navigator as { vibrate?: (pattern: number | number[]) => boolean }).vibrate
   if (typeof vibrate !== 'function') return
-  const pattern = cue === 'done' ? [16, 40, 16] : cue === 'block' ? [14] : undefined
+  const pattern =
+    cue === 'done'
+      ? [16, 40, 16]
+      : cue === 'return'
+        ? [9, 34, 9]
+        : cue === 'block'
+          ? [14]
+          : undefined
   if (pattern === undefined) return
   try {
     vibrate(pattern)
