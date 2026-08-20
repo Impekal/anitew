@@ -1,0 +1,71 @@
+name: ANITEW staging ingest
+
+on:
+  push:
+    branches:
+      - anitew-phase2-staging
+    paths:
+      - '.anitew-staging/phase2.patch.gz.b64'
+
+permissions:
+  contents: write
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout staging branch
+        uses: actions/checkout@v4
+        with:
+          ref: anitew-phase2-staging
+          fetch-depth: 0
+
+      - name: Decode staged patch
+        run: |
+          base64 -d .anitew-staging/phase2.patch.gz.b64 | gzip -d > /tmp/anitew-phase2.patch
+          wc -c /tmp/anitew-phase2.patch
+          wc -l /tmp/anitew-phase2.patch
+
+      - name: Verify and apply patch
+        run: |
+          git apply --check /tmp/anitew-phase2.patch
+          git apply /tmp/anitew-phase2.patch
+          rm .anitew-staging/phase2.patch.gz.b64
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Core tests
+        run: npm test
+
+      - name: Production build
+        run: npm run build
+
+      - name: Size budget
+        run: npm run size
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: E2E tests
+        run: npx playwright test --project=chromium
+
+      - name: Commit validated Phase 2
+        run: |
+          git config user.name "ANITEW Staging Runner"
+          git config user.email "actions@users.noreply.github.com"
+          git diff --name-only -z --diff-filter=ACMRTUXB | xargs -0 -r git add --
+          git ls-files --others --exclude-standard -z | xargs -0 -r git add --
+          git add -u -- .anitew-staging/phase2.patch.gz.b64
+          git diff --cached --check
+          git commit -m "feat: stage ANITEW memory system phase two"
+          git push origin HEAD:anitew-phase2-staging
