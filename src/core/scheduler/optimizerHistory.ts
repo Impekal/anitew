@@ -13,7 +13,7 @@ export interface SchedulerReviewFact {
   readonly recalled: boolean
 }
 
-/** Form, die sich ohne Browser/WASM testen und später 1:1 ins Binding übersetzen lässt. */
+/** Form, die sich ohne Browser/WASM testen und später ins Binding übersetzen lässt. */
 export interface OptimizerReview {
   /** FSRS: 1 = Again, 3 = Good. ANITEW misst binär und erfindet kein Hard/Easy. */
   readonly rating: 1 | 3
@@ -81,18 +81,27 @@ export function optimizerHistoriesOf(
 }
 
 /**
- * Nur eine Fortschrittszahl für die technische Entscheidung, nicht für die UI.
- * Anki/FSRS kann heute auch kleine Datenmengen optimieren; ANITEW startet
- * trotzdem nicht bei der ersten Handvoll Antworten. 100 belegbare Tagesreviews
- * ist ein konservativer Produkt-Gate und zugleich der erste Verdopplungspunkt,
- * den die aktuelle FSRS-FAQ für Re-Optimierung nennt.
+ * Technischer Sicherheits-Gate, nicht Nutzer-Score.
+ *
+ * Moderne FSRS-Versionen können auch kleine Datenmengen optimieren. Für ANITEW
+ * genügt aber nicht, dass viele Dinge einmal gezeigt wurden: Personalisierung
+ * soll erst einsetzen, wenn genügend **zeitversetzte Wiedersehen** vorliegen.
+ * Ein Review mit `deltaDays > 0` enthält genau dieses persönliche Signal.
+ *
+ * 100 ist bewusst konservativ und entspricht zugleich dem ersten in der
+ * aktuellen FSRS-FAQ genannten Verdopplungspunkt (100, 200, 400, …) für
+ * Re-Optimierung. Bis dahin bleiben die breit trainierten Standardparameter.
  */
-export const MIN_OPTIMIZER_REVIEWS = 100
+export const MIN_OPTIMIZER_RETURNS = 100
 
-export function optimizerReviewCount(histories: readonly OptimizerItemHistory[]): number {
-  return histories.reduce((total, history) => total + history.reviews.length, 0)
+export function optimizerReturnCount(histories: readonly OptimizerItemHistory[]): number {
+  return histories.reduce(
+    (total, history) =>
+      total + history.reviews.filter((review) => review.deltaDays > 0).length,
+    0,
+  )
 }
 
 export function hasEnoughOptimizerHistory(histories: readonly OptimizerItemHistory[]): boolean {
-  return optimizerReviewCount(histories) >= MIN_OPTIMIZER_REVIEWS
+  return optimizerReturnCount(histories) >= MIN_OPTIMIZER_RETURNS
 }
