@@ -33,12 +33,6 @@ import { FALLBACK_LANGUAGE, type Language } from '../language.ts'
  * transportieren, also zeichnet sie das Naheliegende und behauptet nicht mehr,
  * als sie zeigen kann. Kahlköpfigkeit bleibt bewusst für alle möglich — die
  * fällt nicht als Fehler auf, der Vollbart schon.
- *
- * Vorher lagen beide Sorten abwechselnd in **einer** Liste. Das sah aus wie
- * Absicht, war aber nur die Reihenfolge, in der ich sie aufgeschrieben habe —
- * im englischen Pool stimmte die Abwechslung ab „Ximena“ schon nicht mehr.
- * Was eine Eigenschaft sein soll, gehört in die Struktur und nicht in die
- * Sortierung.
  */
 const deFeminine = [
   'Beata', 'Dilara', 'Farida', 'Hedwig', 'Jolanda', 'Ludmilla', 'Nadja', 'Pia',
@@ -64,13 +58,7 @@ const enMasculine = [
   'Horace', 'Jasper', 'Leonard', 'Nathaniel', 'Percival', 'Sebastian', 'Vernon',
 ]
 
-/**
- * Fügt die beiden Hälften abwechselnd zusammen.
- *
- * Gezogen wird zwar zufällig, aber die Reihenfolge bleibt die Grundlage: Wo
- * ein Verfahren einen zusammenhängenden Ausschnitt nimmt, soll darin nicht
- * eine Sorte alleine stehen.
- */
+/** Fügt die beiden Hälften abwechselnd zusammen. */
 function interleave(a: readonly string[], b: readonly string[]): readonly string[] {
   const out: string[] = []
   for (let i = 0; i < Math.max(a.length, b.length); i++) {
@@ -94,13 +82,31 @@ const frMasculine = [
   'Rémi', 'Sylvain', 'Thibault', 'Valentin', 'Xavier', 'Yann', 'Basile', 'Côme',
 ]
 
+const esFeminine = [
+  'Almudena', 'Beatriz', 'Candela', 'Dolores', 'Estrella', 'Fátima', 'Gloria', 'Inés',
+  'Jimena', 'Leonor', 'Marisol', 'Nuria', 'Paloma', 'Raquel', 'Soledad', 'Teresa',
+  'Verónica', 'Yolanda', 'Adela', 'Celia', 'Elvira', 'Irene', 'Lucía', 'Pilar',
+]
+
+const esMasculine = [
+  'Agustín', 'Baltasar', 'César', 'Damián', 'Eloy', 'Fabián', 'Gonzalo', 'Héctor',
+  'Ismael', 'Joaquín', 'Leandro', 'Mateo', 'Nicolás', 'Óscar', 'Pablo', 'Rodrigo',
+  'Salvador', 'Tomás', 'Vicente', 'Xabier', 'Bruno', 'Gael', 'Íñigo', 'Ramiro',
+]
+
 const POOLS: Partial<Record<Language, readonly string[]>> = {
   de: interleave(deMasculine, deFeminine),
   en: interleave(enMasculine, enFeminine),
   fr: interleave(frMasculine, frFeminine),
+  es: interleave(esMasculine, esFeminine),
 }
 
-const FEMININE: ReadonlySet<string> = new Set([...deFeminine, ...enFeminine, ...frFeminine])
+const FEMININE: ReadonlySet<string> = new Set([
+  ...deFeminine,
+  ...enFeminine,
+  ...frFeminine,
+  ...esFeminine,
+])
 
 export function namePool(language: Language): readonly string[] {
   return POOLS[language] ?? (POOLS[FALLBACK_LANGUAGE] as readonly string[])
