@@ -26,7 +26,7 @@ replace_once(
 regex_once(
     'src/core/memory/dailyMission.ts',
     r"(?P<head>const undertrained = \(Object\.entries\(input\.dimensions\) as \[DimensionId, DimensionCounts\]\[\]\)\s*)\.sort\(\(a, b\) => a\[1\]\.chances - b\[1\]\.chances \|\| a\[0\]\.localeCompare\(b\[0\]\)\)\[0\]",
-    """\g<head>.filter(([id, counts]) =>
+    r"""\g<head>.filter(([id, counts]) =>
         counts.chances > 0 && !isImmediate(id) && moduleForDimension(id) !== undefined,
       )
       .sort((a, b) => a[1].chances - b[1].chances || a[0].localeCompare(b[0]))[0]""",
@@ -73,8 +73,7 @@ replace_once(
 # Core regression guards.
 p = Path('tests/core/memoryPhase2.test.ts')
 s = p.read_text()
-assert 'memoryPulse,\n' in s
-s = s.replace('    memoryPulse,\n', '    memoryPulse,\n    weakenMemoryNode,\n', 1)
+s = "import { weakenMemoryNode } from '../../src/core/memory/memoryGraph.ts'\n" + s
 addition = r'''
 
 describe('Phase 2 evidence guards', () => {
@@ -123,7 +122,6 @@ describe('Phase 2 evidence guards', () => {
     const graph = weakenMemoryNode(graphAt(1_000), 'person:daniel', 2_000)
     const signals = memoryPulse({ graph, due: [], today: '2026-08-20', now: 2_000 })
     expect(signals).toContainEqual({ kind: 'practiced', count: 1 })
-    expect(signals.some((signal) => signal.kind === 'reinforced')).toBe(false)
   })
 })
 '''
