@@ -1,4 +1,18 @@
-/** Zwillingspaare — Ähnliches auseinanderhalten (Backlog C6/D3). */
+/**
+ * Zwillingspaare — Ähnliches auseinanderhalten (Backlog C6/D3).
+ *
+ * Je Paar zwei echte Wörter, die sich zum Verwechseln ähnlich sind: ein
+ * Buchstabe anders, eine Silbe vertauscht. Eingeprägt wird **eines** davon;
+ * gefragt wird später mit beiden — „Welches stand da?“ Das trainiert genau
+ * die Fähigkeit, die beim Lernen am häufigsten reißt: zwei ähnliche
+ * Einträge nicht ineinanderlaufen zu lassen (Interferenz).
+ *
+ * Kuratiert, nicht erzeugt: Ob zwei Wörter zum Verwechseln ähnlich sind,
+ * entscheidet keine Levenshtein-Distanz, sondern das Lesen. Und **ohne
+ * Überschneidung mit den anderen Vorräten** — ein Zwilling, der zugleich im
+ * Wortmodul oder gar im Quarantänevorrat der Messung läge, machte aus zwei
+ * getrennten Übungen eine (C6) oder verseuchte die Messung (F2a).
+ */
 
 import { createRng } from '../rng.ts'
 import type { Language } from '../language.ts'
@@ -32,14 +46,20 @@ const PAIRS: Readonly<Partial<Record<Language, readonly (readonly [string, strin
   ],
 }
 
+/** Gibt es für diese Sprache Zwillingspaare? */
 export function hasTwinPool(language: Language): boolean {
   return (PAIRS[language]?.length ?? 0) > 0
 }
 
+/** Alle Paare einer Sprache — für Prüfungen und Zählungen. */
 export function twinPairs(language: Language): readonly (readonly [string, string])[] {
   return PAIRS[language] ?? []
 }
 
+/**
+ * Der Vorrat einer Einheit: je Paar eine Kennung `gezeigt%köder`, wobei
+ * der Seed entscheidet, **welche** Seite gezeigt wird.
+ */
 export function twinPool(language: Language, seed: string): string[] {
   const rng = createRng(`twins:${seed}`)
   const items = (PAIRS[language] ?? []).map(([first, second]) => {
