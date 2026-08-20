@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  MIN_OPTIMIZER_REVIEWS,
+  MIN_OPTIMIZER_RETURNS,
   hasEnoughOptimizerHistory,
   optimizerHistoriesOf,
-  optimizerReviewCount,
+  optimizerReturnCount,
   type SchedulerReviewFact,
 } from '../../src/core/index.ts'
 
@@ -58,18 +58,34 @@ describe('C10 — belegbare Optimizer-Historie', () => {
     ])
   })
 
-  it('aktiviert Optimierung erst ab dem konservativen C10-Gate', () => {
-    const facts = (count: number): SchedulerReviewFact[] =>
-      Array.from({ length: count }, (_, index) => ({
-        itemId: `words:de:item-${index}`,
-        day: '2026-08-20',
-        recalled: index % 2 === 0,
-      }))
+  it('zählt Erstkontakte ausdrücklich nicht als persönliche Wiedersehen', () => {
+    const onlyFirstContacts = optimizerHistoriesOf(
+      Array.from({ length: MIN_OPTIMIZER_RETURNS + 20 }, (_, index) => ({
+        itemId: `words:de:first-${index}`,
+        day: '2026-08-20' as const,
+        recalled: true,
+      })),
+    )
 
-    const below = optimizerHistoriesOf(facts(MIN_OPTIMIZER_REVIEWS - 1))
-    const enough = optimizerHistoriesOf(facts(MIN_OPTIMIZER_REVIEWS))
+    expect(optimizerReturnCount(onlyFirstContacts)).toBe(0)
+    expect(hasEnoughOptimizerHistory(onlyFirstContacts)).toBe(false)
+  })
 
-    expect(optimizerReviewCount(below)).toBe(MIN_OPTIMIZER_REVIEWS - 1)
+  it('aktiviert Optimierung erst ab genügend zeitversetzten Wiedersehen', () => {
+    const facts = (returns: number): SchedulerReviewFact[] => {
+      const result: SchedulerReviewFact[] = []
+      for (let index = 0; index < returns; index++) {
+        const itemId = `words:de:item-${index}`
+        result.push({ itemId, day: '2026-08-20', recalled: true })
+        result.push({ itemId, day: '2026-08-21', recalled: index % 2 === 0 })
+      }
+      return result
+    }
+
+    const below = optimizerHistoriesOf(facts(MIN_OPTIMIZER_RETURNS - 1))
+    const enough = optimizerHistoriesOf(facts(MIN_OPTIMIZER_RETURNS))
+
+    expect(optimizerReturnCount(below)).toBe(MIN_OPTIMIZER_RETURNS - 1)
     expect(hasEnoughOptimizerHistory(below)).toBe(false)
     expect(hasEnoughOptimizerHistory(enough)).toBe(true)
   })
