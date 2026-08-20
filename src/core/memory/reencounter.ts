@@ -23,6 +23,27 @@ export interface MemoryAfterglow {
 }
 
 /**
+ * Frühester vorhandener FSRS-Termin je stabiler Graph-ID.
+ *
+ * Ein Knoten kann in mehreren bestätigten Beziehungen als Ziel auftauchen und
+ * deshalb mehrere Memory-Items besitzen. Für die Detailansicht zählt dann das
+ * früheste echte Wiedersehen. Legacy-Termine ohne stabile ID bleiben bewusst
+ * außen vor — Label-Matching würde „Anna“ und „Annabel“ wieder vermischen.
+ */
+export function memoryReviewDays(due: readonly DueItem[]): ReadonlyMap<string, DayKey> {
+  const result = new Map<string, DayKey>()
+  for (const item of due) {
+    if (item.itemId.split(':')[0] !== 'memory') continue
+    const payload = item.itemId.split(':').slice(2).join(':')
+    const id = memoryNodeIdOfItem(payload)
+    if (id === undefined) continue
+    const existing = result.get(id)
+    if (existing === undefined || item.memory.dueDay < existing) result.set(id, item.memory.dueDay)
+  }
+  return result
+}
+
+/**
  * Wählt genau eine belegbare Wiederbegegnung für den Startbildschirm.
  *
  * Der Zeitpunkt kommt ausschließlich aus FSRS (`due`). Der Graph liefert nur
@@ -41,6 +62,7 @@ export function memoryReencounter(input: {
   const seen = new Set<string>()
 
   const candidate = selectDue(input.due, input.today, Number.MAX_SAFE_INTEGER)
+    .filter((item) => item.itemId.split(':')[0] === 'memory')
     .map((item) => {
       const payload = item.itemId.split(':').slice(2).join(':')
       const id = memoryNodeIdOfItem(payload)
