@@ -11,6 +11,13 @@ on:
     branches: ['**']
   pull_request:
 
+# Ein neuer Commit macht den alten CI-Stand desselben Branches/PR wertlos.
+# Gerade die serielle Browser-Suite dauert mehrere Minuten; ohne Abbruch
+# stapeln sich historische Zwischenstände und der aktuelle wartet hinten.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   check:
     runs-on: ubuntu-latest
