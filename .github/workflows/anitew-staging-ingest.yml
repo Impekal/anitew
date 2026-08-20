@@ -35,6 +35,10 @@ jobs:
           test "$(wc -l < /tmp/anitew-phase2.patch)" -eq 1747
           sha256sum /tmp/anitew-phase2.patch
 
+      - name: Normalize transport-only typo in preimage
+        run: |
+          sed -i 's/Widereholungsplan/Wiederholungsplan/g' /tmp/anitew-phase2.patch
+
       - name: Verify and apply patch
         run: |
           git apply --check /tmp/anitew-phase2.patch
