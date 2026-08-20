@@ -8,6 +8,7 @@ import {
   graphConnectionCount,
   latestNodes,
   memoryClusters,
+  memoryForgettingForecasts,
   memoryReviewDays,
   nodesByStrength,
   selectDue,
@@ -15,7 +16,7 @@ import {
 import { loadDue } from '../data/items.ts'
 import { loadMemoryGraph, saveMemoryGraph, MEMORY_VISITED_KEY } from '../data/memoryStore.ts'
 import { removeMemoryNode } from '../core/index.ts'
-import type { Dictionary } from '../i18n/index.ts'
+import { memoryForecastCopyFor, type Dictionary } from '../i18n/index.ts'
 
 import { MemoryConstellation } from './MemoryConstellation.tsx'
 import { scheduleDriveSync } from './driveSync.ts'
@@ -44,6 +45,7 @@ export function MemoryPanel({
   today: DayKey
 }) {
   const texts = dictionary.memory
+  const forecastTexts = memoryForecastCopyFor(language)
 
   const [graph, setGraph] = useState<MemoryGraph>(createMemoryGraph())
   const [selectedId, setSelectedId] = useState<string | undefined>()
@@ -52,6 +54,9 @@ export function MemoryPanel({
   const [clusterId, setClusterId] = useState<string | undefined>()
   const [dueNodeIds, setDueNodeIds] = useState<ReadonlySet<string>>(new Set())
   const [reviewDayByNode, setReviewDayByNode] = useState<ReadonlyMap<string, DayKey>>(new Map())
+  const [forecastByNode, setForecastByNode] = useState<
+    ReadonlyMap<string, { days: number; reviews: number }>
+  >(new Map())
   const reload = useCallback(() => {
     void loadMemoryGraph()
       .then(setGraph)
@@ -61,7 +66,9 @@ export function MemoryPanel({
   useEffect(() => {
     void loadDue(training)
       .then((items) => {
-        setReviewDayByNode(memoryReviewDays(items))
+        const reviewDays = memoryReviewDays(items)
+        setReviewDayByNode(reviewDays)
+        setForecastByNode(memoryForgettingForecasts(items))
         setDueNodeIds(
           new Set(memoryReviewDays(selectDue(items, today, Number.MAX_SAFE_INTEGER)).keys()),
         )
@@ -101,6 +108,7 @@ export function MemoryPanel({
   const strongest = [...byNeed].reverse().slice(0, 3)
   const latest = latestNodes(graph, 3)
   const selected = graph.nodes.find((node) => node.id === selectedId)
+  const selectedForecast = selected === undefined ? undefined : forecastByNode.get(selected.id)
   const connected =
     selected === undefined
       ? []
@@ -206,6 +214,14 @@ export function MemoryPanel({
                           })}
                   </dd>
                 </div>
+                {selectedForecast !== undefined && (
+                  <div>
+                    <dt>{forecastTexts.label}</dt>
+                    <dd>
+                      {forecastTexts.value.replace('{days}', String(selectedForecast.days))}
+                    </dd>
+                  </div>
+                )}
               </dl>
               <button type="button" className="quiet" onClick={() => setSelectedId(undefined)}>
                 {texts.close}

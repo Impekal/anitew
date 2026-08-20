@@ -58,6 +58,22 @@ const MISSION_LOCATION_COPY: Readonly<
   en: { ask: 'Where was the object?', placeholder: 'Position' },
 }
 
+export interface MemoryForecastCopy {
+  readonly label: string
+  readonly value: string
+}
+
+const MEMORY_FORECAST_COPY: Readonly<Partial<Record<Language, MemoryForecastCopy>>> = {
+  de: {
+    label: 'Vergessensprognose',
+    value: 'FSRS schätzt etwa {days} Tage bis zur 90%-Schwelle — aus mindestens drei echten Wiedersehen.',
+  },
+  en: {
+    label: 'Forgetting forecast',
+    value: 'FSRS estimates about {days} days to the 90% threshold — based on at least three real returns.',
+  },
+}
+
 /**
  * Ergänzt die H2-Texte ohne das Quellobjekt zu verändern.
  *
@@ -84,6 +100,20 @@ function withMissionLocation(dictionary: Dictionary, language: Language): Dictio
       },
     },
   }
+}
+
+/**
+ * C3 bleibt absichtlich außerhalb der Wörterbuchform: Es sind zwei kleine
+ * Ergänzungstexte, während `memory.types` selbst ein verschachteltes Objekt
+ * ist. So bleibt die strenge Quellform unangetastet und der Fallback identisch
+ * mit dem übrigen UI-Verhalten.
+ */
+export function memoryForecastCopyFor(language: string): MemoryForecastCopy {
+  const copy =
+    MEMORY_FORECAST_COPY[language as Language] ??
+    MEMORY_FORECAST_COPY[FALLBACK_LANGUAGE] ??
+    MEMORY_FORECAST_COPY.de
+  return copy ?? { label: 'Forgetting forecast', value: 'FSRS: about {days} days.' }
 }
 
 export function dictionaryFor(language: Language): Dictionary {

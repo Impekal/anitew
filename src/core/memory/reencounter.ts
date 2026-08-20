@@ -1,12 +1,21 @@
 import type { DayKey } from '../time.ts'
 import type { DueItem } from '../scheduler/due.ts'
 import { selectDue } from '../scheduler/due.ts'
+import { forgetsInDays } from '../scheduler/memory.ts'
 import type { MemoryGraph, MemoryNode } from './memoryGraph.ts'
 import { memoryNodeIdOfItem } from './missionComposer.ts'
 import { memoryClusters } from './memoryWorld.ts'
 
 export const MEMORY_DAY_MS = 24 * 60 * 60 * 1_000
 export const MEMORY_AFTERGLOW_WINDOW_MS = 15 * 60 * 1_000
+
+/**
+ * Erst nach drei echten Wiedersehen nach dem Lerntag nennen wir ein
+ * persönliches Intervall. Davor rechnet FSRS zwar ebenfalls einen Termin,
+ * aber der kommt noch überwiegend aus den Standardparametern und wäre als
+ * Aussage über diese Person zu früh (R-1/C3).
+ */
+export const MIN_PERSONAL_FORECAST_REVIEWS = 4
 
 export interface MemoryReencounter {
   readonly node: MemoryNode
@@ -20,6 +29,13 @@ export interface MemoryAfterglow {
   readonly anchor: MemoryNode
   readonly recalled: readonly MemoryNode[]
   readonly lastRecalledAt: number
+}
+
+export interface MemoryForgettingForecast {
+  /** Tage von der letzten Abfrage bis zur FSRS-Zielschwelle. */
+  readonly days: number
+  /** Zahl aller Abfragen inklusive Lerntag — transparent für die Schwelle. */
+  readonly reviews: number
 }
 
 /**
@@ -39,6 +55,44 @@ export function memoryReviewDays(due: readonly DueItem[]): ReadonlyMap<string, D
     if (id === undefined) continue
     const existing = result.get(id)
     if (existing === undefined || item.memory.dueDay < existing) result.set(id, item.memory.dueDay)
+  }
+  return result
+}
+
+/**
+ * Persönliche Vergessensprognose je Memory-Knoten (C3).
+ *
+ * Die Zahl ist **keine beobachtete Vergessensdauer**. Sie ist exakt das
+ * Intervall, das der bestehende FSRS-Zustand für dieses Item bis zur
+ * Zielretention von 90 % berechnet. Deshalb speichern wir keine zweite Zahl
+ * und bauen keinen zweiten Scheduler.
+ *
+ * Ein Graph-Knoten kann in mehreren Beziehungen vorkommen. Dann zeigen wir
+ * die früheste belastbare Schwelle: Sobald eine bestätigte Verbindung früher
+ * wieder dran wäre, ist das die vorsichtigere und praktischere Aussage für
+ * den ganzen Knoten.
+ */
+export function memoryForgettingForecasts(
+  due: readonly DueItem[],
+): ReadonlyMap<string, MemoryForgettingForecast> {
+  const result = new Map<string, MemoryForgettingForecast>()
+  for (const item of due) {
+    if (item.itemId.split(':')[0] !== 'memory') continue
+    if (item.memory.reviews < MIN_PERSONAL_FORECAST_REVIEWS) continue
+    const payload = item.itemId.split(':').slice(2).join(':')
+    const id = memoryNodeIdOfItem(payload)
+    if (id === undefined) continue
+    const days = forgetsInDays(item.memory)
+    if (days <= 0) continue
+    const candidate = { days, reviews: item.memory.reviews }
+    const existing = result.get(id)
+    if (
+      existing === undefined ||
+      candidate.days < existing.days ||
+      (candidate.days === existing.days && candidate.reviews > existing.reviews)
+    ) {
+      result.set(id, candidate)
+    }
   }
   return result
 }
