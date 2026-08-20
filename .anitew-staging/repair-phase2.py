@@ -56,6 +56,15 @@ replace_once(
     "practiced: '{count} memories were trained in the last 24 hours.',",
 )
 
+# Phase 2 intentionally gives the focus a new adaptive explanation. Keep the
+# browser contract semantic: a real focus must explain itself, without pinning
+# the test to the Phase 1 copy.
+replace_once(
+    'tests/e2e/profile.spec.ts',
+    "  await expect(page.getByText(/Ändert sich, sobald sich die Zahlen ändern/)).toBeVisible()",
+    "  await expect(page.locator('.focus-why')).toBeVisible()\n  await expect(page.locator('.focus-why')).not.toHaveText('')",
+)
+
 # Core regression guards.
 p = Path('tests/core/memoryPhase2.test.ts')
 s = p.read_text()
