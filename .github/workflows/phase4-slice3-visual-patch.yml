@@ -1,0 +1,52 @@
+name: Phase 4 Slice 3 visual patch
+
+on:
+  push:
+    branches: [anitew-phase4-slice3]
+    paths: [.github/workflows/phase4-slice3-visual-patch.yml]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: anitew-phase4-slice3
+      - name: Wire transient landing state
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          runner = Path('src/app/session/useSessionRunner.ts')
+          text = runner.read_text()
+          replacements = [
+            ("  results: RoundResult[]\n  finished: boolean\n", "  results: RoundResult[]\n  /** Kurze reine Experience-Resonanz nach einem echten persönlichen Treffer. */\n  landingPulse: boolean\n  finished: boolean\n"),
+            ("  const [remaining, setRemaining] = useState(0)\n", "  const [remaining, setRemaining] = useState(0)\n  const [landingPulse, setLandingPulse] = useState(false)\n"),
+            ("        if (graded.correct.length > 0) platform.sound.play('landing')\n", "        if (graded.correct.length > 0) {\n          platform.sound.play('landing')\n          setLandingPulse(true)\n          window.setTimeout(() => setLandingPulse(false), 900)\n        }\n"),
+            ("    results,\n    finished,\n", "    results,\n    landingPulse,\n    finished,\n"),
+          ]
+          for old, new in replacements:
+              if old not in text:
+                  raise SystemExit(f'runner pattern not found: {old!r}')
+              text = text.replace(old, new, 1)
+          runner.write_text(text)
+
+          screen = Path('src/app/session/SessionScreen.tsx')
+          text = screen.read_text()
+          old = '<main className="app session">'
+          new = '<main className={`app session${state.landingPulse ? \' session-memory-landing\' : \'\'}`}> '
+          if old not in text:
+              raise SystemExit('session main pattern not found')
+          screen.write_text(text.replace(old, new, 1))
+          PY
+          rm .github/workflows/phase4-slice3-visual-patch.yml
+      - name: Commit minimal visual-state wiring
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add src/app/session/useSessionRunner.ts src/app/session/SessionScreen.tsx .github/workflows/phase4-slice3-visual-patch.yml
+          git commit -m "Wire signature landing to factual personal recall"
+          git push origin HEAD:anitew-phase4-slice3
