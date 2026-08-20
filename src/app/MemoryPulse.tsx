@@ -104,7 +104,12 @@ export function MemoryPulse({
         </p>
         {reencounter !== undefined && (
           <>
-            <p className="memory-pulse-line memory-return-name"><strong>{reencounter.node.label}</strong></p>
+            <div className="memory-return-titleline">
+              <p className="memory-pulse-line memory-return-name"><strong>{reencounter.node.label}</strong></p>
+              {reencounter.daysAway > 0 && (
+                <span className="memory-return-age">{reencounter.daysAway} d</span>
+              )}
+            </div>
             <p className="hint memory-return-status">{dictionary.memory.dueSoon}</p>
           </>
         )}
