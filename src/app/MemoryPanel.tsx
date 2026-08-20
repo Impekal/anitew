@@ -16,7 +16,7 @@ import {
 import { loadDue } from '../data/items.ts'
 import { loadMemoryGraph, saveMemoryGraph, MEMORY_VISITED_KEY } from '../data/memoryStore.ts'
 import { removeMemoryNode } from '../core/index.ts'
-import type { Dictionary } from '../i18n/index.ts'
+import { memoryForecastCopyFor, type Dictionary } from '../i18n/index.ts'
 
 import { MemoryConstellation } from './MemoryConstellation.tsx'
 import { scheduleDriveSync } from './driveSync.ts'
@@ -45,6 +45,7 @@ export function MemoryPanel({
   today: DayKey
 }) {
   const texts = dictionary.memory
+  const forecastTexts = memoryForecastCopyFor(language)
 
   const [graph, setGraph] = useState<MemoryGraph>(createMemoryGraph())
   const [selectedId, setSelectedId] = useState<string | undefined>()
@@ -215,12 +216,9 @@ export function MemoryPanel({
                 </div>
                 {selectedForecast !== undefined && (
                   <div>
-                    <dt>{texts.forgettingForecast}</dt>
+                    <dt>{forecastTexts.label}</dt>
                     <dd>
-                      {texts.forgettingForecastValue.replace(
-                        '{days}',
-                        String(selectedForecast.days),
-                      )}
+                      {forecastTexts.value.replace('{days}', String(selectedForecast.days))}
                     </dd>
                   </div>
                 )}
