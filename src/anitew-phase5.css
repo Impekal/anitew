@@ -1,0 +1,4 @@
+/* O15 — das Ergebnis als kleines Netz, ohne neue Bedeutung: Die Punkte sind weiterhin nur die echten Session-Items. */
+.summary-screen .summary-words{position:relative;justify-content:center;align-items:center;min-height:9rem;padding:1.2rem;border-radius:2rem;background:repeating-conic-gradient(from 8deg at 50% 50%,var(--net) 0 1deg,transparent 1deg 45deg),radial-gradient(circle at 50% 50%,var(--accent-soft) 0 8%,transparent 8.5% 100%)}
+.summary-screen .summary-words .chip{position:relative;z-index:1;box-shadow:0 0 0 1px var(--line),var(--glow-soft)}
+.summary-screen .summary-words .chip-muted{background:var(--card)}
