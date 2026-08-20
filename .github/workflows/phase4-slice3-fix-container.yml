@@ -1,0 +1,42 @@
+name: Phase 4 Slice 3 fix container
+
+on:
+  push:
+    branches: [anitew-phase4-slice3]
+    paths: [.github/workflows/phase4-slice3-fix-container.yml]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: anitew-phase4-slice3
+      - name: Put landing class on RunningSession, not Settle
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('src/app/session/SessionScreen.tsx')
+          text = p.read_text()
+          bad = "    <main className={`app session${state.landingPulse ? ' session-memory-landing' : ''}`}> \n"
+          if bad not in text:
+              raise SystemExit('bad settle container not found')
+          text = text.replace(bad, '    <main className="app session">\n', 1)
+          marker = '  return (\n    <main className="app session">\n      <header className="session-head">'
+          repl = "  return (\n    <main className={`app session${state.landingPulse ? ' session-memory-landing' : ''}`}>\n      <header className=\"session-head\">"
+          if marker not in text:
+              raise SystemExit('running session container not found')
+          text = text.replace(marker, repl, 1)
+          p.write_text(text)
+          PY
+          rm .github/workflows/phase4-slice3-fix-container.yml
+      - name: Commit corrected container target
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add src/app/session/SessionScreen.tsx .github/workflows/phase4-slice3-fix-container.yml
+          git commit -m "Fix signature landing container target"
+          git push origin HEAD:anitew-phase4-slice3
