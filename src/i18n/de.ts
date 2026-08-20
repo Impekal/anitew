@@ -103,6 +103,14 @@ export const de = {
     settle: 'Ankommen',
     settleHint: 'Antippen, wenn du bereit bist',
     round: 'Runde',
+    phases: {
+      focus: 'FOCUS',
+      encode: 'ENCODE',
+      connect: 'CONNECT',
+      retrieve: 'RETRIEVE',
+      interfere: 'INTERFERE',
+      return: 'RETURN',
+    },
     /*
       Je Modul ein eigener Satz, als Verzeichnis und nicht als Kette von
       Wenn-dann. Der Grund ist mechanisch: `TRAINING_MODULES` bestimmt die
@@ -374,7 +382,13 @@ export const de = {
       sagt, **was gezählt wurde** — und dass „nicht gemessen“ nirgends wie
       „schlecht“ aussieht.
     */
-    heading: 'Dein Profil',
+    heading: 'Memory DNA',
+    sourceTraining: 'Quelle: Training · Wiedersehen',
+    sourceImmediate: 'Quelle: Training · sofort',
+    sourceBenchmark: 'Quelle: wissenschaftliche Messung',
+    sourceNone: 'Quelle: noch keine Messung vorhanden',
+    benchmarkChange: 'Belastbare Veränderung: Spanne {low} bis {high} Prozentpunkte.',
+    benchmarkNoChange: 'Noch kein vom Zufall trennbarer Unterschied (Spanne {low} bis {high}).',
     note: 'Gezählt wird nur das Wiedersehen: wie oft eine Information nach Tagen zurückkam und noch da war. Wie gut du am Lerntag selbst abschneidest, steht hier absichtlich nicht — das ist Übung, nicht Gedächtnis.',
     names: {
       words: 'Wörter',
@@ -416,6 +430,10 @@ export const de = {
     // E6/R-1: Wenn nur der Wunsch spricht, steht da der Wunsch — nicht eine
     // Messung, die es nie gab.
     focusWhyGoal: 'Weil du dir das vorgenommen hast. Sobald deine eigenen Zahlen etwas sagen, zählen die.',
+    focusWhyDue: 'FSRS hat diese Inhalte für heute terminiert. Der Composer mischt sie in die verfügbare Zeit.',
+    focusWhyPersonal: 'Eigene Inhalte ohne erstes Training bekommen heute zuerst eine abrufbare Verbindung.',
+    focusWhyInterference: 'In den letzten Antworten lief Ähnliches mehrfach ineinander. Heute wird genau das getrennt.',
+    focusWhyUndertrained: 'Diese Trainingsdimension hatte bisher die wenigsten echten Gelegenheiten.',
     modules: {
       words: 'Wörter',
       faces: 'Gesichter',
@@ -568,6 +586,14 @@ export const de = {
     invite: 'Neu: ANITEW kann sich echte Dinge aus deinem Leben merken — und sie mit dir trainieren.',
     inviteOpen: '„Mein Gedächtnis“ ansehen',
   },
+  pulse: {
+    heading: 'MEMORY PULSE',
+    attention: '{count} eigene Erinnerungen brauchen heute Aufmerksamkeit.',
+    practiced: '{count} Erinnerungen wurden in den letzten 24 Stunden trainiert.',
+    newNodes: '{count} neue Erinnerungen sind heute in deinem System entstanden.',
+    stale: '„{label}“ ist lange nicht aufgetaucht.',
+    quiet: 'Dein System ist ruhig. Die nächste Mission legt neue Spuren an.',
+  },
   memory: {
     /*
       Der Memory-Bereich (D-036). Der wichtigste Satz ist der über die
@@ -627,6 +653,9 @@ export const de = {
     dueSoon: 'Jetzt im FSRS-Wiederholungsplan fällig',
     fsrsScheduled: 'FSRS plant den nächsten passenden Zeitpunkt',
     close: 'Detail schließen',
+    clusters: 'Erinnerungswelten',
+    allClusters: 'Gesamte Welt',
+    chooseCluster: 'Weitere Erinnerungswelt wählen',
   },
   own: {
     /*
@@ -891,14 +920,17 @@ export const de = {
     /*
       Das Ankommen (Onboarding).
 
-      Fünf Fragen, alle freiwillig — und jede Antwort tut genau das, was ihr
-      Begleitsatz sagt, nicht mehr. Kein Satz hier verspricht etwas über das
-      Gedächtnis (R-1/R-2): Ein Ziel wird ein Vorschlag, ein Zeitbudget eine
-      Voreinstellung, die Tageszeit ein Erinnerungs-Angebot, das Altersband
-      gar nichts. Der Text sagt das offen, damit niemand mehr vermutet.
+      Drei kurze Schritte im Hauptpfad: Versprechen, erste echte Erinnerung,
+      Zeitbudget. Alles freiwillig; keine Aussage über IQ oder allgemeine
+      Gehirnleistung (R-1/R-2).
     */
-    welcomeTitle: 'Schön, dass du da bist.',
-    welcomeNote: 'Ein paar kurze Fragen, damit sich die App nach dir richtet. Alles ist freiwillig — was du nicht sagen willst, überspringst du.',
+    welcomeTitle: 'Dein Gedächtnis, trainiert.',
+    welcomeNote: 'ANITEW trainiert Abruf statt IQ. Fünf Minuten reichen. Es lernt aus echten Antworten, nimmt auf Wunsch eigene Informationen auf und trennt Übung immer von ehrlicher Messung.',
+    promise: 'ERINNERN · NICHT IQ · LOCAL FIRST',
+    memoryQuestion: 'Was möchtest du wirklich behalten?',
+    memoryPlaceholder: 'Daniel arbeitet im Museum, kommt aus Madrid und spielt Gitarre.',
+    memoryNote: 'Daraus entstehen auf diesem Gerät deine ersten Erinnerungen und Verbindungen. Erst dein Tipp auf „Behalten“ speichert sie.',
+    keepMemory: 'Als erste Erinnerung behalten',
     begin: 'Los geht’s',
     skipAll: 'Ohne Fragen anfangen',
     skip: 'Überspringen',

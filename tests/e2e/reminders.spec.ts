@@ -12,6 +12,43 @@ import { openPage, startButton, visit } from './helpers.ts'
  * angeboten hätte (R-2).
  */
 
+/**
+ * Der CI-Browser ist kein Produktvertrag.
+ *
+ * Headless Chromium stellt die Notification-API je nach Runner/Version nicht
+ * immer bereit. Die App reagiert darauf korrekt mit „nicht unterstützt“ —
+ * diese Tests wollen aber ausdrücklich den **unterstützten** Browserpfad
+ * prüfen. Deshalb stellen sie die kleine Web-API selbst bereit, statt vom
+ * gerade installierten Headless-Build abhängig zu sein.
+ */
+async function withNotifications(page: Page, permission: NotificationPermission) {
+  await page.addInitScript((initialPermission) => {
+    let current = initialPermission
+
+    class FakeNotification {
+      static get permission(): NotificationPermission {
+        return current
+      }
+
+      static async requestPermission(): Promise<NotificationPermission> {
+        current = 'granted'
+        return current
+      }
+
+      constructor(_title: string, _options?: NotificationOptions) {}
+    }
+
+    Object.defineProperty(window, 'Notification', {
+      configurable: true,
+      value: FakeNotification,
+    })
+    Object.defineProperty(window, 'isSecureContext', {
+      configurable: true,
+      value: true,
+    })
+  }, permission)
+}
+
 async function openReminders(page: Page) {
   await visit(page)
   await expect(startButton(page)).toBeVisible()
@@ -19,6 +56,7 @@ async function openReminders(page: Page) {
 }
 
 test('sagt zuerst, was dieses Gerät kann — und dann erst die Einstellung', async ({ page }) => {
+  await withNotifications(page, 'default')
   await openReminders(page)
 
   /*
@@ -30,10 +68,8 @@ test('sagt zuerst, was dieses Gerät kann — und dann erst die Einstellung', as
   await expect(page.locator('.reminder input[type="time"]')).toHaveCount(0)
 })
 
-test('verschweigt die Einschränkung des Browsers nicht', async ({ page, browserName }) => {
-  test.skip(browserName !== 'chromium', 'Rechte lassen sich nur in Chromium vorab erteilen')
-
-  await page.context().grantPermissions(['notifications'])
+test('verschweigt die Einschränkung des Browsers nicht', async ({ page }) => {
+  await withNotifications(page, 'granted')
   await openReminders(page)
 
   // Der Satz, auf den es ankommt: nur solange die App offen ist. Und er steht
@@ -45,10 +81,8 @@ test('verschweigt die Einschränkung des Browsers nicht', async ({ page, browser
   await expect(page.getByText(/als App aus dem Store läuft/)).toBeVisible()
 })
 
-test('merkt sich die Uhrzeit und lässt sie wieder abstellen', async ({ page, browserName }) => {
-  test.skip(browserName !== 'chromium', 'Rechte lassen sich nur in Chromium vorab erteilen')
-
-  await page.context().grantPermissions(['notifications'])
+test('merkt sich die Uhrzeit und lässt sie wieder abstellen', async ({ page }) => {
+  await withNotifications(page, 'granted')
   await openReminders(page)
 
   const time = page.locator('.reminder input[type="time"]')
@@ -79,6 +113,7 @@ test('fragt nicht beim ersten Start nach Benachrichtigungen', async ({ page }) =
    * Ablehnung lässt sich von der App aus nie wieder zurücknehmen. Gefragt
    * wird erst dort, wo jemand eine Erinnerung wirklich will.
    */
+  await withNotifications(page, 'default')
   await visit(page)
   await expect(startButton(page)).toBeVisible()
   await expect(page.getByRole('button', { name: 'Benachrichtigungen erlauben' })).toBeHidden()

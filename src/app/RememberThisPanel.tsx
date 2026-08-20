@@ -40,7 +40,7 @@ export function RememberThisPanel({
 }: {
   platform: Platform
   dictionary: Dictionary
-  onSaved: (newNodeIds: readonly string[]) => void
+  onSaved: (created: { nodeIds: readonly string[]; edgeIds: readonly string[] }) => void
 }) {
   const texts = dictionary.memory
 
@@ -150,6 +150,8 @@ export function RememberThisPanel({
       const next = applyRememberedSuggestions(graph, confirmed, platform.clock.now())
       const existing = new Set(graph.nodes.map((node) => node.id))
       const newNodeIds = next.nodes.filter((node) => !existing.has(node.id)).map((node) => node.id)
+      const existingEdges = new Set(graph.edges.map((edge) => edge.id))
+      const newEdgeIds = next.edges.filter((edge) => !existingEdges.has(edge.id)).map((edge) => edge.id)
       const newConnections = next.edges.length - graph.edges.length
       await saveMemoryGraph(next)
       setDraft('')
@@ -160,7 +162,7 @@ export function RememberThisPanel({
       platform.sound.play('remember')
       if (newConnections > 0) platform.sound.play('connection')
       scheduleDriveSync(platform)
-      onSaved(newNodeIds)
+      onSaved({ nodeIds: newNodeIds, edgeIds: newEdgeIds })
     })().catch(() => undefined)
   }
 

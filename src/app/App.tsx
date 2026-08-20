@@ -9,6 +9,7 @@ import {
   dayKeyOf,
   dueLimitFor,
   type ModuleId,
+  type DailyMissionDecision,
   namePool,
   READY_PALACES,
   type OwnPalace,
@@ -41,6 +42,9 @@ import {
   streakOf,
   achievementsOf,
   composeMemoryPool,
+  composeDailyMission,
+  suggestMemories,
+  applyRememberedSuggestions,
   createMemoryGraph,
   adviceOf,
   type CoachContext,
@@ -65,7 +69,7 @@ import {
   moduleOf,
   wordOf,
 } from '../data/items.ts'
-import { loadMemoryGraph } from '../data/memoryStore.ts'
+import { loadMemoryGraph, saveMemoryGraph } from '../data/memoryStore.ts'
 import { loadOwnPool } from '../data/own.ts'
 import {
   type SessionProgress,
@@ -96,6 +100,7 @@ import { FoundationPanel } from './FoundationPanel.tsx'
 import { AchievementsLine } from './AchievementsLine.tsx'
 import { CoachPanel } from './CoachPanel.tsx'
 import { MemoryPanel } from './MemoryPanel.tsx'
+import { MemoryPulse } from './MemoryPulse.tsx'
 import { OwnPanel } from './OwnPanel.tsx'
 import { SyncPanel } from './SyncPanel.tsx'
 import { SYNC_AT_SETTING, SYNC_ON_SETTING, resolveClientId, runDriveSync, scheduleDriveSync } from './driveSync.ts'
@@ -390,6 +395,42 @@ export function App() {
     return { moduleId, source: measured !== undefined ? ('measured' as const) : ('goal' as const) }
   }, [dimensionCounts, mode, profile, training, twinsDone])
 
+  const [missionPreview, setMissionPreview] = useState<DailyMissionDecision | undefined>()
+  useEffect(() => {
+    void (async () => {
+      const now = platform.clock.now()
+      const day = dayKeyOf(now, { offsetMinutes: platform.clock.offsetMinutes(now) })
+      const seconds = MODES[mode].seconds
+      const selected = selectDue(
+        await loadDue(training),
+        day,
+        dueLimitFor(Math.round(seconds * 0.15)),
+      )
+      const dueByModule: Partial<Record<ModuleId, number>> = {}
+      for (const item of selected) {
+        const moduleId = moduleOf(item.itemId) as ModuleId
+        dueByModule[moduleId] = (dueByModule[moduleId] ?? 0) + 1
+      }
+      const graph = await loadMemoryGraph()
+      const ownPool = await loadOwnPool(training)
+      const memoryAnchors = new Set(graph.edges.map((edge) => edge.from))
+      setMissionPreview(
+        composeDailyMission({
+          seconds,
+          dueByModule,
+          personalScenes: composeMemoryPool(graph).length,
+          untrainedPersonalItems:
+            graph.nodes.filter(
+              (node) => !memoryAnchors.has(node.id) && node.lastRecalledAt === undefined,
+            ).length +
+            ownPool.length,
+          dimensions: dimensionCounts,
+          interferenceErrors: (recentByModule['twins'] ?? []).filter((correct) => !correct).length,
+        }),
+      )
+    })().catch(() => setMissionPreview(undefined))
+  }, [dimensionCounts, mode, platform, recentByModule, training, systemPulse])
+
   const start = useCallback(() => {
     // Der erste Ton der Einheit, ausgelöst vom Fingertipp — genau die Geste,
     // die iOS verlangt, bevor eine Seite überhaupt klingen darf.
@@ -433,6 +474,25 @@ export function App() {
         // trotzdem — ein Training, das an einem Lesefehler scheitert, wäre
         // der schlechtere Tausch.
       }
+
+      const memoryGraph = await loadMemoryGraph().catch(() => createMemoryGraph())
+      const ownPool = await loadOwnPool(training).catch(() => [])
+      const memoryPool = composeMemoryPool(memoryGraph)
+      const memoryAnchors = new Set(memoryGraph.edges.map((edge) => edge.from))
+      const mission = composeDailyMission({
+        seconds,
+        dueByModule: Object.fromEntries(
+          Object.entries(due).map(([moduleId, items]) => [moduleId, items.length]),
+        ),
+        personalScenes: memoryPool.length,
+        untrainedPersonalItems:
+          memoryGraph.nodes.filter(
+            (node) => !memoryAnchors.has(node.id) && node.lastRecalledAt === undefined,
+          ).length +
+          ownPool.length,
+        dimensions: dimensionCounts,
+        interferenceErrors: (recentByModule['twins'] ?? []).filter((correct) => !correct).length,
+      })
 
       const plan = planSession({
         mode,
@@ -499,14 +559,14 @@ export function App() {
            * Menschen ohne Termin. Ist er leer — bei den meisten —, nimmt
            * der Vorratsfilter das Modul still aus der Lernrotation.
            */
-          facts: await loadOwnPool(training).catch(() => []),
+          facts: ownPool,
           /*
            * Der Memory-Graph (D-036): Der Missions-Komponist wählt die
            * schwächsten Anker mit ihren Dingen — FSRS bleibt die Wahrheit
            * über das Wann; hier steht nur das Was. Leer bei den meisten:
            * Der Vorratsfilter nimmt das Modul dann still heraus.
            */
-          memory: composeMemoryPool(await loadMemoryGraph().catch(() => createMemoryGraph())),
+          memory: memoryPool,
         },
         due,
         taught,
@@ -524,7 +584,8 @@ export function App() {
             itemsDeltaFor({ recent: recentByModule[moduleId] ?? [] }),
           ]),
         ),
-        focus: focus?.moduleId,
+        focus: mission.focus ?? focus?.moduleId,
+        modules: mission.modules,
       })
       const progress: SessionProgress = {
         sessionId,
@@ -538,7 +599,7 @@ export function App() {
       setRunning(progress)
       void beginSession(progress, day, now).catch(() => undefined)
     })()
-  }, [training, mode, platform, taught, palaceTaught, storyTaught, linkTaught, own, focus, recentByModule])
+  }, [training, mode, platform, taught, palaceTaught, storyTaught, linkTaught, own, focus, recentByModule, dimensionCounts])
 
   const leave = useCallback(() => {
     setRunning(undefined)
@@ -700,12 +761,22 @@ export function App() {
     return (
       <OnboardingScreen
         dictionary={dictionary}
-        onDone={(answers) => {
-          saveProfile(answers)
-          // Die Zeit-Antwort wird sofort zur Voreinstellung — nicht erst
-          // beim nächsten Öffnen. `modeSeeded` ist damit erledigt.
-          modeSeeded.current = true
-          setMode(suggestedMode(answers))
+        onDone={(answers, firstMemory) => {
+          void (async () => {
+            if (firstMemory !== undefined) {
+              const graph = await loadMemoryGraph()
+              const suggestions = suggestMemories({ text: firstMemory })
+              await saveMemoryGraph(
+                applyRememberedSuggestions(graph, suggestions, platform.clock.now()),
+              )
+              platform.sound.play('remember')
+            }
+            saveProfile(answers)
+            // Die Zeit-Antwort wird sofort zur Voreinstellung — nicht erst
+            // beim nächsten Öffnen. `modeSeeded` ist damit erledigt.
+            modeSeeded.current = true
+            setMode(suggestedMode(answers))
+          })().catch(() => saveProfile(answers))
         }}
       />
     )
@@ -795,6 +866,7 @@ export function App() {
             trained={trainingDays}
             today={today}
             dictionary={dictionary}
+            runs={runs}
           />
         ),
       },
@@ -966,6 +1038,13 @@ export function App() {
         duration={label}
         refreshKey={systemPulse}
       />
+      <MemoryPulse
+        platform={platform}
+        training={training}
+        today={today}
+        refreshKey={systemPulse}
+        dictionary={dictionary}
+      />
 
       {/*
         Die Messung meldet sich nur, wenn sie etwas will (D-011/G-2). Kein
@@ -1115,12 +1194,12 @@ export function App() {
           keine Meldung — und sie steht nur da, wenn es wirklich einen
           Schwerpunkt gibt (D-011/G-2).
         */}
-        {focus !== undefined && (
+        {(missionPreview?.focus !== undefined || focus !== undefined) && (
           <>
             <p className="focus">
               {dictionary.profile.focus}{' '}
               <strong>
-                {(dictionary.profile.modules as Record<string, string>)[focus.moduleId]}
+                {(dictionary.profile.modules as Record<string, string>)[missionPreview?.focus ?? focus?.moduleId ?? '']}
               </strong>
             </p>
             {/*
@@ -1131,9 +1210,17 @@ export function App() {
               wäre sonst eine erfundene Messung (R-1).
             */}
             <p className="hint focus-why">
-              {focus.source === 'measured'
-                ? dictionary.profile.focusWhy
-                : dictionary.profile.focusWhyGoal}
+              {missionPreview?.reason === 'due'
+                ? dictionary.profile.focusWhyDue
+                : missionPreview?.reason === 'personal'
+                  ? dictionary.profile.focusWhyPersonal
+                  : missionPreview?.reason === 'interference'
+                    ? dictionary.profile.focusWhyInterference
+                    : missionPreview?.reason === 'undertrained'
+                      ? dictionary.profile.focusWhyUndertrained
+                      : focus?.source === 'measured'
+                        ? dictionary.profile.focusWhy
+                        : dictionary.profile.focusWhyGoal}
             </p>
           </>
         )}

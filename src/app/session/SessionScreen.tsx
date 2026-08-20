@@ -208,6 +208,18 @@ function RunningSession({
 
   const rounds = new Set(state.plan.blocks.map((b) => b.round)).size
   const done = 1 - state.remaining / block.seconds
+  const phase =
+    block.kind === 'teach'
+      ? 'focus'
+      : block.kind === 'review'
+        ? 'return'
+        : block.moduleId === 'reverse' || block.moduleId === 'twins'
+          ? 'interfere'
+          : block.kind === 'encode' && ['memory', 'missions', 'palace'].includes(block.moduleId)
+            ? 'connect'
+            : block.kind === 'encode'
+              ? 'encode'
+              : 'retrieve'
 
   /*
    * Die Konsonantenzeile erscheint erst, wenn sie etwas beiträgt (D5).
@@ -231,6 +243,10 @@ function RunningSession({
         </span>
         <span className="session-clock">{formatSeconds(state.remaining)}</span>
       </header>
+      <div className={`session-phase session-phase-${phase}`} aria-live="polite">
+        <span aria-hidden="true" />
+        {t.phases[phase]}
+      </div>
 
       <div
         className="session-bar"

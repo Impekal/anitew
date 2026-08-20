@@ -453,6 +453,35 @@ body::before {
 .constellation-node-anchor {
   fill: var(--an-gold);
 }
+.constellation-node-person { fill: #e0ad61; }
+.constellation-node-place { fill: #83c9bb; }
+.constellation-node-date,
+.constellation-node-number { fill: #b8c9de; }
+.constellation-node-fact,
+.constellation-node-concept { fill: #eee7d4; }
+
+.memory-clusters {
+  display: flex;
+  gap: .45rem;
+  overflow-x: auto;
+  padding: 0 0 .35rem;
+  scrollbar-width: thin;
+}
+.memory-clusters button {
+  flex: 0 0 auto;
+  display: inline-flex;
+  gap: .45rem;
+  align-items: baseline;
+  padding: .45rem .7rem;
+  border: 0;
+  border-bottom: 1px solid var(--an-line);
+  background: transparent;
+  color: var(--an-muted);
+  font: .8rem var(--sans);
+}
+.memory-clusters small { color: var(--an-dim); font-family: var(--mono); }
+.memory-clusters .memory-cluster-active { border-color: var(--an-gold); color: var(--an-text); }
+.memory-cluster-select { flex: 0 0 auto; border: 1px solid var(--an-line); border-radius: 8px; background: var(--an-bg-2); color: var(--an-muted); font: .75rem var(--sans); }
 
 .constellation-label {
   fill: var(--an-muted);
@@ -737,3 +766,40 @@ body::before {
 .today-invite-open {
   font-size: 0.85rem;
 }
+
+.memory-pulse {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr;
+  gap: .85rem;
+  align-items: start;
+  margin: 1.2rem 0 0;
+  padding: .9rem 0;
+  border-bottom: 1px solid var(--an-line);
+}
+.memory-pulse-mark { position: relative; height: 2.5rem; }
+.memory-pulse-mark::before,
+.memory-pulse-mark::after,
+.memory-pulse-mark span { content: ''; position: absolute; inset: 50% auto auto 50%; border-radius: 50%; transform: translate(-50%, -50%); }
+.memory-pulse-mark::before { width: .45rem; height: .45rem; background: var(--an-gold); box-shadow: 0 0 14px rgba(216,168,90,.4); }
+.memory-pulse-mark::after { width: 1.5rem; height: 1.5rem; border: 1px solid rgba(140,207,192,.35); animation: pulse-orbit var(--motion-breathe) ease-in-out infinite; }
+.memory-pulse-label { margin: 0 0 .25rem; color: var(--an-cyan); font: .65rem var(--mono); letter-spacing: .18em; }
+.memory-pulse-line { margin: .15rem 0; color: var(--an-text); font: 1rem var(--serif); }
+
+.axis-source { display: block; margin-top: .15rem; color: var(--an-dim); font: .62rem var(--mono); letter-spacing: .04em; text-transform: uppercase; }
+
+.session-phase {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  margin: .65rem 0 0;
+  color: var(--an-cyan);
+  font: .66rem var(--mono);
+  letter-spacing: .22em;
+}
+.session-phase span { width: 1.6rem; height: 1px; background: currentColor; animation: phase-signal var(--motion-quick) var(--ease) both; }
+.session-phase-connect,
+.session-phase-encode { color: var(--an-gold); }
+@keyframes phase-signal { from { width: 0; opacity: 0; } }
+
+.arrival-system { color: var(--an-cyan); font: .65rem var(--mono); letter-spacing: .15em; }
+.arrival-memory h2 { font-family: var(--serif); font-weight: 400; }

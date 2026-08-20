@@ -2616,3 +2616,23 @@ Graph-IDs. Die Detailansicht vergleicht Kennung mit Kennung, nicht mehr
 Beschriftungsfragmente. Klanglich heißen die Ereignisse nun Start, Encoded,
 Connection, Recall und Complete; alle bleiben kurze synthetische Offline-Cues
 auf dem vorhandenen Sound-Port, ohne Reward-Jingle und ohne Netzdatei.
+
+## 2026-08-19 · Phase 2: ANITEW erinnert sich sichtbar
+
+Der Memory Pulse beantwortet den Start in höchstens zwei belegbaren Sätzen:
+Was ist aus dem eigenen Graphen fällig, neu, gerade abgerufen oder lange nicht
+aufgetaucht? Keine neue Zahl, keine Gehirnmetapher als Messwert (D-041).
+
+Die Constellation ist zur Memory World geworden: echte Zusammenhangskomponenten
+bilden stabile Orte, Typen haben leise unterschiedliche Tinte, Knotengrad hat
+Gravitation, und Cluster lassen sich fokussieren. Der Daily Composer verbindet
+FSRS-Fälligkeit, frische persönliche Inhalte, Interferenz und bisherige
+Dimensionsgelegenheiten zu Fokus und Mischung, ohne einen einzigen Termin zu
+berechnen (D-042/D-043).
+
+Memory DNA nennt je Achse die Quelle — Training, Soforttraining oder Benchmark
+— und bleibt bei dünnen Daten explizit leer. Das Onboarding besteht im
+Hauptpfad aus Produktversprechen, erster echter Erinnerung und Zeitbudget.
+FOCUS/ENCODE/CONNECT/RETRIEVE/INTERFERE/RETURN geben der unveränderten Session
+eine eigene Sprache. Die fünf Momente sind damit im Produkt: Entstehen,
+Verknüpfen, FSRS-Wiederbegegnung, sichtbarer Recall und belastbarer Benchmark.

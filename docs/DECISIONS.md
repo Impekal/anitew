@@ -1483,3 +1483,27 @@ die Oberfläche behauptet für solche Alttermine jedoch keinen knotengenauen
 Fälligkeitsstatus. Jeder neu erzeugte oder erneut geplante Memory-Termin trägt
 die Kennungen. Verworfen wurde unscharfes `includes`-Matching: „Anna“ darf nie
 den Termin von „Annabel“ übernehmen.
+
+## D-041 · 2026-08-19 · Memory Pulse ist eine Auswahl von Tatsachen
+
+Der Pulse ist kein Score und kein Aggregat mit eigener Währung. Er wählt
+höchstens zwei belegbare Aussagen aus Graph und FSRS: heute fällige eigene
+Knoten, Abrufe oder neue Knoten der letzten 24 Stunden, sowie seit 21 Tagen
+nicht aufgetauchte Knoten. Fehlt alles, sagt er nur, dass das System ruhig ist.
+Er speichert nichts und erfindet keine „Gesundheit“ des Gedächtnisses.
+
+## D-042 · 2026-08-19 · Adaptive Mission mischt, FSRS terminiert
+
+Der Daily Mission Composer priorisiert in dieser Reihenfolge: vorhandene
+FSRS-Fälligkeit, frische persönliche Inhalte, belegtes Interferenzsignal,
+wenig trainierte Dimension, sonst Balance. Er darf Fokus und Reihenfolge der
+vorhandenen Module verändern. Er darf keinen Termin erzeugen, verschieben oder
+löschen; das bleibt ausschließlich FSRS. Die Session Engine bleibt dieselbe.
+
+## D-043 · 2026-08-19 · Memory World hat stabile Zusammenhangswelten
+
+Cluster sind ungerichtete Zusammenhangskomponenten des bestätigten Graphen.
+Ihr Anker ist deterministisch der am stärksten verbundene, dann älteste
+Knoten. Diese Welten steuern räumliche Nähe und Navigation, nicht Leistung.
+Bei großen Graphen bleibt die bestehende Sichtgrenze bestehen; ein Fokus zeigt
+eine Welt statt hunderter gleichzeitiger Punkte.

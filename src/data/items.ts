@@ -130,7 +130,10 @@ export async function loadDimensionCounts(
   const counts: Partial<Record<DimensionId, DimensionCounts>> = {}
 
   for (const row of rows) {
-    const dimension = dimensionOf(row.moduleId as ModuleId)
+    // Persönliche Memory-Kanten und prozedurale Missionen üben beide
+    // Bindungen. Die Profilachse vereint ihre echten Wiedersehen, ohne die
+    // Scheduler- oder Modulidentität zu vermischen.
+    const dimension = row.moduleId === 'memory' ? 'binding' : dimensionOf(row.moduleId as ModuleId)
     if (dimension === undefined || isImmediate(dimension)) continue
     const entry = (counts[dimension] ??= { chances: 0, lost: 0 })
     entry.chances += Math.max(0, row.reviews - 1)

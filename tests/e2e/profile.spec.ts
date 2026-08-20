@@ -43,7 +43,7 @@ async function seed(page: Page, rows: readonly { module: string; reviews: number
   }, rows as { module: string; reviews: number; lapses: number }[])
   await page.reload()
   await expect(startButton(page)).toBeVisible()
-  await openPage(page, 'Dein Profil')
+  await openPage(page, 'Memory DNA')
 }
 
 test('zeigt vor der ersten Aussage einen Satz statt neun leerer Achsen', async ({ page }) => {
@@ -54,7 +54,8 @@ test('zeigt vor der ersten Aussage einen Satz statt neun leerer Achsen', async (
    */
   await seed(page, [])
   await expect(page.getByText(/Das Profil entsteht aus dem Training/)).toBeVisible()
-  await expect(page.locator('.axis')).toHaveCount(0)
+  await expect(page.locator('.axis')).toHaveCount(9)
+  await expect(page.locator('.axis-source')).toHaveCount(9)
 })
 
 test('sagt bei dünner Datenlage „zu wenig“ und nicht „null“ (E7)', async ({ page }) => {
@@ -95,7 +96,7 @@ test('sagt nirgends mehr „misst diese App nicht“ — jede Achse hat eine Que
   }
   // Und den langfristigen Abruf überlässt sie der Messung (F1).
   await expect(page.locator('.axis', { hasText: 'Langfristiger Abruf' })).toContainText(
-    'Das misst die Messung',
+    'Quelle: wissenschaftliche Messung',
   )
 })
 
@@ -161,7 +162,7 @@ test('zeigt die Sofort-Achse als das, was sie ist (D7, D-026)', async ({ page })
   })
   await page.reload()
   await expect(startButton(page)).toBeVisible()
-  await openPage(page, 'Dein Profil')
+  await openPage(page, 'Memory DNA')
 
   const working = page.locator('.axis', { hasText: 'Arbeitsgedächtnis' })
   await expect(working).toContainText('sofort, nicht nach Tagen')
@@ -189,7 +190,8 @@ test('kündigt einen Schwerpunkt an und sagt, warum (E5, E6)', async ({ page }) 
   await leavePage(page)
 
   await expect(page.locator('.focus')).toContainText('Heute mit Schwerpunkt: Zahlen')
-  await expect(page.getByText(/Ändert sich, sobald sich die Zahlen ändern/)).toBeVisible()
+  await expect(page.locator('.focus-why')).toBeVisible()
+  await expect(page.locator('.focus-why')).not.toHaveText('')
 })
 
 test('kündigt keinen an, wo der Unterschied Zufall sein kann', async ({ page }) => {

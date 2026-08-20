@@ -35,15 +35,17 @@ test('merkt echte Information: Vorschläge, Bestätigung, Constellation, Neulade
   await page.getByRole('button', { name: 'Vorschläge ansehen' }).click()
 
   // Vier Knoten, drei Verbindungen — und nichts ist schon gespeichert.
+  // Die Labels sind editierbare Inputs; ihr Wert ist deshalb die Wahrheit,
+  // nicht der innerText des umgebenden Knotens.
   await expect(page.locator('.remember-node')).toHaveCount(4)
-  await expect(page.locator('.remember-node').first()).toContainText('Daniel')
+  await expect(page.locator('.remember-node input').first()).toHaveValue('Daniel')
   await expect(page.locator('.remember-edges li')).toHaveCount(3)
   await expect(page.locator('.remember-edges li').first()).toContainText('Daniel → Museum')
 
   // Ein Vorschlag lässt sich abwählen — und seine Verbindung geht still mit.
-  await page.locator('.remember-node', { hasText: 'Museum' }).locator('.remember-node-toggle').click()
+  await page.getByRole('button', { name: 'Museum nicht übernehmen' }).click()
   await expect(page.locator('.remember-edges li')).toHaveCount(2)
-  await page.locator('.remember-node', { hasText: 'Museum' }).locator('.remember-node-toggle').click()
+  await page.getByRole('button', { name: 'Museum wieder übernehmen' }).click()
   await expect(page.locator('.remember-edges li')).toHaveCount(3)
 
   await page.getByRole('button', { name: 'Bestätigen und merken' }).click()
@@ -64,6 +66,7 @@ test('merkt echte Information: Vorschläge, Bestätigung, Constellation, Neulade
   // Und der Startbildschirm weiß es: Der Blick auf heute nennt den
   // schwächsten Anker — Daniel, denn er ist der einzige.
   await expect(page.locator('.today-memory')).toContainText('Daniel')
+  await expect(page.locator('.memory-pulse')).toContainText('4 neue Erinnerungen')
 })
 
 test('trainiert die Erinnerung in der Einheit — und FSRS bekommt die Termine', async ({
@@ -185,7 +188,7 @@ test('schlägt mit KI vor — nur mit Schlüssel, Anbieter gestubbt, bestätigt 
   // Die Vorschläge tragen ihre Herkunft — und dieselbe Bestätigungstür.
   await expect(page.locator('.remember-aisource')).toBeVisible()
   await expect(page.locator('.remember-node')).toHaveCount(2)
-  await expect(page.locator('.remember-edges li')).toHaveText(['Mira → Cello'])
+  await expect(page.locator('.remember-edges li').first()).toContainText('Mira → Cello')
   await page.getByRole('button', { name: 'Bestätigen und merken' }).click()
   await expect(page.locator('.memory-counts')).toContainText('2 Erinnerungen')
 

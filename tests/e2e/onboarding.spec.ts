@@ -13,43 +13,30 @@ import { openPage, startButton } from './helpers.ts'
  * beantwortet (auch mit „nichts“) kommt keine Frage wieder (D-015).
  */
 
-test('fragt beim ersten Öffnen — und macht aus den Antworten Vorschläge, keine Urteile', async ({
+test('erzeugt in unter drei Schritten die erste echte Erinnerung, ohne ein Urteil', async ({
   page,
 }) => {
   await page.goto('/')
 
   // Der erste Bildschirm ist die Begrüßung, nicht ein Formular.
   await expect(page.locator('.arrival')).toBeVisible()
-  await expect(page.getByText('Schön, dass du da bist.')).toBeVisible()
+  await expect(page.getByText('Dein Gedächtnis, trainiert.')).toBeVisible()
 
   await startButton(page).click()
 
-  // Name — wird zur Anrede, zu nichts sonst.
-  await page.locator('.arrival-name').fill('Anna')
+  await page.locator('.remember-input').fill('Daniel arbeitet im Museum und kommt aus Madrid.')
   await page.locator('.arrival-next').click()
 
-  // Ziel: Zahlen. Wird ein Schwerpunkt-Vorschlag.
-  await page.locator('.choice', { hasText: 'Zahlen & PINs' }).click()
-
-  // Zeitbudget: 3 Minuten. Wird die Voreinstellung des Startbildschirms.
+  // Nur noch das reale Zeitbudget; keine acht Erklärscreens.
   await page.locator('.choice', { hasText: '3 Minuten' }).click()
 
-  // Tageszeit und Altersband.
-  await page.locator('.choice', { hasText: 'Abends' }).click()
-  await page.locator('.choice', { hasText: '30 bis 49' }).click()
-
-  // Danach steht der Startbildschirm — mit Anrede …
+  // Danach steht der Startbildschirm mit der gewählten Dauer …
   await expect(page.locator('.challenge')).toBeVisible()
-  await expect(page.locator('.greeting')).toContainText('Hallo Anna.')
-
-  // … mit dem gewählten Zeitbudget als Voreinstellung …
   await expect(page.locator('.mode-active')).toHaveText('3 Minuten')
 
-  // … und mit dem Ziel als Schwerpunkt. Entscheidend ist die Begründung:
-  // Sie nennt das Vorhaben, nicht eine Messung, die es nie gab (R-1).
-  await expect(page.locator('.focus')).toContainText('Zahlen')
-  await expect(page.locator('.focus-why')).toContainText('vorgenommen')
-  await expect(page.locator('.focus-why')).not.toContainText('zurückkam')
+  // … und der echten ersten Erinnerung im lokalen Graphen.
+  await openPage(page, 'Mein Gedächtnis')
+  await expect(page.locator('.memory-counts')).toContainText('3 Erinnerungen')
 })
 
 test('lässt alles überspringen — und fragt danach nie wieder', async ({ page }) => {
