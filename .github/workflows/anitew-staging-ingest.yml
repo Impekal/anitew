@@ -5,7 +5,7 @@ on:
     branches:
       - anitew-phase2-staging
     paths:
-      - '.anitew-staging/phase2.patch.gz.b64'
+      - '.anitew-staging/phase2.part3.b64'
 
 permissions:
   contents: write
@@ -22,15 +22,16 @@ jobs:
 
       - name: Decode staged patch
         run: |
-          base64 -d .anitew-staging/phase2.patch.gz.b64 | gzip -d > /tmp/anitew-phase2.patch
-          wc -c /tmp/anitew-phase2.patch
-          wc -l /tmp/anitew-phase2.patch
+          cat .anitew-staging/phase2.part1.b64 .anitew-staging/phase2.part2.b64 .anitew-staging/phase2.part3.b64 | base64 -d | gzip -d > /tmp/anitew-phase2.patch
+          test "$(wc -c < /tmp/anitew-phase2.patch)" -eq 74135
+          test "$(wc -l < /tmp/anitew-phase2.patch)" -eq 1747
+          sha256sum /tmp/anitew-phase2.patch
 
       - name: Verify and apply patch
         run: |
           git apply --check /tmp/anitew-phase2.patch
           git apply /tmp/anitew-phase2.patch
-          rm .anitew-staging/phase2.patch.gz.b64
+          rm .anitew-staging/phase2.part1.b64 .anitew-staging/phase2.part2.b64 .anitew-staging/phase2.part3.b64
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -65,7 +66,7 @@ jobs:
           git config user.email "actions@users.noreply.github.com"
           git diff --name-only -z --diff-filter=ACMRTUXB | xargs -0 -r git add --
           git ls-files --others --exclude-standard -z | xargs -0 -r git add --
-          git add -u -- .anitew-staging/phase2.patch.gz.b64
+          git add -u -- .anitew-staging/phase2.part1.b64 .anitew-staging/phase2.part2.b64 .anitew-staging/phase2.part3.b64
           git diff --cached --check
           git commit -m "feat: stage ANITEW memory system phase two"
           git push origin HEAD:anitew-phase2-staging
