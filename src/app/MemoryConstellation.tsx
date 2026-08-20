@@ -121,20 +121,33 @@ export function MemoryConstellation({
   const activity = placed.map((node) => node.activityAt)
   const oldestActivity = Math.min(...activity)
   const newestActivity = Math.max(...activity)
+  const hasReturn = placed.some((node) => dueNodeIds.has(node.id))
+  const hasRecall = placed.some((node) => recalledNodeIds.has(node.id))
 
   if (placed.length === 0) return null
 
   return (
-    <div className="constellation">
+    <div
+      className={`constellation${hasReturn ? ' constellation-has-return' : ''}${hasRecall ? ' constellation-has-recall' : ''}`}
+      data-world-state={hasRecall ? 'retrieve' : hasReturn ? 'return' : 'quiet'}
+    >
       <svg
         viewBox="0 0 100 100"
         aria-hidden={onSelect === undefined ? true : undefined}
         aria-label={onSelect === undefined ? undefined : ariaLabel}
       >
+        <g className="constellation-atmosphere" aria-hidden="true">
+          <circle cx="50" cy="50" r="43" className="constellation-orbit constellation-orbit-outer" />
+          <circle cx="50" cy="50" r="31" className="constellation-orbit constellation-orbit-inner" />
+        </g>
         {graph.edges.map((edge, index) => {
           const from = byId.get(edge.from)
           const to = byId.get(edge.to)
           if (from === undefined || to === undefined) return null
+          const selectedPath = selectedId !== undefined && (edge.from === selectedId || edge.to === selectedId)
+          const returnPath = dueNodeIds.has(edge.from) || dueNodeIds.has(edge.to)
+          const recallPath = recalledNodeIds.has(edge.from) || recalledNodeIds.has(edge.to)
+          const fresh = newEdgeIds.has(edge.id) || newNodeIds.has(edge.from) || newNodeIds.has(edge.to)
           return (
             <line
               key={edge.id}
@@ -142,51 +155,61 @@ export function MemoryConstellation({
               y1={from.y}
               x2={to.x}
               y2={to.y}
-              className={newEdgeIds.has(edge.id) || newNodeIds.has(edge.from) || newNodeIds.has(edge.to) ? 'constellation-edge constellation-edge-new' : 'constellation-edge'}
+              className={`constellation-edge${fresh ? ' constellation-edge-new' : ''}${selectedPath ? ' constellation-edge-selected' : ''}${returnPath ? ' constellation-edge-return' : ''}${recallPath ? ' constellation-edge-recalled' : ''}`}
               style={{ animationDelay: `${(index * 240) % 1800}ms` }}
             />
           )
         })}
-        {placed.map((node, index) => (
-          <g
-            key={node.id}
-            className={`${node.id === selectedId ? 'constellation-memory constellation-memory-selected' : 'constellation-memory'}${newNodeIds.has(node.id) ? ' constellation-memory-new' : ''}${recalledNodeIds.has(node.id) ? ' constellation-memory-recalled' : ''}${dueNodeIds.has(node.id) ? ' constellation-memory-due' : ''}`}
-            role={onSelect === undefined ? undefined : 'button'}
-            tabIndex={onSelect === undefined ? undefined : 0}
-            aria-label={selectLabel?.(node.label) ?? node.label}
-            onClick={() => onSelect?.(node.id)}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault()
-                onSelect?.(node.id)
-              }
-            }}
-          >
-            <circle
-              cx={node.x}
-              cy={node.y}
-              r={(node.anchor ? 2.1 : 1.25) + Math.min(1.2, node.degree * 0.18)}
-              className={
-                `${node.anchor ? 'constellation-node constellation-node-anchor' : 'constellation-node'} constellation-node-${node.type}`
-              }
-              style={{
-                animationDelay: `${(index * 130) % 1600}ms`,
-                opacity:
-                  0.25 +
-                  node.strength * 0.5 +
-                  (newestActivity === oldestActivity
-                    ? 0.25
-                    : ((node.activityAt - oldestActivity) / (newestActivity - oldestActivity)) *
-                      0.25),
+        {placed.map((node, index) => {
+          const isDue = dueNodeIds.has(node.id)
+          const isRecalled = recalledNodeIds.has(node.id)
+          return (
+            <g
+              key={node.id}
+              className={`${node.id === selectedId ? 'constellation-memory constellation-memory-selected' : 'constellation-memory'}${newNodeIds.has(node.id) ? ' constellation-memory-new' : ''}${isRecalled ? ' constellation-memory-recalled' : ''}${isDue ? ' constellation-memory-due' : ''}`}
+              role={onSelect === undefined ? undefined : 'button'}
+              tabIndex={onSelect === undefined ? undefined : 0}
+              aria-label={selectLabel?.(node.label) ?? node.label}
+              onClick={() => onSelect?.(node.id)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault()
+                  onSelect?.(node.id)
+                }
               }}
-            />
-            {node.anchor && (
-              <text x={node.x} y={node.y - 3.4} className="constellation-label" textAnchor="middle">
-                {node.label}
-              </text>
-            )}
-          </g>
-        ))}
+            >
+              {isDue && (
+                <>
+                  <circle cx={node.x} cy={node.y} r="4.3" className="constellation-return-ring constellation-return-ring-a" aria-hidden="true" />
+                  <circle cx={node.x} cy={node.y} r="6.2" className="constellation-return-ring constellation-return-ring-b" aria-hidden="true" />
+                </>
+              )}
+              {isRecalled && (
+                <circle cx={node.x} cy={node.y} r="5.2" className="constellation-recall-wave" aria-hidden="true" />
+              )}
+              <circle
+                cx={node.x}
+                cy={node.y}
+                r={(node.anchor ? 2.1 : 1.25) + Math.min(1.2, node.degree * 0.18)}
+                className={`${node.anchor ? 'constellation-node constellation-node-anchor' : 'constellation-node'} constellation-node-${node.type}`}
+                style={{
+                  animationDelay: `${(index * 130) % 1600}ms`,
+                  opacity:
+                    0.25 +
+                    node.strength * 0.5 +
+                    (newestActivity === oldestActivity
+                      ? 0.25
+                      : ((node.activityAt - oldestActivity) / (newestActivity - oldestActivity)) * 0.25),
+                }}
+              />
+              {node.anchor && (
+                <text x={node.x} y={node.y - 3.4} className="constellation-label" textAnchor="middle">
+                  {node.label}
+                </text>
+              )}
+            </g>
+          )
+        })}
       </svg>
       {graph.nodes.length > placed.length && (
         <span className="constellation-window" aria-live="polite">
