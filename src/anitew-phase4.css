@@ -75,6 +75,7 @@
 .constellation-atmosphere {
   transform-origin: 50% 50%;
   opacity: .36;
+  pointer-events: none;
 }
 
 .constellation-orbit {
@@ -83,6 +84,7 @@
   stroke-width: .13;
   stroke-dasharray: .7 3.2;
   transform-origin: 50px 50px;
+  pointer-events: none;
 }
 
 .constellation-orbit-outer {
@@ -97,6 +99,7 @@
 
 .constellation-edge {
   transition: opacity 260ms ease, stroke-width 260ms ease, filter 260ms ease;
+  pointer-events: none;
 }
 
 .constellation-edge-selected {
@@ -118,6 +121,16 @@
 .constellation-memory {
   transform-box: fill-box;
   transform-origin: center;
+}
+
+/*
+ * The visible point can stay tiny and calm while the touch target is generous.
+ * The transparent rect is deliberately not a circle: legacy tests and data
+ * semantics continue to map one rendered node circle to one real memory.
+ */
+.constellation-hit {
+  fill: transparent;
+  pointer-events: all;
 }
 
 .constellation-memory:hover .constellation-node {
