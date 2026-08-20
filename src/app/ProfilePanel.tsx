@@ -1,5 +1,9 @@
-import { type BenchmarkRun, type DayKey, type DimensionCounts, type DimensionId, type DimensionResult, hasProfile, isImmediate, profileOf, progressOf, trainingFootprint, weakest } from '../core/index.ts'
+import { useMemo } from 'react'
+
+import { type BenchmarkRun, type DayKey, type DimensionCounts, type DimensionId, type DimensionResult, type ProfileSnapshot, hasProfile, isImmediate, profileOf, progressOf, trainingFootprint, weakest } from '../core/index.ts'
 import type { Dictionary } from '../i18n/index.ts'
+import { createWebPlatform } from '../platform/web/index.ts'
+import { useProfileHistory } from './useProfileHistory.ts'
 
 /**
  * Das Gedächtnisprofil (Backlog E3, E4, E7 · D-021).
@@ -31,6 +35,16 @@ export function ProfilePanel({
   const t = dictionary.profile
   const results = profileOf(counts)
   const names: Record<string, string> = t.names
+  /*
+   * E4: Der Verlauf benutzt denselben Web-Port wie die übrige App und legt
+   * tägliche Rohzählungen in den Einstellungen ab. Einstellungen gehören zur
+   * Sicherung und zum Drive-Abgleich; damit entsteht kein zweiter Datenweg.
+   * Die Trainingssprache löst der Haken aus derselben gespeicherten Wahl wie
+   * die App selbst auf, damit ein Sprachwechsel keine falsche Kurve erzeugt.
+   */
+  const historyPlatform = useMemo(() => createWebPlatform(), [])
+  const { history } = useProfileHistory(historyPlatform, today, counts)
+  const trajectories = trajectoryOf(results, history)
 
   /*
     Die Trainingsbilanz (V2): acht Sieben-Tage-Fenster, ganz rechts die
@@ -88,6 +102,30 @@ export function ProfilePanel({
       </ul>
 
       {/*
+        E4 zeigt absichtlich **keinen Pfeil nach oben/unten** und kein Urteil
+        „verbessert“. Zwei gezählte Stände stehen nebeneinander, jeweils mit
+        ihrer Spanne. Ob daraus eine Entwicklung folgt, darf die kleine
+        Stichprobe nicht stärker behaupten als die Daten selbst.
+      */}
+      {trajectories.length > 0 && (
+        <div className="profile-history">
+          <h3 className="coach-source">{dictionary.benchmark.series}</h3>
+          <ul className="axes profile-history-axes">
+            {trajectories.map(({ id, first, last }) => (
+              <li key={id} className="axis axis-measured">
+                <span className="axis-name">{names[id]}</span>
+                <span className="axis-value">
+                  <span>{historyValue(first, t)}</span>
+                  <span aria-hidden="true"> → </span>
+                  <span>{historyValue(last, t)}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/*
         Die schwächste Achse wird nur genannt, wenn sich zwei wirklich
         unterscheiden — sonst hieße „Zahlen sind deine Schwachstelle“ nur,
         dass der Zufall an diesem Tag so lag (E5, R-1).
@@ -99,6 +137,35 @@ export function ProfilePanel({
       )}
     </div>
   )
+}
+
+interface HistoryPoint {
+  day: DayKey
+  result: Extract<DimensionResult, { kind: 'measured' }>
+}
+
+function trajectoryOf(
+  current: readonly DimensionResult[],
+  history: readonly ProfileSnapshot[],
+): readonly { id: DimensionId; first: HistoryPoint; last: HistoryPoint }[] {
+  const rows: { id: DimensionId; first: HistoryPoint; last: HistoryPoint }[] = []
+  for (const result of current) {
+    if (result.kind !== 'measured') continue
+    const points = history.flatMap((snapshot) => {
+      const atDay = profileOf(snapshot.counts).find((entry) => entry.id === result.id)
+      return atDay?.kind === 'measured' ? [{ day: snapshot.day, result: atDay }] : []
+    })
+    const first = points[0]
+    const last = points.at(-1)
+    if (first === undefined || last === undefined || first.day === last.day) continue
+    rows.push({ id: result.id, first, last })
+  }
+  return rows
+}
+
+function historyValue(point: HistoryPoint, t: Dictionary['profile']): string {
+  const result = point.result
+  return `${point.day}: ${result.rate} % · ${t.range} ${result.low}–${result.high} %`
 }
 
 function valueOf(result: DimensionResult, dictionary: Dictionary, runs: readonly BenchmarkRun[]): string {
