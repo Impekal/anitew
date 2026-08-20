@@ -167,6 +167,7 @@ export function MemoryPanel({
             newEdgeIds={newEdgeIds}
             ariaLabel={texts.constellationLabel}
             recalledNodeIds={recalledNodeIds}
+            dueNodeIds={dueNodeIds}
           />
           {selected !== undefined && (
             <section className="memory-detail" aria-live="polite">
