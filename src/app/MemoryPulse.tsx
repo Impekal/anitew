@@ -12,6 +12,8 @@ import { loadDue } from '../data/items.ts'
 import { loadMemoryGraph } from '../data/memoryStore.ts'
 import type { Dictionary } from '../i18n/index.ts'
 
+import './memory-reencounter.css'
+
 export function MemoryPulse({
   platform,
   training,
@@ -64,18 +66,32 @@ export function MemoryPulse({
     }
   }
   return (
-    <section className="memory-pulse memory-reencounter" aria-labelledby="memory-pulse-heading">
-      <div className="memory-pulse-mark" aria-hidden="true"><span /></div>
+    <section
+      className={reencounter === undefined ? 'memory-pulse' : 'memory-pulse memory-reencounter memory-reencounter-live'}
+      aria-labelledby="memory-pulse-heading"
+    >
+      {reencounter === undefined ? (
+        <div className="memory-pulse-mark" aria-hidden="true"><span /></div>
+      ) : (
+        <div className="memory-return-glyph" aria-hidden="true">
+          <svg viewBox="0 0 44 44" focusable="false">
+            <line x1="10" y1="31" x2="33" y2="13" />
+            <circle className="memory-return-anchor" cx="10" cy="31" r="3.5" />
+            <circle className="memory-return-node" cx="33" cy="13" r="5" />
+            <circle className="memory-return-wave" cx="33" cy="13" r="9" />
+          </svg>
+        </div>
+      )}
       <div>
         <p id="memory-pulse-heading" className="memory-pulse-label">
           {reencounter === undefined ? t.heading : dictionary.session.phases.return}
         </p>
         {reencounter !== undefined && (
           <>
-            <p className="memory-pulse-line"><strong>{reencounter.node.label}</strong></p>
-            <p className="hint">{dictionary.memory.dueSoon}</p>
+            <p className="memory-pulse-line memory-return-name"><strong>{reencounter.node.label}</strong></p>
+            <p className="hint memory-return-status">{dictionary.memory.dueSoon}</p>
             {reencounter.worldAnchor !== undefined && reencounter.worldAnchor.id !== reencounter.node.id && (
-              <p className="hint">
+              <p className="hint memory-return-context">
                 {dictionary.memory.connected}: {reencounter.worldAnchor.label}
               </p>
             )}
