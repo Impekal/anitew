@@ -12,6 +12,7 @@ import {
   hasTwinPool,
   hasWordPool,
   missionFor,
+  missionObjectFor,
   namePool,
   trainingLanguages,
   twinPairs,
@@ -43,7 +44,10 @@ describe('Spanisch trainieren', () => {
   it('stellt die Farbe in Missionen hinter den Gegenstand', () => {
     const colours = ['rojo', 'azul', 'verde', 'amarillo', 'negro', 'blanco', 'gris', 'marrón']
     for (const person of namePool('es').slice(0, 12)) {
-      const object = missionFor(person, 'es').facts.find((fact) => fact.kind === 'object')?.value ?? ''
+      // H2 zeigt in der Szene zusätzlich die Lage (`balón negro · sobre la
+      // cómoda`). Für die Grammatikfrage zählt der eigentliche Gegenstand —
+      // genau der Wert, der später bei `#object` abgefragt wird.
+      const object = missionObjectFor(person, 'es')
       const pieces = object.split(' ')
       const colour = pieces.at(-1) ?? ''
       expect(colours, `„${object}“ endet nicht auf einer spanischen Farbe`).toContain(colour)
