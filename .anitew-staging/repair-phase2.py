@@ -56,20 +56,6 @@ replace_once(
     "practiced: '{count} memories were trained in the last 24 hours.',",
 )
 
-# UI: once the adaptive mission has resolved, its explicit 'no focus' must not
-# fall back to the older profile focus. The fallback exists only while preview
-# data has not loaded yet.
-replace_once(
-    'src/app/App.tsx',
-    "{(missionPreview?.focus !== undefined || focus !== undefined) && (",
-    "{((missionPreview !== undefined ? missionPreview.focus : focus?.moduleId) !== undefined) && (",
-)
-replace_once(
-    'src/app/App.tsx',
-    "(dictionary.profile.modules as Record<string, string>)[missionPreview?.focus ?? focus?.moduleId ?? '']",
-    "(dictionary.profile.modules as Record<string, string>)[missionPreview !== undefined ? (missionPreview.focus ?? '') : (focus?.moduleId ?? '')]",
-)
-
 # Core regression guards.
 p = Path('tests/core/memoryPhase2.test.ts')
 s = p.read_text()
