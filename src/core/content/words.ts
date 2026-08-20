@@ -10,14 +10,16 @@
  *    Liste durch den Übersetzer geschickt ergibt auf Englisch krumme Wörter
  *    und misst dann die Übersetzung statt das Gedächtnis.
  * 3. **Untereinander verschieden.** Keine Reimpaare, keine Wortfamilien, keine
- *    zwei Wörter mit demselben Anfang — sonst misst der Abruf, wie gut jemand
+ *    zwei fast gleichen Schreibformen — sonst misst der Abruf, wie gut jemand
  *    ähnliche Dinge auseinanderhält (Interferenz, Backlog C6).
  *
  * Die Listen sind bewusst lang genug, dass eine 15-Minuten-Einheit sie nicht
- * ausschöpft: 8 Wörter × 8 Runden = 64.
+ * ausschöpft. C6 prüft die Regel zusätzlich zur Laufzeit, damit auch spätere
+ * Erweiterungen nicht unbemerkt störende Paare einschleusen.
  */
 
 import { FALLBACK_LANGUAGE, type Language } from '../language.ts'
+import { withoutInterference } from './interference.ts'
 
 const de = [
   'Anker', 'Ampel', 'Bahnhof', 'Bergwerk', 'Besen', 'Bienenstock', 'Blitz', 'Brunnen',
@@ -66,9 +68,15 @@ const POOLS: Partial<Record<Language, readonly string[]>> = { de, en, fr }
  * japanischen Training wären keine Sprachunterstützung, sondern eine Attrappe.
  * Bis die Liste da ist, wird auf der Rückfallsprache trainiert, und die App
  * sagt das (siehe `hasWordPool`).
+ *
+ * C6 läuft **hier**, unmittelbar bevor der Vorrat an den Session-Planer geht.
+ * Damit bleibt die kuratierte Liste lesbar und überprüfbar, während spätere
+ * Ergänzungen trotzdem nicht versehentlich Fast-Dubletten ins freie Abrufen
+ * bringen können.
  */
 export function wordPool(language: Language): readonly string[] {
-  return POOLS[language] ?? (POOLS[FALLBACK_LANGUAGE] as readonly string[])
+  const pool = POOLS[language] ?? (POOLS[FALLBACK_LANGUAGE] as readonly string[])
+  return withoutInterference(pool)
 }
 
 export function hasWordPool(language: Language): boolean {
