@@ -1,18 +1,4 @@
-.session-memory-landing::after,
-.summary-memory-landing::after {
-  content: '';
-  position: fixed;
-  inset: 20%;
-  pointer-events: none;
-  border: 1px solid rgba(216,168,90,.2);
-  border-radius: 50%;
-  animation: return-radar 900ms var(--ease) both;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .session-memory-landing::after,
-  .summary-memory-landing::after {
-    animation: none;
-    opacity: .24;
-  }
+.session-memory-landing,
+.summary-memory-landing {
+  box-shadow: inset 0 0 4rem rgba(216,168,90,.06);
 }
