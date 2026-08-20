@@ -7,12 +7,12 @@ import {
   createMemoryGraph,
   graphConnectionCount,
   latestNodes,
-  memoryNodeIdOfItem,
   memoryClusters,
+  memoryReviewDays,
   nodesByStrength,
   selectDue,
 } from '../core/index.ts'
-import { loadDue, moduleOf, wordOf } from '../data/items.ts'
+import { loadDue } from '../data/items.ts'
 import { loadMemoryGraph, saveMemoryGraph, MEMORY_VISITED_KEY } from '../data/memoryStore.ts'
 import { removeMemoryNode } from '../core/index.ts'
 import type { Dictionary } from '../i18n/index.ts'
@@ -61,23 +61,9 @@ export function MemoryPanel({
   useEffect(() => {
     void loadDue(training)
       .then((items) => {
-        const memoryItems = items.filter((item) => moduleOf(item.itemId) === 'memory')
-        const schedule = new Map<string, DayKey>()
-        for (const item of memoryItems) {
-          const id = memoryNodeIdOfItem(wordOf(item.itemId))
-          if (id === undefined) continue
-          const existing = schedule.get(id)
-          if (existing === undefined || item.memory.dueDay < existing) {
-            schedule.set(id, item.memory.dueDay)
-          }
-        }
-        setReviewDayByNode(schedule)
+        setReviewDayByNode(memoryReviewDays(items))
         setDueNodeIds(
-          new Set(
-            selectDue(memoryItems, today, Number.MAX_SAFE_INTEGER)
-              .map((item) => memoryNodeIdOfItem(wordOf(item.itemId)))
-              .filter((id): id is string => id !== undefined),
-          ),
+          new Set(memoryReviewDays(selectDue(items, today, Number.MAX_SAFE_INTEGER)).keys()),
         )
       })
       .catch(() => undefined)
