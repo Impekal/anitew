@@ -62,3 +62,28 @@ export function spanLengthFor(input: DifficultyInput): number {
   const delta = itemsDeltaFor(input)
   return Math.max(SPAN_MIN, Math.min(SPAN_MAX, SPAN_BASE + delta))
 }
+
+/**
+ * H6 — adaptive Missionsschwierigkeit über die Betrachtungszeit.
+ *
+ * Eine Mission bleibt immer dieselbe vollständige Szene. Wir entfernen keine
+ * Tatsachen und erfinden keine Level. Stattdessen verschiebt dieselbe bereits
+ * vorhandene ±1-Regel nur das Verhältnis zwischen Einprägen und Abrufen:
+ *
+ * - bei Überlastung (`-1`) sechs Sekunden je Tatsache,
+ * - im Zielkorridor (`0`) fünf Sekunden,
+ * - bei sehr sicherer Leistung (`+1`) vier Sekunden.
+ *
+ * Das Gesamtbudget der Runde bleibt dadurch unverändert; mehr Zeit beim
+ * Einprägen bedeutet entsprechend weniger Abrufzeit und umgekehrt.
+ */
+export const MISSION_SECONDS_MIN = 4
+export const MISSION_SECONDS_BASE = 5
+export const MISSION_SECONDS_MAX = 6
+
+export function missionSecondsPerFact(delta: -1 | 0 | 1): number {
+  return Math.max(
+    MISSION_SECONDS_MIN,
+    Math.min(MISSION_SECONDS_MAX, MISSION_SECONDS_BASE - delta),
+  )
+}
