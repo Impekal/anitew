@@ -1,0 +1,93 @@
+.memory-reencounter-live {
+  position: relative;
+  isolation: isolate;
+}
+
+.memory-return-glyph {
+  width: 2.75rem;
+  height: 2.75rem;
+  align-self: start;
+}
+
+.memory-return-glyph svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.memory-return-glyph line {
+  stroke: var(--an-cyan);
+  stroke-width: 1;
+  opacity: .55;
+  stroke-dasharray: 32;
+  stroke-dashoffset: 32;
+  animation: memory-return-trace 900ms var(--ease) forwards;
+}
+
+.memory-return-anchor {
+  fill: var(--an-cyan);
+  opacity: .55;
+}
+
+.memory-return-node {
+  fill: var(--an-gold);
+  filter: drop-shadow(0 0 7px rgba(216, 168, 90, .45));
+  transform-origin: 33px 13px;
+  animation: memory-return-arrive 700ms var(--ease) both;
+}
+
+.memory-return-wave {
+  fill: none;
+  stroke: var(--an-gold);
+  stroke-width: 1;
+  opacity: 0;
+  transform-origin: 33px 13px;
+  animation: memory-return-wave 1200ms var(--ease) 180ms both;
+}
+
+.memory-return-name {
+  font-size: clamp(1.15rem, 4vw, 1.55rem);
+}
+
+.memory-return-status {
+  margin-top: .2rem;
+}
+
+.memory-return-context {
+  margin-top: .1rem;
+  color: var(--an-cyan);
+}
+
+@keyframes memory-return-trace {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes memory-return-arrive {
+  from { opacity: 0; transform: scale(.45); }
+  60% { opacity: 1; transform: scale(1.12); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes memory-return-wave {
+  0% { opacity: 0; transform: scale(.45); }
+  35% { opacity: .5; }
+  100% { opacity: 0; transform: scale(1.45); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .memory-return-glyph line,
+  .memory-return-node,
+  .memory-return-wave {
+    animation: none !important;
+  }
+
+  .memory-return-glyph line {
+    stroke-dashoffset: 0;
+  }
+
+  .memory-return-node {
+    opacity: 1;
+    transform: none;
+  }
+}
