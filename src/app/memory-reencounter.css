@@ -1,4 +1,5 @@
-.memory-reencounter-live {
+.memory-reencounter-live,
+.memory-afterglow-live {
   position: relative;
   isolation: isolate;
 }
@@ -44,6 +45,16 @@
   opacity: 0;
   transform-origin: 33px 13px;
   animation: memory-return-wave 1200ms var(--ease) 180ms both;
+}
+
+.memory-afterglow-live .memory-return-node {
+  fill: var(--an-cyan);
+  filter: drop-shadow(0 0 7px rgba(131, 201, 187, .42));
+}
+
+.memory-afterglow-live .memory-return-wave {
+  stroke: var(--an-cyan);
+  animation-duration: 900ms;
 }
 
 .memory-return-name {
