@@ -7,12 +7,12 @@ import {
   createMemoryGraph,
   graphConnectionCount,
   latestNodes,
-  memoryNodeIdOfItem,
   memoryClusters,
+  memoryReviewDays,
   nodesByStrength,
   selectDue,
 } from '../core/index.ts'
-import { loadDue, moduleOf, wordOf } from '../data/items.ts'
+import { loadDue } from '../data/items.ts'
 import { loadMemoryGraph, saveMemoryGraph, MEMORY_VISITED_KEY } from '../data/memoryStore.ts'
 import { removeMemoryNode } from '../core/index.ts'
 import type { Dictionary } from '../i18n/index.ts'
@@ -51,6 +51,7 @@ export function MemoryPanel({
   const [newEdgeIds, setNewEdgeIds] = useState<ReadonlySet<string>>(new Set())
   const [clusterId, setClusterId] = useState<string | undefined>()
   const [dueNodeIds, setDueNodeIds] = useState<ReadonlySet<string>>(new Set())
+  const [reviewDayByNode, setReviewDayByNode] = useState<ReadonlyMap<string, DayKey>>(new Map())
   const reload = useCallback(() => {
     void loadMemoryGraph()
       .then(setGraph)
@@ -59,16 +60,12 @@ export function MemoryPanel({
   useEffect(() => reload(), [reload])
   useEffect(() => {
     void loadDue(training)
-      .then((items) =>
+      .then((items) => {
+        setReviewDayByNode(memoryReviewDays(items))
         setDueNodeIds(
-          new Set(
-            selectDue(items, today, Number.MAX_SAFE_INTEGER)
-              .filter((item) => moduleOf(item.itemId) === 'memory')
-              .map((item) => memoryNodeIdOfItem(wordOf(item.itemId)))
-              .filter((id): id is string => id !== undefined),
-          ),
-        ),
-      )
+          new Set(memoryReviewDays(selectDue(items, today, Number.MAX_SAFE_INTEGER)).keys()),
+        )
+      })
       .catch(() => undefined)
   }, [training, today])
   // Wer hier war, braucht die Entdeckungszeile auf dem Startbildschirm nicht mehr.
@@ -116,6 +113,7 @@ export function MemoryPanel({
           )
           .filter((node): node is NonNullable<typeof node> => node !== undefined)
   const dueSoon = selected !== undefined && dueNodeIds.has(selected.id)
+  const reviewDay = selected === undefined ? undefined : reviewDayByNode.get(selected.id)
   const recalledNodeIds = new Set(
     graph.nodes
       .filter(
@@ -161,12 +159,16 @@ export function MemoryPanel({
           <MemoryConstellation
             graph={worldGraph}
             selectedId={selectedId}
-            onSelect={setSelectedId}
+            onSelect={(id) => {
+              setSelectedId(id)
+              if (dueNodeIds.has(id)) platform.sound.play('return')
+            }}
             selectLabel={(label) => texts.select.replace('{label}', label)}
             newNodeIds={newNodeIds}
             newEdgeIds={newEdgeIds}
             ariaLabel={texts.constellationLabel}
             recalledNodeIds={recalledNodeIds}
+            dueNodeIds={dueNodeIds}
           />
           {selected !== undefined && (
             <section className="memory-detail" aria-live="polite">
@@ -192,7 +194,17 @@ export function MemoryPanel({
                 </div>
                 <div>
                   <dt>{texts.nextReview}</dt>
-                  <dd>{dueSoon ? texts.dueSoon : texts.fsrsScheduled}</dd>
+                  <dd>
+                    {dueSoon
+                      ? texts.dueSoon
+                      : reviewDay === undefined
+                        ? texts.fsrsScheduled
+                        : new Date(`${reviewDay}T12:00:00Z`).toLocaleDateString(language, {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                          })}
+                  </dd>
                 </div>
               </dl>
               <button type="button" className="quiet" onClick={() => setSelectedId(undefined)}>

@@ -11,6 +11,14 @@ on:
     branches: ['**']
   pull_request:
 
+# Ein neuer Commit macht den alten CI-Stand desselben Branches wertlos.
+# `head_ref` ist beim PR der Quellbranch, `ref_name` beim Push derselbe Name:
+# Push und PR konkurrieren deshalb absichtlich in EINER Gruppe statt die
+# 15-Minuten-Browsersuite doppelt zu rechnen.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
 jobs:
   check:
     runs-on: ubuntu-latest

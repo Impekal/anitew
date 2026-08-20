@@ -89,6 +89,13 @@ function notesFor(cue: SoundCue, step: number): Note[] {
         { step: 1, at: 0.45, decay: 1.1, gain: 0.25 },
         { step: 2, at: 0.53, decay: 1.35, gain: 0.25 },
       ]
+    case 'return':
+      // Ein tiefer Ton kommt zurück, ein zweiter öffnet kurz den Raum darum.
+      // Kein Sieg, kein Jingle: eher Wiedererkennen als Belohnung.
+      return [
+        { step: 0, at: 0, decay: 1.05, gain: 0.27 },
+        { step: 5, at: 0.1, decay: 1.45, gain: 0.2 },
+      ]
     case 'recall':
       // Ein einzelner warmer Impuls: aufgelöst, aber nicht als Sieg verkauft.
       return [{ step: 4, at: 0, decay: 0.75, gain: 0.28 }]

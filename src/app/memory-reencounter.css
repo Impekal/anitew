@@ -1,0 +1,133 @@
+.memory-reencounter-live,
+.memory-afterglow-live {
+  position: relative;
+  isolation: isolate;
+}
+
+.memory-return-glyph {
+  width: 2.75rem;
+  height: 2.75rem;
+  align-self: start;
+}
+
+.memory-return-glyph svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.memory-return-glyph line {
+  stroke: var(--an-cyan);
+  stroke-width: 1;
+  opacity: .55;
+  stroke-dasharray: 32;
+  stroke-dashoffset: 32;
+  animation: memory-return-trace 900ms var(--ease) forwards;
+}
+
+.memory-return-anchor {
+  fill: var(--an-cyan);
+  opacity: .55;
+}
+
+.memory-return-node {
+  fill: var(--an-gold);
+  filter: drop-shadow(0 0 7px rgba(216, 168, 90, .45));
+  transform-origin: 33px 13px;
+  animation: memory-return-arrive 700ms var(--ease) both;
+}
+
+.memory-return-wave {
+  fill: none;
+  stroke: var(--an-gold);
+  stroke-width: 1;
+  opacity: 0;
+  transform-origin: 33px 13px;
+  animation: memory-return-wave 1200ms var(--ease) 180ms both;
+}
+
+.memory-afterglow-live .memory-return-node {
+  fill: var(--an-cyan);
+  filter: drop-shadow(0 0 7px rgba(131, 201, 187, .42));
+}
+
+.memory-afterglow-live .memory-return-wave {
+  stroke: var(--an-cyan);
+  animation-duration: 900ms;
+}
+
+.memory-return-titleline {
+  display: flex;
+  align-items: baseline;
+  gap: .65rem;
+  min-width: 0;
+}
+
+.memory-return-name {
+  min-width: 0;
+  font-size: clamp(1.15rem, 4vw, 1.55rem);
+}
+
+.memory-return-age {
+  flex: 0 0 auto;
+  padding: .12rem .34rem;
+  border: 1px solid rgba(216, 168, 90, .28);
+  border-radius: 999px;
+  color: var(--an-gold);
+  font: .61rem var(--mono);
+  letter-spacing: .08em;
+}
+
+.memory-return-status {
+  margin-top: .2rem;
+}
+
+.memory-return-context {
+  margin-top: .1rem;
+  color: var(--an-cyan);
+}
+
+/*
+ * Dieselbe Wahrheit in der großen Memory World: Ein heute über FSRS fälliger
+ * Knoten bekommt einen leisen Ring. Kein Blinken, kein Alarm — nur eine
+ * visuelle Verbindung zwischen RETURN auf Today und dem echten Graphen.
+ */
+.constellation-memory-due .constellation-node {
+  stroke: var(--an-gold);
+  stroke-width: .55;
+  filter: drop-shadow(0 0 3px rgba(216, 168, 90, .38));
+}
+
+@keyframes memory-return-trace {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes memory-return-arrive {
+  from { opacity: 0; transform: scale(.45); }
+  60% { opacity: 1; transform: scale(1.12); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes memory-return-wave {
+  0% { opacity: 0; transform: scale(.45); }
+  35% { opacity: .5; }
+  100% { opacity: 0; transform: scale(1.45); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .memory-return-glyph line,
+  .memory-return-node,
+  .memory-return-wave {
+    animation: none !important;
+  }
+
+  .memory-return-glyph line {
+    stroke-dashoffset: 0;
+  }
+
+  .memory-return-node {
+    opacity: 1;
+    transform: none;
+  }
+}

@@ -56,6 +56,8 @@ export type SoundCue =
   | 'remember'
   /** Eine bestätigte Beziehung ist im persönlichen Graphen entstanden. */
   | 'connection'
+  /** Ein fälliger persönlicher Knoten wird bewusst wieder betreten. */
+  | 'return'
   /** Ein Abruf wurde aufgelöst; richtig oder falsch bleibt visuell, nicht musikalisch gewertet. */
   | 'recall'
   /** Ein Block ist zu Ende. */
