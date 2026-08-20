@@ -60,6 +60,8 @@ export type SoundCue =
   | 'return'
   /** Ein Abruf wurde aufgelöst; richtig oder falsch bleibt visuell, nicht musikalisch gewertet. */
   | 'recall'
+  /** Mindestens eine persönliche Erinnerung ist tatsächlich wiedergekommen. */
+  | 'landing'
   /** Ein Block ist zu Ende. */
   | 'block'
   /** Die Einheit ist geschafft. */

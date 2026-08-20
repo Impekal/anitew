@@ -58,49 +58,47 @@ function frequency(step: number): number {
 function notesFor(cue: SoundCue, step: number): Note[] {
   switch (cue) {
     case 'start':
-      // Drei Töne aufwärts: ein Vorhang, der aufgeht.
       return [
         { step: 0, at: 0, decay: 1.1, gain: 0.5 },
         { step: 2, at: 0.09, decay: 1.1, gain: 0.45 },
         { step: 4, at: 0.18, decay: 1.4, gain: 0.4 },
       ]
     case 'word':
-      // Steigt mit jedem Wort. Man hört, wie weit die Runde ist.
       return [{ step: 5 + step, at: 0, decay: 0.9, gain: 0.42 }]
     case 'type':
-      // Kurz und hoch, fast ein Tropfen. Er darf beim Tippen nicht nerven.
       return [{ step: 12 + (step % 3), at: 0, decay: 0.28, gain: 0.22 }]
     case 'block':
-      // Zwei Töne abwärts: etwas ist zu Ende, nichts ist schiefgegangen.
       return [
         { step: 4, at: 0, decay: 0.8, gain: 0.34 },
         { step: 2, at: 0.11, decay: 1.2, gain: 0.3 },
       ]
     case 'remember':
-      // Zwei ruhige Töne aufwärts mit langem Ausklingen: etwas ist
-      // aufgehoben. Kleiner als „done" — Merken ist ein Anfang, kein Finale.
       return [
         { step: 2, at: 0, decay: 1.2, gain: 0.36 },
         { step: 7, at: 0.14, decay: 1.8, gain: 0.32 },
       ]
     case 'connection':
-      // Zwei nahe, ineinandergreifende Stimmen: eine Beziehung entsteht.
       return [
         { step: 1, at: 0.45, decay: 1.1, gain: 0.25 },
         { step: 2, at: 0.53, decay: 1.35, gain: 0.25 },
       ]
     case 'return':
-      // Ein tiefer Ton kommt zurück, ein zweiter öffnet kurz den Raum darum.
-      // Kein Sieg, kein Jingle: eher Wiedererkennen als Belohnung.
       return [
         { step: 0, at: 0, decay: 1.05, gain: 0.27 },
         { step: 5, at: 0.1, decay: 1.45, gain: 0.2 },
       ]
     case 'recall':
-      // Ein einzelner warmer Impuls: aufgelöst, aber nicht als Sieg verkauft.
       return [{ step: 4, at: 0, decay: 0.75, gain: 0.28 }]
+    case 'landing':
+      // Signature moment: etwas Persönliches ist wirklich zurückgekommen.
+      // Drei sehr leise Stimmen bilden keine Fanfare, sondern einen Raum,
+      // der sich kurz schließt: Grundton → Verbindung → warmer Nachklang.
+      return [
+        { step: 0, at: 0, decay: 1.0, gain: 0.24 },
+        { step: 5, at: 0.08, decay: 1.35, gain: 0.22 },
+        { step: 7, at: 0.22, decay: 1.8, gain: 0.18 },
+      ]
     case 'done':
-      // Ein warmer Schluss, kein Sieges-Jingle: drei tiefe Atemzüge.
       return [
         { step: 0, at: 0, decay: 1.3, gain: 0.34 },
         { step: 2, at: 0.13, decay: 1.5, gain: 0.32 },
@@ -113,8 +111,9 @@ function notesFor(cue: SoundCue, step: number): Note[] {
  * Ein kurzer, weicher Stoß bei den Wechseln, die zählen (O6).
  *
  * Nicht bei jedem Wort — das wäre ein zappelndes Telefon. Nur wenn ein Block,
- * eine echte Wiederbegegnung oder die Einheit zu Ende ist: eine Bestätigung,
- * die man in der Tasche spürt. RETURN ist bewusst zweiteilig: „da“ — „wieder“.
+ * eine echte Wiederbegegnung, ein echter persönlicher Abruf oder die Einheit
+ * zu Ende ist. RETURN sagt „da — wieder“. LANDING ist noch kleiner und enger:
+ * „gefunden“ — ohne Siegesgeste.
  */
 function buzz(cue: SoundCue): void {
   const vibrate = (navigator as { vibrate?: (pattern: number | number[]) => boolean }).vibrate
@@ -124,15 +123,16 @@ function buzz(cue: SoundCue): void {
       ? [16, 40, 16]
       : cue === 'return'
         ? [9, 34, 9]
-        : cue === 'block'
-          ? [14]
-          : undefined
+        : cue === 'landing'
+          ? [7, 24, 12]
+          : cue === 'block'
+            ? [14]
+            : undefined
   if (pattern === undefined) return
   try {
     vibrate(pattern)
   } catch {
     // Manche Browser verlangen für `vibrate` eine vorangegangene Berührung.
-    // Dann fällt es aus — es war nie mehr als eine Beigabe.
   }
 }
 
@@ -152,7 +152,6 @@ export function createWebSound(enabled: boolean): Sound {
       master.gain.value = MASTER
       master.connect(context.destination)
 
-      // Im Hintergrund schweigen und beim Zurückkommen weitermachen.
       document.addEventListener('visibilitychange', () => {
         if (context === undefined) return
         if (document.hidden) void context.suspend().catch(() => undefined)
@@ -169,13 +168,10 @@ export function createWebSound(enabled: boolean): Sound {
 
     const envelope = ctx.createGain()
     envelope.connect(out)
-    // Weicher Anschlag statt Klick: 12 ms hoch, dann exponentiell aus.
     envelope.gain.setValueAtTime(0.0001, start)
     envelope.gain.exponentialRampToValueAtTime(note.gain, start + 0.012)
     envelope.gain.exponentialRampToValueAtTime(0.0001, start + note.decay)
 
-    // Grundton plus eine leise Oktave darüber — das gibt dem Sinus Glanz,
-    // ohne dass er metallisch wird.
     for (const [multiple, level] of [
       [1, 1],
       [2, 0.28],
@@ -196,19 +192,11 @@ export function createWebSound(enabled: boolean): Sound {
       if (!on) return
       const ctx = ensure()
       if (ctx === undefined || master === undefined) return
-      /*
-       * Haptik hängt am selben Schalter wie der Ton (O6): „dezent und
-       * abschaltbar“ heißt hier ein Schalter für beides, nicht zwei. Nur bei
-       * den bedeutsamen Wechseln — nicht bei jedem Wort —, und nur, wo das
-       * Gerät es kann. iOS-Safari kennt `vibrate` nicht; dort bleibt es ein
-       * stiller Verzicht, kein Fehler.
-       */
       buzz(cue)
       try {
         for (const note of notesFor(cue, step)) strike(ctx, master, note)
       } catch {
-        // Ein stummer Ton ist ein hinnehmbarer Fehler. Ein Absturz mitten in
-        // einer Trainingseinheit wäre keiner.
+        // Ein stummer Ton ist hinnehmbar. Ein Absturz mitten in der Einheit nicht.
       }
     },
     setEnabled(next) {
