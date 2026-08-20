@@ -20,10 +20,10 @@ export function interferenceKey(value: string): string {
  * Sind zwei Lernwörter so ähnlich geschrieben, dass sie nicht gemeinsam in
  * einen freien Wortvorrat gehören?
  *
- * Die Schwellen sind absichtlich eng: gleicher Anfang oder gleiches Ende erst
- * ab vier Zeichen und mindestens fünf Zeichen Wortlänge; zusätzlich genau
- * eine Einfüge-/Lösch-/Ersetzungsabweichung. C6 soll Verwechslungen verhindern,
- * nicht normale Wortschatzvielfalt wegfiltern.
+ * Die Schwelle ist bewusst eng: fünf gleiche Anfangszeichen bei Wörtern ab
+ * sechs Zeichen oder genau eine Einfüge-/Lösch-/Ersetzungsabweichung. C6 soll
+ * Fast-Dubletten wie `Insel/Pinsel` abfangen, nicht normale Ähnlichkeiten wie
+ * `Schlitten/Schlüssel` oder bloße Reime als vermeintlichen Fehler behandeln.
  */
 export function interferes(a: string, b: string): boolean {
   const left = interferenceKey(a)
@@ -31,8 +31,9 @@ export function interferes(a: string, b: string): boolean {
   if (left === '' || right === '') return false
   if (left === right) return true
   if (Math.min(left.length, right.length) < 5) return false
-  if (left.slice(0, 4) === right.slice(0, 4)) return true
-  if (left.slice(-4) === right.slice(-4)) return true
+  if (Math.min(left.length, right.length) >= 6 && left.slice(0, 5) === right.slice(0, 5)) {
+    return true
+  }
   return editDistanceAtMostOne(left, right)
 }
 
