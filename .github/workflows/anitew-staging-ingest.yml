@@ -15,6 +15,7 @@ on:
       - '.anitew-staging/phase2.part3.b64'
       - '.github/workflows/anitew-staging-ingest.yml'
       - 'playwright.config.ts'
+      - 'tests/e2e/memory.spec.ts'
 
 permissions:
   contents: write
@@ -47,15 +48,156 @@ jobs:
           git apply /tmp/anitew-phase2.patch
           rm .anitew-staging/phase2.part1.b64 .anitew-staging/phase2.part2.b64 .anitew-staging/phase2.part3.b64
 
-      - name: Diagnose Phase 2 pulse semantics
+      - name: Repair reviewed Phase 2 logic
         run: |
-          echo '===== MEMORY_PULSE_COMPONENT_BEGIN ====='
-          cat src/app/MemoryPulse.tsx
-          echo '===== MEMORY_PULSE_COMPONENT_END ====='
-          echo '===== MEMORY_PULSE_COPY_BEGIN ====='
-          grep -n -B 8 -A 28 -E 'pulse|reinforced|attention|stale|quiet' src/i18n/de.ts src/i18n/en.ts || true
-          echo '===== MEMORY_PULSE_COPY_END ====='
-          echo '===== PHASE2_TESTS_BEGIN ====='
-          cat tests/core/memoryPhase2.test.ts
-          echo '===== PHASE2_TESTS_END ====='
-          exit 1
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p = Path('src/core/memory/dailyMission.ts')
+          s = p.read_text()
+          old = "import { type DimensionId, moduleForDimension } from '../profile/dimensions.ts'"
+          new = "import { type DimensionId, isImmediate, moduleForDimension } from '../profile/dimensions.ts'"
+          assert old in s
+          s = s.replace(old, new, 1)
+          old = """    const undertrained = (Object.entries(input.dimensions) as [DimensionId, DimensionCounts][])
+              .sort((a, b) => a[1].chances - b[1].chances || a[0].localeCompare(b[0]))[0]
+"""
+          new = """    const undertrained = (Object.entries(input.dimensions) as [DimensionId, DimensionCounts][])
+              // Keine Gelegenheit ist kein Defizit. Und Sofort-Achsen sind eine andere
+              // Währung als Wiedersehen nach Tagen (dieselbe Regel wie `weakest`).
+              .filter(([id, counts]) =>
+                counts.chances > 0 && !isImmediate(id) && moduleForDimension(id) !== undefined,
+              )
+              .sort((a, b) => a[1].chances - b[1].chances || a[0].localeCompare(b[0]))[0]
+"""
+          assert old in s
+          p.write_text(s.replace(old, new, 1))
+
+          p = Path('src/core/memory/memoryPulse.ts')
+          s = p.read_text()
+          assert "| { kind: 'reinforced'; count: number }" in s
+          s = s.replace("| { kind: 'reinforced'; count: number }", "| { kind: 'practiced'; count: number }", 1)
+          assert "signals.push({ kind: 'reinforced', count: recent.length })" in s
+          s = s.replace("signals.push({ kind: 'reinforced', count: recent.length })", "signals.push({ kind: 'practiced', count: recent.length })", 1)
+          p.write_text(s)
+
+          p = Path('src/app/MemoryPulse.tsx')
+          s = p.read_text()
+          assert "case 'reinforced':" in s and 'return t.reinforced' in s
+          s = s.replace("case 'reinforced':", "case 'practiced':", 1)
+          s = s.replace('return t.reinforced.replace', 'return t.practiced.replace', 1)
+          p.write_text(s)
+
+          for name in ('de', 'en'):
+              p = Path(f'src/i18n/{name}.ts')
+              s = p.read_text()
+              if name == 'de':
+                  old = "reinforced: '{count} Erinnerungen wurden in den letzten 24 Stunden abgerufen.',"
+                  new = "practiced: '{count} Erinnerungen wurden in den letzten 24 Stunden trainiert.',"
+              else:
+                  old = "reinforced: '{count} memories were recalled in the last 24 hours.',"
+                  new = "practiced: '{count} memories were trained in the last 24 hours.',"
+              assert old in s
+              p.write_text(s.replace(old, new, 1))
+
+          p = Path('tests/core/memoryPhase2.test.ts')
+          s = p.read_text()
+          assert 'memoryPulse,\n' in s
+          s = s.replace('    memoryPulse,\n', '    memoryPulse,\n    weakenMemoryNode,\n', 1)
+          addition = r'''
+
+describe('Phase 2 evidence guards', () => {
+  it('macht aus einer Sofort-Achse keinen Tages-Schwerpunkt', () => {
+    const decision = composeDailyMission({
+      seconds: 300,
+      dueByModule: {},
+      personalScenes: 0,
+      untrainedPersonalItems: 0,
+      dimensions: { working: { chances: 20, lost: 3 } },
+      interferenceErrors: 0,
+    })
+    expect(decision.focus).toBeUndefined()
+    expect(decision.reason).toBe('balanced')
+  })
+
+  it('behandelt null Wiedersehen als fehlende Evidenz, nicht als Untertraining', () => {
+    const decision = composeDailyMission({
+      seconds: 300,
+      dueByModule: {},
+      personalScenes: 0,
+      untrainedPersonalItems: 0,
+      dimensions: { words: { chances: 0, lost: 0 } },
+      interferenceErrors: 0,
+    })
+    expect(decision.focus).toBeUndefined()
+    expect(decision.reason).toBe('balanced')
+  })
+
+  it('darf eine echte verzögerte Gelegenheit als wenig trainiert priorisieren', () => {
+    const decision = composeDailyMission({
+      seconds: 300,
+      dueByModule: {},
+      personalScenes: 0,
+      untrainedPersonalItems: 0,
+      dimensions: {
+        words: { chances: 4, lost: 1 },
+        faces: { chances: 9, lost: 2 },
+      },
+      interferenceErrors: 0,
+    })
+    expect(decision).toMatchObject({ focus: 'words', reason: 'undertrained' })
+  })
+
+  it('nennt auch einen misslungenen Abruf nur Training, nicht Verstärkung', () => {
+    const graph = weakenMemoryNode(graphAt(1_000), 'person:daniel', 2_000)
+    const signals = memoryPulse({ graph, due: [], today: '2026-08-20', now: 2_000 })
+    expect(signals).toContainEqual({ kind: 'practiced', count: 1 })
+    expect(signals.some((signal) => signal.kind === 'reinforced')).toBe(false)
+  })
+})
+'''
+          assert "describe('Phase 2 evidence guards'" not in s
+          p.write_text(s + addition)
+          PY
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Core tests
+        run: npm test
+
+      - name: Production build
+        run: npm run build
+
+      - name: Size budget
+        run: npm run size
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Phase 2 functional E2E
+        run: npx playwright test tests/e2e/memory.spec.ts tests/e2e/onboarding.spec.ts tests/e2e/profile.spec.ts --project=chromium --max-failures=1
+
+      - name: Phase 2 layout E2E
+        run: npx playwright test tests/e2e/layout.spec.ts --project=desktop-small --max-failures=1
+
+      - name: Commit validated Phase 2
+        if: github.event_name == 'pull_request'
+        run: |
+          git config user.name "ANITEW Staging Runner"
+          git config user.email "actions@users.noreply.github.com"
+          git diff --name-only -z --diff-filter=ACMRTUXB | xargs -0 -r git add --
+          git ls-files --others --exclude-standard -z | xargs -0 -r git add --
+          git add -u -- .anitew-staging/phase2.part1.b64 .anitew-staging/phase2.part2.b64 .anitew-staging/phase2.part3.b64
+          git diff --cached --check
+          git commit -m "feat: stage ANITEW memory system phase two"
+          git push origin HEAD:anitew-phase2-staging
