@@ -25,12 +25,6 @@ const ITEM_SEPARATOR = '#'
 /** Wie viele Dinge eine Szene trägt — vier: genug zum Binden, kein Suchbild. */
 export const GAZE_SCENE_SIZE = 4
 
-/**
- * Die zeichenbaren Dinge. Die Schlüssel sind sprachfrei (sie stehen in der
- * Kennung und in der Zeichnung); die Namen kommen je Sprache dazu. Jedes
- * Ding muss sich als einfache Strichzeichnung erkennen lassen — was sich
- * nicht zeichnen lässt, gehört nicht in ein visuelles Modul.
- */
 export const GAZE_OBJECTS = [
   'umbrella',
   'sun',
@@ -46,72 +40,33 @@ export const GAZE_OBJECTS = [
 
 export type GazeObject = (typeof GAZE_OBJECTS)[number]
 
-/**
- * Die Farben — sechs, die niemand verwechselt und jede Sprache benennt.
- * Bewusst keine Zwischentöne: „War das türkis oder petrol?“ prüfte
- * Farbwissen, nicht Gedächtnis.
- */
 export const GAZE_COLORS = ['red', 'blue', 'green', 'yellow', 'purple', 'orange'] as const
-
 export type GazeColor = (typeof GAZE_COLORS)[number]
 
 const OBJECT_NAMES: Readonly<Partial<Record<Language, Readonly<Record<GazeObject, string>>>>> = {
   de: {
-    umbrella: 'Schirm',
-    sun: 'Sonne',
-    boat: 'Boot',
-    kite: 'Drachen',
-    fish: 'Fisch',
-    bird: 'Vogel',
-    tree: 'Baum',
-    moon: 'Mond',
-    key: 'Schlüssel',
-    bell: 'Glocke',
+    umbrella: 'Schirm', sun: 'Sonne', boat: 'Boot', kite: 'Drachen', fish: 'Fisch',
+    bird: 'Vogel', tree: 'Baum', moon: 'Mond', key: 'Schlüssel', bell: 'Glocke',
   },
   en: {
-    umbrella: 'umbrella',
-    sun: 'sun',
-    boat: 'boat',
-    kite: 'kite',
-    fish: 'fish',
-    bird: 'bird',
-    tree: 'tree',
-    moon: 'moon',
-    key: 'key',
-    bell: 'bell',
+    umbrella: 'umbrella', sun: 'sun', boat: 'boat', kite: 'kite', fish: 'fish',
+    bird: 'bird', tree: 'tree', moon: 'moon', key: 'key', bell: 'bell',
   },
   fr: {
-    umbrella: 'parapluie',
-    sun: 'soleil',
-    boat: 'bateau',
-    kite: 'cerf-volant',
-    fish: 'poisson',
-    bird: 'oiseau',
-    tree: 'arbre',
-    moon: 'lune',
-    key: 'clé',
-    bell: 'cloche',
+    umbrella: 'parapluie', sun: 'soleil', boat: 'bateau', kite: 'cerf-volant', fish: 'poisson',
+    bird: 'oiseau', tree: 'arbre', moon: 'lune', key: 'clé', bell: 'cloche',
+  },
+  es: {
+    umbrella: 'paraguas', sun: 'sol', boat: 'barco', kite: 'cometa', fish: 'pez',
+    bird: 'pájaro', tree: 'árbol', moon: 'luna', key: 'llave', bell: 'campana',
   },
 }
 
 const COLOR_NAMES: Readonly<Partial<Record<Language, Readonly<Record<GazeColor, string>>>>> = {
   de: { red: 'Rot', blue: 'Blau', green: 'Grün', yellow: 'Gelb', purple: 'Lila', orange: 'Orange' },
-  en: {
-    red: 'red',
-    blue: 'blue',
-    green: 'green',
-    yellow: 'yellow',
-    purple: 'purple',
-    orange: 'orange',
-  },
-  fr: {
-    red: 'rouge',
-    blue: 'bleu',
-    green: 'vert',
-    yellow: 'jaune',
-    purple: 'violet',
-    orange: 'orange',
-  },
+  en: { red: 'red', blue: 'blue', green: 'green', yellow: 'yellow', purple: 'purple', orange: 'orange' },
+  fr: { red: 'rouge', blue: 'bleu', green: 'vert', yellow: 'jaune', purple: 'violet', orange: 'orange' },
+  es: { red: 'rojo', blue: 'azul', green: 'verde', yellow: 'amarillo', purple: 'morado', orange: 'naranja' },
 }
 
 /** Gibt es dieses Modul in dieser Sprache? */
@@ -126,11 +81,6 @@ export interface GazeDetail {
   color: GazeColor
 }
 
-/**
- * Der Inhalt einer Szene, aus ihrer Kennung erzeugt: vier verschiedene
- * Dinge, vier verschiedene Farben. Dieselbe Kennung ergibt immer dieselbe
- * Szene — sonst fragte das Wiedersehen nach einem Bild, das es nie gab.
- */
 export function gazeSpec(sceneId: string): readonly GazeDetail[] {
   const rng = createRng(`gaze:${sceneId}`)
   const objects = rng.shuffle([...GAZE_OBJECTS]).slice(0, GAZE_SCENE_SIZE)
@@ -141,12 +91,6 @@ export function gazeSpec(sceneId: string): readonly GazeDetail[] {
 /** Der Vorrat: fortlaufend nummerierte Szenen, Reihenfolge aus dem Seed. */
 export function gazePool(seed: string, count: number): string[] {
   const rng = createRng(`gaze-pool:${seed}`)
-  /*
-   * Ein großer Raum (100000), aus dem gezogen wird: Zwei Einheiten am
-   * selben Tag sollen nicht dieselben Bilder zeigen, und ein Bild von
-   * letzter Woche darf als Wiedersehen zurückkommen, ohne dass es heute
-   * zufällig neu „gelernt“ wird — der Planer sortiert Fällige ohnehin aus.
-   */
   const seen = new Set<string>()
   const pool: string[] = []
   while (pool.length < count) {
@@ -158,28 +102,23 @@ export function gazePool(seed: string, count: number): string[] {
   return pool
 }
 
-/** Die Kennungen der vier Einzelheiten einer Szene. */
 export function gazePlacements(sceneId: string): readonly string[] {
   return gazeSpec(sceneId).map((detail) => `${sceneId}${ITEM_SEPARATOR}${detail.object}`)
 }
 
-/** Die Szene, zu der eine Einzelheit gehört. */
 export function gazeSceneOf(item: string): string {
   return item.split(ITEM_SEPARATOR)[0] ?? item
 }
 
-/** Der Ding-Schlüssel einer Einzelheit. */
 export function gazeObjectOf(item: string): GazeObject | undefined {
   const key = item.split(ITEM_SEPARATOR)[1]
   return (GAZE_OBJECTS as readonly string[]).includes(key ?? '') ? (key as GazeObject) : undefined
 }
 
-/** Ist diese Kennung eine Bild-Szene oder eine ihrer Einzelheiten? */
 export function isGazeId(value: string): boolean {
   return value.startsWith(`${GAZE_PREFIX}${SCENE_SEPARATOR}`)
 }
 
-/** Die gesuchte Antwort: der Farbname in der Trainingssprache. */
 export function gazeAnswer(item: string, language: Language): string | undefined {
   const object = gazeObjectOf(item)
   if (object === undefined) return undefined
@@ -188,7 +127,6 @@ export function gazeAnswer(item: string, language: Language): string | undefined
   return COLOR_NAMES[language]?.[detail.color]
 }
 
-/** Der Name des Dings in der Trainingssprache — die Frage braucht ihn. */
 export function gazeObjectName(item: string, language: Language): string | undefined {
   const object = gazeObjectOf(item)
   if (object === undefined) return undefined

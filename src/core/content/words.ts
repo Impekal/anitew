@@ -58,12 +58,25 @@ const fr = [
   'écharpe', 'enclume',
 ]
 
-const POOLS: Partial<Record<Language, readonly string[]>> = { de, en, fr }
+const es = [
+  'ancla', 'abeja', 'balcón', 'barril', 'bicicleta', 'brújula', 'campana', 'candado',
+  'cañón', 'caracola', 'carretilla', 'castillo', 'cepillo', 'chimenea', 'cohete', 'cometa',
+  'corona', 'cubo', 'delfín', 'escalera', 'escoba', 'espejo', 'faro', 'flauta',
+  'fogata', 'fuente', 'girasol', 'globo', 'granero', 'guante', 'hamaca', 'hacha',
+  'herradura', 'hielo', 'jaula', 'jarrón', 'linterna', 'llave', 'martillo', 'molino',
+  'montaña', 'nido', 'paraguas', 'pato', 'peonza', 'pincel', 'pirámide', 'puente',
+  'reloj', 'remo', 'rueda', 'sartén', 'serpiente', 'sombrero', 'tambor', 'telescopio',
+  'tienda', 'tobogán', 'trompeta', 'túnel', 'vela', 'volcán', 'zapato', 'zanahoria',
+  'ardilla', 'armario', 'botella', 'caballo', 'cactus', 'cascada', 'cesta', 'columpio',
+  'embudo', 'estatua', 'farol', 'guitarra', 'isla', 'loro', 'nube', 'tractor',
+]
+
+const POOLS: Partial<Record<Language, readonly string[]>> = { de, en, fr, es }
 
 /**
  * Der Wortvorrat einer Sprache.
  *
- * Für die neun Sprachen ohne eigene Liste (Backlog L6) gibt es bewusst keinen
+ * Für Sprachen ohne eigene Liste (Backlog L6) gibt es bewusst keinen
  * automatischen Ersatz aus einer anderen Sprache — deutsche Wörter in einem
  * japanischen Training wären keine Sprachunterstützung, sondern eine Attrappe.
  * Bis die Liste da ist, wird auf der Rückfallsprache trainiert, und die App
