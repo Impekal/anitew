@@ -57,8 +57,26 @@
   animation-duration: 900ms;
 }
 
+.memory-return-titleline {
+  display: flex;
+  align-items: baseline;
+  gap: .65rem;
+  min-width: 0;
+}
+
 .memory-return-name {
+  min-width: 0;
   font-size: clamp(1.15rem, 4vw, 1.55rem);
+}
+
+.memory-return-age {
+  flex: 0 0 auto;
+  padding: .12rem .34rem;
+  border: 1px solid rgba(216, 168, 90, .28);
+  border-radius: 999px;
+  color: var(--an-gold);
+  font: .61rem var(--mono);
+  letter-spacing: .08em;
 }
 
 .memory-return-status {
