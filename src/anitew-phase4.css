@@ -59,12 +59,17 @@
   background: radial-gradient(circle, rgba(140, 207, 192, .14), rgba(216, 168, 90, .035) 42%, transparent 70%);
 }
 
+/*
+ * The world has depth, but its interactive geography does not drift.
+ * A remembered node should stay exactly where the person expects it to be;
+ * atmosphere may breathe around it, the target itself remains stable.
+ */
 .constellation svg {
   position: relative;
   z-index: 2;
   transform-origin: 50% 55%;
   transform: translateZ(var(--world-depth)) rotateX(1.2deg);
-  animation: world-float 11s ease-in-out infinite;
+  transition: transform 420ms var(--ease);
 }
 
 .constellation-atmosphere {
@@ -338,11 +343,6 @@
 @keyframes world-drift {
   from { transform: translate3d(-8%, 4%, 0) scale(.94); opacity: .5; }
   to { transform: translate3d(8%, -5%, 0) scale(1.08); opacity: .9; }
-}
-
-@keyframes world-float {
-  0%, 100% { transform: translate3d(0, 0, var(--world-depth)) rotateX(1.2deg); }
-  50% { transform: translate3d(0, -2px, calc(var(--world-depth) + 4px)) rotateX(.3deg); }
 }
 
 @keyframes orbit-turn {
