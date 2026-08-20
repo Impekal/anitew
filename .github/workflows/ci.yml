@@ -11,11 +11,12 @@ on:
     branches: ['**']
   pull_request:
 
-# Ein neuer Commit macht den alten CI-Stand desselben Branches/PR wertlos.
-# Gerade die serielle Browser-Suite dauert mehrere Minuten; ohne Abbruch
-# stapeln sich historische Zwischenstände und der aktuelle wartet hinten.
+# Ein neuer Commit macht den alten CI-Stand desselben Branches wertlos.
+# `head_ref` ist beim PR der Quellbranch, `ref_name` beim Push derselbe Name:
+# Push und PR konkurrieren deshalb absichtlich in EINER Gruppe statt die
+# 15-Minuten-Browsersuite doppelt zu rechnen.
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
