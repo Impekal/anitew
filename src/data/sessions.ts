@@ -15,7 +15,14 @@
  * Fünf-Minuten-Einheit ein Drittel.
  */
 
-import type { DayKey, Instant, RecallResult, SessionPlan } from '../core/index.ts'
+import type {
+  DayKey,
+  Instant,
+  RecallResult,
+  SchedulerReviewFact,
+  SessionPlan,
+} from '../core/index.ts'
+import { itemIdOf } from './items.ts'
 import { type EventRow, db } from './db.ts'
 
 const ACTIVE_KEY = 'activeSession'
@@ -85,6 +92,15 @@ export async function logShown(
 }
 
 /**
+ * Kontext einer Antwort, die tatsächlich den FSRS-Scheduler fortschreibt.
+ * Nur dann wird die vollständige Scheduler-ID ins Rohprotokoll geschrieben.
+ */
+export interface SchedulerEventContext {
+  readonly language: string
+  readonly day: DayKey
+}
+
+/**
  * Das Ergebnis eines Abrufblocks — ein Ereignis je gesuchtem Wort.
  *
  * Absichtlich je Wort und nicht „6 von 8“: Später soll die Engine wissen, ob
@@ -98,13 +114,23 @@ export async function logRecall(
   blockDurationMs: number,
   moduleId = 'recall',
   module?: string,
+  scheduler?: SchedulerEventContext,
 ): Promise<void> {
+  const schedulerFields = (item: string) =>
+    module === undefined || scheduler === undefined
+      ? {}
+      : {
+          schedulerItemId: itemIdOf(module, scheduler.language, item),
+          schedulerDay: scheduler.day,
+        }
+
   const rows: EventRow[] = [
     ...result.correct.map((item) => ({
       sessionId,
       at,
       moduleId,
       ...(module === undefined ? {} : { module }),
+      ...schedulerFields(item),
       itemId: item,
       kind: 'answered' as const,
       correct: true,
@@ -115,6 +141,7 @@ export async function logRecall(
       at,
       moduleId,
       ...(module === undefined ? {} : { module }),
+      ...schedulerFields(item),
       itemId: item,
       kind: 'answered' as const,
       correct: false,
@@ -122,6 +149,31 @@ export async function logRecall(
     })),
   ]
   await db.events.bulkAdd(rows)
+}
+
+/**
+ * Nur belegbare C10-Rohdaten. Ältere Ereignisse ohne vollständige Scheduler-ID
+ * oder ohne Trainingstag fallen heraus; ANITEW rekonstruiert sie nicht aus
+ * Beschriftungen, Sitzungen oder der aktuellen Sprache.
+ */
+export async function loadSchedulerReviewFacts(): Promise<SchedulerReviewFact[]> {
+  const rows = await db.events
+    .filter(
+      (event) =>
+        event.kind === 'answered' &&
+        event.correct !== undefined &&
+        event.schedulerItemId !== undefined &&
+        event.schedulerDay !== undefined,
+    )
+    .toArray()
+
+  return rows
+    .sort((a, b) => a.at - b.at || (a.id ?? 0) - (b.id ?? 0))
+    .map((event) => ({
+      itemId: event.schedulerItemId as string,
+      day: event.schedulerDay as DayKey,
+      recalled: event.correct === true,
+    }))
 }
 
 export async function completeSession(sessionId: string, endedAt: Instant): Promise<void> {
