@@ -1,6 +1,7 @@
 /* Phase 4 · Slice 3 — factual memory landing.
-   This class exists for 900 ms only after a real correct personal recall. */
-.session-memory-landing::after {
+   Exists for 900 ms only after a real correct personal recall. */
+.session-memory-landing::after,
+.summary-memory-landing::after {
   content: '';
   position: fixed;
   inset: 50% auto auto 50%;
@@ -11,9 +12,7 @@
   pointer-events: none;
   z-index: -1;
   border: 1px solid rgba(216,168,90,.2);
-  box-shadow:
-    0 0 0 1.4rem rgba(140,207,192,.035),
-    0 0 4.5rem rgba(216,168,90,.09);
+  box-shadow: 0 0 0 1.4rem rgba(140,207,192,.035), 0 0 4.5rem rgba(216,168,90,.09);
   animation: memory-landing 900ms var(--ease) both;
 }
 
@@ -24,7 +23,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .session-memory-landing::after {
+  .session-memory-landing::after,
+  .summary-memory-landing::after {
     animation: none;
     opacity: .28;
     transform: none;
