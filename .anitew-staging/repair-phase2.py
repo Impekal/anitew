@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 
 
 def replace_once(path: str, old: str, new: str) -> None:
@@ -8,25 +9,27 @@ def replace_once(path: str, old: str, new: str) -> None:
     p.write_text(s.replace(old, new, 1))
 
 
+def regex_once(path: str, pattern: str, replacement: str) -> None:
+    p = Path(path)
+    s = p.read_text()
+    out, count = re.subn(pattern, replacement, s, count=1, flags=re.MULTILINE)
+    assert count == 1, f'expected exactly one regex match in {path}, got {count}: {pattern[:120]!r}'
+    p.write_text(out)
+
+
 # Daily Mission: no focus from zero-evidence or immediate-only dimensions.
 replace_once(
     'src/core/memory/dailyMission.ts',
     "import { type DimensionId, moduleForDimension } from '../profile/dimensions.ts'",
     "import { type DimensionId, isImmediate, moduleForDimension } from '../profile/dimensions.ts'",
 )
-replace_once(
+regex_once(
     'src/core/memory/dailyMission.ts',
-    """    const undertrained = (Object.entries(input.dimensions) as [DimensionId, DimensionCounts][])
-              .sort((a, b) => a[1].chances - b[1].chances || a[0].localeCompare(b[0]))[0]
-""",
-    """    const undertrained = (Object.entries(input.dimensions) as [DimensionId, DimensionCounts][])
-              // Keine Gelegenheit ist kein Defizit. Und Sofort-Achsen sind eine andere
-              // Währung als Wiedersehen nach Tagen (dieselbe Regel wie `weakest`).
-              .filter(([id, counts]) =>
-                counts.chances > 0 && !isImmediate(id) && moduleForDimension(id) !== undefined,
-              )
-              .sort((a, b) => a[1].chances - b[1].chances || a[0].localeCompare(b[0]))[0]
-""",
+    r"(?P<head>const undertrained = \(Object\.entries\(input\.dimensions\) as \[DimensionId, DimensionCounts\]\[\]\)\s*)\.sort\(\(a, b\) => a\[1\]\.chances - b\[1\]\.chances \|\| a\[0\]\.localeCompare\(b\[0\]\)\)\[0\]",
+    """\g<head>.filter(([id, counts]) =>
+        counts.chances > 0 && !isImmediate(id) && moduleForDimension(id) !== undefined,
+      )
+      .sort((a, b) => a[1].chances - b[1].chances || a[0].localeCompare(b[0]))[0]""",
 )
 
 # Memory Pulse: recent activity is evidence of practice, not necessarily reinforcement.
