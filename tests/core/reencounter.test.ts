@@ -7,11 +7,13 @@ import {
   createMemoryGraph,
   addMemoryNode,
   reinforceMemoryNode,
+  memoryAfterglow,
   memoryReencounter,
   type DueItem,
 } from '../../src/core/index.ts'
 
 const DAY = 86_400_000
+const MINUTE = 60_000
 
 const memory = (dueDay: string): DueItem['memory'] => ({
   stability: 2,
@@ -116,5 +118,52 @@ describe('memoryReencounter', () => {
         now,
       }),
     ).toBeUndefined()
+  })
+})
+
+describe('memoryAfterglow', () => {
+  it('lässt nach einem echten Abruf die betroffene Memory World reagieren', () => {
+    const now = Date.UTC(2026, 7, 20, 12)
+    let graph = createMemoryGraph()
+    graph = addMemoryNode(graph, { id: 'person:daniel', type: 'person', label: 'Daniel' }, now - 30 * DAY)
+    graph = addMemoryNode(graph, { id: 'place:madrid', type: 'place', label: 'Madrid' }, now - 30 * DAY)
+    graph = addMemoryNode(graph, { id: 'concept:gitarre', type: 'concept', label: 'Gitarre' }, now - 30 * DAY)
+    graph = connectMemoryNodes(graph, { from: 'person:daniel', to: 'place:madrid', relation: 'association' }, now - 30 * DAY)
+    graph = connectMemoryNodes(graph, { from: 'person:daniel', to: 'concept:gitarre', relation: 'association' }, now - 30 * DAY)
+    graph = reinforceMemoryNode(graph, 'place:madrid', now - 2 * MINUTE)
+    graph = reinforceMemoryNode(graph, 'concept:gitarre', now - 1 * MINUTE)
+
+    const result = memoryAfterglow({ graph, now })
+
+    expect(result?.anchor.id).toBe('person:daniel')
+    expect(result?.recalled.map((node) => node.id).sort()).toEqual(['concept:gitarre', 'place:madrid'])
+    expect(result?.lastRecalledAt).toBe(now - MINUTE)
+  })
+
+  it('verschwindet wieder: ein alter Abruf ist kein dauerndes Erfolgsbanner', () => {
+    const now = Date.UTC(2026, 7, 20, 12)
+    let graph = createMemoryGraph()
+    graph = addMemoryNode(graph, { id: 'place:madrid', type: 'place', label: 'Madrid' }, now - 30 * DAY)
+    graph = reinforceMemoryNode(graph, 'place:madrid', now - 20 * MINUTE)
+
+    expect(memoryAfterglow({ graph, now })).toBeUndefined()
+  })
+
+  it('wählt bei mehreren Welten die mit den meisten gerade abgerufenen Knoten', () => {
+    const now = Date.UTC(2026, 7, 20, 12)
+    let graph = createMemoryGraph()
+    graph = addMemoryNode(graph, { id: 'person:daniel', type: 'person', label: 'Daniel' }, now - 30 * DAY)
+    graph = addMemoryNode(graph, { id: 'place:madrid', type: 'place', label: 'Madrid' }, now - 30 * DAY)
+    graph = addMemoryNode(graph, { id: 'concept:gitarre', type: 'concept', label: 'Gitarre' }, now - 30 * DAY)
+    graph = addMemoryNode(graph, { id: 'person:mira', type: 'person', label: 'Mira' }, now - 30 * DAY)
+    graph = addMemoryNode(graph, { id: 'concept:cello', type: 'concept', label: 'Cello' }, now - 30 * DAY)
+    graph = connectMemoryNodes(graph, { from: 'person:daniel', to: 'place:madrid', relation: 'association' }, now - 30 * DAY)
+    graph = connectMemoryNodes(graph, { from: 'person:daniel', to: 'concept:gitarre', relation: 'association' }, now - 30 * DAY)
+    graph = connectMemoryNodes(graph, { from: 'person:mira', to: 'concept:cello', relation: 'association' }, now - 30 * DAY)
+    graph = reinforceMemoryNode(graph, 'place:madrid', now - 3 * MINUTE)
+    graph = reinforceMemoryNode(graph, 'concept:gitarre', now - 2 * MINUTE)
+    graph = reinforceMemoryNode(graph, 'concept:cello', now - MINUTE)
+
+    expect(memoryAfterglow({ graph, now })?.anchor.id).toBe('person:daniel')
   })
 })
