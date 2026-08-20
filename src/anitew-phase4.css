@@ -1,0 +1,262 @@
+/*
+ * ANITEW Phase 4 — Signature Experience
+ *
+ * This layer never invents memory data. It only gives existing factual states
+ * (quiet / RETURN / RETRIEVE / selection / confirmed connection) a coherent
+ * visual language. Reduced-motion remains a first-class mode.
+ */
+
+.memoryzone {
+  --world-depth: 24px;
+  perspective: 1100px;
+}
+
+.constellation {
+  isolation: isolate;
+  min-height: 18rem;
+  border-color: color-mix(in srgb, var(--an-line-strong) 72%, transparent);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .035),
+    inset 0 -80px 120px rgba(0, 0, 0, .22),
+    0 26px 80px rgba(0, 0, 0, .28);
+  transform-style: preserve-3d;
+}
+
+.constellation::before,
+.constellation::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.constellation::before {
+  width: 74%;
+  aspect-ratio: 1;
+  left: 13%;
+  top: -18%;
+  background: radial-gradient(circle, rgba(140, 207, 192, .09), rgba(140, 207, 192, .025) 40%, transparent 68%);
+  filter: blur(18px);
+  animation: world-breathe calc(var(--motion-breathe) * 1.4) ease-in-out infinite;
+}
+
+.constellation::after {
+  width: 42%;
+  aspect-ratio: 1;
+  right: -10%;
+  bottom: -24%;
+  background: radial-gradient(circle, rgba(216, 168, 90, .09), transparent 68%);
+  filter: blur(22px);
+  animation: world-drift 18s ease-in-out infinite alternate;
+}
+
+.constellation[data-world-state='return']::before {
+  background: radial-gradient(circle, rgba(216, 168, 90, .13), rgba(216, 168, 90, .035) 42%, transparent 70%);
+}
+
+.constellation[data-world-state='retrieve']::before {
+  background: radial-gradient(circle, rgba(140, 207, 192, .14), rgba(216, 168, 90, .035) 42%, transparent 70%);
+}
+
+.constellation svg {
+  position: relative;
+  z-index: 2;
+  transform-origin: 50% 55%;
+  transform: translateZ(var(--world-depth)) rotateX(1.2deg);
+  animation: world-float 11s ease-in-out infinite;
+}
+
+.constellation-atmosphere {
+  transform-origin: 50% 50%;
+  opacity: .36;
+}
+
+.constellation-orbit {
+  fill: none;
+  stroke: rgba(140, 207, 192, .18);
+  stroke-width: .13;
+  stroke-dasharray: .7 3.2;
+  transform-origin: 50px 50px;
+}
+
+.constellation-orbit-outer {
+  animation: orbit-turn 54s linear infinite;
+}
+
+.constellation-orbit-inner {
+  stroke: rgba(216, 168, 90, .14);
+  stroke-dasharray: .45 4.1;
+  animation: orbit-turn-reverse 38s linear infinite;
+}
+
+.constellation-edge {
+  transition: opacity 260ms ease, stroke-width 260ms ease, filter 260ms ease;
+}
+
+.constellation-edge-selected {
+  opacity: .84;
+  stroke-width: .42;
+  filter: drop-shadow(0 0 1.8px rgba(140, 207, 192, .6));
+}
+
+.constellation-edge-return {
+  stroke: var(--an-gold);
+  opacity: .5;
+}
+
+.constellation-edge-recalled {
+  opacity: .72;
+  filter: drop-shadow(0 0 2.2px rgba(216, 168, 90, .46));
+}
+
+.constellation-memory {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.constellation-memory:hover .constellation-node {
+  filter: drop-shadow(0 0 4px rgba(140, 207, 192, .68));
+}
+
+.constellation-memory-selected .constellation-node {
+  filter:
+    drop-shadow(0 0 2px rgba(240, 238, 228, .85))
+    drop-shadow(0 0 7px rgba(140, 207, 192, .42));
+}
+
+.constellation-return-ring,
+.constellation-recall-wave {
+  fill: none;
+  pointer-events: none;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.constellation-return-ring {
+  stroke: var(--an-gold);
+  stroke-width: .22;
+  opacity: 0;
+}
+
+.constellation-return-ring-a {
+  animation: return-radar 3.6s ease-out infinite;
+}
+
+.constellation-return-ring-b {
+  animation: return-radar 3.6s 1.15s ease-out infinite;
+}
+
+.constellation-recall-wave {
+  stroke: var(--an-cyan);
+  stroke-width: .28;
+  animation: retrieve-wave 2.2s var(--ease) both;
+}
+
+.constellation-memory-due .constellation-node {
+  filter: drop-shadow(0 0 4px rgba(216, 168, 90, .55));
+}
+
+.constellation-memory-recalled .constellation-label {
+  fill: var(--an-text);
+}
+
+.memory-detail {
+  position: relative;
+  margin-top: .9rem;
+  border-left-color: color-mix(in srgb, var(--an-cyan) 75%, transparent);
+  background: linear-gradient(90deg, rgba(140, 207, 192, .045), transparent 72%);
+}
+
+.memory-detail::before {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 0;
+  width: 1px;
+  height: 36%;
+  background: var(--an-gold);
+  box-shadow: 0 0 12px rgba(216, 168, 90, .45);
+  animation: detail-scan 2.4s var(--ease) both;
+}
+
+.memory-clusters button {
+  transition: color 220ms ease, border-color 220ms ease, transform 220ms ease;
+}
+
+.memory-clusters button:hover {
+  transform: translateY(-1px);
+  color: var(--an-text);
+}
+
+.memory-clusters .memory-cluster-active {
+  text-shadow: 0 0 16px rgba(216, 168, 90, .22);
+}
+
+@keyframes world-breathe {
+  0%, 100% { opacity: .55; transform: scale(.94); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+@keyframes world-drift {
+  from { transform: translate3d(-8%, 4%, 0) scale(.94); opacity: .5; }
+  to { transform: translate3d(8%, -5%, 0) scale(1.08); opacity: .9; }
+}
+
+@keyframes world-float {
+  0%, 100% { transform: translate3d(0, 0, var(--world-depth)) rotateX(1.2deg); }
+  50% { transform: translate3d(0, -2px, calc(var(--world-depth) + 4px)) rotateX(.3deg); }
+}
+
+@keyframes orbit-turn {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes orbit-turn-reverse {
+  to { transform: rotate(-360deg); }
+}
+
+@keyframes return-radar {
+  0% { opacity: 0; transform: scale(.48); }
+  18% { opacity: .78; }
+  72% { opacity: .13; }
+  100% { opacity: 0; transform: scale(1.72); }
+}
+
+@keyframes retrieve-wave {
+  0% { opacity: .9; transform: scale(.4); }
+  55% { opacity: .42; }
+  100% { opacity: 0; transform: scale(1.85); }
+}
+
+@keyframes detail-scan {
+  0% { height: 0; opacity: 0; }
+  35% { opacity: 1; }
+  100% { height: 36%; opacity: .72; }
+}
+
+@media (max-width: 560px) {
+  .constellation {
+    min-height: 14rem;
+    border-radius: 18px;
+  }
+  .constellation svg {
+    transform: translateZ(12px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .constellation svg,
+  .constellation::before,
+  .constellation::after,
+  .constellation-orbit,
+  .constellation-return-ring,
+  .constellation-recall-wave,
+  .memory-detail::before {
+    animation: none !important;
+    transform: none !important;
+  }
+  .constellation-return-ring-a { opacity: .38; }
+  .constellation-return-ring-b { opacity: .14; }
+  .constellation-recall-wave { opacity: .26; }
+}
