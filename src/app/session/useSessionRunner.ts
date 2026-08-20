@@ -218,7 +218,11 @@ export function useSessionRunner(
        * ausschließlich über `recordOutcome` (FSRS bleibt die Wahrheit).
        */
       if (block.moduleId === 'memory') {
+        // Ein aufgelöster Abruf klingt neutral. Nur wenn tatsächlich mindestens
+        // eine persönliche Erinnerung wiedergekommen ist, folgt ANITEWs
+        // Signature-Landing. Kein Treffer = kein Erfolgsfeedback.
         platform.sound.play('recall')
+        if (graded.correct.length > 0) platform.sound.play('landing')
         void applyMemoryOutcome({ correct: graded.correct, missed: graded.missed }, at).catch(
           () => undefined,
         )
