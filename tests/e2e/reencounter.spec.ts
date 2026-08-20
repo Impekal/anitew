@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { visit } from './helpers.ts'
+import { openPage, visit } from './helpers.ts'
 
 const SEP_ITEM = '\u001e'
 const SEP_ID = '\u001d'
@@ -117,6 +117,12 @@ test('zeigt eine wirklich fällige persönliche Erinnerung als RETURN statt als 
   await expect(page.locator('.memory-return-status')).toContainText('FSRS')
   await expect(page.locator('.memory-return-context')).toContainText('Daniel')
   await expect(page.locator('.memory-return-glyph')).toBeVisible()
+
+  // Dieselbe Wahrheit liegt nicht nur auf Today: In der echten Memory World
+  // trägt genau dieser FSRS-fällige Knoten die RETURN-Signatur weiter.
+  await openPage(page, 'Mein Gedächtnis')
+  const madrid = page.getByRole('button', { name: /Madrid/ })
+  await expect(madrid).toHaveClass(/constellation-memory-due/)
 })
 
 test('reagiert nach einem echten Abruf kurz mit der betroffenen Memory World', async ({ page }) => {
