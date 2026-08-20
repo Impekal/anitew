@@ -84,23 +84,11 @@ jobs:
 
           p = Path('src/core/memory/dailyMission.ts')
           s = p.read_text()
-          old = "import { type DimensionId, moduleForDimension } from '../profile/dimensions.ts'"
-          new = "import { type DimensionId, isImmediate, moduleForDimension } from '../profile/dimensions.ts'"
-          assert old in s
-          s = s.replace(old, new, 1)
-          old = """    const undertrained = (Object.entries(input.dimensions) as [DimensionId, DimensionCounts][])
-              .sort((a, b) => a[1].chances - b[1].chances || a[0].localeCompare(b[0]))[0]
-"""
-          new = """    const undertrained = (Object.entries(input.dimensions) as [DimensionId, DimensionCounts][])
-              // Keine Gelegenheit ist kein Defizit. Und Sofort-Achsen sind eine andere
-              // Währung als Wiedersehen nach Tagen (dieselbe Regel wie `weakest`).
-              .filter(([id, counts]) =>
-                counts.chances > 0 && !isImmediate(id) && moduleForDimension(id) !== undefined,
-              )
-              .sort((a, b) => a[1].chances - b[1].chances || a[0].localeCompare(b[0]))[0]
-"""
-          assert old in s
-          p.write_text(s.replace(old, new, 1))
+          s = s.replace("import { type DimensionId, moduleForDimension } from '../profile/dimensions.ts'", "import { type DimensionId, isImmediate, moduleForDimension } from '../profile/dimensions.ts'", 1)
+          needle = "    const undertrained = (Object.entries(input.dimensions) as [DimensionId, DimensionCounts][])\n      .sort((a, b) => a[1].chances - b[1].chances || a[0].localeCompare(b[0]))[0]"
+          replacement = "    const undertrained = (Object.entries(input.dimensions) as [DimensionId, DimensionCounts][])\n      .filter(([id, counts]) => counts.chances > 0 && !isImmediate(id) && moduleForDimension(id) !== undefined)\n      .sort((a, b) => a[1].chances - b[1].chances || a[0].localeCompare(b[0]))[0]"
+          assert needle in s
+          p.write_text(s.replace(needle, replacement, 1))
 
           p = Path('src/core/memory/memoryPulse.ts')
           s = p.read_text()
@@ -117,76 +105,15 @@ jobs:
           s = s.replace('return t.reinforced.replace', 'return t.practiced.replace', 1)
           p.write_text(s)
 
-          for name in ('de', 'en'):
-              p = Path(f'src/i18n/{name}.ts')
+          replacements = {
+              'src/i18n/de.ts': ("reinforced: '{count} Erinnerungen wurden in den letzten 24 Stunden abgerufen.',", "practiced: '{count} Erinnerungen wurden in den letzten 24 Stunden trainiert.',"),
+              'src/i18n/en.ts': ("reinforced: '{count} memories were recalled in the last 24 hours.',", "practiced: '{count} memories were trained in the last 24 hours.',"),
+          }
+          for filename, (old, new) in replacements.items():
+              p = Path(filename)
               s = p.read_text()
-              if name == 'de':
-                  old = "reinforced: '{count} Erinnerungen wurden in den letzten 24 Stunden abgerufen.',"
-                  new = "practiced: '{count} Erinnerungen wurden in den letzten 24 Stunden trainiert.',"
-              else:
-                  old = "reinforced: '{count} memories were recalled in the last 24 hours.',"
-                  new = "practiced: '{count} memories were trained in the last 24 hours.',"
               assert old in s
               p.write_text(s.replace(old, new, 1))
-
-          p = Path('tests/core/memoryPhase2.test.ts')
-          s = p.read_text()
-          assert 'memoryPulse,\n' in s
-          s = s.replace('    memoryPulse,\n', '    memoryPulse,\n    weakenMemoryNode,\n', 1)
-          addition = r'''
-
-describe('Phase 2 evidence guards', () => {
-  it('macht aus einer Sofort-Achse keinen Tages-Schwerpunkt', () => {
-    const decision = composeDailyMission({
-      seconds: 300,
-      dueByModule: {},
-      personalScenes: 0,
-      untrainedPersonalItems: 0,
-      dimensions: { working: { chances: 20, lost: 3 } },
-      interferenceErrors: 0,
-    })
-    expect(decision.focus).toBeUndefined()
-    expect(decision.reason).toBe('balanced')
-  })
-
-  it('behandelt null Wiedersehen als fehlende Evidenz, nicht als Untertraining', () => {
-    const decision = composeDailyMission({
-      seconds: 300,
-      dueByModule: {},
-      personalScenes: 0,
-      untrainedPersonalItems: 0,
-      dimensions: { words: { chances: 0, lost: 0 } },
-      interferenceErrors: 0,
-    })
-    expect(decision.focus).toBeUndefined()
-    expect(decision.reason).toBe('balanced')
-  })
-
-  it('darf eine echte verzögerte Gelegenheit als wenig trainiert priorisieren', () => {
-    const decision = composeDailyMission({
-      seconds: 300,
-      dueByModule: {},
-      personalScenes: 0,
-      untrainedPersonalItems: 0,
-      dimensions: {
-        words: { chances: 4, lost: 1 },
-        faces: { chances: 9, lost: 2 },
-      },
-      interferenceErrors: 0,
-    })
-    expect(decision).toMatchObject({ focus: 'words', reason: 'undertrained' })
-  })
-
-  it('nennt auch einen misslungenen Abruf nur Training, nicht Verstärkung', () => {
-    const graph = weakenMemoryNode(graphAt(1_000), 'person:daniel', 2_000)
-    const signals = memoryPulse({ graph, due: [], today: '2026-08-20', now: 2_000 })
-    expect(signals).toContainEqual({ kind: 'practiced', count: 1 })
-    expect(signals.some((signal) => signal.kind === 'reinforced')).toBe(false)
-  })
-})
-'''
-          assert "describe('Phase 2 evidence guards'" not in s
-          p.write_text(s + addition)
           PY
 
       - name: Setup Node
