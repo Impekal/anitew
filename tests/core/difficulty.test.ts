@@ -5,10 +5,14 @@ import { type Pools, planSession } from '../../src/core/session/plan.ts'
 import {
   DIFFICULTY_WINDOW,
   MIN_ANSWERS_TO_ADAPT,
+  MISSION_SECONDS_BASE,
+  MISSION_SECONDS_MAX,
+  MISSION_SECONDS_MIN,
   SPAN_BASE,
   SPAN_MAX,
   SPAN_MIN,
   itemsDeltaFor,
+  missionSecondsPerFact,
   spanLengthFor,
 } from '../../src/core/session/difficulty.ts'
 
@@ -55,6 +59,12 @@ describe('die adaptive Schwierigkeit', () => {
     expect(spanLengthFor({ recent: [] })).toBe(SPAN_BASE)
     expect(spanLengthFor({ recent: runs(20, 0) })).toBe(SPAN_MAX)
     expect(spanLengthFor({ recent: runs(10, 10) })).toBe(SPAN_MIN)
+  })
+
+  it('verschiebt bei Missionen nur die Einprägezeit — nie die Szene selbst', () => {
+    expect(missionSecondsPerFact(-1)).toBe(MISSION_SECONDS_MAX)
+    expect(missionSecondsPerFact(0)).toBe(MISSION_SECONDS_BASE)
+    expect(missionSecondsPerFact(1)).toBe(MISSION_SECONDS_MIN)
   })
 
   it('rechnet, statt fortzuschreiben — gleiche Antworten, gleiche Anpassung', () => {
@@ -107,4 +117,3 @@ describe('die Verschiebung im Bauplan (D2)', () => {
     expect(sizes()).toEqual(sizes({ words: 0 }))
   })
 })
-
