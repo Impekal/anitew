@@ -1,326 +1,38 @@
-/*
- * ANITEW Phase 4 · Slice 2 — One continuous journey
- *
- * No new application state lives here. The choreography reads only classes
- * that already represent real product states: Today, settle, the six session
- * phases, and the factual summary. The visual system follows the engine; it
- * never invents another one.
- */
+/* ANITEW Phase 4 · Slice 2 — one journey, no second state machine. */
+.today{animation:journey-arrive 620ms var(--ease) both}
+.today-mission{position:relative}
+.today-mission::before{content:'';position:absolute;left:0;top:-.35rem;width:2.2rem;height:1px;background:linear-gradient(90deg,var(--an-gold),transparent);opacity:.55}
 
-/* ── TODAY · the world is waiting, not shouting ───────────────────────── */
-.today {
-  position: relative;
-  isolation: isolate;
-  animation: journey-arrive 620ms var(--ease) both;
-}
+.session:has(.settle){animation:journey-enter 520ms var(--ease) both}
+.session:has(.settle)::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:-2;background:radial-gradient(circle at 50% 46%,rgba(140,207,192,.055),transparent 34rem);animation:settle-field 3s ease-in-out both}
 
-.today::before {
-  content: '';
-  position: absolute;
-  width: 68%;
-  aspect-ratio: 1;
-  left: 50%;
-  top: 12%;
-  translate: -50% -50%;
-  z-index: -1;
-  pointer-events: none;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(140, 207, 192, .065), transparent 68%);
-  filter: blur(22px);
-  opacity: .72;
-  animation: journey-breathe 8s ease-in-out infinite;
-}
+.session::before{transition:background 520ms var(--ease),opacity 520ms var(--ease),filter 520ms var(--ease)}
+.session:has(.session-phase-focus)::before{background:radial-gradient(circle,rgba(216,168,90,.09),transparent 66%)}
+.session:has(.session-phase-encode)::before{background:radial-gradient(circle,rgba(216,168,90,.075),transparent 66%)}
+.session:has(.session-phase-connect)::before{background:radial-gradient(circle at 44% 48%,rgba(216,168,90,.08),transparent 46%),radial-gradient(circle at 58% 52%,rgba(140,207,192,.07),transparent 54%)}
+.session:has(.session-phase-retrieve)::before{background:radial-gradient(circle,rgba(140,207,192,.095),transparent 66%)}
+.session:has(.session-phase-interfere)::before{background:radial-gradient(circle at 40% 48%,rgba(216,168,90,.06),transparent 45%),radial-gradient(circle at 60% 52%,rgba(140,207,192,.06),transparent 45%)}
+.session:has(.session-phase-return)::before{background:radial-gradient(circle,rgba(216,168,90,.085),transparent 42%),radial-gradient(circle,rgba(140,207,192,.06),transparent 68%)}
 
-.today .constellation {
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, .03),
-    0 20px 70px rgba(0, 0, 0, .2);
-}
+.session-phase{animation:phase-arrive 420ms var(--ease) both}
+.session-phase::after{content:'';position:absolute;left:0;bottom:0;width:100%;height:1px;background:linear-gradient(90deg,currentColor,transparent);transform-origin:left;animation:phase-line 620ms var(--ease) both;opacity:.45}
+.session>.encode,.session>.prompted,.session>.recall,.session>.lesson,.session>.scene{animation:journey-content 460ms var(--ease) both}
+.session:has(.session-phase-retrieve) .recall-input,.session:has(.session-phase-return) .recall-input,.session:has(.session-phase-retrieve) .prompted-input,.session:has(.session-phase-return) .prompted-input{box-shadow:inset 0 1px 0 rgba(255,255,255,.025),0 18px 56px rgba(0,0,0,.16)}
 
-.today-mission {
-  position: relative;
-}
+.summary-screen{position:relative;isolation:isolate;animation:journey-content 680ms var(--ease) both}
+.summary-screen::before{content:'';position:fixed;width:min(82vw,38rem);aspect-ratio:1;left:50%;top:42%;translate:-50% -50%;z-index:-1;pointer-events:none;border-radius:50%;background:radial-gradient(circle,rgba(216,168,90,.07),transparent 45%),radial-gradient(circle,rgba(140,207,192,.04),transparent 68%);filter:blur(16px);animation:summary-glow 7s ease-in-out infinite}
+.summary-score{text-shadow:0 0 34px rgba(216,168,90,.16)}
+.summary-words .chip{opacity:0;animation:summary-memory 440ms var(--ease) forwards;animation-delay:calc(90ms + var(--i,0)*55ms)}
+.summary-actions{animation:journey-content 520ms 260ms var(--ease) both}
 
-.today-mission::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: -.35rem;
-  width: 2.2rem;
-  height: 1px;
-  background: linear-gradient(90deg, var(--an-gold), transparent);
-  opacity: .55;
-}
+@keyframes journey-arrive{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes journey-enter{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:none}}
+@keyframes settle-field{from{opacity:0;transform:scale(1.08)}50%{opacity:1}to{opacity:.72;transform:scale(.96)}}
+@keyframes phase-arrive{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+@keyframes phase-line{from{transform:scaleX(0);opacity:0}to{transform:scaleX(1);opacity:.45}}
+@keyframes journey-content{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes summary-glow{0%,100%{opacity:.48;transform:scale(.94)}50%{opacity:.82;transform:scale(1.04)}}
+@keyframes summary-memory{from{opacity:0;transform:translateY(7px) scale(.96)}to{opacity:1;transform:none}}
 
-/* The start surface is the threshold between Today and the session. */
-.challenge:has(.start) {
-  animation: journey-threshold 560ms var(--ease) both;
-}
-
-.challenge:has(.start) .start {
-  transform-origin: 50% 52%;
-}
-
-.challenge:has(.start) .start:focus-visible {
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.07),
-    0 0 0 2px var(--an-bg),
-    0 0 0 4px rgba(216, 168, 90, .58),
-    0 18px 70px rgba(216,168,90,.10);
-}
-
-/* ── SETTLE · the interface narrows before training ───────────────────── */
-.session:has(.settle) {
-  animation: journey-enter 520ms var(--ease) both;
-}
-
-.session:has(.settle)::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: -2;
-  background: radial-gradient(circle at 50% 46%, rgba(140,207,192,.055), transparent 34rem);
-  animation: settle-field 3s ease-in-out both;
-}
-
-/* ── THE SIX PHASES · one engine, six atmospheres ───────────────────────
-   :has() observes the phase label already rendered by SessionScreen. There
-   is no duplicate phase state and no scheduling branch hidden in CSS. */
-.session::before {
-  transition:
-    background 520ms var(--ease),
-    opacity 520ms var(--ease),
-    filter 520ms var(--ease);
-}
-
-.session:has(.session-phase-focus)::before {
-  background: radial-gradient(circle, rgba(216,168,90,.09), transparent 66%);
-}
-
-.session:has(.session-phase-encode)::before {
-  background:
-    radial-gradient(circle at 46% 46%, rgba(216,168,90,.075), transparent 48%),
-    radial-gradient(circle at 58% 56%, rgba(140,207,192,.025), transparent 62%);
-}
-
-.session:has(.session-phase-connect)::before {
-  background:
-    radial-gradient(circle at 42% 48%, rgba(216,168,90,.08), transparent 48%),
-    radial-gradient(circle at 60% 52%, rgba(140,207,192,.075), transparent 52%);
-  filter: blur(12px);
-}
-
-.session:has(.session-phase-retrieve)::before {
-  background: radial-gradient(circle, rgba(140,207,192,.095), transparent 66%);
-}
-
-.session:has(.session-phase-interfere)::before {
-  background:
-    radial-gradient(circle at 39% 47%, rgba(216,168,90,.065), transparent 42%),
-    radial-gradient(circle at 61% 53%, rgba(140,207,192,.065), transparent 42%);
-  opacity: .82;
-}
-
-.session:has(.session-phase-return)::before {
-  background:
-    radial-gradient(circle at 50% 48%, rgba(216,168,90,.09), transparent 35%),
-    radial-gradient(circle at 50% 52%, rgba(140,207,192,.075), transparent 66%);
-}
-
-.session-phase {
-  animation: phase-arrive 420ms var(--ease) both;
-}
-
-.session-phase::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  height: 1px;
-  background: linear-gradient(90deg, currentColor, transparent);
-  transform-origin: left;
-  animation: phase-line 620ms var(--ease) both;
-  opacity: .45;
-}
-
-/* Content arrives from the same visual horizon, regardless of module. */
-.session > .encode,
-.session > .prompted,
-.session > .recall,
-.session > .lesson,
-.session > .scene {
-  animation: journey-content 460ms var(--ease) both;
-}
-
-/* CONNECT gets a faint relation field, not a louder card. */
-.session:has(.session-phase-connect) .memory-scene,
-.session:has(.session-phase-connect) .scene {
-  filter: drop-shadow(0 10px 28px rgba(140,207,192,.06));
-}
-
-/* RETRIEVE and RETURN narrow attention around the answer surface. */
-.session:has(.session-phase-retrieve) .recall-input,
-.session:has(.session-phase-return) .recall-input,
-.session:has(.session-phase-retrieve) .prompted-input,
-.session:has(.session-phase-return) .prompted-input {
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.025),
-    0 0 0 1px rgba(140,207,192,.035),
-    0 18px 56px rgba(0,0,0,.16);
-}
-
-/* ── SUMMARY · return home, without a victory screen ─────────────────── */
-.summary-screen {
-  position: relative;
-  isolation: isolate;
-  animation: summary-return 680ms var(--ease) both;
-}
-
-.summary-screen::before {
-  content: '';
-  position: fixed;
-  width: min(82vw, 38rem);
-  aspect-ratio: 1;
-  left: 50%;
-  top: 42%;
-  translate: -50% -50%;
-  z-index: -1;
-  pointer-events: none;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle, rgba(216,168,90,.075), transparent 44%),
-    radial-gradient(circle, rgba(140,207,192,.045), transparent 68%);
-  filter: blur(16px);
-  animation: summary-afterglow 7s ease-in-out infinite;
-}
-
-.summary-screen .challenge {
-  animation: summary-section 520ms var(--ease) both;
-}
-
-.summary-score {
-  text-shadow: 0 0 34px rgba(216,168,90,.16);
-}
-
-.summary-words .chip {
-  opacity: 0;
-  animation: summary-memory 440ms var(--ease) forwards;
-  animation-delay: calc(90ms + var(--i, 0) * 55ms);
-}
-
-.summary-actions {
-  animation: summary-actions-in 520ms 260ms var(--ease) both;
-}
-
-.summary-back {
-  position: relative;
-}
-
-.summary-back::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  bottom: -.35rem;
-  width: 1.8rem;
-  height: 1px;
-  translate: -50% 0;
-  background: linear-gradient(90deg, transparent, var(--an-cyan), transparent);
-  opacity: .42;
-}
-
-@keyframes journey-arrive {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes journey-breathe {
-  0%, 100% { opacity: .46; transform: scale(.94); }
-  50% { opacity: .82; transform: scale(1.04); }
-}
-
-@keyframes journey-threshold {
-  from { opacity: .45; transform: translateY(9px) scale(.992); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-@keyframes journey-enter {
-  from { opacity: 0; transform: scale(.985); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-@keyframes settle-field {
-  from { opacity: 0; transform: scale(1.08); }
-  50% { opacity: 1; }
-  to { opacity: .72; transform: scale(.96); }
-}
-
-@keyframes phase-arrive {
-  from { opacity: 0; transform: translateX(-8px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-@keyframes phase-line {
-  from { transform: scaleX(0); opacity: 0; }
-  to { transform: scaleX(1); opacity: .45; }
-}
-
-@keyframes journey-content {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes summary-return {
-  from { opacity: 0; transform: translateY(10px) scale(.99); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-@keyframes summary-afterglow {
-  0%, 100% { opacity: .48; transform: scale(.94); }
-  50% { opacity: .82; transform: scale(1.04); }
-}
-
-@keyframes summary-section {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes summary-memory {
-  from { opacity: 0; transform: translateY(7px) scale(.96); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-@keyframes summary-actions-in {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@media (max-width: 560px) {
-  .today::before { width: 92%; }
-  .summary-screen::before { width: 108vw; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .today,
-  .today::before,
-  .challenge:has(.start),
-  .session:has(.settle),
-  .session:has(.settle)::after,
-  .session-phase,
-  .session-phase::after,
-  .session > .encode,
-  .session > .prompted,
-  .session > .recall,
-  .session > .lesson,
-  .session > .scene,
-  .summary-screen,
-  .summary-screen::before,
-  .summary-screen .challenge,
-  .summary-words .chip,
-  .summary-actions {
-    animation: none !important;
-    transform: none !important;
-  }
-  .summary-words .chip { opacity: 1; }
-}
+@media(max-width:560px){.summary-screen::before{width:108vw}}
+@media(prefers-reduced-motion:reduce){.today,.session:has(.settle),.session:has(.settle)::after,.session-phase,.session-phase::after,.session>.encode,.session>.prompted,.session>.recall,.session>.lesson,.session>.scene,.summary-screen,.summary-screen::before,.summary-words .chip,.summary-actions{animation:none!important;transform:none!important}.summary-words .chip{opacity:1}}
