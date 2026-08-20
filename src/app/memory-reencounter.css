@@ -70,6 +70,17 @@
   color: var(--an-cyan);
 }
 
+/*
+ * Dieselbe Wahrheit in der großen Memory World: Ein heute über FSRS fälliger
+ * Knoten bekommt einen leisen Ring. Kein Blinken, kein Alarm — nur eine
+ * visuelle Verbindung zwischen RETURN auf Today und dem echten Graphen.
+ */
+.constellation-memory-due .constellation-node {
+  stroke: var(--an-gold);
+  stroke-width: .55;
+  filter: drop-shadow(0 0 3px rgba(216, 168, 90, .38));
+}
+
 @keyframes memory-return-trace {
   to { stroke-dashoffset: 0; }
 }
