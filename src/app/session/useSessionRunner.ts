@@ -43,6 +43,8 @@ export interface RunnerState {
   /** Beim gestützten Abruf: welcher Eintrag gerade gefragt wird. */
   promptIndex: number
   results: RoundResult[]
+  /** Kurze reine Experience-Resonanz nach einem echten persönlichen Treffer. */
+  landingPulse: boolean
   finished: boolean
 }
 
@@ -69,6 +71,7 @@ export function useSessionRunner(
   const [promptIndex, setPromptIndex] = useState(0)
   const [itemIndex, setItemIndex] = useState(0)
   const [remaining, setRemaining] = useState(0)
+  const [landingPulse, setLandingPulse] = useState(false)
 
   const blockStartedRef = useRef(platform.clock.elapsed())
   const sessionRef = useRef(initial)
@@ -222,7 +225,11 @@ export function useSessionRunner(
         // eine persönliche Erinnerung wiedergekommen ist, folgt ANITEWs
         // Signature-Landing. Kein Treffer = kein Erfolgsfeedback.
         platform.sound.play('recall')
-        if (graded.correct.length > 0) platform.sound.play('landing')
+        if (graded.correct.length > 0) {
+          platform.sound.play('landing')
+          setLandingPulse(true)
+          window.setTimeout(() => setLandingPulse(false), 900)
+        }
         void applyMemoryOutcome({ correct: graded.correct, missed: graded.missed }, at).catch(
           () => undefined,
         )
@@ -342,6 +349,7 @@ export function useSessionRunner(
     answers,
     promptIndex,
     results,
+    landingPulse,
     finished,
   }
 
