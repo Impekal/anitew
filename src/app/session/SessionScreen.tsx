@@ -82,7 +82,7 @@ function Settle({ dictionary, onDone }: { dictionary: Dictionary; onDone: () => 
   }, [onDone])
 
   return (
-    <main className={`app session${state.landingPulse ? ' session-memory-landing' : ''}`}> 
+    <main className="app session">
       <button type="button" className="settle" onClick={onDone}>
         <span className="settle-breath" aria-hidden="true" />
         <p className="settle-word">{dictionary.session.settle}</p>
@@ -237,7 +237,7 @@ function RunningSession({
       : undefined
 
   return (
-    <main className="app session">
+    <main className={`app session${state.landingPulse ? ' session-memory-landing' : ''}`}>
       <header className="session-head">
         <span>
           {t.round} {block.round}/{rounds}
