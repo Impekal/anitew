@@ -137,8 +137,8 @@ export function MemoryConstellation({
         aria-label={onSelect === undefined ? undefined : ariaLabel}
       >
         <g className="constellation-atmosphere" aria-hidden="true">
-          <circle cx="50" cy="50" r="43" className="constellation-orbit constellation-orbit-outer" />
-          <circle cx="50" cy="50" r="31" className="constellation-orbit constellation-orbit-inner" />
+          <ellipse cx="50" cy="50" rx="43" ry="43" className="constellation-orbit constellation-orbit-outer" />
+          <ellipse cx="50" cy="50" rx="31" ry="31" className="constellation-orbit constellation-orbit-inner" />
         </g>
         {graph.edges.map((edge, index) => {
           const from = byId.get(edge.from)
