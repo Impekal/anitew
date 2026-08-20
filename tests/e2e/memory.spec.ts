@@ -35,8 +35,8 @@ test('merkt echte Information: Vorschläge, Bestätigung, Constellation, Neulade
   await page.getByRole('button', { name: 'Vorschläge ansehen' }).click()
 
   // Vier Knoten, drei Verbindungen — und nichts ist schon gespeichert.
-  // Die Beschriftungen sind seit Phase 1 editierbare Eingabefelder; deshalb
-  // prüfen wir ihren Wert statt den innerText des umgebenden Knotens.
+  // Die Labels sind editierbare Inputs; ihr Wert ist deshalb die Wahrheit,
+  // nicht der innerText des umgebenden Knotens.
   await expect(page.locator('.remember-node')).toHaveCount(4)
   await expect(page.locator('.remember-node input').first()).toHaveValue('Daniel')
   await expect(page.locator('.remember-edges li')).toHaveCount(3)
@@ -90,43 +90,112 @@ test('trainiert die Erinnerung in der Einheit — und FSRS bekommt die Termine',
     await page.locator('.settle').click()
     if ((await pollFirstModule(page)) !== 'memory') {
       await page.locator('.session-abort').click()
+      await expect(page.locator('.challenge')).toBeVisible()
       continue
     }
     found = true
   }
-  expect(found).toBe(true)
+  expect(found, 'in sechzig Anläufen kam keine Memory-Runde').toBe(true)
 
-  // Den Memory-Block wirklich bis zum Abruf spielen. Der Runner schreibt das
-  // Ergebnis über denselben `recordOutcome`-Pfad wie jedes andere Modul.
-  while ((await page.locator('.session-module').getAttribute('data-module')) === 'memory') {
-    const entries = page.locator('.recall-entry')
-    if ((await entries.count()) > 0) {
-      for (let index = 0; index < (await entries.count()); index++) {
-        await entries.nth(index).fill(index === 0 ? 'Museum' : index === 1 ? 'Madrid' : 'Gitarre')
-      }
-      await page.locator('.recall-submit').click()
-    } else {
-      await page.locator('.session-next').click()
-    }
+  // ENCODE: die Szene als Ganzes — Anker und seine drei Dinge.
+  await expect(page.locator('.memory-anchor')).toHaveText('Daniel')
+  await expect(page.locator('.memory-scene li')).toHaveCount(3)
+
+  // RECALL: „Daniel — was gehört dazu?“ — Antworten in beliebiger
+  // Reihenfolge, denn die Reihenfolge ist keine Gedächtnisleistung.
+  await page.locator('.prompted-input').waitFor({ timeout: 40_000 })
+  for (const answer of ['Gitarre', 'Museum', 'Madrid']) {
+    await expect(page.locator('.prompted-question')).toHaveText('Daniel')
+    await page.locator('.prompted-input').fill(answer)
+    await page.locator('.prompted-form button[type=submit], .prompted-form .start').first().click()
   }
 
-  await expect
-    .poll(async () =>
-      page.evaluate(async () => {
-        const request = indexedDB.open('anitew')
-        const db = await new Promise<IDBDatabase>((resolve, reject) => {
-          request.onsuccess = () => resolve(request.result)
-          request.onerror = () => reject(request.error)
-        })
-        const transaction = db.transaction('itemStates', 'readonly')
-        const all = transaction.objectStore('itemStates').getAll()
-        const rows = await new Promise<Array<{ itemId: string }>>((resolve, reject) => {
-          all.onsuccess = () => resolve(all.result as Array<{ itemId: string }>)
-          all.onerror = () => reject(all.error)
-        })
-        db.close()
-        return rows.some((row) => row.itemId.startsWith('memory:'))
+  // Alle drei zählen — die Zusammenfassung sagt es ehrlich.
+  await expect(page.locator('.summary-score strong')).toHaveText('3', { timeout: 60_000 })
+  await expect(page.locator('.summary-score span')).toHaveText('/ 3')
+
+  // Und das Ergebnis liegt im bestehenden Lernmechanismus: drei
+  // FSRS-Termine des Moduls „memory“ in itemStates.
+  const tracked = await page.evaluate(() => {
+    return new Promise<number>((resolve) => {
+      const open = indexedDB.open('anitew')
+      open.onsuccess = () => {
+        const request = open.result.transaction('itemStates').objectStore('itemStates').getAll()
+        request.onsuccess = () =>
+          resolve(
+            (request.result as { moduleId?: string }[]).filter(
+              (row) => row.moduleId === 'memory',
+            ).length,
+          )
+        request.onerror = () => resolve(-1)
+      }
+      open.onerror = () => resolve(-1)
+    })
+  })
+  expect(tracked).toBe(3)
+})
+
+test('schlägt mit KI vor — nur mit Schlüssel, Anbieter gestubbt, bestätigt wird von Hand', async ({
+  page,
+}) => {
+  // Kein Test ruft wirklich hinaus: Gemini antwortet aus der Route (D-037).
+  await page.route('https://generativelanguage.googleapis.com/**', (route) =>
+    route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        candidates: [
+          {
+            content: {
+              parts: [
+                {
+                  text: JSON.stringify({
+                    nodes: [
+                      { type: 'person', label: 'Mira' },
+                      { type: 'concept', label: 'Cello' },
+                    ],
+                    edges: [{ from: 'Mira', to: 'Cello' }],
+                  }),
+                },
+              ],
+            },
+          },
+        ],
       }),
-    )
-    .toBe(true)
+    }),
+  )
+
+  await visit(page)
+
+  // Ohne Schlüssel gibt es den KI-Knopf nicht — kein Pflichtpfad (M2).
+  await openPage(page, 'Mein Gedächtnis')
+  await expect(page.locator('.remember-suggest')).toBeVisible()
+  await expect(page.locator('.remember-ai')).toHaveCount(0)
+  await leavePage(page)
+
+  // Der Schlüssel kommt dort hin, wo er hingehört: zum Coach.
+  await openPage(page, 'Coach')
+  await page.locator('.coach-key-input').fill('AIza-test-nicht-echt')
+  await page.getByRole('button', { name: 'Schlüssel speichern' }).click()
+  await leavePage(page)
+
+  // Jetzt steht der KI-Weg offen — und sagt vorher, wohin der Text geht.
+  await openPage(page, 'Mein Gedächtnis')
+  await expect(page.locator('.remember-ainote')).toContainText('Google Gemini')
+  await page.locator('.remember-input').fill('Mira spielt Cello.')
+  await page.getByRole('button', { name: 'Mit KI vorschlagen' }).click()
+
+  // Die Vorschläge tragen ihre Herkunft — und dieselbe Bestätigungstür.
+  await expect(page.locator('.remember-aisource')).toBeVisible()
+  await expect(page.locator('.remember-node')).toHaveCount(2)
+  await expect(page.locator('.remember-edges li')).toHaveText(['Mira → Cello'])
+  await page.getByRole('button', { name: 'Bestätigen und merken' }).click()
+  await expect(page.locator('.memory-counts')).toContainText('2 Erinnerungen')
+
+  // Fällt das Netz, sagt die Stelle es mit den Coach-Worten — nichts hängt.
+  await page.unroute('https://generativelanguage.googleapis.com/**')
+  await page.route('https://generativelanguage.googleapis.com/**', (route) => route.abort())
+  await page.locator('.remember-input').fill('Noch ein Satz für später.')
+  await page.getByRole('button', { name: 'Mit KI vorschlagen' }).click()
+  await expect(page.locator('.remember-failure')).toContainText('Keine Verbindung')
+  await leavePage(page)
 })
