@@ -6,13 +6,7 @@
   pointer-events: none;
   border: 1px solid rgba(216,168,90,.2);
   border-radius: 50%;
-  animation: memory-landing 900ms var(--ease) both;
-}
-
-@keyframes memory-landing {
-  from { opacity: 0; transform: scale(.78); }
-  35% { opacity: 1; }
-  to { opacity: 0; transform: scale(1.08); }
+  animation: return-radar 900ms var(--ease) both;
 }
 
 @media (prefers-reduced-motion: reduce) {
