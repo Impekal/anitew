@@ -191,6 +191,7 @@ function RunningSession({
         dictionary={dictionary}
         results={state.results}
         language={state.plan.language}
+        landing={state.landingPulse}
         onLeave={() => {
           onComplete()
           leave()
@@ -662,12 +663,14 @@ function Summary({
   dictionary,
   results,
   language,
+  landing,
   onLeave,
   onAgain,
 }: {
   dictionary: Dictionary
   results: RoundResult[]
   language: string
+  landing: boolean
   onLeave: () => void
   onAgain: () => void
 }) {
@@ -698,7 +701,7 @@ function Summary({
   const reviewTotal = reviewCorrect.length + revisited.flatMap((round) => round.missed).length
 
   return (
-    <main className="app summary-screen">
+    <main className={`app summary-screen${landing ? ' summary-memory-landing' : ''}`}>
       <section className="challenge">
         <h2>{t.heading}</h2>
         {/*
