@@ -1,3 +1,19 @@
+/**
+ * Der Gedächtnispalast (Backlog G1, G2, G4, G6, G7).
+ *
+ * Die älteste Merktechnik, die es gibt, und die einzige mit einer eigenen
+ * Untersuchung hinter sich (`core/science.ts`, `mnemonics`): Man legt, was man
+ * behalten will, an **Orte**, die man ohnehin auswendig kennt — und geht sie
+ * später ab. Der Ort ist der Haken, an dem die Erinnerung hängt.
+ *
+ * Ein Palast ist eine **feste Reihenfolge von Stationen**. Ein Gang ist eine
+ * Szene: je ein Gegenstand hängt an je einer Station. Derselbe Gang ergibt
+ * immer dieselben Gegenstände, weil sie aus dem Anker gerechnet werden.
+ *
+ * Die Gegenstände haben einen eigenen Vorrat, damit das Wortmodul und der
+ * Palast sich nicht gegenseitig Antworten schenken (C6).
+ */
+
 import { FALLBACK_LANGUAGE, type Language } from '../language.ts'
 import { createRng } from '../rng.ts'
 
@@ -10,12 +26,16 @@ export const STATIONS: Readonly<Record<PalaceId, readonly string[]>> = {
   home: ['door', 'hall', 'kitchen', 'sofa', 'bed'],
   street: ['gate', 'mailbox', 'bench', 'crossing', 'kiosk'],
   body: ['head', 'shoulder', 'hand', 'knee', 'foot'],
+  /* Eigener Palast: feste Kennungen, freie Beschriftungen. */
   own: ['own1', 'own2', 'own3', 'own4', 'own5'],
 }
 
 export const STATIONS_PER_WALK = 5
 
-/** Eigener, bildhafter Gegenstandsvorrat je Trainingssprache (C6). */
+/**
+ * Was abgelegt wird: konkret, bildhaft, untereinander verschieden und
+ * handlich genug, dass man es an einer Station liegen sehen kann.
+ */
 const OBJECTS: Partial<Record<Language, readonly string[]>> = {
   de: [
     'Akkordeon', 'Bowlingkugel', 'Bratpfanne', 'Cellokasten', 'Dartscheibe',
@@ -56,8 +76,8 @@ const OBJECTS: Partial<Record<Language, readonly string[]>> = {
     'gramófono', 'tostadora', 'erizo', 'reloj de cuco', 'prismáticos', 'farola', 'maniquí', 'microscopio',
     'motocicleta', 'telescopio', 'trampolín', 'tocadiscos', 'aspiradora', 'bañera', 'brasero', 'cofre',
     'cráneo', 'diapasón', 'zancos', 'arpa', 'lámpara', 'maracas', 'biombo', 'esqueleto',
-    'trombón', 'malabar', 'peluca', 'pingüino', 'sarcófago', 'máquina de escribir', 'caja fuerte',
-    'caballito', 'extintor', 'mancuerna', 'parabólica',
+    'trombón', 'peluca', 'pingüino', 'sarcófago', 'máquina de escribir', 'caja fuerte', 'caballito',
+    'extintor', 'mancuerna', 'parabólica',
   ],
 }
 
@@ -105,12 +125,17 @@ export interface Placement {
   object: string
 }
 
+/** Ein Gang, aus seinem Anker gerechnet (G4). */
 export function walkFor(walk: string, language: Language): readonly Placement[] {
   const palace = palaceOf(walk)
   if (palace === undefined) return []
+
   const rng = createRng(`palace:${language}:${walk}`)
   const objects = rng.shuffle(listFor(language))
-  return STATIONS[palace].map((station, index) => ({ station, object: objects[index] as string }))
+  return STATIONS[palace].map((station, index) => ({
+    station,
+    object: objects[index] as string,
+  }))
 }
 
 export function walkPlacements(walk: string): readonly string[] {
@@ -125,6 +150,7 @@ export function objectFor(item: string, language: Language): string | undefined 
   return walkFor(walkOf(item), language).find((entry) => entry.station === station)?.object
 }
 
+/** Vorrat an eindeutigen Gängen, reihum durch die verfügbaren Paläste. */
 export function walkPool(
   seed: string,
   count: number,
@@ -138,6 +164,7 @@ export function walkPool(
   )
 }
 
+/** Ein selbst angelegter Palast (G3). */
 export interface OwnPalace {
   name: string
   stations: readonly string[]
@@ -145,12 +172,18 @@ export interface OwnPalace {
 
 export const LABEL_MAX = 24
 
+/**
+ * Vollständig, fünf verschiedene Stationen, kurz und ohne die Kennungs-
+ * Trennzeichen. Die Kennungen bleiben stabil, auch wenn Beschriftungen sich
+ * später ändern.
+ */
 export function isOwnPalace(value: unknown): value is OwnPalace {
   if (typeof value !== 'object' || value === null) return false
   const candidate = value as Record<string, unknown>
   if (typeof candidate['name'] !== 'string' || candidate['name'].trim() === '') return false
   const stations = candidate['stations']
   if (!Array.isArray(stations) || stations.length !== STATIONS_PER_WALK) return false
+
   const seen = new Set<string>()
   for (const station of stations) {
     if (typeof station !== 'string') return false
