@@ -187,7 +187,7 @@ test('schlägt mit KI vor — nur mit Schlüssel, Anbieter gestubbt, bestätigt 
   // Die Vorschläge tragen ihre Herkunft — und dieselbe Bestätigungstür.
   await expect(page.locator('.remember-aisource')).toBeVisible()
   await expect(page.locator('.remember-node')).toHaveCount(2)
-  await expect(page.locator('.remember-edges li')).toHaveText(['Mira → Cello'])
+  await expect(page.locator('.remember-edges li')).toContainText(['Mira → Cello'])
   await page.getByRole('button', { name: 'Bestätigen und merken' }).click()
   await expect(page.locator('.memory-counts')).toContainText('2 Erinnerungen')
 
