@@ -111,6 +111,10 @@ test('trainiert die Erinnerung in der Einheit — und FSRS bekommt die Termine',
     await page.locator('.prompted-form button[type=submit], .prompted-form .start').first().click()
   }
 
+  // Der echte persönliche Treffer bekommt genau ANITEWs kurzen Landing-Moment.
+  // Er trägt sich bis in die Summary, falls der letzte Treffer die Runde beendet.
+  await expect(page.locator('.summary-memory-landing')).toBeVisible({ timeout: 2_000 })
+
   // Alle drei zählen — die Zusammenfassung sagt es ehrlich.
   await expect(page.locator('.summary-score strong')).toHaveText('3', { timeout: 60_000 })
   await expect(page.locator('.summary-score span')).toHaveText('/ 3')
