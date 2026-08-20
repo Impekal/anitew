@@ -21,7 +21,7 @@ export function interferenceKey(value: string): string {
  * einen freien Wortvorrat gehören?
  *
  * Die Schwellen sind absichtlich eng: gleicher Anfang oder gleiches Ende erst
- * ab drei Zeichen und mindestens fünf Zeichen Wortlänge; zusätzlich genau
+ * ab vier Zeichen und mindestens fünf Zeichen Wortlänge; zusätzlich genau
  * eine Einfüge-/Lösch-/Ersetzungsabweichung. C6 soll Verwechslungen verhindern,
  * nicht normale Wortschatzvielfalt wegfiltern.
  */
@@ -31,8 +31,8 @@ export function interferes(a: string, b: string): boolean {
   if (left === '' || right === '') return false
   if (left === right) return true
   if (Math.min(left.length, right.length) < 5) return false
-  if (left.slice(0, 3) === right.slice(0, 3)) return true
-  if (left.slice(-3) === right.slice(-3)) return true
+  if (left.slice(0, 4) === right.slice(0, 4)) return true
+  if (left.slice(-4) === right.slice(-4)) return true
   return editDistanceAtMostOne(left, right)
 }
 
