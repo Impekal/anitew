@@ -25,8 +25,11 @@ const memory = (dueDay: string): DueItem['memory'] => ({
   dueDay,
 })
 
+// Production persists item IDs as module:language:payload (itemIdOf in data/items.ts).
+// Keep these fixtures on that canonical contract so RETURN is tested against
+// the same IDs loadDue() actually returns.
 const item = (subject: string, target: string, subjectId: string, targetId: string, dueDay: string): DueItem => ({
-  itemId: `de:memory:${subject}${MEMORY_ITEM_SEPARATOR}${target}${MEMORY_ID_SEPARATOR}${subjectId}${MEMORY_ID_SEPARATOR}${targetId}`,
+  itemId: `memory:de:${subject}${MEMORY_ITEM_SEPARATOR}${target}${MEMORY_ID_SEPARATOR}${subjectId}${MEMORY_ID_SEPARATOR}${targetId}`,
   memory: memory(dueDay),
 })
 
@@ -113,7 +116,7 @@ describe('memoryReencounter', () => {
     expect(
       memoryReencounter({
         graph,
-        due: [{ itemId: `de:memory:Daniel${MEMORY_ITEM_SEPARATOR}Madrid`, memory: memory('2026-08-20') }],
+        due: [{ itemId: `memory:de:Daniel${MEMORY_ITEM_SEPARATOR}Madrid`, memory: memory('2026-08-20') }],
         today: '2026-08-20',
         now,
       }),
