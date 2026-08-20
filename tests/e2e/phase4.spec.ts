@@ -28,18 +28,15 @@ test('Phase 4 lässt echte Memory-World-Zustände sprechen, ohne Fake-Knoten', a
   expect(await world.locator('.constellation-edge-selected').count()).toBeGreaterThan(0)
 })
 
-test.describe('Phase 4 reduced motion', () => {
-  test.use({ reducedMotion: 'reduce' })
+test('Phase 4 reduced motion: die Signatur bleibt lesbar, aber die Welt steht still', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await visit(page)
+  await openPage(page, 'Mein Gedächtnis')
+  await page.locator('.remember-input').fill(MEMORY)
+  await page.getByRole('button', { name: 'Vorschläge ansehen' }).click()
+  await page.getByRole('button', { name: 'Bestätigen und merken' }).click()
 
-  test('die Signatur bleibt lesbar, aber die Welt steht still', async ({ page }) => {
-    await visit(page)
-    await openPage(page, 'Mein Gedächtnis')
-    await page.locator('.remember-input').fill(MEMORY)
-    await page.getByRole('button', { name: 'Vorschläge ansehen' }).click()
-    await page.getByRole('button', { name: 'Bestätigen und merken' }).click()
-
-    const orbit = page.locator('.constellation-orbit').first()
-    await expect(orbit).toBeVisible()
-    expect(await orbit.evaluate((node) => getComputedStyle(node).animationName)).toBe('none')
-  })
+  const orbit = page.locator('.constellation-orbit').first()
+  await expect(orbit).toBeVisible()
+  expect(await orbit.evaluate((node) => getComputedStyle(node).animationName)).toBe('none')
 })
