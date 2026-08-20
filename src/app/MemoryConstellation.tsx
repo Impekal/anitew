@@ -103,6 +103,7 @@ export function MemoryConstellation({
   newEdgeIds = new Set(),
   ariaLabel,
   recalledNodeIds = new Set(),
+  dueNodeIds = new Set(),
 }: {
   graph: MemoryGraph
   selectedId?: string
@@ -112,6 +113,8 @@ export function MemoryConstellation({
   newEdgeIds?: ReadonlySet<string>
   ariaLabel?: string
   recalledNodeIds?: ReadonlySet<string>
+  /** Heute wirklich über FSRS fällige persönliche Knoten — kein zweiter Terminplan. */
+  dueNodeIds?: ReadonlySet<string>
 }) {
   const placed = useMemo(() => layout(graph, selectedId), [graph, selectedId])
   const byId = useMemo(() => new Map(placed.map((node) => [node.id, node])), [placed])
@@ -147,7 +150,7 @@ export function MemoryConstellation({
         {placed.map((node, index) => (
           <g
             key={node.id}
-            className={`${node.id === selectedId ? 'constellation-memory constellation-memory-selected' : 'constellation-memory'}${newNodeIds.has(node.id) ? ' constellation-memory-new' : ''}${recalledNodeIds.has(node.id) ? ' constellation-memory-recalled' : ''}`}
+            className={`${node.id === selectedId ? 'constellation-memory constellation-memory-selected' : 'constellation-memory'}${newNodeIds.has(node.id) ? ' constellation-memory-new' : ''}${recalledNodeIds.has(node.id) ? ' constellation-memory-recalled' : ''}${dueNodeIds.has(node.id) ? ' constellation-memory-due' : ''}`}
             role={onSelect === undefined ? undefined : 'button'}
             tabIndex={onSelect === undefined ? undefined : 0}
             aria-label={selectLabel?.(node.label) ?? node.label}
