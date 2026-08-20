@@ -47,44 +47,15 @@ jobs:
           git apply /tmp/anitew-phase2.patch
           rm .anitew-staging/phase2.part1.b64 .anitew-staging/phase2.part2.b64 .anitew-staging/phase2.part3.b64
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Typecheck
-        run: npm run typecheck
-
-      - name: Core tests
-        run: npm test
-
-      - name: Production build
-        run: npm run build
-
-      - name: Size budget
-        run: npm run size
-
-      - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
-
-      - name: Phase 2 functional E2E
-        run: npx playwright test tests/e2e/memory.spec.ts tests/e2e/onboarding.spec.ts tests/e2e/profile.spec.ts --project=chromium --max-failures=1
-
-      - name: Phase 2 layout E2E
-        run: npx playwright test tests/e2e/layout.spec.ts --project=desktop-small --max-failures=1
-
-      - name: Commit validated Phase 2
-        if: github.event_name == 'pull_request'
+      - name: Diagnose Phase 2 mission logic
         run: |
-          git config user.name "ANITEW Staging Runner"
-          git config user.email "actions@users.noreply.github.com"
-          git diff --name-only -z --diff-filter=ACMRTUXB | xargs -0 -r git add --
-          git ls-files --others --exclude-standard -z | xargs -0 -r git add --
-          git add -u -- .anitew-staging/phase2.part1.b64 .anitew-staging/phase2.part2.b64 .anitew-staging/phase2.part3.b64
-          git diff --cached --check
-          git commit -m "feat: stage ANITEW memory system phase two"
-          git push origin HEAD:anitew-phase2-staging
+          echo '===== DAILY_MISSION_BEGIN ====='
+          cat src/core/memory/dailyMission.ts
+          echo '===== DAILY_MISSION_END ====='
+          echo '===== MEMORY_PULSE_BEGIN ====='
+          cat src/core/memory/memoryPulse.ts
+          echo '===== MEMORY_PULSE_END ====='
+          echo '===== APP_MISSION_CALLS_BEGIN ====='
+          grep -n -B 12 -A 28 'composeDailyMission' src/app/App.tsx || true
+          echo '===== APP_MISSION_CALLS_END ====='
+          exit 1
