@@ -1,16 +1,43 @@
-/** Bilder mit Einzelheiten — das visuelle Modul. */
+/**
+ * Bilder mit Einzelheiten — das visuelle Modul (Backlog E2: Achse „Visuell“).
+ *
+ * Eine Szene aus vier einfachen Dingen, jedes in einer Farbe. Eingeprägt
+ * wird das Bild als Ganzes; gefragt wird nach der Einzelheit: „Der Schirm —
+ * welche Farbe?“ Das ist visuelles Gedächtnis im Alltagsformat — nicht „male
+ * das Bild nach“, sondern „war der Schirm rot oder blau?“.
+ *
+ * Gebaut wie der Palast (D-014): Die Szene ist eine **Szene**, keine Liste.
+ * Ihre Kennung erzeugt ihren Inhalt (`bild~7` → immer dieselben vier Dinge
+ * in denselben Farben) — dadurch lässt sich ein Wiedersehen nach Tagen
+ * stellen, ohne das Bild zu speichern. Der Kern liefert nur die
+ * **Beschreibung**; gezeichnet wird in der Oberfläche (D-010, wie bei den
+ * Gesichtern).
+ */
 
 import { createRng } from '../rng.ts'
 import type { Language } from '../language.ts'
 
+/** Kennungsform: `bild~7` für die Szene, `bild~7#umbrella` für ein Ding. */
 export const GAZE_PREFIX = 'bild'
 const SCENE_SEPARATOR = '~'
 const ITEM_SEPARATOR = '#'
+
+/** Wie viele Dinge eine Szene trägt — vier: genug zum Binden, kein Suchbild. */
 export const GAZE_SCENE_SIZE = 4
 
 export const GAZE_OBJECTS = [
-  'umbrella', 'sun', 'boat', 'kite', 'fish', 'bird', 'tree', 'moon', 'key', 'bell',
+  'umbrella',
+  'sun',
+  'boat',
+  'kite',
+  'fish',
+  'bird',
+  'tree',
+  'moon',
+  'key',
+  'bell',
 ] as const
+
 export type GazeObject = (typeof GAZE_OBJECTS)[number]
 
 export const GAZE_COLORS = ['red', 'blue', 'green', 'yellow', 'purple', 'orange'] as const
@@ -42,12 +69,15 @@ const COLOR_NAMES: Readonly<Partial<Record<Language, Readonly<Record<GazeColor, 
   es: { red: 'rojo', blue: 'azul', green: 'verde', yellow: 'amarillo', purple: 'morado', orange: 'naranja' },
 }
 
+/** Gibt es dieses Modul in dieser Sprache? */
 export function hasGazePool(language: Language): boolean {
   return OBJECT_NAMES[language] !== undefined && COLOR_NAMES[language] !== undefined
 }
 
 export interface GazeDetail {
+  /** Der sprachfreie Schlüssel des Dings — steht auch in der Kennung. */
   object: GazeObject
+  /** Die sprachfreie Farbe — für die Zeichnung. */
   color: GazeColor
 }
 
@@ -58,6 +88,7 @@ export function gazeSpec(sceneId: string): readonly GazeDetail[] {
   return objects.map((object, index) => ({ object, color: colors[index] as GazeColor }))
 }
 
+/** Der Vorrat: fortlaufend nummerierte Szenen, Reihenfolge aus dem Seed. */
 export function gazePool(seed: string, count: number): string[] {
   const rng = createRng(`gaze-pool:${seed}`)
   const seen = new Set<string>()
@@ -102,6 +133,7 @@ export function gazeObjectName(item: string, language: Language): string | undef
   return OBJECT_NAMES[language]?.[object]
 }
 
+/** Alle Ding- und Farbnamen einer Sprache — für die Vorratsprüfungen (C6). */
 export function gazeVocabulary(language: Language): readonly string[] {
   return [
     ...Object.values(OBJECT_NAMES[language] ?? {}),
