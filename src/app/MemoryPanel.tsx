@@ -173,7 +173,10 @@ export function MemoryPanel({
           <MemoryConstellation
             graph={worldGraph}
             selectedId={selectedId}
-            onSelect={setSelectedId}
+            onSelect={(id) => {
+              setSelectedId(id)
+              if (dueNodeIds.has(id)) platform.sound.play('return')
+            }}
             selectLabel={(label) => texts.select.replace('{label}', label)}
             newNodeIds={newNodeIds}
             newEdgeIds={newEdgeIds}
