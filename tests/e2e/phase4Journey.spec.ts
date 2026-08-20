@@ -7,7 +7,7 @@ test('Phase 4 verbindet Today, Settle und Session als eine Reise', async ({ page
 
   const today = page.locator('.today')
   await expect(today).toBeVisible()
-  expect(await today.evaluate((node) => getComputedStyle(node).animationName)).toContain('journey-arrive')
+  expect(await today.evaluate((node) => getComputedStyle(node).animationName)).toContain('journey-in')
 
   await page.getByRole('button', { name: '60 Sekunden' }).click()
   await startButton(page).click()
@@ -15,7 +15,7 @@ test('Phase 4 verbindet Today, Settle und Session als eine Reise', async ({ page
   const settle = page.locator('.settle')
   await expect(settle).toBeVisible()
   const settlingSession = page.locator('.session')
-  expect(await settlingSession.evaluate((node) => getComputedStyle(node).animationName)).toContain('journey-enter')
+  expect(await settlingSession.evaluate((node) => getComputedStyle(node).animationName)).toContain('journey-in')
 
   await settle.click()
   const phase = page.locator('.session-phase')
