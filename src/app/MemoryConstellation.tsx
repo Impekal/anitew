@@ -178,6 +178,17 @@ export function MemoryConstellation({
                 }
               }}
             >
+              {onSelect !== undefined && (
+                <rect
+                  x={node.x - 5}
+                  y={node.y - 5}
+                  width="10"
+                  height="10"
+                  rx="5"
+                  className="constellation-hit"
+                  aria-hidden="true"
+                />
+              )}
               {isDue && (
                 <>
                   <circle cx={node.x} cy={node.y} r="4.3" className="constellation-return-ring constellation-return-ring-a" aria-hidden="true" />
