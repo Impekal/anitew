@@ -47,15 +47,15 @@ jobs:
           git apply /tmp/anitew-phase2.patch
           rm .anitew-staging/phase2.part1.b64 .anitew-staging/phase2.part2.b64 .anitew-staging/phase2.part3.b64
 
-      - name: Diagnose Phase 2 mission logic
+      - name: Diagnose Phase 2 pulse semantics
         run: |
-          echo '===== DAILY_MISSION_BEGIN ====='
-          cat src/core/memory/dailyMission.ts
-          echo '===== DAILY_MISSION_END ====='
-          echo '===== MEMORY_PULSE_BEGIN ====='
-          cat src/core/memory/memoryPulse.ts
-          echo '===== MEMORY_PULSE_END ====='
-          echo '===== APP_MISSION_CALLS_BEGIN ====='
-          grep -n -B 12 -A 28 'composeDailyMission' src/app/App.tsx || true
-          echo '===== APP_MISSION_CALLS_END ====='
+          echo '===== MEMORY_PULSE_COMPONENT_BEGIN ====='
+          cat src/app/MemoryPulse.tsx
+          echo '===== MEMORY_PULSE_COMPONENT_END ====='
+          echo '===== MEMORY_PULSE_COPY_BEGIN ====='
+          grep -n -B 8 -A 28 -E 'pulse|reinforced|attention|stale|quiet' src/i18n/de.ts src/i18n/en.ts || true
+          echo '===== MEMORY_PULSE_COPY_END ====='
+          echo '===== PHASE2_TESTS_BEGIN ====='
+          cat tests/core/memoryPhase2.test.ts
+          echo '===== PHASE2_TESTS_END ====='
           exit 1
