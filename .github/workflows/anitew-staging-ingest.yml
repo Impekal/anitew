@@ -14,6 +14,7 @@ on:
       - '.anitew-staging/phase2.part2.b64'
       - '.anitew-staging/phase2.part3.b64'
       - '.github/workflows/anitew-staging-ingest.yml'
+      - 'playwright.config.ts'
 
 permissions:
   contents: write
@@ -21,6 +22,7 @@ permissions:
 jobs:
   ingest:
     runs-on: ubuntu-latest
+    timeout-minutes: 12
     steps:
       - name: Checkout staging branch
         uses: actions/checkout@v4
@@ -69,8 +71,11 @@ jobs:
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
 
-      - name: E2E tests
-        run: npx playwright test --project=chromium
+      - name: Phase 2 functional E2E
+        run: npx playwright test tests/e2e/memory.spec.ts tests/e2e/onboarding.spec.ts tests/e2e/profile.spec.ts --project=chromium --max-failures=1
+
+      - name: Phase 2 layout E2E
+        run: npx playwright test tests/e2e/layout.spec.ts --project=desktop-small --max-failures=1
 
       - name: Commit validated Phase 2
         if: github.event_name == 'pull_request'
