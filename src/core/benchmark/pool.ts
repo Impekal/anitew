@@ -1,4 +1,14 @@
-/** Quarantäne-Vorrat für den Benchmark (F2a · D-006). */
+/**
+ * Der Quarantäne-Vorrat für den Benchmark (Backlog F2a · D-006).
+ *
+ * **Wer eine Übung dreißig Tage lang macht, wird in dieser Übung besser.**
+ * Das beweist nicht, dass sein Gedächtnis besser geworden ist; er kennt
+ * vielleicht nur die Übung. Würde der Benchmark aus demselben Wortvorrat
+ * ziehen wie das Training, dann misst er genau das: geübte Wörter.
+ *
+ * Deshalb liegen diese Wörter **nur hier**. Sie kommen im Training nicht vor,
+ * wandern nie in den Wiederholungsplan und tauchen in keinem Modul auf.
+ */
 
 import { FALLBACK_LANGUAGE, type Language } from '../language.ts'
 
@@ -48,6 +58,7 @@ const es = [
 
 const POOLS: Partial<Record<Language, readonly string[]>> = { de, en, fr, es }
 
+/** Wörter je Messung. Zwanzig — die Zahl aus F5 („Day 1: 8/20“). */
 export const BENCHMARK_ITEMS = 20
 
 export function benchmarkPool(language: Language): readonly string[] {
@@ -58,6 +69,10 @@ export function hasBenchmarkPool(language: Language): boolean {
   return POOLS[language] !== undefined
 }
 
+/**
+ * Der Reihe nach durch den Vorrat, nicht zufällig: So bleiben aufeinander-
+ * folgende Messungen bis zum ersten Umlauf überschneidungsfrei.
+ */
 export function benchmarkItems(ordinal: number, language: Language): readonly string[] {
   const pool = benchmarkPool(language)
   const start = ((ordinal - 1) * BENCHMARK_ITEMS) % pool.length
@@ -66,6 +81,7 @@ export function benchmarkItems(ordinal: number, language: Language): readonly st
   return items
 }
 
+/** Ab welcher Messung sich der Vorrat wiederholt. */
 export function poolCycles(language: Language): number {
   return Math.floor(benchmarkPool(language).length / BENCHMARK_ITEMS) + 1
 }
