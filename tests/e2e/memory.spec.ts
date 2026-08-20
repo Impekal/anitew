@@ -66,6 +66,7 @@ test('merkt echte Information: Vorschläge, Bestätigung, Constellation, Neulade
   // Und der Startbildschirm weiß es: Der Blick auf heute nennt den
   // schwächsten Anker — Daniel, denn er ist der einzige.
   await expect(page.locator('.today-memory')).toContainText('Daniel')
+  await expect(page.locator('.memory-pulse')).toContainText('4 neue Erinnerungen')
 })
 
 test('trainiert die Erinnerung in der Einheit — und FSRS bekommt die Termine', async ({

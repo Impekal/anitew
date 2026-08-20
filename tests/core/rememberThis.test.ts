@@ -15,6 +15,7 @@ import {
 } from '../../src/core/memory/missionComposer.ts'
 import {
   applyRememberedSuggestions,
+  normalizeRememberSuggestions,
   suggestMemories,
 } from '../../src/core/memory/rememberThis.ts'
 import { promptedSetHits } from '../../src/core/session/grading.ts'
@@ -115,6 +116,49 @@ describe('das Behalten-Wollen', () => {
 
     // Alttermine ohne ID bleiben lesbar, geben aber keine erfundene Zuordnung vor.
     expect(memoryNodeIdOfItem('Anna\u001eMuseum')).toBeUndefined()
+  })
+
+  it('kollabiert editierte Duplikate deterministisch ohne Kanten zu verlieren', () => {
+    const daniel = memoryNodeId('person', 'Daniel')
+    const museum = memoryNodeId('place', 'Museum')
+    const normalized = normalizeRememberSuggestions({
+      nodes: [
+        { id: daniel, type: 'person', label: 'Daniel' },
+        { id: 'alt', type: 'person', label: 'Daniel', detail: 'zweiter Vorschlag' },
+        { id: museum, type: 'place', label: 'Museum' },
+      ],
+      edges: [
+        { from: 'alt', to: museum, relation: 'association' },
+        { from: daniel, to: museum, relation: 'association' },
+        { from: daniel, to: daniel, relation: 'association' },
+      ],
+    })
+    expect(normalized.nodes).toHaveLength(2)
+    expect(normalized.nodes.find((node) => node.id === daniel)?.detail).toBe('zweiter Vorschlag')
+    expect(normalized.edges).toEqual([{ from: daniel, to: museum, relation: 'association' }])
+  })
+
+  it('verbindet einen bearbeiteten Vorschlag mit einem bereits vorhandenen Graph-Knoten', () => {
+    const daniel = memoryNodeId('person', 'Daniel')
+    const madrid = memoryNodeId('place', 'Madrid')
+    const existing = applyRememberedSuggestions(
+      createMemoryGraph(),
+      { nodes: [{ id: daniel, type: 'person', label: 'Daniel' }], edges: [] },
+      1,
+    )
+    const merged = applyRememberedSuggestions(
+      existing,
+      {
+        nodes: [
+          { id: daniel, type: 'person', label: 'Daniel' },
+          { id: madrid, type: 'place', label: 'Madrid' },
+        ],
+        edges: [{ from: daniel, to: madrid, relation: 'association' }],
+      },
+      2,
+    )
+    expect(merged.nodes).toHaveLength(2)
+    expect(merged.edges).toHaveLength(1)
   })
 
   it('wäscht KI-Vorschläge wie Fremdmaterial (D-037)', () => {

@@ -93,14 +93,10 @@ test('das Kennenlernen passt auf jedes Gerät', async ({ page }) => {
   await noHorizontalOverflow(page)
   await withinViewport(page, startButton(page), 'der Los-geht’s-Knopf')
 
-  // Und die längste Antwortliste (das Ziel) ragt ebenfalls nirgends hinaus.
+  // Und die erste echte Erinnerung ragt ebenfalls nirgends hinaus.
   await startButton(page).click()
-  await page.locator('.arrival-next').click()
-  const choices = page.locator('.choice')
-  await expect(choices).toHaveCount(5)
-  for (let index = 0; index < 5; index++) {
-    await withinViewport(page, choices.nth(index), `Antwort ${index + 1}`)
-  }
+  await expect(page.locator('.arrival-memory')).toBeVisible()
+  await withinViewport(page, page.locator('.remember-input'), 'erste Erinnerung')
   await noHorizontalOverflow(page)
 })
 

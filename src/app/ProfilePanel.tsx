@@ -1,4 +1,4 @@
-import { type DayKey, type DimensionCounts, type DimensionId, type DimensionResult, hasProfile, isImmediate, profileOf, trainingFootprint, weakest } from '../core/index.ts'
+import { type BenchmarkRun, type DayKey, type DimensionCounts, type DimensionId, type DimensionResult, hasProfile, isImmediate, profileOf, progressOf, trainingFootprint, weakest } from '../core/index.ts'
 import type { Dictionary } from '../i18n/index.ts'
 
 /**
@@ -20,11 +20,13 @@ export function ProfilePanel({
   trained,
   today,
   dictionary,
+  runs,
 }: {
   counts: Partial<Record<DimensionId, DimensionCounts>>
   trained: readonly DayKey[]
   today: DayKey
   dictionary: Dictionary
+  runs: readonly BenchmarkRun[]
 }) {
   const t = dictionary.profile
   const results = profileOf(counts)
@@ -58,25 +60,13 @@ export function ProfilePanel({
     </div>
   )
 
-  if (!hasProfile(results)) {
-    /*
-      Vor der ersten Aussage steht ein Satz und keine Liste aus neun leeren
-      Zeilen. Neun Achsen ohne Zahl sähen aus wie neun Defizite (G-2, R-1).
-    */
-    return (
-      <div className="profile">
-        {footprint}
-        <p className="hint">{t.empty}</p>
-      </div>
-    )
-  }
-
+  const ready = hasProfile(results) || progressOf(runs).kind === 'measured'
   const weak = weakest(results)
 
   return (
     <div className="profile">
       {footprint}
-      <p className="hint">{t.note}</p>
+      <p className="hint">{ready ? t.note : t.empty}</p>
 
       <ul className="axes">
         {results.map((result) => (
@@ -90,8 +80,9 @@ export function ProfilePanel({
                 im selben Gewand (R-1).
               */}
               {isImmediate(result.id) && <span className="axis-note"> · {t.immediate}</span>}
+              <span className="axis-source">{result.kind === 'elsewhere' ? t.sourceBenchmark : result.kind === 'notMeasured' ? t.sourceNone : isImmediate(result.id) ? t.sourceImmediate : t.sourceTraining}</span>
             </span>
-            <span className="axis-value">{valueOf(result, dictionary)}</span>
+            <span className="axis-value">{valueOf(result, dictionary, runs)}</span>
           </li>
         ))}
       </ul>
@@ -101,22 +92,30 @@ export function ProfilePanel({
         unterscheiden — sonst hieße „Zahlen sind deine Schwachstelle“ nur,
         dass der Zufall an diesem Tag so lag (E5, R-1).
       */}
-      <p className="hint">
-        {weak === undefined ? t.noWeakest : `${t.weakest} ${names[weak]}`}
-      </p>
+      {ready && (
+        <p className="hint">
+          {weak === undefined ? t.noWeakest : `${t.weakest} ${names[weak]}`}
+        </p>
+      )}
     </div>
   )
 }
 
-function valueOf(result: DimensionResult, dictionary: Dictionary): string {
+function valueOf(result: DimensionResult, dictionary: Dictionary, runs: readonly BenchmarkRun[]): string {
   const t = dictionary.profile
   switch (result.kind) {
     case 'measured':
       return `${result.held} ${t.of} ${result.chances} ${t.kept} · ${t.range} ${result.low}–${result.high} %`
     case 'tooFew':
       return `${t.tooFew} (${t.chancesSoFar} ${result.chances} ${t.of15})`
-    case 'elsewhere':
-      return t.elsewhere
+    case 'elsewhere': {
+      const benchmark = progressOf(runs)
+      return benchmark.kind === 'calibrating'
+        ? `${t.tooFew} (${benchmark.complete}/${benchmark.needed})`
+        : benchmark.distinguishable
+          ? t.benchmarkChange.replace('{low}', String(benchmark.low)).replace('{high}', String(benchmark.high))
+          : t.benchmarkNoChange.replace('{low}', String(benchmark.low)).replace('{high}', String(benchmark.high))
+    }
     case 'notMeasured':
       return t.notMeasured
   }

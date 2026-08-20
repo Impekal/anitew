@@ -158,12 +158,44 @@ export function applyRememberedSuggestions(
   suggestions: RememberSuggestions,
   now: number,
 ): MemoryGraph {
+  const normalized = normalizeRememberSuggestions(suggestions)
   let next = graph
-  for (const node of suggestions.nodes) {
+  for (const node of normalized.nodes) {
     next = addMemoryNode(next, node, now)
   }
-  for (const edge of suggestions.edges) {
+  for (const edge of normalized.edges) {
     next = connectMemoryNodes(next, edge, now)
   }
   return next
+}
+
+/**
+ * Bearbeitung kann zwei Vorschläge auf dieselbe stabile Kennung führen.
+ * Dann gewinnt deterministisch der erste Knoten, fehlende Details werden
+ * ergänzt, und Kanten werden nach dem Kollaps dedupliziert. Self-Edges fallen.
+ */
+export function normalizeRememberSuggestions(
+  suggestions: RememberSuggestions,
+): RememberSuggestions {
+  const nodes = new Map<string, NodeSuggestion>()
+  const canonical = new Map<string, string>()
+  for (const node of suggestions.nodes) {
+    const id = memoryNodeId(node.type, node.label)
+    canonical.set(node.id, id)
+    const existing = nodes.get(id)
+    if (existing === undefined) nodes.set(id, { ...node, id })
+    else if (existing.detail === undefined && node.detail !== undefined) {
+      nodes.set(id, { ...existing, detail: node.detail })
+    }
+  }
+  const known = new Set(nodes.keys())
+  const edges = new Map<string, EdgeSuggestion>()
+  for (const edge of suggestions.edges) {
+    const from = canonical.get(edge.from) ?? edge.from
+    const to = canonical.get(edge.to) ?? edge.to
+    if (!known.has(from) || !known.has(to) || from === to) continue
+    const normalized = { ...edge, from, to }
+    edges.set(`${from}→${to}:${edge.relation}`, normalized)
+  }
+  return { nodes: [...nodes.values()], edges: [...edges.values()] }
 }

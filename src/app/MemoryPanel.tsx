@@ -8,6 +8,7 @@ import {
   graphConnectionCount,
   latestNodes,
   memoryNodeIdOfItem,
+  memoryClusters,
   nodesByStrength,
   selectDue,
 } from '../core/index.ts'
@@ -47,6 +48,8 @@ export function MemoryPanel({
   const [graph, setGraph] = useState<MemoryGraph>(createMemoryGraph())
   const [selectedId, setSelectedId] = useState<string | undefined>()
   const [newNodeIds, setNewNodeIds] = useState<ReadonlySet<string>>(new Set())
+  const [newEdgeIds, setNewEdgeIds] = useState<ReadonlySet<string>>(new Set())
+  const [clusterId, setClusterId] = useState<string | undefined>()
   const [dueNodeIds, setDueNodeIds] = useState<ReadonlySet<string>>(new Set())
   const reload = useCallback(() => {
     void loadMemoryGraph()
@@ -83,6 +86,20 @@ export function MemoryPanel({
   }
 
   const byNeed = nodesByStrength(graph)
+  const clusters = memoryClusters(graph)
+  const activeCluster = clusters.find((cluster) => cluster.id === clusterId)
+  const worldGraph =
+    activeCluster === undefined
+      ? graph
+      : {
+          ...graph,
+          nodes: activeCluster.nodes,
+          edges: graph.edges.filter(
+            (edge) =>
+              activeCluster.nodes.some((node) => node.id === edge.from) &&
+              activeCluster.nodes.some((node) => node.id === edge.to),
+          ),
+        }
   const weakest = byNeed.slice(0, 3)
   const strongest = [...byNeed].reverse().slice(0, 3)
   const latest = latestNodes(graph, 3)
@@ -116,12 +133,38 @@ export function MemoryPanel({
         <p className="memory-empty">{texts.empty}</p>
       ) : (
         <>
+          {clusters.length > 1 && (
+            <nav className="memory-clusters" aria-label={texts.clusters}>
+              <button type="button" className={clusterId === undefined ? 'memory-cluster-active' : ''} onClick={() => setClusterId(undefined)}>{texts.allClusters}</button>
+              {clusters.slice(0, 8).map((cluster) => (
+                <button key={cluster.id} type="button" className={clusterId === cluster.id ? 'memory-cluster-active' : ''} onClick={() => setClusterId(cluster.id)}>
+                  <span>{cluster.anchor.label}</span><small>{cluster.nodes.length}</small>
+                </button>
+              ))}
+              {clusters.length > 8 && (
+                <select
+                  className="memory-cluster-select"
+                  aria-label={texts.chooseCluster}
+                  value={clusterId ?? ''}
+                  onChange={(event) => setClusterId(event.target.value || undefined)}
+                >
+                  <option value="">{texts.chooseCluster}</option>
+                  {clusters.map((cluster) => (
+                    <option value={cluster.id} key={cluster.id}>
+                      {cluster.anchor.label} · {cluster.nodes.length}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </nav>
+          )}
           <MemoryConstellation
-            graph={graph}
+            graph={worldGraph}
             selectedId={selectedId}
             onSelect={setSelectedId}
             selectLabel={(label) => texts.select.replace('{label}', label)}
             newNodeIds={newNodeIds}
+            newEdgeIds={newEdgeIds}
             ariaLabel={texts.constellationLabel}
             recalledNodeIds={recalledNodeIds}
           />
@@ -222,9 +265,10 @@ export function MemoryPanel({
       <RememberThisPanel
         platform={platform}
         dictionary={dictionary}
-        onSaved={(ids) => {
-          setNewNodeIds(new Set(ids))
-          setSelectedId(ids[0])
+        onSaved={({ nodeIds, edgeIds }) => {
+          setNewNodeIds(new Set(nodeIds))
+          setNewEdgeIds(new Set(edgeIds))
+          setSelectedId(nodeIds[0])
           reload()
         }}
       />

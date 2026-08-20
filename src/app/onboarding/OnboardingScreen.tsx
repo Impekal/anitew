@@ -15,17 +15,18 @@ import {
 import type { Dictionary } from '../../i18n/index.ts'
 
 /**
- * Die Schritte des Ankommens — eine Frage pro Bildschirm (D-011/G-2).
+ * Die Schritte des Ankommens — drei Bildschirme im Hauptpfad (D-011/G-2).
  * `welcome` ist keine Frage, sondern die Erklärung samt Ausgang: Wer nichts
  * beantworten will, ist mit einem Tipp draußen und wird nie wieder gefragt.
+ * Alte Profilfelder bleiben für gespeicherte Profile und „Über dich“ erhalten.
  */
-const STEPS = ['welcome', 'name', 'goal', 'time', 'day', 'age'] as const
+const STEPS = ['welcome', 'memory', 'time', 'name', 'goal', 'day', 'age'] as const
 
 type Step = (typeof STEPS)[number]
 
 interface OnboardingScreenProps {
   dictionary: Dictionary
-  onDone: (profile: OnboardingProfile) => void
+  onDone: (profile: OnboardingProfile, firstMemory?: string) => void
 }
 
 /**
@@ -33,23 +34,28 @@ interface OnboardingScreenProps {
  *
  * Jede Antwort tut genau das, was ihr Begleitsatz sagt — und der steht
  * daneben, nicht in einer Fußnote. Antworten rückt einen Schritt weiter;
- * Überspringen auch. Es gibt keinen Zwang und keinen Fortschrittsbalken,
- * der einen fertig aussehen lassen will (D-015): sechs ruhige Schritte,
- * dann ist man drin.
+ * Überspringen auch. Es gibt keinen Zwang und keinen Fortschrittsbalken:
+ * Produktidee, erste Erinnerung, Zeit — dann ist man drin.
  */
 export function OnboardingScreen({ dictionary, onDone }: OnboardingScreenProps) {
   const [step, setStep] = useState<Step>('welcome')
   const [draft, setDraft] = useState<OnboardingProfile>({})
   const [name, setName] = useState('')
+  const [firstMemory, setFirstMemory] = useState('')
   const texts = dictionary.onboarding
 
-  const stepAfter = (current: Step): Step | undefined => STEPS[STEPS.indexOf(current) + 1]
+  const stepAfter = (current: Step): Step | undefined => {
+    if (current === 'welcome') return 'memory'
+    if (current === 'memory') return 'time'
+    if (current === 'time') return undefined
+    return STEPS[STEPS.indexOf(current) + 1]
+  }
 
   /** Einen Schritt weiter — und nach dem letzten hinaus. */
-  const advance = (current: Step, next: OnboardingProfile) => {
+  const advance = (current: Step, next: OnboardingProfile, memory = firstMemory) => {
     setDraft(next)
     const following = stepAfter(current)
-    if (following === undefined) onDone(next)
+    if (following === undefined) onDone(next, memory.trim() || undefined)
     else setStep(following)
   }
 
@@ -64,7 +70,7 @@ export function OnboardingScreen({ dictionary, onDone }: OnboardingScreenProps) 
         <section className="arrival" aria-label={texts.welcomeTitle}>
           <p className="arrival-note">{texts.welcomeNote}</p>
           <div className="arrival-actions">
-            <button type="button" className="start arrival-begin" onClick={() => setStep('name')}>
+            <button type="button" className="start arrival-begin" onClick={() => setStep('memory')}>
               <span className="start-label">{texts.begin}</span>
             </button>
             {/*
@@ -76,6 +82,26 @@ export function OnboardingScreen({ dictionary, onDone }: OnboardingScreenProps) 
             <button type="button" className="quiet" onClick={() => onDone({})}>
               {texts.skipAll}
             </button>
+          </div>
+        </section>
+      )}
+
+      {step === 'memory' && (
+        <section className="arrival arrival-memory" aria-label={texts.memoryQuestion}>
+          <p className="arrival-system">{texts.promise}</p>
+          <h2>{texts.memoryQuestion}</h2>
+          <textarea
+            className="remember-input"
+            rows={3}
+            value={firstMemory}
+            placeholder={texts.memoryPlaceholder}
+            aria-label={texts.memoryQuestion}
+            onChange={(event) => setFirstMemory(event.target.value)}
+          />
+          <p className="hint">{texts.memoryNote}</p>
+          <div className="arrival-actions">
+            <button type="button" className="quiet arrival-next" onClick={() => advance('memory', draft)} disabled={firstMemory.trim() === ''}>{texts.keepMemory}</button>
+            <button type="button" className="quiet" onClick={() => advance('memory', draft, '')}>{texts.skip}</button>
           </div>
         </section>
       )}

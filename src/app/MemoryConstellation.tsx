@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 
-import type { MemoryGraph } from '../core/index.ts'
+import { memoryClusters, type MemoryGraph, type MemoryNodeType } from '../core/index.ts'
 
 /**
  * Die Memory-Constellation (D-036) — echte Daten, kein Dekor.
@@ -26,6 +26,9 @@ interface Placed {
   readonly y: number
   readonly strength: number
   readonly anchor: boolean
+  readonly type: MemoryNodeType
+  readonly degree: number
+  readonly activityAt: number
 }
 
 export const MAX_VISIBLE_MEMORY_NODES = 72
@@ -56,20 +59,38 @@ function visibleNodeIds(graph: MemoryGraph, selectedId?: string): Set<string> {
 
 function layout(graph: MemoryGraph, selectedId?: string): Placed[] {
   const anchors = new Set(graph.edges.map((edge) => edge.from))
+  const degree = new Map<string, number>()
+  for (const edge of graph.edges) {
+    degree.set(edge.from, (degree.get(edge.from) ?? 0) + 1)
+    degree.set(edge.to, (degree.get(edge.to) ?? 0) + 1)
+  }
   const visible = visibleNodeIds(graph, selectedId)
-  const ordered = graph.nodes.filter((node) => visible.has(node.id)).sort((a, b) => a.createdAt - b.createdAt)
-  return ordered.map((node, index) => {
-    const angle = ((index * GOLDEN_ANGLE) % 360) * (Math.PI / 180)
-    // Wurzel-Spirale: gleichmäßige Dichte, die Mitte gehört den Ältesten.
-    const radius = 8 + 38 * Math.sqrt((index + 0.4) / Math.max(1, ordered.length))
-    return {
-      id: node.id,
-      label: node.label,
-      x: 50 + radius * Math.cos(angle),
-      y: 50 + radius * Math.sin(angle),
-      strength: node.strength,
-      anchor: anchors.has(node.id),
-    }
+  const clusters = memoryClusters({
+    ...graph,
+    nodes: graph.nodes.filter((node) => visible.has(node.id)),
+    edges: graph.edges.filter((edge) => visible.has(edge.from) && visible.has(edge.to)),
+  })
+  return clusters.flatMap((cluster, clusterIndex) => {
+    const clusterAngle = ((clusterIndex * GOLDEN_ANGLE) % 360) * (Math.PI / 180)
+    const clusterRadius = clusters.length === 1 ? 0 : 27 * Math.sqrt((clusterIndex + 1) / clusters.length)
+    const centerX = 50 + clusterRadius * Math.cos(clusterAngle)
+    const centerY = 50 + clusterRadius * Math.sin(clusterAngle)
+    const ordered = [...cluster.nodes].sort((a, b) => a.createdAt - b.createdAt || a.id.localeCompare(b.id))
+    return ordered.map((node, index) => {
+      const angle = ((index * GOLDEN_ANGLE) % 360) * (Math.PI / 180)
+      const radius = index === 0 ? 0 : Math.min(17, 5 + 3.2 * Math.sqrt(index))
+      return {
+        id: node.id,
+        label: node.label,
+        x: centerX + radius * Math.cos(angle),
+        y: centerY + radius * Math.sin(angle),
+        strength: node.strength,
+        anchor: anchors.has(node.id) || node.id === cluster.anchor.id,
+        type: node.type,
+        degree: degree.get(node.id) ?? 0,
+        activityAt: node.lastRecalledAt ?? node.createdAt,
+      }
+    })
   })
 }
 
@@ -79,6 +100,7 @@ export function MemoryConstellation({
   onSelect,
   selectLabel,
   newNodeIds = new Set(),
+  newEdgeIds = new Set(),
   ariaLabel,
   recalledNodeIds = new Set(),
 }: {
@@ -87,11 +109,15 @@ export function MemoryConstellation({
   onSelect?: (id: string) => void
   selectLabel?: (label: string) => string
   newNodeIds?: ReadonlySet<string>
+  newEdgeIds?: ReadonlySet<string>
   ariaLabel?: string
   recalledNodeIds?: ReadonlySet<string>
 }) {
   const placed = useMemo(() => layout(graph, selectedId), [graph, selectedId])
   const byId = useMemo(() => new Map(placed.map((node) => [node.id, node])), [placed])
+  const activity = placed.map((node) => node.activityAt)
+  const oldestActivity = Math.min(...activity)
+  const newestActivity = Math.max(...activity)
 
   if (placed.length === 0) return null
 
@@ -113,7 +139,7 @@ export function MemoryConstellation({
               y1={from.y}
               x2={to.x}
               y2={to.y}
-              className={newNodeIds.has(edge.from) || newNodeIds.has(edge.to) ? 'constellation-edge constellation-edge-new' : 'constellation-edge'}
+              className={newEdgeIds.has(edge.id) || newNodeIds.has(edge.from) || newNodeIds.has(edge.to) ? 'constellation-edge constellation-edge-new' : 'constellation-edge'}
               style={{ animationDelay: `${(index * 240) % 1800}ms` }}
             />
           )
@@ -136,13 +162,19 @@ export function MemoryConstellation({
             <circle
               cx={node.x}
               cy={node.y}
-              r={node.anchor ? 2.1 : 1.3}
+              r={(node.anchor ? 2.1 : 1.25) + Math.min(1.2, node.degree * 0.18)}
               className={
-                node.anchor ? 'constellation-node constellation-node-anchor' : 'constellation-node'
+                `${node.anchor ? 'constellation-node constellation-node-anchor' : 'constellation-node'} constellation-node-${node.type}`
               }
               style={{
                 animationDelay: `${(index * 130) % 1600}ms`,
-                opacity: 0.45 + node.strength * 0.55,
+                opacity:
+                  0.25 +
+                  node.strength * 0.5 +
+                  (newestActivity === oldestActivity
+                    ? 0.25
+                    : ((node.activityAt - oldestActivity) / (newestActivity - oldestActivity)) *
+                      0.25),
               }}
             />
             {node.anchor && (
