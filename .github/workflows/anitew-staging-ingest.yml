@@ -1,5 +1,6 @@
 name: ANITEW staging ingest
 
+# Staging-only validation harness; keep isolated from anitew-redesign-v2 until green.
 on:
   push:
     branches:
