@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react'
 
 import {
   type DayKey,
+  type MemoryAfterglow,
   type MemoryPulseSignal,
   type MemoryReencounter,
   type Platform,
+  memoryAfterglow,
   memoryPulse,
   memoryReencounter,
 } from '../core/index.ts'
@@ -29,27 +31,31 @@ export function MemoryPulse({
 }) {
   const [signals, setSignals] = useState<readonly MemoryPulseSignal[]>([])
   const [reencounter, setReencounter] = useState<MemoryReencounter | undefined>()
+  const [afterglow, setAfterglow] = useState<MemoryAfterglow | undefined>()
   useEffect(() => {
     void Promise.all([loadMemoryGraph(), loadDue(training)])
       .then(([graph, due]) => {
         const now = platform.clock.now()
         const returning = memoryReencounter({ graph, due, today, now })
+        const recalled = returning === undefined ? memoryAfterglow({ graph, now }) : undefined
         setReencounter(returning)
+        setAfterglow(recalled)
         const next = memoryPulse({ graph, due, today, now })
-        // Wenn die konkrete Rückkehr sichtbar ist, wiederholen wir dieselbe
-        // Tatsache nicht noch einmal abstrakt als „1 Erinnerung braucht
-        // Aufmerksamkeit“. Der Pulse darf daneben höchstens eine andere
-        // belegbare Beobachtung tragen.
+        // Konkrete Ereignisse schlagen abstrakte Summen. RETURN wiederholt
+        // „Aufmerksamkeit“ nicht; der Afterglow wiederholt „trainiert“ nicht.
+        // Daneben bleibt höchstens eine andere belegbare Beobachtung.
         setSignals(
-          returning === undefined
-            ? next
-            : next.filter((signal) => signal.kind !== 'attention').slice(0, 1),
+          returning !== undefined
+            ? next.filter((signal) => signal.kind !== 'attention').slice(0, 1)
+            : recalled !== undefined
+              ? next.filter((signal) => signal.kind !== 'practiced').slice(0, 1)
+              : next,
         )
       })
       .catch(() => undefined)
   }, [platform, refreshKey, today, training])
 
-  if (signals.length === 0 && reencounter === undefined) return null
+  if (signals.length === 0 && reencounter === undefined && afterglow === undefined) return null
   const t = dictionary.pulse
   const sentence = (signal: MemoryPulseSignal) => {
     switch (signal.kind) {
@@ -65,12 +71,18 @@ export function MemoryPulse({
         return t.quiet
     }
   }
+  const live = reencounter !== undefined || afterglow !== undefined
+  const anchor = reencounter?.worldAnchor ?? afterglow?.anchor
   return (
     <section
-      className={reencounter === undefined ? 'memory-pulse' : 'memory-pulse memory-reencounter memory-reencounter-live'}
+      className={
+        !live
+          ? 'memory-pulse'
+          : `memory-pulse memory-reencounter ${reencounter !== undefined ? 'memory-reencounter-live' : 'memory-afterglow-live'}`
+      }
       aria-labelledby="memory-pulse-heading"
     >
-      {reencounter === undefined ? (
+      {!live ? (
         <div className="memory-pulse-mark" aria-hidden="true"><span /></div>
       ) : (
         <div className="memory-return-glyph" aria-hidden="true">
@@ -84,19 +96,33 @@ export function MemoryPulse({
       )}
       <div>
         <p id="memory-pulse-heading" className="memory-pulse-label">
-          {reencounter === undefined ? t.heading : dictionary.session.phases.return}
+          {reencounter !== undefined
+            ? dictionary.session.phases.return
+            : afterglow !== undefined
+              ? dictionary.session.phases.retrieve
+              : t.heading}
         </p>
         {reencounter !== undefined && (
           <>
             <p className="memory-pulse-line memory-return-name"><strong>{reencounter.node.label}</strong></p>
             <p className="hint memory-return-status">{dictionary.memory.dueSoon}</p>
-            {reencounter.worldAnchor !== undefined && reencounter.worldAnchor.id !== reencounter.node.id && (
-              <p className="hint memory-return-context">
-                {dictionary.memory.connected}: {reencounter.worldAnchor.label}
-              </p>
-            )}
           </>
         )}
+        {afterglow !== undefined && (
+          <>
+            <p className="memory-pulse-line memory-return-name"><strong>{afterglow.anchor.label}</strong></p>
+            <p className="hint memory-return-status">
+              {t.practiced.replace('{count}', String(afterglow.recalled.length))}
+            </p>
+          </>
+        )}
+        {anchor !== undefined &&
+          reencounter !== undefined &&
+          anchor.id !== reencounter.node.id && (
+            <p className="hint memory-return-context">
+              {dictionary.memory.connected}: {anchor.label}
+            </p>
+          )}
         {signals.map((signal, index) => <p className="memory-pulse-line" key={`${signal.kind}:${index}`}>{sentence(signal)}</p>)}
       </div>
     </section>
