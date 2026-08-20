@@ -5,9 +5,11 @@ import {
   SUPPORTED_LANGUAGES,
   canTrainIn,
   hasBenchmarkPool,
+  hasGazePool,
   hasMissionPool,
   hasNamePool,
   hasPalacePool,
+  hasTwinPool,
   hasWordPool,
   resolveTrainingLanguage,
   trainingLanguages,
@@ -23,51 +25,39 @@ import {
  */
 describe('worin sich trainieren lässt', () => {
   it('verlangt alle Vorräte, nicht die meisten', () => {
-    /*
-     * Ein Modul, das mitten in einer Einheit auf Englisch umschaltet, wäre
-     * schlimmer als eines, das gar nicht kommt — und die Messung hinge an
-     * einem Quarantänevorrat, den es in dieser Sprache nicht gibt (F2a).
-     */
     for (const language of SUPPORTED_LANGUAGES) {
       const complete =
         hasWordPool(language) &&
         hasNamePool(language) &&
         hasMissionPool(language) &&
         hasPalacePool(language) &&
+        hasTwinPool(language) &&
+        hasGazePool(language) &&
         hasBenchmarkPool(language)
       expect(canTrainIn(language)).toBe(complete)
     }
   })
 
   it('bietet heute genau die an, die vollständig sind', () => {
-    expect([...trainingLanguages()]).toEqual(['de', 'en', 'fr'])
+    expect([...trainingLanguages()]).toEqual(['de', 'en', 'fr', 'es'])
   })
 
   it('folgt ohne eigene Wahl der Oberfläche', () => {
-    // Wer die App auf Deutsch bedient, trainiert auf Deutsch, bis er etwas
-    // anderes sagt.
     expect(resolveTrainingLanguage(undefined, 'de')).toBe('de')
     expect(resolveTrainingLanguage(undefined, 'en')).toBe('en')
   })
 
   it('weicht aus, wenn sich in der Oberflächensprache nicht trainieren lässt', () => {
-    // Japanisch ist wählbar, aber es gibt keine japanischen Wörter — dann
-    // trainiert man auf der Rückfallsprache, statt japanisch beschriftete
-    // englische Wörter zu bekommen.
     expect(resolveTrainingLanguage(undefined, 'ja')).toBe(FALLBACK_LANGUAGE)
   })
 
   it('behält eine Wahl, die es hergibt', () => {
     expect(resolveTrainingLanguage('en', 'de')).toBe('en')
     expect(resolveTrainingLanguage('de', 'en')).toBe('de')
+    expect(resolveTrainingLanguage('es', 'de')).toBe('es')
   })
 
   it('behält eine Wahl nicht, für die es keinen Inhalt gibt', () => {
-    /*
-     * Wichtig für später: Fällt ein Vorrat weg oder kommt jemand mit einer
-     * eingelesenen Sicherung von einem Gerät mit mehr Inhalt, darf daraus
-     * keine Einheit werden, die es nicht geben kann.
-     */
     expect(resolveTrainingLanguage('ja', 'de')).toBe('de')
     expect(resolveTrainingLanguage('unsinn', 'de')).toBe('de')
   })
