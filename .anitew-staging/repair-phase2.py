@@ -18,6 +18,8 @@ def regex_once(path: str, pattern: str, replacement: str) -> None:
 
 
 # Daily Mission: no focus from zero-evidence or immediate-only dimensions.
+# "Undertrained" is comparative: one eligible delayed dimension must have
+# strictly fewer opportunities than the next. Equal exposure has no winner.
 replace_once(
     'src/core/memory/dailyMission.ts',
     "import { type DimensionId, moduleForDimension } from '../profile/dimensions.ts'",
@@ -26,10 +28,16 @@ replace_once(
 regex_once(
     'src/core/memory/dailyMission.ts',
     r"(?P<head>const undertrained = \(Object\.entries\(input\.dimensions\) as \[DimensionId, DimensionCounts\]\[\]\)\s*)\.sort\(\(a, b\) => a\[1\]\.chances - b\[1\]\.chances \|\| a\[0\]\.localeCompare\(b\[0\]\)\)\[0\]",
-    r"""\g<head>.filter(([id, counts]) =>
+    r"""const undertrainedRanked = (Object.entries(input.dimensions) as [DimensionId, DimensionCounts][])
+      .filter(([id, counts]) =>
         counts.chances > 0 && !isImmediate(id) && moduleForDimension(id) !== undefined,
       )
-      .sort((a, b) => a[1].chances - b[1].chances || a[0].localeCompare(b[0]))[0]""",
+      .sort((a, b) => a[1].chances - b[1].chances || a[0].localeCompare(b[0]))
+    const undertrained =
+      undertrainedRanked.length >= 2 &&
+      undertrainedRanked[0]![1].chances < undertrainedRanked[1]![1].chances
+        ? undertrainedRanked[0]
+        : undefined""",
 )
 
 # Memory Pulse: recent activity is evidence of practice, not necessarily reinforcement.
@@ -92,6 +100,22 @@ describe('Phase 2 evidence guards', () => {
       personalScenes: 0,
       untrainedPersonalItems: 0,
       dimensions: { words: { chances: 0, lost: 0 } },
+      interferenceErrors: 0,
+    })
+    expect(decision.focus).toBeUndefined()
+    expect(decision.reason).toBe('balanced')
+  })
+
+  it('erfindet bei gleich viel Training keinen untertrainierten Gewinner', () => {
+    const decision = composeDailyMission({
+      seconds: 300,
+      dueByModule: {},
+      personalScenes: 0,
+      untrainedPersonalItems: 0,
+      dimensions: {
+        words: { chances: 21, lost: 5 },
+        numbers: { chances: 21, lost: 6 },
+      },
       interferenceErrors: 0,
     })
     expect(decision.focus).toBeUndefined()
