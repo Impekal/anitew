@@ -33,7 +33,16 @@
  *    das als Messung zu verbuchen, wäre es nicht (R-1).
  */
 
-import { Rating, State, createEmptyCard, fsrs, type Card } from 'ts-fsrs'
+import {
+  Rating,
+  State,
+  checkParameters,
+  createEmptyCard,
+  fsrs,
+  generatorParameters,
+  type Card,
+  type FSRSParameters,
+} from 'ts-fsrs'
 
 import { type DayKey, daysBetween } from '../time.ts'
 
@@ -55,12 +64,36 @@ export const TARGET_RETENTION = 0.9
  */
 export const MAX_INTERVAL_DAYS = 3650
 
-const engine = fsrs({
-  request_retention: TARGET_RETENTION,
-  maximum_interval: MAX_INTERVAL_DAYS,
-  enable_fuzz: false,
-  enable_short_term: false,
-})
+/**
+ * Von einem Optimizer gelernte FSRS-Gewichte.
+ *
+ * C10 speichert später nur diesen Vektor. Retention, Maximalintervall,
+ * Kurzzeitschritte und Zufallsstreuung bleiben Produktregeln von ANITEW und
+ * dürfen durch Optimierung nicht nebenbei verändert werden.
+ */
+export type MemorySchedulerWeights = readonly number[]
+
+/**
+ * Baut die vollständige Scheduler-Konfiguration aus optionalen persönlichen
+ * Gewichten. Extern gelernte Werte werden an der Kern-Grenze validiert; die
+ * übrigen ANITEW-Regeln bleiben unverändert.
+ */
+export function memorySchedulerParameters(weights?: MemorySchedulerWeights): FSRSParameters {
+  const validated = weights === undefined ? undefined : [...checkParameters(weights)]
+  return generatorParameters({
+    request_retention: TARGET_RETENTION,
+    maximum_interval: MAX_INTERVAL_DAYS,
+    enable_fuzz: false,
+    enable_short_term: false,
+    ...(validated === undefined ? {} : { w: validated }),
+  })
+}
+
+const engine = fsrs(memorySchedulerParameters())
+
+function engineFor(weights?: MemorySchedulerWeights) {
+  return weights === undefined ? engine : fsrs(memorySchedulerParameters(weights))
+}
 
 /** Was ANITEW sich über eine einzelne Information merkt. */
 export interface Memory {
@@ -87,13 +120,22 @@ export interface Memory {
  * erste Stabilität. Wir setzen nichts eigenes davor — eine geratene
  * Anfangsstabilität wäre genau die erfundene Zahl aus R-1.
  */
-export function newMemory(day: DayKey, recalled: boolean): Memory {
-  return review(fromCard(createEmptyCard(dayToDate(day)), day), day, recalled)
+export function newMemory(
+  day: DayKey,
+  recalled: boolean,
+  weights?: MemorySchedulerWeights,
+): Memory {
+  return review(fromCard(createEmptyCard(dayToDate(day)), day), day, recalled, weights)
 }
 
 /** Eine Abfrage verbuchen und den nächsten Termin berechnen. */
-export function review(memory: Memory, day: DayKey, recalled: boolean): Memory {
-  const { card } = engine.next(
+export function review(
+  memory: Memory,
+  day: DayKey,
+  recalled: boolean,
+  weights?: MemorySchedulerWeights,
+): Memory {
+  const { card } = engineFor(weights).next(
     toCard(memory),
     dayToDate(day),
     recalled ? Rating.Good : Rating.Again,
