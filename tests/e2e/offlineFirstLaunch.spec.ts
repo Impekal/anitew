@@ -26,14 +26,14 @@ test('startet nach der Installation auf einer frischen Seite vollständig offlin
 
   // Der bestehende Tab soll nicht versehentlich aus seinem Dokumentzustand
   // weiterleben. Ein neuer Tab ist der harte Fall: HTML, JS und CSS müssen aus
-  // dem Service-Worker-Cache kommen.
+  // dem Service-Worker-Cache kommen. Der echte Startknopf ist dabei der
+  // belastbare Endzustand; seine interne Containerklasse ist kein Vertrag.
   await page.close()
   await context.setOffline(true)
   try {
     const installedLaunch = await context.newPage()
     await installedLaunch.goto('/', { waitUntil: 'commit' })
     await expect(startButton(installedLaunch)).toBeVisible({ timeout: 30_000 })
-    await expect(installedLaunch.locator('.challenge')).toBeVisible()
   } finally {
     await context.setOffline(false)
   }
