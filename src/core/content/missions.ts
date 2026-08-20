@@ -65,7 +65,7 @@ const OBJECTS: Partial<Record<Language, readonly string[]>> = {
 /**
  * Wo der Gegenstand in der Szene liegt.
  *
- * Kurze, konkrete Relationen statt abstrakter Richtungen: „neben dem Fenster"
+ * Kurze, konkrete Relationen statt abstrakter Richtungen: „neben dem Fenster“
  * bildet ein Bild; „links“ hängt vom Blickwinkel ab. Jede Sprache hat eigene
  * Formulierungen, weil die Lage selbst Trainingsinhalt ist.
  */
@@ -136,19 +136,19 @@ export function missionFor(person: string, language: Language): Mission {
 
   const room = String(100 + rng.int(900))
   /*
-   * Die ersten Ziehungen bleiben in derselben Reihenfolge wie vor H2. Die
-   * neue Lage wird erst **nach** dem Gegenstand gezogen. Bestehende Szenen
-   * ändern sich damit nur um genau die neue Information statt vollständig
-   * neu gemischt zu werden.
+   * Die bisherigen Ziehungen bleiben **exakt** in ihrer alten Reihenfolge.
+   * Erst nachdem Zimmer, Gegenstand, Uhrzeit und Restaurant feststehen, zieht
+   * H2 die neue Lage. So verändern wir bereits gelernte Szenen nicht unter
+   * den Füßen der Nutzer; sie bekommen nur eine zusätzliche Tatsache.
    */
   const colour = rng.pick(listFor(COLOURS, language))
   const noun = rng.pick(listFor(OBJECTS, language))
   const object = ADJECTIVE_AFTER_NOUN.has(language) ? `${noun} ${colour}` : `${colour} ${noun}`
-  const location = rng.pick(listFor(LOCATIONS, language))
   const hour = 6 + rng.int(18)
   const minute = rng.int(12) * 5
   const time = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
   const place = rng.pick(listFor(PLACES, language))
+  const location = rng.pick(listFor(LOCATIONS, language))
 
   return {
     person,
@@ -187,7 +187,7 @@ export function factKindOf(item: string): FactKind | undefined {
   return (FACT_KINDS as readonly string[]).includes(kind) ? (kind as FactKind) : undefined
 }
 
-/** Der Gegenstand ohne seine Lage — als Anker für die Lage-Frage. */
+/** Der Gegenstand ohne seine Lage — nützlich, wenn die Lage separat gefragt wird. */
 export function missionObjectFor(person: string, language: Language): string {
   const combined = missionFor(person, language).facts.find((fact) => fact.kind === 'object')?.value ?? ''
   return combined.split(OBJECT_LOCATION_SEPARATOR)[0] ?? combined
