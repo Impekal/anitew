@@ -48,6 +48,7 @@ const GAZE_COLOR_NAME = new Map([
 const MISSION_LABEL_OF_QUESTION = new Map([
   ['Welche Zimmernummer?', 'Zimmer'],
   ['Was hatte sie oder er dabei?', 'Dabei'],
+  ['Wo lag der Gegenstand?', 'Dabei'],
   ['Wann ging es los?', 'Abfahrt'],
   ['Wie hieß das Restaurant?', 'Restaurant'],
 ])
@@ -176,12 +177,12 @@ export async function pollFirstModule(page: Page): Promise<string> {
 /**
  * Liest die Szene, wenn gerade eine dasteht.
  *
- * Zwei Module bauen eine: die **Mission** (vier Tatsachen an einer Person)
- * und der **Palast** (fünf Dinge an fünf Orten). Sie sehen im Aufbau gleich
- * aus, und deshalb liest der Test sie auch gleich — mit einem Unterschied:
- * Beim Gang steht vor jeder Station ihre Nummer. Die gehört zur Anzeige und
- * nicht zum Etikett, also wird die Beschriftung dort aus ihrem eigenen
- * Element gelesen statt aus dem ganzen `dt`.
+ * Zwei Module bauen eine: die **Mission** (vier sichtbare Zeilen, fünf
+ * Tatsachen an einer Person) und der **Palast** (fünf Dinge an fünf Orten).
+ * Sie sehen im Aufbau gleich aus, und deshalb liest der Test sie auch gleich
+ * — mit einem Unterschied: Beim Gang steht vor jeder Station ihre Nummer.
+ * Die gehört zur Anzeige und nicht zum Etikett, also wird die Beschriftung
+ * dort aus ihrem eigenen Element gelesen statt aus dem ganzen `dt`.
  */
 export async function sceneOf(page: Page): Promise<Map<string, string> | undefined> {
   if ((await page.locator('.scene').count()) === 0) return undefined
@@ -292,7 +293,7 @@ export type Give = 'all' | 'none' | 'allButLast'
  *
  * Bei einer **Mission** wird nach der Frage geantwortet und nicht nach der
  * Stelle. Der Grund ist eine Lehre aus dem ersten Anlauf: Die Szene zeigt
- * Zimmer · Abfahrt · Dabei · Restaurant, gefragt wird Zimmer · Dabei ·
+ * Zimmer · Abfahrt · Dabei · Restaurant, gefragt wird Zimmer · Dabei · Lage ·
  * Abfahrt · Restaurant. Dass die beiden Reihenfolgen auseinanderfallen, ist
  * kein Fehler, sondern gut so — wer die Reihenfolge mitlernen kann, lernt die
  * Reihenfolge statt die Szene. Nur darf der Test sie eben nicht raten.
@@ -393,5 +394,10 @@ async function answerAt(page: Page, learned: Learned, index: number): Promise<st
   const asked = question.replace(/^.*?von früher:\s*/i, '')
   const label = MISSION_LABEL_OF_QUESTION.get(asked)
   expect(label, `unbekannte Frage: „${question}“`).toBeDefined()
-  return learned.scene.get(label as string) ?? ''
+  const value = learned.scene.get(label as string) ?? ''
+  if (label === 'Dabei') {
+    const [object = '', location = ''] = value.split(' · ')
+    return asked === 'Wo lag der Gegenstand?' ? location : object
+  }
+  return value
 }
