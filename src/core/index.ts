@@ -58,7 +58,37 @@ export * from './scheduler/memory.ts'
 export * from './session/difficulty.ts'
 export * from './sync/drive.ts'
 export * from './session/grading.ts'
-export * from './session/plan.ts'
+export {
+  SECONDS_PER_ITEM,
+  MIN_ITEMS_PER_ROUND,
+  MAX_ITEMS_PER_ROUND,
+  MIN_SECONDS_FOR_TEACHING,
+  MIN_SECONDS_FOR_PALACE,
+  TRAINING_MODULES,
+  isCognitivelyHeavy,
+  isPrompted,
+  entersReview,
+  asksOnSight,
+  SECONDS_PER_REVERSE_PROMPT,
+  isScene,
+  sceneItemsOf,
+  secondsPerItemFor,
+  subjectOf,
+  targetOf,
+  displayOf,
+  leniencyFor,
+  learnableModules,
+  itemsOf,
+  reviewItemsOf,
+  modulesOf,
+  type BlockKind,
+  type ModuleId,
+  type BlockPlan,
+  type SessionPlan,
+  type PlanInput,
+  type Pools,
+} from './session/plan.ts'
+export { planSession } from './session/adaptivePlan.ts'
 export * from './technique/encodings.ts'
 export * from './technique/major.ts'
 export * from './time.ts'
