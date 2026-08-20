@@ -147,6 +147,20 @@ export const TRAINING_MODULES = [
 export type ModuleId = (typeof TRAINING_MODULES)[number]
 
 /**
+ * Kognitiv schwere Module (O7).
+ *
+ * Die Liste ist absichtlich eng: Palast bindet mehrere Dinge an Orte,
+ * Rückwärts transformiert aktiv im Arbeitsgedächtnis, Zwillinge erzeugen
+ * gezielte Interferenz. Missionen und Bilder sind anspruchsvoll, aber nicht
+ * pauschal "schwer" — sonst würde die Regel die normale Vielfalt ausdünnen.
+ */
+const COGNITIVELY_HEAVY_MODULES: readonly ModuleId[] = ['palace', 'reverse', 'twins']
+
+export function isCognitivelyHeavy(moduleId: ModuleId): boolean {
+  return COGNITIVELY_HEAVY_MODULES.includes(moduleId)
+}
+
+/**
  * Freier Abruf oder gestützter?
  *
  * **Wörter frei** — leeres Feld, schreib auf, was geblieben ist. Das ist die
@@ -765,6 +779,7 @@ export function planSession(input: PlanInput): SessionPlan {
     return isScene(moduleId) ? left >= 1 : left >= MIN_ITEMS_PER_ROUND
   }
 
+  let previousModuleId: ModuleId | undefined
   for (let round = 1; round <= rounds; round++) {
     /*
      * Der Vorratsfilter oben sah den Vorrat **vor** der Einheit — ein
@@ -783,6 +798,29 @@ export function planSession(input: PlanInput): SessionPlan {
         .find(hasStockLeft)
       if (substitute !== undefined) moduleId = substitute
     }
+
+    /*
+     * O7 — keine zwei besonders schweren Lernrunden direkt hintereinander,
+     * sofern eine leichte Alternative mit echtem Vorrat verfügbar ist.
+     *
+     * Das ist eine Ordnungsregel, keine Ausschlussregel: Gibt es nur schwere
+     * Module oder ist der leichte Vorrat erschöpft, bleibt der ursprüngliche
+     * Plan bestehen. Nichts verschwindet, keine Session wird unplanbar und
+     * das Zeitbudget bleibt exakt gleich.
+     */
+    if (
+      previousModuleId !== undefined &&
+      isCognitivelyHeavy(previousModuleId) &&
+      isCognitivelyHeavy(moduleId) &&
+      learnFrom.length > 1
+    ) {
+      const at = learnFrom.indexOf(moduleId)
+      const lighter = learnFrom
+        .map((_, step) => learnFrom[(at + step + 1) % learnFrom.length] as ModuleId)
+        .find((candidate) => !isCognitivelyHeavy(candidate) && hasStockLeft(candidate))
+      if (lighter !== undefined) moduleId = lighter
+    }
+
     const pool = remaining.get(moduleId) as string[]
     const used = taken.get(moduleId) as number
 
@@ -839,6 +877,7 @@ export function planSession(input: PlanInput): SessionPlan {
       seconds: roundSeconds - encodeSeconds,
       items,
     })
+    previousModuleId = moduleId
   }
 
   // Das Wiedersehen kommt zuletzt — so wie in der Blockfolge aus B3. Wer
