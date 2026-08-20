@@ -51,6 +51,7 @@ export function MemoryPanel({
   const [newEdgeIds, setNewEdgeIds] = useState<ReadonlySet<string>>(new Set())
   const [clusterId, setClusterId] = useState<string | undefined>()
   const [dueNodeIds, setDueNodeIds] = useState<ReadonlySet<string>>(new Set())
+  const [reviewDayByNode, setReviewDayByNode] = useState<ReadonlyMap<string, DayKey>>(new Map())
   const reload = useCallback(() => {
     void loadMemoryGraph()
       .then(setGraph)
@@ -59,16 +60,26 @@ export function MemoryPanel({
   useEffect(() => reload(), [reload])
   useEffect(() => {
     void loadDue(training)
-      .then((items) =>
+      .then((items) => {
+        const memoryItems = items.filter((item) => moduleOf(item.itemId) === 'memory')
+        const schedule = new Map<string, DayKey>()
+        for (const item of memoryItems) {
+          const id = memoryNodeIdOfItem(wordOf(item.itemId))
+          if (id === undefined) continue
+          const existing = schedule.get(id)
+          if (existing === undefined || item.memory.dueDay < existing) {
+            schedule.set(id, item.memory.dueDay)
+          }
+        }
+        setReviewDayByNode(schedule)
         setDueNodeIds(
           new Set(
-            selectDue(items, today, Number.MAX_SAFE_INTEGER)
-              .filter((item) => moduleOf(item.itemId) === 'memory')
+            selectDue(memoryItems, today, Number.MAX_SAFE_INTEGER)
               .map((item) => memoryNodeIdOfItem(wordOf(item.itemId)))
               .filter((id): id is string => id !== undefined),
           ),
-        ),
-      )
+        )
+      })
       .catch(() => undefined)
   }, [training, today])
   // Wer hier war, braucht die Entdeckungszeile auf dem Startbildschirm nicht mehr.
@@ -116,6 +127,7 @@ export function MemoryPanel({
           )
           .filter((node): node is NonNullable<typeof node> => node !== undefined)
   const dueSoon = selected !== undefined && dueNodeIds.has(selected.id)
+  const reviewDay = selected === undefined ? undefined : reviewDayByNode.get(selected.id)
   const recalledNodeIds = new Set(
     graph.nodes
       .filter(
@@ -193,7 +205,17 @@ export function MemoryPanel({
                 </div>
                 <div>
                   <dt>{texts.nextReview}</dt>
-                  <dd>{dueSoon ? texts.dueSoon : texts.fsrsScheduled}</dd>
+                  <dd>
+                    {dueSoon
+                      ? texts.dueSoon
+                      : reviewDay === undefined
+                        ? texts.fsrsScheduled
+                        : new Date(`${reviewDay}T12:00:00Z`).toLocaleDateString(language, {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                          })}
+                  </dd>
                 </div>
               </dl>
               <button type="button" className="quiet" onClick={() => setSelectedId(undefined)}>
