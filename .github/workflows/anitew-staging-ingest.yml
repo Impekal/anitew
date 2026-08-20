@@ -6,6 +6,14 @@ on:
       - anitew-phase2-staging
     paths:
       - '.anitew-staging/phase2.part3.b64'
+  pull_request:
+    branches:
+      - anitew-redesign-v2
+    paths:
+      - '.anitew-staging/phase2.part1.b64'
+      - '.anitew-staging/phase2.part2.b64'
+      - '.anitew-staging/phase2.part3.b64'
+      - '.github/workflows/anitew-staging-ingest.yml'
 
 permissions:
   contents: write
@@ -61,6 +69,7 @@ jobs:
         run: npx playwright test --project=chromium
 
       - name: Commit validated Phase 2
+        if: github.event_name == 'pull_request'
         run: |
           git config user.name "ANITEW Staging Runner"
           git config user.email "actions@users.noreply.github.com"
