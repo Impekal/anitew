@@ -29,21 +29,17 @@ type Widen<T> = T extends string ? string : { [K in keyof T]: Widen<T[K]> }
 type SourceDictionary = Widen<typeof de>
 
 /**
- * Missions-Tatsachen wachsen unabhängig von den UI-Texten (H2).
- *
- * `missionAsk` und `missionPlaceholders` waren ursprünglich aus vier festen
- * Schlüsseln abgeleitet. H2 ergänzt eine fünfte Tatsache (`location`), ohne
- * dafür die komplette Quellübersetzung umzuschreiben: Die beiden Verzeichnisse
- * dürfen zusätzliche String-Schlüssel tragen; `dictionaryFor()` setzt die
- * zwei neuen Texte unten explizit ein. Alle übrigen Wörterbuchteile bleiben
- * weiterhin streng aus `de` abgeleitet — ein vergessener normaler Schlüssel
- * bleibt also ein TypeScript-Fehler.
+ * Missions-Tatsachen und die C3-Prognose wachsen unabhängig von den großen
+ * Quellwörterbüchern. Für diese kleinen, klar begrenzten Erweiterungen werden
+ * die zusätzlichen Schlüssel hier streng eingesetzt; der Rest des
+ * Wörterbuchs bleibt weiterhin vollständig aus `de` abgeleitet.
  */
-export type Dictionary = Omit<SourceDictionary, 'session'> & {
+export type Dictionary = Omit<SourceDictionary, 'session' | 'memory'> & {
   session: Omit<SourceDictionary['session'], 'missionAsk' | 'missionPlaceholders'> & {
     missionAsk: SourceDictionary['session']['missionAsk'] & Record<string, string>
     missionPlaceholders: SourceDictionary['session']['missionPlaceholders'] & Record<string, string>
   }
+  memory: SourceDictionary['memory'] & Record<string, string>
 }
 
 const DICTIONARIES: Partial<Record<Language, Dictionary>> = {
@@ -56,6 +52,19 @@ const MISSION_LOCATION_COPY: Readonly<
 > = {
   de: { ask: 'Wo lag der Gegenstand?', placeholder: 'Position' },
   en: { ask: 'Where was the object?', placeholder: 'Position' },
+}
+
+const MEMORY_FORECAST_COPY: Readonly<
+  Partial<Record<Language, { label: string; value: string }>>
+> = {
+  de: {
+    label: 'Vergessensprognose',
+    value: 'FSRS schätzt etwa {days} Tage bis zur 90%-Schwelle — aus mindestens drei echten Wiedersehen.',
+  },
+  en: {
+    label: 'Forgetting forecast',
+    value: 'FSRS estimates about {days} days to the 90% threshold — based on at least three real returns.',
+  },
 }
 
 /**
@@ -86,10 +95,27 @@ function withMissionLocation(dictionary: Dictionary, language: Language): Dictio
   }
 }
 
+/** C3: Modellprognose klar als Modellprognose benennen, nie als gemessene Tatsache. */
+function withMemoryForecast(dictionary: Dictionary, language: Language): Dictionary {
+  const copy =
+    MEMORY_FORECAST_COPY[language] ??
+    MEMORY_FORECAST_COPY[FALLBACK_LANGUAGE] ??
+    MEMORY_FORECAST_COPY.de
+  if (copy === undefined) return dictionary
+  return {
+    ...dictionary,
+    memory: {
+      ...dictionary.memory,
+      forgettingForecast: copy.label,
+      forgettingForecastValue: copy.value,
+    },
+  }
+}
+
 export function dictionaryFor(language: Language): Dictionary {
   const resolved = DICTIONARIES[language] ?? DICTIONARIES[FALLBACK_LANGUAGE] ?? de
   const copyLanguage = DICTIONARIES[language] === undefined ? FALLBACK_LANGUAGE : language
-  return withMissionLocation(resolved, copyLanguage)
+  return withMemoryForecast(withMissionLocation(resolved, copyLanguage), copyLanguage)
 }
 
 /** Gibt es für diese Sprache schon Texte, oder behelfen wir uns mit Englisch? */
