@@ -8,6 +8,7 @@ import './styles.css'
 import './anitew-redesign.css'
 import './anitew-phase4.css'
 import './anitew-phase4-journey.css'
+import './anitew-phase4-landing.css'
 
 // Neue Fassungen kommen von selbst an — siehe updates.ts. Steht vor dem
 // Rendern, damit auch ein Fehler in der App die Aktualisierung nicht blockiert.
