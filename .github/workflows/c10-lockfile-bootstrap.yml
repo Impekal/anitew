@@ -1,0 +1,31 @@
+name: C10 lockfile bootstrap
+
+on:
+  push:
+    branches:
+      - anitew-phase6-c10-wasi-runtime
+
+permissions:
+  contents: write
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: anitew-phase6-c10-wasi-runtime
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Resolve official FSRS WASI dependencies
+        run: npm install --package-lock-only --save-exact @open-spaced-repetition/binding@0.5.0 @open-spaced-repetition/binding-wasm32-wasi@0.5.0
+      - name: Commit resolver output
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- package.json package-lock.json
+          git diff --cached --quiet && exit 0
+          git commit -m "Resolve C10 WASI dependencies"
+          git push origin HEAD:anitew-phase6-c10-wasi-runtime
