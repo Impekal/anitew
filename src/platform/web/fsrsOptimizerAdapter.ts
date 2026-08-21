@@ -5,11 +5,11 @@ import {
 } from '../../core/index.ts'
 
 /** Minimal surface used from the public-beta FSRS WASI binding. */
-export interface FsrsOptimizerBinding {
-  readonly FSRSBindingReview: new (rating: 1 | 3, deltaDays: number) => unknown
-  readonly FSRSBindingItem: new (reviews: unknown[]) => unknown
+export interface FsrsOptimizerBinding<Review = unknown, Item = unknown> {
+  readonly FSRSBindingReview: new (rating: 1 | 3, deltaDays: number) => Review
+  readonly FSRSBindingItem: new (reviews: Review[]) => Item
   computeParameters(
-    items: unknown[],
+    items: Item[],
     options: {
       readonly enableShortTerm: false
       readonly numRelearningSteps: 0
@@ -26,8 +26,8 @@ export interface FsrsOptimizerBinding {
  * returned by the binding is allowed to cross back into core, where it is
  * validated before persistence or scheduling.
  */
-export function createFsrsBindingOptimizer(
-  binding: FsrsOptimizerBinding,
+export function createFsrsBindingOptimizer<Review, Item>(
+  binding: FsrsOptimizerBinding<Review, Item>,
 ): SchedulerOptimizerPort {
   return {
     async optimize(histories: readonly OptimizerItemHistory[]): Promise<unknown> {
