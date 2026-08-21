@@ -4,17 +4,17 @@ import {
   type FsrsOptimizerBinding,
 } from './fsrsOptimizerAdapter.ts'
 
-export interface FsrsDynamicWasiModule {
+export interface FsrsDynamicWasiModule<Review = unknown, Item = unknown> {
   initOptimizer(options: {
     readonly wasm: string
     readonly worker: () => Worker
-  }): Promise<FsrsOptimizerBinding>
+  }): Promise<FsrsOptimizerBinding<Review, Item>>
 }
 
-export interface BrowserFsrsRuntimeOptions {
+export interface BrowserFsrsRuntimeOptions<Review = unknown, Item = unknown> {
   readonly wasmUrl: string
   readonly createWorker: () => Worker
-  readonly loadDynamicWasi: () => Promise<FsrsDynamicWasiModule>
+  readonly loadDynamicWasi: () => Promise<FsrsDynamicWasiModule<Review, Item>>
   readonly crossOriginIsolated?: boolean
 }
 
@@ -29,8 +29,8 @@ export type BrowserFsrsRuntimeResult =
  * If the page is not cross-origin isolated, ANITEW leaves scheduling untouched
  * instead of attempting a worker/WASM launch that cannot be relied on.
  */
-export async function createBrowserFsrsOptimizerRuntime(
-  options: BrowserFsrsRuntimeOptions,
+export async function createBrowserFsrsOptimizerRuntime<Review, Item>(
+  options: BrowserFsrsRuntimeOptions<Review, Item>,
 ): Promise<BrowserFsrsRuntimeResult> {
   const isolated = options.crossOriginIsolated ?? globalThis.crossOriginIsolated === true
   if (!isolated) {
