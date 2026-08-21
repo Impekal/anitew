@@ -108,12 +108,12 @@ export async function leavePage(page: Page) {
 /**
  * Startet den Notfallmodus und überspringt das Ankommen.
  *
- * Und noch eines, seit es das Rückwärts-Modul gibt (D7): Fast alle
- * Prüfungen, die hiermit starten, setzen voraus, dass die Einheit
- * **Termine hinterlässt** — eine Rückwärts-Runde tut das absichtlich nicht
- * (D-026) und würde sie zufällig rot machen, je nachdem, was der Seed
- * zieht. Deshalb wird eine Rückwärts-Runde abgebrochen und neu gezogen;
- * das Modul selbst hat seine eigene Prüfung (`reverse.spec.ts`).
+ * Rückwärts und D12-Spatial haben eigene Antwortformen. Die vielen älteren
+ * E2E-Helfer, die anschließend `collectItems`/`answerRecall` verwenden,
+ * lesen dagegen bewusst nur Wort-/Prompt-/Szenenrunden. Deshalb werden diese
+ * beiden spezialisierten Module hier neu gezogen; ihre Semantik wird in ihren
+ * eigenen E2E- und Kerntests geprüft. So rät der gemeinsame Helfer nicht über
+ * eine Antwortform, die er gar nicht lesen kann.
  */
 export async function startEmergency(page: Page) {
   for (let attempt = 0; attempt < 25; attempt++) {
@@ -123,18 +123,9 @@ export async function startEmergency(page: Page) {
     // nicht drei Sekunden auf einen atmenden Kreis.
     await page.locator('.settle').click()
 
-    /*
-     * Welches Modul die Runde hat, steht **im persistierten Plan** — die
-     * App schreibt ihn beim Start in die Einstellungen (B5). Von dort zu
-     * lesen ist deterministisch; zwei Anläufe, es am Bildschirm zu erraten,
-     * hatten je ein Schlupfloch, und je ein voller Lauf hat es getroffen.
-     */
     const moduleId = await pollFirstModule(page)
-    if (moduleId !== 'reverse') {
-      // D12 ergänzt eine echte räumliche Einprägeansicht. Sie ist ebenso ein
-      // gültiger Startzustand wie Wort oder Szene und darf den gemeinsamen
-      // Helfer nicht zufällig in einen Timeout schicken.
-      await expect(page.locator('.encode-word, .scene, .spatial-encode').first()).toBeVisible({
+    if (moduleId !== 'reverse' && moduleId !== 'spatial') {
+      await expect(page.locator('.encode-word, .scene').first()).toBeVisible({
         timeout: 15_000,
       })
       return
@@ -143,7 +134,7 @@ export async function startEmergency(page: Page) {
     await page.locator('.session-abort').click()
     await expect(page.locator('.challenge')).toBeVisible()
   }
-  throw new Error('in 25 Anläufen kam keine Runde mit Terminen')
+  throw new Error('in 25 Anläufen kam keine kompatible Runde mit Terminen')
 }
 
 /** Das Modul des ersten Blocks, aus dem persistierten Plan gelesen. */
@@ -227,36 +218,10 @@ export async function collectItems(page: Page, limit = 12): Promise<Learned> {
 
   const word = page.locator('.encode-word')
   const seen: string[] = []
-  /*
-   * Mit Frist, und das ist eine Lehre aus einem einzigen Fehlschlag in einem
-   * vollen Lauf: Die Schleife hatte keinen Ausgang außer dem Beginn des
-   * Abrufs. Als der einmal ausblieb, drehte sie drei Minuten lang, bis die
-   * Prüfung an ihrer eigenen Zeitgrenze starb — mit einer Fehlermeldung, die
-   * auf `waitForTimeout` zeigte und damit auf gar nichts.
-   *
-   * Neunzig Sekunden sind großzügig: Der längste Einprägeblock (ein Gang,
-   * fünf Stationen à sechs Sekunden) dauert dreißig. Wer hier anschlägt, hat
-   * kein Zeitproblem, sondern ein anderes — und liest das jetzt auch.
-   */
   const deadline = Date.now() + 90_000
   while (seen.length < limit) {
-    // Der Abruf beginnt mit einem Feld — oder, bei den Zwillingen (D-027),
-    // mit zwei Knöpfen. Wer nur auf das Feld wartet, sitzt dort die ganze
-    // Runde ab, bis die Einheit über ihn hinweg zu Ende geht.
     if ((await page.locator('.recall-input, .twin-choice').count()) > 0) break
     expect(Date.now(), 'der Abruf hat nicht begonnen').toBeLessThan(deadline)
-    /*
-     * Mit **kurzer** Frist, und das ist der eigentliche Fehler, den zwei
-     * hängende Prüfungen gekostet haben: `textContent()` wartet von Haus aus
-     * dreißig Sekunden darauf, dass es das Element gibt. Sobald der Abruf
-     * beginnt, verschwindet `.encode-word` — die Schleife hing dann eine halbe
-     * Minute in dieser einen Zeile, während der Abrufblock ablief und die
-     * Einheit weiterlief. Wenn sie wieder aufwachte, war die Einheit vorbei
-     * und `.recall-input` nie wieder da.
-     *
-     * **Ein Warten ohne Frist in einer Schleife, die pollen soll, schaltet
-     * das Pollen ab.**
-     */
     const text = (await word.textContent({ timeout: 1000 }).catch(() => null))?.trim()
     if (text !== undefined && text !== '' && text !== seen[seen.length - 1]) seen.push(text)
     await page.waitForTimeout(150)
@@ -270,35 +235,10 @@ export async function recallKind(page: Page): Promise<'prompted' | 'free'> {
   return (await page.locator('.prompted').count()) > 0 ? 'prompted' : 'free'
 }
 
-/**
- * Wie viel geantwortet wird.
- *
- * `allButLast` lässt die letzte Antwort offen — was fehlt, gilt als nicht
- * erinnert, und das ist der Normalfall, wenn die Zeit ausläuft. Es steht als
- * Angabe am Aufruf und nicht als gekürzte Antwortliste: Bei einer Mission
- * kommen die Antworten aus der Szene und nicht aus der Liste, eine gekürzte
- * Liste bliebe dort wirkungslos. Genau das ist mir beim ersten Anlauf
- * passiert — der Test kürzte etwas, das gar nicht gelesen wurde, und erwartete
- * dann eine fehlende Antwort, die es nie gab.
- */
+/** Wie viel geantwortet wird. */
 export type Give = 'all' | 'none' | 'allButLast'
 
-/**
- * Beantwortet den offenen Abrufblock und lässt ihn hinter sich.
- *
- * Beim freien Abruf steht alles in einem Feld, beim gestützten kommt ein
- * Gesicht nach dem anderen. Wie viele es sind, steht in der App selbst
- * („3 / 5“) — der Test zählt nicht mit, sondern liest nach. Sonst liefe er
- * bei einer Abweichung entweder in einen Block hinein, der ihm nicht gehört,
- * oder gar nicht mehr heraus.
- *
- * Bei einer **Mission** wird nach der Frage geantwortet und nicht nach der
- * Stelle. Der Grund ist eine Lehre aus dem ersten Anlauf: Die Szene zeigt
- * Zimmer · Abfahrt · Dabei · Restaurant, gefragt wird Zimmer · Dabei · Lage ·
- * Abfahrt · Restaurant. Dass die beiden Reihenfolgen auseinanderfallen, ist
- * kein Fehler, sondern gut so — wer die Reihenfolge mitlernen kann, lernt die
- * Reihenfolge statt die Szene. Nur darf der Test sie eben nicht raten.
- */
+/** Beantwortet den offenen Abrufblock und lässt ihn hinter sich. */
 export async function answerRecall(page: Page, learned: Learned, give: Give) {
   if ((await recallKind(page)) === 'free') {
     const wanted =
@@ -318,21 +258,7 @@ export async function answerRecall(page: Page, learned: Learned, give: Give) {
     await input.or(choice).first().waitFor({ timeout: 30_000 })
     const skip = give === 'none' || (give === 'allButLast' && index === total - 1)
 
-    /*
-     * Zwillinge (D-027) antworten per Knopf, nicht per Feld. „Nicht
-     * antworten“ gibt es dort als Geste nicht — wer nichts weiß, rät. Der
-     * Test bildet das ab: `skip` drückt den **falschen** Knopf. Exakter
-     * Name, nicht Teilzeichenkette — die beiden Wörter sind einander zum
-     * Verwechseln ähnlich, das ist ihr Beruf.
-     */
     if ((await choice.count()) > 0) {
-      /*
-       * Nicht nach Position raten: Im Wiedersehensblock kommen die Fragen
-       * in der Reihenfolge der Fälligkeit, nicht des Lernens — ein voller
-       * Lauf hat den Klick auf einen Knopf gesucht, den es an dieser Frage
-       * nie gab. Gelesen wird stattdessen, was die Knöpfe anbieten, und
-       * gewählt das Wort, das beim Einprägen dastand.
-       */
       const words = (await choice.allTextContents()).map((word) => word.trim())
       const right = words.find((word) => learned.items.includes(word)) ?? words[0] ?? ''
       const wrong = words.find((word) => word !== right) ?? right
@@ -350,13 +276,6 @@ export async function answerRecall(page: Page, learned: Learned, give: Give) {
 
 /** Die Antwort für die Stelle, an der der Abruf gerade steht. */
 async function answerAt(page: Page, learned: Learned, index: number): Promise<string> {
-  /*
-   * Rückwärts (D7): Die Folge steht kurz da und wird dann nur unsichtbar,
-   * nicht entfernt — der Test liest sie ab (auch verdeckt liefert
-   * `textContent` den Text) und dreht sie um. Das Eintippen wartet von
-   * selbst, bis das Feld freigegeben ist: `fill` tippt nie in ein
-   * gesperrtes Feld.
-   */
   const reveal = page.locator('.reveal-digits')
   if ((await reveal.count()) > 0) {
     const digits = ((await reveal.textContent()) ?? '').trim()
@@ -365,14 +284,6 @@ async function answerAt(page: Page, learned: Learned, index: number): Promise<st
 
   if (learned.scene === undefined) return learned.items[index] ?? ''
 
-  /*
-   * Beim Palast steht die Frage nicht im Text, sondern auf dem Schild: „Was
-   * lag hier?“ ist bei allen fünf Stationen dieselbe Frage — welche gemeint
-   * ist, sagt der Ort darüber. Der Test liest ihn ab, statt die Reihenfolge
-   * des Weges vorherzusagen; dass sie hier tatsächlich stimmt, ist eine
-   * Eigenschaft der Technik und keine, auf die er sich stützen sollte.
-   */
-  // Beim Bild sagt die Hervorhebung, welches Ding gefragt ist.
   const askedGlyph = page.locator('.gaze-asked .gaze-glyph')
   if ((await askedGlyph.count()) > 0) {
     const object = (await askedGlyph.getAttribute('data-object')) ?? ''
@@ -390,8 +301,6 @@ async function answerAt(page: Page, learned: Learned, index: number): Promise<st
   }
 
   const question = ((await page.locator('.prompted .hint').first().textContent()) ?? '').trim()
-  // Im Wiedersehensblock steht ein Vorspann davor („Und von früher: …“) —
-  // gesucht ist die Frage selbst.
   const asked = question.replace(/^.*?von früher:\s*/i, '')
   const label = MISSION_LABEL_OF_QUESTION.get(asked)
   expect(label, `unbekannte Frage: „${question}“`).toBeDefined()
