@@ -4,12 +4,16 @@ on:
   push:
     branches:
       - anitew-phase6-c10-wasi-runtime
+  pull_request:
+    branches:
+      - anitew-redesign-v2
 
 permissions:
   contents: write
 
 jobs:
   resolve:
+    if: github.head_ref == 'anitew-phase6-c10-wasi-runtime' || github.ref_name == 'anitew-phase6-c10-wasi-runtime'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
