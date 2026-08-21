@@ -83,6 +83,14 @@ export interface EventRow {
    * Schemaversion.
    */
   module?: string
+  /**
+   * C10: vollständige Identität genau des FSRS-Items, das diese Antwort
+   * fortschreibt (`modul:sprache:item`). Nur echte Scheduler-Antworten tragen
+   * sie. Alte Ereignisse bleiben absichtlich leer statt rückwirkend geraten.
+   */
+  schedulerItemId?: string
+  /** Trainingstag derselben Scheduler-Antwort (4-Uhr-Tagesgrenze). */
+  schedulerDay?: DayKey
   correct?: boolean
   /** Antwortzeit in Millisekunden, gemessen mit der monotonen Uhr. */
   latencyMs?: number

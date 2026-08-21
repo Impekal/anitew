@@ -192,6 +192,9 @@ export function useSessionRunner(
         // Das echte Modul, nicht die Blockart — daraus zählen die
         // Sofort-Achsen des Profils (D-026).
         block.moduleId,
+        // C10: Nur Module, die wirklich einen FSRS-Termin fortschreiben,
+        // tragen vollständige Scheduler-ID + Trainingstag ins Rohprotokoll.
+        entersReview(block.moduleId) ? { language: plan.language, day: plan.day } : undefined,
       ).catch(() => undefined)
 
       /*
