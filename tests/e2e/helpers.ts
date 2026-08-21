@@ -131,9 +131,10 @@ export async function startEmergency(page: Page) {
      */
     const moduleId = await pollFirstModule(page)
     if (moduleId !== 'reverse') {
-      // Und erst zurück, wenn der Einprägeblock wirklich steht — das ist,
-      // worauf jeder Aufrufer als Nächstes wartet.
-      await expect(page.locator('.encode-word, .scene').first()).toBeVisible({
+      // D12 ergänzt eine echte räumliche Einprägeansicht. Sie ist ebenso ein
+      // gültiger Startzustand wie Wort oder Szene und darf den gemeinsamen
+      // Helfer nicht zufällig in einen Timeout schicken.
+      await expect(page.locator('.encode-word, .scene, .spatial-encode').first()).toBeVisible({
         timeout: 15_000,
       })
       return
