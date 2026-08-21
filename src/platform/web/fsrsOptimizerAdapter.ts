@@ -7,9 +7,9 @@ import {
 /** Minimal surface used from the public-beta FSRS WASI binding. */
 export interface FsrsOptimizerBinding {
   readonly FSRSBindingReview: new (rating: 1 | 3, deltaDays: number) => unknown
-  readonly FSRSBindingItem: new (reviews: readonly unknown[]) => unknown
+  readonly FSRSBindingItem: new (reviews: unknown[]) => unknown
   computeParameters(
-    items: readonly unknown[],
+    items: unknown[],
     options: {
       readonly enableShortTerm: false
       readonly numRelearningSteps: 0
