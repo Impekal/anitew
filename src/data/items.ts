@@ -22,8 +22,6 @@ import {
   review,
 } from '../core/index.ts'
 import { type ItemStateRow, db } from './db.ts'
-import { refreshSchedulerPersonalization } from './schedulerPersonalization.ts'
-import { loadOptimizedSchedulerWeights } from './schedulerWeights.ts'
 
 /** Das Modul, zu dem die Wortlisten gehören. */
 export const WORD_MODULE = 'words'
@@ -77,9 +75,10 @@ export async function recordOutcome(
   ]
   if (entries.length === 0) return
 
-  // C10: Nur bereits validierte, lokal persistierte Gewichte dürfen einen
-  // Termin beeinflussen. Ein fehlender/kaputter Wert fällt in der Ladeschicht
-  // auf `undefined` zurück und lässt damit exakt den bisherigen Scheduler laufen.
+  // C10: Personalisierung gehört nicht zum Kaltstart. Erst wenn wirklich ein
+  // Ergebnis geschrieben wird, laden wir die kleine Persistenzschicht und
+  // verwenden ausschließlich bereits validierte lokale Gewichte.
+  const { loadOptimizedSchedulerWeights } = await import('./schedulerWeights.ts')
   const weights = await loadOptimizedSchedulerWeights()
 
   await db.transaction('rw', db.itemStates, async () => {
@@ -108,9 +107,12 @@ export async function recordOutcome(
     }
   })
 
-  // Optimization is best-effort and cadence-gated. The answer above is always
-  // scheduled first; newly learned weights can only affect later scheduling.
-  void refreshSchedulerPersonalization()
+  // Auch die Optimizer-Orchestrierung bleibt vollständig aus dem Kaltstart.
+  // Fehler beim Laden oder Optimieren sind best-effort und dürfen das gerade
+  // erfolgreich gespeicherte Scheduling niemals zurückrollen.
+  void import('./schedulerPersonalization.ts')
+    .then(({ refreshSchedulerPersonalization }) => refreshSchedulerPersonalization())
+    .catch(() => undefined)
 }
 
 /**
