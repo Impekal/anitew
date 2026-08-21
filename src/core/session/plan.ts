@@ -31,9 +31,6 @@ export function isPrompted(moduleId: ModuleId): boolean {
   return moduleId === 'spatial' || base.isPrompted(moduleId as base.ModuleId)
 }
 
-// Für unbekannte Module verwendet der stabile Basisplaner bereits die
-// allgemeinen Defaults. Diese Funktionen brauchen daher nur eine breitere
-// Typgrenze und keinen zusätzlichen Runtime-Wrapper.
 export const entersReview = base.entersReview as (moduleId: ModuleId) => boolean
 export const asksOnSight = base.asksOnSight as (moduleId: ModuleId) => boolean
 export const isCognitivelyHeavy = base.isCognitivelyHeavy as (moduleId: ModuleId) => boolean
@@ -59,10 +56,12 @@ export function leniencyFor(moduleId: ModuleId, item?: string): Leniency {
   return moduleId === 'spatial' ? 'exact' : base.leniencyFor(moduleId as base.ModuleId, item)
 }
 
-export const learnableModules = base.learnableModules as (
+export function learnableModules(
   totalSeconds: number,
-  modules?: readonly ModuleId[],
-) => readonly ModuleId[]
+  modules: readonly ModuleId[] = TRAINING_MODULES,
+): readonly ModuleId[] {
+  return base.learnableModules(totalSeconds, modules as readonly base.ModuleId[]) as readonly ModuleId[]
+}
 
 export function planSession(input: PlanInput): SessionPlan {
   const pools = {
