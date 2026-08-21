@@ -9,12 +9,25 @@ import {
   type OptimizerRunResult,
   type SchedulerOptimizerPort,
 } from '../../core/index.ts'
-import { createBrowserFsrsOptimizerRuntime } from './fsrsOptimizerRuntime.ts'
+import {
+  createBrowserFsrsOptimizerRuntime,
+  type BrowserFsrsRuntimeResult,
+} from './fsrsOptimizerRuntime.ts'
 
 export type BrowserWasiOptimizationResult =
   | OptimizerRunResult
   | { readonly status: 'runtime-unavailable'; readonly returnCount: number }
   | { readonly status: 'optimizer-failed'; readonly returnCount: number }
+
+type BrowserRuntimeFactory = () => Promise<BrowserFsrsRuntimeResult>
+
+async function createOfficialRuntime(): Promise<BrowserFsrsRuntimeResult> {
+  return createBrowserFsrsOptimizerRuntime({
+    wasmUrl,
+    createWorker: () => new WasiWorker(),
+    loadDynamicWasi: async () => ({ initOptimizer }),
+  })
+}
 
 /**
  * Official browser/WASI optimizer port for Vite.
@@ -23,14 +36,12 @@ export type BrowserWasiOptimizationResult =
  * Runtime construction stays inside optimize(), so the existing core cadence
  * decides first whether expensive local training is due.
  */
-export function createOfficialBrowserFsrsOptimizer(): SchedulerOptimizerPort {
+export function createOfficialBrowserFsrsOptimizer(
+  runtimeFactory: BrowserRuntimeFactory = createOfficialRuntime,
+): SchedulerOptimizerPort {
   return {
     async optimize(histories: readonly OptimizerItemHistory[]): Promise<unknown> {
-      const runtime = await createBrowserFsrsOptimizerRuntime({
-        wasmUrl,
-        createWorker: () => new WasiWorker(),
-        loadDynamicWasi: async () => ({ initOptimizer }),
-      })
+      const runtime = await runtimeFactory()
 
       if (runtime.status !== 'ready') {
         throw new Error(`FSRS browser runtime unavailable: ${runtime.reason}`)
@@ -49,6 +60,7 @@ export function createOfficialBrowserFsrsOptimizer(): SchedulerOptimizerPort {
 export async function optimizeBrowserFsrsWeightsIfDue(
   histories: readonly OptimizerItemHistory[],
   lastOptimizedReturnCount: number | undefined,
+  runtimeFactory: BrowserRuntimeFactory = createOfficialRuntime,
 ): Promise<BrowserWasiOptimizationResult> {
   const returnCount = optimizerReturnCount(histories)
 
@@ -56,7 +68,7 @@ export async function optimizeBrowserFsrsWeightsIfDue(
     return await optimizeSchedulerWeightsIfDue(
       histories,
       lastOptimizedReturnCount,
-      createOfficialBrowserFsrsOptimizer(),
+      createOfficialBrowserFsrsOptimizer(runtimeFactory),
     )
   } catch {
     return {
