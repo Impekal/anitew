@@ -4,14 +4,10 @@ import {
   type SchedulerOptimizerPort,
 } from '../../core/index.ts'
 
-interface FsrsBindingConstructor<T> {
-  new (...args: never[]): T
-}
-
 /** Minimal surface used from the public-beta FSRS WASI binding. */
 export interface FsrsOptimizerBinding {
-  readonly FSRSBindingReview: FsrsBindingConstructor<unknown>
-  readonly FSRSBindingItem: FsrsBindingConstructor<unknown>
+  readonly FSRSBindingReview: new (rating: 1 | 3, deltaDays: number) => unknown
+  readonly FSRSBindingItem: new (reviews: readonly unknown[]) => unknown
   computeParameters(
     items: readonly unknown[],
     options: {
