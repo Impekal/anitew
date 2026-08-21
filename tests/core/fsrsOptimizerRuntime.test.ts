@@ -33,11 +33,14 @@ describe('FSRS browser runtime gate', () => {
 
     const worker = {} as Worker
     const computeParameters = vi.fn(() => Array.from({ length: 19 }, (_, index) => index + 1))
-    const initOptimizer = vi.fn(async () => ({
-      FSRSBindingReview: Review,
-      FSRSBindingItem: Item,
-      computeParameters,
-    }))
+    const initOptimizer = vi.fn(async (options: { wasm: string; worker: () => Worker }) => {
+      void options
+      return {
+        FSRSBindingReview: Review,
+        FSRSBindingItem: Item,
+        computeParameters,
+      }
+    })
     const loadDynamicWasi = vi.fn(async () => ({ initOptimizer }))
 
     const result = await createBrowserFsrsOptimizerRuntime({
