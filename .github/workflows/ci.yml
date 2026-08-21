@@ -28,7 +28,10 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
+      # The official browser WASI asset package intentionally declares cpu=wasm32.
+      # `--force` is required only so npm materializes that static asset on the
+      # x64 CI host; Vite ships it to the browser and never executes it on x64.
+      - run: npm ci --force
       - name: Typen prüfen (App und Kern getrennt)
         run: npm run typecheck
       - name: Tests (Kern, ohne Browser)
