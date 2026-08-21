@@ -1,13 +1,3 @@
-/**
- * D12 — räumliches Gedächtnis als dünne Erweiterung des stabilen Sessionplaners.
- *
- * Der bestehende Planer bleibt unverändert als `planBase.ts`. Dieser Adapter
- * erweitert ausschließlich seine Modulsprache um `spatial`, erzeugt dessen
- * sprachfreien deterministischen Vorrat aus dem Session-Seed und gibt dem
- * Abruf eine exakt prüfbare Zielzelle. Reihenfolge, Zeitbudget, Reviews und
- * alle übrigen Module bleiben beim bewährten Basisplan.
- */
-
 import { spatialCellOf, spatialPool } from '../content/spatial.ts'
 import * as base from './planBase.ts'
 import type { Leniency } from './grading.ts'
@@ -26,12 +16,6 @@ export interface SessionPlan extends Omit<base.SessionPlan, 'focus' | 'blocks'> 
   blocks: readonly BlockPlan[]
 }
 
-/**
- * Alle bisherigen Vorräte bleiben Pflicht. Spatial ist die einzige Ausnahme:
- * Der Vorrat ist sprachfrei und vollständig aus dem Session-Seed ableitbar,
- * deshalb darf ein Aufrufer ihn zum Testen überschreiben, muss ihn aber nicht
- * parallel zur deterministischen Wahrheit speichern.
- */
 export type Pools = Readonly<base.Pools & { spatial?: readonly string[] }>
 
 export interface PlanInput
@@ -47,88 +31,57 @@ export function isPrompted(moduleId: ModuleId): boolean {
   return moduleId === 'spatial' || base.isPrompted(moduleId as base.ModuleId)
 }
 
-export function entersReview(moduleId: ModuleId): boolean {
-  return base.entersReview(moduleId as base.ModuleId)
-}
-
-export function asksOnSight(moduleId: ModuleId): boolean {
-  return moduleId !== 'spatial' && base.asksOnSight(moduleId as base.ModuleId)
-}
-
-export function isCognitivelyHeavy(moduleId: ModuleId): boolean {
-  return moduleId !== 'spatial' && base.isCognitivelyHeavy(moduleId as base.ModuleId)
-}
-
-export function isScene(moduleId: ModuleId): boolean {
-  return moduleId !== 'spatial' && base.isScene(moduleId as base.ModuleId)
-}
-
-export function sceneItemsOf(moduleId: ModuleId, anchor: string): readonly string[] {
-  return base.sceneItemsOf(moduleId as base.ModuleId, anchor)
-}
-
-export function secondsPerItemFor(moduleId: ModuleId): number {
-  return moduleId === 'spatial' ? base.SECONDS_PER_ITEM : base.secondsPerItemFor(moduleId as base.ModuleId)
-}
-
-export function subjectOf(moduleId: ModuleId, item: string): string {
-  return base.subjectOf(moduleId as base.ModuleId, item)
-}
+// Für unbekannte Module verwendet der stabile Basisplaner bereits die
+// allgemeinen Defaults. Diese Funktionen brauchen daher nur eine breitere
+// Typgrenze und keinen zusätzlichen Runtime-Wrapper.
+export const entersReview = base.entersReview as (moduleId: ModuleId) => boolean
+export const asksOnSight = base.asksOnSight as (moduleId: ModuleId) => boolean
+export const isCognitivelyHeavy = base.isCognitivelyHeavy as (moduleId: ModuleId) => boolean
+export const isScene = base.isScene as (moduleId: ModuleId) => boolean
+export const sceneItemsOf = base.sceneItemsOf as (
+  moduleId: ModuleId,
+  anchor: string,
+) => readonly string[]
+export const secondsPerItemFor = base.secondsPerItemFor as (moduleId: ModuleId) => number
+export const subjectOf = base.subjectOf as (moduleId: ModuleId, item: string) => string
+export const displayOf = base.displayOf as (
+  moduleId: ModuleId,
+  item: string,
+  language: string,
+) => string
 
 export function targetOf(moduleId: ModuleId, item: string, language: string): string {
   if (moduleId === 'spatial') return spatialCellOf(item) ?? item
   return base.targetOf(moduleId as base.ModuleId, item, language)
 }
 
-export function displayOf(moduleId: ModuleId, item: string, language: string): string {
-  return base.displayOf(moduleId as base.ModuleId, item, language)
-}
-
 export function leniencyFor(moduleId: ModuleId, item?: string): Leniency {
   return moduleId === 'spatial' ? 'exact' : base.leniencyFor(moduleId as base.ModuleId, item)
 }
 
-export function learnableModules(
+export const learnableModules = base.learnableModules as (
   totalSeconds: number,
-  modules: readonly ModuleId[] = TRAINING_MODULES,
-): readonly ModuleId[] {
-  return base.learnableModules(totalSeconds, modules as readonly base.ModuleId[]) as readonly ModuleId[]
-}
+  modules?: readonly ModuleId[],
+) => readonly ModuleId[]
 
-/**
- * Der Basisplan kann unbekannte Modulkennungen bereits generisch planen:
- * Spatial ist keine Szene, fragt nicht auf Sicht und nutzt dieselbe
- * Einprägen/Abrufen-Struktur wie Wörter. Wir geben ihm deshalb den echten
- * Spatial-Vorrat und lassen ihn Zeitbudget, Rotation und fällige Reviews wie
- * immer bauen. Nur die Typgrenze sitzt hier, an genau einer Stelle.
- */
 export function planSession(input: PlanInput): SessionPlan {
   const pools = {
     ...input.pools,
     spatial: input.pools.spatial ?? spatialPool(input.seed, 40),
   }
-  const plan = base.planSession({
+  return base.planSession({
     ...input,
     pools,
     modules: input.modules ?? TRAINING_MODULES,
-  } as unknown as base.PlanInput)
-  return plan as unknown as SessionPlan
+  } as unknown as base.PlanInput) as unknown as SessionPlan
 }
 
-export function itemsOf(plan: SessionPlan, moduleId?: ModuleId): string[] {
-  return base.itemsOf(
-    plan as unknown as base.SessionPlan,
-    moduleId as base.ModuleId | undefined,
-  )
-}
-
-export function reviewItemsOf(plan: SessionPlan, moduleId?: ModuleId): string[] {
-  return base.reviewItemsOf(
-    plan as unknown as base.SessionPlan,
-    moduleId as base.ModuleId | undefined,
-  )
-}
-
-export function modulesOf(plan: SessionPlan): ModuleId[] {
-  return base.modulesOf(plan as unknown as base.SessionPlan) as ModuleId[]
-}
+export const itemsOf = base.itemsOf as (
+  plan: SessionPlan,
+  moduleId?: ModuleId,
+) => string[]
+export const reviewItemsOf = base.reviewItemsOf as (
+  plan: SessionPlan,
+  moduleId?: ModuleId,
+) => string[]
+export const modulesOf = base.modulesOf as (plan: SessionPlan) => ModuleId[]
