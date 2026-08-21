@@ -32,11 +32,6 @@
  * im Code, weil die nächste Achse ohne Modul wieder ehrlich „nicht
  * gemessen“ sagen soll statt einen leeren Balken zu zeigen (D-016).
  *
- * **Räumlich** kommt seit D12 aus einer eigenen 3×3-Positionsaufgabe. Der
- * Gedächtnispalast bleibt eine Technik zum Binden von Dingen an Orte; ihn als
- * Messgerät für allgemeines räumliches Erinnern zu verwenden wäre eine
- * bequemere, aber andere Aussage.
- *
  * **Aufmerksamkeit** zählt seit den Zwillingen (C6/D-027) das, was ihr Name
  * in der Anzeige sagt: Ähnliches auseinanderhalten — Wiedersehen nach
  * Tagen, dieselbe Währung wie die anderen Modul-Achsen.
@@ -96,7 +91,7 @@ export const SOURCES: Readonly<Record<DimensionId, DimensionSource>> = {
   words: { kind: 'module', moduleId: 'words' },
   faces: { kind: 'module', moduleId: 'faces' },
   numbers: { kind: 'module', moduleId: 'numbers' },
-  spatial: { kind: 'module', moduleId: 'spatial' },
+  spatial: { kind: 'module', moduleId: 'palace' },
   binding: { kind: 'module', moduleId: 'missions' },
   visual: { kind: 'module', moduleId: 'gaze' },
   attention: { kind: 'module', moduleId: 'twins' },
