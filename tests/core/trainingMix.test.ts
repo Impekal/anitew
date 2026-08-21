@@ -28,12 +28,16 @@ describe('Phase 6.1 — persönlicher Trainingsmix', () => {
     expect(decision.kind).toBe('balanced')
   })
 
-  it('verspricht keinen Schwerpunkt, der in der gewählten Zeit nicht trainierbar ist', () => {
+  it('nutzt D12 räumlich auch im Kurzmodus, sobald das Modul dort wirklich trainierbar ist', () => {
     const counts = { spatial: full(60, 40), words: full(60, 3), faces: full(60, 5) }
-    expect(adaptiveTrainingMix(counts, 60)).toEqual({ kind: 'balanced' })
+    expect(adaptiveTrainingMix(counts, 60)).toEqual({
+      kind: 'focus',
+      moduleId: 'spatial',
+      dimensionId: 'spatial',
+    })
     expect(adaptiveTrainingMix(counts, 300)).toEqual({
       kind: 'focus',
-      moduleId: 'palace',
+      moduleId: 'spatial',
       dimensionId: 'spatial',
     })
   })
