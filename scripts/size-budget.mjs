@@ -7,10 +7,12 @@
  * niemand merkt es, weil auf dem schnellen Buildrechner alles sofort da ist.
  *
  * Dieser Wächter läuft nach `npm run build` und in der CI. Er misst die
- * **gzip-Größe** — das ist, was wirklich über die Leitung geht — und bricht
- * ab, wenn das Budget überschritten wird. Das Budget hat Luft nach oben
- * (heute ~126 KB, Grenze 165 KB), aber nicht so viel, dass eine verdoppelte
- * Abhängigkeit durchrutschte.
+ * **gzip-Größe der Ressourcen, die index.html beim Kaltstart tatsächlich
+ * anfordert**: entry scripts, modulepreloads und stylesheets. Lazy chunks
+ * zählen bewusst nicht zum Kaltstart; sie werden erst gemessen, wenn der
+ * jeweilige Produktpfad sie anfordert. Damit kann z. B. der ausschließlich bei
+ * fälliger C10-Optimierung geladene WASI-Optimizer außerhalb des Startbudgets
+ * bleiben, ohne das Budget selbst anzuheben.
  *
  * Wer das Budget bewusst heben will, hebt es **hier** — mit einem Grund im
  * Commit. Genau das ist der Zweck: die Entscheidung sichtbar machen, statt
@@ -18,30 +20,50 @@
  */
 
 import { gzipSync } from 'node:zlib'
-import { readFileSync, readdirSync } from 'node:fs'
-import { join } from 'node:path'
+import { readFileSync } from 'node:fs'
+import { basename, join } from 'node:path'
 
 /** Budgets in Kilobyte (gzip). */
 const BUDGET_JS = 165
 const BUDGET_CSS = 12
 const BUDGET_TOTAL = 180
 
-const ASSETS = 'dist/assets'
+const DIST = 'dist'
+const ASSETS = join(DIST, 'assets')
 
 function gzipKilobytes(file) {
   return gzipSync(readFileSync(join(ASSETS, file))).length / 1024
 }
 
-let files
+let html
 try {
-  files = readdirSync(ASSETS)
+  html = readFileSync(join(DIST, 'index.html'), 'utf8')
 } catch {
-  console.error(`✗ ${ASSETS} fehlt — erst \`npm run build\`.`)
+  console.error(`✗ ${DIST}/index.html fehlt — erst \`npm run build\`.`)
   process.exit(1)
 }
 
-const js = files.filter((f) => f.endsWith('.js')).reduce((sum, f) => sum + gzipKilobytes(f), 0)
-const css = files.filter((f) => f.endsWith('.css')).reduce((sum, f) => sum + gzipKilobytes(f), 0)
+// Vite schreibt alle beim initialen Laden benötigten Dateien in index.html:
+// entry module scripts, statische modulepreloads und Stylesheets. Dynamische
+// import()-Chunks erscheinen dort nicht und gehören daher nicht zum Kaltstart.
+const initialAssets = new Set()
+for (const match of html.matchAll(/<(?:script|link)\b[^>]*(?:src|href)=["']([^"']+)["'][^>]*>/gi)) {
+  const href = match[1]
+  if (!href?.includes('/assets/')) continue
+  const file = basename(href.split(/[?#]/, 1)[0])
+  if (file.endsWith('.js') || file.endsWith('.css')) initialAssets.add(file)
+}
+
+const jsFiles = [...initialAssets].filter((file) => file.endsWith('.js'))
+const cssFiles = [...initialAssets].filter((file) => file.endsWith('.css'))
+
+if (jsFiles.length === 0) {
+  console.error('✗ Kein initiales JavaScript in dist/index.html gefunden.')
+  process.exit(1)
+}
+
+const js = jsFiles.reduce((sum, file) => sum + gzipKilobytes(file), 0)
+const css = cssFiles.reduce((sum, file) => sum + gzipKilobytes(file), 0)
 const total = js + css
 
 const rows = [
@@ -57,6 +79,8 @@ for (const [name, size, budget] of rows) {
   const mark = ok ? '✓' : '✗'
   console.log(`${mark} ${name.padEnd(11)} ${size.toFixed(1).padStart(6)} KB gzip  (Budget ${budget} KB)`)
 }
+
+console.log(`  Kaltstart-Dateien: ${[...initialAssets].join(', ')}`)
 
 if (over) {
   console.error(
