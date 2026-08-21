@@ -75,14 +75,20 @@ export async function recordOutcome(
   ]
   if (entries.length === 0) return
 
+  // C10: Personalisierung gehört nicht zum Kaltstart. Erst wenn wirklich ein
+  // Ergebnis geschrieben wird, laden wir die kleine Persistenzschicht und
+  // verwenden ausschließlich bereits validierte lokale Gewichte.
+  const { loadOptimizedSchedulerWeights } = await import('./schedulerWeights.ts')
+  const weights = await loadOptimizedSchedulerWeights()
+
   await db.transaction('rw', db.itemStates, async () => {
     for (const entry of entries) {
       const itemId = itemIdOf(moduleId, language, entry.word)
       const existing = await db.itemStates.get(itemId)
       const memory =
         existing !== undefined && hasMemory(existing)
-          ? review(toMemory(existing), day, entry.recalled)
-          : newMemory(day, entry.recalled)
+          ? review(toMemory(existing), day, entry.recalled, weights)
+          : newMemory(day, entry.recalled, weights)
 
       await db.itemStates.put({
         itemId,
@@ -100,6 +106,13 @@ export async function recordOutcome(
       })
     }
   })
+
+  // Auch die Optimizer-Orchestrierung bleibt vollständig aus dem Kaltstart.
+  // Fehler beim Laden oder Optimieren sind best-effort und dürfen das gerade
+  // erfolgreich gespeicherte Scheduling niemals zurückrollen.
+  void import('./schedulerPersonalization.ts')
+    .then(({ refreshSchedulerPersonalization }) => refreshSchedulerPersonalization())
+    .catch(() => undefined)
 }
 
 /**
