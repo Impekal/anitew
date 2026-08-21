@@ -22,6 +22,7 @@ import {
   review,
 } from '../core/index.ts'
 import { type ItemStateRow, db } from './db.ts'
+import { refreshSchedulerPersonalization } from './schedulerPersonalization.ts'
 import { loadOptimizedSchedulerWeights } from './schedulerWeights.ts'
 
 /** Das Modul, zu dem die Wortlisten gehören. */
@@ -106,6 +107,10 @@ export async function recordOutcome(
       })
     }
   })
+
+  // Optimization is best-effort and cadence-gated. The answer above is always
+  // scheduled first; newly learned weights can only affect later scheduling.
+  void refreshSchedulerPersonalization()
 }
 
 /**
