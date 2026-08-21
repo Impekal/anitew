@@ -204,20 +204,20 @@ test('kündigt keinen an, wo der Unterschied Zufall sein kann', async ({ page })
   await expect(page.locator('.focus')).toHaveCount(0)
 })
 
-test('verspricht keinen Schwerpunkt, den die gewählte Zeit nicht hergibt', async ({ page }) => {
+test('behält einen räumlichen Schwerpunkt auch im Notfallmodus, weil D12 dort trainierbar ist', async ({ page }) => {
   /*
-   * Der Palast wird unter drei Minuten nicht gelernt (D-020). Wäre er die
-   * schwächste Achse, dürfte er im Notfallmodus nicht angekündigt werden —
-   * sonst verspräche der Startbildschirm etwas, das der Plan nicht einhält.
+   * Seit D12 misst die räumliche Achse eine eigene 3×3-Positionsaufgabe.
+   * Anders als der Gedächtnispalast ist dieses Modul auch in 60 Sekunden
+   * sinnvoll trainierbar. Der Startbildschirm darf den gemessenen Schwerpunkt
+   * deshalb im Notfallmodus nicht mehr künstlich ausblenden.
    */
   await seed(page, [
     { module: 'words', reviews: 61, lapses: 3 },
-    { module: 'palace', reviews: 61, lapses: 40 },
+    { module: 'spatial', reviews: 61, lapses: 40 },
   ])
-  // Der Schwerpunkt steht auf dem Startbildschirm, nicht auf der Profilseite.
   await leavePage(page)
 
-  await expect(page.locator('.focus')).toContainText('Palast')
+  await expect(page.locator('.focus')).toContainText('Räumlich')
   await page.getByRole('button', { name: '60 Sekunden' }).click()
-  await expect(page.locator('.focus')).toHaveCount(0)
+  await expect(page.locator('.focus')).toContainText('Räumlich')
 })
