@@ -14,7 +14,7 @@
  * ist ein Gang unverständlich; eine ungelehrte Technik kostet nur Kraft).
  */
 
-import type { ModuleId } from '../session/plan.ts'
+import type { ModuleId } from '../session/planBase.ts'
 
 export const ENCODING_LESSONS = ['story', 'link'] as const
 
