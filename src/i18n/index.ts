@@ -29,20 +29,27 @@ type Widen<T> = T extends string ? string : { [K in keyof T]: Widen<T[K]> }
 type SourceDictionary = Widen<typeof de>
 
 /**
- * Missions-Tatsachen wachsen unabhängig von den UI-Texten (H2).
+ * Missions-Tatsachen und renderer-eigene Module wachsen unabhängig von den
+ * vorhandenen UI-Texten.
  *
  * `missionAsk` und `missionPlaceholders` waren ursprünglich aus vier festen
  * Schlüsseln abgeleitet. H2 ergänzt eine fünfte Tatsache (`location`), ohne
  * dafür die komplette Quellübersetzung umzuschreiben: Die beiden Verzeichnisse
  * dürfen zusätzliche String-Schlüssel tragen; `dictionaryFor()` setzt die
- * zwei neuen Texte unten explizit ein. Alle übrigen Wörterbuchteile bleiben
- * weiterhin streng aus `de` abgeleitet — ein vergessener normaler Schlüssel
- * bleibt also ein TypeScript-Fehler.
+ * zwei neuen Texte unten explizit ein.
+ *
+ * D12 hat mit dem 3×3-Raster einen eigenen Renderer. Sein Einprägebild braucht
+ * keinen modulspezifischen Satz aus `encodeHints`; trotzdem muss der generische
+ * Session-Zweig typseitig weitere Modulkennungen zulassen, weil die Auswahl
+ * erst im JSX auf den Spatial-Renderer verzweigt. Das Record hält diese
+ * Typgrenze offen, ohne einen Text zu erfinden, der zur Laufzeit nie gelesen
+ * wird.
  */
 export type Dictionary = Omit<SourceDictionary, 'session'> & {
-  session: Omit<SourceDictionary['session'], 'missionAsk' | 'missionPlaceholders'> & {
+  session: Omit<SourceDictionary['session'], 'missionAsk' | 'missionPlaceholders' | 'encodeHints'> & {
     missionAsk: SourceDictionary['session']['missionAsk'] & Record<string, string>
     missionPlaceholders: SourceDictionary['session']['missionPlaceholders'] & Record<string, string>
+    encodeHints: SourceDictionary['session']['encodeHints'] & Record<string, string>
   }
 }
 
