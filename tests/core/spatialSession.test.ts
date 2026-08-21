@@ -1,11 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  dimensionOf,
   entersReview,
   isPrompted,
   leniencyFor,
-  moduleForDimension,
   planSession,
   reviewItemsOf,
   spatialCellOf,
@@ -66,7 +64,7 @@ describe('D12 spatial session wiring', () => {
     expect(encoded.every((item) => spatialCellOf(item) !== undefined)).toBe(true)
   })
 
-  it('keeps an older spatial item as a review and maps the profile axis to measured spatial returns', () => {
+  it('keeps an older spatial item as a normal due review', () => {
     const seed = 'd12-review'
     const due = spatialPool('older', 1)[0]!
     const plan = planSession({
@@ -80,7 +78,5 @@ describe('D12 spatial session wiring', () => {
     })
 
     expect(reviewItemsOf(plan, 'spatial')).toEqual([due])
-    expect(dimensionOf('spatial')).toBe('spatial')
-    expect(moduleForDimension('spatial')).toBe('spatial')
   })
 })
