@@ -6,7 +6,7 @@ import { createWebPlatform } from '../platform/web/index.ts'
 import { useProfileHistory } from './useProfileHistory.ts'
 
 /**
- * Das Gedächtnisprofil (Backlog E3, E4, E7 · D-021).
+ * Das Gedächtnisprofil (Backlog E3, E4, E7, O15 · D-021).
  *
  * Die gefährlichste Anzeige der ganzen App: Sie sieht aus wie ein Befund über
  * einen Menschen. Drei Dinge halten sie ehrlich:
@@ -82,6 +82,8 @@ export function ProfilePanel({
       {footprint}
       <p className="hint">{ready ? t.note : t.empty}</p>
 
+      <ProfileNetwork results={results} names={names} />
+
       <ul className="axes">
         {results.map((result) => (
           <li key={result.id} className={`axis axis-${result.kind}`}>
@@ -136,6 +138,124 @@ export function ProfilePanel({
         </p>
       )}
     </div>
+  )
+}
+
+/**
+ * O15: Die gemessenen Achsen bekommen eine kleine Netzansicht, ohne eine neue
+ * Kennzahl zu erfinden. Jeder Knoten benutzt ausschließlich den bereits
+ * angezeigten beobachteten Anteil. Achsen mit zu wenig Daten fehlen aus dem
+ * Netz vollständig — sie werden also nicht versehentlich als „0“ gezeichnet.
+ *
+ * Die ausführliche Liste darunter bleibt die semantische Quelle für Spannen,
+ * Herkunft und dünne Daten. Das SVG ist deshalb bewusst aria-hidden: Es ist
+ * eine visuelle Verdichtung derselben Messung, kein zweiter Befund.
+ */
+function ProfileNetwork({
+  results,
+  names,
+}: {
+  results: readonly DimensionResult[]
+  names: Readonly<Record<string, string>>
+}) {
+  const measured = results.filter(
+    (result): result is Extract<DimensionResult, { kind: 'measured' }> => result.kind === 'measured',
+  )
+  if (measured.length < 3) return null
+
+  const center = 140
+  const innerRadius = 28
+  const outerRadius = 92
+  const labelRadius = 118
+  const angleOf = (index: number) => -Math.PI / 2 + (index / measured.length) * Math.PI * 2
+  const pointAt = (radius: number, index: number) => {
+    const angle = angleOf(index)
+    return {
+      x: center + Math.cos(angle) * radius,
+      y: center + Math.sin(angle) * radius,
+    }
+  }
+  const points = measured.map((result, index) => {
+    const radius = innerRadius + (result.rate / 100) * (outerRadius - innerRadius)
+    return { ...pointAt(radius, index), result }
+  })
+  const polygon = points.map(({ x, y }) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ')
+
+  return (
+    <svg
+      className="profile-network"
+      viewBox="0 0 280 280"
+      aria-hidden="true"
+      style={{ display: 'block', width: '100%', maxWidth: '21rem', margin: '0.75rem auto 1.25rem' }}
+    >
+      {[0.25, 0.5, 0.75, 1].map((fraction) => {
+        const radius = innerRadius + fraction * (outerRadius - innerRadius)
+        const ring = measured
+          .map((_, index) => {
+            const point = pointAt(radius, index)
+            return `${point.x.toFixed(1)},${point.y.toFixed(1)}`
+          })
+          .join(' ')
+        return <polygon key={fraction} points={ring} fill="none" stroke="var(--line)" strokeWidth="1" />
+      })}
+
+      {measured.map((_, index) => {
+        const outer = pointAt(outerRadius, index)
+        return (
+          <line
+            key={index}
+            x1={center}
+            y1={center}
+            x2={outer.x}
+            y2={outer.y}
+            stroke="var(--line)"
+            strokeWidth="1"
+          />
+        )
+      })}
+
+      <polygon
+        points={polygon}
+        fill="var(--accent-soft)"
+        fillOpacity="0.5"
+        stroke="var(--accent)"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+
+      {points.map(({ x, y, result }) => (
+        <circle
+          key={result.id}
+          className="profile-network-node"
+          data-dimension={result.id}
+          data-rate={result.rate}
+          cx={x}
+          cy={y}
+          r="4"
+          fill="var(--accent)"
+        />
+      ))}
+
+      {measured.map((result, index) => {
+        const point = pointAt(labelRadius, index)
+        const cosine = Math.cos(angleOf(index))
+        const textAnchor = cosine > 0.25 ? 'start' : cosine < -0.25 ? 'end' : 'middle'
+        return (
+          <text
+            key={result.id}
+            x={point.x}
+            y={point.y}
+            textAnchor={textAnchor}
+            dominantBaseline="middle"
+            fill="var(--ink-soft)"
+            fontSize="9"
+            fontFamily="var(--sans)"
+          >
+            {names[result.id]}
+          </text>
+        )
+      })}
+    </svg>
   )
 }
 
