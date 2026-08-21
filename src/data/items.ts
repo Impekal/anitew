@@ -22,6 +22,7 @@ import {
   review,
 } from '../core/index.ts'
 import { type ItemStateRow, db } from './db.ts'
+import { loadOptimizedSchedulerWeights } from './schedulerWeights.ts'
 
 /** Das Modul, zu dem die Wortlisten gehören. */
 export const WORD_MODULE = 'words'
@@ -75,14 +76,19 @@ export async function recordOutcome(
   ]
   if (entries.length === 0) return
 
+  // C10: Nur bereits validierte, lokal persistierte Gewichte dürfen einen
+  // Termin beeinflussen. Ein fehlender/kaputter Wert fällt in der Ladeschicht
+  // auf `undefined` zurück und lässt damit exakt den bisherigen Scheduler laufen.
+  const weights = await loadOptimizedSchedulerWeights()
+
   await db.transaction('rw', db.itemStates, async () => {
     for (const entry of entries) {
       const itemId = itemIdOf(moduleId, language, entry.word)
       const existing = await db.itemStates.get(itemId)
       const memory =
         existing !== undefined && hasMemory(existing)
-          ? review(toMemory(existing), day, entry.recalled)
-          : newMemory(day, entry.recalled)
+          ? review(toMemory(existing), day, entry.recalled, weights)
+          : newMemory(day, entry.recalled, weights)
 
       await db.itemStates.put({
         itemId,
