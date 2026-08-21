@@ -1,6 +1,7 @@
 import { checkParameters } from 'ts-fsrs'
 
 import type { MemorySchedulerWeights } from './memory.ts'
+export type { MemorySchedulerWeights } from './memory.ts'
 
 /**
  * Persisted optimizer output is untrusted data: it may come from an older app
