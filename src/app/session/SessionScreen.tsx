@@ -38,6 +38,7 @@ import type { RoundResult, SessionProgress } from '../../data/sessions.ts'
 import type { Dictionary } from '../../i18n/index.ts'
 import { Face } from '../Face.tsx'
 import { GazeScene } from '../GazeScene.tsx'
+import { SpatialGrid } from '../SpatialGrid.tsx'
 import { useCountUp } from '../useCountUp.ts'
 
 import { useSessionRunner } from './useSessionRunner.ts'
@@ -322,6 +323,26 @@ function RunningSession({
           und die Bindung — worauf es ankommt — käme gar nicht vor.
         */
         <Scene dictionary={dictionary} person={personOf(block.items[0] ?? '')} language={state.plan.language} />
+      ) : block.kind === 'encode' && block.moduleId === 'spatial' ? (
+        <section className="encode spatial-encode">
+          {state.currentItem !== undefined && (
+            <SpatialGrid itemId={state.currentItem} mode="encode" label={t.phases.encode} />
+          )}
+          <div
+            className="encode-dots"
+            role="img"
+            aria-label={`${state.itemIndex + 1} / ${block.items.length}`}
+          >
+            {block.items.map((item, index) => (
+              <span
+                key={item}
+                className={
+                  index === state.itemIndex ? 'dot-now' : index < state.itemIndex ? 'dot-done' : ''
+                }
+              />
+            ))}
+          </div>
+        </section>
       ) : block.kind === 'encode' ? (
         <section className="encode">
           <p className="hint">
@@ -398,6 +419,20 @@ function RunningSession({
               />
             ))}
           </div>
+        </section>
+      ) : block.moduleId === 'spatial' ? (
+        <section className="prompted spatial-recall">
+          <p className="hint">{block.kind === 'review' ? t.reviewHint : t.recallHint}</p>
+          <SpatialGrid
+            key={`${block.id}-${state.promptIndex}`}
+            itemId={block.items[state.promptIndex] ?? ''}
+            mode="recall"
+            label={block.kind === 'review' ? t.reviewHint : t.recallHint}
+            onChoose={submitPrompt}
+          />
+          <p className="hint">
+            {state.promptIndex + 1} / {block.items.length}
+          </p>
         </section>
       ) : isPrompted(block.moduleId) ? (
         <PromptedRecall

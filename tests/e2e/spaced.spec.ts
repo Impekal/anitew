@@ -140,19 +140,6 @@ test('holt gelernte Wörter an einem späteren Tag zurück (D8)', async ({ page 
     // Wer alles weiß, hat alles richtig.
     expect(correct).toBe(total)
   }
-  /*
-   * Beim gestützten Abruf steht diese Zusage hier bewusst **nicht**.
-   *
-   * Dort gehört zu jeder Stelle ein bestimmtes Gesicht, und welches, ist dem
-   * Test nicht zu entnehmen — der Name steht ja gerade nicht auf dem
-   * Bildschirm, das ist die Aufgabe. Um richtig zu antworten, müsste er die
-   * Reihenfolge des Schedulers nachbauen; genau davor warnt der Absatz
-   * darüber, und eine zweite Kopie derselben Logik im Test wäre keine
-   * Prüfung, sondern eine Verdopplung.
-   *
-   * Dass die Zuordnung Stelle für Stelle stimmt, prüft `gradePrompted` in den
-   * Kerntests — dort ohne Browser und ohne Raten.
-   */
 })
 
 test('zeigt kein Wiedersehen, wenn nichts fällig ist', async ({ page }) => {
@@ -163,17 +150,13 @@ test('zeigt kein Wiedersehen, wenn nichts fällig ist', async ({ page }) => {
   // Nichts vordatiert: Das frisch Gelernte ist erst in Tagen dran.
   await startEmergency(page)
   /*
-   * Großzügige Frist, und das ist kein Zugeständnis an Flackern.
-   *
-   * Seit M2 tut die App vor dem ersten Wort mehr: Sie liest die fälligen
-   * Termine aus der Datenbank, plant, legt die Einheit an — und davor liegen
-   * drei Sekunden Ankommen. Unter Last (mehrere Testläufe gleichzeitig,
-   * daneben eine Einheit, die 60 Sekunden echte Zeit abwartet) reichten 30
-   * Sekunden einmal nicht. Geprüft wird hier, *dass* kein Wiedersehen kommt,
-   * nicht wie schnell das erste Wort erscheint.
+   * Klassische Module stehen in `.encode-word` oder `.scene`; D12 besitzt
+   * zusätzlich eine eigene räumliche Einprägefläche. Jeder dieser Zustände
+   * beweist, dass die neue Runde läuft — ohne einen Wiedersehensblock zu
+   * erfinden oder die zufällig gezogene Modulsorte vorherzusagen.
    */
-  // Wörter, Gesichter und Zahlen stehen in `.encode-word`, eine Mission
-  // zeigt stattdessen ihre Szene. Eins von beidem muss kommen.
-  await expect(page.locator('.encode-word, .scene').first()).toBeVisible({ timeout: 60_000 })
+  await expect(page.locator('.encode-word, .scene, .spatial-encode').first()).toBeVisible({
+    timeout: 60_000,
+  })
   await expect(page.getByText(/Und (jetzt )?von früher/)).toBeHidden()
 })

@@ -28,21 +28,21 @@ import { en } from '../../src/i18n/en.ts'
 const full = (chances: number, lost: number) => ({ chances, lost })
 
 describe('die Achsen', () => {
-  it('hat für jedes Trainingsmodul genau eine Achse — außer für Eigenes und Memory', () => {
+  it('hat für jedes eigenständig gemessene Trainingsmodul genau eine Achse', () => {
     /*
-     * Eigene Inhalte (D-032) und der Memory-Graph (D-036) sind die zwei
-     * Ausnahmen, mit Absicht: Der Stoff dort ist **gewählt**, nicht
-     * erzeugt — wer schwere Vokabeln oder viele Namen einträgt, hat kein
-     * schlechteres Gedächtnis als jemand mit leichten. Eine Achse daraus
-     * wäre ein Vergleich zweier Währungen (R-1).
+     * Eigene Inhalte (D-032) und der Memory-Graph (D-036) sind gewählt und
+     * deshalb keine vergleichbaren Messquellen. Seit D12 ist außerdem der
+     * Gedächtnispalast bewusst nur noch Technik/Übung: Die räumliche Achse
+     * wird ausschließlich durch das eigenständige `spatial`-Modul gemessen.
      */
-    const chosen = new Set(['facts', 'memory'])
+    const chosen = new Set(['facts', 'memory', 'palace'])
     const measured = TRAINING_MODULES.filter((moduleId) => !chosen.has(moduleId))
     for (const moduleId of measured) {
       expect(dimensionOf(moduleId), `${moduleId} ohne Achse`).toBeDefined()
     }
     expect(dimensionOf('facts')).toBeUndefined()
     expect(dimensionOf('memory')).toBeUndefined()
+    expect(dimensionOf('palace')).toBeUndefined()
     const mapped = measured.map(dimensionOf)
     expect(new Set(mapped).size).toBe(measured.length)
   })

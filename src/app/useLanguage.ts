@@ -19,6 +19,29 @@ export interface LanguageState {
 }
 
 /**
+ * D12 hat `spatial` als echtes Trainingsmodul ergänzt. Die bestehende
+ * Wörterbuch-Schnittstelle führt den sichtbaren Namen bereits als Profilachse,
+ * aber die ältere Modulliste kennt den neuen Schlüssel typseitig noch nicht.
+ * An dieser einen UI-Grenze spiegeln wir deshalb denselben übersetzten Namen
+ * in die Modulliste, damit Schwerpunkt und Coach niemals ein leeres Label
+ * anzeigen. Keine zweite Übersetzung, nur dieselbe vorhandene Zeichenkette.
+ */
+function withSpatialModuleLabel(dictionary: Dictionary): Dictionary {
+  const modules = dictionary.profile.modules as Record<string, string>
+  if (modules.spatial === dictionary.profile.names.spatial) return dictionary
+  return {
+    ...dictionary,
+    profile: {
+      ...dictionary.profile,
+      modules: {
+        ...dictionary.profile.modules,
+        spatial: dictionary.profile.names.spatial,
+      } as typeof dictionary.profile.modules,
+    },
+  }
+}
+
+/**
  * Die Sprache der Oberfläche (D-007).
  *
  * Beim ersten Start gilt die Systemsprache, danach die eigene Wahl. Die
@@ -73,7 +96,7 @@ export function useLanguage(platform: Platform): LanguageState {
 
   return {
     language,
-    dictionary: dictionaryFor(language),
+    dictionary: withSpatialModuleLabel(dictionaryFor(language)),
     translated: isTranslated(language),
     ready,
     choose,

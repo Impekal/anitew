@@ -23,7 +23,19 @@ export interface DailyMissionDecision {
   readonly signals: readonly MissionSignal[]
 }
 
-const CORE_MODULES: readonly ModuleId[] = ['memory', 'facts', 'faces', 'numbers', 'words', 'missions', 'twins', 'reverse', 'palace', 'gaze']
+const CORE_MODULES: readonly ModuleId[] = [
+  'memory',
+  'facts',
+  'faces',
+  'numbers',
+  'words',
+  'missions',
+  'twins',
+  'reverse',
+  'palace',
+  'gaze',
+  'spatial',
+]
 
 const REASON_ORDER: Readonly<Record<Exclude<MissionReason, 'balanced'>, number>> = {
   due: 0,
