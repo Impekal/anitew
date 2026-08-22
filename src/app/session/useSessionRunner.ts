@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 import {
   type BlockPlan,
+  displayOf,
   entersReview,
   gradeRecall,
   isPrompted,
@@ -341,12 +342,18 @@ export function useSessionRunner(
       .finally(onLeave)
   }, [onLeave])
 
+  const item = block?.kind === 'encode' ? block.items[itemIndex] : undefined
+  const currentItem =
+    item !== undefined && block?.moduleId === 'associative'
+      ? `${displayOf('associative', item, plan.language)} · ${targetOf('associative', item, plan.language)}`
+      : item
+
   const state: RunnerState = {
     plan,
     blockIndex,
     block,
     remaining,
-    currentItem: block?.kind === 'encode' ? block.items[itemIndex] : undefined,
+    currentItem,
     itemIndex,
     entries,
     answers,
