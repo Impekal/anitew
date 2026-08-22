@@ -50,7 +50,10 @@
           radial-gradient(circle at 50% 48%, rgb(216 168 90 / 5%), transparent 19rem),
           #030706;
         color: #f0eee4;
-        pointer-events: none;
+        /* Während die Signatur gezeichnet wird, darf kein unsichtbarer
+           Fingertipp das Onboarding darunter überspringen. `visibility:hidden`
+           am Ende nimmt die Fläche anschließend vollständig aus dem Hit-Test. */
+        pointer-events: auto;
         animation: anitew-launch-away 1.65s cubic-bezier(.4,0,.2,1) forwards;
       }
       .anitew-launch-core {
