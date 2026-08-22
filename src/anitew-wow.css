@@ -1,0 +1,300 @@
+/* ANITEW — Signature Experience
+ * Loaded after the first paint so the cold-start budget stays focused on
+ * usability. This layer only changes atmosphere and motion; it never owns
+ * training state, measurement or persistence.
+ */
+
+:root {
+  --wow-gold: #e5b86d;
+  --wow-gold-hot: #ffd997;
+  --wow-mint: #9ee6d2;
+  --wow-deep: #050908;
+  --wow-glass: rgb(12 20 17 / 68%);
+  --wow-line: rgb(192 226 211 / 14%);
+}
+
+/* The app should feel like a place, not a stack of cards. */
+body::after {
+  content: '';
+  position: fixed;
+  inset: -18vmax;
+  z-index: 0;
+  pointer-events: none;
+  opacity: .72;
+  background:
+    conic-gradient(from 18deg at 50% 38%, transparent 0 18%, rgb(158 230 210 / 3%) 24%, transparent 31% 62%, rgb(229 184 109 / 3%) 70%, transparent 78%),
+    radial-gradient(circle at 50% 34%, rgb(158 230 210 / 7%), transparent 24vmax),
+    radial-gradient(circle at 50% 70%, rgb(229 184 109 / 4%), transparent 30vmax);
+  filter: blur(22px);
+  animation: wow-aurora 28s ease-in-out infinite alternate;
+}
+
+.neural {
+  opacity: .62;
+  filter: drop-shadow(0 0 7px rgb(158 230 210 / 8%));
+}
+.neural-links line {
+  stroke: rgb(158 230 210 / 10%);
+}
+.neural-nodes circle {
+  fill: var(--wow-mint);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: wow-neuron 7s ease-in-out infinite;
+}
+
+.brand {
+  isolation: isolate;
+}
+.brand h1 {
+  text-shadow: 0 0 28px rgb(158 230 210 / 12%);
+}
+.brand h1::before {
+  content: '';
+  display: inline-block;
+  width: .52em;
+  height: .52em;
+  margin-right: .7em;
+  border: 1px solid rgb(158 230 210 / 42%);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 4px rgb(158 230 210 / 4%),
+    0 0 20px rgb(158 230 210 / 18%);
+  vertical-align: .02em;
+  animation: wow-mark 5.8s ease-in-out infinite;
+}
+.greeting {
+  max-width: 32ch;
+  text-wrap: balance;
+}
+
+/* The start control becomes the ANITEW ritual: quiet at rest, magnetic on
+   intent, physical on press. No JS loop, no main-thread animation. */
+.challenge {
+  perspective: 900px;
+}
+.start {
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 50% 42%, rgb(229 184 109 / 17%), transparent 31%),
+    radial-gradient(circle at 50% 50%, transparent 0 29%, rgb(158 230 210 / 5%) 30% 30.5%, transparent 31%),
+    linear-gradient(145deg, rgb(229 184 109 / 9%), rgb(158 230 210 / 3%));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 7%),
+    inset 0 -30px 70px rgb(0 0 0 / 16%),
+    0 24px 80px rgb(0 0 0 / 30%),
+    0 0 80px rgb(229 184 109 / 7%);
+}
+.start::before {
+  width: 132px;
+  height: 132px;
+  border-color: rgb(229 184 109 / 24%);
+  box-shadow:
+    0 0 0 18px rgb(229 184 109 / 2.6%),
+    0 0 0 38px rgb(158 230 210 / 1.8%),
+    0 0 42px rgb(229 184 109 / 11%);
+  animation: wow-start-breathe 5.2s ease-in-out infinite;
+}
+.start:hover {
+  transform: translateY(-4px) rotateX(1.2deg) scale(1.006);
+  border-color: rgb(255 217 151 / 62%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 9%),
+    0 28px 90px rgb(0 0 0 / 36%),
+    0 0 110px rgb(229 184 109 / 13%);
+}
+.start:active {
+  transform: translateY(2px) scale(.986);
+  transition-duration: 80ms;
+}
+.start-time {
+  background: linear-gradient(180deg, #fffaf0 0%, #e8e2d5 64%, #a9987d 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 20px rgb(229 184 109 / 17%));
+}
+.start-label {
+  color: var(--wow-gold-hot);
+  text-shadow: 0 0 22px rgb(229 184 109 / 24%);
+}
+.mode-active {
+  box-shadow: inset 0 0 24px rgb(229 184 109 / 5%), 0 0 24px rgb(229 184 109 / 4%);
+}
+
+/* Information should arrive like telemetry, never as generic dashboard cards. */
+.note,
+.today-line,
+.memory-pulse,
+.today-history > * {
+  backdrop-filter: blur(14px) saturate(112%);
+}
+.note {
+  background: linear-gradient(145deg, rgb(18 29 25 / 82%), rgb(11 18 16 / 74%));
+}
+
+/* Memory DNA / constellation is ANITEW's signature visual. Real graph states
+   remain the only driver; this layer merely gives them depth. */
+.constellation {
+  position: relative;
+  isolation: isolate;
+  border: 1px solid rgb(158 230 210 / 10%);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 50% 48%, rgb(158 230 210 / 5%), transparent 34%),
+    radial-gradient(circle at 70% 25%, rgb(229 184 109 / 3%), transparent 28%),
+    rgb(5 10 8 / 34%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 3%),
+    inset 0 0 80px rgb(0 0 0 / 18%),
+    0 24px 70px rgb(0 0 0 / 20%);
+  overflow: hidden;
+}
+.constellation::before {
+  content: '';
+  position: absolute;
+  inset: 8%;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(158 230 210 / 7%), transparent 63%);
+  filter: blur(18px);
+  animation: wow-constellation-breathe 8s ease-in-out infinite;
+}
+.constellation svg {
+  filter: drop-shadow(0 0 9px rgb(158 230 210 / 8%));
+}
+.constellation-orbit {
+  fill: none;
+  stroke: rgb(158 230 210 / 7%);
+  stroke-width: .18;
+  stroke-dasharray: .8 2.2;
+  transform-origin: 50px 50px;
+  animation: wow-orbit 44s linear infinite;
+}
+.constellation-orbit-inner {
+  animation-direction: reverse;
+  animation-duration: 31s;
+}
+.constellation-edge {
+  stroke: rgb(158 230 210 / 14%);
+  stroke-width: .22;
+  filter: drop-shadow(0 0 1.5px rgb(158 230 210 / 25%));
+}
+.constellation-edge-selected,
+.constellation-edge-recalled {
+  stroke: rgb(255 217 151 / 48%);
+  filter: drop-shadow(0 0 2.5px rgb(229 184 109 / 52%));
+}
+.constellation-node {
+  fill: var(--wow-mint);
+  filter: drop-shadow(0 0 2px rgb(158 230 210 / 60%));
+}
+.constellation-node-anchor {
+  fill: var(--wow-gold-hot);
+  filter: drop-shadow(0 0 4px rgb(229 184 109 / 72%));
+}
+.constellation-memory-selected .constellation-node {
+  filter: drop-shadow(0 0 6px rgb(255 217 151 / 85%));
+}
+.constellation-return-ring {
+  fill: none;
+  stroke: rgb(229 184 109 / 52%);
+  stroke-width: .34;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: wow-return 2.8s ease-out infinite;
+}
+.constellation-return-ring-b { animation-delay: 1.4s; }
+.constellation-recall-wave {
+  fill: none;
+  stroke: rgb(158 230 210 / 72%);
+  stroke-width: .42;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: wow-recall 1.6s ease-out 2;
+}
+.constellation-label {
+  fill: #e8eee8;
+  font-size: 2.2px;
+  paint-order: stroke;
+  stroke: rgb(5 9 8 / 82%);
+  stroke-width: .65px;
+  letter-spacing: .03em;
+}
+.constellation-has-return {
+  box-shadow: inset 0 0 90px rgb(229 184 109 / 4%), 0 24px 70px rgb(0 0 0 / 20%);
+}
+.constellation-has-recall {
+  box-shadow: inset 0 0 90px rgb(158 230 210 / 5%), 0 24px 70px rgb(0 0 0 / 20%);
+}
+
+/* Drawer and secondary pages feel like the same world, not a settings site. */
+.drawer {
+  background:
+    radial-gradient(circle at 100% 0, rgb(158 230 210 / 6%), transparent 32%),
+    rgb(8 14 12 / 96%) !important;
+}
+.drawer-item:active,
+.quiet:active,
+.mode:active,
+.hamburger:active {
+  transform: scale(.97);
+}
+.page-title {
+  text-wrap: balance;
+  text-shadow: 0 0 28px rgb(158 230 210 / 7%);
+}
+
+@keyframes wow-aurora {
+  0% { transform: translate3d(-2%, -1%, 0) rotate(-2deg) scale(1); }
+  100% { transform: translate3d(2%, 1.5%, 0) rotate(2deg) scale(1.035); }
+}
+@keyframes wow-neuron {
+  0%, 100% { opacity: .32; transform: scale(.82); }
+  45% { opacity: .76; transform: scale(1.18); }
+}
+@keyframes wow-mark {
+  0%, 100% { opacity: .48; transform: scale(.86); }
+  50% { opacity: 1; transform: scale(1.08); box-shadow: 0 0 0 5px rgb(158 230 210 / 4%), 0 0 25px rgb(158 230 210 / 22%); }
+}
+@keyframes wow-start-breathe {
+  0%, 100% { transform: scale(.82); opacity: .34; }
+  50% { transform: scale(1.12); opacity: .86; }
+}
+@keyframes wow-constellation-breathe {
+  0%, 100% { opacity: .42; transform: scale(.88); }
+  50% { opacity: .9; transform: scale(1.08); }
+}
+@keyframes wow-orbit {
+  to { transform: rotate(360deg); }
+}
+@keyframes wow-return {
+  0% { opacity: .74; transform: scale(.55); }
+  100% { opacity: 0; transform: scale(1.8); }
+}
+@keyframes wow-recall {
+  0% { opacity: .9; transform: scale(.55); }
+  100% { opacity: 0; transform: scale(1.75); }
+}
+
+@media (hover: none) {
+  .start:hover { transform: none; }
+}
+
+@media (max-width: 560px) {
+  .start { min-height: 202px; }
+  .constellation { border-radius: 22px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::after,
+  .neural-nodes circle,
+  .brand h1::before,
+  .start::before,
+  .constellation::before,
+  .constellation-orbit,
+  .constellation-return-ring,
+  .constellation-recall-wave {
+    animation: none !important;
+  }
+}
