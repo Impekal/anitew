@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 
 import { answerRecall, collectItems, pollFirstModule, startButton, visit } from './helpers.ts'
 
@@ -11,29 +11,64 @@ import { answerRecall, collectItems, pollFirstModule, startButton, visit } from 
  * Antwort zu tragen.
  */
 
-test('zeigt das Bild in Farbe, fragt es in Tinte — und zählt ehrlich', async ({ page }) => {
-  test.setTimeout(300_000)
-
+/**
+ * Gibt dem realen Profil genug Evidenz, um „Visuell“ als klar schwächste
+ * gemessene Achse zu erkennen. Der Planer setzt diesen Schwerpunkt in Runde 1
+ * um. Damit prüft der E2E nicht mehr 50 zufällige Seeds in der Hoffnung, dass
+ * irgendwann `gaze` fällt — Personalisierung ist hier die deterministische
+ * Produkt-API, die der Nutzer ebenfalls bekommt.
+ */
+async function seedGazeFocus(page: Page) {
   await visit(page)
   await expect(startButton(page)).toBeVisible()
+  await page.evaluate(async () => {
+    const open = indexedDB.open('anitew')
+    const database: IDBDatabase = await new Promise((resolve, reject) => {
+      open.onsuccess = () => resolve(open.result)
+      open.onerror = () => reject(open.error)
+    })
+    await new Promise<void>((resolve, reject) => {
+      const transaction = database.transaction('itemStates', 'readwrite')
+      const store = transaction.objectStore('itemStates')
+      ;[
+        { module: 'words', reviews: 61, lapses: 3 },
+        { module: 'gaze', reviews: 61, lapses: 40 },
+      ].forEach((row, index) => {
+        store.put({
+          itemId: `${row.module}:de:e2e-profile-${index}`,
+          moduleId: row.module,
+          language: 'de',
+          createdAt: 1,
+          lastSeenAt: 1,
+          reviews: row.reviews,
+          lapses: row.lapses,
+          stability: 3,
+          difficulty: 5,
+          fsrsState: 2,
+          dueDay: '2099-01-01',
+        })
+      })
+      transaction.oncomplete = () => resolve()
+      transaction.onerror = () => reject(transaction.error)
+    })
+  })
+  await page.reload()
+  await expect(startButton(page)).toBeVisible()
+  await expect(page.locator('.focus')).toBeVisible({ timeout: 15_000 })
+}
 
-  let found = false
-  for (let attempt = 0; attempt < 50 && !found; attempt++) {
-    await page.getByRole('button', { name: '60 Sekunden' }).click()
-    await startButton(page).click()
-    await page.locator('.settle').click()
+test('zeigt das Bild in Farbe, fragt es in Tinte — und zählt ehrlich', async ({ page }) => {
+  test.setTimeout(180_000)
 
-    // Welches Modul die Runde hat, sagt der persistierte Plan — kein
-    // Bildschirm-Raten (dieselbe Lehre wie in `startEmergency`).
-    if ((await pollFirstModule(page)) === 'gaze') {
-      await page.locator('.gaze-encode').waitFor({ timeout: 15_000 })
-      found = true
-      break
-    }
-    await page.locator('.session-abort').click()
-    await expect(page.locator('.challenge')).toBeVisible()
-  }
-  expect(found, 'in fünfzig Anläufen kam kein Bild').toBe(true)
+  await seedGazeFocus(page)
+  await page.getByRole('button', { name: '60 Sekunden' }).click()
+  await startButton(page).click()
+  await page.locator('.settle').click()
+
+  expect(await pollFirstModule(page), 'der visuelle Schwerpunkt muss die erste Runde führen').toBe(
+    'gaze',
+  )
+  await page.locator('.gaze-encode').waitFor({ timeout: 15_000 })
 
   // Vier Dinge, vier Farben — alle verschieden, alle benannt.
   const learned = await collectItems(page, 8)
@@ -71,5 +106,7 @@ test('zeigt das Bild in Farbe, fragt es in Tinte — und zählt ehrlich', async 
       }
     })
   })
-  expect(tracked).toBe(4)
+  // Ein Profil-Evidenzsatz wurde absichtlich vorab angelegt; die vier echten
+  // Bilddetails müssen zusätzlich als terminierte Erinnerungen existieren.
+  expect(tracked).toBe(5)
 })
