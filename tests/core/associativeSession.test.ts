@@ -19,7 +19,7 @@ function pools(): Pools {
     words: [],
     faces: [],
     numbers: [],
-    missions: ['Elena'],
+    missions: ['Elena', 'Noah', 'Mina'],
     palace: [],
     reverse: [],
     twins: [],
