@@ -1,0 +1,176 @@
+/* ANITEW — Session ritual and memory landing.
+ * Real session/result state already exists in the DOM; this file only gives
+ * those states a coherent physical rhythm.
+ */
+
+.session {
+  isolation: isolate;
+}
+
+.settle {
+  position: relative;
+  min-height: min(72dvh, 620px);
+}
+.settle::before,
+.settle::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+.settle::before {
+  width: min(66vw, 360px);
+  aspect-ratio: 1;
+  border: 1px solid rgb(158 230 210 / 10%);
+  box-shadow: 0 0 0 32px rgb(158 230 210 / 1.8%), 0 0 90px rgb(158 230 210 / 7%);
+  animation: wow-settle-ring 3s ease-in-out infinite;
+}
+.settle::after {
+  width: min(38vw, 210px);
+  aspect-ratio: 1;
+  background: radial-gradient(circle, rgb(158 230 210 / 8%), transparent 66%);
+  filter: blur(10px);
+  animation: wow-settle-core 3s ease-in-out infinite;
+}
+.settle-breath {
+  box-shadow: 0 0 60px rgb(158 230 210 / 18%);
+}
+.settle-word {
+  position: relative;
+  z-index: 2;
+  text-shadow: 0 0 24px rgb(158 230 210 / 12%);
+}
+
+.session-head {
+  color: rgb(228 235 228 / 72%);
+  letter-spacing: .04em;
+}
+.session-clock {
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 18px rgb(158 230 210 / 12%);
+}
+.session-phase {
+  position: relative;
+  overflow: hidden;
+}
+.session-phase::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(158 230 210 / 34%), transparent);
+  transform: translateX(-100%);
+  animation: wow-phase-scan 5.8s ease-in-out infinite;
+}
+.session-phase-return::after,
+.session-phase-retrieve::after {
+  background: linear-gradient(90deg, transparent, rgb(229 184 109 / 40%), transparent);
+}
+.session-bar > span {
+  box-shadow: 0 0 18px rgb(158 230 210 / 18%);
+}
+
+/* Completion is a landing, not confetti. Every chip is an actual recalled
+   item; the stagger already comes from --i in SessionScreen. */
+.summary-screen {
+  isolation: isolate;
+}
+.summary-screen::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 24%, rgb(229 184 109 / 7%), transparent 28rem),
+    radial-gradient(circle at 50% 62%, rgb(158 230 210 / 5%), transparent 34rem);
+  animation: wow-summary-light 8s ease-in-out infinite alternate;
+}
+.summary-screen .challenge:first-of-type {
+  border: 1px solid rgb(229 184 109 / 12%);
+  background:
+    radial-gradient(circle at 50% 35%, rgb(229 184 109 / 9%), transparent 36%),
+    rgb(7 12 10 / 25%);
+  box-shadow: inset 0 1px rgb(255 255 255 / 3%), 0 28px 90px rgb(0 0 0 / 18%);
+}
+.summary-score {
+  text-shadow: 0 0 34px rgb(229 184 109 / 18%);
+}
+.summary-score strong {
+  display: inline-block;
+  color: #fff6e5;
+  filter: drop-shadow(0 0 22px rgb(229 184 109 / 24%));
+  animation: wow-score-arrive 720ms cubic-bezier(.16, 1, .3, 1) both;
+}
+.summary-words .chip {
+  transform-origin: 50% 100%;
+  animation: wow-chip-land 620ms cubic-bezier(.16, 1, .3, 1) both;
+  animation-delay: calc(min(var(--i, 0), 18) * 46ms + 120ms);
+}
+.summary-words .chip:not(.chip-muted) {
+  border-color: rgb(158 230 210 / 18%);
+  box-shadow: inset 0 1px rgb(255 255 255 / 4%), 0 5px 24px rgb(0 0 0 / 14%);
+}
+.summary-words .chip-muted {
+  animation-name: wow-chip-soft-land;
+}
+.summary-actions .quiet {
+  transition: transform 120ms ease, border-color 220ms ease, background 220ms ease;
+}
+.summary-actions .quiet:hover {
+  border-color: rgb(158 230 210 / 28%);
+  background: rgb(158 230 210 / 4%);
+}
+.summary-memory-landing .challenge:first-of-type {
+  animation: wow-memory-landing 1.8s ease-out both;
+}
+
+@keyframes wow-settle-ring {
+  0%, 100% { opacity: .28; transform: translate(-50%, -50%) scale(.84); }
+  50% { opacity: .78; transform: translate(-50%, -50%) scale(1.04); }
+}
+@keyframes wow-settle-core {
+  0%, 100% { opacity: .34; transform: translate(-50%, -50%) scale(.82); }
+  50% { opacity: .88; transform: translate(-50%, -50%) scale(1.08); }
+}
+@keyframes wow-phase-scan {
+  0%, 52% { transform: translateX(-110%); opacity: 0; }
+  62% { opacity: 1; }
+  82%, 100% { transform: translateX(110%); opacity: 0; }
+}
+@keyframes wow-summary-light {
+  from { opacity: .56; transform: scale(.98); }
+  to { opacity: .94; transform: scale(1.025); }
+}
+@keyframes wow-score-arrive {
+  from { opacity: 0; transform: translateY(12px) scale(.86); filter: blur(7px); }
+  to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+@keyframes wow-chip-land {
+  from { opacity: 0; transform: translateY(18px) scale(.82); filter: blur(4px); }
+  to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+@keyframes wow-chip-soft-land {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: .72; transform: translateY(0); }
+}
+@keyframes wow-memory-landing {
+  0% { box-shadow: inset 0 0 0 rgb(158 230 210 / 0%), 0 28px 90px rgb(0 0 0 / 18%); }
+  35% { box-shadow: inset 0 0 80px rgb(158 230 210 / 8%), 0 28px 90px rgb(0 0 0 / 18%); }
+  100% { box-shadow: inset 0 0 0 rgb(158 230 210 / 0%), 0 28px 90px rgb(0 0 0 / 18%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settle::before,
+  .settle::after,
+  .session-phase::after,
+  .summary-screen::before,
+  .summary-score strong,
+  .summary-words .chip,
+  .summary-memory-landing .challenge:first-of-type {
+    animation: none !important;
+  }
+}
