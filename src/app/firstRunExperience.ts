@@ -363,6 +363,22 @@ const root = document.getElementById('root') ?? document.body
 const observer = new MutationObserver(refresh)
 observer.observe(root, { childList: true, subtree: true })
 
+// Die Führung ist ein Angebot, kein Modus, der die App sperrt. Wer statt
+// „Weiter“ direkt einen echten Teil von ANITEW antippt, hat damit ebenfalls
+// entschieden, dass er genug gesehen hat. Der Klick selbst läuft danach ganz
+// normal weiter; nur die Erklärung räumt ihren Platz.
+document.addEventListener(
+  'click',
+  (event) => {
+    if (!guideOpen) return
+    const target = event.target
+    if (!(target instanceof Element)) return
+    if (target.closest('.first-run-guide-card') !== null) return
+    closeGuide(true)
+  },
+  true,
+)
+
 window.addEventListener(
   'pagehide',
   () => {
