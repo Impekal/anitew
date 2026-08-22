@@ -31,7 +31,7 @@ function pools(): Pools {
 }
 
 describe('D13 associative session wiring', () => {
-  it('is a prompted FSRS module whose target is the original person', () => {
+  it('is a prompted FSRS module whose target is the original person without leaking it in the cue', () => {
     const item = associationItems('Elena')[0]!
     const cue = associationCueFor(item, 'de')
 
@@ -41,7 +41,7 @@ describe('D13 associative session wiring', () => {
     expect(leniencyFor('associative')).toBe('typos')
     expect(cue).toBeDefined()
     expect(targetOf('associative', item, 'de')).toBe('Elena')
-    expect(displayOf('associative', item, 'de')).toBe(`${cue?.cue} · Elena`)
+    expect(displayOf('associative', item, 'de')).toBe(cue?.cue)
   })
 
   it('derives reverse-association items from the deterministic mission pool', () => {
