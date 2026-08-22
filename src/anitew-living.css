@@ -1,0 +1,677 @@
+/* ANITEW — Living Memory Interface
+ *
+ * This layer deliberately changes the interaction language without owning
+ * memory truth. It never fabricates graph nodes, scores, due dates or profile
+ * claims. Existing React state remains authoritative; this file turns that
+ * state into one recognisable physical world.
+ */
+
+:root {
+  --living-core: #d8a85a;
+  --living-core-hot: #ffd990;
+  --living-calm: #8ccfc0;
+  --living-void: #050907;
+  --living-ring: rgb(140 207 192 / 18%);
+  --living-gold-ring: rgb(216 168 90 / 24%);
+}
+
+/* ── 1. The ANITEW Core --------------------------------------------------
+   The old hamburger remains a semantic button for accessibility, but is no
+   longer drawn as a hamburger. Visually it is ANITEW's single living object:
+   a warm centre, a cool orbital shell and a quiet breathing field. */
+.hamburger {
+  position: relative !important;
+  width: 58px !important;
+  height: 58px !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  overflow: visible !important;
+  background:
+    radial-gradient(circle at 43% 38%, rgb(255 243 207 / 94%) 0 3%, transparent 4%),
+    radial-gradient(circle at 50% 50%, var(--living-core-hot) 0 6%, var(--living-core) 7% 12%, rgb(216 168 90 / 20%) 13% 20%, transparent 21%),
+    radial-gradient(circle at 50% 50%, rgb(140 207 192 / 8%) 0 54%, transparent 55%) !important;
+  box-shadow:
+    0 0 0 1px rgb(140 207 192 / 16%),
+    0 0 0 9px rgb(140 207 192 / 2.5%),
+    0 0 28px rgb(216 168 90 / 16%),
+    inset 0 0 22px rgb(140 207 192 / 7%) !important;
+  color: transparent !important;
+  isolation: isolate;
+  transition: transform 280ms cubic-bezier(.2,.8,.2,1), filter 280ms ease !important;
+}
+.hamburger svg { display: none !important; }
+.hamburger::before,
+.hamburger::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  inset: 8px;
+  border: 1px solid var(--living-ring);
+  transform-origin: center;
+}
+.hamburger::before {
+  inset: 4px;
+  border-color: var(--living-gold-ring);
+  border-left-color: transparent;
+  border-bottom-color: transparent;
+  animation: living-orbit 9s linear infinite;
+}
+.hamburger::after {
+  inset: -7px;
+  border-color: rgb(140 207 192 / 9%);
+  border-top-color: rgb(140 207 192 / 32%);
+  animation: living-orbit-reverse 14s linear infinite;
+}
+.hamburger:hover {
+  transform: scale(1.07) !important;
+  filter: brightness(1.14);
+}
+.hamburger:active {
+  transform: scale(.90) !important;
+  filter: brightness(1.3);
+}
+.hamburger[aria-expanded='true'] {
+  box-shadow:
+    0 0 0 1px rgb(255 217 144 / 32%),
+    0 0 0 12px rgb(216 168 90 / 4%),
+    0 0 50px rgb(216 168 90 / 30%),
+    inset 0 0 26px rgb(255 217 144 / 11%) !important;
+}
+
+/* The wordmark is intentionally quiet: the Core becomes the logo motion. */
+.brand h1::before { display: none !important; }
+.brand h1 {
+  text-shadow: none !important;
+}
+.brand-row {
+  min-height: 64px;
+}
+
+/* ── 2. The home screen becomes a world, not a document ----------------- */
+@supports selector(main:has(> .brand)) {
+  main.app:has(> .brand) {
+    display: flex;
+    flex-direction: column;
+  }
+  main.app:has(> .brand) > .brand { order: 0; }
+  main.app:has(> .brand) > .today { order: 1; }
+  main.app:has(> .brand) > .memory-pulse { order: 2; }
+  main.app:has(> .brand) > .challenge { order: 3; }
+  main.app:has(> .brand) > .note { order: 4; }
+  main.app:has(> .brand) > .today-history { order: 5; }
+  main.app:has(> .brand) > .footer { order: 6; }
+  main.app:has(> .brand) > .drawer-veil { order: 99; }
+}
+
+.today {
+  position: relative;
+  isolation: isolate;
+  margin-top: 26px !important;
+  padding: 32px 0 20px !important;
+  border: 0 !important;
+  background: transparent !important;
+  overflow: visible !important;
+}
+.today::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  top: 46%;
+  width: min(92vw, 640px);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, rgb(140 207 192 / 7%), transparent 34%),
+    repeating-radial-gradient(circle at 50% 50%, transparent 0 46px, rgb(140 207 192 / 5%) 47px, transparent 48px 75px);
+  mask-image: radial-gradient(circle, black 0 58%, transparent 78%);
+  opacity: .72;
+  animation: living-world-breathe 10s ease-in-out infinite;
+  pointer-events: none;
+}
+.today-system,
+.today-mission-label,
+.memory-pulse-label {
+  font-family: var(--mono) !important;
+  letter-spacing: .28em !important;
+  text-transform: uppercase !important;
+}
+.today-system {
+  color: rgb(140 207 192 / 70%) !important;
+  font-size: 9px !important;
+  text-align: center;
+}
+.today .constellation {
+  width: min(100%, 680px);
+  min-height: clamp(290px, 56vw, 430px) !important;
+  margin: 8px auto 22px;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background:
+    radial-gradient(circle at 50% 50%, rgb(140 207 192 / 6%), transparent 56%),
+    transparent !important;
+  box-shadow: none !important;
+  mask-image: radial-gradient(circle, black 0 64%, transparent 92%);
+}
+.today .constellation svg {
+  transform: translateZ(30px) scale(1.04) !important;
+}
+.today-mission {
+  position: relative;
+  display: grid !important;
+  grid-template-columns: 1fr auto;
+  gap: 10px 20px;
+  align-items: end;
+  margin: 8px 0 0 !important;
+  padding: 18px 0 0 !important;
+  border-top: 1px solid rgb(140 207 192 / 10%);
+}
+.today-mission::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 0;
+  width: 74px;
+  height: 1px;
+  background: linear-gradient(90deg, var(--living-calm), transparent);
+  box-shadow: 0 0 16px rgb(140 207 192 / 24%);
+}
+.today-mission-label {
+  color: var(--an-gold) !important;
+  font-size: 10px !important;
+}
+.today-duration {
+  color: var(--an-dim) !important;
+  font-family: var(--mono) !important;
+  font-size: 10px !important;
+  letter-spacing: .08em;
+  text-align: right;
+}
+.today-line {
+  max-width: 38ch;
+  margin: 15px 0 0 !important;
+  color: var(--an-text) !important;
+  font-family: var(--serif) !important;
+  font-size: clamp(19px, 4.4vw, 25px) !important;
+  line-height: 1.28 !important;
+}
+.today-invite {
+  margin-top: 14px;
+}
+.today-invite-open {
+  border-radius: 999px !important;
+  backdrop-filter: blur(12px);
+}
+
+/* Pulse is a signal emerging from the world, not another dashboard card. */
+.memory-pulse {
+  position: relative;
+  margin: 12px 0 4px !important;
+  padding: 18px 0 20px 76px !important;
+  border: 0 !important;
+  border-top: 1px solid rgb(140 207 192 / 9%) !important;
+  border-bottom: 1px solid rgb(140 207 192 / 9%) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.memory-pulse-mark,
+.memory-return-glyph {
+  position: absolute !important;
+  left: 6px !important;
+  top: 50% !important;
+  translate: 0 -50%;
+}
+.memory-pulse-mark {
+  width: 48px !important;
+  height: 48px !important;
+  border: 1px solid rgb(140 207 192 / 22%) !important;
+  border-radius: 50%;
+  box-shadow: 0 0 22px rgb(140 207 192 / 7%);
+}
+.memory-pulse-mark::after {
+  content: '';
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  left: -2px;
+  top: -2px;
+  background: var(--an-gold);
+  box-shadow: 0 0 14px rgb(216 168 90 / 50%);
+}
+.memory-pulse-line {
+  font-family: var(--serif) !important;
+  font-size: clamp(17px, 3.9vw, 22px) !important;
+  line-height: 1.35;
+}
+
+/* ── 3. Mission portal ---------------------------------------------------
+   The main action stops being a rectangular call-to-action. It is the large
+   form of the same Core that opens navigation: same object, same grammar. */
+.challenge {
+  display: grid;
+  justify-items: center;
+  margin: 34px 0 26px !important;
+  padding: 36px 0 14px !important;
+  overflow: visible !important;
+  perspective: 1000px;
+}
+.challenge::before {
+  width: 1px !important;
+  height: 44px !important;
+  margin: 0 0 18px !important;
+  background: linear-gradient(to bottom, transparent, var(--living-calm)) !important;
+  box-shadow: 0 12px 20px rgb(140 207 192 / 16%);
+}
+.challenge::after {
+  width: min(78vw, 340px) !important;
+  height: min(78vw, 340px) !important;
+  right: auto !important;
+  left: 50% !important;
+  top: 48px !important;
+  translate: -50% 0;
+  border: 1px solid rgb(140 207 192 / 8%) !important;
+  border-top-color: rgb(216 168 90 / 25%) !important;
+  border-radius: 50% !important;
+  box-shadow:
+    0 0 0 24px rgb(140 207 192 / 1.8%),
+    0 0 0 54px rgb(140 207 192 / 1.1%),
+    0 0 95px rgb(216 168 90 / 6%) !important;
+  animation: living-orbit 24s linear infinite;
+}
+.start {
+  width: min(66vw, 286px) !important;
+  min-height: 0 !important;
+  aspect-ratio: 1 !important;
+  border-radius: 50% !important;
+  border: 1px solid rgb(216 168 90 / 34%) !important;
+  background:
+    radial-gradient(circle at 46% 40%, rgb(255 241 206 / 10%), transparent 8%),
+    radial-gradient(circle at 50% 48%, rgb(216 168 90 / 15%), transparent 28%),
+    radial-gradient(circle at 50% 50%, rgb(140 207 192 / 5%), transparent 63%),
+    rgb(8 14 12 / 58%) !important;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 6%),
+    inset 0 0 60px rgb(140 207 192 / 4%),
+    0 26px 90px rgb(0 0 0 / 36%),
+    0 0 70px rgb(216 168 90 / 10%) !important;
+  backdrop-filter: blur(18px) saturate(116%);
+  transform-style: preserve-3d;
+}
+.start::before {
+  width: 64% !important;
+  height: 64% !important;
+  border: 1px solid rgb(216 168 90 / 24%) !important;
+  box-shadow:
+    0 0 0 18px rgb(216 168 90 / 2%),
+    0 0 0 34px rgb(140 207 192 / 1.8%),
+    0 0 40px rgb(216 168 90 / 8%) !important;
+  animation: living-core-breathe 5.4s ease-in-out infinite !important;
+}
+.start::after {
+  content: '' !important;
+  inset: 10px !important;
+  width: auto !important;
+  height: auto !important;
+  bottom: 10px !important;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  border-right-color: rgb(140 207 192 / 17%);
+  border-bottom-color: rgb(216 168 90 / 15%);
+  animation: living-orbit-reverse 18s linear infinite;
+}
+.start:hover {
+  transform: translateY(-4px) rotateX(1.5deg) scale(1.018) !important;
+}
+.start:active {
+  transform: translateY(3px) scale(.94) !important;
+  transition-duration: 90ms !important;
+}
+.start-time {
+  font-size: clamp(52px, 14vw, 78px) !important;
+  font-weight: 280 !important;
+  color: var(--an-text) !important;
+  background: none !important;
+  filter: none !important;
+  text-shadow:
+    0 0 24px rgb(216 168 90 / 20%),
+    0 0 60px rgb(140 207 192 / 8%) !important;
+}
+.start-label {
+  margin-top: -16px;
+  color: var(--living-core-hot) !important;
+  font-size: 10px !important;
+  letter-spacing: .34em !important;
+}
+#challenge-heading {
+  margin-top: 76px !important;
+  text-align: center;
+}
+.modes {
+  width: min(100%, 520px);
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 10px !important;
+}
+.mode {
+  min-height: 48px !important;
+  border-radius: 999px !important;
+  background: transparent !important;
+  backdrop-filter: blur(10px);
+}
+.mode-active {
+  background: rgb(216 168 90 / 8%) !important;
+  box-shadow: 0 0 28px rgb(216 168 90 / 8%), inset 0 0 18px rgb(216 168 90 / 4%) !important;
+}
+
+/* ── 4. Navigation unfolds into a memory atlas --------------------------
+   The drawer ceases to be a drawer. Opening the Core reveals a full-screen
+   field. Primary areas float as memory-system nodes; technical destinations
+   form a quieter second layer. */
+.drawer-veil {
+  position: fixed !important;
+  inset: 0 !important;
+  display: grid !important;
+  place-items: stretch !important;
+  z-index: 1000 !important;
+  background:
+    radial-gradient(circle at 50% 37%, rgb(140 207 192 / 8%), transparent 23rem),
+    radial-gradient(circle at 50% 37%, rgb(216 168 90 / 5%), transparent 34rem),
+    rgb(3 7 6 / 95%) !important;
+  backdrop-filter: blur(24px) saturate(116%) !important;
+  animation: living-atlas-in 420ms cubic-bezier(.16,.84,.22,1) both;
+}
+.drawer-veil::before,
+.drawer-veil::after {
+  content: '';
+  position: fixed;
+  pointer-events: none;
+  left: 50%;
+  top: 36%;
+  translate: -50% -50%;
+  border-radius: 50%;
+}
+.drawer-veil::before {
+  width: min(80vw, 620px);
+  aspect-ratio: 1;
+  border: 1px solid rgb(140 207 192 / 7%);
+  box-shadow:
+    0 0 0 60px rgb(140 207 192 / 1.4%),
+    0 0 0 118px rgb(140 207 192 / .7%);
+  animation: living-world-breathe 9s ease-in-out infinite;
+}
+.drawer-veil::after {
+  width: min(53vw, 390px);
+  aspect-ratio: 1;
+  border: 1px dashed rgb(216 168 90 / 11%);
+  animation: living-orbit 70s linear infinite;
+}
+.drawer {
+  position: relative !important;
+  inset: auto !important;
+  width: min(100%, 820px) !important;
+  max-width: none !important;
+  height: 100dvh !important;
+  margin: 0 auto !important;
+  padding: max(78px, env(safe-area-inset-top)) 22px max(42px, env(safe-area-inset-bottom)) !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+}
+.drawer-close {
+  position: relative !important;
+  left: 50% !important;
+  top: auto !important;
+  translate: -50% 0;
+  width: 72px !important;
+  height: 72px !important;
+  margin: 0 0 46px !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background:
+    radial-gradient(circle, var(--living-core-hot) 0 5%, var(--living-core) 6% 11%, rgb(216 168 90 / 14%) 12% 19%, transparent 20%),
+    rgb(140 207 192 / 3%) !important;
+  color: rgb(240 238 228 / 58%) !important;
+  box-shadow:
+    0 0 0 1px rgb(140 207 192 / 14%),
+    0 0 0 12px rgb(140 207 192 / 2%),
+    0 0 48px rgb(216 168 90 / 18%) !important;
+}
+.drawer-close svg {
+  width: 18px !important;
+  height: 18px !important;
+  opacity: .42;
+}
+.drawer-close::before {
+  content: '';
+  position: absolute;
+  inset: -10px;
+  border-radius: 50%;
+  border: 1px solid rgb(216 168 90 / 16%);
+  border-left-color: transparent;
+  animation: living-orbit 12s linear infinite;
+}
+.menu-group {
+  position: relative;
+  z-index: 2;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px 14px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+.menu-group + .menu-group {
+  margin-top: 54px !important;
+}
+.menu-label {
+  grid-column: 1 / -1;
+  margin: 0 0 4px !important;
+  color: rgb(140 207 192 / 58%) !important;
+  text-align: center;
+  letter-spacing: .32em !important;
+}
+.menu-group-device .menu-label {
+  color: rgb(180 205 188 / 36%) !important;
+}
+.drawer-item {
+  position: relative;
+  display: grid !important;
+  place-items: center;
+  align-content: center;
+  gap: 9px !important;
+  min-width: 0;
+  min-height: 116px !important;
+  padding: 12px 6px !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background:
+    radial-gradient(circle, rgb(140 207 192 / 5%), transparent 62%) !important;
+  color: rgb(240 238 228 / 76%) !important;
+  text-align: center;
+  transform: translateY(10px) scale(.94);
+  opacity: 0;
+  animation: living-node-in 520ms cubic-bezier(.16,.84,.22,1) forwards;
+}
+.drawer-item::before {
+  content: '';
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  border: 1px solid rgb(140 207 192 / 11%);
+  box-shadow: inset 0 0 26px rgb(140 207 192 / 2%);
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+.drawer-item svg {
+  width: 27px !important;
+  height: 27px !important;
+  color: var(--living-calm) !important;
+  opacity: .74;
+  filter: drop-shadow(0 0 10px rgb(140 207 192 / 12%));
+}
+.drawer-item > span:last-child {
+  max-width: 13ch;
+  font-family: var(--serif);
+  font-size: 14px;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+.drawer-item:hover,
+.drawer-item:focus-visible {
+  background: radial-gradient(circle, rgb(216 168 90 / 8%), transparent 66%) !important;
+  color: var(--an-text) !important;
+  transform: translateY(-2px) scale(1.03) !important;
+}
+.drawer-item:hover::before,
+.drawer-item:focus-visible::before {
+  border-color: rgb(216 168 90 / 35%);
+  box-shadow: 0 0 28px rgb(216 168 90 / 9%), inset 0 0 30px rgb(216 168 90 / 3%);
+  transform: scale(1.04);
+}
+.drawer-item:active {
+  transform: scale(.91) !important;
+}
+.menu-group .drawer-item:nth-of-type(1) { animation-delay: 30ms; }
+.menu-group .drawer-item:nth-of-type(2) { animation-delay: 65ms; }
+.menu-group .drawer-item:nth-of-type(3) { animation-delay: 100ms; }
+.menu-group .drawer-item:nth-of-type(4) { animation-delay: 135ms; }
+.menu-group .drawer-item:nth-of-type(5) { animation-delay: 170ms; }
+.menu-group .drawer-item:nth-of-type(6) { animation-delay: 205ms; }
+.menu-group .drawer-item:nth-of-type(7) { animation-delay: 240ms; }
+.menu-group-device .drawer-item {
+  min-height: 88px !important;
+  opacity: 0;
+  color: rgb(180 205 188 / 54%) !important;
+  background: transparent !important;
+}
+.menu-group-device .drawer-item::before {
+  inset: 16%;
+  border-color: rgb(180 205 188 / 7%);
+}
+.menu-group-device .drawer-item svg {
+  width: 20px !important;
+  height: 20px !important;
+  opacity: .5;
+}
+.menu-group-device .drawer-item > span:last-child {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: .04em;
+}
+
+/* Pages feel as if a node opened, rather than a new website loaded. */
+.page {
+  animation: living-page-open 380ms cubic-bezier(.16,.84,.22,1) both;
+}
+.page-head {
+  border: 0 !important;
+}
+.page-back {
+  border-radius: 999px !important;
+  backdrop-filter: blur(12px);
+}
+.page-title {
+  position: relative;
+  padding-left: 30px;
+}
+.page-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: .47em;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--living-core);
+  box-shadow: 0 0 18px rgb(216 168 90 / 38%), 0 0 0 7px rgb(216 168 90 / 4%);
+}
+
+/* Secondary controls recede; daily interaction belongs to the world. */
+.footer {
+  opacity: .58;
+  transition: opacity 240ms ease;
+}
+.footer:focus-within,
+.footer:hover { opacity: 1; }
+
+/* ── Motion -------------------------------------------------------------- */
+@keyframes living-orbit {
+  to { transform: rotate(360deg); }
+}
+@keyframes living-orbit-reverse {
+  to { transform: rotate(-360deg); }
+}
+@keyframes living-core-breathe {
+  0%, 100% { transform: scale(.78); opacity: .34; }
+  48% { transform: scale(1.12); opacity: .9; }
+}
+@keyframes living-world-breathe {
+  0%, 100% { transform: scale(.94); opacity: .48; }
+  50% { transform: scale(1.045); opacity: .9; }
+}
+@keyframes living-atlas-in {
+  from { opacity: 0; backdrop-filter: blur(0); }
+  to { opacity: 1; backdrop-filter: blur(24px) saturate(116%); }
+}
+@keyframes living-node-in {
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes living-page-open {
+  from { opacity: 0; transform: scale(.985) translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (max-width: 560px) {
+  .brand { padding-top: 4px !important; }
+  .hamburger { width: 54px !important; height: 54px !important; }
+  .today { padding-top: 22px !important; }
+  .today-mission { grid-template-columns: 1fr; }
+  .today-duration { text-align: left; }
+  .memory-pulse { padding-left: 66px !important; }
+  .challenge { margin-top: 26px !important; }
+  .start { width: min(70vw, 270px) !important; }
+  .challenge::after { width: min(82vw, 318px) !important; height: min(82vw, 318px) !important; }
+  #challenge-heading { margin-top: 66px !important; }
+  .modes { grid-template-columns: repeat(2, 1fr) !important; width: min(100%, 380px); }
+  .drawer { padding-left: 15px !important; padding-right: 15px !important; }
+  .drawer-close { margin-bottom: 34px !important; }
+  .menu-group { gap: 12px 7px !important; }
+  .drawer-item { min-height: 104px !important; }
+  .drawer-item > span:last-child { font-size: 12.5px; }
+  .menu-group-device { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .menu-group-device .drawer-item { min-height: 76px !important; }
+}
+
+@media (max-width: 390px) {
+  .drawer-item { min-height: 92px !important; }
+  .drawer-item > span:last-child { font-size: 11.5px; }
+  .menu-group { gap: 8px 4px !important; }
+}
+
+@media (hover: none) {
+  .hamburger:hover { transform: none !important; filter: none; }
+  .start:hover { transform: none !important; }
+  .drawer-item:hover { transform: none !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hamburger::before,
+  .hamburger::after,
+  .today::before,
+  .challenge::after,
+  .start::before,
+  .start::after,
+  .drawer-veil,
+  .drawer-veil::before,
+  .drawer-veil::after,
+  .drawer-close::before,
+  .drawer-item,
+  .page {
+    animation: none !important;
+  }
+  .drawer-item { opacity: 1; transform: none; }
+}
