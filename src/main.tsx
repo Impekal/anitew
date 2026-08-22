@@ -13,19 +13,40 @@ import './anitew-phase5.css'
 
 // Die Signatur-Schichten sind bewusst kein Startpfad. Erst wenn Dokument,
 // App und Service-Worker-Start vollständig zur Ruhe gekommen sind, holen wir
-// die rein visuelle Tiefe nach. So konkurriert ein Reload weder mit den
-// optionalen CSS-Chunks noch mit der Update-Prüfung. Fällt das Nachladen aus,
-// bleibt ANITEW vollständig funktional und lesbar.
+// die rein visuelle Tiefe nach. Die Schichten kommen absichtlich nacheinander:
+// Living Memory ist die letzte Autorität und kann ältere Drawer-/Startregeln
+// sicher ersetzen, statt mit parallelen CSS-Chunks um die Reihenfolge zu
+// konkurrieren.
+let signatureTimer: number | undefined
+let pageIsLeaving = false
+
 const loadSignatureExperience = () => {
-  window.setTimeout(() => {
-    void Promise.all([
-      import('./anitew-wow.css'),
-      import('./anitew-wow-session.css'),
-      import('./anitew-living.css'),
-      import('./anitew-living-adaptive.css'),
-    ]).catch(() => undefined)
+  signatureTimer = window.setTimeout(() => {
+    if (pageIsLeaving) return
+    void (async () => {
+      await import('./anitew-wow.css')
+      if (pageIsLeaving) return
+      await import('./anitew-wow-session.css')
+      if (pageIsLeaving) return
+      await import('./anitew-living.css')
+      if (pageIsLeaving) return
+      await import('./anitew-living-adaptive.css')
+    })().catch(() => undefined)
   }, 750)
 }
+
+// Ein altes Dokument darf beim Reload keine optionalen Chunks mehr anwerfen.
+// Sonst können genau diese Requests mit Service-Worker-Übernahme und dem neuen
+// Dokument konkurrieren. Funktional geht nichts verloren: das neue Dokument
+// lädt seine eigene Signatur nach stabilem Start selbst.
+window.addEventListener(
+  'pagehide',
+  () => {
+    pageIsLeaving = true
+    if (signatureTimer !== undefined) window.clearTimeout(signatureTimer)
+  },
+  { once: true },
+)
 
 if (document.readyState === 'complete') loadSignatureExperience()
 else window.addEventListener('load', loadSignatureExperience, { once: true })
