@@ -7,9 +7,9 @@
  * Mitlesen (R-3): Der Schlüssel liegt in den Einstellungen dieses Geräts
  * und geht in genau einen Header.
  *
- * Fünf Anbieter, ein Muster: Jeder ist **ein** Eintrag in einer Tabelle —
+ * Sechs Anbieter, ein Muster: Jeder ist **ein** Eintrag in einer Tabelle —
  * Adresse, Modell, Kopfzeilen, Antwortform. Bewusst rohes `fetch` statt
- * fünf SDKs: Das Kaltstart-Budget (P4) zählt jede Abhängigkeit, und für
+ * sechs SDKs: Das Kaltstart-Budget (P4) zählt jede Abhängigkeit, und für
  * je einen POST wären SDKs genau die dicken Abhängigkeiten, vor denen der
  * Budget-Wächter warnt.
  */
@@ -19,7 +19,14 @@ import type { CoachPort, CoachRequest } from '../../core/coach/prompt.ts'
 
 /** Die Anbieter, in der Reihenfolge der Auswahl. Gemini zuerst: Der
  *  Schlüssel ist dort in zwei Minuten angelegt und kostenlos nutzbar. */
-export const COACH_PROVIDERS = ['gemini', 'anthropic', 'groq', 'openrouter', 'mistral'] as const
+export const COACH_PROVIDERS = [
+  'gemini',
+  'anthropic',
+  'openai',
+  'groq',
+  'openrouter',
+  'mistral',
+] as const
 export type CoachProvider = (typeof COACH_PROVIDERS)[number]
 
 export const DEFAULT_COACH_PROVIDER: CoachProvider = 'gemini'
@@ -39,13 +46,14 @@ export const LEGACY_COACH_KEY_SETTING = 'coach.key'
 export const COACH_PROVIDER_NAMES: Readonly<Record<CoachProvider, string>> = {
   gemini: 'Google Gemini',
   anthropic: 'Anthropic (Claude)',
+  openai: 'OpenAI',
   groq: 'Groq',
   openrouter: 'OpenRouter',
   mistral: 'Mistral',
 }
 
-/** Wo der Schlüssel entsteht — der Direktlink je Anbieter. */
-export const COACH_KEY_URLS: Readonly<Record<CoachProvider, string>> = {
+/** Wo der Schlüssel entsteht — der Direktlink je bestehendem statischen Anbieter. */
+export const COACH_KEY_URLS: Readonly<Record<Exclude<CoachProvider, 'openai'>, string>> = {
   gemini: 'https://aistudio.google.com/apikey',
   anthropic: 'https://console.anthropic.com/settings/keys',
   groq: 'https://console.groq.com/keys',
@@ -58,7 +66,7 @@ export const COACH_KEY_URLS: Readonly<Record<CoachProvider, string>> = {
  * Frage an den Menschen, die die App beantworten kann (D-031). Gewählt
  * sind die soliden Alltagsmodelle der Anbieter, nicht deren teuerste.
  */
-const MODELS: Readonly<Record<CoachProvider, string>> = {
+const MODELS: Readonly<Record<Exclude<CoachProvider, 'openai'>, string>> = {
   gemini: 'gemini-2.5-flash',
   anthropic: 'claude-opus-5',
   groq: 'llama-3.3-70b-versatile',
@@ -103,7 +111,7 @@ function openAiCall(url: string, key: string, model: string, request: CoachReque
   }
 }
 
-function callFor(provider: CoachProvider, key: string, request: CoachRequest): ProviderCall {
+function callFor(provider: CoachProvider, key: string, request: CoachRequest) {
   switch (provider) {
     case 'gemini':
       return {
@@ -114,7 +122,7 @@ function callFor(provider: CoachProvider, key: string, request: CoachRequest): P
           contents: [{ role: 'user', parts: [{ text: request.question }] }],
           generationConfig: { maxOutputTokens: COACH_MAX_TOKENS },
         },
-        parse: (payload) => {
+        parse: (payload: unknown) => {
           const body = payload as {
             promptFeedback?: { blockReason?: string }
             candidates?: { content?: { parts?: { text?: string }[] } }[]
@@ -131,12 +139,6 @@ function callFor(provider: CoachProvider, key: string, request: CoachRequest): P
         headers: {
           'x-api-key': key,
           'anthropic-version': '2023-06-01',
-          /*
-           * Anthropic verlangt dieses ausdrückliche Einverständnis für
-           * Aufrufe aus dem Browser — genau unser Fall: Der Schlüssel
-           * gehört dem Menschen selbst, es gibt keinen Server, dem er
-           * anvertraut wäre.
-           */
           'anthropic-dangerous-direct-browser-access': 'true',
         },
         body: {
@@ -145,7 +147,7 @@ function callFor(provider: CoachProvider, key: string, request: CoachRequest): P
           system: request.system,
           messages: [{ role: 'user', content: request.question }],
         },
-        parse: (payload) => {
+        parse: (payload: unknown) => {
           const body = payload as {
             stop_reason?: string
             content?: readonly { type: string; text?: string }[]
@@ -157,6 +159,10 @@ function callFor(provider: CoachProvider, key: string, request: CoachRequest): P
             .join('')
         },
       }
+    case 'openai':
+      return import('./openaiCoach.ts').then(({ openAiResponsesCall }) =>
+        openAiResponsesCall(key, request),
+      )
     case 'groq':
       return openAiCall('https://api.groq.com/openai/v1/chat/completions', key, MODELS.groq, request)
     case 'openrouter':
@@ -182,7 +188,7 @@ export function createWebCoach(readConfig: () => Promise<CoachConfig>): CoachPor
       const { provider, key } = await readConfig()
       if (key === undefined || key.trim() === '') throw new CoachError('no-key')
 
-      const call = callFor(provider, key.trim(), request)
+      const call = await callFor(provider, key.trim(), request)
       let response: Response
       try {
         response = await fetch(call.url, {

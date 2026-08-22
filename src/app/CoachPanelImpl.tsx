@@ -137,7 +137,7 @@ export function CoachPanelImpl({
           <select value={provider} onChange={(event) => choose(event.target.value as CoachProvider)}>
             {COACH_PROVIDERS.map((id) => (
               <option key={id} value={id}>
-                {texts.providers[id]}
+                {id === 'openai' ? 'OpenAI' : texts.providers[id]}
               </option>
             ))}
           </select>
@@ -146,8 +146,16 @@ export function CoachPanelImpl({
         {!hasKey && (
           <>
             <p className="coach-key-help">
-              {texts.keySteps[provider]}{' '}
-              <a href={COACH_KEY_URLS[provider]} target="_blank" rel="noreferrer">
+              {provider === 'openai' ? 'OpenAI Platform · API keys' : texts.keySteps[provider]}{' '}
+              <a
+                href={
+                  provider === 'openai'
+                    ? 'https://platform.openai.com/api-keys'
+                    : COACH_KEY_URLS[provider]
+                }
+                target="_blank"
+                rel="noreferrer"
+              >
                 {texts.keyLink}
               </a>
             </p>
