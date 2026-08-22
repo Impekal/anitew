@@ -11,12 +11,15 @@ import './anitew-phase4-journey.css'
 import './anitew-phase4-landing.css'
 import './anitew-phase5.css'
 
-// Die Signatur-Schicht ist bewusst kein Kaltstart-CSS: Der erste echte
-// Bildschirm bleibt sofort benutzbar, danach bekommt dieselbe Oberfläche
-// Tiefe, Glühen und die lebendige Memory-DNA. Fällt der optionale Chunk aus,
-// bleibt ANITEW vollständig funktional und lesbar.
+// Die Signatur-Schichten sind bewusst kein Kaltstart-CSS: Der erste echte
+// Bildschirm bleibt sofort benutzbar, danach bekommen Start, Memory-DNA und
+// Trainingsritual ihre Tiefe. Fällt ein optionaler Chunk aus, bleibt ANITEW
+// vollständig funktional und lesbar.
 requestAnimationFrame(() => {
-  void import('./anitew-wow.css').catch(() => undefined)
+  void Promise.all([
+    import('./anitew-wow.css'),
+    import('./anitew-wow-session.css'),
+  ]).catch(() => undefined)
 })
 
 // Neue Fassungen kommen von selbst an — siehe updates.ts. Steht vor dem
