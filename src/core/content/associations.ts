@@ -29,12 +29,7 @@ export interface AssociationCue {
 
 /** Aus `Elena#room` wird das separate Querabruf-Item `Elena#room~person`. */
 export function associationId(missionItem: string): string | undefined {
-  if (factKindOf(missionItem) === undefined) return undefined
-  return `${missionItem}${REVERSE_SUFFIX}`
-}
-
-export function isAssociationId(item: string): boolean {
-  return item.endsWith(REVERSE_SUFFIX) && factKindOf(baseMissionItem(item)) !== undefined
+  return factKindOf(missionItem) === undefined ? undefined : `${missionItem}${REVERSE_SUFFIX}`
 }
 
 /** Das ursprüngliche Mission-Item hinter einem Querabruf. */
@@ -42,13 +37,17 @@ export function baseMissionItem(item: string): string {
   return item.endsWith(REVERSE_SUFFIX) ? item.slice(0, -REVERSE_SUFFIX.length) : item
 }
 
+export function isAssociationId(item: string): boolean {
+  return item.endsWith(REVERSE_SUFFIX) && factKindOf(baseMissionItem(item)) !== undefined
+}
+
 /**
  * Liefert Cue und Ziel ausschließlich aus der deterministischen Mission.
  * Ungültige IDs werden nicht still interpretiert.
  */
 export function associationCueFor(item: string, language: Language): AssociationCue | undefined {
-  if (!isAssociationId(item)) return undefined
-  const base = baseMissionItem(item)
+  if (!item.endsWith(REVERSE_SUFFIX)) return undefined
+  const base = item.slice(0, -REVERSE_SUFFIX.length)
   const kind = factKindOf(base)
   if (kind === undefined) return undefined
   const cue = answerFor(base, language)
@@ -66,6 +65,11 @@ export function associationCueFor(item: string, language: Language): Association
  * ist eine echte Bindung wie Zimmer, Gegenstand, Zeit oder Ort.
  */
 export function associationItems(person: string): readonly string[] {
-  const kinds: readonly FactKind[] = ['room', 'object', 'location', 'time', 'place']
-  return kinds.map((kind) => `${person}#${kind}${REVERSE_SUFFIX}`)
+  return [
+    `${person}#room${REVERSE_SUFFIX}`,
+    `${person}#object${REVERSE_SUFFIX}`,
+    `${person}#location${REVERSE_SUFFIX}`,
+    `${person}#time${REVERSE_SUFFIX}`,
+    `${person}#place${REVERSE_SUFFIX}`,
+  ]
 }

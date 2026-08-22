@@ -34,8 +34,11 @@ describe('die Achsen', () => {
      * deshalb keine vergleichbaren Messquellen. Seit D12 ist außerdem der
      * Gedächtnispalast bewusst nur noch Technik/Übung: Die räumliche Achse
      * wird ausschließlich durch das eigenständige `spatial`-Modul gemessen.
+     * Seit D13 ist auch die Mission selbst die Szene/Übung; die Achse
+     * „Zusammenhänge“ misst den separaten fact-to-person-Querabruf aus
+     * `associative`, damit dieselbe Mission nicht zweimal als Profilwert zählt.
      */
-    const chosen = new Set(['facts', 'memory', 'palace'])
+    const chosen = new Set(['facts', 'memory', 'palace', 'missions'])
     const measured = TRAINING_MODULES.filter((moduleId) => !chosen.has(moduleId))
     for (const moduleId of measured) {
       expect(dimensionOf(moduleId), `${moduleId} ohne Achse`).toBeDefined()
@@ -43,6 +46,7 @@ describe('die Achsen', () => {
     expect(dimensionOf('facts')).toBeUndefined()
     expect(dimensionOf('memory')).toBeUndefined()
     expect(dimensionOf('palace')).toBeUndefined()
+    expect(dimensionOf('missions')).toBeUndefined()
     const mapped = measured.map(dimensionOf)
     expect(new Set(mapped).size).toBe(measured.length)
   })
@@ -62,11 +66,6 @@ describe('die Achsen', () => {
 
 describe('was das Profil sagt — und was nicht', () => {
   it('sagt nichts, solange zu wenige Gelegenheiten da sind (E7)', () => {
-    /*
-     * Der Kern von E7: „82 nach drei Aufgaben wäre eine erfundene Zahl.“
-     * Wichtig ist dabei die **Art** der Antwort — nicht `rate: 0`, sondern
-     * ein eigener Fall. Eine Null ließe sich als schlechtes Ergebnis lesen.
-     */
     const [words] = profileOf({ words: full(MIN_CHANCES - 1, 0) })
     expect(words?.kind).toBe('tooFew')
     expect(words).not.toHaveProperty('rate')
@@ -76,13 +75,6 @@ describe('was das Profil sagt — und was nicht', () => {
     const results = profileOf({})
     const words = results.find((result) => result.id === 'words')
     expect(words?.kind).toBe('tooFew')
-    /*
-     * Seit dem Bild-Modul hat jede der neun Achsen eine echte Quelle —
-     * keine sagt mehr „misst diese App nicht“. Der `none`-Zweig bleibt im
-     * Code für die nächste Achse ohne Modul (D-016); solange es keine
-     * gibt, ist „nicht gemessen“ nirgends die Antwort — und „zu wenig“
-     * bleibt scharf von „schlecht“ getrennt.
-     */
     for (const result of results) {
       expect(result.kind, result.id).not.toBe('notMeasured')
     }
@@ -92,12 +84,6 @@ describe('was das Profil sagt — und was nicht', () => {
   })
 
   it('nennt eine Sofort-Achse nie als schwächste — zwei Währungen (D-026)', () => {
-    /*
-     * Arbeitsgedächtnis 50 % sofort, Wörter 90 % nach Tagen: Die Spannen
-     * lägen weit auseinander, aber die Zahlen messen Verschiedenes. „Am
-     * wenigsten bleibt hier hängen“ wäre über die Sofort-Achse gelogen —
-     * dort bleibt gar nichts hängen, dort wird umgebaut.
-     */
     const results = profileOf({
       working: full(60, 30),
       words: full(60, 6),
@@ -105,14 +91,10 @@ describe('was das Profil sagt — und was nicht', () => {
     })
     const weak = weakest(results)
     expect(weak).not.toBe('working')
-    // Zwischen den beiden Wiedersehens-Achsen darf weiterhin entschieden
-    // werden — hier überlappen sich ihre Spannen aber, also schweigt sie.
     expect(weak === undefined || weak === 'words' || weak === 'faces').toBe(true)
   })
 
   it('überlässt den langfristigen Abruf der Messung (F1)', () => {
-    // Zwei Zahlen über dasselbe zu haben hieße, dass eine davon die
-    // schlechtere ist — und niemand wüsste, welche.
     const long = profileOf({}).find((result) => result.id === 'longTerm')
     expect(long?.kind).toBe('elsewhere')
   })
@@ -127,7 +109,6 @@ describe('was das Profil sagt — und was nicht', () => {
     if (words?.kind !== 'measured') throw new Error('nicht gemessen')
     expect(words.low).toBeLessThan(words.rate)
     expect(words.high).toBeGreaterThan(words.rate)
-    // Und sie bleibt in den Grenzen, die ein Anteil hat.
     expect(words.low).toBeGreaterThanOrEqual(0)
     expect(words.high).toBeLessThanOrEqual(100)
   })
@@ -147,10 +128,6 @@ describe('was das Profil sagt — und was nicht', () => {
 
 describe('die schwächste Achse (E5)', () => {
   it('schweigt, solange sich die Spannen überlappen', () => {
-    /*
-     * Der eigentliche Punkt: Eine App, die auf einen zufälligen Unterschied
-     * hin den Trainingsplan umbaut, baut ihn auf Rauschen um.
-     */
     const results = profileOf({ words: full(20, 5), numbers: full(20, 6) })
     expect(weakest(results)).toBeUndefined()
   })
@@ -161,7 +138,6 @@ describe('die schwächste Achse (E5)', () => {
   })
 
   it('schweigt, solange nur eine Achse überhaupt trägt', () => {
-    // Ohne Vergleich gibt es keine schwächste — nur eine einzige.
     expect(weakest(profileOf({ words: full(40, 20) }))).toBeUndefined()
   })
 })
@@ -189,12 +165,6 @@ describe('der Schwerpunkt im Bauplan (E5)', () => {
     plan.blocks.filter((block) => block.kind === 'encode').map((block) => block.moduleId)
 
   it('gibt dem Schwerpunkt jede zweite Runde', () => {
-    /*
-     * Nicht alle Runden: Eine Einheit, die nur noch das Schwächste übt, ist
-     * keine Personalisierung, sondern eine Strafe für eine Schwäche — und sie
-     * ließe alles andere verfallen, obwohl der Wiederholungsplan es weiter für
-     * fällig hält.
-     */
     const plan = planSession({ ...base, pools, modules: ['words', 'faces', 'numbers'], focus: 'numbers' })
     const rounds = modulesOf(plan)
     expect(rounds.length).toBeGreaterThan(2)
@@ -212,12 +182,6 @@ describe('der Schwerpunkt im Bauplan (E5)', () => {
   })
 
   it('übergeht einen Schwerpunkt, der in dieser Zeit gar nicht vorkommt', () => {
-    /*
-     * Der Palast wird unter drei Minuten nicht gelernt (D-020). Ihn dann als
-     * Schwerpunkt zu setzen hieße, einen Schwerpunkt zu versprechen, den der
-     * Plan nicht einhält — deshalb benutzt der Startbildschirm dieselbe Regel
-     * (`learnableModules`) und kündigt ihn gar nicht erst an.
-     */
     expect(learnableModules(60)).not.toContain('palace')
     expect(learnableModules(300)).toContain('palace')
     const plan = planSession({ ...base, mode: 'emergency', pools, focus: 'palace' })
@@ -225,9 +189,6 @@ describe('der Schwerpunkt im Bauplan (E5)', () => {
   })
 
   it('lässt der Lektion den Vortritt', () => {
-    // Unterricht ohne Anwendung ist am nächsten Tag wieder weg (D5). Wer heute
-    // die erste Ziffer lernt, fängt mit Zahlen an, auch wenn Wörter schwächer
-    // sind.
     const plan = planSession({
       ...base,
       mode: 'daily',
@@ -242,7 +203,6 @@ describe('der Schwerpunkt im Bauplan (E5)', () => {
   })
 
   it('plant ohne Schwerpunkt genauso wie bisher', () => {
-    // Die Gegenprobe: Ohne Profilaussage ändert sich am Plan nichts.
     const plain = planSession({ ...base, pools, modules: ['words', 'faces', 'numbers'] })
     expect(plain.focus).toBeUndefined()
     const rounds = modulesOf(plain)
@@ -254,18 +214,17 @@ describe('die Trainingsbilanz (V2)', () => {
   it('zählt Tage je Sieben-Tage-Fenster — dedupliziert, Zukunft und Uraltes fallen', () => {
     const bars = trainingFootprint(
       [
-        '2026-08-19', // heute → letztes Fenster
-        '2026-08-19', // doppelt → zählt einmal
-        '2026-08-13', // 6 Tage zurück → noch letztes Fenster
-        '2026-08-12', // 7 Tage zurück → vorletztes Fenster
-        '2026-08-20', // Zukunft → fällt
-        '2026-01-01', // vor dem Zeitraum → fällt
+        '2026-08-19',
+        '2026-08-19',
+        '2026-08-13',
+        '2026-08-12',
+        '2026-08-20',
+        '2026-01-01',
       ],
       '2026-08-19',
       8,
     )
     expect(bars).toHaveLength(8)
-    // Lesereihenfolge: das älteste zuerst, ganz rechts die laufende Woche.
     expect(bars[7]?.daysTrained).toBe(2)
     expect(bars[6]?.daysTrained).toBe(1)
     expect(bars.slice(0, 6).every((week) => week.daysTrained === 0)).toBe(true)

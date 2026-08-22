@@ -37,6 +37,12 @@
  * Messgerät für allgemeines räumliches Erinnern zu verwenden wäre eine
  * bequemere, aber andere Aussage.
  *
+ * **Zusammenhänge** werden seit D13 aus dem expliziten assoziativen Querabruf
+ * gemessen: Von einer tatsächlich gelernten Missions-Tatsache zurück zur
+ * Person. Die Mission selbst bleibt die Szene und Übung; dieselbe Szene noch
+ * einmal als eigene Profilachse zu zählen würde denselben Inhalt doppelt
+ * bewerten.
+ *
  * **Aufmerksamkeit** zählt seit den Zwillingen (C6/D-027) das, was ihr Name
  * in der Anzeige sagt: Ähnliches auseinanderhalten — Wiedersehen nach
  * Tagen, dieselbe Währung wie die anderen Modul-Achsen.
@@ -83,21 +89,13 @@ export type DimensionSource =
   | { kind: 'benchmark' }
   | { kind: 'none' }
 
-/**
- * Die Zuordnung.
- *
- * **Zusammenhänge** (`binding`) steht nicht in der Liste aus E2 und ist
- * trotzdem dabei: Eine Mission übt, dass Zimmer, Gegenstand, Uhrzeit und Ort
- * **zu einer Person gehören** (D-014). Das ist eine eigene Fähigkeit und die
- * alltagsnächste von allen — sie unter „Namen & Gesichter“ zu verbuchen wäre
- * bequem und falsch.
- */
+/** Die Zuordnung. */
 export const SOURCES: Readonly<Record<DimensionId, DimensionSource>> = {
   words: { kind: 'module', moduleId: 'words' },
   faces: { kind: 'module', moduleId: 'faces' },
   numbers: { kind: 'module', moduleId: 'numbers' },
   spatial: { kind: 'module', moduleId: 'spatial' },
-  binding: { kind: 'module', moduleId: 'missions' },
+  binding: { kind: 'module', moduleId: 'associative' },
   visual: { kind: 'module', moduleId: 'gaze' },
   attention: { kind: 'module', moduleId: 'twins' },
   working: { kind: 'immediate', moduleId: 'reverse' },
