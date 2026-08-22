@@ -7,21 +7,24 @@
  * durchgesehen, und die App misst dann Wiedererkennen statt Gedächtnis —
  * derselbe Grund wie beim Gesichtsgenerator (D-005).
  *
- * ── Warum die Ziffern zusammenhängen und keine Leerzeichen haben ──────────
+ * ── Gruppierte Schreibweise ────────────────────────────────────────────────
  *
- * D10 nennt „Ziffernfolgen, Jahreszahlen, PINs, Telefonnummern“. Eine
- * Telefonnummer schriebe man gern als „0176 4392 118“ — und genau das geht
- * nicht: Der freie Abruf zerlegt die Eingabe an Leerzeichen (`splitEntries`),
- * aus einer Nummer würden drei Antworten. Gruppierte Zahlen brauchen also
- * erst eine Eingabe, die weiß, dass sie **eine** Antwort erwartet. Bis dahin
- * sind alle Zahlen zusammenhängend — eine Einschränkung, und sie wird hier
- * benannt statt versteckt.
+ * Die Scheduler-ID einer Zahl bleibt immer die reine Ziffernfolge. Für die
+ * Anzeige darf dieselbe Zahl aber gruppiert werden, und eine gruppiert
+ * eingegebene Antwort wird wieder auf genau diese Ziffernfolge reduziert.
+ * Damit verändert eine Darstellungsverbesserung weder bereits gelernte Items
+ * noch ihre FSRS-Historie.
  *
- * ── Keine führenden Nullen ────────────────────────────────────────────────
+ * Mehrere Zahlen werden bewusst nur durch Zeilenumbruch, Komma oder Semikolon
+ * getrennt. Leerzeichen gehören innerhalb einer Zahl zur Gruppierung. So ist
+ * „0176 4392 118“ eine Antwort und nicht drei scheinbare Antworten.
  *
- * „0473“ und „473“ wären zwei verschiedene Gegenstände, und wer die Zahl
- * abtippt, lässt die Null vorne ganz selbstverständlich weg. Gemessen würde
- * dann Schreibweise statt Gedächtnis.
+ * ── Keine führenden Nullen im bisherigen Generator ────────────────────────
+ *
+ * Der bestehende 3–6-Ziffern-Vorrat bleibt unverändert. Das ist Absicht:
+ * Bereits erzeugte Trainingstage sollen durch diesen UI-/Eingabe-Slice nicht
+ * unter den Füßen der Nutzer neu ausgewürfelt werden. Längere Telefonnummern
+ * können darauf aufbauen, ohne alte IDs umzudeuten.
  */
 
 import { createRng } from '../rng.ts'
@@ -29,6 +32,41 @@ import { createRng } from '../rng.ts'
 /** Kürzeste und längste Folge. Sechs liegt in der Nähe der Merkspanne. */
 export const MIN_DIGITS = 3
 export const MAX_DIGITS = 6
+
+/**
+ * Gruppiert eine Ziffernfolge nur für die Anzeige.
+ *
+ * Von rechts in Dreiergruppen, weil dadurch die zugrunde liegende ID nie
+ * verändert wird und jede Länge deterministisch dargestellt werden kann.
+ * Nicht-numerische Werte werden unverändert gelassen; diese Funktion erfindet
+ * keine Bedeutung für fremde IDs.
+ */
+export function displayNumber(value: string): string {
+  if (!/^\d+$/.test(value) || value.length <= 4) return value
+  const first = value.length % 3 || 3
+  const groups = [value.slice(0, first)]
+  for (let index = first; index < value.length; index += 3) {
+    groups.push(value.slice(index, index + 3))
+  }
+  return groups.join(' ')
+}
+
+/**
+ * Zerlegt freien Zahlabruf, ohne Gruppierungsleerzeichen zu zerstören.
+ *
+ * Eine Zahl pro Zeile ist der natürliche Mehrfachabruf. Komma und Semikolon
+ * funktionieren ebenfalls. Innerhalb eines Eintrags werden nur sichtbare
+ * Gruppierungszeichen entfernt; übrig bleiben muss eine reine Ziffernfolge.
+ * Ungültige Einträge bleiben erhalten, damit die Bewertung sie als `extra`
+ * statt stillschweigend als Treffer verbuchen kann.
+ */
+export function splitNumberEntries(text: string): string[] {
+  return text
+    .split(/[\n,;]+/)
+    .map((entry) => entry.trim())
+    .filter((entry) => entry.length > 0)
+    .map((entry) => (/^[\d\s]+$/.test(entry) ? entry.replace(/\s+/g, '') : entry))
+}
 
 /**
  * Ist die Folge zu leicht, um etwas zu messen?

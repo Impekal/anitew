@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
-import { MAX_DIGITS, MIN_DIGITS, isTooEasy, numberPool } from '../../src/core/content/numbers.ts'
+import {
+  MAX_DIGITS,
+  MIN_DIGITS,
+  displayNumber,
+  isTooEasy,
+  numberPool,
+  splitNumberEntries,
+} from '../../src/core/content/numbers.ts'
 import { gradePrompted, gradeRecall } from '../../src/core/session/grading.ts'
 import { leniencyFor } from '../../src/core/session/plan.ts'
 
@@ -44,12 +51,29 @@ describe('der Zahlenvorrat (D10)', () => {
     expect(isTooEasy('4719')).toBe(false)
     expect(pool.some(isTooEasy)).toBe(false)
   })
+})
 
-  it('hat keine Leerzeichen — der freie Abruf zerlegt sonst eine Zahl in drei', () => {
-    // Bis es eine Eingabe gibt, die weiß, dass sie **eine** Antwort erwartet,
-    // sind gruppierte Nummern nicht möglich. Die Einschränkung wird benannt,
-    // nicht versteckt.
-    for (const value of pool) expect(value).not.toMatch(/\s/)
+describe('gruppierte Zahlen (D10)', () => {
+  it('gruppiert nur die Anzeige und lässt die Scheduler-ID unberührt', () => {
+    expect(displayNumber('471926')).toBe('471 926')
+    expect(displayNumber('71926')).toBe('71 926')
+    expect(displayNumber('4719')).toBe('4719')
+    expect(displayNumber('Elena#room')).toBe('Elena#room')
+  })
+
+  it('behandelt Leerzeichen innerhalb einer Zahl als Gruppierung', () => {
+    expect(splitNumberEntries('0176 4392 118')).toEqual(['01764392118'])
+    expect(splitNumberEntries('471 926\n583 104')).toEqual(['471926', '583104'])
+    expect(splitNumberEntries('471 926; 583 104')).toEqual(['471926', '583104'])
+  })
+
+  it('verschluckt ungültige Eingaben nicht', () => {
+    expect(splitNumberEntries('471 926\nabc')).toEqual(['471926', 'abc'])
+  })
+
+  it('lässt gruppierte Eingabe unter der strengen Zahlenregel treffen', () => {
+    const entries = splitNumberEntries('471 926')
+    expect(gradeRecall(entries, ['471926'], 'exact').correct).toEqual(['471926'])
   })
 })
 
