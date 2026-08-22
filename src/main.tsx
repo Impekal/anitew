@@ -2,7 +2,6 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
 import { App } from './app/App.tsx'
-import { NeuralField } from './app/NeuralField.tsx'
 import { keepUpToDate } from './platform/web/updates.ts'
 import './styles.css'
 import './anitew-redesign.css'
@@ -16,7 +15,7 @@ import './anitew-phase5.css'
 // die rein visuelle Tiefe nach. Die Schichten kommen absichtlich nacheinander:
 // Living Memory ist die letzte Autorität und kann ältere Drawer-/Startregeln
 // sicher ersetzen, statt mit parallelen CSS-Chunks um die Reihenfolge zu
-// konkurrieren. Der letzte Import lädt Adaptive + Core Ritual gemeinsam.
+// konkurrieren. Der letzte Import lädt Adaptive + Core Ritual + Neural Field.
 let signatureTimer: number | undefined
 let pageIsLeaving = false
 
@@ -35,10 +34,6 @@ const loadSignatureExperience = () => {
   }, 750)
 }
 
-// Ein altes Dokument darf beim Reload keine optionalen Chunks mehr anwerfen.
-// Sonst können genau diese Requests mit Service-Worker-Übernahme und dem neuen
-// Dokument konkurrieren. Funktional geht nichts verloren: das neue Dokument
-// lädt seine eigene Signatur nach stabilem Start selbst.
 window.addEventListener(
   'pagehide',
   () => {
@@ -51,8 +46,6 @@ window.addEventListener(
 if (document.readyState === 'complete') loadSignatureExperience()
 else window.addEventListener('load', loadSignatureExperience, { once: true })
 
-// Neue Fassungen kommen von selbst an — siehe updates.ts. Steht vor dem
-// Rendern, damit auch ein Fehler in der App die Aktualisierung nicht blockiert.
 keepUpToDate()
 
 const container = document.getElementById('root')
@@ -60,10 +53,6 @@ if (container === null) throw new Error('#root fehlt in index.html')
 
 createRoot(container).render(
   <StrictMode>
-    {/* Liegt hinter allem und über jedem Bildschirm — deshalb hier und nicht
-        in App: So wird es beim Wechsel zwischen Start und Einheit nicht neu
-        aufgebaut und flackert nicht (D-011/G-3, G-8). */}
-    <NeuralField />
     <App />
   </StrictMode>,
 )
