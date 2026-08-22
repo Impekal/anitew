@@ -7,9 +7,9 @@
  * Mitlesen (R-3): Der Schlüssel liegt in den Einstellungen dieses Geräts
  * und geht in genau einen Header.
  *
- * Fünf Anbieter, ein Muster: Jeder ist **ein** Eintrag in einer Tabelle —
+ * Sechs Anbieter, ein Muster: Jeder ist **ein** Eintrag in einer Tabelle —
  * Adresse, Modell, Kopfzeilen, Antwortform. Bewusst rohes `fetch` statt
- * fünf SDKs: Das Kaltstart-Budget (P4) zählt jede Abhängigkeit, und für
+ * sechs SDKs: Das Kaltstart-Budget (P4) zählt jede Abhängigkeit, und für
  * je einen POST wären SDKs genau die dicken Abhängigkeiten, vor denen der
  * Budget-Wächter warnt.
  */
@@ -19,7 +19,14 @@ import type { CoachPort, CoachRequest } from '../../core/coach/prompt.ts'
 
 /** Die Anbieter, in der Reihenfolge der Auswahl. Gemini zuerst: Der
  *  Schlüssel ist dort in zwei Minuten angelegt und kostenlos nutzbar. */
-export const COACH_PROVIDERS = ['gemini', 'anthropic', 'groq', 'openrouter', 'mistral'] as const
+export const COACH_PROVIDERS = [
+  'gemini',
+  'anthropic',
+  'openai',
+  'groq',
+  'openrouter',
+  'mistral',
+] as const
 export type CoachProvider = (typeof COACH_PROVIDERS)[number]
 
 export const DEFAULT_COACH_PROVIDER: CoachProvider = 'gemini'
@@ -39,6 +46,7 @@ export const LEGACY_COACH_KEY_SETTING = 'coach.key'
 export const COACH_PROVIDER_NAMES: Readonly<Record<CoachProvider, string>> = {
   gemini: 'Google Gemini',
   anthropic: 'Anthropic (Claude)',
+  openai: 'OpenAI',
   groq: 'Groq',
   openrouter: 'OpenRouter',
   mistral: 'Mistral',
@@ -48,6 +56,7 @@ export const COACH_PROVIDER_NAMES: Readonly<Record<CoachProvider, string>> = {
 export const COACH_KEY_URLS: Readonly<Record<CoachProvider, string>> = {
   gemini: 'https://aistudio.google.com/apikey',
   anthropic: 'https://console.anthropic.com/settings/keys',
+  openai: 'https://platform.openai.com/api-keys',
   groq: 'https://console.groq.com/keys',
   openrouter: 'https://openrouter.ai/settings/keys',
   mistral: 'https://console.mistral.ai/api-keys',
@@ -61,6 +70,7 @@ export const COACH_KEY_URLS: Readonly<Record<CoachProvider, string>> = {
 const MODELS: Readonly<Record<CoachProvider, string>> = {
   gemini: 'gemini-2.5-flash',
   anthropic: 'claude-opus-5',
+  openai: 'gpt-5.6-luna',
   groq: 'llama-3.3-70b-versatile',
   openrouter: 'openrouter/auto',
   mistral: 'mistral-small-latest',
@@ -99,6 +109,40 @@ function openAiCall(url: string, key: string, model: string, request: CoachReque
     parse: (payload) => {
       const body = payload as { choices?: { message?: { content?: string } }[] }
       return body.choices?.[0]?.message?.content ?? ''
+    },
+  }
+}
+
+/**
+ * OpenAI selbst nutzt inzwischen die Responses API. Wir bleiben absichtlich
+ * beim rohen HTTP-Aufruf: kein SDK im Start-Bundle und der BYOK-Schlüssel geht
+ * weiterhin direkt vom Gerät des Menschen zu seinem Anbieter.
+ */
+function openAiResponsesCall(key: string, request: CoachRequest): ProviderCall {
+  return {
+    url: 'https://api.openai.com/v1/responses',
+    headers: { authorization: `Bearer ${key}` },
+    body: {
+      model: MODELS.openai,
+      instructions: request.system,
+      input: request.question,
+      max_output_tokens: COACH_MAX_TOKENS,
+    },
+    parse: (payload) => {
+      const body = payload as {
+        output?: readonly {
+          type?: string
+          content?: readonly { type?: string; text?: string; refusal?: string }[]
+        }[]
+      }
+      const content = (body.output ?? [])
+        .filter((item) => item.type === 'message')
+        .flatMap((item) => item.content ?? [])
+      if (content.some((part) => part.type === 'refusal')) throw new CoachError('refused')
+      return content
+        .filter((part) => part.type === 'output_text')
+        .map((part) => part.text ?? '')
+        .join('')
     },
   }
 }
@@ -157,6 +201,8 @@ function callFor(provider: CoachProvider, key: string, request: CoachRequest): P
             .join('')
         },
       }
+    case 'openai':
+      return openAiResponsesCall(key, request)
     case 'groq':
       return openAiCall('https://api.groq.com/openai/v1/chat/completions', key, MODELS.groq, request)
     case 'openrouter':
