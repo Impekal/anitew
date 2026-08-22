@@ -11,6 +11,23 @@ import './anitew-phase4-journey.css'
 import './anitew-phase4-landing.css'
 import './anitew-phase5.css'
 
+// Die Signatur-Schichten sind bewusst kein Startpfad. Erst wenn Dokument,
+// App und Service-Worker-Start vollständig zur Ruhe gekommen sind, holen wir
+// die rein visuelle Tiefe nach. So konkurriert ein Reload weder mit den
+// optionalen CSS-Chunks noch mit der Update-Prüfung. Fällt das Nachladen aus,
+// bleibt ANITEW vollständig funktional und lesbar.
+const loadSignatureExperience = () => {
+  window.setTimeout(() => {
+    void Promise.all([
+      import('./anitew-wow.css'),
+      import('./anitew-wow-session.css'),
+    ]).catch(() => undefined)
+  }, 750)
+}
+
+if (document.readyState === 'complete') loadSignatureExperience()
+else window.addEventListener('load', loadSignatureExperience, { once: true })
+
 // Neue Fassungen kommen von selbst an — siehe updates.ts. Steht vor dem
 // Rendern, damit auch ein Fehler in der App die Aktualisierung nicht blockiert.
 keepUpToDate()
