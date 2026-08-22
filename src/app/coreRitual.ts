@@ -1,3 +1,4 @@
+import '../anitew-living-adaptive.css'
 import '../anitew-core-ritual.css'
 
 let installed = false
@@ -42,10 +43,7 @@ function ritualTone(kind: 'core' | 'portal'): void {
     if (ritualAudio.state === 'suspended') void ritualAudio.resume().catch(() => undefined)
 
     const now = ritualAudio.currentTime
-    const notes =
-      kind === 'core'
-        ? ([110, 277.18, 440] as const)
-        : ([110, 220, 440] as const)
+    const notes = kind === 'core' ? ([110, 277.18, 440] as const) : ([110, 220, 440] as const)
     const delays = kind === 'core' ? [0, 0.065, 0.2] : [0, 0.045, 0.18]
     const decays = kind === 'core' ? [0.8, 1.15, 1.55] : [1.25, 1.45, 2.15]
     const gains = kind === 'core' ? [0.034, 0.038, 0.022] : [0.042, 0.055, 0.032]
@@ -112,12 +110,7 @@ function noticeSessionArrival(): void {
   }, 760)
 }
 
-/**
- * Verbindet die vorhandenen React-Aktionen mit der Signature-Choreografie.
- * Kein eigener Navigations- oder Trainingszustand: Die Schicht beobachtet nur
- * zwei bedeutende Gesten und lässt die bestehende App ihre Arbeit tun.
- */
-export function installCoreRitual(): void {
+function installCoreRitual(): void {
   if (installed) return
   installed = true
   root().dataset.anitewRitualReady = 'true'
@@ -158,3 +151,7 @@ export function installCoreRitual(): void {
     { once: true },
   )
 }
+
+// Dieser Modulimport ist selbst der letzte Living-Memory-Schritt. Dadurch
+// braucht main.tsx keinen zusätzlichen Dynamic-Import nur für das Ritual.
+installCoreRitual()
