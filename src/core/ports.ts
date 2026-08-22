@@ -46,8 +46,6 @@ export interface SettingsStore {
  * ohne den Kern anzufassen.
  */
 export type SoundCue =
-  /** Der ANITEW Core entfaltet die persönliche Memory World. */
-  | 'core'
   /** Die Einheit beginnt. Zugleich der Griff, der auf iOS die Tonausgabe freischaltet. */
   | 'start'
   /** Ein neues Wort erscheint beim Einprägen. */
