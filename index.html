@@ -95,6 +95,15 @@
         text-indent: .42em;
         animation: anitew-launch-name 520ms 520ms ease forwards;
       }
+      /*
+       * Der Atlas wird später als Kind von #root gerendert. Seine eigenen
+       * Styles geben ihm z-index:1000; die First-Run-Fokusmarken liegen aber
+       * absichtlich bei 2201. Nach dem Schließen der Einführung darf deshalb
+       * niemals ein Root-Layer vor den Menü-Knoten landen. Die stärkere
+       * Selektorregel hält den echten Atlas als oberste interaktive Ebene,
+       * ohne den Launch (99999) zu überholen.
+       */
+      #root .drawer-veil { z-index: 3000 !important; }
       @keyframes anitew-launch-draw { to { stroke-dashoffset: 0; } }
       @keyframes anitew-launch-point {
         0% { opacity: 0; transform: scale(.2); }
