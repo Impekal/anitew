@@ -1,15 +1,19 @@
 /**
- * Google-Anmeldung und Drive-App-Ordner (Backlog N7/N8 · D-033).
+ * Google-Anmeldung und sichtbarer Drive-Ordner (Backlog N7/N8 · D-033).
  *
  * Zwei Drähte, beide so schmal wie möglich:
  *
  * - **Anmeldung** über Googles eigenes Identity-Skript (GIS). Es wird erst
  *   geladen, wenn der Mensch den Abgleich wirklich anfasst — nicht beim
  *   Start, nicht im Bündel (das Kaltstart-Budget P4 bleibt unberührt).
- *   Der Zugriff ist der engste, den Google kennt: `drive.appdata`, nur
- *   der App-Ordner dieser App, nichts sonst im Drive ist sichtbar.
- * - **Drive-REST** über rohes `fetch` (dieselbe Begründung wie beim
- *   Coach, D-031): eine Datei finden, lesen, schreiben — drei Aufrufe.
+ *   Der Zugriff ist `drive.file`: ANITEW sieht und verwaltet nur Dateien und
+ *   Ordner, die die App selbst erstellt oder die ausdrücklich mit ihr geöffnet
+ *   wurden. Das übrige Drive ist nicht lesbar.
+ * - **Drive-REST** über rohes `fetch` (dieselbe Begründung wie beim Coach,
+ *   D-031): Ordner finden/anlegen, Sicherung finden, lesen, schreiben.
+ *
+ * Bei der ersten bewussten Verbindung entsteht in „Meine Ablage“ der sichtbare
+ * Ordner „Anitew“. Ohne Verbindung bleibt alles lokal.
  *
  * Die Client-Kennung ist die der App (nicht des Nutzers) und kommt zur
  * Bauzeit aus `VITE_GOOGLE_CLIENT_ID`. Eine Einstellungszeile
@@ -18,7 +22,7 @@
  */
 
 import type { BackupFile } from '../../core/index.ts'
-import { DRIVE_FILE_NAME, DRIVE_SCOPE } from '../../core/sync/drive.ts'
+import { DRIVE_FILE_NAME, DRIVE_FOLDER_NAME, DRIVE_SCOPE } from '../../core/sync/drive.ts'
 
 /** Wo die Einstellungen die Client-Kennung übersteuern dürfen. */
 export const DRIVE_CLIENT_SETTING = 'sync.clientId'
@@ -87,18 +91,11 @@ async function loadGis(): Promise<GisOauth2> {
   return loaded
 }
 
-/*
- * Wer verbunden ist, darf einen Namen haben (V2: das Google-Konto als
- * Identität). `openid email` sind Googles schmalste Auskunftsrechte —
- * sie werden nur beim **bewussten** Verbinden erbeten, nie im stillen
- * Start-Abgleich: Dort reicht das längst gewährte `drive.appdata`, und
- * eine stille Anfrage nach mehr würde Google zu Recht ablehnen.
- */
 const IDENTITY_SCOPE = 'openid email'
 
 /**
  * Holt ein Zugriffstoken. `silent` versucht es ohne Rückfrage — für den
- * stillen Abgleich beim Start; scheitert das (kein Google-Sitzung, Popup
+ * stillen Abgleich beim Start; scheitert das (keine Google-Sitzung, Popup
  * unterdrückt), ist das ein leises `denied`, kein Drama. `withIdentity`
  * bittet zusätzlich um die Konto-Auskunft — nur im hörbaren Weg.
  */
@@ -140,8 +137,7 @@ async function driveFetch(token: string, url: string, init?: RequestInit): Promi
 
 /**
  * Wessen Konto das ist — die E-Mail aus Googles Auskunft. Schmuck, kein
- * Tragwerk: Scheitert die Auskunft, scheitert **nicht** der Abgleich,
- * darum gibt es hier `undefined` statt Fehlern.
+ * Tragwerk: Scheitert die Auskunft, scheitert **nicht** der Abgleich.
  */
 export async function fetchAccountEmail(token: string): Promise<string | undefined> {
   try {
@@ -158,24 +154,58 @@ export async function fetchAccountEmail(token: string): Promise<string | undefin
 
 const FILES = 'https://www.googleapis.com/drive/v3/files'
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files'
+const FOLDER_MIME = 'application/vnd.google-apps.folder'
 
-async function findFileId(token: string): Promise<string | undefined> {
-  const query = encodeURIComponent(`name='${DRIVE_FILE_NAME}'`)
+function quoteDriveQuery(value: string): string {
+  return value.replaceAll('\\', '\\\\').replaceAll("'", "\\'")
+}
+
+async function findFolderId(token: string): Promise<string | undefined> {
+  const name = quoteDriveQuery(DRIVE_FOLDER_NAME)
+  const query = encodeURIComponent(`name='${name}' and mimeType='${FOLDER_MIME}' and trashed=false`)
   const response = await driveFetch(
     token,
-    `${FILES}?spaces=appDataFolder&q=${query}&fields=files(id)`,
+    `${FILES}?spaces=drive&q=${query}&fields=files(id)&pageSize=10`,
+  )
+  const body = (await response.json()) as { files?: { id: string }[] }
+  return body.files?.[0]?.id
+}
+
+async function ensureFolderId(token: string): Promise<string> {
+  const present = await findFolderId(token)
+  if (present !== undefined) return present
+
+  const response = await driveFetch(token, `${FILES}?fields=id`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json; charset=UTF-8' },
+    body: JSON.stringify({ name: DRIVE_FOLDER_NAME, mimeType: FOLDER_MIME }),
+  })
+  const body = (await response.json()) as { id?: unknown }
+  if (typeof body.id !== 'string' || body.id === '') throw new DriveError('drive')
+  return body.id
+}
+
+async function findFileId(token: string, folderId: string): Promise<string | undefined> {
+  const name = quoteDriveQuery(DRIVE_FILE_NAME)
+  const parent = quoteDriveQuery(folderId)
+  const query = encodeURIComponent(`name='${name}' and '${parent}' in parents and trashed=false`)
+  const response = await driveFetch(
+    token,
+    `${FILES}?spaces=drive&q=${query}&fields=files(id)&pageSize=10`,
   )
   const body = (await response.json()) as { files?: { id: string }[] }
   return body.files?.[0]?.id
 }
 
 /**
- * Die Sicherung aus dem App-Ordner, JSON-geparst — oder nichts. Eine
- * Datei, die kein JSON ist, kommt als roher Text zurück: `readBackup`
- * nennt sie dann unlesbar, und der Kern rührt sie nicht an (D-033).
+ * Die Sicherung aus dem sichtbaren Anitew-Ordner, JSON-geparst — oder nichts.
+ * Existiert der Ordner noch nicht, wird beim Lesen **nichts** angelegt; die
+ * erste erfolgreiche Upload-Hälfte des Syncs erzeugt ihn.
  */
 export async function downloadDriveBackup(token: string): Promise<unknown | undefined> {
-  const id = await findFileId(token)
+  const folderId = await findFolderId(token)
+  if (folderId === undefined) return undefined
+  const id = await findFileId(token, folderId)
   if (id === undefined) return undefined
   const response = await driveFetch(token, `${FILES}/${id}?alt=media`)
   const text = await response.text()
@@ -186,10 +216,11 @@ export async function downloadDriveBackup(token: string): Promise<unknown | unde
   }
 }
 
-/** Schreibt die Sicherung in den App-Ordner — anlegen oder ersetzen. */
+/** Schreibt die Sicherung in `Anitew/` — Ordner/Datei anlegen oder ersetzen. */
 export async function uploadDriveBackup(token: string, file: BackupFile): Promise<void> {
   const body = JSON.stringify(file)
-  const id = await findFileId(token)
+  const folderId = await ensureFolderId(token)
+  const id = await findFileId(token, folderId)
   if (id !== undefined) {
     await driveFetch(token, `${UPLOAD}/${id}?uploadType=media`, {
       method: 'PATCH',
@@ -198,17 +229,13 @@ export async function uploadDriveBackup(token: string, file: BackupFile): Promis
     })
     return
   }
-  /*
-   * Anlegen braucht Metadaten (Name, App-Ordner) **und** Inhalt in einem
-   * Aufruf — das ist Googles Multipart-Form, von Hand gebaut, damit kein
-   * SDK einzieht.
-   */
+
   const boundary = 'anitew-sicherung'
   const multipart = [
     `--${boundary}`,
     'Content-Type: application/json; charset=UTF-8',
     '',
-    JSON.stringify({ name: DRIVE_FILE_NAME, parents: ['appDataFolder'] }),
+    JSON.stringify({ name: DRIVE_FILE_NAME, parents: [folderId] }),
     `--${boundary}`,
     'Content-Type: application/json',
     '',
