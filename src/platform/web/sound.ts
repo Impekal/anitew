@@ -17,16 +17,35 @@ import type { Sound, SoundCue } from '../../core/index.ts'
  * weit unter dem, was eine Spiele-App nimmt. Ein Ton soll bestätigen, nicht
  * belohnen (G-1): Wer ihn abschaltet, soll nichts vermissen außer der
  * Bestätigung.
+ *
+ * Zwei Eigenheiten der Browser, die hier gelöst sind:
+ *
+ * 1. **iOS gibt keinen Ton ohne Berührung.** Der AudioContext entsteht deshalb
+ *    erst beim ersten `play()` — und das erste `play()` ist `start`, ausgelöst
+ *    vom Fingertipp auf den Startknopf. Wird er trotzdem angehalten geliefert,
+ *    versucht `resume()` es bei jedem weiteren Ton erneut.
+ * 2. **Der Ton läuft weiter, wenn die App in den Hintergrund geht.** Deshalb
+ *    wird der Kontext beim Verstecken angehalten und beim Zurückkommen wieder
+ *    aufgenommen.
  */
 
+/** Grundton A3. Tief genug, dass nichts schrill wird. */
 const BASE_HZ = 220
+
+/** Pentatonisch: große Sekunde, Terz, Quinte, Sexte. Keine Halbtöne. */
 const SCALE = [0, 2, 4, 7, 9]
+
+/** Insgesamt sehr leise — ein Bestätigen, kein Belohnen. */
 const MASTER = 0.14
 
 interface Note {
+  /** Stufe in der Tonleiter, 0 = Grundton. Darf über 4 hinausgehen. */
   step: number
+  /** Verzögerung in Sekunden ab jetzt. */
   at: number
+  /** Ausklingzeit in Sekunden. */
   decay: number
+  /** Lautstärke relativ zur Grundlautstärke. */
   gain: number
 }
 
@@ -39,12 +58,10 @@ function frequency(step: number): number {
 function notesFor(cue: SoundCue, step: number): Note[] {
   switch (cue) {
     case 'start':
-      // Das Portal öffnet mit derselben tiefen Klangfarbe wie eine Verbindung:
-      // Unterton → Kern → weiter Nachklang. Keine Fanfare, sondern Raum.
       return [
-        { step: -5, at: 0, decay: 1.25, gain: 0.32 },
-        { step: 0, at: 0.045, decay: 1.45, gain: 0.42 },
-        { step: 7, at: 0.18, decay: 2.15, gain: 0.24 },
+        { step: 0, at: 0, decay: 1.1, gain: 0.5 },
+        { step: 2, at: 0.09, decay: 1.1, gain: 0.45 },
+        { step: 4, at: 0.18, decay: 1.4, gain: 0.4 },
       ]
     case 'word':
       return [{ step: 5 + step, at: 0, decay: 0.9, gain: 0.42 }]
@@ -61,13 +78,9 @@ function notesFor(cue: SoundCue, step: number): Note[] {
         { step: 7, at: 0.14, decay: 1.8, gain: 0.32 },
       ]
     case 'connection':
-      // Dieses Motiv gehört Verbindungen im Gedächtnis. Der Living Core nutzt
-      // bewusst genau dasselbe Ereignis: Er öffnet nicht „ein Menü“, sondern
-      // die Welt dieser Verbindungen.
       return [
-        { step: -5, at: 0, decay: 0.8, gain: 0.24 },
-        { step: 2, at: 0.065, decay: 1.15, gain: 0.27 },
-        { step: 7, at: 0.2, decay: 1.55, gain: 0.16 },
+        { step: 1, at: 0.45, decay: 1.1, gain: 0.25 },
+        { step: 2, at: 0.53, decay: 1.35, gain: 0.25 },
       ]
     case 'return':
       return [
@@ -77,6 +90,9 @@ function notesFor(cue: SoundCue, step: number): Note[] {
     case 'recall':
       return [{ step: 4, at: 0, decay: 0.75, gain: 0.28 }]
     case 'landing':
+      // Signature moment: etwas Persönliches ist wirklich zurückgekommen.
+      // Drei sehr leise Stimmen bilden keine Fanfare, sondern einen Raum,
+      // der sich kurz schließt: Grundton → Verbindung → warmer Nachklang.
       return [
         { step: 0, at: 0, decay: 1.0, gain: 0.24 },
         { step: 5, at: 0.08, decay: 1.35, gain: 0.22 },
@@ -91,6 +107,14 @@ function notesFor(cue: SoundCue, step: number): Note[] {
   }
 }
 
+/**
+ * Ein kurzer, weicher Stoß bei den Wechseln, die zählen (O6).
+ *
+ * Nicht bei jedem Wort — das wäre ein zappelndes Telefon. Nur wenn ein Block,
+ * eine echte Wiederbegegnung, ein echter persönlicher Abruf oder die Einheit
+ * zu Ende ist. RETURN sagt „da — wieder“. LANDING ist noch kleiner und enger:
+ * „gefunden“ — ohne Siegesgeste.
+ */
 function buzz(cue: SoundCue): void {
   const vibrate = (navigator as { vibrate?: (pattern: number | number[]) => boolean }).vibrate
   if (typeof vibrate !== 'function') return
@@ -111,8 +135,6 @@ function buzz(cue: SoundCue): void {
     // Manche Browser verlangen für `vibrate` eine vorangegangene Berührung.
   }
 }
-
-type WebSoundWindow = Window & { __anitewSound?: Sound }
 
 export function createWebSound(enabled: boolean): Sound {
   let on = enabled
@@ -165,7 +187,7 @@ export function createWebSound(enabled: boolean): Sound {
     }
   }
 
-  const sound: Sound = {
+  return {
     play(cue, step = 0) {
       if (!on) return
       const ctx = ensure()
@@ -185,6 +207,4 @@ export function createWebSound(enabled: boolean): Sound {
       return on
     },
   }
-  ;(window as WebSoundWindow).__anitewSound = sound
-  return sound
 }
