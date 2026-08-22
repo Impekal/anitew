@@ -57,11 +57,7 @@ export const sceneItemsOf = base.sceneItemsOf as (
   anchor: string,
 ) => readonly string[]
 export const secondsPerItemFor = base.secondsPerItemFor as (moduleId: ModuleId) => number
-
-export function subjectOf(moduleId: ModuleId, item: string): string {
-  if (moduleId === 'associative') return item
-  return base.subjectOf(moduleId as base.ModuleId, item)
-}
+export const subjectOf = base.subjectOf as (moduleId: ModuleId, item: string) => string
 
 export function displayOf(moduleId: ModuleId, item: string, language: string): string {
   if (moduleId === 'associative') {
