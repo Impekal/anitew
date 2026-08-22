@@ -16,8 +16,7 @@ import './anitew-phase5.css'
 // die rein visuelle Tiefe nach. Die Schichten kommen absichtlich nacheinander:
 // Living Memory ist die letzte Autorität und kann ältere Drawer-/Startregeln
 // sicher ersetzen, statt mit parallelen CSS-Chunks um die Reihenfolge zu
-// konkurrieren. Das Core Ritual kommt ganz zuletzt und verbindet genau diese
-// fertige Welt mit Klang, taktilem Marker und Session-Übergang.
+// konkurrieren. Der letzte Import lädt Adaptive + Core Ritual gemeinsam.
 let signatureTimer: number | undefined
 let pageIsLeaving = false
 
@@ -31,11 +30,7 @@ const loadSignatureExperience = () => {
       if (pageIsLeaving) return
       await import('./anitew-living.css')
       if (pageIsLeaving) return
-      await import('./anitew-living-adaptive.css')
-      if (pageIsLeaving) return
-      const { installCoreRitual } = await import('./app/coreRitual.ts')
-      if (pageIsLeaving) return
-      installCoreRitual()
+      await import('./app/coreRitual.ts')
     })().catch(() => undefined)
   }, 750)
 }
