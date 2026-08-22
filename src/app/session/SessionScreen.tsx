@@ -466,7 +466,13 @@ function RunningSession({
               ? factPrompt(block.items[state.promptIndex] ?? '')
               : block.moduleId === 'memory'
                 ? memorySubjectOf(block.items[state.promptIndex] ?? '')
-                : undefined
+                : block.moduleId === 'associative'
+                  ? displayOf(
+                      'associative',
+                      block.items[state.promptIndex] ?? '',
+                      state.plan.language,
+                    )
+                  : undefined
           }
           gazeCue={
             block.moduleId === 'gaze'
