@@ -72,3 +72,45 @@ test('nimmt den Schlüssel, sagt bei fehlendem Netz die Wahrheit — und lässt 
   await expect(page.locator('.coach-key-input')).toBeVisible()
   await expect(page.locator('.coach-question')).toHaveCount(0)
 })
+
+test('OpenAI bleibt BYOK und spricht direkt über die Responses API', async ({ page }) => {
+  let requestSeen = false
+  await page.route('https://api.openai.com/v1/responses', async (route) => {
+    requestSeen = true
+    const request = route.request()
+    expect(request.headers().authorization).toBe('Bearer sk-test-nicht-echt')
+    expect(request.postDataJSON()).toMatchObject({
+      model: 'gpt-5.6-luna',
+      input: expect.stringContaining('Namen'),
+      instructions: expect.any(String),
+    })
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        output: [
+          {
+            type: 'message',
+            content: [{ type: 'output_text', text: 'Baue beim Namen sofort eine Verbindung.' }],
+          },
+        ],
+      }),
+    })
+  })
+
+  await visit(page)
+  await openPage(page, 'Coach')
+  await page.locator('.coach-provider select').selectOption('openai')
+  await expect(page.locator('.coach-key-help a')).toHaveAttribute(
+    'href',
+    'https://platform.openai.com/api-keys',
+  )
+
+  await page.locator('.coach-key-input').fill('sk-test-nicht-echt')
+  await page.getByRole('button', { name: 'Schlüssel speichern' }).click()
+  await page.locator('.coach-question').fill('Wie halte ich Namen besser?')
+  await page.getByRole('button', { name: 'Fragen' }).click()
+
+  await expect(page.locator('.coach-answer')).toContainText('sofort eine Verbindung')
+  expect(requestSeen).toBe(true)
+})
