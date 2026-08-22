@@ -147,7 +147,15 @@ export function CoachPanelImpl({
           <>
             <p className="coach-key-help">
               {provider === 'openai' ? 'OpenAI Platform · API keys' : texts.keySteps[provider]}{' '}
-              <a href={COACH_KEY_URLS[provider]} target="_blank" rel="noreferrer">
+              <a
+                href={
+                  provider === 'openai'
+                    ? 'https://platform.openai.com/api-keys'
+                    : COACH_KEY_URLS[provider]
+                }
+                target="_blank"
+                rel="noreferrer"
+              >
                 {texts.keyLink}
               </a>
             </p>
