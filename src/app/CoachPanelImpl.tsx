@@ -75,7 +75,9 @@ export function CoachPanelImpl({
         ? ''
         : entry.moduleId === 'spatial'
           ? dictionary.profile.names.spatial
-          : dictionary.profile.modules[entry.moduleId]
+          : entry.moduleId === 'associative'
+            ? dictionary.profile.names.binding
+            : dictionary.profile.modules[entry.moduleId]
     return template
       .replace('{axis}', entry.dimension === undefined ? '' : dictionary.profile.names[entry.dimension])
       .replace('{module}', moduleLabel)
