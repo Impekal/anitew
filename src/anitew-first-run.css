@@ -264,14 +264,15 @@
   flex: 0 0 auto;
 }
 
-/* When the Core atlas is open, the atlas owns hit-testing. The home world
-   remains visible underneath, but none of its large transformed layers may
-   sit above a menu node in the browser's pointer-event stack. */
+/* Keep the atlas in the same DOM tree, but make its stacking context
+   unambiguous. Disabling pointer events on #root made the browser fall back
+   to <body> as the hit target; the fix is hierarchy, not ancestor masking. */
 #root:has(.drawer-veil) {
-  pointer-events: none !important;
+  position: relative;
+  isolation: isolate;
 }
-#root:has(.drawer-veil) .drawer-veil,
-#root:has(.drawer-veil) .drawer-veil * {
+#root:has(.drawer-veil) .drawer-veil {
+  z-index: 2147483647 !important;
   pointer-events: auto !important;
 }
 main.app:has(> .drawer-veil) > :not(.drawer-veil) {
