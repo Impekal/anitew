@@ -11,41 +11,20 @@ import type { Sound, SoundCue } from '../../core/index.ts'
  * **Es kann nicht falsch klingen.** Alle Töne stammen aus einer
  * pentatonischen Tonleiter. Die hat keine Halbtonschritte, also gibt es keine
  * Reibung — egal in welcher Reihenfolge die Töne kommen, es klingt stimmig.
- * Genau deshalb steht sie auf Kinderxylophonen.
  *
  * **Es ist leise.** Weiche Anschläge, langes Ausklingen, eine Grundlautstärke
  * weit unter dem, was eine Spiele-App nimmt. Ein Ton soll bestätigen, nicht
- * belohnen (G-1): Wer ihn abschaltet, soll nichts vermissen außer der
- * Bestätigung.
- *
- * Zwei Eigenheiten der Browser, die hier gelöst sind:
- *
- * 1. **iOS gibt keinen Ton ohne Berührung.** Der AudioContext entsteht deshalb
- *    erst beim ersten `play()` — und das erste `play()` ist `start`, ausgelöst
- *    vom Fingertipp auf den Startknopf. Wird er trotzdem angehalten geliefert,
- *    versucht `resume()` es bei jedem weiteren Ton erneut.
- * 2. **Der Ton läuft weiter, wenn die App in den Hintergrund geht.** Deshalb
- *    wird der Kontext beim Verstecken angehalten und beim Zurückkommen wieder
- *    aufgenommen.
+ * belohnen (G-1).
  */
 
-/** Grundton A3. Tief genug, dass nichts schrill wird. */
 const BASE_HZ = 220
-
-/** Pentatonisch: große Sekunde, Terz, Quinte, Sexte. Keine Halbtöne. */
 const SCALE = [0, 2, 4, 7, 9]
-
-/** Insgesamt sehr leise — ein Bestätigen, kein Belohnen. */
 const MASTER = 0.14
 
 interface Note {
-  /** Stufe in der Tonleiter, 0 = Grundton. Darf über 4 hinausgehen. */
   step: number
-  /** Verzögerung in Sekunden ab jetzt. */
   at: number
-  /** Ausklingzeit in Sekunden. */
   decay: number
-  /** Lautstärke relativ zur Grundlautstärke. */
   gain: number
 }
 
@@ -57,11 +36,23 @@ function frequency(step: number): number {
 
 function notesFor(cue: SoundCue, step: number): Note[] {
   switch (cue) {
-    case 'start':
+    case 'core':
+      // Der Core ist kein Menü-Klick: ein tiefer Kontakt, dann eine kleine
+      // Antwort aus der Memory World. Kurz genug, um nicht zu nerven; eigen
+      // genug, um nach einigen Tagen sofort als ANITEW erkannt zu werden.
       return [
-        { step: 0, at: 0, decay: 1.1, gain: 0.5 },
-        { step: 2, at: 0.09, decay: 1.1, gain: 0.45 },
-        { step: 4, at: 0.18, decay: 1.4, gain: 0.4 },
+        { step: -5, at: 0, decay: 0.8, gain: 0.24 },
+        { step: 2, at: 0.065, decay: 1.15, gain: 0.27 },
+        { step: 7, at: 0.2, decay: 1.55, gain: 0.16 },
+      ]
+    case 'start':
+      // Das Portal öffnet nicht mit einer Fanfare, sondern mit Tiefe:
+      // Unterton → Kern → weiter Nachklang. Derselbe Klangraum wie CORE,
+      // nur größer. Dadurch werden Navigation und Training ein System.
+      return [
+        { step: -5, at: 0, decay: 1.25, gain: 0.32 },
+        { step: 0, at: 0.045, decay: 1.45, gain: 0.42 },
+        { step: 7, at: 0.18, decay: 2.15, gain: 0.24 },
       ]
     case 'word':
       return [{ step: 5 + step, at: 0, decay: 0.9, gain: 0.42 }]
@@ -90,9 +81,6 @@ function notesFor(cue: SoundCue, step: number): Note[] {
     case 'recall':
       return [{ step: 4, at: 0, decay: 0.75, gain: 0.28 }]
     case 'landing':
-      // Signature moment: etwas Persönliches ist wirklich zurückgekommen.
-      // Drei sehr leise Stimmen bilden keine Fanfare, sondern einen Raum,
-      // der sich kurz schließt: Grundton → Verbindung → warmer Nachklang.
       return [
         { step: 0, at: 0, decay: 1.0, gain: 0.24 },
         { step: 5, at: 0.08, decay: 1.35, gain: 0.22 },
@@ -108,32 +96,48 @@ function notesFor(cue: SoundCue, step: number): Note[] {
 }
 
 /**
- * Ein kurzer, weicher Stoß bei den Wechseln, die zählen (O6).
+ * Weiche physische Marker nur an bedeutenden Übergängen.
  *
- * Nicht bei jedem Wort — das wäre ein zappelndes Telefon. Nur wenn ein Block,
- * eine echte Wiederbegegnung, ein echter persönlicher Abruf oder die Einheit
- * zu Ende ist. RETURN sagt „da — wieder“. LANDING ist noch kleiner und enger:
- * „gefunden“ — ohne Siegesgeste.
+ * Die Vibration API funktioniert z. B. auf Android-Browsern. Safari/iOS-Web
+ * unterstützt sie nicht zuverlässig; dort bleibt der Moment durch Klang und
+ * visuelle Kompression vollständig verständlich. Eine native iOS-Hülle kann
+ * später dieselben Ereignisse auf echte Haptics abbilden, ohne den Kern zu
+ * ändern.
  */
 function buzz(cue: SoundCue): void {
   const vibrate = (navigator as { vibrate?: (pattern: number | number[]) => boolean }).vibrate
   if (typeof vibrate !== 'function') return
   const pattern =
-    cue === 'done'
-      ? [16, 40, 16]
-      : cue === 'return'
-        ? [9, 34, 9]
-        : cue === 'landing'
-          ? [7, 24, 12]
-          : cue === 'block'
-            ? [14]
-            : undefined
+    cue === 'core'
+      ? [6, 22, 10]
+      : cue === 'start'
+        ? [8, 28, 13]
+        : cue === 'done'
+          ? [16, 40, 16]
+          : cue === 'return'
+            ? [9, 34, 9]
+            : cue === 'landing'
+              ? [7, 24, 12]
+              : cue === 'block'
+                ? [14]
+                : undefined
   if (pattern === undefined) return
   try {
     vibrate(pattern)
   } catch {
-    // Manche Browser verlangen für `vibrate` eine vorangegangene Berührung.
+    // Ein Gerät darf Haptik verweigern; die App darf deswegen nie scheitern.
   }
+}
+
+let activeSound: Sound | undefined
+
+/**
+ * Brücke für rein visuelle, nachgeladene Experience-Schichten. Sie benutzt
+ * exakt dieselbe Sound-Instanz wie React und respektiert deshalb den
+ * vorhandenen Ton-Schalter; kein zweiter AudioContext, keine Parallelwahrheit.
+ */
+export function playActiveWebSound(cue: SoundCue, step = 0): void {
+  activeSound?.play(cue, step)
 }
 
 export function createWebSound(enabled: boolean): Sound {
@@ -187,12 +191,13 @@ export function createWebSound(enabled: boolean): Sound {
     }
   }
 
-  return {
+  const sound: Sound = {
     play(cue, step = 0) {
       if (!on) return
+      // Haptik hängt nicht davon ab, ob dieses Gerät WebAudio besitzt.
+      buzz(cue)
       const ctx = ensure()
       if (ctx === undefined || master === undefined) return
-      buzz(cue)
       try {
         for (const note of notesFor(cue, step)) strike(ctx, master, note)
       } catch {
@@ -207,4 +212,7 @@ export function createWebSound(enabled: boolean): Sound {
       return on
     },
   }
+
+  activeSound = sound
+  return sound
 }
