@@ -10,7 +10,6 @@ import {
 import {
   COACH_KEY_URLS,
   COACH_PROVIDERS,
-  COACH_PROVIDER_NAMES,
   COACH_PROVIDER_SETTING,
   CoachError,
   type CoachFailure,
@@ -138,7 +137,7 @@ export function CoachPanelImpl({
           <select value={provider} onChange={(event) => choose(event.target.value as CoachProvider)}>
             {COACH_PROVIDERS.map((id) => (
               <option key={id} value={id}>
-                {id === 'openai' ? COACH_PROVIDER_NAMES[id] : texts.providers[id]}
+                {id === 'openai' ? 'OpenAI' : texts.providers[id]}
               </option>
             ))}
           </select>
