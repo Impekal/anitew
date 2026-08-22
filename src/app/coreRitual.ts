@@ -58,6 +58,7 @@ function noticeSessionArrival(): void {
 export function installCoreRitual(): void {
   if (installed) return
   installed = true
+  root().dataset.anitewRitualReady = 'true'
 
   document.addEventListener(
     'click',
