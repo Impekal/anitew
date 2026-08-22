@@ -56,8 +56,11 @@ export interface RunnerState {
  * Abgleich mit dem Netz oder weil jemand die Streak überlisten will. Ein Block,
  * der 60 Sekunden dauern soll, darf davon nichts merken (Backlog P5).
  *
- * Ein Block endet, wenn seine Zeit abgelaufen ist — oder früher, wenn der
- * Nutzer fertig ist. Das Budget ist eine Obergrenze, keine Wartepflicht.
+ * Ein Trainingsblock endet, wenn seine Zeit abgelaufen ist — oder früher,
+ * wenn der Nutzer fertig ist. **Techniklektionen sind die Ausnahme:** Lesen
+ * ist kein Reaktionstest. Sie bleiben stehen, bis der Mensch bewusst weiter
+ * tippt; ihre Lesezeit wird damit nicht heimlich vom gewählten Trainingsbudget
+ * abgezogen.
  */
 export function useSessionRunner(
   platform: Platform,
@@ -117,10 +120,10 @@ export function useSessionRunner(
     const nextResults = [...results]
 
     /*
-     * Eine Lektion gilt als gehalten, sobald sie vorbei ist — ob durch Tippen
-     * oder durch Ablauf der Zeit (D5). Das Merken passiert hier und nicht im
-     * Bildschirm: Wer die Lektion wegtippt, hat sie ebenso gesehen wie wer
-     * sie ausliest, und beide sollen morgen die nächste bekommen.
+     * Eine Lektion gilt erst als gehalten, wenn der Mensch bewusst weitergeht.
+     * Techniklektionen laufen nicht mehr von selbst ab: Wer hier landet, hat
+     * den expliziten Weiter-Knopf benutzt. Das Merken passiert weiterhin im
+     * Runner und nicht im Bildschirm, damit es nur eine Wahrheit gibt.
      */
     if (block.kind === 'teach') {
       /*
@@ -258,10 +261,16 @@ export function useSessionRunner(
     [answers, block, blockIndex, entries, persist, plan, platform, results],
   )
 
-  // Der Herzschlag. 200 ms ist fein genug für eine Sekundenanzeige und grob
-  // genug, dass es den Akku nicht kostet.
+  // Der Herzschlag. Techniklektionen hängen bewusst **nicht** daran: Sie
+  // bleiben so lange stehen, wie Lesen eben dauert. Erst nach dem bewussten
+  // Weiter beginnt der nächste zeitbegrenzte Trainingsblock mit eigener Uhr.
   useEffect(() => {
     if (finished || block === undefined) return
+    if (block.kind === 'teach') {
+      setRemaining(block.seconds)
+      return
+    }
+
     const timer = setInterval(() => {
       const elapsed = (platform.clock.elapsed() - blockStartedRef.current) / 1000
       const left = Math.max(0, block.seconds - elapsed)
