@@ -55,9 +55,8 @@ export const subjectOf = base.subjectOf as (moduleId: ModuleId, item: string) =>
 
 export function displayOf(moduleId: ModuleId, item: string, language: string): string {
   if (moduleId === 'associative') {
-    const baseItem = associationBase(item)
-    const cue = answerFor(baseItem, language as Language)
-    return cue === undefined ? item : `${cue} · ${personOf(baseItem)}`
+    const cue = answerFor(associationBase(item), language as Language)
+    return cue ?? item
   }
   return base.displayOf(moduleId as base.ModuleId, item, language)
 }
