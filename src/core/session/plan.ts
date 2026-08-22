@@ -1,6 +1,4 @@
-import { answerFor, personOf } from '../content/missions.ts'
 import { spatialCellOf, spatialPool } from '../content/spatial.ts'
-import type { Language } from '../language.ts'
 import * as base from './planBase.ts'
 import type { Leniency } from './grading.ts'
 
@@ -34,8 +32,9 @@ export interface PlanInput
   modules?: readonly ModuleId[]
 }
 
-function associationBase(item: string): string {
-  return item.endsWith('~person') ? item.slice(0, -7) : ''
+function associationBase(item: string, language: string): string {
+  const source = item.endsWith('~person') ? item.slice(0, -7) : ''
+  return source && base.targetOf('missions', source, language) !== source ? source : ''
 }
 
 export function isPrompted(moduleId: ModuleId): boolean {
@@ -55,8 +54,8 @@ export const subjectOf = base.subjectOf as (moduleId: ModuleId, item: string) =>
 
 export function displayOf(moduleId: ModuleId, item: string, language: string): string {
   if (moduleId === 'associative') {
-    const cue = answerFor(associationBase(item), language as Language)
-    return cue ?? item
+    const source = associationBase(item, language)
+    return source ? base.targetOf('missions', source, language) : item
   }
   return base.displayOf(moduleId as base.ModuleId, item, language)
 }
@@ -64,8 +63,8 @@ export function displayOf(moduleId: ModuleId, item: string, language: string): s
 export function targetOf(moduleId: ModuleId, item: string, language: string): string {
   if (moduleId === 'spatial') return spatialCellOf(item) ?? item
   if (moduleId === 'associative') {
-    const baseItem = associationBase(item)
-    return answerFor(baseItem, language as Language) === undefined ? item : personOf(baseItem)
+    const source = associationBase(item, language)
+    return source ? base.subjectOf('missions', source) : item
   }
   return base.targetOf(moduleId as base.ModuleId, item, language)
 }
