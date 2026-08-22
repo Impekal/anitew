@@ -67,10 +67,9 @@ export const COACH_KEY_URLS: Readonly<Record<CoachProvider, string>> = {
  * Frage an den Menschen, die die App beantworten kann (D-031). Gewählt
  * sind die soliden Alltagsmodelle der Anbieter, nicht deren teuerste.
  */
-const MODELS: Readonly<Record<CoachProvider, string>> = {
+const MODELS: Readonly<Record<Exclude<CoachProvider, 'openai'>, string>> = {
   gemini: 'gemini-2.5-flash',
   anthropic: 'claude-opus-5',
-  openai: 'gpt-5.6-luna',
   groq: 'llama-3.3-70b-versatile',
   openrouter: 'openrouter/auto',
   mistral: 'mistral-small-latest',
@@ -113,41 +112,11 @@ function openAiCall(url: string, key: string, model: string, request: CoachReque
   }
 }
 
-/**
- * OpenAI selbst nutzt inzwischen die Responses API. Wir bleiben absichtlich
- * beim rohen HTTP-Aufruf: kein SDK im Start-Bundle und der BYOK-Schlüssel geht
- * weiterhin direkt vom Gerät des Menschen zu seinem Anbieter.
- */
-function openAiResponsesCall(key: string, request: CoachRequest): ProviderCall {
-  return {
-    url: 'https://api.openai.com/v1/responses',
-    headers: { authorization: `Bearer ${key}` },
-    body: {
-      model: MODELS.openai,
-      instructions: request.system,
-      input: request.question,
-      max_output_tokens: COACH_MAX_TOKENS,
-    },
-    parse: (payload) => {
-      const body = payload as {
-        output?: readonly {
-          type?: string
-          content?: readonly { type?: string; text?: string; refusal?: string }[]
-        }[]
-      }
-      const content = (body.output ?? [])
-        .filter((item) => item.type === 'message')
-        .flatMap((item) => item.content ?? [])
-      if (content.some((part) => part.type === 'refusal')) throw new CoachError('refused')
-      return content
-        .filter((part) => part.type === 'output_text')
-        .map((part) => part.text ?? '')
-        .join('')
-    },
-  }
-}
-
-function callFor(provider: CoachProvider, key: string, request: CoachRequest): ProviderCall {
+async function callFor(
+  provider: CoachProvider,
+  key: string,
+  request: CoachRequest,
+): Promise<ProviderCall> {
   switch (provider) {
     case 'gemini':
       return {
@@ -175,12 +144,6 @@ function callFor(provider: CoachProvider, key: string, request: CoachRequest): P
         headers: {
           'x-api-key': key,
           'anthropic-version': '2023-06-01',
-          /*
-           * Anthropic verlangt dieses ausdrückliche Einverständnis für
-           * Aufrufe aus dem Browser — genau unser Fall: Der Schlüssel
-           * gehört dem Menschen selbst, es gibt keinen Server, dem er
-           * anvertraut wäre.
-           */
           'anthropic-dangerous-direct-browser-access': 'true',
         },
         body: {
@@ -201,8 +164,10 @@ function callFor(provider: CoachProvider, key: string, request: CoachRequest): P
             .join('')
         },
       }
-    case 'openai':
+    case 'openai': {
+      const { openAiResponsesCall } = await import('./openaiCoach.ts')
       return openAiResponsesCall(key, request)
+    }
     case 'groq':
       return openAiCall('https://api.groq.com/openai/v1/chat/completions', key, MODELS.groq, request)
     case 'openrouter':
@@ -228,7 +193,7 @@ export function createWebCoach(readConfig: () => Promise<CoachConfig>): CoachPor
       const { provider, key } = await readConfig()
       if (key === undefined || key.trim() === '') throw new CoachError('no-key')
 
-      const call = callFor(provider, key.trim(), request)
+      const call = await callFor(provider, key.trim(), request)
       let response: Response
       try {
         response = await fetch(call.url, {
