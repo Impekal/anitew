@@ -1,5 +1,10 @@
-import { playActiveWebSound } from '../platform/web/sound.ts'
 import '../anitew-core-ritual.css'
+
+type RitualSound = {
+  play(cue: 'connection'): void
+  isEnabled(): boolean
+}
+type RitualWindow = Window & { __anitewSound?: RitualSound }
 
 let installed = false
 let coreTimer: number | undefined
@@ -7,15 +12,32 @@ let enteringFallback: number | undefined
 let arrivalTimer: number | undefined
 
 const root = () => document.documentElement
+const sound = () => (window as RitualWindow).__anitewSound
 
 function clearTimer(timer: number | undefined): void {
   if (timer !== undefined) window.clearTimeout(timer)
 }
 
+function tactile(pattern: number[]): void {
+  const vibrate = (navigator as { vibrate?: (value: number | number[]) => boolean }).vibrate
+  if (typeof vibrate !== 'function') return
+  try {
+    vibrate(pattern)
+  } catch {
+    // Web-Haptik ist ein Bonus. Visuell und akustisch bleibt der Moment ganz.
+  }
+}
+
 function pulseCore(): void {
   const html = root()
   html.dataset.anitewCoreOpening = 'true'
-  playActiveWebSound('core')
+  const active = sound()
+  if (active?.isEnabled() === true) {
+    tactile([6, 22, 10])
+    // Der Core ist die Welt der Verbindungen. Deshalb benutzt er bewusst
+    // das bestehende Connection-Motiv statt einen zweiten Klangkosmos.
+    active.play('connection')
+  }
   clearTimer(coreTimer)
   coreTimer = window.setTimeout(() => {
     delete html.dataset.anitewCoreOpening
@@ -25,6 +47,7 @@ function pulseCore(): void {
 function beginPortalRitual(): void {
   const html = root()
   html.dataset.anitewEntering = 'true'
+  if (sound()?.isEnabled() === true) tactile([8, 28, 13])
   clearTimer(enteringFallback)
   // Der Trainingsplan entsteht normalerweise sofort. Falls eine Datenbank auf
   // einem schwachen Gerät hängt, darf der Startbildschirm aber nie dauerhaft
@@ -49,11 +72,9 @@ function noticeSessionArrival(): void {
 
 /**
  * Verbindet die bereits vorhandenen React-Aktionen mit der Signature-Choreografie.
- *
- * Kein eigener Navigationszustand, kein zweites Sound-Setting: Der Core bleibt
- * derselbe zugängliche Button und der Trainingsstart bleibt dieselbe React-
- * Aktion. Diese Schicht beobachtet nur die zwei bedeutenden Gesten und lässt
- * die bestehende App ihre Arbeit tun.
+ * Kein eigener Navigationszustand und kein zweites Setting: Diese Schicht
+ * beobachtet nur die zwei bedeutenden Gesten und lässt die bestehende App
+ * Navigation, Training und Tonwahl beherrschen.
  */
 export function installCoreRitual(): void {
   if (installed) return
