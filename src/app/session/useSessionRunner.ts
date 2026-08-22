@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 import {
   type BlockPlan,
+  displayNumber,
   displayOf,
   entersReview,
   gradeRecall,
@@ -14,6 +15,7 @@ import {
   subjectOf,
   type SessionPlan,
   splitEntries,
+  splitNumberEntries,
   targetOf,
 } from '../../core/index.ts'
 import { recordOutcome } from '../../data/items.ts'
@@ -179,7 +181,11 @@ export function useSessionRunner(
               extra: [] as string[],
             }
           })()
-        : gradeRecall(splitEntries(entries), block.items, leniencyFor(block.moduleId))
+        : gradeRecall(
+            block.moduleId === 'numbers' ? splitNumberEntries(entries) : splitEntries(entries),
+            block.items,
+            leniencyFor(block.moduleId),
+          )
       nextResults.push({ round: block.round, kind: block.kind, moduleId: block.moduleId, ...graded })
       const duration = platform.clock.elapsed() - blockStartedRef.current
       const at = platform.clock.now()
@@ -346,7 +352,9 @@ export function useSessionRunner(
   const currentItem =
     item !== undefined && block?.moduleId === 'associative'
       ? `${displayOf('associative', item, plan.language)} · ${targetOf('associative', item, plan.language)}`
-      : item
+      : item !== undefined && block?.moduleId === 'numbers'
+        ? displayNumber(item)
+        : item
 
   const state: RunnerState = {
     plan,
