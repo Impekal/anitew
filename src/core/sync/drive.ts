@@ -1,13 +1,15 @@
 /**
- * Der Abgleich über den eigenen Google-Drive-App-Ordner (Backlog N7/N8/N10 · D-033).
+ * Der Abgleich über den eigenen sichtbaren Google-Drive-Ordner
+ * (Backlog N7/N8/N10 · D-033).
  *
- * Kein eigener Server, kein Konto bei uns (R-3): Die Daten liegen in
- * **deinem** Drive, in einem App-Ordner, den nur diese App sieht — und was
- * dort liegt, ist exakt die Sicherungsdatei (N2), die es schon gibt.
+ * Kein eigener Server, kein Konto bei uns (R-3): Wer Google Drive freiwillig
+ * verbindet, bekommt in „Meine Ablage“ einen Ordner **Anitew**. Darin liegt
+ * exakt die Sicherungsdatei (N2), die es schon gibt. Ohne Verbindung bleibt
+ * die App vollständig lokal und offline nutzbar.
  *
  * Der Ablauf ist bewusst das vorhandene Mischwerk und kein zweites:
  *
- * 1. **Herunterladen**, was im App-Ordner liegt (oder nichts).
+ * 1. **Herunterladen**, was im Anitew-Ordner liegt (oder nichts).
  * 2. **Einmischen** mit den Regeln der Sicherung (N9): nie löschen, bei
  *    zwei Fassungen gewinnt die reichere — zwei Geräte, die eine Woche
  *    getrennt liefen, haben beide recht.
@@ -24,16 +26,23 @@
 
 import { type BackupFile, readBackup } from '../backup.ts'
 
-/** Der Dateiname im App-Ordner — eine Datei, immer der ganze Stand. */
+/** Der sichtbare Ordner, den ANITEW bei der ersten Verbindung anlegt. */
+export const DRIVE_FOLDER_NAME = 'Anitew'
+
+/** Der Dateiname im Anitew-Ordner — eine Datei, immer der ganze Stand. */
 export const DRIVE_FILE_NAME = 'anitew-sicherung.json'
 
-/** Der engste Google-Zugriff, der das kann: nur der eigene App-Ordner. */
-export const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.appdata'
+/**
+ * Googles `drive.file`-Scope: ANITEW darf nur Dateien und Ordner verwalten,
+ * die es selbst erstellt oder die ausdrücklich mit der App geöffnet wurden —
+ * nicht das übrige Drive des Menschen.
+ */
+export const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file'
 
 export interface SyncPorts {
-  /** Die Datei aus dem App-Ordner, JSON-geparst — oder nichts. */
+  /** Die Datei aus dem Anitew-Ordner, JSON-geparst — oder nichts. */
   download(): Promise<unknown | undefined>
-  /** Schreibt die Datei in den App-Ordner (anlegen oder ersetzen). */
+  /** Schreibt die Datei in den Anitew-Ordner (anlegen oder ersetzen). */
   upload(file: BackupFile): Promise<void>
   /** Die ganze lokale Datenbank als Sicherungsdatei. */
   exportLocal(): Promise<BackupFile>
@@ -44,7 +53,7 @@ export interface SyncPorts {
 export interface SyncReport {
   /** Wie viele Datensätze vom Drive neu auf dieses Gerät kamen. */
   readonly pulled: number
-  /** Lag im App-Ordner schon eine Datei? */
+  /** Lag im Anitew-Ordner schon eine Datei? */
   readonly hadRemote: boolean
 }
 
