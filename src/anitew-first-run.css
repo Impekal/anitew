@@ -1,0 +1,339 @@
+/* ANITEW — First-run refinement
+ *
+ * Pure experience layer: no memory truth, scheduling or measurement logic.
+ * It explains the product once, keeps technique lessons readable, and fixes
+ * the Core atlas geometry on narrow phones.
+ */
+
+/* ── First encounter ------------------------------------------------------ */
+.onboarding .brand {
+  text-align: center;
+}
+.onboarding .brand h1 {
+  letter-spacing: .28em;
+}
+.onboarding .brand .greeting {
+  max-width: 24ch;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: clamp(25px, 6.3vw, 38px) !important;
+  line-height: 1.08 !important;
+  text-wrap: balance;
+}
+.first-run-philosophy {
+  margin: 8px auto 0;
+  color: rgb(216 168 90 / 78%);
+  font-family: var(--serif);
+  font-size: 13px;
+  letter-spacing: .04em;
+}
+.onboarding .arrival {
+  max-width: 760px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.onboarding .arrival-note {
+  max-width: 48ch;
+  margin: 8px auto 0 !important;
+  color: var(--an-text) !important;
+  font-family: var(--serif);
+  font-size: clamp(18px, 4.4vw, 23px) !important;
+  line-height: 1.42 !important;
+  text-align: center;
+  text-wrap: balance;
+}
+.first-run-adaptive {
+  max-width: 50ch;
+  margin: 18px auto 0;
+  color: rgb(140 207 192 / 86%);
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 1.48;
+  text-align: center;
+  text-wrap: balance;
+}
+.first-run-different {
+  margin: 34px 0 15px;
+  color: rgb(216 168 90 / 68%);
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: .28em;
+  text-align: center;
+  text-transform: uppercase;
+}
+.first-run-highlights {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 26px;
+  border-top: 1px solid rgb(140 207 192 / 10%);
+  border-bottom: 1px solid rgb(140 207 192 / 10%);
+  padding: 8px 0;
+}
+.first-run-highlight {
+  position: relative;
+  min-width: 0;
+  padding: 17px 8px 17px 24px;
+}
+.first-run-highlight-dot {
+  position: absolute;
+  left: 3px;
+  top: 22px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--living-core, #d8a85a);
+  box-shadow: 0 0 15px rgb(216 168 90 / 42%);
+}
+.first-run-highlight strong {
+  display: block;
+  color: rgb(240 238 228 / 92%);
+  font-family: var(--serif);
+  font-size: 14px;
+  font-weight: 540;
+  line-height: 1.25;
+}
+.first-run-highlight p {
+  margin: 6px 0 0;
+  color: rgb(180 205 188 / 62%);
+  font-size: 12px;
+  line-height: 1.45;
+}
+.first-run-trust {
+  margin: 18px auto 0;
+  color: rgb(140 207 192 / 56%);
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: .2em;
+  text-align: center;
+}
+.first-run-questions {
+  max-width: 54ch;
+  margin: 26px auto 8px;
+  color: rgb(240 238 228 / 68%);
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
+}
+.onboarding .arrival-actions {
+  margin-top: 18px;
+}
+
+/* ── Guided orientation -------------------------------------------------- */
+.first-run-guide {
+  position: fixed;
+  inset: 0;
+  z-index: 2200;
+  pointer-events: none;
+}
+.first-run-guide-veil {
+  position: absolute;
+  inset: 0;
+  background: rgb(2 6 5 / 56%);
+  backdrop-filter: blur(2px);
+  animation: first-run-veil-in 260ms ease both;
+}
+.first-run-guide-card {
+  position: fixed;
+  z-index: 2;
+  left: max(14px, env(safe-area-inset-left));
+  right: max(14px, env(safe-area-inset-right));
+  bottom: max(18px, env(safe-area-inset-bottom));
+  width: min(620px, calc(100vw - 28px));
+  margin: 0 auto;
+  padding: 20px 20px 18px;
+  border: 1px solid rgb(140 207 192 / 16%);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 12% 0%, rgb(216 168 90 / 8%), transparent 34%),
+    rgb(5 10 8 / 94%);
+  box-shadow: 0 22px 80px rgb(0 0 0 / 55%), inset 0 1px 0 rgb(255 255 255 / 3%);
+  backdrop-filter: blur(24px) saturate(112%);
+  pointer-events: auto;
+  animation: first-run-card-in 360ms cubic-bezier(.16,.84,.22,1) both;
+}
+.first-run-guide-counter {
+  margin: 0 0 9px;
+  color: rgb(140 207 192 / 56%);
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: .22em;
+}
+.first-run-guide-title {
+  margin: 0;
+  color: var(--an-text);
+  font-family: var(--serif);
+  font-size: clamp(22px, 5vw, 30px);
+  font-weight: 480;
+}
+.first-run-guide-body {
+  max-width: 56ch;
+  margin: 9px 0 0;
+  color: rgb(220 226 217 / 72%);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.first-run-guide-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 18px;
+}
+.first-run-guide-skip,
+.first-run-guide-next {
+  min-height: 44px;
+  border-radius: 999px;
+  font: inherit;
+}
+.first-run-guide-skip {
+  border: 0;
+  padding: 0 8px;
+  background: transparent;
+  color: rgb(180 205 188 / 52%);
+  font-size: 11px;
+}
+.first-run-guide-next {
+  border: 1px solid rgb(216 168 90 / 30%);
+  padding: 0 18px;
+  background: rgb(216 168 90 / 9%);
+  color: rgb(255 226 169 / 92%);
+  font-size: 12px;
+  letter-spacing: .04em;
+  box-shadow: 0 0 28px rgb(216 168 90 / 8%);
+}
+.first-run-focus {
+  position: relative !important;
+  z-index: 2201 !important;
+  filter: brightness(1.18) !important;
+  outline: 1px solid rgb(255 217 144 / 44%) !important;
+  outline-offset: 8px !important;
+  box-shadow: 0 0 0 12px rgb(216 168 90 / 5%), 0 0 52px rgb(216 168 90 / 24%) !important;
+  transition: outline 220ms ease, box-shadow 220ms ease, filter 220ms ease !important;
+}
+
+/* ── Technique lessons: reading owns the pace --------------------------- */
+.session:has(.session-phase-focus) .session-clock,
+.session:has(.session-phase-focus) .session-bar {
+  visibility: hidden !important;
+}
+.lesson .lesson-card {
+  pointer-events: none !important;
+  cursor: default !important;
+}
+.lesson-continue {
+  display: block;
+  min-height: 48px;
+  margin: 24px auto 0;
+  padding: 0 22px;
+  border: 1px solid rgb(216 168 90 / 30%);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 50% 0%, rgb(216 168 90 / 10%), transparent 70%),
+    rgb(8 14 12 / 68%);
+  color: rgb(255 226 169 / 94%);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  box-shadow: 0 0 30px rgb(216 168 90 / 8%);
+}
+.lesson-continue:active {
+  transform: scale(.95);
+}
+
+/* ── Core atlas: never escape a phone viewport -------------------------- */
+.drawer-veil {
+  overflow-x: hidden !important;
+}
+.drawer {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: min(100vw, 820px) !important;
+  overflow-x: hidden !important;
+}
+.drawer-close {
+  position: sticky !important;
+  left: auto !important;
+  right: auto !important;
+  top: max(12px, env(safe-area-inset-top)) !important;
+  translate: none !important;
+  display: grid !important;
+  place-items: center !important;
+  margin: 0 auto 34px !important;
+  z-index: 40 !important;
+  flex: 0 0 auto;
+}
+
+/* `.app` enters with an animation that touches `transform`. With a fixed
+   descendant Chromium can keep that animated element as the containing block
+   even after the visual motion is over. The atlas must be viewport-fixed, so
+   while it is open the home shell deliberately has no transform-producing
+   animation/filter/perspective at all. */
+main.app:has(> .drawer-veil) {
+  animation: none !important;
+  transform: none !important;
+  filter: none !important;
+  perspective: none !important;
+  transform-style: flat !important;
+  clip-path: none !important;
+  contain: none !important;
+}
+
+/* The atlas owns hit-testing while it is open; the visible home stays below
+   it but cannot become the click target. */
+#root:has(.drawer-veil) .drawer-veil {
+  z-index: 2147483647 !important;
+  pointer-events: auto !important;
+}
+main.app:has(> .drawer-veil) > :not(.drawer-veil) {
+  pointer-events: none !important;
+}
+main.app:has(> .drawer-veil) > .drawer-veil,
+main.app:has(> .drawer-veil) > .drawer-veil .drawer,
+main.app:has(> .drawer-veil) > .drawer-veil .drawer-item,
+main.app:has(> .drawer-veil) > .drawer-veil .drawer-close {
+  pointer-events: auto !important;
+}
+
+@media (max-width: 560px) {
+  .first-run-highlights {
+    grid-template-columns: 1fr;
+  }
+  .first-run-highlight {
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+  .first-run-highlight-dot {
+    top: 19px;
+  }
+  .first-run-guide-card {
+    border-radius: 20px;
+    padding: 17px 16px 15px;
+  }
+  .first-run-guide-actions {
+    align-items: stretch;
+  }
+  .first-run-guide-skip,
+  .first-run-guide-next {
+    font-size: 10px;
+  }
+}
+
+@keyframes first-run-veil-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes first-run-card-in {
+  from { opacity: 0; transform: translateY(18px) scale(.985); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .first-run-guide-veil,
+  .first-run-guide-card {
+    animation: none !important;
+  }
+  .first-run-focus {
+    transition: none !important;
+  }
+}

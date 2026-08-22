@@ -21,8 +21,9 @@ import { answerRecall, collectItems, openPage, pollFirstModule, startButton, vis
  * Wiedersehensanteil blieben für fünf Fragen zehn Sekunden, und zwei Sekunden
  * je Station sind keine Frage, sondern eine Formalie.
  *
- * Auf einer frischen Datenbank steht davor die Lektion — die wird
- * weggetippt, sie ist an anderer Stelle geprüft.
+ * Auf einer frischen Datenbank steht davor die Lektion — die wird über ihren
+ * expliziten Weiter-Knopf verlassen; die Leserate bleibt damit Teil des
+ * echten Produktpfads statt von einem alten Klick auf die Karte abzukürzen.
  */
 async function startWalk(page: Page): Promise<boolean> {
   for (let attempt = 0; attempt < 60; attempt++) {
@@ -33,9 +34,8 @@ async function startWalk(page: Page): Promise<boolean> {
     // Welches Modul die Runde hat, sagt der persistierte Plan — kein
     // Bildschirm-Raten (dieselbe Lehre wie in `startEmergency`).
     if ((await pollFirstModule(page)) === 'palace') {
-      // Die Palastlektion kann davorstehen — wegtippen, dann steht der Gang.
-      const lesson = page.locator('.lesson-card')
-      if ((await lesson.count()) > 0) await lesson.click()
+      const lesson = page.locator('.lesson')
+      if ((await lesson.count()) > 0) await lesson.getByRole('button', { name: 'Weiter ins Training' }).click()
       await page.locator('.walk').waitFor({ timeout: 30_000 })
       return true
     }
@@ -66,18 +66,24 @@ test('erklärt den Palast, bevor der erste Gang kommt — und nur einmal', async
   // Der Satz, auf den es ankommt: Das Bild baut der Nutzer (D-017).
   await expect(lesson.getByText(/Das Bild musst du bauen, nicht lesen/)).toBeVisible()
 
-  // Weggetippt, und der Gang steht da.
-  await lesson.locator('.lesson-card').click()
+  // Bewusst weiter, und der Gang steht da.
+  await lesson.getByRole('button', { name: 'Weiter ins Training' }).click()
   await expect(page.locator('.walk')).toBeVisible({ timeout: 30_000 })
 
-  // Zweite Einheit: keine Lektion mehr.
+  // Die erste Einheit sauber verwerfen, bevor die zweite beginnt. Ein Reload
+  // mitten in derselben Einheit muss den aktiven Block absichtlich wieder
+  // aufnehmen (B5) und wäre deshalb kein Test für „einmal erklärt“.
+  await page.getByRole('button', { name: 'Abbrechen' }).click()
+  await expect(startButton(page)).toBeVisible()
+
+  // Zweite echte Einheit: keine Palastlektion mehr. Welches Trainingsmodul
+  // danach zuerst kommt, entscheidet der Planer und ist kein Vertrag dieses
+  // Tests; die Session selbst muss nur angelaufen sein.
   await visit(page)
   await page.getByRole('button', { name: '5 Minuten', exact: true }).click()
   await startButton(page).click()
   await page.locator('.settle').click()
-  await expect(
-    page.locator('.walk, .encode-word, .scene, .reveal-digits').first(),
-  ).toBeVisible({ timeout: 30_000 })
+  await expect(page.locator('.session-phase')).toBeVisible({ timeout: 30_000 })
   await expect(page.locator('.lesson').getByText('Der Gedächtnispalast')).toHaveCount(0)
 })
 

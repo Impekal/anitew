@@ -1,5 +1,6 @@
 import '../anitew-living-adaptive.css'
 import '../anitew-core-ritual.css'
+import './firstRunExperience.ts'
 import { mountNeuralField, unmountNeuralField } from './NeuralFieldMount.tsx'
 
 let installed = false
@@ -120,6 +121,17 @@ function installCoreRitual(): void {
     (event) => {
       const target = event.target
       if (!(target instanceof Element)) return
+
+      // Beim allerersten Einstieg ist „Los geht’s“ die erste freigegebene
+      // Nutzer-Geste. Genau dort darf das Sonic Logo zuverlässig erklingen —
+      // iOS blockiert Ton beim bloßen Seitenaufruf. Danach tragen Core und
+      // Portal dieselbe Klang-DNA weiter.
+      const firstRun = target.closest('.arrival-begin')
+      if (firstRun !== null) {
+        tactile([6, 22, 10])
+        ritualTone('core')
+        return
+      }
 
       const core = target.closest('.hamburger')
       if (core !== null && core.getAttribute('aria-expanded') !== 'true') {

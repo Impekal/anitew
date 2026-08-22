@@ -42,5 +42,16 @@ jobs:
         run: npm run size
       - name: Browser für die E2E-Tests
         run: npx playwright install --with-deps chromium
+      # Die drei bekannten Problemklassen laufen zuerst. So kostet ein kleiner
+      # Regression-Fix nicht wieder 50 Minuten, bevor derselbe Fehler sichtbar
+      # wird. Das Voll-Gate darunter bleibt unverändert und ist weiterhin die
+      # einzige Grundlage für einen Merge.
+      - name: E2E-Regressions-Smoke
+        run: >-
+          npx playwright test --project=chromium
+          tests/e2e/achievements.spec.ts
+          tests/e2e/palace.spec.ts
+          tests/e2e/technique.spec.ts
+          --grep "nennt eine Tatsache|erklärt den Palast|unterrichtet die Technik und lässt sie sofort anwenden"
       - name: Tests (die gebaute App im Browser)
         run: npx playwright test --project=chromium

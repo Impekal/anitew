@@ -6,7 +6,7 @@
     <title>ANITEW</title>
     <meta
       name="description"
-      content="Gedächtnis ist Technik, kein Talent. Fünf Minuten Training am Tag — mit einer Messung, die zählt, was am Folgetag noch da ist."
+      content="Hol zurück, was bleiben soll. Gedächtnis ist Technik, kein Talent. Abruftraining, Wiederholungsplanung und ehrliche Messung."
     />
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f4f2ee" />
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f1218" />
@@ -30,8 +30,137 @@
     <!-- iOS skaliert selbst; 192 ist groß genug für die 180 Punkte, die es
          auf dem Startbildschirm zeichnet. -->
     <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192.png" />
+    <style>
+      /*
+       * Der Launch-Moment ist absichtlich direkt im Dokument: Er erscheint,
+       * bevor React, IndexedDB oder ein nachgeladener Experience-Chunk etwas
+       * tun können. Keine Ladeanzeige, sondern ANITEWs Signatur. Nach 1,65 s
+       * gibt er die bereits darunter aufgebaute App frei.
+       */
+      #anitew-launch {
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        display: grid;
+        place-items: center;
+        align-content: center;
+        gap: 18px;
+        background:
+          radial-gradient(circle at 50% 44%, rgb(140 207 192 / 7%), transparent 28rem),
+          radial-gradient(circle at 50% 48%, rgb(216 168 90 / 5%), transparent 19rem),
+          #030706;
+        color: #f0eee4;
+        /* Während die Signatur gezeichnet wird, darf kein unsichtbarer
+           Fingertipp das Onboarding darunter überspringen. `visibility:hidden`
+           am Ende nimmt die Fläche anschließend vollständig aus dem Hit-Test. */
+        pointer-events: auto;
+        animation: anitew-launch-away 1.65s cubic-bezier(.4,0,.2,1) forwards;
+      }
+      .anitew-launch-core {
+        width: 94px;
+        height: 94px;
+        overflow: visible;
+        filter: drop-shadow(0 0 20px rgb(216 168 90 / 20%));
+      }
+      .anitew-launch-ring,
+      .anitew-launch-link {
+        fill: none;
+        stroke-linecap: round;
+        stroke-dasharray: 220;
+        stroke-dashoffset: 220;
+        animation: anitew-launch-draw 720ms cubic-bezier(.16,.84,.22,1) forwards;
+      }
+      .anitew-launch-ring-a { stroke: rgb(216 168 90 / 64%); stroke-width: 1.1; }
+      .anitew-launch-ring-b {
+        stroke: rgb(140 207 192 / 44%);
+        stroke-width: .9;
+        animation-delay: 110ms;
+      }
+      .anitew-launch-link {
+        stroke: rgb(140 207 192 / 36%);
+        stroke-width: 1;
+        animation-delay: 210ms;
+      }
+      .anitew-launch-point {
+        fill: #ffd990;
+        opacity: 0;
+        transform-origin: 47px 47px;
+        animation: anitew-launch-point 620ms 180ms cubic-bezier(.16,.84,.22,1) forwards;
+      }
+      .anitew-launch-name {
+        opacity: 0;
+        transform: translateY(5px);
+        font: 500 18px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        letter-spacing: .42em;
+        text-indent: .42em;
+        animation: anitew-launch-name 520ms 520ms ease forwards;
+      }
+      /*
+       * Der Atlas wird als Kind von #root gerendert. Nach dem Schließen der
+       * Einführung muss seine gesamte Interaktionskette über dem restlichen
+       * App-Layer liegen. Nicht nur der Schleier, sondern auch Navigation und
+       * Knoten bekommen deshalb einen expliziten Hit-Test-/Stacking-Kontext.
+       * Der Launch selbst bleibt mit 99999 weiterhin darüber.
+       */
+      #root .drawer-veil {
+        z-index: 3000 !important;
+        pointer-events: auto !important;
+        isolation: isolate;
+      }
+      #root .drawer {
+        z-index: 1 !important;
+        pointer-events: auto !important;
+      }
+      #root .menu-group {
+        z-index: 2 !important;
+        pointer-events: auto !important;
+      }
+      #root .drawer-item {
+        z-index: 3 !important;
+        pointer-events: auto !important;
+      }
+      @keyframes anitew-launch-draw { to { stroke-dashoffset: 0; } }
+      @keyframes anitew-launch-point {
+        0% { opacity: 0; transform: scale(.2); }
+        55% { opacity: 1; transform: scale(1.45); }
+        100% { opacity: 1; transform: scale(1); }
+      }
+      @keyframes anitew-launch-name {
+        to { opacity: 1; transform: none; }
+      }
+      @keyframes anitew-launch-away {
+        0%, 72% { opacity: 1; visibility: visible; }
+        100% { opacity: 0; visibility: hidden; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #anitew-launch {
+          animation-duration: .42s;
+        }
+        .anitew-launch-ring,
+        .anitew-launch-link,
+        .anitew-launch-point,
+        .anitew-launch-name {
+          animation: none;
+          stroke-dashoffset: 0;
+          opacity: 1;
+          transform: none;
+        }
+      }
+    </style>
   </head>
   <body>
+    <div id="anitew-launch" aria-hidden="true">
+      <svg class="anitew-launch-core" viewBox="0 0 94 94" aria-hidden="true">
+        <circle class="anitew-launch-ring anitew-launch-ring-a" cx="47" cy="47" r="31" />
+        <path class="anitew-launch-ring anitew-launch-ring-b" d="M23 55a31 31 0 0 1 43-31" />
+        <path class="anitew-launch-link" d="M47 47 68 35M47 47 28 31M47 47 31 68" />
+        <circle class="anitew-launch-point" cx="47" cy="47" r="5.2" />
+        <circle class="anitew-launch-point" cx="68" cy="35" r="2.2" style="animation-delay:280ms" />
+        <circle class="anitew-launch-point" cx="28" cy="31" r="1.8" style="animation-delay:340ms" />
+        <circle class="anitew-launch-point" cx="31" cy="68" r="1.8" style="animation-delay:400ms" />
+      </svg>
+      <div class="anitew-launch-name">ANITEW</div>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
