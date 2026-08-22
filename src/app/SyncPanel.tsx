@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import { SyncError, type Platform, type SyncReport } from '../core/index.ts'
-import { DriveError } from '../platform/web/drive.ts'
+import type { DriveFailure } from '../platform/web/drive.ts'
 import type { Dictionary } from '../i18n/index.ts'
 
 import {
@@ -12,7 +12,7 @@ import {
   resolveClientId,
 } from './driveSync.ts'
 
-type SyncFailureText = 'denied' | 'offline' | 'drive' | 'remote-invalid'
+type SyncFailureText = DriveFailure | 'remote-invalid'
 
 interface VisibleDriveCopy {
   intro: string
@@ -62,6 +62,12 @@ const DRIVE_EN: VisibleDriveCopy = {
 
 function visibleCopy(): VisibleDriveCopy {
   return document.documentElement.lang.toLowerCase().startsWith('de') ? DRIVE_DE : DRIVE_EN
+}
+
+function driveFailure(error: unknown): DriveFailure | undefined {
+  if (typeof error !== 'object' || error === null || !('reason' in error)) return undefined
+  const reason = (error as { reason?: unknown }).reason
+  return reason === 'denied' || reason === 'offline' || reason === 'drive' ? reason : undefined
 }
 
 /**
@@ -123,8 +129,7 @@ export function SyncPanel({ platform, dictionary }: { platform: Platform; dictio
       })
       .catch((error: unknown) => {
         if (error instanceof SyncError) setFailure(error.reason)
-        else if (error instanceof DriveError) setFailure(error.reason)
-        else setFailure('drive')
+        else setFailure(driveFailure(error) ?? 'drive')
       })
       .finally(() => setBusy(false))
   }
