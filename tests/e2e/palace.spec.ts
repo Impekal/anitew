@@ -70,9 +70,15 @@ test('erklärt den Palast, bevor der erste Gang kommt — und nur einmal', async
   await lesson.getByRole('button', { name: 'Weiter ins Training' }).click()
   await expect(page.locator('.walk')).toBeVisible({ timeout: 30_000 })
 
-  // Zweite Einheit: keine Palastlektion mehr. Welches Trainingsmodul danach
-  // tatsächlich zuerst kommt, entscheidet der Planer und ist kein Vertrag
-  // dieses Tests; die Session selbst muss nur angelaufen sein.
+  // Die erste Einheit sauber verwerfen, bevor die zweite beginnt. Ein Reload
+  // mitten in derselben Einheit muss den aktiven Block absichtlich wieder
+  // aufnehmen (B5) und wäre deshalb kein Test für „einmal erklärt“.
+  await page.getByRole('button', { name: 'Abbrechen' }).click()
+  await expect(startButton(page)).toBeVisible()
+
+  // Zweite echte Einheit: keine Palastlektion mehr. Welches Trainingsmodul
+  // danach zuerst kommt, entscheidet der Planer und ist kein Vertrag dieses
+  // Tests; die Session selbst muss nur angelaufen sein.
   await visit(page)
   await page.getByRole('button', { name: '5 Minuten', exact: true }).click()
   await startButton(page).click()
