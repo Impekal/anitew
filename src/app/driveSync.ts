@@ -88,7 +88,12 @@ export function scheduleDriveSync(platform: Platform, delayMs = 4_000): void {
   if (pendingSync !== undefined) clearTimeout(pendingSync)
   pendingSync = setTimeout(() => {
     pendingSync = undefined
-    if (syncRunning) return
+    // Eine Änderung darf nicht verloren gehen, nur weil der stille Start-
+    // Abgleich noch läuft. In dem Fall versuchen wir kurz danach erneut.
+    if (syncRunning) {
+      scheduleDriveSync(platform, 1_000)
+      return
+    }
     void (async () => {
       const on = await platform.settings.read<boolean>(SYNC_ON_SETTING).catch(() => undefined)
       if (on !== true) return
