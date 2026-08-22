@@ -8,32 +8,49 @@ import { startButton, visit } from './helpers.ts'
  * D5 ist der Satz, an dem sich ANITEW von jeder Brain-Game-App unterscheidet:
  * **Merktechniken werden beigebracht, nicht nur abgefragt.** Geprüft wird
  * deshalb nicht, ob irgendwo eine Lektion auftaucht, sondern die Kette, auf
- * die es ankommt: unterrichten → sofort anwenden lassen → beim nächsten Mal
- * die nächste Ziffer.
- *
- * Der Drei-Minuten-Modus statt der fünf: Er ist der kürzeste, in dem
- * überhaupt gelehrt wird, und spart dem Lauf zwei Minuten. Abgewartet wird
- * die Einheit nie — nach dem, was geprüft ist, geht der Test hinaus.
+ * die es ankommt: unterrichten → bewusst weitergehen → sofort anwenden lassen
+ * → beim nächsten Mal die nächste Ziffer.
  */
 
 /** Die Ziffern, die das Major-System lehrt, in der Reihenfolge der Lektionen. */
 const TEACH_ORDER = [1, 2, 3, 4, 5, 9, 7, 8, 0, 6]
 
+async function continueLesson(page: Page) {
+  const button = page.locator('.lesson-continue')
+  await expect(button).toBeVisible({ timeout: 10_000 })
+  await button.click()
+}
+
+async function currentBlockSeconds(page: Page): Promise<number> {
+  return page.evaluate(() => {
+    return new Promise<number>((resolve, reject) => {
+      const open = indexedDB.open('anitew')
+      open.onsuccess = () => {
+        const request = open.result
+          .transaction('settings')
+          .objectStore('settings')
+          .get('activeSession')
+        request.onsuccess = () => {
+          const value = request.result?.value as
+            | { blockIndex?: number; plan?: { blocks?: { seconds?: number }[] } }
+            | undefined
+          const index = value?.blockIndex ?? 0
+          const seconds = value?.plan?.blocks?.[index]?.seconds
+          if (typeof seconds === 'number') resolve(seconds)
+          else reject(new Error('kein laufender Block mit Sekunden'))
+        }
+        request.onerror = () => reject(request.error)
+      }
+      open.onerror = () => reject(open.error)
+    })
+  })
+}
+
 /**
  * Setzt den Lernstand, bevor die Einheit beginnt.
- *
- * Der Grund ist eine Lehre aus dem ersten Anlauf dieses Tests: Er prüfte die
- * Konsonantenzeile nur, **wenn zufällig eine Eins in der Zahl vorkam** — und
- * lief deshalb einmal grün, während der Fehler noch drin war. Ein Test, der
- * sich seine Gelegenheit vom Zufall geben lässt, ist keiner.
- *
- * Sind neun der zehn Ziffern schon gelehrt, lehrt die Lektion die zehnte, und
- * danach muss unter **jeder** Ziffer jeder Zahl ein Konsonant stehen. Damit
- * ist die Prüfung vollständig, egal welche Zahl gezogen wird.
  */
 async function seedTaught(page: Page, digits: readonly number[]) {
   await visit(page)
-  // Erst nach dem ersten Laden gibt es das Schema, in das geschrieben wird.
   await expect(startButton(page)).toBeVisible()
   await page.evaluate(async (value) => {
     const open = indexedDB.open('anitew')
@@ -44,23 +61,9 @@ async function seedTaught(page: Page, digits: readonly number[]) {
     await new Promise<void>((resolve, reject) => {
       const store = database.transaction('settings', 'readwrite').objectStore('settings')
       store.put({ key: 'technique.major.taught', value })
-      /*
-       * Und der Palast gilt als erklärt.
-       *
-       * Seit es ihn gibt, geht **seine** Lektion der ersten Ziffer vor (G,
-       * D-017) — auf einer frischen Datenbank kommt also nicht die Eins,
-       * sondern der Gedächtnispalast. Das ist richtig so und hat drei
-       * Prüfungen hier zu Recht rot gemacht: Sie handeln vom Major-System
-       * und beginnen deshalb in dem Zustand, in dem jemand den Palast schon
-       * kennt.
-       */
+      /* Der Palast gilt als erklärt: Diese Prüfungen handeln vom Major-System. */
       store.put({ key: 'technique.palace.taught', value: true })
-      /*
-       * Und Geschichte wie Verknüpfung ebenso: Seit D5 gehen beide der
-       * ersten Ziffer vor — diese Prüfungen handeln vom Major-System und
-       * beginnen im Zustand, in dem die Einpräge-Lektionen schon gehalten
-       * sind. Ihre eigenen Prüfungen haben sie im Kern.
-       */
+      /* Geschichte und Verknüpfung ebenso; ihre Semantik hat eigene Prüfungen. */
       store.put({ key: 'technique.story.taught', value: true })
       const request = store.put({ key: 'technique.link.taught', value: true })
       request.onsuccess = () => resolve()
@@ -75,6 +78,31 @@ async function startShort(page: Page) {
   await startButton(page).click()
   await page.locator('.settle').click()
 }
+
+test('der Gedächtnispalast bleibt stehen, bis der Mensch bewusst weitergeht', async ({ page }) => {
+  test.setTimeout(120_000)
+
+  // Frischer Lernstand: Der Palast ist die erste Techniklektion.
+  await visit(page)
+  await startShort(page)
+  await expect(page.getByText('Der Gedächtnispalast')).toBeVisible({ timeout: 30_000 })
+  await expect(page.locator('.lesson-continue')).toBeVisible({ timeout: 10_000 })
+
+  const seconds = await currentBlockSeconds(page)
+  await page.waitForTimeout((seconds + 1) * 1000)
+
+  // Früher wäre der Runner jetzt automatisch weitergesprungen. Lesen besitzt
+  // jetzt die Zeit: kein Countdown und kein Fortschritt ohne bewussten Tipp.
+  await expect(page.getByText('Der Gedächtnispalast')).toBeVisible()
+  await expect(page.locator('.lesson-continue')).toBeVisible()
+  const pointerEvents = await page
+    .locator('.lesson-card')
+    .evaluate((element) => getComputedStyle(element).pointerEvents)
+  expect(pointerEvents).toBe('none')
+
+  await continueLesson(page)
+  await expect(page.getByText('Der Gedächtnispalast')).toBeHidden()
+})
 
 test('unterrichtet die Geschichten-Methode vor der ersten Ziffer (D5)', async ({ page }) => {
   test.setTimeout(120_000)
@@ -106,9 +134,7 @@ test('unterrichtet die Geschichten-Methode vor der ersten Ziffer (D5)', async ({
   await expect(page.getByText('Die Geschichten-Methode')).toBeVisible()
   await expect(page.getByText(/je absurder, desto fester/)).toBeVisible()
 
-  // Antippen — und die erste Runde gehört den Wörtern: Unterricht mit
-  // sofortiger Anwendung.
-  await page.locator('.lesson-card').click()
+  await continueLesson(page)
   await expect(page.locator('.encode-word')).toBeVisible({ timeout: 30_000 })
   const hint = ((await page.locator('.encode .hint').first().textContent()) ?? '').trim()
   expect(hint).toContain('Ein Wort nach dem anderen')
@@ -120,24 +146,14 @@ test('unterrichtet die Technik und lässt sie sofort anwenden', async ({ page })
   await seedTaught(page, [])
   await startShort(page)
 
-  // Die erste Lektion nennt den Zweck, danach nicht mehr (G-2).
   await expect(page.locator('.lesson')).toBeVisible({ timeout: 30_000 })
   await expect(page.getByText('Ziffern sind schwer zu behalten')).toBeVisible()
-
-  // Die Eins zuerst: Ihre Brücke ist die sichtbarste. Wer mit der Null oder
-  // der Sechs anfängt, hält die Technik für willkürlich.
   await expect(page.locator('.lesson-digit')).toHaveText('1')
   await expect(page.locator('.lesson-letters')).toHaveText('t · d')
   await expect(page.getByText('Das kleine t hat einen Abstrich')).toBeVisible()
 
-  // Antippen geht weiter — die Lektion ist kein Hindernis, das man nehmen muss.
-  await page.locator('.lesson-card').click()
+  await continueLesson(page)
 
-  /*
-   * Und jetzt das Entscheidende: **Zahlen kommen direkt danach.** Erst die
-   * Technik erklären und sie dann drei Runden lang nicht benutzen dürfen wäre
-   * Unterricht ohne Anwendung — und am nächsten Tag wieder weg.
-   */
   await expect(page.locator('.encode-word')).toBeVisible({ timeout: 30_000 })
   const shown = (await page.locator('.encode-word').textContent())?.trim() ?? ''
   expect(shown).toMatch(/^\d+$/)
@@ -148,25 +164,13 @@ test('schreibt den Konsonanten unter seine Ziffer — auch den frisch gelernten'
 }) => {
   test.setTimeout(180_000)
 
-  /*
-   * Neun Ziffern sitzen, die zehnte kommt gleich als Lektion. Danach muss
-   * unter **jeder** Ziffer jeder Zahl ein Konsonant stehen — fehlte der
-   * frisch gelernten ihrer, während alle anderen ihren haben, fällt genau
-   * das hier auf.
-   *
-   * Und deshalb wird der **ganze Block** beobachtet und nicht die erste Zahl.
-   * Der erste Anlauf prüfte nur, was zufällig gerade dastand: Er lief zweimal
-   * grün, während der Fehler noch drin war, weil die gezogene Zahl die
-   * fragliche Ziffer nicht enthielt. Ein Test, der sich seine Gelegenheit vom
-   * Zufall geben lässt, ist keiner — er muss auf sie warten.
-   */
   const fresh = String(TEACH_ORDER[TEACH_ORDER.length - 1])
 
   for (let attempt = 0; attempt < 3; attempt++) {
     await seedTaught(page, TEACH_ORDER.slice(0, -1))
     await startShort(page)
     await expect(page.locator('.lesson-digit')).toHaveText(fresh, { timeout: 30_000 })
-    await page.locator('.lesson-card').click()
+    await continueLesson(page)
     await expect(page.locator('.encode-word')).toBeVisible({ timeout: 30_000 })
 
     const seen = new Set<string>()
@@ -174,8 +178,6 @@ test('schreibt den Konsonanten unter seine Ziffer — auch den frisch gelernten'
     while (!used && (await page.locator('.recall-input').count()) === 0) {
       const shown = (await page.locator('.encode-word').textContent())?.trim() ?? ''
       const letters = await page.locator('.major-letters span').allTextContents()
-      // Zwischen den beiden Abfragen kann die Zahl gewechselt haben; dann
-      // gehören Ziffern und Buchstaben nicht zusammen und die Probe fällt aus.
       const still = (await page.locator('.encode-word').textContent())?.trim() ?? ''
 
       if (shown !== '' && shown === still && !seen.has(shown)) {
@@ -203,20 +205,11 @@ test('schreibt den Konsonanten unter seine Ziffer — auch den frisch gelernten'
 test('zeigt nichts an, solange nichts gelehrt ist', async ({ page }) => {
   test.setTimeout(120_000)
 
-  /*
-   * Die Gegenprobe. Ohne sie könnte die Zeile immer erscheinen, mit Punkten
-   * gefüllt — ein Versprechen auf etwas, das noch nicht da ist, und nach G-2
-   * schlicht Möbel.
-   *
-   * Im Notfallmodus wird nicht unterrichtet, es bleibt also alles ungelehrt.
-   */
   await visit(page)
   await page.getByRole('button', { name: '60 Sekunden' }).click()
   await startButton(page).click()
   await page.locator('.settle').click()
 
-  // Eine Mission zeigt ihre Szene, Rückwärts (D7) seine Ziffernfolge —
-  // alles drei zählt als „die Einheit läuft, ohne Lektion davor“.
   await expect(
     page.locator('.encode-word, .scene, .reveal-digits').first(),
   ).toBeVisible({ timeout: 30_000 })
@@ -230,17 +223,13 @@ test('hält beim nächsten Mal die nächste Lektion', async ({ page }) => {
   await seedTaught(page, [])
   await startShort(page)
   await expect(page.locator('.lesson-digit')).toHaveText('1', { timeout: 30_000 })
-  await page.locator('.lesson-card').click()
+  await continueLesson(page)
 
-  // Abbrechen statt abwarten: Gelehrt ist gelehrt, sobald die Lektion vorbei
-  // ist — davon hängt nicht ab, ob die Einheit zu Ende läuft.
   await page.getByRole('button', { name: 'Abbrechen' }).click()
   await expect(startButton(page)).toBeVisible()
 
   await startShort(page)
 
-  // Die Zwei, nicht noch einmal die Eins.
   await expect(page.locator('.lesson-digit')).toHaveText('2', { timeout: 30_000 })
-  // Der Zweck steht nur beim allerersten Mal da.
   await expect(page.getByText('Ziffern sind schwer zu behalten')).toBeHidden()
 })
