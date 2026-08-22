@@ -14,16 +14,66 @@ import {
 
 type SyncFailureText = 'denied' | 'offline' | 'drive' | 'remote-invalid'
 
+interface VisibleDriveCopy {
+  intro: string
+  how: string
+  start: string
+  again: string
+  autoNote: string
+  localNote: string
+  stop: string
+  firstTime: string
+  remoteInvalid: string
+}
+
+const DRIVE_DE: VisibleDriveCopy = {
+  intro:
+    'Empfohlen für mehrere Geräte: Verbinde dein Google Drive. ANITEW legt in „Meine Ablage“ den sichtbaren Ordner „Anitew“ an und speichert dort dieselbe Sicherungsdatei wie beim manuellen Backup. ANITEW hat keinen eigenen Datenserver.',
+  how:
+    'Beim Abgleich wird zuerst geholt und sicher zusammengeführt, was im Ordner „Anitew“ liegt; nichts wird einfach gelöscht. Danach wird der vereinigte Stand wieder dorthin geschrieben.',
+  start: 'Google Drive verbinden — empfohlen',
+  again: 'Jetzt mit Google Drive abgleichen',
+  autoNote:
+    'Automatischer Abgleich ist aktiv. ANITEW versucht beim Öffnen und nach Änderungen still zu synchronisieren. Wenn Google eine neue Freigabe braucht, wartet die App bis zu deinem nächsten Tipp.',
+  localNote:
+    'Aktuell lokal: Ohne Google-Drive-Verbindung bleiben Training, Erinnerungen und Verlauf ausschließlich auf diesem Gerät.',
+  stop: 'Google Drive trennen · lokal weiter',
+  firstTime: 'Der Ordner „Anitew“ wurde in deinem Drive angelegt und der aktuelle Stand dort gespeichert.',
+  remoteInvalid:
+    'Im Ordner „Anitew“ liegt eine Datei, die keine gültige ANITEW-Sicherung ist. Sie wurde nicht verändert.',
+}
+
+const DRIVE_EN: VisibleDriveCopy = {
+  intro:
+    'Recommended across devices: connect Google Drive. ANITEW creates a visible “Anitew” folder in My Drive and stores the same backup file used by manual backup. ANITEW has no data server of its own.',
+  how:
+    'Sync first downloads and safely merges what is in the “Anitew” folder; nothing is simply deleted. The merged state is then written back there.',
+  start: 'Connect Google Drive — recommended',
+  again: 'Sync with Google Drive now',
+  autoNote:
+    'Automatic sync is active. ANITEW quietly tries to sync when opening and after changes. If Google needs permission again, the app waits for your next tap.',
+  localNote:
+    'Currently local: without Google Drive, training, memories and history remain only on this device.',
+  stop: 'Disconnect Google Drive · stay local',
+  firstTime: 'The “Anitew” folder was created in your Drive and the current state was stored there.',
+  remoteInvalid:
+    'The “Anitew” folder contains a file that is not a valid ANITEW backup. It was left untouched.',
+}
+
+function visibleCopy(): VisibleDriveCopy {
+  return document.documentElement.lang.toLowerCase().startsWith('de') ? DRIVE_DE : DRIVE_EN
+}
+
 /**
  * Der Abgleich (N7/N8/N10 · D-033).
  *
- * Die Seite erklärt **vor** dem ersten Fingertipp, wohin die Daten gehen
- * (R-3, D-015): eigener Drive, eigener App-Ordner, kein Server dazwischen.
- * Ohne eingerichtete Client-Kennung sagt sie genau das — und nichts sieht
- * kaputt aus, denn Sicherung und Training hängen nicht daran.
+ * Die Seite erklärt vor dem ersten Fingertipp, wohin die Daten gehen: eigener
+ * sichtbarer Drive-Ordner, kein ANITEW-Server. Ohne Verbindung ist „lokal“
+ * ein vollständiger Betriebsmodus und kein Fehlerzustand.
  */
 export function SyncPanel({ platform, dictionary }: { platform: Platform; dictionary: Dictionary }) {
   const texts = dictionary.sync
+  const drive = visibleCopy()
 
   const [clientId, setClientId] = useState<string | undefined>(undefined)
   const [checked, setChecked] = useState(false)
@@ -66,7 +116,6 @@ export function SyncPanel({ platform, dictionary }: { platform: Platform; dictio
         setLastAt(now)
         void platform.settings.write(SYNC_ON_SETTING, true).catch(() => undefined)
         void platform.settings.write(SYNC_AT_SETTING, now).catch(() => undefined)
-        // Die Konto-Zeile ist Anzeige, kein Tragwerk: fehlt sie, fehlt sie.
         if (result.account !== undefined) {
           setAccount(result.account)
           void platform.settings.write(SYNC_ACCOUNT_SETTING, result.account).catch(() => undefined)
@@ -83,6 +132,7 @@ export function SyncPanel({ platform, dictionary }: { platform: Platform; dictio
   const stop = () => {
     setAuto(false)
     setAccount(undefined)
+    setReport(undefined)
     void platform.settings.write(SYNC_ON_SETTING, false).catch(() => undefined)
     void platform.settings.remove(SYNC_ACCOUNT_SETTING).catch(() => undefined)
   }
@@ -92,31 +142,36 @@ export function SyncPanel({ platform, dictionary }: { platform: Platform; dictio
   if (clientId === undefined) {
     return (
       <div className="sync">
-        <p className="hint">{texts.intro}</p>
+        <p className="hint">{drive.intro}</p>
         <p className="sync-note">{texts.notConfigured}</p>
+        <p className="sync-note">{drive.localNote}</p>
       </div>
     )
   }
 
   return (
     <div className="sync">
-      <p className="hint">{texts.intro}</p>
-      <p className="hint">{texts.how}</p>
+      <p className="hint">{drive.intro}</p>
+      <p className="hint">{drive.how}</p>
 
       <button type="button" className="quiet sync-run" onClick={sync} disabled={busy}>
-        {busy ? texts.running : auto ? texts.again : texts.start}
+        {busy ? texts.running : auto ? drive.again : drive.start}
       </button>
 
       {report !== undefined && (
         <p className="sync-report">
           {!report.hadRemote
-            ? texts.firstTime
+            ? drive.firstTime
             : report.pulled > 0
               ? texts.pulledSome.replace('{n}', String(report.pulled))
               : texts.pulledNone}
         </p>
       )}
-      {failure !== undefined && <p className="sync-failure">{texts.errors[failure]}</p>}
+      {failure !== undefined && (
+        <p className="sync-failure">
+          {failure === 'remote-invalid' ? drive.remoteInvalid : texts.errors[failure]}
+        </p>
+      )}
 
       {account !== undefined && (
         <p className="sync-note sync-account">{texts.account.replace('{account}', account)}</p>
@@ -126,13 +181,15 @@ export function SyncPanel({ platform, dictionary }: { platform: Platform; dictio
           {texts.lastAt} {new Date(lastAt).toLocaleString()}
         </p>
       )}
-      {auto && (
+      {auto ? (
         <>
-          <p className="sync-note">{texts.autoNote}</p>
+          <p className="sync-note">{drive.autoNote}</p>
           <button type="button" className="quiet sync-stop" onClick={stop}>
-            {texts.stop}
+            {drive.stop}
           </button>
         </>
+      ) : (
+        <p className="sync-note">{drive.localNote}</p>
       )}
     </div>
   )
