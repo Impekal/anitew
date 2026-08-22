@@ -1,8 +1,8 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 
 import { startButton, visit } from './helpers.ts'
 
-async function waitForLivingLayer(page: Parameters<typeof test>[0] extends never ? never : any) {
+async function waitForLivingLayer(page: Page) {
   await expect
     .poll(
       () =>
