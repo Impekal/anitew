@@ -219,8 +219,12 @@ function enhanceGuide(): void {
   }
 
   const index = Number(counter.textContent?.split('/')[0]?.trim() ?? '0') - 1
-  context.textContent = copy().guideContext[index] ?? ''
-  context.hidden = context.textContent === ''
+  const next = copy().guideContext[index] ?? ''
+  // Wichtig: Der MutationObserver beobachtet auch diesen Text. Nur schreiben,
+  // wenn sich der Inhalt wirklich geändert hat, sonst löst die Verfeinerung
+  // ihre eigene Mutation immer wieder aus und blockiert die Oberfläche.
+  if (context.textContent !== next) context.textContent = next
+  context.hidden = next === ''
 }
 
 function refine(): void {
