@@ -75,16 +75,40 @@ export function startButton(page: Page): Locator {
  * Prüfungen wollen aber den Startbildschirm — und ein zweites Öffnen im
  * selben Durchlauf zeigt die Fragen nicht mehr, weil die Antwort (auch die
  * leere) gespeichert ist. Geprüft wird, was da ist, nicht was da sein müsste.
+ *
+ * Seit dem First-Run-Pass gibt es danach noch eine **einmalige Orientierung**
+ * über die echte Oberfläche. Die wird in `firstRunExperience.spec.ts` selbst
+ * vollständig geprüft. Alle anderen Produkttests überspringen sie hier
+ * bewusst, sobald der gespeicherte Pending-Marker sagt, dass sie ansteht.
+ * Sonst würde ein Onboarding-Overlay fachfremde Training-, Memory- und
+ * Navigationstests blockieren und sie in lange Click-Timeouts schicken.
  */
 export async function visit(page: Page) {
   await page.goto('/')
   await page.locator('.arrival, .challenge').first().waitFor()
   if ((await page.locator('.arrival').count()) > 0) {
-    // Der „Ohne Fragen anfangen“-Knopf ist der einzige stille auf dem
-    // Willkommensschritt — über die Klasse gefunden, nicht über den Namen
-    // (die alte Teilzeichenketten-Falle).
+    // „Direkt starten“ ist der stille Weg am Willkommensschritt — über die
+    // Klasse gefunden, nicht über den Namen (die alte Teilzeichenketten-Falle).
     await page.locator('.arrival .quiet').click()
     await page.locator('.challenge').waitFor()
+  }
+
+  const guideExpected = await page.evaluate(() => {
+    try {
+      return (
+        window.localStorage.getItem('anitew.first-run-guide.pending.v2') === '1' &&
+        window.localStorage.getItem('anitew.first-run-guide.v2') !== '1'
+      )
+    } catch {
+      return false
+    }
+  })
+
+  if (guideExpected) {
+    const guide = page.locator('.first-run-guide')
+    await guide.waitFor({ state: 'visible', timeout: 8_000 })
+    await page.locator('.first-run-guide-skip').click()
+    await expect(guide).toBeHidden()
   }
 }
 
