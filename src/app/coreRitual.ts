@@ -1,5 +1,6 @@
 import '../anitew-living-adaptive.css'
 import '../anitew-core-ritual.css'
+import { mountNeuralField, unmountNeuralField } from './NeuralFieldMount.tsx'
 
 let installed = false
 let coreTimer: number | undefined
@@ -87,8 +88,6 @@ function beginPortalRitual(): void {
   html.dataset.anitewEntering = 'true'
   if (soundEnabled()) {
     tactile([8, 28, 13])
-    // Der bestehende React-Startton folgt auf derselben Berührung. Dieser
-    // tiefe Auftakt macht ihn zur großen Form desselben Core-Klangraums.
     ritualTone('portal')
   }
   clearTimer(enteringFallback)
@@ -113,6 +112,7 @@ function noticeSessionArrival(): void {
 function installCoreRitual(): void {
   if (installed) return
   installed = true
+  mountNeuralField()
   root().dataset.anitewRitualReady = 'true'
 
   document.addEventListener(
@@ -146,12 +146,11 @@ function installCoreRitual(): void {
       clearTimer(coreTimer)
       clearTimer(enteringFallback)
       clearTimer(arrivalTimer)
+      unmountNeuralField()
       if (ritualAudio !== undefined) void ritualAudio.close().catch(() => undefined)
     },
     { once: true },
   )
 }
 
-// Dieser Modulimport ist selbst der letzte Living-Memory-Schritt. Dadurch
-// braucht main.tsx keinen zusätzlichen Dynamic-Import nur für das Ritual.
 installCoreRitual()
