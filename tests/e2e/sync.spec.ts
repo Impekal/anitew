@@ -220,8 +220,10 @@ test('gleicht unsichtbar ab: nach dem Merken wandert der Graph still in Anitew',
       request.onerror = () => reject(request.error)
     })
   })
-  await page.reload()
 
+  // scheduleDriveSync liest die Einstellung selbst. Kein Reload nötig: So
+  // prüft dieser Vertrag genau den stillen Abgleich nach einer Änderung und
+  // vermischt ihn nicht mit dem separaten Start-Abgleich.
   await openPage(page, 'Mein Gedächtnis')
   await page
     .locator('.remember-input')
