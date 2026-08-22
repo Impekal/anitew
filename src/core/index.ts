@@ -13,6 +13,7 @@
  */
 
 export * from './backup.ts'
+export * from './content/associations.ts'
 export * from './content/faces.ts'
 export * from './content/interference.ts'
 export * from './content/names.ts'
