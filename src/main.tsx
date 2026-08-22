@@ -16,7 +16,7 @@ import './anitew-phase5.css'
 // Tiefe, Glühen und die lebendige Memory-DNA. Fällt der optionale Chunk aus,
 // bleibt ANITEW vollständig funktional und lesbar.
 requestAnimationFrame(() => {
-  void import('../src/anitew-wow.css').catch(() => undefined)
+  void import('./anitew-wow.css').catch(() => undefined)
 })
 
 // Neue Fassungen kommen von selbst an — siehe updates.ts. Steht vor dem
