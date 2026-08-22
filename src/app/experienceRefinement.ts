@@ -231,7 +231,11 @@ function refine(): void {
 
 refine()
 const observer = new MutationObserver(refine)
-observer.observe(document.getElementById('root') ?? document.body, {
+// Der First-Run-Guide wird absichtlich direkt an <body> gehängt, damit sein
+// Overlay nicht vom App-Stacking-Kontext abgeschnitten wird. Deshalb muss die
+// Verfeinerung auch dort beobachten; nur #root zu beobachten ließ den
+// Zusatztext nach Schritt 1 stehen.
+observer.observe(document.body, {
   childList: true,
   subtree: true,
   characterData: true,
