@@ -264,6 +264,19 @@
   flex: 0 0 auto;
 }
 
+/* When the Core atlas is open, the atlas owns hit-testing. The home world
+   remains visible underneath, but none of its large transformed layers may
+   sit above a menu node in the browser's pointer-event stack. */
+main.app:has(> .drawer-veil) > :not(.drawer-veil) {
+  pointer-events: none !important;
+}
+main.app:has(> .drawer-veil) > .drawer-veil,
+main.app:has(> .drawer-veil) > .drawer-veil .drawer,
+main.app:has(> .drawer-veil) > .drawer-veil .drawer-item,
+main.app:has(> .drawer-veil) > .drawer-veil .drawer-close {
+  pointer-events: auto !important;
+}
+
 @media (max-width: 560px) {
   .first-run-highlights {
     grid-template-columns: 1fr;
