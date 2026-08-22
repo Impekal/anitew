@@ -156,7 +156,10 @@ test('unterrichtet die Technik und lässt sie sofort anwenden', async ({ page })
 
   await expect(page.locator('.encode-word')).toBeVisible({ timeout: 30_000 })
   const shown = (await page.locator('.encode-word').textContent())?.trim() ?? ''
-  expect(shown).toMatch(/^\d+$/)
+  // Zahlen dürfen als merkbare Gruppen erscheinen (z. B. „37 299“); die
+  // Aussage dieses Tests ist, dass nach der Lektion sofort echtes
+  // Zahlenmaterial kommt — keine Buchstaben oder Platzhalter.
+  expect(shown).toMatch(/^\d+(?:\s+\d+)*$/)
 })
 
 test('schreibt den Konsonanten unter seine Ziffer — auch den frisch gelernten', async ({
