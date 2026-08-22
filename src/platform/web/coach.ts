@@ -112,11 +112,7 @@ function openAiCall(url: string, key: string, model: string, request: CoachReque
   }
 }
 
-async function callFor(
-  provider: CoachProvider,
-  key: string,
-  request: CoachRequest,
-): Promise<ProviderCall> {
+function callFor(provider: CoachProvider, key: string, request: CoachRequest) {
   switch (provider) {
     case 'gemini':
       return {
@@ -127,7 +123,7 @@ async function callFor(
           contents: [{ role: 'user', parts: [{ text: request.question }] }],
           generationConfig: { maxOutputTokens: COACH_MAX_TOKENS },
         },
-        parse: (payload) => {
+        parse: (payload: unknown) => {
           const body = payload as {
             promptFeedback?: { blockReason?: string }
             candidates?: { content?: { parts?: { text?: string }[] } }[]
@@ -152,7 +148,7 @@ async function callFor(
           system: request.system,
           messages: [{ role: 'user', content: request.question }],
         },
-        parse: (payload) => {
+        parse: (payload: unknown) => {
           const body = payload as {
             stop_reason?: string
             content?: readonly { type: string; text?: string }[]
@@ -164,10 +160,10 @@ async function callFor(
             .join('')
         },
       }
-    case 'openai': {
-      const { openAiResponsesCall } = await import('./openaiCoach.ts')
-      return openAiResponsesCall(key, request)
-    }
+    case 'openai':
+      return import('./openaiCoach.ts').then(({ openAiResponsesCall }) =>
+        openAiResponsesCall(key, request),
+      )
     case 'groq':
       return openAiCall('https://api.groq.com/openai/v1/chat/completions', key, MODELS.groq, request)
     case 'openrouter':
