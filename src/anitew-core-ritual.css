@@ -51,9 +51,15 @@ html[data-anitew-entering='true'] .start-label {
 }
 
 /* When React replaces home with the real session, it appears from the same
-   optical centre instead of looking like a route change. */
+   optical centre instead of looking like a route change.
+
+   Phase 4 already owns the session's translate/opacity journey. The Ritual
+   therefore composes with `journey-in` instead of replacing it and only adds
+   the optical reveal (blur + aperture). Two layers, one transition. */
 html[data-anitew-session-arriving='true'] .session {
-  animation: ritual-session-arrive 690ms cubic-bezier(.16,.84,.22,1) both !important;
+  animation:
+    journey-in 520ms var(--ease) both,
+    ritual-session-arrive 690ms cubic-bezier(.16,.84,.22,1) both !important;
   transform-origin: 50% 24%;
 }
 html[data-anitew-session-arriving='true'] .session-head {
@@ -112,9 +118,9 @@ html[data-anitew-session-arriving='true'] .session::before {
   100% { opacity: 0; transform: translateZ(0) scale(.56); }
 }
 @keyframes ritual-session-arrive {
-  0% { opacity: 0; transform: scale(.82); filter: blur(8px); }
-  42% { opacity: 1; filter: blur(1px); }
-  100% { opacity: 1; transform: none; filter: none; }
+  0% { filter: blur(8px); clip-path: circle(12% at 50% 24%); }
+  42% { filter: blur(1px); clip-path: circle(82% at 50% 24%); }
+  100% { filter: none; clip-path: circle(140% at 50% 24%); }
 }
 @keyframes ritual-session-head {
   0% { opacity: 0; transform: translateY(18px) scale(.94); }
