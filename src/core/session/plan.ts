@@ -87,9 +87,9 @@ export function learnableModules(
 export function planSession(input: PlanInput): SessionPlan {
   const associative =
     input.pools.associative ??
-    (input.pools.missions ?? []).flatMap((person) =>
-      base.sceneItemsOf('missions', person).map((item) => `${item}~person`),
-    )
+    (input.pools.missions ?? [])
+      .flatMap((person) => base.sceneItemsOf('missions', person))
+      .map((item) => `${item}~person`)
   const pools = {
     ...input.pools,
     spatial: input.pools.spatial ?? spatialPool(input.seed, 40),
