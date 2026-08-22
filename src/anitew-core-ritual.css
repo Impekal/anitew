@@ -1,0 +1,151 @@
+/* ANITEW Core Ritual
+ * One physical grammar: touch the Core → the world answers; enter training →
+ * the world contracts into the same Core and the session emerges from it.
+ * No memory claims or scores live here. Reduced Motion removes choreography.
+ */
+
+html[data-anitew-core-opening='true'] .hamburger {
+  animation: ritual-core-contact 720ms cubic-bezier(.16,.84,.22,1) both !important;
+}
+html[data-anitew-core-opening='true'] .hamburger::before {
+  animation: ritual-core-ring 720ms cubic-bezier(.16,.84,.22,1) both !important;
+}
+html[data-anitew-core-opening='true'] .hamburger::after {
+  animation: ritual-core-echo 720ms cubic-bezier(.16,.84,.22,1) both !important;
+}
+
+/* The home does not vanish as a webpage. It is pulled into the portal. */
+html[data-anitew-entering='true'] main.app:has(> .brand) > .brand,
+html[data-anitew-entering='true'] main.app:has(> .brand) > .today,
+html[data-anitew-entering='true'] main.app:has(> .brand) > .memory-pulse,
+html[data-anitew-entering='true'] main.app:has(> .brand) > .today-history,
+html[data-anitew-entering='true'] main.app:has(> .brand) > .footer,
+html[data-anitew-entering='true'] main.app:has(> .brand) > .note {
+  animation: ritual-world-withdraw 430ms cubic-bezier(.32,0,.2,1) both;
+  pointer-events: none;
+}
+
+html[data-anitew-entering='true'] .challenge {
+  z-index: 30;
+}
+html[data-anitew-entering='true'] .challenge > :not(.start),
+html[data-anitew-entering='true'] .challenge::before {
+  animation: ritual-controls-withdraw 300ms ease both;
+}
+html[data-anitew-entering='true'] .challenge::after {
+  animation: ritual-outer-ring 690ms cubic-bezier(.16,.84,.22,1) both !important;
+}
+html[data-anitew-entering='true'] .start {
+  animation: ritual-portal-fold 690ms cubic-bezier(.16,.84,.22,1) both !important;
+  pointer-events: none;
+}
+html[data-anitew-entering='true'] .start::before {
+  animation: ritual-inner-ring 690ms cubic-bezier(.16,.84,.22,1) both !important;
+}
+html[data-anitew-entering='true'] .start::after {
+  animation: ritual-counter-ring 690ms cubic-bezier(.16,.84,.22,1) both !important;
+}
+html[data-anitew-entering='true'] .start-time,
+html[data-anitew-entering='true'] .start-label {
+  animation: ritual-number-sink 480ms ease both;
+}
+
+/* When React replaces home with the real session, it appears from the same
+   optical centre instead of looking like a route change. */
+html[data-anitew-session-arriving='true'] .session {
+  animation: ritual-session-arrive 690ms cubic-bezier(.16,.84,.22,1) both !important;
+  transform-origin: 50% 24%;
+}
+html[data-anitew-session-arriving='true'] .session-head {
+  animation: ritual-session-head 760ms cubic-bezier(.16,.84,.22,1) both;
+}
+html[data-anitew-session-arriving='true'] .session::before {
+  animation: ritual-session-aura 920ms cubic-bezier(.16,.84,.22,1) both !important;
+}
+
+@keyframes ritual-core-contact {
+  0% { transform: scale(1); filter: brightness(1); }
+  20% { transform: scale(.82); filter: brightness(1.45); }
+  55% { transform: scale(1.1); filter: brightness(1.2); }
+  100% { transform: scale(1); filter: none; }
+}
+@keyframes ritual-core-ring {
+  0% { transform: scale(.72) rotate(0deg); opacity: .25; }
+  45% { transform: scale(1.38) rotate(110deg); opacity: .9; }
+  100% { transform: scale(1.7) rotate(180deg); opacity: 0; }
+}
+@keyframes ritual-core-echo {
+  0% { transform: scale(.82) rotate(0deg); opacity: .18; }
+  55% { transform: scale(1.7) rotate(-90deg); opacity: .55; }
+  100% { transform: scale(2.15) rotate(-170deg); opacity: 0; }
+}
+@keyframes ritual-world-withdraw {
+  from { opacity: 1; transform: scale(1); filter: blur(0); }
+  to { opacity: .05; transform: scale(.955); filter: blur(5px); }
+}
+@keyframes ritual-controls-withdraw {
+  to { opacity: 0; transform: translateY(10px) scale(.97); }
+}
+@keyframes ritual-portal-fold {
+  0% { transform: scale(1); filter: brightness(1); }
+  38% { transform: scale(1.055); filter: brightness(1.32); box-shadow: 0 0 110px rgb(216 168 90 / 18%); }
+  72% { transform: scale(.5); filter: brightness(1.7); opacity: .92; }
+  100% { transform: scale(.075); filter: brightness(2.2); opacity: 0; }
+}
+@keyframes ritual-outer-ring {
+  0% { transform: translateX(-50%) scale(1) rotate(0); opacity: .62; }
+  55% { transform: translateX(-50%) scale(.78) rotate(120deg); opacity: .9; }
+  100% { transform: translateX(-50%) scale(.08) rotate(240deg); opacity: 0; }
+}
+@keyframes ritual-inner-ring {
+  0% { transform: scale(.8); opacity: .35; }
+  46% { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(.05); opacity: 0; }
+}
+@keyframes ritual-counter-ring {
+  0% { transform: rotate(0) scale(1); opacity: .42; }
+  100% { transform: rotate(-260deg) scale(.08); opacity: 0; }
+}
+@keyframes ritual-number-sink {
+  0% { opacity: 1; transform: translateZ(0) scale(1); }
+  70% { opacity: .85; transform: translateZ(0) scale(.92); }
+  100% { opacity: 0; transform: translateZ(0) scale(.56); }
+}
+@keyframes ritual-session-arrive {
+  0% { opacity: 0; transform: scale(.82); filter: blur(8px); }
+  42% { opacity: 1; filter: blur(1px); }
+  100% { opacity: 1; transform: none; filter: none; }
+}
+@keyframes ritual-session-head {
+  0% { opacity: 0; transform: translateY(18px) scale(.94); }
+  55% { opacity: .6; }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes ritual-session-aura {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(.2); }
+  55% { opacity: 1; transform: translate(-50%, -50%) scale(1.16); }
+  100% { opacity: .7; transform: translate(-50%, -50%) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-anitew-core-opening='true'] .hamburger,
+  html[data-anitew-core-opening='true'] .hamburger::before,
+  html[data-anitew-core-opening='true'] .hamburger::after,
+  html[data-anitew-entering='true'] main.app:has(> .brand) > *,
+  html[data-anitew-entering='true'] .challenge,
+  html[data-anitew-entering='true'] .challenge::before,
+  html[data-anitew-entering='true'] .challenge::after,
+  html[data-anitew-entering='true'] .start,
+  html[data-anitew-entering='true'] .start::before,
+  html[data-anitew-entering='true'] .start::after,
+  html[data-anitew-entering='true'] .start-time,
+  html[data-anitew-entering='true'] .start-label,
+  html[data-anitew-session-arriving='true'] .session,
+  html[data-anitew-session-arriving='true'] .session-head,
+  html[data-anitew-session-arriving='true'] .session::before {
+    animation: none !important;
+    filter: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
