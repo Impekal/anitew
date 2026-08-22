@@ -1,21 +1,19 @@
 import '../anitew-core-ritual.css'
 
-type RitualSound = {
-  play(cue: 'connection'): void
-  isEnabled(): boolean
-}
-type RitualWindow = Window & { __anitewSound?: RitualSound }
-
 let installed = false
 let coreTimer: number | undefined
 let enteringFallback: number | undefined
 let arrivalTimer: number | undefined
+let ritualAudio: AudioContext | undefined
 
 const root = () => document.documentElement
-const sound = () => (window as RitualWindow).__anitewSound
 
 function clearTimer(timer: number | undefined): void {
   if (timer !== undefined) window.clearTimeout(timer)
+}
+
+function soundEnabled(): boolean {
+  return document.querySelector('.sound-toggle')?.getAttribute('aria-pressed') !== 'false'
 }
 
 function tactile(pattern: number[]): void {
@@ -24,19 +22,61 @@ function tactile(pattern: number[]): void {
   try {
     vibrate(pattern)
   } catch {
-    // Web-Haptik ist ein Bonus. Visuell und akustisch bleibt der Moment ganz.
+    // Web-Haptik ist ein Bonus. Visuell bleibt der Moment vollständig.
+  }
+}
+
+/**
+ * Ein winziger, rein nachgeladener Klangfingerabdruck für den Core. Er lebt
+ * absichtlich in diesem Experience-Chunk: Der normale Trainingssound bleibt
+ * unverändert im Startbundle und der Woooooow-Pass kostet keine Kaltstart-Bytes.
+ */
+function ritualTone(kind: 'core' | 'portal'): void {
+  if (!soundEnabled()) return
+  try {
+    const Ctor =
+      window.AudioContext ??
+      (window as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
+    if (Ctor === undefined) return
+    ritualAudio ??= new Ctor()
+    if (ritualAudio.state === 'suspended') void ritualAudio.resume().catch(() => undefined)
+
+    const now = ritualAudio.currentTime
+    const notes =
+      kind === 'core'
+        ? ([110, 277.18, 440] as const)
+        : ([110, 220, 440] as const)
+    const delays = kind === 'core' ? [0, 0.065, 0.2] : [0, 0.045, 0.18]
+    const decays = kind === 'core' ? [0.8, 1.15, 1.55] : [1.25, 1.45, 2.15]
+    const gains = kind === 'core' ? [0.034, 0.038, 0.022] : [0.042, 0.055, 0.032]
+
+    notes.forEach((hz, index) => {
+      const start = now + (delays[index] ?? 0)
+      const decay = decays[index] ?? 1
+      const envelope = ritualAudio?.createGain()
+      const oscillator = ritualAudio?.createOscillator()
+      if (envelope === undefined || oscillator === undefined || ritualAudio === undefined) return
+      envelope.gain.setValueAtTime(0.0001, start)
+      envelope.gain.exponentialRampToValueAtTime(gains[index] ?? 0.03, start + 0.012)
+      envelope.gain.exponentialRampToValueAtTime(0.0001, start + decay)
+      oscillator.type = 'sine'
+      oscillator.frequency.value = hz
+      oscillator.connect(envelope).connect(ritualAudio.destination)
+      oscillator.start(start)
+      oscillator.stop(start + decay + 0.05)
+    })
+  } catch {
+    // Ein Browser ohne freigegebenes WebAudio bekommt weiterhin die ganze
+    // visuelle Choreografie; Klang darf niemals den Start blockieren.
   }
 }
 
 function pulseCore(): void {
   const html = root()
   html.dataset.anitewCoreOpening = 'true'
-  const active = sound()
-  if (active?.isEnabled() === true) {
+  if (soundEnabled()) {
     tactile([6, 22, 10])
-    // Der Core ist die Welt der Verbindungen. Deshalb benutzt er bewusst
-    // das bestehende Connection-Motiv statt einen zweiten Klangkosmos.
-    active.play('connection')
+    ritualTone('core')
   }
   clearTimer(coreTimer)
   coreTimer = window.setTimeout(() => {
@@ -47,11 +87,13 @@ function pulseCore(): void {
 function beginPortalRitual(): void {
   const html = root()
   html.dataset.anitewEntering = 'true'
-  if (sound()?.isEnabled() === true) tactile([8, 28, 13])
+  if (soundEnabled()) {
+    tactile([8, 28, 13])
+    // Der bestehende React-Startton folgt auf derselben Berührung. Dieser
+    // tiefe Auftakt macht ihn zur großen Form desselben Core-Klangraums.
+    ritualTone('portal')
+  }
   clearTimer(enteringFallback)
-  // Der Trainingsplan entsteht normalerweise sofort. Falls eine Datenbank auf
-  // einem schwachen Gerät hängt, darf der Startbildschirm aber nie dauerhaft
-  // weggeblendet bleiben.
   enteringFallback = window.setTimeout(() => {
     delete html.dataset.anitewEntering
     delete html.dataset.anitewSessionArriving
@@ -71,10 +113,9 @@ function noticeSessionArrival(): void {
 }
 
 /**
- * Verbindet die bereits vorhandenen React-Aktionen mit der Signature-Choreografie.
- * Kein eigener Navigationszustand und kein zweites Setting: Diese Schicht
- * beobachtet nur die zwei bedeutenden Gesten und lässt die bestehende App
- * Navigation, Training und Tonwahl beherrschen.
+ * Verbindet die vorhandenen React-Aktionen mit der Signature-Choreografie.
+ * Kein eigener Navigations- oder Trainingszustand: Die Schicht beobachtet nur
+ * zwei bedeutende Gesten und lässt die bestehende App ihre Arbeit tun.
  */
 export function installCoreRitual(): void {
   if (installed) return
@@ -112,6 +153,7 @@ export function installCoreRitual(): void {
       clearTimer(coreTimer)
       clearTimer(enteringFallback)
       clearTimer(arrivalTimer)
+      if (ritualAudio !== undefined) void ritualAudio.close().catch(() => undefined)
     },
     { once: true },
   )
