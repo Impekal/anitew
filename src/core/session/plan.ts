@@ -1,4 +1,4 @@
-import { associationCueFor, associationItems } from '../content/associations.ts'
+import { associationCueFor } from '../content/associations.ts'
 import { spatialCellOf, spatialPool } from '../content/spatial.ts'
 import type { Language } from '../language.ts'
 import * as base from './planBase.ts'
@@ -89,7 +89,9 @@ export function learnableModules(
 export function planSession(input: PlanInput): SessionPlan {
   const associative =
     input.pools.associative ??
-    (input.pools.missions ?? []).flatMap((person) => associationItems(person))
+    (input.pools.missions ?? []).flatMap((person) =>
+      base.sceneItemsOf('missions', person).map((item) => `${item}~person`),
+    )
   const pools = {
     ...input.pools,
     spatial: input.pools.spatial ?? spatialPool(input.seed, 40),
