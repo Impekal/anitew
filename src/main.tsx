@@ -21,6 +21,7 @@ const loadSignatureExperience = () => {
     void Promise.all([
       import('./anitew-wow.css'),
       import('./anitew-wow-session.css'),
+      import('./anitew-living.css'),
     ]).catch(() => undefined)
   }, 750)
 }
