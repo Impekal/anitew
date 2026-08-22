@@ -13,7 +13,15 @@ export interface ProfileState {
   profile: OnboardingProfile | undefined
   /** Erst wenn der Speicher gelesen ist, darf das Ankommen entscheiden. */
   ready: boolean
-  save: (profile: OnboardingProfile) => void
+  /**
+   * Erst speichern, dann den sichtbaren Zustand umschalten.
+   *
+   * Das ist absichtlich ein Promise: Ein sofortiger Reload nach „Ohne Fragen
+   * anfangen“ darf nicht zwischen React-State und IndexedDB-Schreibvorgang
+   * fallen. Sonst ist der Startbildschirm schon sichtbar, obwohl „nie wieder
+   * fragen“ noch gar nicht dauerhaft auf dem Gerät liegt.
+   */
+  save: (profile: OnboardingProfile) => Promise<void>
 }
 
 /**
@@ -44,9 +52,13 @@ export function useProfile(platform: Platform): ProfileState {
   }, [platform])
 
   const save = useCallback(
-    (next: OnboardingProfile) => {
+    async (next: OnboardingProfile) => {
+      // Persistenz ist die Commit-Grenze des Onboardings. Auch wenn ein
+      // Browser nicht dauerhaft speichern kann, warten wir auf den Versuch,
+      // bevor die Oberfläche „fertig“ meldet; der Plattform-Layer darf dabei
+      // wie bisher auf seinen flüchtigen Fallback zurückfallen.
+      await platform.settings.write(SETTING_KEY, next).catch(() => undefined)
       setProfile(next)
-      void platform.settings.write(SETTING_KEY, next).catch(() => undefined)
     },
     [platform],
   )
