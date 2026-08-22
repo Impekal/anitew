@@ -34,18 +34,12 @@ export interface PlanInput
   modules?: readonly ModuleId[]
 }
 
-function associationPrompt(item: string, language: string): readonly [string, string] | undefined {
-  const baseItem = item.endsWith('~person') ? item.slice(0, -7) : ''
-  const cue = answerFor(baseItem, language as Language)
-  return cue === undefined ? undefined : [cue, personOf(baseItem)]
+function associationBase(item: string): string {
+  return item.endsWith('~person') ? item.slice(0, -7) : ''
 }
 
 export function isPrompted(moduleId: ModuleId): boolean {
-  return (
-    moduleId === 'spatial' ||
-    moduleId === 'associative' ||
-    base.isPrompted(moduleId as base.ModuleId)
-  )
+  return moduleId === 'spatial' || moduleId === 'associative' || base.isPrompted(moduleId as base.ModuleId)
 }
 
 export const entersReview = base.entersReview as (moduleId: ModuleId) => boolean
@@ -61,8 +55,9 @@ export const subjectOf = base.subjectOf as (moduleId: ModuleId, item: string) =>
 
 export function displayOf(moduleId: ModuleId, item: string, language: string): string {
   if (moduleId === 'associative') {
-    const prompt = associationPrompt(item, language)
-    return prompt === undefined ? item : `${prompt[0]} · ${prompt[1]}`
+    const baseItem = associationBase(item)
+    const cue = answerFor(baseItem, language as Language)
+    return cue === undefined ? item : `${cue} · ${personOf(baseItem)}`
   }
   return base.displayOf(moduleId as base.ModuleId, item, language)
 }
@@ -70,7 +65,8 @@ export function displayOf(moduleId: ModuleId, item: string, language: string): s
 export function targetOf(moduleId: ModuleId, item: string, language: string): string {
   if (moduleId === 'spatial') return spatialCellOf(item) ?? item
   if (moduleId === 'associative') {
-    return associationPrompt(item, language)?.[1] ?? item
+    const baseItem = associationBase(item)
+    return answerFor(baseItem, language as Language) === undefined ? item : personOf(baseItem)
   }
   return base.targetOf(moduleId as base.ModuleId, item, language)
 }
