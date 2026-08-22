@@ -1,4 +1,4 @@
-import { associationCueFor } from '../content/associations.ts'
+import { answerFor, personOf } from '../content/missions.ts'
 import { spatialCellOf, spatialPool } from '../content/spatial.ts'
 import type { Language } from '../language.ts'
 import * as base from './planBase.ts'
@@ -34,6 +34,12 @@ export interface PlanInput
   modules?: readonly ModuleId[]
 }
 
+function associationPrompt(item: string, language: string): readonly [string, string] | undefined {
+  const baseItem = item.endsWith('~person') ? item.slice(0, -7) : ''
+  const cue = answerFor(baseItem, language as Language)
+  return cue === undefined ? undefined : [cue, personOf(baseItem)]
+}
+
 export function isPrompted(moduleId: ModuleId): boolean {
   return (
     moduleId === 'spatial' ||
@@ -59,8 +65,8 @@ export function subjectOf(moduleId: ModuleId, item: string): string {
 
 export function displayOf(moduleId: ModuleId, item: string, language: string): string {
   if (moduleId === 'associative') {
-    const cue = associationCueFor(item, language as Language)
-    return cue === undefined ? item : `${cue.cue} · ${cue.target}`
+    const prompt = associationPrompt(item, language)
+    return prompt === undefined ? item : `${prompt[0]} · ${prompt[1]}`
   }
   return base.displayOf(moduleId as base.ModuleId, item, language)
 }
@@ -68,7 +74,7 @@ export function displayOf(moduleId: ModuleId, item: string, language: string): s
 export function targetOf(moduleId: ModuleId, item: string, language: string): string {
   if (moduleId === 'spatial') return spatialCellOf(item) ?? item
   if (moduleId === 'associative') {
-    return associationCueFor(item, language as Language)?.target ?? item
+    return associationPrompt(item, language)?.[1] ?? item
   }
   return base.targetOf(moduleId as base.ModuleId, item, language)
 }
