@@ -1,0 +1,29 @@
+/* ANITEW Living Memory — truth-aware home choreography.
+ * No graph => Core is the first object. Real graph => the real constellation
+ * becomes the first object. We never draw fake memories to fill empty space.
+ */
+@supports selector(main:has(.today .constellation)) {
+  main.app:has(> .brand):not(:has(.today .constellation)) > .challenge { order: 1; }
+  main.app:has(> .brand):not(:has(.today .constellation)) > .today { order: 2; }
+  main.app:has(> .brand):not(:has(.today .constellation)) > .memory-pulse { order: 3; }
+
+  main.app:has(> .brand):has(.today .constellation) > .today { order: 1; }
+  main.app:has(> .brand):has(.today .constellation) > .memory-pulse { order: 2; }
+  main.app:has(> .brand):has(.today .constellation) > .challenge { order: 3; }
+}
+
+/* Empty-system copy stays present but no longer pushes the Core below the fold. */
+main.app:has(> .brand):not(:has(.today .constellation)) > .today {
+  margin-top: 4px !important;
+  padding-top: 18px !important;
+}
+main.app:has(> .brand):not(:has(.today .constellation)) > .today::before {
+  opacity: .28;
+  transform: scale(.82);
+}
+
+@media (max-width: 560px) {
+  main.app:has(> .brand):not(:has(.today .constellation)) > .challenge {
+    margin-top: 8px !important;
+  }
+}
