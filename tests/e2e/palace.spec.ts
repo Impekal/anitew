@@ -70,14 +70,14 @@ test('erklärt den Palast, bevor der erste Gang kommt — und nur einmal', async
   await lesson.getByRole('button', { name: 'Weiter ins Training' }).click()
   await expect(page.locator('.walk')).toBeVisible({ timeout: 30_000 })
 
-  // Zweite Einheit: keine Lektion mehr.
+  // Zweite Einheit: keine Palastlektion mehr. Welches Trainingsmodul danach
+  // tatsächlich zuerst kommt, entscheidet der Planer und ist kein Vertrag
+  // dieses Tests; die Session selbst muss nur angelaufen sein.
   await visit(page)
   await page.getByRole('button', { name: '5 Minuten', exact: true }).click()
   await startButton(page).click()
   await page.locator('.settle').click()
-  await expect(
-    page.locator('.walk, .encode-word, .scene, .reveal-digits').first(),
-  ).toBeVisible({ timeout: 30_000 })
+  await expect(page.locator('.session-phase')).toBeVisible({ timeout: 30_000 })
   await expect(page.locator('.lesson').getByText('Der Gedächtnispalast')).toHaveCount(0)
 })
 
