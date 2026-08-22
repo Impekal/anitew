@@ -15,7 +15,8 @@ import './anitew-phase5.css'
 // die rein visuelle Tiefe nach. Die Schichten kommen absichtlich nacheinander:
 // Living Memory ist die letzte Autorität und kann ältere Drawer-/Startregeln
 // sicher ersetzen, statt mit parallelen CSS-Chunks um die Reihenfolge zu
-// konkurrieren. Der letzte Import lädt Adaptive + Core Ritual + Neural Field.
+// konkurrieren. V3 sitzt ganz hinten: Sie verfeinert nur Atmosphäre,
+// Einführung und optionale Drive-Verbindung, nie Gedächtniswahrheit.
 let signatureTimer: number | undefined
 let pageIsLeaving = false
 
@@ -30,6 +31,8 @@ const loadSignatureExperience = () => {
       await import('./anitew-living.css')
       if (pageIsLeaving) return
       await import('./app/coreRitual.ts')
+      if (pageIsLeaving) return
+      await import('./app/experienceRefinement.ts')
     })().catch(() => undefined)
   }, 750)
 }
