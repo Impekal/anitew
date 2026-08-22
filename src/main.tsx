@@ -22,6 +22,7 @@ const loadSignatureExperience = () => {
       import('./anitew-wow.css'),
       import('./anitew-wow-session.css'),
       import('./anitew-living.css'),
+      import('./anitew-living-adaptive.css'),
     ]).catch(() => undefined)
   }, 750)
 }
