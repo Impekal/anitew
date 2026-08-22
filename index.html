@@ -96,14 +96,29 @@
         animation: anitew-launch-name 520ms 520ms ease forwards;
       }
       /*
-       * Der Atlas wird später als Kind von #root gerendert. Seine eigenen
-       * Styles geben ihm z-index:1000; die First-Run-Fokusmarken liegen aber
-       * absichtlich bei 2201. Nach dem Schließen der Einführung darf deshalb
-       * niemals ein Root-Layer vor den Menü-Knoten landen. Die stärkere
-       * Selektorregel hält den echten Atlas als oberste interaktive Ebene,
-       * ohne den Launch (99999) zu überholen.
+       * Der Atlas wird als Kind von #root gerendert. Nach dem Schließen der
+       * Einführung muss seine gesamte Interaktionskette über dem restlichen
+       * App-Layer liegen. Nicht nur der Schleier, sondern auch Navigation und
+       * Knoten bekommen deshalb einen expliziten Hit-Test-/Stacking-Kontext.
+       * Der Launch selbst bleibt mit 99999 weiterhin darüber.
        */
-      #root .drawer-veil { z-index: 3000 !important; }
+      #root .drawer-veil {
+        z-index: 3000 !important;
+        pointer-events: auto !important;
+        isolation: isolate;
+      }
+      #root .drawer {
+        z-index: 1 !important;
+        pointer-events: auto !important;
+      }
+      #root .menu-group {
+        z-index: 2 !important;
+        pointer-events: auto !important;
+      }
+      #root .drawer-item {
+        z-index: 3 !important;
+        pointer-events: auto !important;
+      }
       @keyframes anitew-launch-draw { to { stroke-dashoffset: 0; } }
       @keyframes anitew-launch-point {
         0% { opacity: 0; transform: scale(.2); }
