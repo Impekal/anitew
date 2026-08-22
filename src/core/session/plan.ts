@@ -1,11 +1,13 @@
+import { associationCueFor, associationItems } from '../content/associations.ts'
 import { spatialCellOf, spatialPool } from '../content/spatial.ts'
+import type { Language } from '../language.ts'
 import * as base from './planBase.ts'
 import type { Leniency } from './grading.ts'
 
 export * from './planBase.ts'
 
-export const TRAINING_MODULES = [...base.TRAINING_MODULES, 'spatial'] as const
-export type ModuleId = base.ModuleId | 'spatial'
+export const TRAINING_MODULES = [...base.TRAINING_MODULES, 'spatial', 'associative'] as const
+export type ModuleId = base.ModuleId | 'spatial' | 'associative'
 
 export interface BlockPlan extends Omit<base.BlockPlan, 'moduleId'> {
   moduleId: ModuleId
@@ -16,7 +18,12 @@ export interface SessionPlan extends Omit<base.SessionPlan, 'focus' | 'blocks'> 
   blocks: readonly BlockPlan[]
 }
 
-export type Pools = Readonly<base.Pools & { spatial?: readonly string[] }>
+export type Pools = Readonly<
+  base.Pools & {
+    spatial?: readonly string[]
+    associative?: readonly string[]
+  }
+>
 
 export interface PlanInput
   extends Omit<base.PlanInput, 'pools' | 'due' | 'difficulty' | 'focus' | 'modules'> {
@@ -28,7 +35,11 @@ export interface PlanInput
 }
 
 export function isPrompted(moduleId: ModuleId): boolean {
-  return moduleId === 'spatial' || base.isPrompted(moduleId as base.ModuleId)
+  return (
+    moduleId === 'spatial' ||
+    moduleId === 'associative' ||
+    base.isPrompted(moduleId as base.ModuleId)
+  )
 }
 
 export const entersReview = base.entersReview as (moduleId: ModuleId) => boolean
@@ -40,20 +51,32 @@ export const sceneItemsOf = base.sceneItemsOf as (
   anchor: string,
 ) => readonly string[]
 export const secondsPerItemFor = base.secondsPerItemFor as (moduleId: ModuleId) => number
-export const subjectOf = base.subjectOf as (moduleId: ModuleId, item: string) => string
-export const displayOf = base.displayOf as (
-  moduleId: ModuleId,
-  item: string,
-  language: string,
-) => string
+
+export function subjectOf(moduleId: ModuleId, item: string): string {
+  if (moduleId === 'associative') return item
+  return base.subjectOf(moduleId as base.ModuleId, item)
+}
+
+export function displayOf(moduleId: ModuleId, item: string, language: string): string {
+  if (moduleId === 'associative') {
+    const cue = associationCueFor(item, language as Language)
+    return cue === undefined ? item : `${cue.cue} · ${cue.target}`
+  }
+  return base.displayOf(moduleId as base.ModuleId, item, language)
+}
 
 export function targetOf(moduleId: ModuleId, item: string, language: string): string {
   if (moduleId === 'spatial') return spatialCellOf(item) ?? item
+  if (moduleId === 'associative') {
+    return associationCueFor(item, language as Language)?.target ?? item
+  }
   return base.targetOf(moduleId as base.ModuleId, item, language)
 }
 
 export function leniencyFor(moduleId: ModuleId, item?: string): Leniency {
-  return moduleId === 'spatial' ? 'exact' : base.leniencyFor(moduleId as base.ModuleId, item)
+  if (moduleId === 'spatial') return 'exact'
+  if (moduleId === 'associative') return 'typos'
+  return base.leniencyFor(moduleId as base.ModuleId, item)
 }
 
 export function learnableModules(
@@ -64,9 +87,13 @@ export function learnableModules(
 }
 
 export function planSession(input: PlanInput): SessionPlan {
+  const associative =
+    input.pools.associative ??
+    (input.pools.missions ?? []).flatMap((person) => associationItems(person))
   const pools = {
     ...input.pools,
     spatial: input.pools.spatial ?? spatialPool(input.seed, 40),
+    associative,
   }
   return base.planSession({
     ...input,
