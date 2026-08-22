@@ -236,9 +236,9 @@ test('lässt nach der Einheit weitermachen — noch eine Runde (B7)', async ({ p
   await page.getByRole('button', { name: 'Noch eine Runde' }).click()
   await expect(page.locator('.settle')).toBeVisible({ timeout: 30_000 })
   await page.locator('.settle').click()
-  // Auch die frische Einheit kann jede Sorte ziehen — Rückwärts (D7)
-  // eingeschlossen, das ohne Einprägeblock direkt fragt.
+  // Auch die frische Einheit kann jede Sorte ziehen — Rückwärts (D7) und
+  // D12-Spatial eingeschlossen. Beide haben keinen klassischen Wortblock.
   await expect(
-    page.locator('.encode-word, .scene, .lesson, .reveal-digits').first(),
+    page.locator('.encode-word, .scene, .lesson, .reveal-digits, .spatial-encode').first(),
   ).toBeVisible({ timeout: 30_000 })
 })
