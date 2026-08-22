@@ -1,0 +1,200 @@
+/* ANITEW — Experience refinement V3
+ *
+ * This layer makes the living-memory language explicit without owning any
+ * training truth: the neural field becomes a quiet communicating substrate,
+ * onboarding gains a readable capability map, Drive is visibly recommended,
+ * and the Core close control says what it does.
+ */
+
+/* ── Neural field: alive, but never a screensaver ----------------------- */
+.neural {
+  opacity: .76 !important;
+  filter:
+    drop-shadow(0 0 7px rgb(140 207 192 / 9%))
+    drop-shadow(0 0 18px rgb(216 168 90 / 3%)) !important;
+}
+.neural-links line {
+  stroke: rgb(140 207 192 / 12%) !important;
+  stroke-width: .22 !important;
+  vector-effect: non-scaling-stroke;
+  transition: opacity 700ms ease;
+}
+/* Nur ein kleiner Teil der Verbindungen „spricht“. Das Auge nimmt Bewegung
+   wahr, ohne einem wandernden Punkt folgen zu müssen. */
+.neural-links line:nth-child(7n + 2),
+.neural-links line:nth-child(11n + 5) {
+  stroke: rgb(216 168 90 / 24%) !important;
+  stroke-dasharray: 1.1 3.8;
+  animation: anitew-neural-signal 10s linear infinite;
+}
+.neural-links line:nth-child(11n + 5) {
+  stroke: rgb(140 207 192 / 24%) !important;
+  animation-duration: 14s;
+  animation-direction: reverse;
+}
+.neural-nodes circle {
+  fill: rgb(140 207 192 / 78%) !important;
+  opacity: .42;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: anitew-neural-node 8.6s ease-in-out infinite !important;
+}
+.neural-nodes circle:nth-child(9n + 3),
+.neural-nodes circle:nth-child(13n + 7) {
+  fill: rgb(255 217 144 / 88%) !important;
+  filter: drop-shadow(0 0 2.4px rgb(216 168 90 / 60%));
+  animation-duration: 11.8s !important;
+}
+.neural-nodes circle:nth-child(5n + 1) {
+  filter: drop-shadow(0 0 2px rgb(140 207 192 / 52%));
+}
+/* Im Training zieht sich das Netz zurück. Es bleibt als Ort erhalten, aber
+   konkurriert nicht mit dem einen Wort / Gesicht / Weg im Vordergrund. */
+html[data-focus='on'] .neural {
+  opacity: .22 !important;
+  filter: none !important;
+}
+
+/* ── Core close: the gesture names itself -------------------------------- */
+.drawer-close {
+  margin-bottom: 52px !important;
+}
+.drawer-close-label {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  translate: -50% 0;
+  width: max-content;
+  max-width: min(70vw, 220px);
+  color: rgb(210 222 215 / 62%);
+  font-family: var(--mono);
+  font-size: 9px;
+  line-height: 1.2;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+.drawer-close:hover .drawer-close-label,
+.drawer-close:focus-visible .drawer-close-label {
+  color: rgb(255 226 169 / 88%);
+}
+
+/* ── First run: capabilities before questions ---------------------------- */
+.first-run-highlights {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+.first-run-highlight[data-refinement='true'] {
+  border-top: 1px solid rgb(140 207 192 / 8%);
+}
+.first-run-highlight-badge {
+  display: inline-block;
+  margin-top: 7px;
+  color: rgb(216 168 90 / 68%);
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.first-run-drive-card {
+  position: relative;
+  max-width: 680px;
+  margin: 24px auto 4px;
+  padding: 20px 20px 18px;
+  border: 1px solid rgb(140 207 192 / 16%);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 90% 0%, rgb(140 207 192 / 7%), transparent 42%),
+    radial-gradient(circle at 0% 100%, rgb(216 168 90 / 5%), transparent 42%),
+    rgb(6 12 10 / 52%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 2%);
+}
+.first-run-drive-kicker {
+  margin: 0;
+  color: rgb(255 217 144 / 78%);
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+}
+.first-run-drive-title {
+  margin: 7px 0 0;
+  color: var(--an-text);
+  font-family: var(--serif);
+  font-size: 18px;
+  font-weight: 520;
+}
+.first-run-drive-body {
+  margin: 8px 0 0;
+  color: rgb(196 211 201 / 68%);
+  font-size: 12px;
+  line-height: 1.48;
+}
+.first-run-drive-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px 14px;
+  flex-wrap: wrap;
+  margin-top: 15px;
+}
+.first-run-drive-connect {
+  min-height: 44px;
+  padding: 0 17px;
+  border: 1px solid rgb(216 168 90 / 28%);
+  border-radius: 999px;
+  background: rgb(216 168 90 / 8%);
+  color: rgb(255 226 169 / 92%);
+  font: 500 11px/1 var(--sans);
+  letter-spacing: .02em;
+}
+.first-run-drive-connect:disabled {
+  opacity: .58;
+}
+.first-run-drive-status {
+  margin: 0;
+  color: rgb(140 207 192 / 66%);
+  font-size: 10px;
+  line-height: 1.35;
+}
+.first-run-drive-status[data-error='true'] {
+  color: rgb(224 137 124 / 82%);
+}
+.first-run-guide-context {
+  margin: 11px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid rgb(140 207 192 / 9%);
+  color: rgb(180 205 188 / 54%);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+@keyframes anitew-neural-signal {
+  0% { stroke-dashoffset: 0; opacity: .32; }
+  42% { opacity: .82; }
+  100% { stroke-dashoffset: -32; opacity: .34; }
+}
+@keyframes anitew-neural-node {
+  0%, 100% { opacity: .28; transform: scale(.78); }
+  38% { opacity: .58; transform: scale(1.08); }
+  54% { opacity: .44; transform: scale(.93); }
+}
+
+@media (max-width: 560px) {
+  .first-run-highlights {
+    grid-template-columns: 1fr !important;
+  }
+  .first-run-drive-card {
+    border-radius: 20px;
+    padding: 17px 16px 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .neural-links line,
+  .neural-nodes circle {
+    animation: none !important;
+  }
+  .neural-nodes circle {
+    opacity: .42;
+    transform: none;
+  }
+}
