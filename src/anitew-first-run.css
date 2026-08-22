@@ -267,6 +267,13 @@
 /* When the Core atlas is open, the atlas owns hit-testing. The home world
    remains visible underneath, but none of its large transformed layers may
    sit above a menu node in the browser's pointer-event stack. */
+#root:has(.drawer-veil) {
+  pointer-events: none !important;
+}
+#root:has(.drawer-veil) .drawer-veil,
+#root:has(.drawer-veil) .drawer-veil * {
+  pointer-events: auto !important;
+}
 main.app:has(> .drawer-veil) > :not(.drawer-veil) {
   pointer-events: none !important;
 }
