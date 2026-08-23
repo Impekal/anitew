@@ -1,11 +1,10 @@
 // Cloudflare Workers + Static Assets — Backlog A7.
 //
 // Die App bleibt local-first und ohne ANITEW-Konto oder Nutzerdatenbank.
-// Servercode läuft ausschließlich für den Google-OAuth-Handschlag: Google
-// liefert den Autorisierungscode an /oauth/google/*, der Worker tauscht ihn
-// gegen Tokens und hält die verschlüsselte Sitzung nur im Browser-Cookie.
-// Trainings-, Erinnerungs- und Sicherungsdaten werden nicht serverseitig
-// gespeichert und laufen weiterhin direkt zwischen Gerät und eigenem Drive.
+// Servercode läuft nur für ausdrücklich gewählte Infrastruktur: Google OAuth
+// und Web Push. Push speichert ausschließlich die technische Push-Adresse,
+// die gewählte Zeit/Zeitzone und generische Erinnerungstexte — niemals
+// Trainings-, Gedächtnis-, Profil- oder Sicherungsinhalte.
 {
   "name": "anitew",
   "compatibility_date": "2026-08-23",
@@ -14,6 +13,20 @@
     "directory": "./dist",
     "binding": "ASSETS",
     "not_found_handling": "single-page-application",
-    "run_worker_first": ["/oauth/google/*"]
+    "run_worker_first": ["/oauth/google/*", "/push/*"]
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "PUSH_REMINDERS",
+        "class_name": "PushReminder"
+      }
+    ]
+  },
+  "exports": {
+    "PushReminder": {
+      "type": "durable-object",
+      "storage": "sqlite"
+    }
   }
 }
