@@ -376,6 +376,7 @@
   display: grid !important;
   place-items: stretch !important;
   z-index: 1000 !important;
+  overflow: clip !important;
   background:
     radial-gradient(circle at 50% 37%, rgb(140 207 192 / 8%), transparent 23rem),
     radial-gradient(circle at 50% 37%, rgb(216 168 90 / 5%), transparent 34rem),
