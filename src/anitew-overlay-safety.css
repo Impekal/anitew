@@ -32,3 +32,19 @@ body:has(.drawer-veil) {
     padding-top: calc(18px + var(--anitew-safe-area-top));
   }
 }
+
+/*
+ * When Google Drive is connected, the late Core refinement inserts the
+ * signed-in account immediately below the close control. That layer used a
+ * negative top margin for the account card and visually pulled name/e-mail
+ * into the "Close menu" label on a real iPhone. Keep the two controls as
+ * separate rows. `!important` is intentional: the refinement stylesheet is
+ * lazy-loaded later and must not be allowed to pull the account upward again.
+ */
+.drawer-close {
+  margin-bottom: 68px !important;
+}
+
+.drawer-google-account {
+  margin: 8px auto 20px !important;
+}
