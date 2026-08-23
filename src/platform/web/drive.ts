@@ -67,16 +67,20 @@ declare global {
 }
 
 const GIS_SRC = 'https://accounts.google.com/gsi/client'
+let gisLoading: Promise<GisOauth2> | undefined
 
-/** Lädt Googles Identity-Skript einmal — erst bei Bedarf. */
-async function loadGis(): Promise<GisOauth2> {
+/** Lädt Googles Identity-Skript einmal. Die Promise wird geteilt, damit
+ * Onboarding und Abgleich niemals zwei Google-Skripte gleichzeitig anlegen. */
+function loadGis(): Promise<GisOauth2> {
   const present = window.google?.accounts?.oauth2
-  if (present !== undefined) return present
-  await new Promise<void>((resolve, reject) => {
-    const existing = document.querySelector(`script[src="${GIS_SRC}"]`)
+  if (present !== undefined) return Promise.resolve(present)
+  if (gisLoading !== undefined) return gisLoading
+
+  gisLoading = new Promise<void>((resolve, reject) => {
+    const existing = document.querySelector<HTMLScriptElement>(`script[src="${GIS_SRC}"]`)
     if (existing !== null) {
-      existing.addEventListener('load', () => resolve())
-      existing.addEventListener('error', () => reject(new DriveError('offline')))
+      existing.addEventListener('load', () => resolve(), { once: true })
+      existing.addEventListener('error', () => reject(new DriveError('offline')), { once: true })
       return
     }
     const script = document.createElement('script')
@@ -86,9 +90,28 @@ async function loadGis(): Promise<GisOauth2> {
     script.onerror = () => reject(new DriveError('offline'))
     document.head.append(script)
   })
-  const loaded = window.google?.accounts?.oauth2
-  if (loaded === undefined) throw new DriveError('offline')
-  return loaded
+    .then(() => {
+      const loaded = window.google?.accounts?.oauth2
+      if (loaded === undefined) throw new DriveError('offline')
+      return loaded
+    })
+    .catch((error: unknown) => {
+      // Ein späterer bewusster Versuch darf nach einem Netz-/Browserfehler
+      // erneut laden können.
+      gisLoading = undefined
+      throw error
+    })
+
+  return gisLoading
+}
+
+/**
+ * Bereitet Google nur dort vor, wo der Drive-Weg bereits sichtbar ist. Das
+ * hält den normalen Start lokal und sorgt zugleich dafür, dass ein späterer
+ * Klick das OAuth-Popup noch innerhalb der echten Benutzer-Geste öffnen kann.
+ */
+export async function preloadDriveAuth(): Promise<void> {
+  await loadGis()
 }
 
 /* Name und E-Mail dienen nur dazu, eindeutig zu zeigen, welches eigene
@@ -96,18 +119,12 @@ async function loadGis(): Promise<GisOauth2> {
    weiterhin auf `drive.file` beschränkt. */
 const IDENTITY_SCOPE = 'openid email profile'
 
-/**
- * Holt ein Zugriffstoken. `silent` versucht es ohne Rückfrage — für den
- * stillen Abgleich beim Start; scheitert das (keine Google-Sitzung, Popup
- * unterdrückt), ist das ein leises `denied`, kein Drama. `withIdentity`
- * bittet zusätzlich um die Konto-Auskunft — nur im hörbaren Weg.
- */
-export async function requestDriveToken(
+function requestTokenWith(
+  oauth2: GisOauth2,
   clientId: string,
   silent: boolean,
-  withIdentity = false,
+  withIdentity: boolean,
 ): Promise<string> {
-  const oauth2 = await loadGis()
   return new Promise<string>((resolve, reject) => {
     const client = oauth2.initTokenClient({
       client_id: clientId,
@@ -121,6 +138,26 @@ export async function requestDriveToken(
     })
     client.requestAccessToken(silent ? { prompt: 'none' } : {})
   })
+}
+
+/**
+ * Holt ein Zugriffstoken. `silent` versucht es ohne Rückfrage — für den
+ * stillen Abgleich beim Start; scheitert das (keine Google-Sitzung, Popup
+ * unterdrückt), ist das ein leises `denied`, kein Drama. `withIdentity`
+ * bittet zusätzlich um die Konto-Auskunft — nur im hörbaren Weg.
+ *
+ * Wichtig auf iOS: Ist GIS bereits vorgewärmt, wird `requestAccessToken`
+ * synchron in diesem Aufruf ausgeführt. Dadurch bleibt die Benutzer-Geste
+ * des Button-Klicks erhalten und der Browser darf das Google-Popup öffnen.
+ */
+export function requestDriveToken(
+  clientId: string,
+  silent: boolean,
+  withIdentity = false,
+): Promise<string> {
+  const ready = window.google?.accounts?.oauth2
+  if (ready !== undefined) return requestTokenWith(ready, clientId, silent, withIdentity)
+  return loadGis().then((oauth2) => requestTokenWith(oauth2, clientId, silent, withIdentity))
 }
 
 async function driveFetch(token: string, url: string, init?: RequestInit): Promise<Response> {
