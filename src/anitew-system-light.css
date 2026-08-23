@@ -1,86 +1,155 @@
-/* System theme must be visually identical to explicit Light when the device is light. */
+/* System follows the complete V4.1 light material system when the device is light. */
 @media (prefers-color-scheme: light) {
-  html[data-anitew-theme='system'] body,
-  html[data-anitew-theme='system'] .app,
-  html[data-anitew-theme='system'] .onboarding,
-  html[data-anitew-theme='system'] .drawer,
-  html[data-anitew-theme='system'] .note,
-  html[data-anitew-theme='system'] .first-run-guide-card,
-  html[data-anitew-theme='system'] .first-run-highlight,
-  html[data-anitew-theme='system'] .first-run-drive-card,
-  html[data-anitew-theme='system'] .theme-control,
-  html[data-anitew-theme='system'] .sync-identity {
-    color: var(--ink) !important;
+  html[data-anitew-theme='system'] {
+    color-scheme: light;
+    --paper: #eee7dc;
+    --paper-glow: #fff9ed;
+    --card: #fffdf8;
+    --line: #c9baa5;
+    --ink: #17120e;
+    --ink-soft: #4d4338;
+    --ink-faint: #706252;
+    --accent: #94480f;
+    --accent-soft: #edd4b6;
+    --accent-ink: #fffaf2;
+    --calm: #285c54;
+    --bad: #8f2e27;
+
+    --an-bg: #eee7dc;
+    --an-bg-2: #f7f1e7;
+    --an-surface: rgb(255 253 248 / 94%);
+    --an-surface-2: #fffdf8;
+    --an-line: rgb(73 92 81 / 22%);
+    --an-line-strong: rgb(73 92 81 / 38%);
+    --an-text: #17120e;
+    --an-muted: #4d4338;
+    --an-dim: #706252;
+    --an-gold: #94480f;
+    --an-gold-soft: rgb(148 72 15 / 13%);
+    --an-cyan: #285c54;
+    --an-cyan-soft: rgb(40 92 84 / 10%);
+
+    --living-core: #a85f22;
+    --living-core-hot: #7a3507;
+    --living-calm: #285c54;
+    --living-void: #e9e0d3;
+    --living-ring: rgb(40 92 84 / 28%);
+    --living-gold-ring: rgb(148 72 15 / 34%);
+
+    --v4-mint: #285c54;
+    --v4-mint-hot: #174b44;
+    --v4-gold: #94480f;
+    --v4-gold-hot: #713205;
+    --v4-surface: rgb(255 253 248 / 96%);
+    --v4-surface-strong: #fffdf8;
+    --v4-line: rgb(40 92 84 / 34%);
+    --v4-line-hot: rgb(148 72 15 / 54%);
+    --v4-neural: rgb(23 75 68 / 48%);
+    --v4-neural-hot: rgb(148 72 15 / 70%);
+    --v4-card-shadow:
+      0 1px 0 rgb(255 255 255 / 94%) inset,
+      0 13px 30px -20px rgb(72 46 24 / 44%),
+      0 30px 68px -40px rgb(40 92 84 / 42%);
+    --v4-start-shadow:
+      0 0 0 1px rgb(148 72 15 / 38%),
+      0 10px 28px -9px rgb(148 72 15 / 50%),
+      0 28px 64px -26px rgb(40 92 84 / 38%);
+
+    --shadow: 0 2px 4px rgb(65 44 23 / 10%), 0 10px 28px -18px rgb(65 44 23 / 36%);
+    --shadow-lift: 0 3px 7px rgb(65 44 23 / 12%), 0 20px 46px -22px rgb(65 44 23 / 46%);
+    background: var(--paper) !important;
   }
 
-  html[data-anitew-theme='system'] .drawer,
-  html[data-anitew-theme='system'] .note,
-  html[data-anitew-theme='system'] .first-run-guide-card,
-  html[data-anitew-theme='system'] .first-run-highlight,
-  html[data-anitew-theme='system'] .first-run-drive-card,
-  html[data-anitew-theme='system'] .theme-control,
-  html[data-anitew-theme='system'] .sync-identity {
-    background-color: var(--card) !important;
-    border-color: var(--line) !important;
-    box-shadow: var(--v4-card-shadow) !important;
+  html[data-anitew-theme='system'] body {
+    background:
+      radial-gradient(circle at 50% 3%, rgb(255 250 239 / 96%), transparent 29rem),
+      radial-gradient(circle at 88% 48%, rgb(148 72 15 / 8%), transparent 25rem),
+      radial-gradient(circle at 8% 70%, rgb(40 92 84 / 8%), transparent 27rem),
+      linear-gradient(180deg, #f7f1e7 0%, #eee7dc 58%, #e9e0d3 100%) !important;
+    color: var(--an-text) !important;
+  }
+  html[data-anitew-theme='system'] body::before {
+    opacity: .42 !important;
+    background-image: radial-gradient(rgb(40 67 58 / 20%) .5px, transparent .55px) !important;
+    background-size: 8px 8px !important;
   }
 
-  html[data-anitew-theme='system'] :is(
-    .tagline,
-    .arrival-note,
-    .first-run-adaptive,
-    .first-run-highlight p,
-    .first-run-drive-body,
-    .first-run-questions,
-    .first-run-guide-body,
-    .drawer-google-copy span,
-    .sync-account,
-    .menu-label
-  ) {
-    color: var(--ink-soft) !important;
+  html[data-anitew-theme='system'] :is(.app, .onboarding, .page, .brand h1, .page-title, .today-line, .note h3) {
+    color: var(--an-text) !important;
+  }
+  html[data-anitew-theme='system'] :is(.greeting, .tagline, .focus, .page-body, .note, .memory-pulse-line, .hint, .sync-note) {
+    color: var(--an-muted) !important;
+  }
+  html[data-anitew-theme='system'] :is(.focus-why, .today-duration, .footer, .menu-label, #challenge-heading) {
+    color: var(--an-dim) !important;
   }
 
-  html[data-anitew-theme='system'] :is(
-    .first-run-different,
-    .theme-label,
-    .drawer-close-label,
-    .drawer-google-copy small
-  ) {
-    color: var(--ink-faint) !important;
+  html[data-anitew-theme='system'] .drawer-veil {
+    background: rgb(90 73 53 / 28%) !important;
+    backdrop-filter: blur(16px) saturate(88%) !important;
+  }
+  html[data-anitew-theme='system'] .drawer {
+    color: var(--an-text) !important;
+    background:
+      radial-gradient(circle at 100% 0, rgb(40 92 84 / 9%), transparent 35%),
+      radial-gradient(circle at 0 82%, rgb(148 72 15 / 8%), transparent 38%),
+      #fffdf8 !important;
+    border-left-color: rgb(40 92 84 / 20%) !important;
+    box-shadow: -22px 0 70px rgb(77 54 31 / 24%) !important;
   }
 
+  html[data-anitew-theme='system'] .start {
+    border-color: rgb(148 72 15 / 55%) !important;
+    background:
+      radial-gradient(circle at 43% 34%, rgb(255 255 255 / 94%) 0 3%, transparent 8%),
+      radial-gradient(circle at 50% 42%, rgb(216 164 94 / 29%), transparent 33%),
+      radial-gradient(circle at 50% 75%, rgb(40 92 84 / 13%), transparent 47%),
+      linear-gradient(150deg, #fff9ef, #ead9c3) !important;
+    color: var(--an-text) !important;
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 96%),
+      inset 0 -16px 40px rgb(148 72 15 / 8%),
+      0 0 0 1px rgb(148 72 15 / 18%),
+      0 12px 30px -9px rgb(148 72 15 / 48%),
+      0 30px 72px -28px rgb(40 92 84 / 42%) !important;
+  }
   html[data-anitew-theme='system'] .start-time {
     background: none !important;
-    -webkit-background-clip: border-box !important;
-    background-clip: border-box !important;
     color: #1b1510 !important;
     -webkit-text-fill-color: #1b1510 !important;
-    text-shadow: 0 2px 0 rgb(255 255 255 / 72%), 0 8px 24px rgb(154 79 22 / 22%);
   }
-
-  html[data-anitew-theme='system'] .start-label {
-    color: #713307 !important;
-    text-shadow: 0 1px 0 rgb(255 255 255 / 80%), 0 5px 18px rgb(154 79 22 / 26%) !important;
-  }
+  html[data-anitew-theme='system'] .start-label { color: #713205 !important; }
 
   html[data-anitew-theme='system'] .mode {
     background: #fffaf2 !important;
-    border-color: #b9aa96 !important;
-    color: #40372d !important;
-    box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 95%),
-      0 8px 20px -14px rgb(49 95 88 / 44%) !important;
+    border-color: #b3a28c !important;
+    color: #3f352a !important;
+  }
+  html[data-anitew-theme='system'] .mode-active {
+    background: #f4dfc6 !important;
+    border-color: rgb(148 72 15 / 72%) !important;
+    color: #21160d !important;
+    box-shadow: 0 9px 28px -7px rgb(148 72 15 / 50%) !important;
   }
 
-  html[data-anitew-theme='system'] .mode-active {
-    background:
-      radial-gradient(circle at 50% 0, rgb(154 79 22 / 18%), transparent 75%),
-      #f9ead8 !important;
-    border-color: rgb(154 79 22 / 68%) !important;
-    color: #21160d !important;
+  html[data-anitew-theme='system'] :is(.first-run-drive-connect, .sync-run, .sync-stop, .page .quiet, .page .primary, .today-invite-open) {
+    background: linear-gradient(180deg, #fffdf8, #f2e5d4) !important;
+    color: #2b2118 !important;
+    border-color: rgb(148 72 15 / 42%) !important;
     box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 92%),
-      0 0 0 1px rgb(154 79 22 / 16%),
-      0 8px 24px -8px rgb(154 79 22 / 42%) !important;
+      inset 0 1px 0 #fff,
+      0 8px 22px -10px rgb(148 72 15 / 30%),
+      0 18px 36px -22px rgb(40 92 84 / 36%) !important;
+  }
+  html[data-anitew-theme='system'] :is(.first-run-drive-connect, .sync-run, .sync-stop, .page .quiet, .page .primary, .today-invite-open):hover,
+  html[data-anitew-theme='system'] :is(.first-run-drive-connect, .sync-run, .sync-stop, .page .quiet, .page .primary, .today-invite-open):focus-visible {
+    background: linear-gradient(180deg, #fffaf0, #ead6bd) !important;
+    border-color: rgb(148 72 15 / 72%) !important;
+    color: #1c140d !important;
+    box-shadow:
+      inset 0 1px 0 #fff,
+      0 0 0 1px rgb(148 72 15 / 14%),
+      0 10px 28px -8px rgb(148 72 15 / 50%),
+      0 22px 46px -20px rgb(40 92 84 / 44%) !important;
   }
 }
