@@ -213,9 +213,11 @@ test('zeigt nichts an, solange nichts gelehrt ist', async ({ page }) => {
   await startButton(page).click()
   await page.locator('.settle').click()
 
-  await expect(
-    page.locator('.encode-word, .scene, .reveal-digits').first(),
-  ).toBeVisible({ timeout: 30_000 })
+  // Die Aussage des Tests ist, dass keine Techniklektion eingeblendet wird.
+  // Welches reguläre Trainingsmodul der adaptive Planer zuerst wählt, ist
+  // absichtlich variabel; `.session-phase` ist der stabile Nachweis, dass der
+  // erste echte Block läuft, ohne den Test an dessen heutige DOM-Form zu binden.
+  await expect(page.locator('.session-phase')).toBeVisible({ timeout: 30_000 })
   await expect(page.locator('.lesson')).toBeHidden()
   await expect(page.locator('.major-letters')).toBeHidden()
 })
