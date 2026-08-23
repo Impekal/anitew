@@ -1,0 +1,247 @@
+/* ANITEW V4.1 — Core menu contrast
+ * The Core is navigation, not telemetry. Every destination must be readable
+ * before hover. Icons therefore get their own luminous material tile instead
+ * of inheriting a faint text colour from older design layers.
+ */
+
+.drawer .menu-group {
+  position: relative;
+  display: grid;
+  gap: 6px;
+}
+
+.drawer .menu-group + .menu-group {
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid color-mix(in oklab, var(--v4-mint) 20%, var(--line));
+}
+
+.drawer .menu-label {
+  margin: 0 0 7px !important;
+  color: var(--ink-soft) !important;
+  font-size: 8.5px !important;
+  font-weight: 760 !important;
+  letter-spacing: .18em !important;
+  opacity: 1 !important;
+  text-shadow: 0 1px 0 color-mix(in oklab, var(--paper) 70%, transparent);
+}
+
+.drawer .drawer-item {
+  display: grid !important;
+  grid-template-columns: 38px minmax(0, 1fr);
+  align-items: center !important;
+  gap: 12px !important;
+  min-height: 52px !important;
+  padding: 7px 10px !important;
+  border: 1px solid color-mix(in oklab, var(--v4-mint) 12%, transparent) !important;
+  border-radius: 15px !important;
+  background: color-mix(in oklab, var(--card) 34%, transparent) !important;
+  color: var(--ink) !important;
+  opacity: 1 !important;
+}
+
+.drawer .drawer-item > span {
+  min-width: 0;
+  color: var(--ink) !important;
+  font-size: 12.5px !important;
+  font-weight: 610 !important;
+  line-height: 1.25 !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+.drawer .menu-icon {
+  display: block;
+  width: 36px !important;
+  height: 36px !important;
+  padding: 7px;
+  overflow: visible;
+  border: 1px solid color-mix(in oklab, currentColor 34%, transparent);
+  border-radius: 12px;
+  stroke-width: 1.95 !important;
+  opacity: 1 !important;
+  transform: translateZ(0);
+  transition:
+    transform 180ms cubic-bezier(.2,.8,.2,1),
+    color 180ms ease,
+    background 180ms ease,
+    border-color 180ms ease,
+    box-shadow 220ms ease,
+    filter 220ms ease;
+}
+
+/* App / personal memory destinations: warm human gold. */
+.drawer .menu-group:not(.menu-group-device) .menu-icon {
+  color: var(--v4-gold-hot) !important;
+  background:
+    radial-gradient(circle at 38% 28%, color-mix(in oklab, var(--v4-gold) 23%, transparent), transparent 56%),
+    color-mix(in oklab, var(--v4-gold) 8%, var(--card)) !important;
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 8%, transparent),
+    0 0 0 1px color-mix(in oklab, var(--v4-gold) 8%, transparent),
+    0 0 18px color-mix(in oklab, var(--v4-gold) 17%, transparent),
+    0 9px 24px -15px color-mix(in oklab, var(--v4-gold) 38%, transparent) !important;
+}
+
+/* Device / technical destinations: cool neural mint. */
+.drawer .menu-group-device .menu-icon {
+  color: var(--v4-mint-hot) !important;
+  background:
+    radial-gradient(circle at 38% 28%, color-mix(in oklab, var(--v4-mint) 22%, transparent), transparent 56%),
+    color-mix(in oklab, var(--v4-mint) 8%, var(--card)) !important;
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 8%, transparent),
+    0 0 0 1px color-mix(in oklab, var(--v4-mint) 8%, transparent),
+    0 0 18px color-mix(in oklab, var(--v4-mint) 17%, transparent),
+    0 9px 24px -15px color-mix(in oklab, var(--v4-mint) 38%, transparent) !important;
+}
+
+.drawer .drawer-item:hover,
+.drawer .drawer-item:focus-visible {
+  color: var(--ink) !important;
+  border-color: color-mix(in oklab, var(--v4-gold) 34%, var(--v4-mint)) !important;
+  background:
+    linear-gradient(90deg,
+      color-mix(in oklab, var(--v4-gold) 7%, var(--card)),
+      color-mix(in oklab, var(--v4-mint) 7%, var(--card))) !important;
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 9%, transparent),
+    0 0 0 1px color-mix(in oklab, var(--v4-gold) 8%, transparent),
+    0 11px 30px -19px color-mix(in oklab, var(--v4-mint) 48%, transparent),
+    0 0 24px color-mix(in oklab, var(--v4-gold) 13%, transparent) !important;
+  transform: translateX(2px) !important;
+}
+
+.drawer .drawer-item:hover .menu-icon,
+.drawer .drawer-item:focus-visible .menu-icon {
+  transform: scale(1.07) translateY(-1px);
+  filter: brightness(1.08) saturate(1.08);
+}
+
+.drawer .menu-group:not(.menu-group-device) .drawer-item:hover .menu-icon,
+.drawer .menu-group:not(.menu-group-device) .drawer-item:focus-visible .menu-icon {
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 11%, transparent),
+    0 0 0 1px color-mix(in oklab, var(--v4-gold) 17%, transparent),
+    0 0 28px color-mix(in oklab, var(--v4-gold) 30%, transparent),
+    0 12px 27px -13px color-mix(in oklab, var(--v4-gold) 48%, transparent) !important;
+}
+
+.drawer .menu-group-device .drawer-item:hover .menu-icon,
+.drawer .menu-group-device .drawer-item:focus-visible .menu-icon {
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 11%, transparent),
+    0 0 0 1px color-mix(in oklab, var(--v4-mint) 17%, transparent),
+    0 0 28px color-mix(in oklab, var(--v4-mint) 30%, transparent),
+    0 12px 27px -13px color-mix(in oklab, var(--v4-mint) 48%, transparent) !important;
+}
+
+/* Theme switch lives inside Device and must be as legible as destinations. */
+.drawer .menu-group-device .theme-control {
+  margin: 4px 0 8px !important;
+  border-color: color-mix(in oklab, var(--v4-mint) 28%, var(--line)) !important;
+  background: color-mix(in oklab, var(--card) 80%, transparent) !important;
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 7%, transparent),
+    0 12px 28px -22px color-mix(in oklab, var(--v4-mint) 38%, transparent) !important;
+}
+
+.drawer .theme-label {
+  color: var(--ink-soft) !important;
+  font-size: 8px !important;
+  opacity: 1 !important;
+}
+
+.drawer .theme-choice {
+  color: var(--ink-soft) !important;
+  border-color: color-mix(in oklab, var(--v4-mint) 28%, var(--line)) !important;
+  background: color-mix(in oklab, var(--card) 82%, transparent) !important;
+  opacity: 1 !important;
+}
+
+.drawer .theme-choice[aria-pressed='true'] {
+  color: var(--ink) !important;
+  border-color: color-mix(in oklab, var(--v4-gold) 58%, var(--line)) !important;
+  background: color-mix(in oklab, var(--v4-gold) 13%, var(--card)) !important;
+}
+
+/* Light needs coloured depth, not pale bloom. */
+html[data-anitew-theme='light'] .drawer .menu-label {
+  color: #5b4c3d !important;
+  text-shadow: 0 1px 0 rgb(255 255 255 / 80%);
+}
+
+html[data-anitew-theme='light'] .drawer .drawer-item {
+  color: #1d1711 !important;
+  border-color: rgb(76 91 79 / 18%) !important;
+  background: rgb(255 253 248 / 74%) !important;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 96%),
+    0 7px 18px -16px rgb(72 46 24 / 40%) !important;
+}
+
+html[data-anitew-theme='light'] .drawer .drawer-item > span {
+  color: #1d1711 !important;
+}
+
+html[data-anitew-theme='light'] .drawer .menu-group:not(.menu-group-device) .menu-icon {
+  color: #783405 !important;
+  border-color: rgb(148 72 15 / 42%) !important;
+  background: linear-gradient(145deg, #fff8ed, #edd8bd) !important;
+  box-shadow:
+    inset 0 1px 0 #fff,
+    0 0 0 1px rgb(148 72 15 / 10%),
+    0 7px 20px -8px rgb(148 72 15 / 42%) !important;
+}
+
+html[data-anitew-theme='light'] .drawer .menu-group-device .menu-icon {
+  color: #174b44 !important;
+  border-color: rgb(40 92 84 / 42%) !important;
+  background: linear-gradient(145deg, #f8fbf7, #dbe9e3) !important;
+  box-shadow:
+    inset 0 1px 0 #fff,
+    0 0 0 1px rgb(40 92 84 / 10%),
+    0 7px 20px -8px rgb(40 92 84 / 42%) !important;
+}
+
+html[data-anitew-theme='light'] .drawer .drawer-item:hover,
+html[data-anitew-theme='light'] .drawer .drawer-item:focus-visible {
+  border-color: rgb(148 72 15 / 46%) !important;
+  background: linear-gradient(90deg, #fff8ed, #f2f7f3) !important;
+  box-shadow:
+    inset 0 1px 0 #fff,
+    0 0 0 1px rgb(148 72 15 / 10%),
+    0 10px 28px -10px rgb(148 72 15 / 36%),
+    0 22px 42px -24px rgb(40 92 84 / 40%) !important;
+}
+
+@media (prefers-color-scheme: light) {
+  html[data-anitew-theme='system'] .drawer .menu-label {
+    color: #5b4c3d !important;
+  }
+  html[data-anitew-theme='system'] .drawer .drawer-item,
+  html[data-anitew-theme='system'] .drawer .drawer-item > span {
+    color: #1d1711 !important;
+  }
+  html[data-anitew-theme='system'] .drawer .drawer-item {
+    border-color: rgb(76 91 79 / 18%) !important;
+    background: rgb(255 253 248 / 74%) !important;
+  }
+  html[data-anitew-theme='system'] .drawer .menu-group:not(.menu-group-device) .menu-icon {
+    color: #783405 !important;
+    border-color: rgb(148 72 15 / 42%) !important;
+    background: linear-gradient(145deg, #fff8ed, #edd8bd) !important;
+  }
+  html[data-anitew-theme='system'] .drawer .menu-group-device .menu-icon {
+    color: #174b44 !important;
+    border-color: rgb(40 92 84 / 42%) !important;
+    background: linear-gradient(145deg, #f8fbf7, #dbe9e3) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drawer .drawer-item,
+  .drawer .menu-icon {
+    transition-duration: 0ms !important;
+  }
+}
