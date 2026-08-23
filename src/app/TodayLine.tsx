@@ -26,8 +26,10 @@ import { MemoryConstellation } from './MemoryConstellation.tsx'
  *   eine Vorhersage über diese eine Einheit — versprochen wird nur, was
  *   die Auswahl wirklich tut.
  *
- * Kein „Memory +18 %“, kein Countdown, kein Druck: Zahlen, die stimmen,
- * und eine Tür ins Training.
+ * K5 ergänzt genau eine weitere Tatsachenzeile: den längsten tatsächlich
+ * korrekt beantworteten Zahlenabruf aus dem append-only Antwortprotokoll.
+ * Der Datenpfad wird erst hier dynamisch geladen; ohne belegten Treffer wird
+ * nichts angezeigt. Kein rekonstruierter Altwert, kein Score.
  */
 export function TodayLine({
   platform,
@@ -53,6 +55,7 @@ export function TodayLine({
   const [weakest, setWeakest] = useState<string | undefined>(undefined)
   const [invite, setInvite] = useState(false)
   const [graph, setGraph] = useState<MemoryGraph>(createMemoryGraph())
+  const [numberRecord, setNumberRecord] = useState<number | undefined>(undefined)
 
   useEffect(() => {
     void (async () => {
@@ -65,6 +68,13 @@ export function TodayLine({
       setGraph(graph)
       const pool = composeMemoryPool(graph)
       setWeakest(pool.length > 0 ? memorySubjectOf(pool[0] as string) : undefined)
+      /*
+        K5 bleibt aus dem Kaltstartpfad: Erst die sichtbare Today-Fläche lädt
+        den kleinen Fakten-Bridge. Das Ergebnis ist `undefined`, wenn kein
+        explizit protokollierter korrekter Zahlenabruf existiert.
+      */
+      const { loadLongestRecalledNumber } = await import('../data/numberRecord.ts')
+      setNumberRecord((await loadLongestRecalledNumber())?.digits)
       /*
         Die Entdeckungszeile (V2-Onboarding fürs Memory-System): einmal
         sagen, dass es „Mein Gedächtnis" gibt — solange dort nichts liegt
@@ -83,6 +93,12 @@ export function TodayLine({
   }, [platform, training, today, refreshKey])
 
   const showDue = tracked > 0 && due !== undefined
+  const numberRecordText =
+    numberRecord === undefined
+      ? undefined
+      : document.documentElement.lang === 'de'
+        ? `Längste korrekt erinnerte Zahl: ${numberRecord} Ziffern.`
+        : `Longest correctly recalled number: ${numberRecord} digits.`
   return (
     <section className={refreshKey > 0 ? 'today today-resolved' : 'today'} aria-label={texts.heading}>
       <p className="today-system">{texts.systemHeading}</p>
@@ -102,6 +118,9 @@ export function TodayLine({
       )}
       {weakest !== undefined && (
         <p className="today-line today-memory">{texts.weakest.replace('{label}', weakest)}</p>
+      )}
+      {numberRecordText !== undefined && (
+        <p className="today-line" data-testid="number-record">{numberRecordText}</p>
       )}
       {!showDue && weakest === undefined && <p className="today-line">{texts.quietMission}</p>}
       {invite && (
