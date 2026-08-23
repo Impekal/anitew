@@ -64,9 +64,11 @@ test('hält die Breite auf jeder Menüseite — und in der Schublade', async ({ 
   await visit(page)
   await expect(startButton(page)).toBeVisible()
 
-  // Die Schublade selbst zuerst.
-  await page.locator('button.hamburger').click()
+  const hamburger = page.locator('button.hamburger')
   const drawer = page.locator('.drawer')
+
+  // Die Schublade selbst zuerst.
+  await hamburger.click()
   await expect(drawer).toBeVisible()
   await noHorizontalOverflow(page)
 
@@ -78,14 +80,37 @@ test('hält die Breite auf jeder Menüseite — und in der Schublade', async ({ 
     .filter((label) => label !== '')
   expect(labels.length).toBeGreaterThan(0)
 
-  // Core ist die Elternnavigation: Eine Unterseite geht mit „Zurück“ wieder
-  // in die bereits offene Schublade, nicht bis zum Tages-Startbildschirm.
-  // Genau in diesem Zustand wird die Breite nach jeder Seite erneut geprüft.
+  /*
+   * Hier wird Geometrie geprüft, nicht die Zurück-Navigation — deren Browser-
+   * und Seitenknopf-Verhalten hat `coreNavigation.spec.ts` als eigenen Gate.
+   *
+   * Der Drawer darf beim Öffnen/Zurückkehren animieren. Auf sehr breiten CI-
+   * Viewports kann Playwright einen normalen `.click()` deshalb minutenlang
+   * auf „stable“ warten, obwohl die Seite bereits korrekt im Viewport liegt.
+   * Für diesen Layout-Test löst `force` denselben echten Click-Handler aus,
+   * ohne die Animationsstabilität zu einer zweiten, fachfremden Assertion zu
+   * machen. Falls Core nach einer Unterseite bereits geschlossen ist, öffnen
+   * wir es für die nächste Breitenmessung ausdrücklich wieder.
+   */
   for (const label of labels) {
-    await page.getByRole('button', { name: label, exact: true }).click()
+    if (!(await drawer.isVisible())) {
+      await hamburger.click({ force: true })
+      await expect(drawer).toBeVisible()
+      await noHorizontalOverflow(page)
+    }
+
+    const item = page.getByRole('button', { name: label, exact: true })
+    await expect(item).toBeVisible()
+    await item.click({ force: true })
     await page.locator('.page').waitFor()
     await noHorizontalOverflow(page)
-    await page.locator('.page-back').click()
+
+    await page.locator('.page-back').click({ force: true })
+    await expect(page.locator('.page')).toBeHidden()
+
+    if (!(await drawer.isVisible())) {
+      await hamburger.click({ force: true })
+    }
     await expect(drawer).toBeVisible()
     await noHorizontalOverflow(page)
   }
