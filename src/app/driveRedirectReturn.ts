@@ -7,12 +7,7 @@ import {
   finishDriveAuthorization,
   resolveClientId,
 } from './driveSync.ts'
-
-export const DRIVE_REDIRECT_NOTICE = 'anitew.google.oauth.notice.v1'
-
-export type DriveRedirectNotice =
-  | { kind: 'connected'; account?: string; accountName?: string }
-  | { kind: 'error'; detail: string }
+import { storeDriveRedirectNotice } from './driveRedirectNotice.ts'
 
 function detailOf(error: unknown): string {
   if (typeof error === 'object' && error !== null && 'detail' in error) {
@@ -20,14 +15,6 @@ function detailOf(error: unknown): string {
     if (typeof detail === 'string' && detail !== '') return detail
   }
   return error instanceof Error && error.message !== '' ? error.message : 'oauth_return_failed'
-}
-
-function storeNotice(notice: DriveRedirectNotice): void {
-  try {
-    window.sessionStorage.setItem(DRIVE_REDIRECT_NOTICE, JSON.stringify(notice))
-  } catch {
-    // Die Anmeldung selbst darf nicht davon abhängen, ob sessionStorage geht.
-  }
 }
 
 function cleanOAuthQuery(): void {
@@ -48,7 +35,7 @@ export async function finishGoogleDriveRedirect(): Promise<void> {
   if (status === null) return
 
   if (status !== 'complete') {
-    storeNotice({ kind: 'error', detail: url.searchParams.get('detail') ?? status })
+    storeDriveRedirectNotice({ kind: 'error', detail: url.searchParams.get('detail') ?? status })
     cleanOAuthQuery()
     return
   }
@@ -66,13 +53,13 @@ export async function finishGoogleDriveRedirect(): Promise<void> {
     if (result.accountName !== undefined) {
       await platform.settings.write(SYNC_ACCOUNT_NAME_SETTING, result.accountName)
     }
-    storeNotice({
+    storeDriveRedirectNotice({
       kind: 'connected',
       account: result.account,
       accountName: result.accountName,
     })
   } catch (error) {
-    storeNotice({ kind: 'error', detail: detailOf(error) })
+    storeDriveRedirectNotice({ kind: 'error', detail: detailOf(error) })
   } finally {
     cleanOAuthQuery()
   }
