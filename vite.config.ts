@@ -8,10 +8,9 @@ const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 
   version: string
 }
 
-// ANITEW — local-first PWA. Kein Backend, keine Analytik, kein Tracking
-// (Backlog A10). Der Build ist ein Ordner statischer Dateien; jeder Hoster
-// kann ihn ausliefern, und daraus wird später ohne Umbau ein Android-Bundle
-// (D-010).
+// ANITEW — local-first PWA. Kein Tracking, keine ANITEW-Nutzerdatenbank.
+// Der kleine Worker-Endpunkt fuer Google OAuth ist Infrastruktur, nicht
+// Datenspeicher; Trainings- und Erinnerungsdaten bleiben lokal/auf eigenem Drive.
 export default defineConfig({
   define: {
     __ANITEW_BUILD__: JSON.stringify({
@@ -28,16 +27,8 @@ export default defineConfig({
       manifest: {
         name: 'ANITEW',
         short_name: 'ANITEW',
-        // Diese Zeile wandert beim Verpacken in den Store-Eintrag und ist
-        // damit eine Marketingfläche (F7): Sie trägt denselben Werbespruch wie
-        // die App und dieselbe Zurückhaltung — gezählt wird, was am Folgetag
-        // noch da ist, versprochen wird nichts darüber hinaus (R-2).
-        // Der Wortlaut steht in docs/STORE.md, ein Test hält beide zusammen.
         description:
           'Gedächtnis ist Technik, kein Talent. Fünf Minuten Training am Tag — mit einer Messung, die zählt, was am Folgetag noch da ist.',
-        // Der Manifest-Name ist die eine Zeichenkette, die Android beim
-        // Verpacken als TWA übernimmt — deshalb steht hier schon der endgültige
-        // Name (D-001) und kein Arbeitstitel.
         lang: 'de',
         theme_color: '#0f1218',
         background_color: '#0f1218',
@@ -49,11 +40,6 @@ export default defineConfig({
           { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png' },
           {
-            /*
-              Maskable braucht Grund bis in die Ecken und das Zeichen in
-              der 80%-Schutzzone — das abgerundete Normal-Icon würde beim
-              Android-Zuschnitt Ecken verlieren (D-039).
-            */
             src: 'icons/icon-maskable-512.png',
             sizes: '512x512',
             type: 'image/png',
@@ -63,6 +49,16 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        // Google muss seinen Authorization-Code wirklich an den Worker liefern.
+        // Der PWA-Navigations-Fallback darf /oauth/google/callback niemals mit
+        // einer gecachten index.html beantworten.
+        navigateFallbackDenylist: [/^\/oauth\/google\//],
+        // Bei einem Release soll kein alter App-Shell-Cache weiterleben. Das
+        // ist besonders auf iOS wichtig, wo offene/installierte PWAs sonst
+        // noch die vorherige JS-Fassung ausliefern koennen.
+        cleanupOutdatedCaches: true,
+        skipWaiting: true,
+        clientsClaim: true,
       },
     }),
   ],
