@@ -38,8 +38,15 @@ test('ersetzt das Hamburger-Menü durch den ANITEW Core und entfaltet eine Memor
 
   const firstNode = page.locator('.drawer-item').first()
   await expect(firstNode).toBeVisible()
-  const radius = await firstNode.evaluate((node) => getComputedStyle(node).borderRadius)
-  expect(radius).toContain('%')
+  /*
+   * V4.1 macht aus den alten runden Memory-Map-Knoten bewusst lesbare,
+   * eigenständige Menüflächen. Die Design-Invariante ist weiterhin: klar
+   * gerundet, nicht rechteckig — aber die konkrete Einheit (px statt %) ist
+   * kein Produktversprechen. So schützt der Test die Form, ohne die neue
+   * freigegebene Geometrie wieder auf den alten Kreis zurückzuzwingen.
+   */
+  const radius = await firstNode.evaluate((node) => Number.parseFloat(getComputedStyle(node).borderRadius))
+  expect(radius).toBeGreaterThanOrEqual(12)
 })
 
 test('macht aus dem Missionsstart ein rundes Core-Portal statt einer Karte', async ({ page }) => {
