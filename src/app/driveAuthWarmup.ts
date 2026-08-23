@@ -1,3 +1,5 @@
+import { prepareDriveAuth } from './driveAuthBridge.ts'
+
 /*
  * First-run Google Drive has a special browser constraint: GIS opens its
  * consent window as a popup, and strict mobile browsers only allow that while
@@ -14,8 +16,7 @@ function warmWhenDriveIsVisible(): void {
   if (document.querySelector('.first-run-drive-card') === null) return
 
   warming = true
-  void import('../platform/web/drive.ts')
-    .then(({ preloadDriveAuth }) => preloadDriveAuth())
+  void prepareDriveAuth()
     .then(() => {
       ready = true
     })
