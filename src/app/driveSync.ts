@@ -23,11 +23,20 @@ export const SYNC_ACCOUNT_SETTING = 'sync.account'
 /** Anzeigename des verbundenen Google-Kontos (nur Anzeige, nur dieses Gerät). */
 export const SYNC_ACCOUNT_NAME_SETTING = 'sync.accountName'
 
-/** Die Client-Kennung: aus dem Bau — oder aus den Einstellungen (Prüfpfad). */
-export async function resolveClientId(settings: SettingsStore): Promise<string | undefined> {
+/* OAuth-Client-IDs sind öffentliche App-Kennungen, keine Secrets. ANITEW hat
+ * genau eine eigene Web-App-Kennung; sie bleibt deshalb als sichere
+ * Produkt-Voreinstellung verfügbar, damit ein normaler Build nicht aus
+ * Versehen den sichtbaren Drive-Weg abschaltet. VITE_GOOGLE_CLIENT_ID und der
+ * lokale Settings-Prüfpfad dürfen sie weiterhin übersteuern. */
+const ANITEW_GOOGLE_CLIENT_ID =
+  '360791045103-jvbjtv7mdatp4f5svtcfj7uabjm7jdok.apps.googleusercontent.com'
+
+/** Client-Kennung: lokale Prüf-Einstellung → Buildwert → ANITEW-Standard. */
+export async function resolveClientId(settings: SettingsStore): Promise<string> {
   const { DRIVE_CLIENT_SETTING, builtInClientId } = await import('../platform/web/drive.ts')
   const stored = await settings.read<string>(DRIVE_CLIENT_SETTING).catch(() => undefined)
-  return stored !== undefined && stored !== '' ? stored : builtInClientId()
+  if (stored !== undefined && stored !== '') return stored
+  return builtInClientId() ?? ANITEW_GOOGLE_CLIENT_ID
 }
 
 /**
@@ -108,7 +117,6 @@ export function scheduleDriveSync(platform: Platform, delayMs = 4_000): void {
       const on = await platform.settings.read<boolean>(SYNC_ON_SETTING).catch(() => undefined)
       if (on !== true) return
       const clientId = await resolveClientId(platform.settings)
-      if (clientId === undefined) return
       syncRunning = true
       try {
         const now = platform.clock.now()

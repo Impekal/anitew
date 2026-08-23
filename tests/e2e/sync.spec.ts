@@ -112,11 +112,12 @@ async function installGoogleStub(page: Page, options: DriveStubOptions = {}) {
   await page.route('https://www.googleapis.com/**', handle)
 }
 
-test('sagt ohne Einrichtung die Wahrheit — und nichts sieht kaputt aus', async ({ page }) => {
+test('stellt Google Drive im normalen ANITEW-Build bereit und bleibt bis zur Verbindung lokal', async ({ page }) => {
   await visit(page)
   await openPage(page, 'Abgleich')
-  await expect(page.locator('.sync-note').filter({ hasText: 'noch nicht eingerichtet' })).toBeVisible()
-  await expect(page.locator('.sync-run')).toHaveCount(0)
+  await expect(page.locator('.sync-run')).toBeVisible()
+  await expect(page.locator('.sync-run')).toContainText('Google Drive verbinden')
+  await expect(page.locator('.sync-note').filter({ hasText: 'noch nicht eingerichtet' })).toHaveCount(0)
   await expect(page.getByText(/Lokaler Modus/)).toBeVisible()
   await expect(page.getByText(/Deine Daten bleiben unter deiner Kontrolle/)).toBeVisible()
 })

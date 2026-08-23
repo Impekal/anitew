@@ -1,5 +1,12 @@
 import '../anitew-living-adaptive.css'
 import '../anitew-core-ritual.css'
+import '../anitew-sensory-light.css'
+import '../anitew-system-light.css'
+import '../anitew-core-menu-contrast.css'
+import '../anitew-core-icon-identity.css'
+import '../anitew-button-aura.css'
+import '../anitew-core-glyph-distinct.css'
+import '../anitew-living-node-shape.css'
 import './firstRunExperience.ts'
 import { mountNeuralField, unmountNeuralField } from './NeuralFieldMount.tsx'
 
@@ -7,6 +14,7 @@ let installed = false
 let coreTimer: number | undefined
 let enteringFallback: number | undefined
 let arrivalTimer: number | undefined
+let pressTimer: number | undefined
 let ritualAudio: AudioContext | undefined
 
 const root = () => document.documentElement
@@ -20,6 +28,7 @@ function soundEnabled(): boolean {
 }
 
 function tactile(pattern: number[]): void {
+  if (!soundEnabled()) return
   const vibrate = (navigator as { vibrate?: (value: number | number[]) => boolean }).vibrate
   if (typeof vibrate !== 'function') return
   try {
@@ -29,12 +38,14 @@ function tactile(pattern: number[]): void {
   }
 }
 
+type ToneKind = 'core' | 'portal' | 'select' | 'navigate' | 'confirm'
+
 /**
- * Ein winziger, rein nachgeladener Klangfingerabdruck für den Core. Er lebt
- * absichtlich in diesem Experience-Chunk: Der normale Trainingssound bleibt
- * unverändert im Startbundle und der Woooooow-Pass kostet keine Kaltstart-Bytes.
+ * ANITEWs akustische Sprache bleibt klein und bedeutungsvoll: Auswahl ist ein
+ * trockener kurzer Impuls, Navigation etwas weicher, Core/Portal tragen die
+ * tiefe Marken-DNA. Keine Zufallssounds und keine Belohnungsmaschine.
  */
-function ritualTone(kind: 'core' | 'portal'): void {
+function ritualTone(kind: ToneKind): void {
   if (!soundEnabled()) return
   try {
     const Ctor =
@@ -44,26 +55,66 @@ function ritualTone(kind: 'core' | 'portal'): void {
     ritualAudio ??= new Ctor()
     if (ritualAudio.state === 'suspended') void ritualAudio.resume().catch(() => undefined)
 
-    const now = ritualAudio.currentTime
-    const notes = kind === 'core' ? ([110, 277.18, 440] as const) : ([110, 220, 440] as const)
-    const delays = kind === 'core' ? [0, 0.065, 0.2] : [0, 0.045, 0.18]
-    const decays = kind === 'core' ? [0.8, 1.15, 1.55] : [1.25, 1.45, 2.15]
-    const gains = kind === 'core' ? [0.034, 0.038, 0.022] : [0.042, 0.055, 0.032]
+    const bank: Record<ToneKind, {
+      notes: readonly number[]
+      delays: readonly number[]
+      decays: readonly number[]
+      gains: readonly number[]
+      wave: OscillatorType
+    }> = {
+      core: {
+        notes: [110, 277.18, 440],
+        delays: [0, 0.065, 0.2],
+        decays: [0.8, 1.15, 1.55],
+        gains: [0.034, 0.038, 0.022],
+        wave: 'sine',
+      },
+      portal: {
+        notes: [110, 220, 440],
+        delays: [0, 0.045, 0.18],
+        decays: [1.25, 1.45, 2.15],
+        gains: [0.042, 0.055, 0.032],
+        wave: 'sine',
+      },
+      select: {
+        notes: [330, 494],
+        delays: [0, 0.026],
+        decays: [0.11, 0.16],
+        gains: [0.024, 0.013],
+        wave: 'triangle',
+      },
+      navigate: {
+        notes: [220, 330],
+        delays: [0, 0.035],
+        decays: [0.14, 0.2],
+        gains: [0.018, 0.011],
+        wave: 'sine',
+      },
+      confirm: {
+        notes: [294, 440, 587],
+        delays: [0, 0.035, 0.08],
+        decays: [0.16, 0.22, 0.3],
+        gains: [0.019, 0.017, 0.011],
+        wave: 'sine',
+      },
+    }
 
-    notes.forEach((hz, index) => {
-      const start = now + (delays[index] ?? 0)
-      const decay = decays[index] ?? 1
+    const voice = bank[kind]
+    const now = ritualAudio.currentTime
+    voice.notes.forEach((hz, index) => {
+      const start = now + (voice.delays[index] ?? 0)
+      const decay = voice.decays[index] ?? 0.16
       const envelope = ritualAudio?.createGain()
       const oscillator = ritualAudio?.createOscillator()
       if (envelope === undefined || oscillator === undefined || ritualAudio === undefined) return
       envelope.gain.setValueAtTime(0.0001, start)
-      envelope.gain.exponentialRampToValueAtTime(gains[index] ?? 0.03, start + 0.012)
+      envelope.gain.exponentialRampToValueAtTime(voice.gains[index] ?? 0.012, start + 0.008)
       envelope.gain.exponentialRampToValueAtTime(0.0001, start + decay)
-      oscillator.type = 'sine'
+      oscillator.type = voice.wave
       oscillator.frequency.value = hz
       oscillator.connect(envelope).connect(ritualAudio.destination)
       oscillator.start(start)
-      oscillator.stop(start + decay + 0.05)
+      oscillator.stop(start + decay + 0.04)
     })
   } catch {
     // Ein Browser ohne freigegebenes WebAudio bekommt weiterhin die ganze
@@ -71,13 +122,19 @@ function ritualTone(kind: 'core' | 'portal'): void {
   }
 }
 
+function flashPress(): void {
+  root().dataset.anitewPress = 'true'
+  clearTimer(pressTimer)
+  pressTimer = window.setTimeout(() => {
+    delete root().dataset.anitewPress
+  }, 150)
+}
+
 function pulseCore(): void {
   const html = root()
   html.dataset.anitewCoreOpening = 'true'
-  if (soundEnabled()) {
-    tactile([6, 22, 10])
-    ritualTone('core')
-  }
+  tactile([6, 22, 10])
+  ritualTone('core')
   clearTimer(coreTimer)
   coreTimer = window.setTimeout(() => {
     delete html.dataset.anitewCoreOpening
@@ -87,10 +144,8 @@ function pulseCore(): void {
 function beginPortalRitual(): void {
   const html = root()
   html.dataset.anitewEntering = 'true'
-  if (soundEnabled()) {
-    tactile([8, 28, 13])
-    ritualTone('portal')
-  }
+  tactile([8, 28, 13])
+  ritualTone('portal')
   clearTimer(enteringFallback)
   enteringFallback = window.setTimeout(() => {
     delete html.dataset.anitewEntering
@@ -122,25 +177,50 @@ function installCoreRitual(): void {
       const target = event.target
       if (!(target instanceof Element)) return
 
-      // Beim allerersten Einstieg ist „Los geht’s“ die erste freigegebene
-      // Nutzer-Geste. Genau dort darf das Sonic Logo zuverlässig erklingen —
-      // iOS blockiert Ton beim bloßen Seitenaufruf. Danach tragen Core und
-      // Portal dieselbe Klang-DNA weiter.
       const firstRun = target.closest('.arrival-begin')
       if (firstRun !== null) {
         tactile([6, 22, 10])
         ritualTone('core')
+        flashPress()
         return
       }
 
       const core = target.closest('.hamburger')
       if (core !== null && core.getAttribute('aria-expanded') !== 'true') {
         pulseCore()
+        flashPress()
         return
       }
 
       const portal = target.closest('.start')
-      if (portal instanceof HTMLButtonElement && !portal.disabled) beginPortalRitual()
+      if (portal instanceof HTMLButtonElement && !portal.disabled) {
+        beginPortalRitual()
+        flashPress()
+        return
+      }
+
+      const choice = target.closest('.mode, .theme-choice')
+      if (choice instanceof HTMLButtonElement && !choice.disabled) {
+        tactile([6])
+        ritualTone('select')
+        flashPress()
+        return
+      }
+
+      const drive = target.closest('.first-run-drive-connect, .sync-run, .sync-stop')
+      if (drive instanceof HTMLButtonElement && !drive.disabled) {
+        tactile(drive.matches('.sync-stop') ? [8] : [7, 18, 7])
+        ritualTone(drive.matches('.sync-stop') ? 'navigate' : 'confirm')
+        flashPress()
+        return
+      }
+
+      const drawerItem = target.closest('.drawer-item')
+      if (drawerItem instanceof HTMLButtonElement && !drawerItem.disabled) {
+        tactile([5])
+        ritualTone('navigate')
+        flashPress()
+      }
     },
     true,
   )
@@ -158,6 +238,7 @@ function installCoreRitual(): void {
       clearTimer(coreTimer)
       clearTimer(enteringFallback)
       clearTimer(arrivalTimer)
+      clearTimer(pressTimer)
       unmountNeuralField()
       if (ritualAudio !== undefined) void ritualAudio.close().catch(() => undefined)
     },

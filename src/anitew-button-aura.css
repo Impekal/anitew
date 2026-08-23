@@ -1,0 +1,256 @@
+/* ANITEW V4.1 — Button Aura
+ *
+ * The 5:00 portal established the physical language: a control should cast a
+ * visible field into the world around it, not merely change its border. This
+ * layer gives important actions the same spatial presence without turning
+ * every navigation control into a competing hero.
+ */
+
+/* Primary / meaningful actions: Google, first-run, explicit sync and major
+ * calls to action. Resting state already has depth; hover releases the aura. */
+:is(
+  .first-run-drive-connect,
+  .sync-run,
+  .arrival-begin,
+  .today-invite-open,
+  .page .primary
+) {
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+  overflow: visible !important;
+  will-change: transform, box-shadow, filter;
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 13%, transparent),
+    0 0 0 1px color-mix(in oklab, var(--v4-gold) 15%, transparent),
+    0 8px 22px -13px color-mix(in oklab, var(--v4-gold) 42%, transparent),
+    0 18px 44px -28px color-mix(in oklab, var(--v4-mint) 38%, transparent) !important;
+  transition:
+    transform 180ms cubic-bezier(.18,.82,.22,1),
+    box-shadow 260ms cubic-bezier(.18,.82,.22,1),
+    border-color 220ms ease,
+    filter 220ms ease,
+    background 220ms ease !important;
+}
+
+:is(
+  .first-run-drive-connect,
+  .sync-run,
+  .arrival-begin,
+  .today-invite-open,
+  .page .primary
+):hover,
+:is(
+  .first-run-drive-connect,
+  .sync-run,
+  .arrival-begin,
+  .today-invite-open,
+  .page .primary
+):focus-visible {
+  z-index: 4;
+  transform: translateY(-3px) scale(1.012) !important;
+  filter: brightness(1.055) saturate(1.08);
+  border-color: color-mix(in oklab, var(--v4-gold) 76%, var(--line)) !important;
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 22%, transparent),
+    inset 0 -12px 30px color-mix(in oklab, var(--v4-gold) 8%, transparent),
+    0 0 0 1px color-mix(in oklab, var(--v4-gold) 27%, transparent),
+    0 0 24px 3px color-mix(in oklab, var(--v4-gold) 24%, transparent),
+    0 10px 30px -4px color-mix(in oklab, var(--v4-gold) 48%, transparent),
+    0 24px 58px -15px color-mix(in oklab, var(--v4-gold) 42%, transparent),
+    0 38px 92px -30px color-mix(in oklab, var(--v4-mint) 42%, transparent) !important;
+}
+
+/* Google / sync is intentionally one of the brightest secondary portals. */
+:is(.first-run-drive-connect, .sync-run):hover,
+:is(.first-run-drive-connect, .sync-run):focus-visible {
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 25%, transparent),
+    inset 0 -14px 32px color-mix(in oklab, var(--v4-gold) 10%, transparent),
+    0 0 0 1px color-mix(in oklab, var(--v4-gold) 32%, transparent),
+    0 0 30px 5px color-mix(in oklab, var(--v4-gold) 29%, transparent),
+    0 12px 34px -3px color-mix(in oklab, var(--v4-gold) 54%, transparent),
+    0 28px 66px -14px color-mix(in oklab, var(--v4-gold) 46%, transparent),
+    0 42px 104px -30px color-mix(in oklab, var(--v4-mint) 47%, transparent) !important;
+}
+
+/* Secondary actions keep the same material grammar at roughly half the
+ * radius. They should feel responsive without stealing the primary field. */
+:is(
+  .sync-stop,
+  .page .quiet,
+  .note-actions .quiet,
+  .page-back
+) {
+  position: relative;
+  z-index: 1;
+  overflow: visible !important;
+  transition:
+    transform 160ms cubic-bezier(.18,.82,.22,1),
+    box-shadow 230ms ease,
+    border-color 210ms ease,
+    filter 210ms ease !important;
+}
+
+:is(
+  .sync-stop,
+  .page .quiet,
+  .note-actions .quiet,
+  .page-back
+):hover,
+:is(
+  .sync-stop,
+  .page .quiet,
+  .note-actions .quiet,
+  .page-back
+):focus-visible {
+  z-index: 3;
+  transform: translateY(-2px) !important;
+  filter: brightness(1.035) saturate(1.05);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 15%, transparent),
+    0 0 0 1px color-mix(in oklab, var(--v4-gold) 18%, transparent),
+    0 0 18px 1px color-mix(in oklab, var(--v4-gold) 16%, transparent),
+    0 10px 28px -8px color-mix(in oklab, var(--v4-gold) 37%, transparent),
+    0 24px 54px -27px color-mix(in oklab, var(--v4-mint) 38%, transparent) !important;
+}
+
+/* Light paper cannot emit literal light, so the aura is a dense warm colour
+ * shadow — deliberately broad, like the 5:00 reference. */
+html[data-anitew-theme='light'] :is(
+  .first-run-drive-connect,
+  .sync-run,
+  .arrival-begin,
+  .today-invite-open,
+  .page .primary
+):hover,
+html[data-anitew-theme='light'] :is(
+  .first-run-drive-connect,
+  .sync-run,
+  .arrival-begin,
+  .today-invite-open,
+  .page .primary
+):focus-visible {
+  background: linear-gradient(180deg, #fff9ee 0%, #e9cda9 100%) !important;
+  color: #24160c !important;
+  border-color: rgb(145 68 10 / 82%) !important;
+  box-shadow:
+    inset 0 1px 0 #fff,
+    inset 0 -18px 38px rgb(145 68 10 / 10%),
+    0 0 0 1px rgb(145 68 10 / 25%),
+    0 0 28px 5px rgb(171 91 28 / 24%),
+    0 10px 30px 0 rgb(164 82 19 / 39%),
+    0 25px 58px -8px rgb(164 82 19 / 43%),
+    0 42px 92px -25px rgb(40 92 84 / 38%) !important;
+}
+
+html[data-anitew-theme='light'] :is(.first-run-drive-connect, .sync-run):hover,
+html[data-anitew-theme='light'] :is(.first-run-drive-connect, .sync-run):focus-visible {
+  box-shadow:
+    inset 0 1px 0 #fff,
+    inset 0 -20px 42px rgb(145 68 10 / 11%),
+    0 0 0 1px rgb(145 68 10 / 28%),
+    0 0 34px 7px rgb(171 91 28 / 28%),
+    0 12px 34px 2px rgb(164 82 19 / 44%),
+    0 29px 68px -6px rgb(164 82 19 / 48%),
+    0 46px 108px -26px rgb(40 92 84 / 42%) !important;
+}
+
+html[data-anitew-theme='light'] :is(
+  .sync-stop,
+  .page .quiet,
+  .note-actions .quiet,
+  .page-back
+):hover,
+html[data-anitew-theme='light'] :is(
+  .sync-stop,
+  .page .quiet,
+  .note-actions .quiet,
+  .page-back
+):focus-visible {
+  box-shadow:
+    inset 0 1px 0 #fff,
+    0 0 0 1px rgb(145 68 10 / 16%),
+    0 0 18px 2px rgb(164 82 19 / 15%),
+    0 10px 28px -7px rgb(164 82 19 / 34%),
+    0 25px 52px -24px rgb(40 92 84 / 34%) !important;
+}
+
+@media (prefers-color-scheme: light) {
+  html[data-anitew-theme='system'] :is(
+    .first-run-drive-connect,
+    .sync-run,
+    .arrival-begin,
+    .today-invite-open,
+    .page .primary
+  ):hover,
+  html[data-anitew-theme='system'] :is(
+    .first-run-drive-connect,
+    .sync-run,
+    .arrival-begin,
+    .today-invite-open,
+    .page .primary
+  ):focus-visible {
+    background: linear-gradient(180deg, #fff9ee 0%, #e9cda9 100%) !important;
+    color: #24160c !important;
+    border-color: rgb(145 68 10 / 82%) !important;
+    box-shadow:
+      inset 0 1px 0 #fff,
+      inset 0 -18px 38px rgb(145 68 10 / 10%),
+      0 0 0 1px rgb(145 68 10 / 25%),
+      0 0 28px 5px rgb(171 91 28 / 24%),
+      0 10px 30px 0 rgb(164 82 19 / 39%),
+      0 25px 58px -8px rgb(164 82 19 / 43%),
+      0 42px 92px -25px rgb(40 92 84 / 38%) !important;
+  }
+}
+
+:is(
+  .first-run-drive-connect,
+  .sync-run,
+  .arrival-begin,
+  .today-invite-open,
+  .page .primary,
+  .sync-stop,
+  .page .quiet,
+  .note-actions .quiet,
+  .page-back
+):active {
+  transform: translateY(1px) scale(.975) !important;
+  filter: brightness(.99) saturate(1.04);
+  transition-duration: 80ms !important;
+}
+
+@media (hover: none) {
+  /* Touch devices have no hover. Keep a visible resting depth but do not leave
+   * a sticky hover aura after tap. */
+  :is(
+    .first-run-drive-connect,
+    .sync-run,
+    .arrival-begin,
+    .today-invite-open,
+    .page .primary
+  ) {
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklab, white 13%, transparent),
+      0 0 0 1px color-mix(in oklab, var(--v4-gold) 15%, transparent),
+      0 8px 24px -12px color-mix(in oklab, var(--v4-gold) 42%, transparent),
+      0 20px 48px -30px color-mix(in oklab, var(--v4-mint) 38%, transparent) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(
+    .first-run-drive-connect,
+    .sync-run,
+    .arrival-begin,
+    .today-invite-open,
+    .page .primary,
+    .sync-stop,
+    .page .quiet,
+    .note-actions .quiet,
+    .page-back
+  ) {
+    transition-duration: 0ms !important;
+  }
+}

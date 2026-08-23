@@ -1,0 +1,172 @@
+/* ANITEW V4.1 — unmistakable Core glyphs
+ *
+ * Final authority for Core icon identity. Earlier layers may style menu rows,
+ * but they must never turn seven different destinations into the same badge.
+ * The wrapper owns material and silhouette; the SVG owns only the symbol.
+ */
+
+.drawer .menu-glyph-wrap {
+  --glyph-a: var(--v4-mint);
+  --glyph-b: var(--v4-gold);
+  position: relative;
+  display: grid !important;
+  place-items: center;
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  padding: 0 !important;
+  overflow: visible;
+  color: var(--glyph-a) !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  opacity: 1 !important;
+  border: 1px solid color-mix(in oklab, var(--glyph-a) 44%, transparent) !important;
+  background:
+    radial-gradient(circle at 32% 24%, color-mix(in oklab, var(--glyph-b) 19%, transparent), transparent 48%),
+    linear-gradient(150deg,
+      color-mix(in oklab, var(--glyph-a) 12%, var(--card)),
+      color-mix(in oklab, var(--glyph-b) 6%, var(--card))) !important;
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 11%, transparent),
+    0 0 0 1px color-mix(in oklab, var(--glyph-a) 9%, transparent),
+    0 8px 22px -13px color-mix(in oklab, var(--glyph-a) 42%, transparent) !important;
+  transform: none;
+  transition:
+    transform 180ms cubic-bezier(.2,.8,.2,1),
+    box-shadow 220ms ease,
+    border-color 220ms ease,
+    filter 220ms ease !important;
+}
+
+.drawer .menu-glyph-wrap .menu-icon {
+  width: 24px !important;
+  height: 24px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  color: inherit !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+  clip-path: none !important;
+  transform: none !important;
+  stroke-width: 1.9 !important;
+}
+
+/* Human/app destinations stay warm and restrained. */
+.drawer .menu-group:not(.menu-group-device) .menu-glyph-wrap {
+  --glyph-a: var(--v4-gold-hot);
+  --glyph-b: var(--v4-mint);
+  border-radius: 12px;
+}
+
+/* App & Gerät — deliberately different silhouettes. */
+.drawer .menu-glyph-wrap[data-icon-kind='reminder'] {
+  --glyph-a: #a7651f;
+  --glyph-b: var(--v4-gold);
+  border-radius: 50% !important;
+}
+
+.drawer .menu-glyph-wrap[data-icon-kind='science'] {
+  --glyph-a: #287368;
+  --glyph-b: var(--v4-mint);
+  border-radius: 7px !important;
+  clip-path: polygon(24% 0, 76% 0, 100% 24%, 100% 76%, 76% 100%, 24% 100%, 0 76%, 0 24%);
+}
+
+.drawer .menu-glyph-wrap[data-icon-kind='install'] {
+  --glyph-a: #396c78;
+  --glyph-b: var(--v4-mint);
+  width: 33px !important;
+  min-width: 33px !important;
+  height: 40px !important;
+  margin-inline: 2.5px;
+  border-radius: 10px 10px 14px 14px !important;
+}
+
+.drawer .menu-glyph-wrap[data-icon-kind='privacy'] {
+  --glyph-a: #8a4515;
+  --glyph-b: var(--v4-gold);
+  border-radius: 48% 48% 34% 34% / 30% 30% 70% 70% !important;
+}
+
+.drawer .menu-glyph-wrap[data-icon-kind='backup'] {
+  --glyph-a: #526c50;
+  --glyph-b: var(--v4-gold);
+  width: 40px !important;
+  min-width: 40px !important;
+  height: 34px !important;
+  margin-inline: -1px;
+  border-radius: 7px 7px 13px 13px !important;
+}
+
+.drawer .menu-glyph-wrap[data-icon-kind='sync'] {
+  --glyph-a: #1f7468;
+  --glyph-b: #b66c21;
+  border-radius: 50% !important;
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 12%, transparent),
+    0 0 0 1px color-mix(in oklab, var(--glyph-a) 15%, transparent),
+    0 0 0 4px color-mix(in oklab, var(--glyph-a) 4%, transparent),
+    0 0 20px color-mix(in oklab, var(--glyph-a) 18%, transparent) !important;
+}
+
+.drawer .menu-glyph-wrap[data-icon-kind='check'] {
+  --glyph-a: #726137;
+  --glyph-b: var(--v4-mint);
+  border-radius: 8px !important;
+  clip-path: polygon(50% 0, 88% 14%, 100% 50%, 86% 88%, 50% 100%, 14% 88%, 0 50%, 12% 14%);
+}
+
+/* The actual symbols stay large enough that silhouette wins over the tile. */
+.drawer .menu-glyph-wrap[data-icon-kind='reminder'] .menu-icon { width: 25px !important; height: 25px !important; }
+.drawer .menu-glyph-wrap[data-icon-kind='science'] .menu-icon { width: 25px !important; height: 25px !important; }
+.drawer .menu-glyph-wrap[data-icon-kind='install'] .menu-icon { width: 22px !important; height: 26px !important; }
+.drawer .menu-glyph-wrap[data-icon-kind='privacy'] .menu-icon { width: 24px !important; height: 26px !important; }
+.drawer .menu-glyph-wrap[data-icon-kind='backup'] .menu-icon { width: 27px !important; height: 23px !important; }
+.drawer .menu-glyph-wrap[data-icon-kind='sync'] .menu-icon { width: 27px !important; height: 27px !important; }
+.drawer .menu-glyph-wrap[data-icon-kind='check'] .menu-icon { width: 25px !important; height: 25px !important; }
+
+.drawer .drawer-item:hover .menu-glyph-wrap,
+.drawer .drawer-item:focus-visible .menu-glyph-wrap {
+  transform: translateY(-1px) scale(1.08) !important;
+  border-color: color-mix(in oklab, var(--glyph-a) 70%, transparent) !important;
+  filter: saturate(1.08) brightness(1.04);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 15%, transparent),
+    0 0 0 1px color-mix(in oklab, var(--glyph-a) 16%, transparent),
+    0 0 28px color-mix(in oklab, var(--glyph-a) 27%, transparent),
+    0 12px 28px -13px color-mix(in oklab, var(--glyph-b) 42%, transparent) !important;
+}
+
+html[data-anitew-theme='light'] .drawer .menu-glyph-wrap {
+  color: color-mix(in oklab, var(--glyph-a) 88%, #17120e) !important;
+  border-color: color-mix(in oklab, var(--glyph-a) 50%, #c6b8a4) !important;
+  background:
+    radial-gradient(circle at 32% 24%, color-mix(in oklab, var(--glyph-b) 20%, transparent), transparent 48%),
+    linear-gradient(150deg,
+      color-mix(in oklab, var(--glyph-a) 8%, #fffdf8),
+      color-mix(in oklab, var(--glyph-b) 10%, #eee3d5)) !important;
+  box-shadow:
+    inset 0 1px 0 #fff,
+    0 0 0 1px color-mix(in oklab, var(--glyph-a) 9%, transparent),
+    0 8px 20px -9px color-mix(in oklab, var(--glyph-a) 42%, transparent) !important;
+}
+
+@media (prefers-color-scheme: light) {
+  html[data-anitew-theme='system'] .drawer .menu-glyph-wrap {
+    color: color-mix(in oklab, var(--glyph-a) 88%, #17120e) !important;
+    border-color: color-mix(in oklab, var(--glyph-a) 50%, #c6b8a4) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drawer .menu-glyph-wrap,
+  .drawer .menu-glyph-wrap .menu-icon {
+    transition: none !important;
+    transform: none !important;
+  }
+}

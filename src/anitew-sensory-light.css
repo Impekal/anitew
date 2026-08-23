@@ -1,0 +1,425 @@
+/* ANITEW V4.1 — Sensory & Light
+ *
+ * Light mode is not a washed-out copy of the dark surface. It is a high-
+ * contrast luminous material system: dark readable ink, solid cards, warm
+ * depth shadows and coloured light around controls. Dark mode keeps bloom;
+ * light mode uses denser coloured shadows because white cannot visibly glow.
+ */
+
+:root {
+  --sensory-press: 0 1px 0 rgb(255 255 255 / 8%);
+}
+
+/* ── Light mode: one palette for ALL generations of ANITEW CSS ----------
+ * V1/V2 still use --an-* and --living-* while newer layers use
+ * --paper/--ink/--v4-*. If only one family is changed, the interface becomes
+ * a half-light/half-dark collision. V4.1 deliberately resolves all of them.
+ */
+html[data-anitew-theme='light'] {
+  color-scheme: light;
+
+  --paper: #eee7dc;
+  --paper-glow: #fff9ed;
+  --card: #fffdf8;
+  --line: #c9baa5;
+  --ink: #17120e;
+  --ink-soft: #4d4338;
+  --ink-faint: #706252;
+  --accent: #94480f;
+  --accent-soft: #edd4b6;
+  --accent-ink: #fffaf2;
+  --calm: #285c54;
+  --bad: #8f2e27;
+
+  --an-bg: #eee7dc;
+  --an-bg-2: #f7f1e7;
+  --an-surface: rgb(255 253 248 / 94%);
+  --an-surface-2: #fffdf8;
+  --an-line: rgb(73 92 81 / 22%);
+  --an-line-strong: rgb(73 92 81 / 38%);
+  --an-text: #17120e;
+  --an-muted: #4d4338;
+  --an-dim: #706252;
+  --an-gold: #94480f;
+  --an-gold-soft: rgb(148 72 15 / 13%);
+  --an-cyan: #285c54;
+  --an-cyan-soft: rgb(40 92 84 / 10%);
+  --an-shadow:
+    0 1px 0 rgb(255 255 255 / 92%) inset,
+    0 16px 34px -24px rgb(75 48 25 / 48%),
+    0 34px 70px -44px rgb(40 92 84 / 42%);
+
+  --living-core: #a85f22;
+  --living-core-hot: #7a3507;
+  --living-calm: #285c54;
+  --living-void: #e9e0d3;
+  --living-ring: rgb(40 92 84 / 28%);
+  --living-gold-ring: rgb(148 72 15 / 34%);
+
+  --v4-mint: #285c54;
+  --v4-mint-hot: #174b44;
+  --v4-gold: #94480f;
+  --v4-gold-hot: #713205;
+  --v4-surface: rgb(255 253 248 / 96%);
+  --v4-surface-strong: #fffdf8;
+  --v4-line: rgb(40 92 84 / 34%);
+  --v4-line-hot: rgb(148 72 15 / 54%);
+  --v4-neural: rgb(23 75 68 / 48%);
+  --v4-neural-hot: rgb(148 72 15 / 70%);
+  --v4-card-shadow:
+    0 1px 0 rgb(255 255 255 / 94%) inset,
+    0 13px 30px -20px rgb(72 46 24 / 44%),
+    0 30px 68px -40px rgb(40 92 84 / 42%);
+  --v4-start-shadow:
+    0 0 0 1px rgb(148 72 15 / 38%),
+    0 10px 28px -9px rgb(148 72 15 / 50%),
+    0 28px 64px -26px rgb(40 92 84 / 38%);
+
+  --shadow: 0 2px 4px rgb(65 44 23 / 10%), 0 10px 28px -18px rgb(65 44 23 / 36%);
+  --shadow-lift: 0 3px 7px rgb(65 44 23 / 12%), 0 20px 46px -22px rgb(65 44 23 / 46%);
+  --glow: 0 0 0 1px rgb(148 72 15 / 34%), 0 7px 25px -7px rgb(148 72 15 / 52%);
+  --glow-soft: 0 8px 34px -5px rgb(148 72 15 / 46%);
+  --glow-strong: 0 12px 50px -4px rgb(148 72 15 / 58%);
+  --glow-text: 0 3px 18px rgb(148 72 15 / 25%);
+  --glow-flare: 0 8px 34px rgb(148 72 15 / 44%);
+  --glow-pill: 0 7px 24px -3px rgb(148 72 15 / 48%);
+
+  background: var(--paper) !important;
+}
+
+/* The old redesign layer paints a hard-coded dark canvas. Override the
+ * canvas itself, not merely its tokens. This is the crucial light-mode fix. */
+html[data-anitew-theme='light'] body {
+  background:
+    radial-gradient(circle at 50% 3%, rgb(255 250 239 / 96%), transparent 29rem),
+    radial-gradient(circle at 88% 48%, rgb(148 72 15 / 8%), transparent 25rem),
+    radial-gradient(circle at 8% 70%, rgb(40 92 84 / 8%), transparent 27rem),
+    linear-gradient(180deg, #f7f1e7 0%, #eee7dc 58%, #e9e0d3 100%) !important;
+  color: var(--an-text) !important;
+}
+
+html[data-anitew-theme='light'] body::before {
+  opacity: .42 !important;
+  background-image: radial-gradient(rgb(40 67 58 / 20%) .5px, transparent .55px) !important;
+  background-size: 8px 8px !important;
+}
+
+html[data-anitew-theme='light'] :is(.app, .onboarding, .page) {
+  color: var(--an-text) !important;
+}
+
+html[data-anitew-theme='light'] :is(
+  .brand h1,
+  .page,
+  .page-title,
+  .today-line,
+  .note h3,
+  .first-run-guide-title,
+  .first-run-highlight strong,
+  .first-run-drive-title,
+  .sync-privacy-lead,
+  .sync-identity-copy strong
+) {
+  color: var(--an-text) !important;
+}
+
+html[data-anitew-theme='light'] :is(
+  .greeting,
+  .tagline,
+  .focus,
+  .page-body,
+  .note,
+  .memory-pulse-line,
+  .arrival-note,
+  .first-run-adaptive,
+  .first-run-highlight p,
+  .first-run-drive-body,
+  .first-run-questions,
+  .first-run-guide-body,
+  .drawer-google-copy span,
+  .sync-account,
+  .sync-note,
+  .hint
+) {
+  color: var(--an-muted) !important;
+}
+
+html[data-anitew-theme='light'] :is(
+  .focus-why,
+  .today-duration,
+  .footer,
+  .menu-label,
+  .first-run-different,
+  .theme-label,
+  .drawer-close-label,
+  .drawer-google-copy small,
+  #challenge-heading
+) {
+  color: var(--an-dim) !important;
+}
+
+html[data-anitew-theme='light'] :is(.today-system, .memory-pulse-label) {
+  color: var(--an-cyan) !important;
+}
+html[data-anitew-theme='light'] :is(.today-mission-label, .first-run-philosophy, .first-run-highlight-badge) {
+  color: var(--an-gold) !important;
+}
+
+html[data-anitew-theme='light'] .drawer-veil {
+  background: rgb(90 73 53 / 28%) !important;
+  backdrop-filter: blur(16px) saturate(88%) !important;
+}
+
+html[data-anitew-theme='light'] :is(
+  .drawer,
+  .note,
+  .first-run-guide-card,
+  .first-run-highlight,
+  .first-run-drive-card,
+  .theme-control,
+  .sync-identity
+) {
+  color: var(--an-text) !important;
+  background-color: var(--card) !important;
+  border-color: var(--line) !important;
+  box-shadow: var(--v4-card-shadow) !important;
+}
+
+html[data-anitew-theme='light'] .drawer {
+  background:
+    radial-gradient(circle at 100% 0, rgb(40 92 84 / 9%), transparent 35%),
+    radial-gradient(circle at 0 82%, rgb(148 72 15 / 8%), transparent 38%),
+    #fffdf8 !important;
+  border-left-color: rgb(40 92 84 / 20%) !important;
+  box-shadow: -22px 0 70px rgb(77 54 31 / 24%) !important;
+}
+
+html[data-anitew-theme='light'] .constellation {
+  background:
+    radial-gradient(circle at 50% 48%, rgb(40 92 84 / 10%), transparent 43%),
+    radial-gradient(circle at 73% 27%, rgb(148 72 15 / 7%), transparent 31%),
+    transparent !important;
+}
+html[data-anitew-theme='light'] .constellation-label {
+  fill: #211a14 !important;
+  stroke: rgb(247 241 231 / 92%) !important;
+}
+html[data-anitew-theme='light'] .neural {
+  opacity: 1 !important;
+  filter:
+    drop-shadow(0 2px 5px rgb(40 92 84 / 28%))
+    drop-shadow(0 7px 18px rgb(148 72 15 / 12%)) !important;
+}
+
+/* The mission portal becomes a luminous physical object on paper rather
+ * than a dark glass circle pasted onto a light page. */
+html[data-anitew-theme='light'] .start {
+  border-color: rgb(148 72 15 / 55%) !important;
+  background:
+    radial-gradient(circle at 43% 34%, rgb(255 255 255 / 94%) 0 3%, transparent 8%),
+    radial-gradient(circle at 50% 42%, rgb(216 164 94 / 29%), transparent 33%),
+    radial-gradient(circle at 50% 75%, rgb(40 92 84 / 13%), transparent 47%),
+    linear-gradient(150deg, #fff9ef, #ead9c3) !important;
+  color: var(--an-text) !important;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 96%),
+    inset 0 -16px 40px rgb(148 72 15 / 8%),
+    0 0 0 1px rgb(148 72 15 / 18%),
+    0 12px 30px -9px rgb(148 72 15 / 48%),
+    0 30px 72px -28px rgb(40 92 84 / 42%) !important;
+}
+html[data-anitew-theme='light'] .start:hover {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 100%),
+    inset 0 -18px 42px rgb(148 72 15 / 10%),
+    0 0 0 1px rgb(148 72 15 / 28%),
+    0 15px 38px -7px rgb(148 72 15 / 58%),
+    0 34px 82px -24px rgb(40 92 84 / 48%) !important;
+}
+html[data-anitew-theme='light'] .start-time {
+  background: none !important;
+  -webkit-background-clip: border-box !important;
+  background-clip: border-box !important;
+  color: #1b1510 !important;
+  -webkit-text-fill-color: #1b1510 !important;
+  text-shadow: 0 2px 0 rgb(255 255 255 / 78%), 0 8px 24px rgb(148 72 15 / 24%) !important;
+}
+html[data-anitew-theme='light'] .start-label {
+  color: #713205 !important;
+  text-shadow: 0 1px 0 rgb(255 255 255 / 84%), 0 6px 18px rgb(148 72 15 / 25%) !important;
+}
+
+html[data-anitew-theme='light'] .mode {
+  background: #fffaf2 !important;
+  border-color: #b3a28c !important;
+  color: #3f352a !important;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 98%),
+    0 8px 22px -14px rgb(40 92 84 / 46%) !important;
+}
+html[data-anitew-theme='light'] .mode:hover {
+  border-color: rgb(148 72 15 / 58%) !important;
+  color: #21170f !important;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 100%),
+    0 10px 25px -9px rgb(148 72 15 / 46%),
+    0 20px 42px -25px rgb(40 92 84 / 48%) !important;
+}
+html[data-anitew-theme='light'] .mode-active {
+  background:
+    radial-gradient(circle at 50% 0, rgb(148 72 15 / 20%), transparent 72%),
+    #f4dfc6 !important;
+  border-color: rgb(148 72 15 / 72%) !important;
+  color: #21160d !important;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 96%),
+    0 0 0 1px rgb(148 72 15 / 18%),
+    0 9px 28px -7px rgb(148 72 15 / 50%) !important;
+}
+
+/* ── Luminous control language ---------------------------------------- */
+.start,
+.mode,
+.first-run-highlight-visual,
+.first-run-drive-visual,
+.drawer-google-avatar,
+.sync-identity-avatar,
+.theme-choice,
+.drawer-item,
+.first-run-drive-connect,
+.sync-run,
+.sync-stop,
+.page button {
+  transition:
+    transform 140ms cubic-bezier(.2,.8,.2,1),
+    box-shadow 220ms ease,
+    border-color 220ms ease,
+    background-color 220ms ease,
+    filter 220ms ease !important;
+}
+
+.first-run-highlight-visual,
+.first-run-drive-visual,
+.drawer-google-avatar,
+.sync-identity-avatar {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 12%),
+    0 0 0 1px color-mix(in oklab, currentColor 18%, transparent),
+    0 0 22px color-mix(in oklab, currentColor 28%, transparent),
+    0 12px 30px -14px color-mix(in oklab, currentColor 38%, transparent) !important;
+}
+
+.drawer-item {
+  position: relative;
+  border: 1px solid transparent !important;
+  border-radius: 14px !important;
+}
+.drawer-item:hover,
+.drawer-item:focus-visible {
+  border-color: color-mix(in oklab, var(--v4-mint) 34%, transparent) !important;
+  background: color-mix(in oklab, var(--v4-mint) 9%, var(--card)) !important;
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 10%, transparent),
+    0 0 26px color-mix(in oklab, var(--v4-mint) 18%, transparent),
+    0 12px 34px -17px color-mix(in oklab, var(--v4-gold) 30%, transparent) !important;
+}
+.drawer-item :is(svg, .icon, [class*='icon']) {
+  filter:
+    drop-shadow(0 0 5px color-mix(in oklab, var(--v4-mint) 50%, transparent))
+    drop-shadow(0 5px 11px color-mix(in oklab, var(--v4-gold) 26%, transparent));
+}
+
+/* Important action buttons receive the same halo, including Google. */
+:is(.first-run-drive-connect, .sync-run, .sync-stop, .page .quiet, .page .primary, .today-invite-open) {
+  border: 1px solid color-mix(in oklab, var(--v4-gold) 32%, var(--line)) !important;
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 7%, transparent),
+    0 7px 22px -15px color-mix(in oklab, var(--v4-mint) 45%, transparent),
+    0 0 18px color-mix(in oklab, var(--v4-gold) 10%, transparent) !important;
+}
+:is(.first-run-drive-connect, .sync-run, .sync-stop, .page .quiet, .page .primary, .today-invite-open):hover,
+:is(.first-run-drive-connect, .sync-run, .sync-stop, .page .quiet, .page .primary, .today-invite-open):focus-visible {
+  border-color: color-mix(in oklab, var(--v4-gold) 62%, var(--line)) !important;
+  filter: brightness(1.04) saturate(1.07);
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 11%, transparent),
+    0 0 0 1px color-mix(in oklab, var(--v4-gold) 14%, transparent),
+    0 0 28px color-mix(in oklab, var(--v4-gold) 22%, transparent),
+    0 14px 36px -15px color-mix(in oklab, var(--v4-mint) 48%, transparent) !important;
+}
+
+html[data-anitew-theme='light'] :is(.first-run-drive-connect, .sync-run, .sync-stop, .page .quiet, .page .primary, .today-invite-open) {
+  background: linear-gradient(180deg, #fffdf8, #f2e5d4) !important;
+  color: #2b2118 !important;
+  border-color: rgb(148 72 15 / 42%) !important;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 100%),
+    0 8px 22px -10px rgb(148 72 15 / 30%),
+    0 18px 36px -22px rgb(40 92 84 / 36%) !important;
+}
+html[data-anitew-theme='light'] :is(.first-run-drive-connect, .sync-run, .sync-stop, .page .quiet, .page .primary, .today-invite-open):hover,
+html[data-anitew-theme='light'] :is(.first-run-drive-connect, .sync-run, .sync-stop, .page .quiet, .page .primary, .today-invite-open):focus-visible {
+  background: linear-gradient(180deg, #fffaf0, #ead6bd) !important;
+  border-color: rgb(148 72 15 / 72%) !important;
+  color: #1c140d !important;
+  box-shadow:
+    inset 0 1px 0 #fff,
+    0 0 0 1px rgb(148 72 15 / 14%),
+    0 10px 28px -8px rgb(148 72 15 / 50%),
+    0 22px 46px -20px rgb(40 92 84 / 44%) !important;
+}
+
+.theme-choice {
+  cursor: pointer;
+}
+.theme-choice:hover,
+.theme-choice:focus-visible {
+  border-color: color-mix(in oklab, var(--v4-gold) 54%, var(--line)) !important;
+  box-shadow:
+    0 0 22px color-mix(in oklab, var(--v4-gold) 17%, transparent),
+    0 10px 25px -17px color-mix(in oklab, var(--v4-mint) 42%, transparent) !important;
+}
+
+.mode {
+  position: relative;
+  overflow: hidden;
+}
+.mode::after {
+  content: '';
+  position: absolute;
+  inset: auto 18% -16px;
+  height: 22px;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(circle, color-mix(in oklab, var(--v4-gold) 35%, transparent), transparent 68%);
+  filter: blur(8px);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+.mode:hover::after,
+.mode-active::after {
+  opacity: .9;
+  transform: translateY(-4px);
+}
+
+:is(.mode, .theme-choice, .drawer-item, .first-run-drive-connect, .sync-run, .sync-stop, .page button):active {
+  transform: translateY(1px) scale(.975) !important;
+  filter: brightness(1.04) saturate(1.08);
+}
+
+html[data-anitew-press='true'] :is(.mode, .theme-choice, .drawer-item, .sync-run, .first-run-drive-connect):focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--v4-gold) 40%, transparent) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .start,
+  .mode,
+  .drawer-item,
+  .theme-choice,
+  .first-run-drive-connect,
+  .sync-run,
+  .sync-stop,
+  .page button {
+    transition-duration: 0ms !important;
+  }
+}

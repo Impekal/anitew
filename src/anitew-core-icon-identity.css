@@ -1,0 +1,139 @@
+/* ANITEW V4.1 — Core icon identity
+ *
+ * The Core menu is a map. A map is weaker when every destination is stamped
+ * into the same tile. The glyphs already have different meanings; this layer
+ * makes those differences instantly visible through silhouette, material and
+ * micro-aura while staying inside ANITEW's gold/mint language.
+ */
+
+.drawer .menu-group-device .menu-icon[data-icon-kind] {
+  --icon-a: var(--v4-mint);
+  --icon-b: var(--v4-gold);
+  color: color-mix(in oklab, var(--icon-a) 82%, var(--ink)) !important;
+  border-color: color-mix(in oklab, var(--icon-a) 48%, transparent) !important;
+  background:
+    radial-gradient(circle at 34% 24%, color-mix(in oklab, var(--icon-b) 18%, transparent), transparent 44%),
+    linear-gradient(145deg,
+      color-mix(in oklab, var(--icon-a) 13%, var(--card)),
+      color-mix(in oklab, var(--icon-b) 6%, var(--card))) !important;
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 10%, transparent),
+    0 0 0 1px color-mix(in oklab, var(--icon-a) 9%, transparent),
+    0 0 19px color-mix(in oklab, var(--icon-a) 17%, transparent),
+    0 9px 23px -14px color-mix(in oklab, var(--icon-b) 34%, transparent) !important;
+}
+
+/* Erinnerung: warm, rund, wie ein stiller Signalgeber. */
+.drawer .menu-group-device .menu-icon[data-icon-kind='reminder'] {
+  --icon-a: var(--v4-gold);
+  --icon-b: var(--v4-mint);
+  border-radius: 50% !important;
+}
+
+/* Wissenschaft: kühler sechseckiger Labor-Körper. */
+.drawer .menu-group-device .menu-icon[data-icon-kind='science'] {
+  --icon-a: var(--v4-mint);
+  --icon-b: var(--v4-gold);
+  border-radius: 8px !important;
+  clip-path: polygon(24% 0, 76% 0, 100% 24%, 100% 76%, 76% 100%, 24% 100%, 0 76%, 0 24%);
+}
+
+/* Installation: aufrechter Device-Körper statt derselben quadratischen Kapsel. */
+.drawer .menu-group-device .menu-icon[data-icon-kind='install'] {
+  --icon-a: color-mix(in oklab, var(--v4-mint) 78%, var(--v4-gold));
+  --icon-b: var(--v4-gold);
+  border-radius: 9px 9px 14px 14px !important;
+  transform: scaleX(.92) translateZ(0);
+}
+
+/* Datenschutz: warme Schild-Silhouette. */
+.drawer .menu-group-device .menu-icon[data-icon-kind='privacy'] {
+  --icon-a: color-mix(in oklab, var(--v4-gold) 82%, var(--v4-mint));
+  --icon-b: var(--v4-mint);
+  border-radius: 48% 48% 38% 38% / 34% 34% 66% 66% !important;
+}
+
+/* Sicherung: Archiv-/Speicherblock, bewusst horizontaler. */
+.drawer .menu-group-device .menu-icon[data-icon-kind='backup'] {
+  --icon-a: color-mix(in oklab, var(--v4-mint) 64%, var(--v4-gold));
+  --icon-b: var(--v4-gold);
+  border-radius: 7px 7px 14px 14px !important;
+  transform: scaleY(.92) translateZ(0);
+}
+
+/* Abgleich: echter kreisender Knoten. */
+.drawer .menu-group-device .menu-icon[data-icon-kind='sync'] {
+  --icon-a: var(--v4-mint);
+  --icon-b: var(--v4-gold);
+  border-radius: 50% !important;
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 10%, transparent),
+    0 0 0 1px color-mix(in oklab, var(--v4-mint) 14%, transparent),
+    0 0 0 5px color-mix(in oklab, var(--v4-mint) 3%, transparent),
+    0 0 22px color-mix(in oklab, var(--v4-mint) 22%, transparent) !important;
+}
+
+/* Systemcheck: technischer Prüfdiamant. */
+.drawer .menu-group-device .menu-icon[data-icon-kind='check'] {
+  --icon-a: color-mix(in oklab, var(--v4-gold) 54%, var(--v4-mint));
+  --icon-b: var(--v4-mint);
+  border-radius: 9px !important;
+  clip-path: polygon(50% 0, 93% 18%, 100% 50%, 82% 93%, 50% 100%, 18% 93%, 0 50%, 7% 18%);
+}
+
+/* Hover reinforces the identity instead of replacing it with one generic glow. */
+.drawer .menu-group-device .drawer-item:hover .menu-icon[data-icon-kind],
+.drawer .menu-group-device .drawer-item:focus-visible .menu-icon[data-icon-kind] {
+  color: color-mix(in oklab, var(--icon-a) 88%, var(--ink)) !important;
+  border-color: color-mix(in oklab, var(--icon-a) 70%, transparent) !important;
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 14%, transparent),
+    0 0 0 1px color-mix(in oklab, var(--icon-a) 18%, transparent),
+    0 0 30px color-mix(in oklab, var(--icon-a) 31%, transparent),
+    0 12px 30px -12px color-mix(in oklab, var(--icon-b) 46%, transparent) !important;
+}
+
+/* Preserve the special non-square silhouettes when the generic hover layer
+ * wants to scale them. */
+.drawer .menu-group-device .drawer-item:hover .menu-icon[data-icon-kind='install'],
+.drawer .menu-group-device .drawer-item:focus-visible .menu-icon[data-icon-kind='install'] {
+  transform: scaleX(.97) scaleY(1.06) translateY(-1px);
+}
+.drawer .menu-group-device .drawer-item:hover .menu-icon[data-icon-kind='backup'],
+.drawer .menu-group-device .drawer-item:focus-visible .menu-icon[data-icon-kind='backup'] {
+  transform: scaleX(1.06) scaleY(.98) translateY(-1px);
+}
+
+/* In Light mode the icon material needs pigment rather than pale bloom. */
+html[data-anitew-theme='light'] .drawer .menu-group-device .menu-icon[data-icon-kind] {
+  color: color-mix(in oklab, var(--icon-a) 84%, #15110d) !important;
+  border-color: color-mix(in oklab, var(--icon-a) 50%, #c9baa5) !important;
+  background:
+    radial-gradient(circle at 34% 24%, color-mix(in oklab, var(--icon-b) 18%, transparent), transparent 46%),
+    linear-gradient(145deg,
+      color-mix(in oklab, var(--icon-a) 9%, #fffdf8),
+      color-mix(in oklab, var(--icon-b) 11%, #f1e7d9)) !important;
+  box-shadow:
+    inset 0 1px 0 #fff,
+    0 0 0 1px color-mix(in oklab, var(--icon-a) 10%, transparent),
+    0 7px 20px -8px color-mix(in oklab, var(--icon-a) 43%, transparent),
+    0 18px 30px -22px color-mix(in oklab, var(--icon-b) 42%, transparent) !important;
+}
+
+@media (prefers-color-scheme: light) {
+  html[data-anitew-theme='system'] .drawer .menu-group-device .menu-icon[data-icon-kind] {
+    color: color-mix(in oklab, var(--icon-a) 84%, #15110d) !important;
+    border-color: color-mix(in oklab, var(--icon-a) 50%, #c9baa5) !important;
+    background:
+      radial-gradient(circle at 34% 24%, color-mix(in oklab, var(--icon-b) 18%, transparent), transparent 46%),
+      linear-gradient(145deg,
+        color-mix(in oklab, var(--icon-a) 9%, #fffdf8),
+        color-mix(in oklab, var(--icon-b) 11%, #f1e7d9)) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drawer .menu-group-device .menu-icon[data-icon-kind] {
+    transform: none !important;
+  }
+}
