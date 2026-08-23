@@ -10,6 +10,54 @@ import {
 import type { Dictionary } from '../i18n/index.ts'
 import { type ImportReport, exportBackup, importBackup, readBackupFile } from '../data/backup.ts'
 import { wipeEverything } from '../data/reset.ts'
+import {
+  deleteDriveBackup,
+  disconnectDriveAuthorization,
+  requestDriveToken,
+} from '../platform/web/drive.ts'
+import { resolveClientId } from './driveSync.ts'
+
+interface ResetCopy {
+  heading: string
+  scope: string
+  cloud: string
+  cloudNote: string
+  keepCloud: string
+  type: string
+  cloudFailed: string
+}
+
+const RESET_DE: ResetCopy = {
+  heading: 'Neu anfangen',
+  scope:
+    'Löscht Training, Erinnerungen, Messungen, Profil und Einstellungen auf diesem Gerät, trennt Google und startet ANITEW danach wie beim ersten Öffnen.',
+  cloud: 'Auch die ANITEW-Sicherungsdatei in Google Drive löschen',
+  cloudNote:
+    'Der Ordner „Anitew“ bleibt bestehen; nur die von ANITEW angelegte Sicherungsdatei wird gelöscht. Andere Dateien in diesem Ordner fasst ANITEW nie an.',
+  keepCloud:
+    'Ohne diesen Haken bleibt die Drive-Sicherung erhalten und kann bei einer späteren Anmeldung wieder eingelesen werden.',
+  type: 'Zur endgültigen Bestätigung ANITEW eingeben.',
+  cloudFailed:
+    'Die ANITEW-Sicherung in Google Drive konnte nicht gelöscht werden. Lokal wurde deshalb noch nichts gelöscht.',
+}
+
+const RESET_EN: ResetCopy = {
+  heading: 'Start over',
+  scope:
+    'Deletes training, memories, measurements, profile and settings on this device, disconnects Google and then starts ANITEW like the first launch.',
+  cloud: 'Also delete the ANITEW backup file in Google Drive',
+  cloudNote:
+    'The “Anitew” folder stays in place; only the backup file created by ANITEW is deleted. ANITEW never touches other files in that folder.',
+  keepCloud:
+    'Without this option, the Drive backup remains and can be imported again after a later sign-in.',
+  type: 'Type ANITEW to confirm permanently.',
+  cloudFailed:
+    'The ANITEW backup in Google Drive could not be deleted. Nothing was deleted locally.',
+}
+
+function resetCopy(): ResetCopy {
+  return document.documentElement.lang.toLowerCase().startsWith('de') ? RESET_DE : RESET_EN
+}
 
 /**
  * Sicherung speichern und einlesen (Backlog N2).
@@ -30,11 +78,14 @@ export function BackupPanel({
   dictionary: Dictionary
 }) {
   const t = dictionary.backup
+  const reset = resetCopy()
   const fileInput = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState<string | undefined>()
   // N4: Die einzige Rückfrage der App — weil das Löschen unwiderruflich ist.
   const [confirmWipe, setConfirmWipe] = useState(false)
+  const [wipeDrive, setWipeDrive] = useState(false)
+  const [wipePhrase, setWipePhrase] = useState('')
   /*
    * Wie viel Platz belegt ist (N5). Gemessen über navigator.storage, nicht
    * geschätzt — und „etwa“, weil der Browser den Wert bewusst grob hält.
@@ -110,6 +161,38 @@ export function BackupPanel({
     }
   }
 
+  const resetFromScratch = async () => {
+    setBusy(true)
+    setMessage(undefined)
+    try {
+      if (wipeDrive) {
+        const clientId = await resolveClientId(platform.settings)
+        const token = await requestDriveToken(clientId, true)
+        await deleteDriveBackup(token)
+      }
+
+      // Erst Cloud/Session trennen, dann lokal leeren. So kann kein noch
+      // laufender stiller Sync die gerade gelöschten Daten wieder einlesen.
+      await disconnectDriveAuthorization()
+      await wipeEverything()
+
+      // Theme-Erststart, First-run-Hilfen und einmalige UI-Zustände liegen
+      // bewusst außerhalb von Dexie. Für „von vorn“ müssen auch sie weg.
+      try {
+        window.localStorage.clear()
+        window.sessionStorage.clear()
+      } catch {
+        // Der eigentliche Nutzerdatenspeicher ist bereits gelöscht. Geblockter
+        // Komfortspeicher darf den Reset nicht rückgängig machen.
+      }
+
+      window.location.replace('/')
+    } catch {
+      setMessage(wipeDrive ? reset.cloudFailed : t.failed)
+      setBusy(false)
+    }
+  }
+
   return (
     <section className="backup" aria-label={t.heading}>
       <p className="hint">{t.note}</p>
@@ -150,35 +233,53 @@ export function BackupPanel({
         </p>
       )}
 
-      {/*
-        Alles löschen (N4). Absichtlich unten, hinter allem, und mit einer
-        echten Rückfrage: Das ist der eine Ort, an dem die App warnt statt
-        beruhigt — weil danach wirklich nichts mehr da ist. Der Hinweis rät
-        vorher zu sichern; die beiden Knöpfe darüber sind der Weg dazu.
-      */}
       <div className="wipe">
+        <h3>{reset.heading}</h3>
+        <p className="hint">{reset.scope}</p>
         {confirmWipe ? (
           <>
             <p className="hint wipe-warn">{t.wipeConfirm}</p>
+            <label className="hint">
+              <input
+                type="checkbox"
+                checked={wipeDrive}
+                onChange={(event) => setWipeDrive(event.target.checked)}
+                disabled={busy}
+              />{' '}
+              {reset.cloud}
+            </label>
+            <p className="hint">{wipeDrive ? reset.cloudNote : reset.keepCloud}</p>
+            <label className="hint">
+              <span>{reset.type}</span>
+              <input
+                className="wipe-confirm-input"
+                type="text"
+                value={wipePhrase}
+                autoComplete="off"
+                spellCheck={false}
+                onChange={(event) => setWipePhrase(event.target.value)}
+                disabled={busy}
+              />
+            </label>
             <div className="backup-actions">
               <button
                 type="button"
                 className="quiet wipe-go"
-                disabled={busy}
-                onClick={() => {
-                  setBusy(true)
-                  void wipeEverything()
-                    .then(() => {
-                      setMessage(t.wipeDone)
-                      setConfirmWipe(false)
-                    })
-                    .catch(() => setMessage(t.failed))
-                    .finally(() => setBusy(false))
-                }}
+                disabled={busy || wipePhrase.trim().toUpperCase() !== 'ANITEW'}
+                onClick={() => void resetFromScratch()}
               >
                 {t.wipe}
               </button>
-              <button type="button" className="quiet" onClick={() => setConfirmWipe(false)}>
+              <button
+                type="button"
+                className="quiet"
+                disabled={busy}
+                onClick={() => {
+                  setConfirmWipe(false)
+                  setWipeDrive(false)
+                  setWipePhrase('')
+                }}
+              >
                 {t.wipeCancel}
               </button>
             </div>
