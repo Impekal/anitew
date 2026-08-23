@@ -40,7 +40,7 @@ interface PushTruthCopy {
   readonly whileOpen: string
   readonly scheduled: string
   readonly privacyLead: string
-  readonly privacyPoints: readonly string[]
+  readonly privacyPoints: readonly [string, string, string, string, string]
   readonly privacyHonest: string
 }
 
@@ -131,7 +131,7 @@ function withPushTruth(dictionary: Dictionary, language: Language): Dictionary {
     privacy: {
       ...dictionary.privacy,
       lead: copy.privacyLead,
-      points: [...copy.privacyPoints],
+      points: copy.privacyPoints,
       honest: copy.privacyHonest,
     },
   }
