@@ -13,6 +13,7 @@
 
 import { type Platform, type SettingsStore, type SyncReport, syncOnce } from '../core/index.ts'
 import { exportBackup, importBackup } from '../data/backup.ts'
+import { requestPreparedDriveToken } from './driveAuthBridge.ts'
 
 /** Merkt sich, dass der Abgleich gewollt ist — für den stillen Start. */
 export const SYNC_ON_SETTING = 'sync.on'
@@ -49,15 +50,21 @@ export async function runDriveSync(
   silent: boolean,
   now: number,
 ): Promise<SyncReport> {
-  const { requestDriveToken } = await import('../platform/web/drive.ts')
-  const token = await requestDriveToken(clientId, silent)
+  const prepared = requestPreparedDriveToken(clientId, silent)
+  const token =
+    prepared !== undefined
+      ? await prepared
+      : await import('../platform/web/drive.ts').then(({ requestDriveToken }) =>
+          requestDriveToken(clientId, silent),
+        )
   return syncWithToken(token, now)
 }
 
 /**
- * Der bewusste erste Weg: hörbar verbinden, dabei einmal fragen, wessen
- * Konto das ist. Name und E-Mail sind reine Anzeige; fehlen sie, funktioniert
- * der Abgleich trotzdem vollständig.
+ * Der bewusste erste Weg: hörbar anmelden, dabei einmal fragen, wessen Konto
+ * das ist. Entscheidend für iOS: Der vorbereitete Token-Starter wird direkt
+ * beim Eintritt in diese Funktion aufgerufen — noch vor jedem `await` und vor
+ * jedem dynamischen Import. Damit bleibt Googles Popup im echten Tap-Stack.
  */
 export async function connectDriveSync(
   clientId: string,
@@ -67,8 +74,16 @@ export async function connectDriveSync(
   account: string | undefined
   accountName: string | undefined
 }> {
-  const { requestDriveToken, fetchAccountProfile } = await import('../platform/web/drive.ts')
-  const token = await requestDriveToken(clientId, false, true)
+  const prepared = requestPreparedDriveToken(clientId, false, true)
+  let token: string
+  if (prepared !== undefined) {
+    token = await prepared
+  } else {
+    const { requestDriveToken } = await import('../platform/web/drive.ts')
+    token = await requestDriveToken(clientId, false, true)
+  }
+
+  const { fetchAccountProfile } = await import('../platform/web/drive.ts')
   const identity = await fetchAccountProfile(token)
   const report = await syncWithToken(token, now)
   return {
