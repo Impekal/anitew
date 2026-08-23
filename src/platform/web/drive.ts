@@ -4,8 +4,8 @@
  * Zwei Drähte, beide so schmal wie möglich:
  *
  * - **Anmeldung** über Googles eigenes Identity-Skript (GIS). Es wird erst
- *   geladen, wenn der Mensch den Abgleich wirklich anfasst — nicht beim
- *   Start, nicht im Bündel (das Kaltstart-Budget P4 bleibt unberührt).
+ *   vorbereitet, wenn eine Drive-Oberfläche wirklich sichtbar ist — nicht
+ *   beim Start, nicht im Bündel (das Kaltstart-Budget P4 bleibt unberührt).
  *   Der Zugriff ist `drive.file`: ANITEW sieht und verwaltet nur Dateien und
  *   Ordner, die die App selbst erstellt oder die ausdrücklich mit ihr geöffnet
  *   wurden. Das übrige Drive ist nicht lesbar.
@@ -67,28 +67,51 @@ declare global {
 }
 
 const GIS_SRC = 'https://accounts.google.com/gsi/client'
+let gisLoad: Promise<GisOauth2> | undefined
 
-/** Lädt Googles Identity-Skript einmal — erst bei Bedarf. */
+/**
+ * Lädt Googles Identity-Skript genau einmal. Ein geteiltes Promise verhindert,
+ * dass First Run und Abgleich zwei Skripte parallel einsetzen. Ein verwaister
+ * alter Script-Knoten wird vor einem echten Retry entfernt; sonst könnte ein
+ * zweiter Versuch ewig auf ein `load`-Ereignis warten, das bereits vorbei ist.
+ */
 async function loadGis(): Promise<GisOauth2> {
   const present = window.google?.accounts?.oauth2
   if (present !== undefined) return present
-  await new Promise<void>((resolve, reject) => {
-    const existing = document.querySelector(`script[src="${GIS_SRC}"]`)
-    if (existing !== null) {
-      existing.addEventListener('load', () => resolve())
-      existing.addEventListener('error', () => reject(new DriveError('offline')))
-      return
-    }
+  if (gisLoad !== undefined) return gisLoad
+
+  gisLoad = new Promise<GisOauth2>((resolve, reject) => {
+    document.querySelector(`script[src="${GIS_SRC}"]`)?.remove()
+
     const script = document.createElement('script')
     script.src = GIS_SRC
     script.async = true
-    script.onload = () => resolve()
+    script.onload = () => {
+      const loaded = window.google?.accounts?.oauth2
+      if (loaded !== undefined) resolve(loaded)
+      else reject(new DriveError('offline'))
+    }
     script.onerror = () => reject(new DriveError('offline'))
     document.head.append(script)
   })
-  const loaded = window.google?.accounts?.oauth2
-  if (loaded === undefined) throw new DriveError('offline')
-  return loaded
+
+  try {
+    return await gisLoad
+  } catch (error) {
+    // Netzwerk-/Content-Fehler dürfen einen späteren Retry nicht vergiften.
+    gisLoad = undefined
+    throw error
+  }
+}
+
+/**
+ * Bereitet Google vor, ohne Kontoauswahl oder Berechtigung zu öffnen.
+ * Mobile Browser behalten dadurch den eigentlichen späteren Klick vollständig
+ * für `requestAccessToken()` statt ihn an einen vorherigen Script-Download zu
+ * verlieren.
+ */
+export async function prepareDriveAuth(): Promise<void> {
+  await loadGis()
 }
 
 /* Name und E-Mail dienen nur dazu, eindeutig zu zeigen, welches eigene
