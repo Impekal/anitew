@@ -2,7 +2,6 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
 import { App } from './app/App.tsx'
-import './app/coreNavigationReturn.ts'
 import { keepUpToDate } from './platform/web/updates.ts'
 import './styles.css'
 import './anitew-redesign.css'
@@ -64,6 +63,11 @@ if (document.readyState === 'complete') loadSignatureExperience()
 else window.addEventListener('load', loadSignatureExperience, { once: true })
 
 keepUpToDate()
+
+// Parent-navigation is interactive polish, not cold-start work. Start loading
+// it immediately, but keep its event bridge in a separate async chunk so the
+// strict P4 first-load budget stays reserved for the actual app shell.
+void import('./app/coreNavigationReturn.ts').catch(() => undefined)
 
 const rootContainer = document.getElementById('root')
 if (rootContainer === null) throw Error('#root fehlt')
