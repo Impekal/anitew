@@ -11,6 +11,20 @@ import './anitew-phase4-journey.css'
 import './anitew-phase4-landing.css'
 import './anitew-phase5.css'
 
+// Dunkel ist der ANITEW-Erststart. Die Markierung trennt „noch nie gewählt“
+// von einem später ausdrücklich gewählten „System“: System entfernt weiterhin
+// den Theme-Key, darf beim nächsten Start aber nicht wieder zu Dunkel werden.
+try {
+  const themeDefaultSeeded = 'anitew.theme-default.v2'
+  const theme = 'anitew.theme.v1'
+  if (window.localStorage.getItem(themeDefaultSeeded) !== '1') {
+    if (window.localStorage.getItem(theme) === null) window.localStorage.setItem(theme, 'dark')
+    window.localStorage.setItem(themeDefaultSeeded, '1')
+  }
+} catch {
+  // Darstellung ist Komfort. Geblocktes localStorage darf den Start nie stoppen.
+}
+
 // Die Signatur-Schichten sind bewusst kein Startpfad. Erst wenn Dokument,
 // App und Service-Worker-Start vollständig zur Ruhe gekommen sind, holen wir
 // die rein visuelle Tiefe nach.
