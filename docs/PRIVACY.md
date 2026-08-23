@@ -2,8 +2,8 @@
 
 **Stand: 2026-08-24** · Backlog R4
 
-> Der kurze Teil zuerst: **ANITEW bleibt local-first.** Es gibt kein ANITEW-
-> Nutzerkonto, keine Werbung, keine Analyse-Dienste und keine Tracker.
+> Der kurze Teil zuerst: **ANITEW bleibt local-first.** Es gibt **kein Konto**
+> bei ANITEW, keine Werbung, keine Analyse-Dienste und keine Tracker.
 > Training, Erinnerungen, Messungen und Profil bleiben auf deinem Gerät. Nur
 > Funktionen, die du ausdrücklich einschaltest — Google-Drive-Abgleich, Coach
 > und Systembenachrichtigungen — benutzen dafür notwendige Netzdienste.
@@ -48,8 +48,10 @@ Webserver fallen dabei technisch Verbindungsdaten wie IP-Adresse, Zeitpunkt,
 Browser- und Dateianfrage beim Infrastruktur-Anbieter an. ANITEW baut daraus
 kein Nutzungsprofil.
 
-Nach dem Laden ist das **Training selbst offlinefähig**. Netzzugriff wird nur
-für ausdrücklich gewählte Online-Funktionen benötigt.
+**Klartext:** Nach dem Laden ist das **Training selbst offlinefähig**.
+Netzzugriff wird nur für ausdrücklich gewählte Online-Funktionen benötigt.
+Drive-Abgleich, Coach und Systembenachrichtigungen sind **aus, bis du sie
+anfasst**.
 
 ## 5. Sicherung und Wiederherstellung
 
@@ -117,10 +119,11 @@ Für Google gelten zusätzlich Googles Datenschutzbedingungen.
 ## 9. Coach mit eigenem API-Schlüssel
 
 Der Coach ist aus, bis du einen eigenen Schlüssel hinterlegst und eine Frage
-stellst. Dann gehen Frage und der dafür beschriebene Zahlenkontext direkt an
-den von dir gewählten KI-Anbieter. Eigene Erinnerungstexte werden nur bei einer
-von dir ausgelösten KI-Vorschlagsfunktion übertragen. Der API-Schlüssel bleibt
-auf deinem Gerät. Für die Verarbeitung beim jeweiligen Anbieter gilt dessen
+stellst. Unterstützt werden **Gemini, Anthropic, Groq, OpenRouter und Mistral**.
+Dann gehen Frage und der dafür beschriebene Zahlenkontext direkt an den von dir
+gewählten KI-Anbieter. Eigene Erinnerungstexte werden nur bei einer von dir
+ausgelösten KI-Vorschlagsfunktion übertragen. Der API-Schlüssel bleibt auf
+deinem Gerät. Für die Verarbeitung beim jeweiligen Anbieter gilt dessen
 Datenschutzerklärung.
 
 ## 10. Kinder
