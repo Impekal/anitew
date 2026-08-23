@@ -11,10 +11,14 @@ interface PushMockOptions {
 async function withWebPush(page: Page, options: PushMockOptions) {
   await page.addInitScript((input) => {
     let current = input.permission
+    ;(window as any).__anitewUnsubscribeCount = 0
     const subscription = {
       endpoint: 'https://push.example.invalid/anitew-device',
       toJSON: () => ({ endpoint: 'https://push.example.invalid/anitew-device' }),
-      unsubscribe: async () => true,
+      unsubscribe: async () => {
+        ;(window as any).__anitewUnsubscribeCount++
+        return true
+      },
     }
     const pushManager = {
       getSubscription: async () => subscription,
@@ -111,7 +115,6 @@ test('plant die Tageserinnerung anonym mit Fälligkeit und Zeitzone', async ({ p
   expect(scheduled?.reminder?.title).toBe('ANITEW')
   expect(scheduled?.reminder?.recurrence?.localTime).toBe('07:15')
   expect(typeof scheduled?.reminder?.recurrence?.timeZone).toBe('string')
-  // Keine Trainings-, Profil- oder Gedächtnisdaten gehören in diesen Request.
   expect(JSON.stringify(scheduled)).not.toMatch(/profile|memory|training|answer|email/i)
 })
 
@@ -137,6 +140,23 @@ test('merkt die Uhrzeit und schaltet den täglichen Servertermin ausdrücklich d
   await page.getByRole('button', { name: 'Keine Erinnerung' }).click()
   await expect(page.locator('.reminder').getByText('Aus.', { exact: true })).toBeVisible()
   await expect.poll(() => permanentCancel).toBe(true)
+})
+
+test('macht bei Serverausfall die alte Push-Adresse lokal ungültig', async ({ page }) => {
+  await withWebPush(page, { permission: 'granted' })
+  await page.route('**/push/schedule', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }),
+  )
+  await page.route('**/push/cancel', (route) => route.abort('failed'))
+
+  await openReminders(page)
+  await page.locator('.reminder input[type="time"]').fill('07:15')
+  await page.getByRole('button', { name: 'Erinnerung merken' }).click()
+  await expect(page.locator('.reminder').getByText('Gemerkt.', { exact: true })).toBeVisible()
+
+  await page.getByRole('button', { name: 'Keine Erinnerung' }).click()
+  await expect(page.locator('.reminder').getByText('Aus.', { exact: true })).toBeVisible()
+  await expect.poll(() => page.evaluate(() => (window as any).__anitewUnsubscribeCount)).toBe(1)
 })
 
 test('fragt nicht beim ersten Start nach Benachrichtigungen', async ({ page }) => {
