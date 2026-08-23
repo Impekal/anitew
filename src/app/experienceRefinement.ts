@@ -9,6 +9,7 @@ import {
   connectDriveSync,
   resolveClientId,
 } from './driveSync.ts'
+import { prepareDriveAuth } from './driveAuthBridge.ts'
 
 type CapabilityKind = 'adaptive' | 'technique' | 'world' | 'measure' | 'coach' | 'privacy'
 type ThemeChoice = 'system' | 'light' | 'dark'
@@ -34,6 +35,7 @@ interface RefinementCopy {
   driveCardTitle: string
   driveCardBody: string
   driveConnect: string
+  drivePreparing: string
   driveConnecting: string
   driveConnected: string
   driveUnavailable: string
@@ -97,9 +99,10 @@ const DE: RefinementCopy = {
   driveCardBody:
     'Standardmäßig bleibt alles auf diesem Gerät. Für mehrere Geräte kannst du dich mit Google anmelden und deine ANITEW-Daten in deinem eigenen Google Drive speichern. ANITEW synchronisiert dann über deinen sichtbaren Ordner „Anitew“ — ohne zusätzliche ANITEW-Cloudkopie.',
   driveConnect: 'Anmelden / Daten im Google Drive speichern',
+  drivePreparing: 'Google-Anmeldung wird vorbereitet …',
   driveConnecting: 'Google-Anmeldung wird geöffnet …',
   driveConnected: 'Angemeldet. Automatischer Abgleich ist aktiv',
-  driveUnavailable: 'Google-Anmeldung ist für diesen Build noch nicht eingerichtet.',
+  driveUnavailable: 'Google-Anmeldung konnte nicht vorbereitet werden.',
   driveDenied: 'Anmeldung nicht abgeschlossen. Lokal funktioniert ANITEW vollständig weiter.',
   scroll: 'Mehr entdecken',
   appearance: 'Darstellung',
@@ -166,9 +169,10 @@ const EN: RefinementCopy = {
   driveCardBody:
     'Everything stays on this device by default. For multiple devices, sign in with Google and save your ANITEW data in your own Google Drive. ANITEW then syncs through your visible “Anitew” folder — without an additional ANITEW cloud copy.',
   driveConnect: 'Sign in / save data in Google Drive',
+  drivePreparing: 'Preparing Google sign-in …',
   driveConnecting: 'Opening Google sign-in …',
   driveConnected: 'Signed in. Automatic sync is active',
-  driveUnavailable: 'Google sign-in is not configured for this build yet.',
+  driveUnavailable: 'Google sign-in could not be prepared.',
   driveDenied: 'Sign-in was not completed. ANITEW continues to work fully locally.',
   scroll: 'Explore more',
   appearance: 'Appearance',
@@ -304,38 +308,52 @@ function enhanceWelcome(): void {
   const driveActions = element('div', 'first-run-drive-actions')
   const button = element('button', 'first-run-drive-connect')
   button.type = 'button'
-  button.textContent = t.driveConnect
+  button.disabled = true
+  button.textContent = t.drivePreparing
   const status = element('p', 'first-run-drive-status')
   status.setAttribute('aria-live', 'polite')
 
+  let preparedClientId: string | undefined
+  void Promise.all([resolveClientId(platform.settings), prepareDriveAuth()])
+    .then(([clientId]) => {
+      preparedClientId = clientId
+      button.disabled = false
+      button.textContent = t.driveConnect
+    })
+    .catch((error: unknown) => {
+      status.dataset.error = 'true'
+      const detail = oauthDetail(error)
+      status.textContent = `${t.driveUnavailable}${detail === undefined ? '' : ` · ${detail}`}`
+      button.textContent = t.driveConnect
+    })
+
   button.addEventListener('click', () => {
-    if (button.disabled) return
+    if (button.disabled || preparedClientId === undefined) return
+
     button.disabled = true
     button.textContent = t.driveConnecting
     status.textContent = ''
     delete status.dataset.error
 
-    void (async () => {
-      const clientId = await resolveClientId(platform.settings)
-      if (clientId === undefined) {
-        status.dataset.error = 'true'
-        status.textContent = t.driveUnavailable
-        return
-      }
-      const now = platform.clock.now()
-      const result = await connectDriveSync(clientId, now)
-      await platform.settings.write(SYNC_ON_SETTING, true)
-      await platform.settings.write(SYNC_AT_SETTING, now)
-      if (result.account !== undefined) {
-        await platform.settings.write(SYNC_ACCOUNT_SETTING, result.account)
-      }
-      if (result.accountName !== undefined) {
-        await platform.settings.write(SYNC_ACCOUNT_NAME_SETTING, result.accountName)
-      }
-      button.textContent = '✓'
-      const identity = result.accountName ?? result.account
-      status.textContent = `${t.driveConnected}${identity === undefined ? '' : ` · ${identity}`}`
-    })()
+    const now = platform.clock.now()
+    // Keine asynchrone Grenze vor diesem Aufruf: connectDriveSync stößt den
+    // vorbereiteten Google-Token-Client sofort im echten Tap-Stack an.
+    const connection = connectDriveSync(preparedClientId, now)
+
+    void connection
+      .then(async (result) => {
+        await platform.settings.write(SYNC_ON_SETTING, true)
+        await platform.settings.write(SYNC_AT_SETTING, now)
+        if (result.account !== undefined) {
+          await platform.settings.write(SYNC_ACCOUNT_SETTING, result.account)
+        }
+        if (result.accountName !== undefined) {
+          await platform.settings.write(SYNC_ACCOUNT_NAME_SETTING, result.accountName)
+        }
+        button.textContent = '✓'
+        const identity = result.accountName ?? result.account
+        status.textContent = `${t.driveConnected}${identity === undefined ? '' : ` · ${identity}`}`
+      })
       .catch((error: unknown) => {
         status.dataset.error = 'true'
         const detail = oauthDetail(error)
