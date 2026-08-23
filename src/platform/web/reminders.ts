@@ -32,74 +32,21 @@ function permission(): ReminderPermission {
   return state === 'default' ? 'unasked' : state
 }
 
-function fromBase64Url(value: string): ArrayBuffer {
-  const padded = value.replaceAll('-', '+').replaceAll('_', '/') + '='.repeat((4 - (value.length % 4)) % 4)
-  const binary = atob(padded)
-  const bytes = new Uint8Array(binary.length)
-  for (let index = 0; index < binary.length; index++) bytes[index] = binary.charCodeAt(index)
-  return bytes.buffer
-}
-
-async function post(path: string, body: unknown): Promise<Response> {
-  return fetch(path, {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      'x-anitew-request': '1',
-    },
-    body: JSON.stringify(body),
-  })
-}
-
-async function ensureSubscription(): Promise<PushSubscription> {
-  const registration = await navigator.serviceWorker.ready
-  const existing = await registration.pushManager.getSubscription()
-  if (existing !== null) return existing
-
-  const response = await fetch('/push/vapid-public', { cache: 'no-store' })
-  if (!response.ok) throw new Error(`push_key_http_${response.status}`)
-  const body = (await response.json()) as { publicKey?: unknown }
-  if (typeof body.publicKey !== 'string' || body.publicKey === '') throw new Error('push_key_missing')
-
-  return registration.pushManager.subscribe({
-    userVisibleOnly: true,
-    applicationServerKey: fromBase64Url(body.publicKey),
-  })
-}
-
-function recurrenceOf(reminder: Reminder): { localTime: string; timeZone: string } | undefined {
-  if (reminder.id !== 'daily') return undefined
-  const date = new Date(reminder.at)
-  const localTime = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
-  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
-  return { localTime, timeZone }
-}
-
 /**
- * Entfernt ANITEWs Push-Adresse vollständig. Der Voll-Reset ruft das bewusst
- * vor dem Löschen der lokalen Daten auf. Selbst wenn der Worker gerade nicht
- * erreichbar ist, macht `unsubscribe()` die bisherige Push-Adresse ungültig.
+ * Voll-Reset ist selten. Deshalb bleibt selbst das Abmelden vom Pushdienst aus
+ * dem Kaltstart: erst wenn wirklich zurückgesetzt wird, laden wir den Transport.
  */
 export async function clearWebPushRegistration(): Promise<void> {
-  if (!('serviceWorker' in navigator)) return
-  const registration = await navigator.serviceWorker.getRegistration()
-  if (registration === undefined) return
-  const subscription = await registration.pushManager?.getSubscription().catch(() => null)
-  if (subscription === null || subscription === undefined) return
-  await post('/push/unsubscribe', { endpoint: subscription.endpoint }).catch(() => undefined)
-  await subscription.unsubscribe().catch(() => undefined)
+  const push = await import('./pushReminders.ts')
+  await push.clearWebPushRegistration()
 }
 
 /**
  * Erinnerungen im Web.
  *
- * Standard-Web-Push ist der starke Pfad: Auf unterstützten Browsern und in
- * installierten iOS/iPadOS-PWAs weckt der Push-Service den Service Worker auch
- * nach dem Schließen. Der Worker speichert dafür nur die technische
- * Push-Adresse und die generische Fälligkeit — keine Trainingsinhalte.
- *
- * Wo Web Push nicht verfügbar ist, bleibt der alte ehrliche In-Page-Timer als
- * Fallback. `ability()` sagt vor der Einstellung, welcher Pfad gilt.
+ * Die kleine Fähigkeitsprüfung bleibt im Startbundle. VAPID-Decoding,
+ * Subscription und Servertransport werden erst nach einer echten
+ * Erinnerungsaktion geladen. So kostet Web Push keinen normalen ANITEW-Start.
  */
 export function createWebReminders(): Reminders {
   const timers = new Map<string, ReturnType<typeof setTimeout>>()
@@ -136,9 +83,12 @@ export function createWebReminders(): Reminders {
       }
       const answer = permission()
       if (answer === 'granted' && webPushSupported()) {
-        await ensureSubscription().catch(() => {
+        try {
+          const push = await import('./pushReminders.ts')
+          await push.ensureWebPushSubscription()
+        } catch {
           pushFailed = true
-        })
+        }
       }
       return answer
     },
@@ -148,15 +98,8 @@ export function createWebReminders(): Reminders {
 
       if (webPushSupported()) {
         try {
-          const subscription = await ensureSubscription()
-          const response = await post('/push/schedule', {
-            endpoint: subscription.endpoint,
-            reminder: {
-              ...reminder,
-              recurrence: recurrenceOf(reminder),
-            },
-          })
-          if (!response.ok) throw new Error(`push_schedule_http_${response.status}`)
+          const push = await import('./pushReminders.ts')
+          await push.scheduleWebPush(reminder)
           return true
         } catch {
           pushFailed = true
@@ -172,26 +115,13 @@ export function createWebReminders(): Reminders {
       timers.delete(id)
 
       if (!('serviceWorker' in navigator) || !('PushManager' in window)) return
-      const registration = await navigator.serviceWorker.getRegistration().catch(() => undefined)
-      const subscription = await registration?.pushManager.getSubscription().catch(() => null)
-      if (subscription === null || subscription === undefined) return
-
       try {
-        const response = await post('/push/cancel', {
-          endpoint: subscription.endpoint,
-          id,
-          permanent,
-        })
-        if (!response.ok) throw new Error(`push_cancel_http_${response.status}`)
+        const push = await import('./pushReminders.ts')
+        await push.cancelWebPush(id, permanent)
       } catch {
-        // „Keine Erinnerung“ ist ein harter Nutzerwunsch. Selbst wenn ANITEWs
-        // Worker gerade nicht erreichbar ist, invalidiert unsubscribe() die
-        // alte Push-Adresse beim Browser-Pushdienst. Der serverseitige Rest
-        // bekommt beim nächsten Zustellversuch 404/410 und löscht sich selbst.
-        if (permanent) {
-          await subscription.unsubscribe().catch(() => undefined)
-          pushFailed = true
-        }
+        // Bei einem permanenten Aus wurde das Browser-Abo im Transport bereits
+        // widerrufen; ab jetzt darf ability() keinen sicheren Push mehr zusagen.
+        if (permanent) pushFailed = true
       }
     },
   }
