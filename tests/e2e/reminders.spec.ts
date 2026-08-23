@@ -140,6 +140,9 @@ test('merkt die Uhrzeit und schaltet den täglichen Servertermin ausdrücklich d
   await openReminders(page)
   await page.locator('.reminder input[type="time"]').fill('07:15')
   await page.getByRole('button', { name: 'Erinnerung merken' }).click()
+  // „Gemerkt.“ ist der öffentliche Abschluss des asynchronen IndexedDB-Writes.
+  // Erst danach darf ein Reload erwarten, die Uhrzeit dauerhaft wiederzufinden.
+  await expect(page.locator('.reminder').getByText('Gemerkt.', { exact: true })).toBeVisible()
   await page.reload()
   await openPage(page, 'Erinnerung')
   await expect(page.locator('.reminder input[type="time"]')).toHaveValue('07:15')
