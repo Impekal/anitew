@@ -219,6 +219,20 @@ export async function downloadDriveBackup(token: string): Promise<unknown | unde
   }
 }
 
+/**
+ * Löscht ausschließlich ANITEWs eigene Sicherungsdatei. Der sichtbare Ordner
+ * bleibt absichtlich bestehen: Darin könnten Nutzer selbst weitere Dateien
+ * abgelegt haben, die ANITEW niemals ungefragt löschen darf.
+ */
+export async function deleteDriveBackup(token: string): Promise<boolean> {
+  const folderId = await findFolderId(token)
+  if (folderId === undefined) return false
+  const id = await findFileId(token, folderId)
+  if (id === undefined) return false
+  await driveFetch(token, `${FILES}/${id}`, { method: 'DELETE' })
+  return true
+}
+
 /** Schreibt die Sicherung in `Anitew/` — Ordner/Datei anlegen oder ersetzen. */
 export async function uploadDriveBackup(token: string, file: BackupFile): Promise<void> {
   const body = JSON.stringify(file)
