@@ -1,0 +1,257 @@
+/* ANITEW V4.1 — Sensory & Light
+ *
+ * Light mode is not a washed-out copy of the dark surface. It is a high-
+ * contrast luminous material system: dark readable ink, solid cards, warm
+ * depth shadows and coloured light around controls. Dark mode keeps bloom;
+ * light mode uses denser coloured shadows because white cannot visibly glow.
+ */
+
+:root {
+  --sensory-press: 0 1px 0 rgb(255 255 255 / 8%);
+}
+
+/* ── Light mode: explicit overrides ----------------------------------- */
+html[data-anitew-theme='light'] {
+  --paper: #f3eee5;
+  --paper-glow: #fffaf0;
+  --card: #fffdf8;
+  --line: #cfc2b0;
+  --ink: #17130f;
+  --ink-soft: #51483e;
+  --ink-faint: #736758;
+  --accent: #9a4f16;
+  --accent-soft: #ecd4b8;
+  --accent-ink: #fffaf2;
+  --calm: #315f58;
+  --bad: #8f2e27;
+  --v4-mint: #315f58;
+  --v4-mint-hot: #174f47;
+  --v4-gold: #9a4f16;
+  --v4-gold-hot: #7c390a;
+  --v4-surface: rgb(255 253 248 / 96%);
+  --v4-surface-strong: #fffdf8;
+  --v4-line: rgb(49 95 88 / 34%);
+  --v4-line-hot: rgb(154 79 22 / 52%);
+  --v4-neural: rgb(23 79 71 / 43%);
+  --v4-neural-hot: rgb(154 79 22 / 66%);
+  --v4-card-shadow:
+    0 1px 0 rgb(255 255 255 / 90%) inset,
+    0 12px 28px -18px rgb(72 48 25 / 42%),
+    0 28px 64px -38px rgb(49 95 88 / 36%);
+  --v4-start-shadow:
+    0 0 0 1px rgb(154 79 22 / 34%),
+    0 8px 24px -8px rgb(154 79 22 / 48%),
+    0 26px 58px -24px rgb(49 95 88 / 34%);
+  background: var(--paper);
+}
+
+@media (prefers-color-scheme: light) {
+  html[data-anitew-theme='system'] {
+    --paper: #f3eee5;
+    --paper-glow: #fffaf0;
+    --card: #fffdf8;
+    --line: #cfc2b0;
+    --ink: #17130f;
+    --ink-soft: #51483e;
+    --ink-faint: #736758;
+    --accent: #9a4f16;
+    --accent-soft: #ecd4b8;
+    --accent-ink: #fffaf2;
+    --calm: #315f58;
+    --bad: #8f2e27;
+    --v4-mint: #315f58;
+    --v4-mint-hot: #174f47;
+    --v4-gold: #9a4f16;
+    --v4-gold-hot: #7c390a;
+    --v4-surface: rgb(255 253 248 / 96%);
+    --v4-surface-strong: #fffdf8;
+    --v4-line: rgb(49 95 88 / 34%);
+    --v4-line-hot: rgb(154 79 22 / 52%);
+    --v4-neural: rgb(23 79 71 / 43%);
+    --v4-neural-hot: rgb(154 79 22 / 66%);
+    --v4-card-shadow:
+      0 1px 0 rgb(255 255 255 / 90%) inset,
+      0 12px 28px -18px rgb(72 48 25 / 42%),
+      0 28px 64px -38px rgb(49 95 88 / 36%);
+    --v4-start-shadow:
+      0 0 0 1px rgb(154 79 22 / 34%),
+      0 8px 24px -8px rgb(154 79 22 / 48%),
+      0 26px 58px -24px rgb(49 95 88 / 34%);
+  }
+}
+
+html[data-anitew-theme='light'] body,
+html[data-anitew-theme='light'] .app,
+html[data-anitew-theme='light'] .onboarding,
+html[data-anitew-theme='light'] .drawer,
+html[data-anitew-theme='light'] .note,
+html[data-anitew-theme='light'] .first-run-guide-card,
+html[data-anitew-theme='light'] .first-run-highlight,
+html[data-anitew-theme='light'] .first-run-drive-card,
+html[data-anitew-theme='light'] .theme-control,
+html[data-anitew-theme='light'] .sync-identity {
+  color: var(--ink) !important;
+}
+
+html[data-anitew-theme='light'] .drawer,
+html[data-anitew-theme='light'] .note,
+html[data-anitew-theme='light'] .first-run-guide-card,
+html[data-anitew-theme='light'] .first-run-highlight,
+html[data-anitew-theme='light'] .first-run-drive-card,
+html[data-anitew-theme='light'] .theme-control,
+html[data-anitew-theme='light'] .sync-identity {
+  background-color: var(--card) !important;
+  border-color: var(--line) !important;
+  box-shadow: var(--v4-card-shadow) !important;
+}
+
+html[data-anitew-theme='light'] :is(
+  .tagline,
+  .arrival-note,
+  .first-run-adaptive,
+  .first-run-highlight p,
+  .first-run-drive-body,
+  .first-run-questions,
+  .first-run-guide-body,
+  .drawer-google-copy span,
+  .sync-account,
+  .menu-label
+) {
+  color: var(--ink-soft) !important;
+}
+
+html[data-anitew-theme='light'] :is(
+  .first-run-different,
+  .theme-label,
+  .drawer-close-label,
+  .drawer-google-copy small
+) {
+  color: var(--ink-faint) !important;
+}
+
+html[data-anitew-theme='light'] .start-time {
+  background: none !important;
+  -webkit-background-clip: border-box !important;
+  background-clip: border-box !important;
+  color: #1b1510 !important;
+  -webkit-text-fill-color: #1b1510 !important;
+  text-shadow: 0 2px 0 rgb(255 255 255 / 72%), 0 8px 24px rgb(154 79 22 / 22%);
+}
+
+html[data-anitew-theme='light'] .start-label {
+  color: #713307 !important;
+  text-shadow: 0 1px 0 rgb(255 255 255 / 80%), 0 5px 18px rgb(154 79 22 / 26%) !important;
+}
+
+html[data-anitew-theme='light'] .mode {
+  background: #fffaf2 !important;
+  border-color: #b9aa96 !important;
+  color: #40372d !important;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 95%),
+    0 8px 20px -14px rgb(49 95 88 / 44%) !important;
+}
+
+html[data-anitew-theme='light'] .mode-active {
+  background:
+    radial-gradient(circle at 50% 0, rgb(154 79 22 / 18%), transparent 75%),
+    #f9ead8 !important;
+  border-color: rgb(154 79 22 / 68%) !important;
+  color: #21160d !important;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 92%),
+    0 0 0 1px rgb(154 79 22 / 16%),
+    0 8px 24px -8px rgb(154 79 22 / 42%) !important;
+}
+
+/* ── Luminous control language ---------------------------------------- */
+.start,
+.mode-active,
+.first-run-highlight-visual,
+.first-run-drive-visual,
+.drawer-google-avatar,
+.sync-identity-avatar,
+.theme-choice[aria-pressed='true'],
+.drawer-item {
+  transition:
+    transform 140ms cubic-bezier(.2,.8,.2,1),
+    box-shadow 220ms ease,
+    border-color 220ms ease,
+    background-color 220ms ease,
+    filter 220ms ease !important;
+}
+
+.first-run-highlight-visual,
+.first-run-drive-visual,
+.drawer-google-avatar,
+.sync-identity-avatar {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 9%),
+    0 0 0 1px color-mix(in oklab, currentColor 13%, transparent),
+    0 0 18px color-mix(in oklab, currentColor 25%, transparent),
+    0 10px 28px -14px color-mix(in oklab, currentColor 34%, transparent) !important;
+}
+
+.drawer-item {
+  position: relative;
+  border: 1px solid transparent !important;
+  border-radius: 14px !important;
+}
+
+.drawer-item:hover,
+.drawer-item:focus-visible {
+  border-color: color-mix(in oklab, var(--v4-mint) 28%, transparent) !important;
+  background: color-mix(in oklab, var(--v4-mint) 8%, var(--card)) !important;
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 7%, transparent),
+    0 0 22px color-mix(in oklab, var(--v4-mint) 14%, transparent),
+    0 10px 30px -18px color-mix(in oklab, var(--v4-gold) 24%, transparent) !important;
+}
+
+.drawer-item :is(svg, .icon, [class*='icon']) {
+  filter:
+    drop-shadow(0 0 4px color-mix(in oklab, var(--v4-mint) 42%, transparent))
+    drop-shadow(0 4px 9px color-mix(in oklab, var(--v4-gold) 20%, transparent));
+}
+
+.mode {
+  position: relative;
+  overflow: hidden;
+}
+
+.mode::after {
+  content: '';
+  position: absolute;
+  inset: auto 18% -16px;
+  height: 22px;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(circle, color-mix(in oklab, var(--v4-gold) 35%, transparent), transparent 68%);
+  filter: blur(8px);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.mode:hover::after,
+.mode-active::after {
+  opacity: .9;
+  transform: translateY(-4px);
+}
+
+:is(.mode, .theme-choice, .drawer-item, .first-run-drive-connect):active {
+  transform: translateY(1px) scale(.975) !important;
+  filter: brightness(1.04) saturate(1.08);
+}
+
+html[data-anitew-press='true'] :is(.mode, .theme-choice, .drawer-item):focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--v4-gold) 38%, transparent) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .start,
+  .mode,
+  .drawer-item,
+  .theme-choice,
+  .first-run-drive-connect {
+    transition-duration: 0ms !important;
+  }
+}
