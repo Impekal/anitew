@@ -9,9 +9,26 @@
  * create another history layer; it only restores the visual parent drawer
  * after React has handled the popstate and removed the page.
  */
+let coreReturnArmed = false
+
+// The visible page-back button clears React's page state before history.back()
+// eventually emits popstate. Arm the parent return in capture phase while the
+// page is still unquestionably the source of the navigation.
+document.addEventListener(
+  'click',
+  (event) => {
+    const target = event.target
+    if (target instanceof Element && target.closest('.page-back') !== null) coreReturnArmed = true
+  },
+  true,
+)
+
 window.addEventListener('popstate', () => {
-  const wasCorePage = document.querySelector('.app.page') !== null
-  if (!wasCorePage) return
+  // A native browser/iOS back gesture has no preceding click, so the still
+  // visible page itself proves that this pop belongs to a Core child.
+  const shouldReturnToCore = coreReturnArmed || document.querySelector('.app.page') !== null
+  coreReturnArmed = false
+  if (!shouldReturnToCore) return
 
   // React's popstate handler closes the page in the same event turn. Wait for
   // that commit before opening Core again. Two frames also cover Safari/PWA,
