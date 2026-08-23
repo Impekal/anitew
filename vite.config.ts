@@ -9,8 +9,8 @@ const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 
 }
 
 // ANITEW — local-first PWA. Kein Tracking, keine ANITEW-Nutzerdatenbank.
-// Der kleine Worker-Endpunkt fuer Google OAuth ist Infrastruktur, nicht
-// Datenspeicher; Trainings- und Erinnerungsdaten bleiben lokal/auf eigenem Drive.
+// OAuth und der optionale Web-Push-Wecker sind Infrastruktur; Trainings-,
+// Gedächtnis- und Sicherungsdaten bleiben lokal/auf dem eigenen Drive.
 export default defineConfig({
   define: {
     __ANITEW_BUILD__: JSON.stringify({
@@ -49,10 +49,12 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
-        // Google muss seinen Authorization-Code wirklich an den Worker liefern.
-        // Der PWA-Navigations-Fallback darf /oauth/google/callback niemals mit
-        // einer gecachten index.html beantworten.
-        navigateFallbackDenylist: [/^\/oauth\/google\//],
+        // Der kleine Push-Handler bleibt eigenes, gut prüfbares JS und wird in
+        // den von Workbox erzeugten Service Worker importiert.
+        importScripts: ['push-sw.js'],
+        // OAuth und Push sind echte Worker-Endpunkte. Der PWA-Navigations-
+        // Fallback darf sie niemals mit einer gecachten index.html beantworten.
+        navigateFallbackDenylist: [/^\/oauth\/google\//, /^\/push\//],
         // Bei einem Release soll kein alter App-Shell-Cache weiterleben. Das
         // ist besonders auf iOS wichtig, wo offene/installierte PWAs sonst
         // noch die vorherige JS-Fassung ausliefern koennen.
