@@ -24,7 +24,10 @@ async function withWebPush(page: Page, options: PushMockOptions) {
       getSubscription: async () => subscription,
       subscribe: async () => subscription,
     }
-    const registration = { pushManager }
+    const registration = {
+      pushManager,
+      update: async () => undefined,
+    }
 
     class FakeNotification {
       static get permission(): NotificationPermission {
@@ -43,8 +46,12 @@ async function withWebPush(page: Page, options: PushMockOptions) {
     Object.defineProperty(navigator, 'serviceWorker', {
       configurable: true,
       value: {
+        controller: null,
         ready: Promise.resolve(registration),
         getRegistration: async () => registration,
+        register: async () => registration,
+        addEventListener: () => undefined,
+        removeEventListener: () => undefined,
       },
     })
     if (input.ios) {
