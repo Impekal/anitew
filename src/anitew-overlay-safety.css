@@ -12,3 +12,23 @@ html:has(.drawer-veil),
 body:has(.drawer-veil) {
   overflow-y: hidden;
 }
+
+/*
+ * The mobile redesign deliberately tightens the top spacing to 18px, but that
+ * rule used to replace the base `.app` safe-area padding completely. On a
+ * real standalone iPhone PWA this put the page-level "Close" action under the
+ * status bar / Dynamic Island even though Chromium layout profiles were green.
+ *
+ * Keep the compact visual rhythm and add the hardware inset instead. The
+ * custom property makes the contract testable in Chromium by substituting a
+ * representative inset; iOS supplies the real value through `env()`.
+ */
+:root {
+  --anitew-safe-area-top: env(safe-area-inset-top);
+}
+
+@media (max-width: 560px) {
+  .app {
+    padding-top: calc(18px + var(--anitew-safe-area-top));
+  }
+}
