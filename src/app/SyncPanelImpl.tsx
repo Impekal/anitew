@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import { SyncError, type Platform, type SyncReport } from '../core/index.ts'
-import type { DriveFailure } from '../platform/web/drive.ts'
+import { disconnectDriveAuthorization, type DriveFailure } from '../platform/web/drive.ts'
 import type { Dictionary } from '../i18n/index.ts'
 
 import {
@@ -89,13 +89,6 @@ function initials(name: string | undefined, email: string | undefined): string {
   return (email?.[0] ?? 'G').toUpperCase()
 }
 
-/**
- * Der Abgleich (N7/N8/N10 · D-033).
- *
- * Datenschutz wird hier nicht als fehlende Infrastruktur verkauft, sondern
- * als Architekturentscheidung: lokal zuerst, optional der eigene Drive,
- * keine zusätzliche ANITEW-Cloudkopie.
- */
 export function SyncPanelImpl({ platform, dictionary }: { platform: Platform; dictionary: Dictionary }) {
   const texts = dictionary.sync
   const drive = visibleCopy()
@@ -116,22 +109,10 @@ export function SyncPanelImpl({ platform, dictionary }: { platform: Platform; di
       setClientId(id)
       setChecked(true)
     })
-    void platform.settings
-      .read<boolean>(SYNC_ON_SETTING)
-      .then((on) => setAuto(on === true))
-      .catch(() => undefined)
-    void platform.settings
-      .read<number>(SYNC_AT_SETTING)
-      .then(setLastAt)
-      .catch(() => undefined)
-    void platform.settings
-      .read<string>(SYNC_ACCOUNT_SETTING)
-      .then(setAccount)
-      .catch(() => undefined)
-    void platform.settings
-      .read<string>(SYNC_ACCOUNT_NAME_SETTING)
-      .then(setAccountName)
-      .catch(() => undefined)
+    void platform.settings.read<boolean>(SYNC_ON_SETTING).then((on) => setAuto(on === true)).catch(() => undefined)
+    void platform.settings.read<number>(SYNC_AT_SETTING).then(setLastAt).catch(() => undefined)
+    void platform.settings.read<string>(SYNC_ACCOUNT_SETTING).then(setAccount).catch(() => undefined)
+    void platform.settings.read<string>(SYNC_ACCOUNT_NAME_SETTING).then(setAccountName).catch(() => undefined)
   }, [platform])
 
   const sync = () => {
@@ -154,9 +135,7 @@ export function SyncPanelImpl({ platform, dictionary }: { platform: Platform; di
           void platform.settings.write(SYNC_ACCOUNT_SETTING, result.account).catch(() => undefined)
         }
         if (result.accountName !== undefined) {
-          void platform.settings
-            .write(SYNC_ACCOUNT_NAME_SETTING, result.accountName)
-            .catch(() => undefined)
+          void platform.settings.write(SYNC_ACCOUNT_NAME_SETTING, result.accountName).catch(() => undefined)
         }
       })
       .catch((error: unknown) => {
@@ -174,6 +153,7 @@ export function SyncPanelImpl({ platform, dictionary }: { platform: Platform; di
     setReport(undefined)
     setFailure(undefined)
     setFailureDetail(undefined)
+    void disconnectDriveAuthorization()
     void platform.settings.write(SYNC_ON_SETTING, false).catch(() => undefined)
     void platform.settings.remove(SYNC_ACCOUNT_SETTING).catch(() => undefined)
     void platform.settings.remove(SYNC_ACCOUNT_NAME_SETTING).catch(() => undefined)
