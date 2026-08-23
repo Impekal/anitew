@@ -66,7 +66,8 @@ test('hält die Breite auf jeder Menüseite — und in der Schublade', async ({ 
 
   // Die Schublade selbst zuerst.
   await page.locator('button.hamburger').click()
-  await expect(page.locator('.drawer')).toBeVisible()
+  const drawer = page.locator('.drawer')
+  await expect(drawer).toBeVisible()
   await noHorizontalOverflow(page)
 
   // Nur die sichtbare Beschriftung jedes Knotens lesen. MenuIcon bringt ein
@@ -75,16 +76,23 @@ test('hält die Breite auf jeder Menüseite — und in der Schublade', async ({ 
   const labels = (await page.locator('.drawer-item > span:last-child').allTextContents())
     .map((label) => label.trim())
     .filter((label) => label !== '')
-  await page.keyboard.press('Escape')
   expect(labels.length).toBeGreaterThan(0)
+
+  // Core ist die Elternnavigation: Eine Unterseite geht mit „Zurück“ wieder
+  // in die bereits offene Schublade, nicht bis zum Tages-Startbildschirm.
+  // Genau in diesem Zustand wird die Breite nach jeder Seite erneut geprüft.
   for (const label of labels) {
-    await page.locator('button.hamburger').click()
     await page.getByRole('button', { name: label, exact: true }).click()
     await page.locator('.page').waitFor()
     await noHorizontalOverflow(page)
     await page.locator('.page-back').click()
-    await page.locator('.challenge').waitFor()
+    await expect(drawer).toBeVisible()
+    await noHorizontalOverflow(page)
   }
+
+  await page.keyboard.press('Escape')
+  await expect(drawer).toBeHidden()
+  await expect(page.locator('.challenge')).toBeVisible()
 })
 
 test('das Kennenlernen passt auf jedes Gerät', async ({ page }) => {
