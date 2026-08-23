@@ -1,24 +1,12 @@
 /**
  * Google-Anmeldung und sichtbarer Drive-Ordner (Backlog N7/N8 · D-033).
  *
- * Zwei Drähte, beide so schmal wie möglich:
- *
- * - **Anmeldung** über Googles eigenes Identity-Skript (GIS). Es wird erst
- *   geladen, wenn der Mensch den Abgleich wirklich anfasst — nicht beim
- *   Start, nicht im Bündel (das Kaltstart-Budget P4 bleibt unberührt).
- *   Der Zugriff ist `drive.file`: ANITEW sieht und verwaltet nur Dateien und
- *   Ordner, die die App selbst erstellt oder die ausdrücklich mit ihr geöffnet
- *   wurden. Das übrige Drive ist nicht lesbar.
- * - **Drive-REST** über rohes `fetch` (dieselbe Begründung wie beim Coach,
- *   D-031): Ordner finden/anlegen, Sicherung finden, lesen, schreiben.
- *
- * Bei der ersten bewussten Verbindung entsteht in „Meine Ablage“ der sichtbare
- * Ordner „Anitew“. Ohne Verbindung bleibt alles lokal.
- *
- * Die Client-Kennung ist die der App (nicht des Nutzers) und kommt zur
- * Bauzeit aus `VITE_GOOGLE_CLIENT_ID`. Eine Einstellungszeile
- * (`sync.clientId`) darf sie übersteuern — das ist der Prüfpfad der
- * E2E-Tests und der Weg für Selbst-Hoster.
+ * iOS/ITP schließt Googles Token-Popup nach der Anmeldung, bevor der
+ * JavaScript-Callback zuverlässig zurückkommt. ANITEW nutzt deshalb für die
+ * bewusste Anmeldung den robusteren Redirect-Code-Flow. Der kleine
+ * Cloudflare-Worker tauscht ausschließlich den OAuth-Code gegen Tokens; er
+ * hat keine Nutzerdatenbank und sieht keine Trainings-/Erinnerungsdaten.
+ * Drive-Dateien laufen weiterhin direkt zwischen Browser und Google Drive.
  */
 
 import type { BackupFile } from '../../core/index.ts'
@@ -45,136 +33,86 @@ export class DriveError extends Error {
   }
 }
 
-/* Das Nötigste aus Googles Identity-Skript, selbst deklariert — ein
-   Typpaket für drei Felder wäre eine Abhängigkeit ohne Gegenwert. */
-interface TokenResponse {
-  access_token?: string
-  error?: string
-}
-interface TokenClient {
-  requestAccessToken(options?: { prompt?: string }): void
-}
-interface GisOauth2 {
-  initTokenClient(config: {
-    client_id: string
-    scope: string
-    callback: (response: TokenResponse) => void
-    error_callback?: (error: { type?: string }) => void
-  }): TokenClient
-}
-
-declare global {
-  interface Window {
-    google?: { accounts?: { oauth2?: GisOauth2 } }
-  }
-}
-
-const GIS_SRC = 'https://accounts.google.com/gsi/client'
-let gisLoading: Promise<GisOauth2> | undefined
-
-/** Lädt Googles Identity-Skript einmal. Die Promise wird geteilt, damit
- * Onboarding und Abgleich niemals zwei Google-Skripte gleichzeitig anlegen. */
-function loadGis(): Promise<GisOauth2> {
-  const present = window.google?.accounts?.oauth2
-  if (present !== undefined) return Promise.resolve(present)
-  if (gisLoading !== undefined) return gisLoading
-
-  gisLoading = new Promise<void>((resolve, reject) => {
-    const existing = document.querySelector<HTMLScriptElement>(`script[src="${GIS_SRC}"]`)
-    if (existing !== null) {
-      existing.addEventListener('load', () => resolve(), { once: true })
-      existing.addEventListener(
-        'error',
-        () => reject(new DriveError('offline', 'gis_load_failed')),
-        { once: true },
-      )
-      return
-    }
-    const script = document.createElement('script')
-    script.src = GIS_SRC
-    script.async = true
-    script.onload = () => resolve()
-    script.onerror = () => reject(new DriveError('offline', 'gis_load_failed'))
-    document.head.append(script)
-  })
-    .then(() => {
-      const loaded = window.google?.accounts?.oauth2
-      if (loaded === undefined) throw new DriveError('offline', 'gis_missing_after_load')
-      return loaded
-    })
-    .catch((error: unknown) => {
-      // Ein späterer bewusster Versuch darf nach einem Netz-/Browserfehler
-      // erneut laden können.
-      gisLoading = undefined
-      throw error
-    })
-
-  return gisLoading
-}
-
-/**
- * Bereitet Google nur dort vor, wo der Drive-Weg bereits sichtbar ist. Das
- * hält den normalen Start lokal und sorgt zugleich dafür, dass ein späterer
- * Klick das OAuth-Popup noch innerhalb der echten Benutzer-Geste öffnen kann.
- */
-export async function preloadDriveAuth(): Promise<void> {
-  await loadGis()
-}
-
-/* Name und E-Mail dienen nur dazu, eindeutig zu zeigen, welches eigene
-   Google-Konto der Mensch verbunden hat. Der Drive-Zugriff selbst bleibt
-   weiterhin auf `drive.file` beschränkt. */
 const IDENTITY_SCOPE = 'openid email profile'
+const GOOGLE_AUTH = 'https://accounts.google.com/o/oauth2/v2/auth'
+const OAUTH_CALLBACK_PATH = '/oauth/google/callback'
+const OAUTH_STATE_COOKIE = 'anitew_google_oauth_state'
 
-function requestTokenWith(
-  oauth2: GisOauth2,
-  clientId: string,
-  silent: boolean,
-  withIdentity: boolean,
-): Promise<string> {
-  return new Promise<string>((resolve, reject) => {
-    const client = oauth2.initTokenClient({
-      client_id: clientId,
-      scope: withIdentity ? `${DRIVE_SCOPE} ${IDENTITY_SCOPE}` : DRIVE_SCOPE,
-      callback: (response) => {
-        if (response.access_token !== undefined && response.access_token !== '') {
-          resolve(response.access_token)
-        } else reject(new DriveError('denied', response.error ?? 'no_access_token'))
-      },
-      error_callback: (error) =>
-        reject(new DriveError('denied', error.type ?? 'oauth_popup_error')),
-    })
-    try {
-      client.requestAccessToken(silent ? { prompt: 'none' } : {})
-    } catch (error) {
-      reject(
-        new DriveError(
-          'denied',
-          error instanceof Error && error.message !== '' ? error.message : 'oauth_request_failed',
-        ),
-      )
-    }
-  })
+function randomState(): string {
+  const bytes = crypto.getRandomValues(new Uint8Array(24))
+  let binary = ''
+  for (const byte of bytes) binary += String.fromCharCode(byte)
+  return btoa(binary).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/u, '')
 }
 
 /**
- * Holt ein Zugriffstoken. `silent` versucht es ohne Rückfrage — für den
- * stillen Abgleich beim Start; scheitert das (keine Google-Sitzung, Popup
- * unterdrückt), ist das ein leises `denied`, kein Drama. `withIdentity`
- * bittet zusätzlich um die Konto-Auskunft — nur im hörbaren Weg.
- *
- * Wichtig auf iOS: Ist GIS bereits vorgewärmt, wird `requestAccessToken`
- * synchron in diesem Aufruf ausgeführt. Dadurch bleibt die Benutzer-Geste
- * des Button-Klicks erhalten und der Browser darf das Google-Popup öffnen.
+ * Startet den Google-Code-Flow als echte Seitennavigation. Es gibt bewusst
+ * keinen Popup-Callback mehr: Safari und Firefox auf iOS behandeln den
+ * Redirect stabil, während GIS Token-Popups dort nach erfolgreicher Anmeldung
+ * als `popup_closed` zurückkommen können.
  */
-export function requestDriveToken(
-  clientId: string,
-  silent: boolean,
-  withIdentity = false,
+export function beginDriveAuthorization(clientId: string): void {
+  const state = randomState()
+  const secure = window.location.protocol === 'https:' ? '; Secure' : ''
+  document.cookie = `${OAUTH_STATE_COOKIE}=${state}; Path=/; Max-Age=600; SameSite=Lax${secure}`
+
+  const target = new URL(GOOGLE_AUTH)
+  target.searchParams.set('client_id', clientId)
+  target.searchParams.set('redirect_uri', `${window.location.origin}${OAUTH_CALLBACK_PATH}`)
+  target.searchParams.set('response_type', 'code')
+  target.searchParams.set('scope', `${DRIVE_SCOPE} ${IDENTITY_SCOPE}`)
+  target.searchParams.set('access_type', 'offline')
+  target.searchParams.set('include_granted_scopes', 'true')
+  target.searchParams.set('prompt', 'consent')
+  target.searchParams.set('state', state)
+  window.location.assign(target.toString())
+}
+
+/**
+ * Zugriffstoken aus der verschlüsselten, HttpOnly Browser-Sitzung holen. Der
+ * Worker speichert nichts in einer Datenbank; bei Bedarf erneuert er das
+ * kurzlebige Access-Token mit dem ebenfalls verschlüsselt im Browser liegenden
+ * Refresh-Token.
+ */
+export async function requestDriveToken(
+  _clientId: string,
+  _silent: boolean,
+  _withIdentity = false,
 ): Promise<string> {
-  const ready = window.google?.accounts?.oauth2
-  if (ready !== undefined) return requestTokenWith(ready, clientId, silent, withIdentity)
-  return loadGis().then((oauth2) => requestTokenWith(oauth2, clientId, silent, withIdentity))
+  let response: Response
+  try {
+    response = await fetch('/oauth/google/access-token', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'x-anitew-request': '1' },
+    })
+  } catch {
+    throw new DriveError('offline', 'oauth_worker_unreachable')
+  }
+
+  if (response.status === 401) {
+    const body = (await response.json().catch(() => ({}))) as { error?: unknown }
+    throw new DriveError(
+      'denied',
+      typeof body.error === 'string' ? body.error : 'oauth_session_missing',
+    )
+  }
+  if (!response.ok) throw new DriveError('drive', `oauth_worker_http_${response.status}`)
+
+  const body = (await response.json().catch(() => ({}))) as { access_token?: unknown }
+  if (typeof body.access_token !== 'string' || body.access_token === '') {
+    throw new DriveError('drive', 'oauth_access_token_missing')
+  }
+  return body.access_token
+}
+
+/** Entfernt die Browser-OAuth-Sitzung und widerruft sie bei Google best effort. */
+export async function disconnectDriveAuthorization(): Promise<void> {
+  await fetch('/oauth/google/logout', {
+    method: 'POST',
+    credentials: 'same-origin',
+    headers: { 'x-anitew-request': '1' },
+  }).catch(() => undefined)
 }
 
 async function driveFetch(token: string, url: string, init?: RequestInit): Promise<Response> {
@@ -199,11 +137,7 @@ export interface DriveAccountProfile {
   name?: string
 }
 
-/**
- * Zeigt nach der bewussten Verbindung eindeutig, welches Google-Konto aktiv
- * ist. Schmuck, kein Tragwerk: Scheitert die Auskunft, scheitert **nicht** der
- * eigentliche Drive-Abgleich.
- */
+/** Name/E-Mail dienen nur zur Anzeige des angemeldeten Google-Kontos. */
 export async function fetchAccountProfile(token: string): Promise<DriveAccountProfile | undefined> {
   try {
     const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
@@ -220,7 +154,7 @@ export async function fetchAccountProfile(token: string): Promise<DriveAccountPr
   }
 }
 
-/** Rückwärtskompatibler schmaler Helfer für Aufrufer, die nur die E-Mail brauchen. */
+/** Rückwärtskompatibler Helfer für Aufrufer, die nur die E-Mail brauchen. */
 export async function fetchAccountEmail(token: string): Promise<string | undefined> {
   return (await fetchAccountProfile(token))?.email
 }
@@ -270,11 +204,7 @@ async function findFileId(token: string, folderId: string): Promise<string | und
   return body.files?.[0]?.id
 }
 
-/**
- * Die Sicherung aus dem sichtbaren Anitew-Ordner, JSON-geparst — oder nichts.
- * Existiert der Ordner noch nicht, wird beim Lesen **nichts** angelegt; die
- * erste erfolgreiche Upload-Hälfte des Syncs erzeugt ihn.
- */
+/** Liest die Sicherung aus dem sichtbaren Anitew-Ordner. */
 export async function downloadDriveBackup(token: string): Promise<unknown | undefined> {
   const folderId = await findFolderId(token)
   if (folderId === undefined) return undefined
