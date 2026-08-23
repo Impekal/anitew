@@ -33,6 +33,8 @@ const loadSignatureExperience = () => {
       await import('./app/coreRitual.ts')
       if (pageIsLeaving) return
       await import('./app/experienceRefinement.ts')
+      if (pageIsLeaving) return
+      await import('./app/driveAuthWarmup.ts')
     })().catch(() => undefined)
   }, 750)
 }
