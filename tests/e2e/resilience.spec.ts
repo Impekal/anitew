@@ -1,6 +1,6 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 
-import { answerRecall, collectItems, openPage, startButton, visit } from './helpers.ts'
+import { openPage, startButton, visit } from './helpers.ts'
 
 /**
  * Fehlertoleranz (Backlog P7).
@@ -29,12 +29,14 @@ test('läuft ohne jede Datenbank weiter (privater Modus)', async ({ page }) => {
   // Kein weißer Bildschirm: Der Startknopf ist da.
   await expect(startButton(page)).toBeVisible({ timeout: 30_000 })
 
-  // Und eine Einheit lässt sich trotzdem starten.
+  // Und eine Einheit lässt sich trotzdem starten. Alle realen Modul-Anfänge
+  // zählen: Spatial hat bewusst kein `.encode-word` und darf deshalb nicht
+  // zufällig wie ein kaputter Start aussehen.
   await page.getByRole('button', { name: '60 Sekunden' }).click()
   await startButton(page).click()
   await page.locator('.settle').click()
   await expect(
-    page.locator('.encode-word, .scene, .lesson, .reveal-digits').first(),
+    page.locator('.encode-word, .scene, .lesson, .reveal-digits, .spatial-encode').first(),
   ).toBeVisible({ timeout: 30_000 })
 
   expect(errors, `ungefangene Fehler: ${errors.join(' | ')}`).toEqual([])
@@ -66,6 +68,54 @@ test('schweigt, wo gespeichert wird', async ({ page }) => {
   await expect(page.getByText(/Dieses Gerät speichert gerade nichts/)).toHaveCount(0)
 })
 
+/**
+ * Bringt eine beliebige 60-Sekunden-Einheit bis zum Abschluss, ohne etwas
+ * über das zufällig gewählte Modul vorauszusetzen. Für diesen Resilience-Test
+ * ist die Trefferzahl ausdrücklich egal — bewiesen wird, dass fehlender
+ * Speicher den Ablauf nicht zerstört.
+ */
+async function finishAnySession(page: Page): Promise<void> {
+  const summary = page.getByRole('heading', { name: 'Geblieben' })
+  const deadline = Date.now() + 105_000
+
+  while ((await summary.count()) === 0) {
+    expect(Date.now(), 'die Einheit kam ohne Datenbank nicht zum Abschluss').toBeLessThan(deadline)
+
+    const spatial = page.locator('.spatial-recall .spatial-cell').first()
+    if (await spatial.isVisible().catch(() => false)) {
+      await spatial.click()
+      continue
+    }
+
+    const twin = page.locator('.twin-choice').first()
+    if (await twin.isVisible().catch(() => false)) {
+      await twin.click()
+      continue
+    }
+
+    const prompted = page.locator('.prompted-input').first()
+    if (await prompted.isVisible().catch(() => false)) {
+      // Rückwärts-Ziffern sperren das Feld während der kurzen Anzeige. Erst
+      // danach absenden; leere Antwort ist hier absichtlich erlaubt.
+      if (await prompted.isDisabled()) {
+        await expect(prompted).toBeEnabled({ timeout: 10_000 })
+      }
+      await page.locator('.prompted-form').getByRole('button', { name: 'Fertig' }).click()
+      continue
+    }
+
+    const freeRecall = page.locator('.recall > .recall-input').first()
+    if (await freeRecall.isVisible().catch(() => false)) {
+      await page.locator('.recall').getByRole('button', { name: 'Fertig' }).click()
+      continue
+    }
+
+    // Encode-/Lehrphasen laufen selbst weiter. Kurzes Polling hält den Test
+    // schnell, ohne die Produktzeiten zu manipulieren.
+    await page.waitForTimeout(150)
+  }
+}
+
 test('führt eine ganze Einheit ohne Datenbank zu Ende (voller Speicher)', async ({ page }) => {
   /*
    * Derselbe Fehlerfall wie ein voller Speicher: Jeder Schreibversuch wirft.
@@ -86,10 +136,9 @@ test('führt eine ganze Einheit ohne Datenbank zu Ende (voller Speicher)', async
   await startButton(page).click()
   await page.locator('.settle').click()
 
-  const learned = await collectItems(page, 8)
-  await answerRecall(page, learned, 'all')
+  await finishAnySession(page)
 
-  await expect(page.getByRole('heading', { name: 'Geblieben' })).toBeVisible({ timeout: 60_000 })
+  await expect(page.getByRole('heading', { name: 'Geblieben' })).toBeVisible({ timeout: 5_000 })
   expect(errors, `ungefangene Fehler: ${errors.join(' | ')}`).toEqual([])
 })
 
