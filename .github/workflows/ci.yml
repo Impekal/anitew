@@ -53,6 +53,15 @@ jobs:
           tests/e2e/technique.spec.ts
           tests/e2e/livingInterface.spec.ts
           --grep "nennt eine Tatsache|erklärt den Palast|unterrichtet die Technik und lässt sie sofort anwenden|zeigt nichts an, solange nichts gelehrt ist|keinen horizontalen iPhone-Overflow"
+      # Releasefehler aus den letzten echten iPhone-Prüfungen: erfolgreicher
+      # OAuth-Redirect muss beim Resume sichtbar werden, ein Reset muss wirklich
+      # von vorn beginnen, und Core-Unterseiten kehren in ihren Eltern-Core zurück.
+      - name: V4.2 OAuth, Reset und Core-Navigation
+        run: >-
+          npx playwright test --project=chromium
+          tests/e2e/oauthResume.spec.ts
+          tests/e2e/reset.spec.ts
+          tests/e2e/coreNavigation.spec.ts
       # Die schnelle Layoutsuite fährt alle sieben Profile aus playwright.config.ts:
       # iPhone SE, randloses iPhone, iPad hoch/quer, Android-Tablet sowie zwei
       # Desktopbreiten. Sie steht bewusst vor den langen Vollregressionen, damit
@@ -77,4 +86,7 @@ jobs:
           tests/e2e/resilience.spec.ts
           tests/e2e/session.spec.ts
           tests/e2e/sync.spec.ts
+          tests/e2e/oauthResume.spec.ts
+          tests/e2e/reset.spec.ts
+          tests/e2e/coreNavigation.spec.ts
           tests/e2e/upgrade.spec.ts
