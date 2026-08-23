@@ -91,7 +91,10 @@ async function loadGis(): Promise<GisOauth2> {
   return loaded
 }
 
-const IDENTITY_SCOPE = 'openid email'
+/* Name und E-Mail dienen nur dazu, eindeutig zu zeigen, welches eigene
+   Google-Konto der Mensch verbunden hat. Der Drive-Zugriff selbst bleibt
+   weiterhin auf `drive.file` beschränkt. */
+const IDENTITY_SCOPE = 'openid email profile'
 
 /**
  * Holt ein Zugriffstoken. `silent` versucht es ohne Rückfrage — für den
@@ -135,21 +138,35 @@ async function driveFetch(token: string, url: string, init?: RequestInit): Promi
   return response
 }
 
+export interface DriveAccountProfile {
+  email?: string
+  name?: string
+}
+
 /**
- * Wessen Konto das ist — die E-Mail aus Googles Auskunft. Schmuck, kein
- * Tragwerk: Scheitert die Auskunft, scheitert **nicht** der Abgleich.
+ * Zeigt nach der bewussten Verbindung eindeutig, welches Google-Konto aktiv
+ * ist. Schmuck, kein Tragwerk: Scheitert die Auskunft, scheitert **nicht** der
+ * eigentliche Drive-Abgleich.
  */
-export async function fetchAccountEmail(token: string): Promise<string | undefined> {
+export async function fetchAccountProfile(token: string): Promise<DriveAccountProfile | undefined> {
   try {
     const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
       headers: { authorization: `Bearer ${token}` },
     })
     if (!response.ok) return undefined
-    const body = (await response.json()) as { email?: unknown }
-    return typeof body.email === 'string' && body.email !== '' ? body.email : undefined
+    const body = (await response.json()) as { email?: unknown; name?: unknown }
+    const profile: DriveAccountProfile = {}
+    if (typeof body.email === 'string' && body.email !== '') profile.email = body.email
+    if (typeof body.name === 'string' && body.name.trim() !== '') profile.name = body.name.trim()
+    return profile.email === undefined && profile.name === undefined ? undefined : profile
   } catch {
     return undefined
   }
+}
+
+/** Rückwärtskompatibler schmaler Helfer für Aufrufer, die nur die E-Mail brauchen. */
+export async function fetchAccountEmail(token: string): Promise<string | undefined> {
+  return (await fetchAccountProfile(token))?.email
 }
 
 const FILES = 'https://www.googleapis.com/drive/v3/files'
