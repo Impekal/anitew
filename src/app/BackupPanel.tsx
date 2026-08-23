@@ -10,11 +10,6 @@ import {
 import type { Dictionary } from '../i18n/index.ts'
 import { type ImportReport, exportBackup, importBackup, readBackupFile } from '../data/backup.ts'
 import { wipeEverything } from '../data/reset.ts'
-import {
-  deleteDriveBackup,
-  disconnectDriveAuthorization,
-  requestDriveToken,
-} from '../platform/web/drive.ts'
 import { resolveClientId } from './driveSync.ts'
 
 interface ResetCopy {
@@ -165,15 +160,18 @@ export function BackupPanel({
     setBusy(true)
     setMessage(undefined)
     try {
+      // Drive ist kein Kaltstartpfad. Der schwere Google-Code wird erst hier
+      // geladen, wenn jemand den seltenen, bewussten Reset wirklich bestätigt.
+      const drive = await import('../platform/web/drive.ts')
       if (wipeDrive) {
         const clientId = await resolveClientId(platform.settings)
-        const token = await requestDriveToken(clientId, true)
-        await deleteDriveBackup(token)
+        const token = await drive.requestDriveToken(clientId, true)
+        await drive.deleteDriveBackup(token)
       }
 
       // Erst Cloud/Session trennen, dann lokal leeren. So kann kein noch
       // laufender stiller Sync die gerade gelöschten Daten wieder einlesen.
-      await disconnectDriveAuthorization()
+      await drive.disconnectDriveAuthorization()
       await wipeEverything()
 
       // Theme-Erststart, First-run-Hilfen und einmalige UI-Zustände liegen
