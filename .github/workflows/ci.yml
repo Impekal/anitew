@@ -52,7 +52,14 @@ jobs:
           tests/e2e/palace.spec.ts
           tests/e2e/technique.spec.ts
           tests/e2e/livingInterface.spec.ts
-          --grep "nennt eine Tatsache|erklärt den Palast|unterrichtet die Technik und lässt sie sofort anwenden|keinen horizontalen iPhone-Overflow"
+          --grep "nennt eine Tatsache|erklärt den Palast|unterrichtet die Technik und lässt sie sofort anwenden|zeigt nichts an, solange nichts gelehrt ist|keinen horizontalen iPhone-Overflow"
+      # Die schnelle Layoutsuite fährt alle sieben Profile aus playwright.config.ts:
+      # iPhone SE, randloses iPhone, iPad hoch/quer, Android-Tablet sowie zwei
+      # Desktopbreiten. Sie steht bewusst vor den langen Vollregressionen, damit
+      # ein Geometriefehler nach wenigen Minuten statt nach einer halben Stunde
+      # sichtbar wird. Safari-Engine-Eigenheiten bleiben echter Hardware vorbehalten.
+      - name: Layout-Matrix
+        run: npx playwright test tests/e2e/layout.spec.ts
       - name: Vollregression Desktop-Chromium
         run: npx playwright test --project=chromium
       # Releasekritische Telefonpfade werden zusätzlich auf dem Pixel-7-Profil
@@ -71,8 +78,3 @@ jobs:
           tests/e2e/session.spec.ts
           tests/e2e/sync.spec.ts
           tests/e2e/upgrade.spec.ts
-      # Die schnelle Layoutsuite fährt alle sieben Profile aus playwright.config.ts:
-      # iPhone SE, randloses iPhone, iPad hoch/quer, Android-Tablet sowie zwei
-      # Desktopbreiten. Safari-Engine-Eigenheiten bleiben echter Hardware vorbehalten.
-      - name: Layout-Matrix
-        run: npx playwright test tests/e2e/layout.spec.ts
