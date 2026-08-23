@@ -32,10 +32,12 @@ function permission(): ReminderPermission {
   return state === 'default' ? 'unasked' : state
 }
 
-function fromBase64Url(value: string): Uint8Array {
+function fromBase64Url(value: string): ArrayBuffer {
   const padded = value.replaceAll('-', '+').replaceAll('_', '/') + '='.repeat((4 - (value.length % 4)) % 4)
   const binary = atob(padded)
-  return Uint8Array.from(binary, (char) => char.charCodeAt(0))
+  const bytes = new Uint8Array(binary.length)
+  for (let index = 0; index < binary.length; index++) bytes[index] = binary.charCodeAt(index)
+  return bytes.buffer
 }
 
 async function post(path: string, body: unknown): Promise<Response> {
