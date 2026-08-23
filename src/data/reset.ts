@@ -14,8 +14,16 @@
 
 import { db } from './db.ts'
 
-/** Leert jede Tabelle. Das Schema bleibt, die Historie ist weg. */
+/** Leert jede Tabelle und widerruft auch die technische Web-Push-Adresse. */
 export async function wipeEverything(): Promise<void> {
+  // Push ist kein Kaltstartpfad. Beim seltenen Voll-Reset wird der Browser-
+  // Teil erst hier geladen. Ein nicht erreichbarer Push-Worker darf das lokale
+  // Recht auf Löschung nicht blockieren: unsubscribe() invalidiert die Adresse
+  // bestmöglich, danach werden die eigentlichen Nutzerdaten immer gelöscht.
+  await import('../platform/web/reminders.ts')
+    .then((module) => module.clearWebPushRegistration())
+    .catch(() => undefined)
+
   await db.transaction(
     'rw',
     [db.settings, db.sessions, db.events, db.itemStates, db.benchmarks],
