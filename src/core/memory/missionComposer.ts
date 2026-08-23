@@ -101,13 +101,11 @@ function connectedForScene(graph: MemoryGraph, subject: MemoryNode): readonly Me
     }
   }
 
+  // Nur echte Übungsstärke ordnet um. Bei Gleichstand bleibt die bestätigte
+  // Kantenreihenfolge stabil — bestehende Szenen dürfen durch V4.2 nicht
+  // scheinbar zufällig ihre Reihenfolge wechseln.
   return [...connected.values()]
-    .sort(
-      (a, b) =>
-        a.strength - b.strength ||
-        (a.lastRecalledAt ?? a.createdAt) - (b.lastRecalledAt ?? b.createdAt) ||
-        a.id.localeCompare(b.id),
-    )
+    .sort((a, b) => a.strength - b.strength)
     .slice(0, MAX_ITEMS_PER_SCENE)
 }
 
