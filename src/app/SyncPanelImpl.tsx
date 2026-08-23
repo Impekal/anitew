@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { SyncError, type Platform, type SyncReport } from '../core/index.ts'
 import { disconnectDriveAuthorization, type DriveFailure } from '../platform/web/drive.ts'
@@ -12,6 +12,7 @@ import {
   connectDriveSync,
   resolveClientId,
 } from './driveSync.ts'
+import { takeDriveRedirectNotice } from './driveRedirectNotice.ts'
 
 type SyncFailureText = DriveFailure | 'remote-invalid'
 
@@ -26,6 +27,7 @@ interface VisibleDriveCopy {
   firstTime: string
   remoteInvalid: string
   identity: string
+  connected: string
 }
 
 const DRIVE_DE: VisibleDriveCopy = {
@@ -44,6 +46,7 @@ const DRIVE_DE: VisibleDriveCopy = {
   remoteInvalid:
     'Im Ordner „Anitew“ liegt eine Datei, die keine gültige ANITEW-Sicherung ist. Sie wurde nicht verändert.',
   identity: 'Angemeldetes Google-Konto',
+  connected: 'Google-Anmeldung abgeschlossen. Dein Konto ist jetzt verbunden.',
 }
 
 const DRIVE_EN: VisibleDriveCopy = {
@@ -62,6 +65,7 @@ const DRIVE_EN: VisibleDriveCopy = {
   remoteInvalid:
     'The “Anitew” folder contains a file that is not a valid ANITEW backup. It was left untouched.',
   identity: 'Signed-in Google account',
+  connected: 'Google sign-in completed. Your account is now connected.',
 }
 
 function visibleCopy(): VisibleDriveCopy {
@@ -103,23 +107,83 @@ export function SyncPanelImpl({ platform, dictionary }: { platform: Platform; di
   const [failureDetail, setFailureDetail] = useState<string | undefined>(undefined)
   const [account, setAccount] = useState<string | undefined>(undefined)
   const [accountName, setAccountName] = useState<string | undefined>(undefined)
+  const [connectionNotice, setConnectionNotice] = useState(false)
+  const connectedRef = useRef(false)
+  const initializedRef = useRef(false)
 
-  useEffect(() => {
-    void resolveClientId(platform.settings).then((id) => {
+  const refreshConnectionState = useCallback(
+    async (announceResume: boolean) => {
+      const [id, on, at, storedAccount, storedAccountName] = await Promise.all([
+        resolveClientId(platform.settings),
+        platform.settings.read<boolean>(SYNC_ON_SETTING).catch(() => undefined),
+        platform.settings.read<number>(SYNC_AT_SETTING).catch(() => undefined),
+        platform.settings.read<string>(SYNC_ACCOUNT_SETTING).catch(() => undefined),
+        platform.settings.read<string>(SYNC_ACCOUNT_NAME_SETTING).catch(() => undefined),
+      ])
+
+      const connected = on === true
       setClientId(id)
       setChecked(true)
-    })
-    void platform.settings.read<boolean>(SYNC_ON_SETTING).then((on) => setAuto(on === true)).catch(() => undefined)
-    void platform.settings.read<number>(SYNC_AT_SETTING).then(setLastAt).catch(() => undefined)
-    void platform.settings.read<string>(SYNC_ACCOUNT_SETTING).then(setAccount).catch(() => undefined)
-    void platform.settings.read<string>(SYNC_ACCOUNT_NAME_SETTING).then(setAccountName).catch(() => undefined)
-  }, [platform])
+      setAuto(connected)
+      setLastAt(at)
+      setAccount(storedAccount)
+      setAccountName(storedAccountName)
+
+      if (announceResume && initializedRef.current && connected && !connectedRef.current) {
+        setConnectionNotice(true)
+        setFailure(undefined)
+        setFailureDetail(undefined)
+      }
+      connectedRef.current = connected
+      initializedRef.current = true
+    },
+    [platform],
+  )
+
+  useEffect(() => {
+    const applyRedirectNotice = () => {
+      const notice = takeDriveRedirectNotice()
+      if (notice?.kind === 'connected') {
+        setConnectionNotice(true)
+        setFailure(undefined)
+        setFailureDetail(undefined)
+        return
+      }
+      if (notice?.kind === 'error') {
+        setConnectionNotice(false)
+        setFailure('drive')
+        setFailureDetail(notice.detail)
+      }
+    }
+
+    const refresh = (announceResume: boolean) => {
+      void refreshConnectionState(announceResume)
+        .then(applyRedirectNotice)
+        .catch(() => setChecked(true))
+    }
+
+    refresh(false)
+
+    const onResume = () => refresh(true)
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') onResume()
+    }
+    window.addEventListener('pageshow', onResume)
+    window.addEventListener('focus', onResume)
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => {
+      window.removeEventListener('pageshow', onResume)
+      window.removeEventListener('focus', onResume)
+      document.removeEventListener('visibilitychange', onVisibility)
+    }
+  }, [refreshConnectionState])
 
   const sync = () => {
     if (clientId === undefined || busy) return
     setBusy(true)
     setFailure(undefined)
     setFailureDetail(undefined)
+    setConnectionNotice(false)
     setReport(undefined)
     const now = platform.clock.now()
     void connectDriveSync(clientId, now)
@@ -129,6 +193,7 @@ export function SyncPanelImpl({ platform, dictionary }: { platform: Platform; di
         setLastAt(now)
         setAccount(result.account)
         setAccountName(result.accountName)
+        connectedRef.current = true
         void platform.settings.write(SYNC_ON_SETTING, true).catch(() => undefined)
         void platform.settings.write(SYNC_AT_SETTING, now).catch(() => undefined)
         if (result.account !== undefined) {
@@ -153,6 +218,8 @@ export function SyncPanelImpl({ platform, dictionary }: { platform: Platform; di
     setReport(undefined)
     setFailure(undefined)
     setFailureDetail(undefined)
+    setConnectionNotice(false)
+    connectedRef.current = false
     void disconnectDriveAuthorization()
     void platform.settings.write(SYNC_ON_SETTING, false).catch(() => undefined)
     void platform.settings.remove(SYNC_ACCOUNT_SETTING).catch(() => undefined)
@@ -193,6 +260,11 @@ export function SyncPanelImpl({ platform, dictionary }: { platform: Platform; di
         {busy ? texts.running : auto ? drive.again : drive.start}
       </button>
 
+      {connectionNotice && (
+        <p className="sync-report" role="status">
+          {drive.connected}
+        </p>
+      )}
       {report !== undefined && (
         <p className="sync-report">
           {!report.hadRemote
