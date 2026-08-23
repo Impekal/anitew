@@ -8,19 +8,17 @@ let preparedRequest: RequestDriveToken | undefined
 let preparing: Promise<void> | undefined
 
 /**
- * Lädt GIS nur dann, wenn ein Google-Weg wirklich sichtbar ist, und merkt sich
- * anschließend den synchron aufrufbaren Token-Starter. Der Starter selbst
- * wird später direkt im Button-Klick ausgeführt — ohne `await` oder dynamischen
- * Import davor. Genau diese Reihenfolge brauchen strenge iOS-Browser für
- * OAuth-Popups.
+ * Die alte Popup-Vorwärmung ist nicht mehr nötig. Wir laden den schmalen
+ * Drive-Adapter weiterhin erst, wenn der Google-Weg sichtbar wird; die
+ * eigentliche bewusste Anmeldung wechselt bei fehlender OAuth-Sitzung auf
+ * eine vollständige Google-Weiterleitung.
  */
 export function prepareDriveAuth(): Promise<void> {
   if (preparedRequest !== undefined) return Promise.resolve()
   if (preparing !== undefined) return preparing
 
   preparing = import('../platform/web/drive.ts')
-    .then(async (drive) => {
-      await drive.preloadDriveAuth()
+    .then((drive) => {
       preparedRequest = drive.requestDriveToken
     })
     .finally(() => {
@@ -30,11 +28,6 @@ export function prepareDriveAuth(): Promise<void> {
   return preparing
 }
 
-/**
- * Muss aus dem echten Benutzerereignis heraus aufgerufen werden. Wenn Google
- * vorbereitet ist, wird `requestAccessToken()` dadurch noch in demselben
- * JavaScript-Stack angestoßen.
- */
 export function requestPreparedDriveToken(
   clientId: string,
   silent: boolean,
