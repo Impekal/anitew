@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
 import { App } from './app/App.tsx'
+import './app/coreNavigationReturn.ts'
 import { keepUpToDate } from './platform/web/updates.ts'
 import './styles.css'
 import './anitew-redesign.css'
