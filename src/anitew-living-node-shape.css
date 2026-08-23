@@ -1,4 +1,5 @@
 /* Preserve the Living Memory atlas geometry after sensory styling layers load. */
-.drawer-item {
+.drawer .menu-group .drawer-item,
+.drawer .menu-group-device .drawer-item {
   border-radius: 50% !important;
 }
