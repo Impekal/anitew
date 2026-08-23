@@ -16,13 +16,17 @@ test('Neu anfangen löscht lokal vollständig, trennt Google, Push und optional 
       pushManager: {
         getSubscription: async () => subscription,
       },
+      update: async () => undefined,
     }
     Object.defineProperty(navigator, 'serviceWorker', {
       configurable: true,
       value: {
+        controller: null,
         ready: Promise.resolve(registration),
         getRegistration: async () => registration,
         register: async () => registration,
+        addEventListener: () => undefined,
+        removeEventListener: () => undefined,
       },
     })
   })
