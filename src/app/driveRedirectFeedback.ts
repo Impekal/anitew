@@ -4,18 +4,9 @@ import {
   SYNC_ACCOUNT_SETTING,
   SYNC_ON_SETTING,
 } from './driveSync.ts'
-import { DRIVE_REDIRECT_NOTICE, type DriveRedirectNotice } from './driveRedirectReturn.ts'
+import { takeDriveRedirectNotice } from './driveRedirectNotice.ts'
 
 const platform = createWebPlatform()
-let notice: DriveRedirectNotice | undefined
-
-try {
-  const raw = window.sessionStorage.getItem(DRIVE_REDIRECT_NOTICE)
-  if (raw !== null) notice = JSON.parse(raw) as DriveRedirectNotice
-  window.sessionStorage.removeItem(DRIVE_REDIRECT_NOTICE)
-} catch {
-  // Nur Rückmeldung; die eigentliche OAuth-Sitzung liegt nicht hier.
-}
 
 function copy() {
   const de = document.documentElement.lang.toLowerCase().startsWith('de')
@@ -41,10 +32,10 @@ async function applyFeedback(): Promise<void> {
 
   applying = true
   try {
+    const notice = takeDriveRedirectNotice()
     if (notice?.kind === 'error') {
       status.dataset.error = 'true'
       status.textContent = `${copy().failed} · ${notice.detail}`
-      notice = undefined
       return
     }
 
@@ -60,7 +51,6 @@ async function applyFeedback(): Promise<void> {
     button.textContent = '✓'
     const identity = accountName ?? account
     status.textContent = `${copy().connected}${identity === undefined ? '' : ` · ${identity}`}`
-    notice = undefined
   } finally {
     applying = false
   }
