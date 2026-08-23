@@ -3,3 +3,15 @@
 .drawer .menu-group-device .drawer-item {
   border-radius: 50% !important;
 }
+
+/*
+ * Die beiden dekorativen Atlas-Orbits gehören zum Fullscreen-Overlay.
+ * Als `fixed`-Pseudoelemente konnten sie in Chromium außerhalb des bereits
+ * geclippten Overlays noch wenige Pixel Root-Overflow erzeugen. `absolute`
+ * bindet sie an die feste Overlay-Box; die Optik bleibt identisch, das
+ * Dokument bekommt aber nie eine horizontale Scrollbreite.
+ */
+.drawer-veil::before,
+.drawer-veil::after {
+  position: absolute !important;
+}
