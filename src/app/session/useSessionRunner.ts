@@ -117,153 +117,153 @@ export function useSessionRunner(
   /** Block beenden — durch Zeitablauf oder weil der Nutzer fertig ist. */
   const advance = useCallback(
     (finalAnswers?: readonly string[]) => {
-    if (advancingRef.current || block === undefined) return
-    advancingRef.current = true
+      if (advancingRef.current || block === undefined) return
+      advancingRef.current = true
 
-    const nextResults = [...results]
-
-    /*
-     * Eine Lektion gilt erst als gehalten, wenn der Mensch bewusst weitergeht.
-     * Techniklektionen laufen nicht mehr von selbst ab: Wer hier landet, hat
-     * den expliziten Weiter-Knopf benutzt. Das Merken passiert weiterhin im
-     * Runner und nicht im Bildschirm, damit es nur eine Wahrheit gibt.
-     */
-    if (block.kind === 'teach') {
-      /*
-       * Vier Techniken, vier Merker: die Ziffer beim Major-System, je ein
-       * schlichtes Ja bei Palast, Geschichte und Verknüpfung — die drei
-       * werden nur einmal erklärt (G, D5). Geschichte/Verknüpfung erkennt
-       * man an der Block-Kennung, nicht am Modul: Ihr Modul ist das
-       * Anwendungsmodul (words/faces), und das lehrt auch Ziffern nie.
-       */
-      if (block.id === 'teach-story') void markStoryTaught().catch(() => undefined)
-      else if (block.id === 'teach-link') void markLinkTaught().catch(() => undefined)
-      else if (block.moduleId === 'palace') void markPalaceTaught().catch(() => undefined)
-      else void markTaught(Number(block.items[0])).catch(() => undefined)
-    }
-
-    if (block.kind === 'recall' || block.kind === 'review') {
-      // Frei getippt oder Eintrag für Eintrag gefragt — die Bewertung
-      // unterscheidet sich, das Ergebnis hat dieselbe Form.
-      /*
-       * Die Strenge kommt vom Modul, nicht von hier — und innerhalb einer
-       * Mission sogar von der einzelnen Tatsache: Zimmernummer und Uhrzeit
-       * sind Zahlen, der Gegenstand ist ein Wort (D-012).
-       *
-       * Und noch etwas trennt sich hier, was überall sonst dasselbe ist:
-       * **Gefragt wird nach dem Wert, verbucht wird die Kennung.** Bei einem
-       * Wort ist beides „Anker“; bei einer Mission ist das eine „314“ und das
-       * andere `Elena#room`. Der Wiederholungstermin hängt an der Kennung —
-       * sonst wären zwei Szenen mit demselben Zimmer eine.
-       */
-      const graded = isPrompted(block.moduleId)
-        ? (() => {
-            const targets = block.items.map((item) => targetOf(block.moduleId, item, plan.language))
-            /*
-             * Memory (D-036): Am selben Anker stellen alle Fragen dieselbe
-             * Frage — gewertet wird deshalb als Menge je Anker, nicht
-             * Position für Position: Die Reihenfolge, in der jemandem
-             * Madrid und Museum einfallen, ist keine Gedächtnisleistung.
-             */
-            const hits =
-              block.moduleId === 'memory'
-                ? promptedSetHits(
-                    finalAnswers ?? answers,
-                    targets,
-                    block.items.map((item) => leniencyFor(block.moduleId, item)),
-                    (index) => subjectOf(block.moduleId, block.items[index] ?? ''),
-                  )
-                : promptedHits(
-                    finalAnswers ?? answers,
-                    targets,
-                    block.items.map((item) => leniencyFor(block.moduleId, item)),
-                  )
-            return {
-              correct: block.items.filter((_, index) => hits[index] === true),
-              missed: block.items.filter((_, index) => hits[index] !== true),
-              extra: [] as string[],
-            }
-          })()
-        : gradeRecall(
-            block.moduleId === 'numbers' ? splitNumberEntries(entries) : splitEntries(entries),
-            block.items,
-            leniencyFor(block.moduleId),
-          )
-      nextResults.push({ round: block.round, kind: block.kind, moduleId: block.moduleId, ...graded })
-      const duration = platform.clock.elapsed() - blockStartedRef.current
-      const at = platform.clock.now()
-
-      void logRecall(
-        sessionRef.current.sessionId,
-        at,
-        graded,
-        duration,
-        block.kind,
-        // Das echte Modul, nicht die Blockart — daraus zählen die
-        // Sofort-Achsen des Profils (D-026).
-        block.moduleId,
-        // C10: Nur Module, die wirklich einen FSRS-Termin fortschreiben,
-        // tragen vollständige Scheduler-ID + Trainingstag ins Rohprotokoll.
-        entersReview(block.moduleId) ? { language: plan.language, day: plan.day } : undefined,
-      ).catch(() => undefined)
+      const nextResults = [...results]
 
       /*
-       * Hier wird aus einer Antwort ein Termin (D-004).
-       *
-       * Beide Blockarten schreiben denselben Weg: Ein heute gelerntes Wort
-       * bekommt seinen ersten Termin, ein wiedergesehenes seinen nächsten.
-       * Für den Scheduler ist das derselbe Vorgang — nur der Vorzustand
-       * unterscheidet sich, und den kennt er selbst.
-       *
-       * **Außer beim Arbeitsgedächtnis** (D7 · D-026): Umbauen im Moment ist
-       * kein Behalten — eine Rückwärts-Folge bekommt keinen Termin, sonst
-       * fragte das Wiedersehen nach Tagen etwas, das nie zum Merken gedacht
-       * war.
+       * Eine Lektion gilt erst als gehalten, wenn der Mensch bewusst weitergeht.
+       * Techniklektionen laufen nicht mehr von selbst ab: Wer hier landet, hat
+       * den expliziten Weiter-Knopf benutzt. Das Merken passiert weiterhin im
+       * Runner und nicht im Bildschirm, damit es nur eine Wahrheit gibt.
        */
-      if (entersReview(block.moduleId)) {
-        void recordOutcome(block.moduleId, plan.language, plan.day, at, {
-          recalled: graded.correct,
-          missed: graded.missed,
-        }).catch(() => undefined)
+      if (block.kind === 'teach') {
+        /*
+         * Vier Techniken, vier Merker: die Ziffer beim Major-System, je ein
+         * schlichtes Ja bei Palast, Geschichte und Verknüpfung — die drei
+         * werden nur einmal erklärt (G, D5). Geschichte/Verknüpfung erkennt
+         * man an der Block-Kennung, nicht am Modul: Ihr Modul ist das
+         * Anwendungsmodul (words/faces), und das lehrt auch Ziffern nie.
+         */
+        if (block.id === 'teach-story') void markStoryTaught().catch(() => undefined)
+        else if (block.id === 'teach-link') void markLinkTaught().catch(() => undefined)
+        else if (block.moduleId === 'palace') void markPalaceTaught().catch(() => undefined)
+        else void markTaught(Number(block.items[0])).catch(() => undefined)
       }
 
-      /*
-       * Der Memory-Graph (D-036) bekommt dasselbe Ergebnis als **Auswahl**-
-       * Signal: richtig hebt die Stärke, falsch senkt sie — die nächste
-       * Einheit nimmt die schwächsten zuerst. Der Termin läuft weiter
-       * ausschließlich über `recordOutcome` (FSRS bleibt die Wahrheit).
-       */
-      if (block.moduleId === 'memory') {
-        // Ein aufgelöster Abruf klingt neutral. Nur wenn tatsächlich mindestens
-        // eine persönliche Erinnerung wiedergekommen ist, folgt ANITEWs
-        // Signature-Landing. Kein Treffer = kein Erfolgsfeedback.
-        platform.sound.play('recall')
-        if (graded.correct.length > 0) {
-          platform.sound.play('landing')
-          setLandingPulse(true)
-          window.setTimeout(() => setLandingPulse(false), 900)
+      if (block.kind === 'recall' || block.kind === 'review') {
+        // Frei getippt oder Eintrag für Eintrag gefragt — die Bewertung
+        // unterscheidet sich, das Ergebnis hat dieselbe Form.
+        /*
+         * Die Strenge kommt vom Modul, nicht von hier — und innerhalb einer
+         * Mission sogar von der einzelnen Tatsache: Zimmernummer und Uhrzeit
+         * sind Zahlen, der Gegenstand ist ein Wort (D-012).
+         *
+         * Und noch etwas trennt sich hier, was überall sonst dasselbe ist:
+         * **Gefragt wird nach dem Wert, verbucht wird die Kennung.** Bei einem
+         * Wort ist beides „Anker“; bei einer Mission ist das eine „314“ und das
+         * andere `Elena#room`. Der Wiederholungstermin hängt an der Kennung —
+         * sonst wären zwei Szenen mit demselben Zimmer eine.
+         */
+        const graded = isPrompted(block.moduleId)
+          ? (() => {
+              const targets = block.items.map((item) => targetOf(block.moduleId, item, plan.language))
+              /*
+               * Memory (D-036): Am selben Anker stellen alle Fragen dieselbe
+               * Frage — gewertet wird deshalb als Menge je Anker, nicht
+               * Position für Position: Die Reihenfolge, in der jemandem
+               * Madrid und Museum einfallen, ist keine Gedächtnisleistung.
+               */
+              const hits =
+                block.moduleId === 'memory'
+                  ? promptedSetHits(
+                      finalAnswers ?? answers,
+                      targets,
+                      block.items.map((item) => leniencyFor(block.moduleId, item)),
+                      (index) => subjectOf(block.moduleId, block.items[index] ?? ''),
+                    )
+                  : promptedHits(
+                      finalAnswers ?? answers,
+                      targets,
+                      block.items.map((item) => leniencyFor(block.moduleId, item)),
+                    )
+              return {
+                correct: block.items.filter((_, index) => hits[index] === true),
+                missed: block.items.filter((_, index) => hits[index] !== true),
+                extra: [] as string[],
+              }
+            })()
+          : gradeRecall(
+              block.moduleId === 'numbers' ? splitNumberEntries(entries) : splitEntries(entries),
+              block.items,
+              leniencyFor(block.moduleId),
+            )
+        nextResults.push({ round: block.round, kind: block.kind, moduleId: block.moduleId, ...graded })
+        const duration = platform.clock.elapsed() - blockStartedRef.current
+        const at = platform.clock.now()
+
+        void logRecall(
+          sessionRef.current.sessionId,
+          at,
+          graded,
+          duration,
+          block.kind,
+          // Das echte Modul, nicht die Blockart — daraus zählen die
+          // Sofort-Achsen des Profils (D-026).
+          block.moduleId,
+          // C10: Nur Module, die wirklich einen FSRS-Termin fortschreiben,
+          // tragen vollständige Scheduler-ID + Trainingstag ins Rohprotokoll.
+          entersReview(block.moduleId) ? { language: plan.language, day: plan.day } : undefined,
+        ).catch(() => undefined)
+
+        /*
+         * Hier wird aus einer Antwort ein Termin (D-004).
+         *
+         * Beide Blockarten schreiben denselben Weg: Ein heute gelerntes Wort
+         * bekommt seinen ersten Termin, ein wiedergesehenes seinen nächsten.
+         * Für den Scheduler ist das derselbe Vorgang — nur der Vorzustand
+         * unterscheidet sich, und den kennt er selbst.
+         *
+         * **Außer beim Arbeitsgedächtnis** (D7 · D-026): Umbauen im Moment ist
+         * kein Behalten — eine Rückwärts-Folge bekommt keinen Termin, sonst
+         * fragte das Wiedersehen nach Tagen etwas, das nie zum Merken gedacht
+         * war.
+         */
+        if (entersReview(block.moduleId)) {
+          void recordOutcome(block.moduleId, plan.language, plan.day, at, {
+            recalled: graded.correct,
+            missed: graded.missed,
+          }).catch(() => undefined)
         }
-        void applyMemoryOutcome({ correct: graded.correct, missed: graded.missed }, at).catch(
+
+        /*
+         * Der Memory-Graph (D-036) bekommt dasselbe Ergebnis als **Auswahl**-
+         * Signal: richtig hebt die Stärke, falsch senkt sie — die nächste
+         * Einheit nimmt die schwächsten zuerst. Der Termin läuft weiter
+         * ausschließlich über `recordOutcome` (FSRS bleibt die Wahrheit).
+         */
+        if (block.moduleId === 'memory') {
+          // Retrieve und Error sind dieselbe Klangfamilie. Ein vollständiges
+          // Offenbleiben klingt weich nach unten, ein echter Treffer neutral
+          // aufgelöst; erst danach darf das persönliche Landing folgen.
+          platform.sound.play(graded.correct.length === 0 && graded.missed.length > 0 ? 'error' : 'recall')
+          if (graded.correct.length > 0) {
+            platform.sound.play('landing')
+            setLandingPulse(true)
+            window.setTimeout(() => setLandingPulse(false), 900)
+          }
+          void applyMemoryOutcome({ correct: graded.correct, missed: graded.missed }, at).catch(
+            () => undefined,
+          )
+        }
+
+        setResults(nextResults)
+      }
+
+      const nextIndex = blockIndex + 1
+      persist(nextIndex, nextResults)
+      setBlockIndex(nextIndex)
+
+      // Ein Block endet hörbar (D-011/G-9): zwei Töne abwärts, wenn es
+      // weitergeht — der ganze kleine Akkord, wenn es geschafft ist.
+      platform.sound.play(nextIndex >= plan.blocks.length ? 'done' : 'block')
+
+      if (nextIndex >= plan.blocks.length) {
+        void completeSession(sessionRef.current.sessionId, platform.clock.now()).catch(
           () => undefined,
         )
       }
-
-      setResults(nextResults)
-    }
-
-    const nextIndex = blockIndex + 1
-    persist(nextIndex, nextResults)
-    setBlockIndex(nextIndex)
-
-    // Ein Block endet hörbar (D-011/G-9): zwei Töne abwärts, wenn es
-    // weitergeht — der ganze kleine Akkord, wenn es geschafft ist.
-    platform.sound.play(nextIndex >= plan.blocks.length ? 'done' : 'block')
-
-    if (nextIndex >= plan.blocks.length) {
-      void completeSession(sessionRef.current.sessionId, platform.clock.now()).catch(
-        () => undefined,
-      )
-    }
     },
     [answers, block, blockIndex, entries, persist, plan, platform, results],
   )

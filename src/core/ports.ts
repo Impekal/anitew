@@ -58,8 +58,10 @@ export type SoundCue =
   | 'connection'
   /** Ein fälliger persönlicher Knoten wird bewusst wieder betreten. */
   | 'return'
-  /** Ein Abruf wurde aufgelöst; richtig oder falsch bleibt visuell, nicht musikalisch gewertet. */
+  /** Ein Abruf wurde aufgelöst. */
   | 'recall'
+  /** Ein persönlicher Abruf blieb vollständig offen — weich, nie strafend. */
+  | 'error'
   /** Mindestens eine persönliche Erinnerung ist tatsächlich wiedergekommen. */
   | 'landing'
   /** Ein Block ist zu Ende. */
