@@ -58,13 +58,22 @@ test('Neu anfangen löscht lokal vollständig, trennt Google und kann die Drive-
   await page.locator('.wipe input[type=checkbox]').check()
   await page.locator('.wipe-confirm-input').fill('ANITEW')
 
-  await Promise.all([
-    page.waitForURL((url) => url.pathname === '/'),
-    page.locator('.wipe-go').click(),
-  ])
+  // Every in-app Core page already lives at `/`, so waiting for pathname `/`
+  // would succeed before the async reset even starts. Wait for the destructive
+  // side effects themselves and the real document reload instead.
+  const remoteDelete = page.waitForRequest(
+    (request) => request.method() === 'DELETE' && request.url().endsWith('/file-anitew'),
+  )
+  const logout = page.waitForRequest(
+    (request) => request.method() === 'POST' && request.url().includes('/oauth/google/logout'),
+  )
+  const reload = page.waitForNavigation({ waitUntil: 'domcontentloaded' })
+
+  await Promise.all([remoteDelete, logout, reload, page.locator('.wipe-go').click()])
 
   expect(deletedRemote).toBe(1)
   expect(loggedOut).toBe(1)
+  await expect(page.locator('.arrival')).toBeVisible()
 
   const state = await page.evaluate(async () => {
     const open = indexedDB.open('anitew')
