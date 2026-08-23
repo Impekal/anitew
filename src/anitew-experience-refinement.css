@@ -673,6 +673,9 @@ html[data-focus='on'] .neural {
   white-space: nowrap;
 }
 .theme-control {
+  position: relative;
+  z-index: 4;
+  pointer-events: auto;
   margin: 5px 0 13px;
   padding: 12px;
   border: 1px solid var(--v4-line);
@@ -689,17 +692,23 @@ html[data-focus='on'] .neural {
   text-transform: uppercase;
 }
 .theme-choices {
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 5px;
 }
 .theme-choice {
+  position: relative;
+  z-index: 1;
   min-height: 38px;
   border: 1px solid color-mix(in oklab, var(--v4-mint) 18%, var(--line));
   border-radius: 12px;
   background: transparent;
   color: var(--ink-soft);
   font: 600 9px/1 var(--sans);
+  cursor: pointer;
+  pointer-events: auto;
 }
 .theme-choice[aria-pressed='true'] {
   border-color: color-mix(in oklab, var(--v4-gold) 46%, transparent);
