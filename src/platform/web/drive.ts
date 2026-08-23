@@ -36,8 +36,11 @@ export function builtInClientId(): string | undefined {
 export type DriveFailure = 'denied' | 'offline' | 'drive'
 
 export class DriveError extends Error {
-  constructor(readonly reason: DriveFailure) {
-    super(reason)
+  constructor(
+    readonly reason: DriveFailure,
+    readonly detail?: string,
+  ) {
+    super(detail ?? reason)
     this.name = 'DriveError'
   }
 }
@@ -80,19 +83,23 @@ function loadGis(): Promise<GisOauth2> {
     const existing = document.querySelector<HTMLScriptElement>(`script[src="${GIS_SRC}"]`)
     if (existing !== null) {
       existing.addEventListener('load', () => resolve(), { once: true })
-      existing.addEventListener('error', () => reject(new DriveError('offline')), { once: true })
+      existing.addEventListener(
+        'error',
+        () => reject(new DriveError('offline', 'gis_load_failed')),
+        { once: true },
+      )
       return
     }
     const script = document.createElement('script')
     script.src = GIS_SRC
     script.async = true
     script.onload = () => resolve()
-    script.onerror = () => reject(new DriveError('offline'))
+    script.onerror = () => reject(new DriveError('offline', 'gis_load_failed'))
     document.head.append(script)
   })
     .then(() => {
       const loaded = window.google?.accounts?.oauth2
-      if (loaded === undefined) throw new DriveError('offline')
+      if (loaded === undefined) throw new DriveError('offline', 'gis_missing_after_load')
       return loaded
     })
     .catch((error: unknown) => {
@@ -132,11 +139,21 @@ function requestTokenWith(
       callback: (response) => {
         if (response.access_token !== undefined && response.access_token !== '') {
           resolve(response.access_token)
-        } else reject(new DriveError('denied'))
+        } else reject(new DriveError('denied', response.error ?? 'no_access_token'))
       },
-      error_callback: () => reject(new DriveError('denied')),
+      error_callback: (error) =>
+        reject(new DriveError('denied', error.type ?? 'oauth_popup_error')),
     })
-    client.requestAccessToken(silent ? { prompt: 'none' } : {})
+    try {
+      client.requestAccessToken(silent ? { prompt: 'none' } : {})
+    } catch (error) {
+      reject(
+        new DriveError(
+          'denied',
+          error instanceof Error && error.message !== '' ? error.message : 'oauth_request_failed',
+        ),
+      )
+    }
   })
 }
 
@@ -168,10 +185,12 @@ async function driveFetch(token: string, url: string, init?: RequestInit): Promi
       headers: { ...init?.headers, authorization: `Bearer ${token}` },
     })
   } catch {
-    throw new DriveError('offline')
+    throw new DriveError('offline', 'drive_fetch_failed')
   }
-  if (response.status === 401 || response.status === 403) throw new DriveError('denied')
-  if (!response.ok) throw new DriveError('drive')
+  if (response.status === 401 || response.status === 403) {
+    throw new DriveError('denied', `drive_http_${response.status}`)
+  }
+  if (!response.ok) throw new DriveError('drive', `drive_http_${response.status}`)
   return response
 }
 
@@ -235,7 +254,7 @@ async function ensureFolderId(token: string): Promise<string> {
     body: JSON.stringify({ name: DRIVE_FOLDER_NAME, mimeType: FOLDER_MIME }),
   })
   const body = (await response.json()) as { id?: unknown }
-  if (typeof body.id !== 'string' || body.id === '') throw new DriveError('drive')
+  if (typeof body.id !== 'string' || body.id === '') throw new DriveError('drive', 'folder_id_missing')
   return body.id
 }
 
