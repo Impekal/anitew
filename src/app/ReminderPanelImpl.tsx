@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
 import {
   DAILY_REMINDER_ID,
@@ -26,13 +26,25 @@ export function ReminderPanelImpl({
 }) {
   const t = dictionary.reminder
   const [permission, setPermission] = useState(platform.reminders.permission())
-  const [time, setTime] = useState<string>(daily ?? suggested ?? '19:30')
+  const initialTime = daily ?? suggested ?? '19:30'
+  const [time, setTime] = useState<string>(initialTime)
+  /*
+   * `input[type=time]` kann seinen DOM-Wert schon geändert haben, während ein
+   * unmittelbar folgender Klick noch den React-State aus dem vorherigen Render
+   * sieht. Die Ref wird im Eingabe-Event synchron gesetzt und ist deshalb die
+   * verlässliche Quelle für „Erinnerung merken“ — auch bei sehr schnellem Tap
+   * oder automatisierten Browsern.
+   */
+  const latestTime = useRef<string>(initialTime)
   const [said, setSaid] = useState<'saved' | 'cleared' | undefined>(undefined)
 
   const [loaded, setLoaded] = useState(daily)
   if (daily !== loaded) {
     setLoaded(daily)
-    if (daily !== undefined) setTime(daily)
+    if (daily !== undefined) {
+      latestTime.current = daily
+      setTime(daily)
+    }
   }
 
   const ability = platform.reminders.ability()
@@ -79,7 +91,9 @@ export function ReminderPanelImpl({
               type="time"
               value={time}
               onChange={(event) => {
-                setTime(event.target.value)
+                const next = event.target.value
+                latestTime.current = next
+                setTime(next)
                 setSaid(undefined)
               }}
             />
@@ -91,7 +105,9 @@ export function ReminderPanelImpl({
               className="quiet"
               disabled={!isTimeOfDay(time)}
               onClick={() => {
-                void saveDailyTime(time)
+                const chosen = latestTime.current
+                if (!isTimeOfDay(chosen)) return
+                void saveDailyTime(chosen)
                   .then((ok) => setSaid(ok ? 'saved' : undefined))
                   .catch(() => undefined)
                   .finally(onChange)
