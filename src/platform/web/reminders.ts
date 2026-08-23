@@ -173,7 +173,24 @@ export function createWebReminders(): Reminders {
       const registration = await navigator.serviceWorker.getRegistration().catch(() => undefined)
       const subscription = await registration?.pushManager.getSubscription().catch(() => null)
       if (subscription === null || subscription === undefined) return
-      await post('/push/cancel', { endpoint: subscription.endpoint, id, permanent }).catch(() => undefined)
+
+      try {
+        const response = await post('/push/cancel', {
+          endpoint: subscription.endpoint,
+          id,
+          permanent,
+        })
+        if (!response.ok) throw new Error(`push_cancel_http_${response.status}`)
+      } catch {
+        // „Keine Erinnerung“ ist ein harter Nutzerwunsch. Selbst wenn ANITEWs
+        // Worker gerade nicht erreichbar ist, invalidiert unsubscribe() die
+        // alte Push-Adresse beim Browser-Pushdienst. Der serverseitige Rest
+        // bekommt beim nächsten Zustellversuch 404/410 und löscht sich selbst.
+        if (permanent) {
+          await subscription.unsubscribe().catch(() => undefined)
+          pushFailed = true
+        }
+      }
     },
   }
 }
