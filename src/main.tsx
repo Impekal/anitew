@@ -49,8 +49,9 @@ else window.addEventListener('load', loadSignatureExperience, { once: true })
 
 keepUpToDate()
 
-const container = document.getElementById('root')
-if (!container) throw Error('#root fehlt')
+const rootContainer = document.getElementById('root')
+if (rootContainer === null) throw Error('#root fehlt')
+const container: HTMLElement = rootContainer
 
 function render(): void {
   createRoot(container).render(
