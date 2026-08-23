@@ -18,8 +18,10 @@ import { exportBackup, importBackup } from '../data/backup.ts'
 export const SYNC_ON_SETTING = 'sync.on'
 /** Wann zuletzt abgeglichen wurde (nur Anzeige, nur dieses Gerät). */
 export const SYNC_AT_SETTING = 'sync.lastAt'
-/** Wessen Google-Konto verbunden ist (nur Anzeige, nur dieses Gerät). */
+/** E-Mail des verbundenen Google-Kontos (nur Anzeige, nur dieses Gerät). */
 export const SYNC_ACCOUNT_SETTING = 'sync.account'
+/** Anzeigename des verbundenen Google-Kontos (nur Anzeige, nur dieses Gerät). */
+export const SYNC_ACCOUNT_NAME_SETTING = 'sync.accountName'
 
 /** Die Client-Kennung: aus dem Bau — oder aus den Einstellungen (Prüfpfad). */
 export async function resolveClientId(settings: SettingsStore): Promise<string | undefined> {
@@ -45,18 +47,26 @@ export async function runDriveSync(
 
 /**
  * Der bewusste erste Weg: hörbar verbinden, dabei einmal fragen, wessen
- * Konto das ist — die E-Mail ist Anzeige, kein Tragwerk; fehlt sie, fehlt
- * nur die Zeile.
+ * Konto das ist. Name und E-Mail sind reine Anzeige; fehlen sie, funktioniert
+ * der Abgleich trotzdem vollständig.
  */
 export async function connectDriveSync(
   clientId: string,
   now: number,
-): Promise<{ report: SyncReport; account: string | undefined }> {
-  const { requestDriveToken, fetchAccountEmail } = await import('../platform/web/drive.ts')
+): Promise<{
+  report: SyncReport
+  account: string | undefined
+  accountName: string | undefined
+}> {
+  const { requestDriveToken, fetchAccountProfile } = await import('../platform/web/drive.ts')
   const token = await requestDriveToken(clientId, false, true)
-  const account = await fetchAccountEmail(token)
+  const identity = await fetchAccountProfile(token)
   const report = await syncWithToken(token, now)
-  return { report, account }
+  return {
+    report,
+    account: identity?.email,
+    accountName: identity?.name,
+  }
 }
 
 async function syncWithToken(token: string, now: number): Promise<SyncReport> {
