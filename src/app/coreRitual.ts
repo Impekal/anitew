@@ -6,6 +6,7 @@ import '../anitew-core-menu-contrast.css'
 import '../anitew-core-icon-identity.css'
 import '../anitew-button-aura.css'
 import '../anitew-core-glyph-distinct.css'
+import '../anitew-living-node-shape.css'
 import './firstRunExperience.ts'
 import { mountNeuralField, unmountNeuralField } from './NeuralFieldMount.tsx'
 
@@ -27,6 +28,7 @@ function soundEnabled(): boolean {
 }
 
 function tactile(pattern: number[]): void {
+  if (!soundEnabled()) return
   const vibrate = (navigator as { vibrate?: (value: number | number[]) => boolean }).vibrate
   if (typeof vibrate !== 'function') return
   try {
