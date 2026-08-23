@@ -37,8 +37,8 @@ self.addEventListener('push', (event) => {
       await self.registration.showNotification(notice.title, {
         body: notice.body,
         tag: notice.tag,
-        icon: '/pwa-192x192.png',
-        badge: '/pwa-192x192.png',
+        icon: '/icons/icon-192.png',
+        badge: '/icons/icon-192.png',
         data: { url: '/' },
       })
     })(),
