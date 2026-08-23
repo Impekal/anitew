@@ -40,6 +40,7 @@ interface PushTruthCopy {
   readonly whileOpen: string
   readonly scheduled: string
   readonly privacyLead: string
+  readonly privacyLocal: string
   readonly privacyPush: string
   readonly privacyDelete: string
   readonly privacyHonest: string
@@ -51,18 +52,24 @@ const PUSH_TRUTH: Readonly<Partial<Record<Language, PushTruthCopy>>> = {
     whileOpen: 'Hier nur **solange es offen ist**. iPhone/iPad: nach dem Schließen nur als Home-Screen-App.',
     scheduled: 'Kommt als Systemmitteilung an, auch wenn ANITEW geschlossen ist.',
     privacyLead: 'ANITEW bleibt local-first.',
-    privacyPush: 'Push: Geräteadresse, Fälligkeit, Zeitzone — keine Trainings- oder Gedächtnisinhalte.',
+    privacyLocal: 'Training, Erinnerungen, Messungen und Profil bleiben auf diesem Gerät.',
+    privacyPush:
+      'Für Push speichert ANITEW nur die technische Push-Adresse dieses Geräts, Fälligkeit und Zeitzone. Keine Trainings- oder Gedächtnisinhalte.',
     privacyDelete: '„Keine Erinnerung“ stoppt täglich; „Neu anfangen“ widerruft Push.',
-    privacyHonest: 'Hoster sieht beim Laden Webserverdaten; Push braucht Netz. Training bleibt offlinefähig.',
+    privacyHonest:
+      'Beim Laden sieht der Hoster die üblichen Webserverdaten. Wenn du Systembenachrichtigungen aktivierst, braucht Push zusätzlich Netz; das Training selbst bleibt offlinefähig.',
   },
   en: {
     reminderNote: 'No account. Push stores device address, time and time zone — no training data.',
     whileOpen: 'Here only **while it is open**. iPhone/iPad: after closing, only as a Home Screen app.',
     scheduled: 'Arrives as a system notification even when ANITEW is closed.',
     privacyLead: 'ANITEW stays local-first.',
-    privacyPush: 'Push: device address, due time, time zone — no training or memory content.',
+    privacyLocal: 'Training, memories, measurements and profile stay on this device.',
+    privacyPush:
+      'For push, ANITEW stores only this device’s technical push address, due time and time zone. No training or memory content.',
     privacyDelete: '“No reminder” stops daily; “Start over” revokes push.',
-    privacyHonest: 'The host sees web-server data while loading; push needs network. Training stays offline-capable.',
+    privacyHonest:
+      'While loading, the host sees ordinary web-server data. If you enable system notifications, push also needs network; training itself stays offline-capable.',
   },
 }
 
@@ -117,7 +124,7 @@ function withPushTruth(dictionary: Dictionary, language: Language): Dictionary {
     privacy: {
       ...dictionary.privacy,
       lead: copy.privacyLead,
-      points: [points[0], points[1], points[2], copy.privacyPush, copy.privacyDelete],
+      points: [copy.privacyLocal, points[1], points[2], copy.privacyPush, copy.privacyDelete],
       honest: copy.privacyHonest,
     },
   }
