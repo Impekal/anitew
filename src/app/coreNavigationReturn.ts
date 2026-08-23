@@ -11,21 +11,22 @@
  */
 let coreReturnArmed = false
 
-// The visible page-back button clears React's page state before history.back()
-// eventually emits popstate. Arm the parent return in capture phase while the
-// page is still unquestionably the source of the navigation.
+// Remember the parent while entering a Core child, not only when the visible
+// back button is used. A native iOS/browser back gesture has no click on
+// `.page-back`, so arming at entry is the reliable signal for both paths.
 document.addEventListener(
   'click',
   (event) => {
     const target = event.target
-    if (target instanceof Element && target.closest('.page-back') !== null) coreReturnArmed = true
+    if (!(target instanceof Element)) return
+    if (target.closest('.drawer-item') !== null || target.closest('.page-back') !== null) {
+      coreReturnArmed = true
+    }
   },
   true,
 )
 
 window.addEventListener('popstate', () => {
-  // A native browser/iOS back gesture has no preceding click, so the still
-  // visible page itself proves that this pop belongs to a Core child.
   const shouldReturnToCore = coreReturnArmed || document.querySelector('.app.page') !== null
   coreReturnArmed = false
   if (!shouldReturnToCore) return
