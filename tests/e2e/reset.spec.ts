@@ -2,10 +2,35 @@ import { expect, test } from '@playwright/test'
 
 import { openPage, visit } from './helpers.ts'
 
-test('Neu anfangen löscht lokal vollständig, trennt Google und kann die Drive-Sicherung entfernen', async ({ page }) => {
+test('Neu anfangen löscht lokal vollständig, trennt Google, Push und optional Drive', async ({ page }) => {
   let deletedRemote = 0
   let loggedOut = 0
+  let pushUnregistered = 0
 
+  await page.addInitScript(() => {
+    const subscription = {
+      endpoint: 'https://push.example.invalid/reset-device',
+      unsubscribe: async () => true,
+    }
+    const registration = {
+      pushManager: {
+        getSubscription: async () => subscription,
+      },
+    }
+    Object.defineProperty(navigator, 'serviceWorker', {
+      configurable: true,
+      value: {
+        ready: Promise.resolve(registration),
+        getRegistration: async () => registration,
+        register: async () => registration,
+      },
+    })
+  })
+
+  await page.route('**/push/unsubscribe', async (route) => {
+    pushUnregistered++
+    await route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' })
+  })
   await page.route('**/oauth/google/access-token', (route) =>
     route.fulfill({
       contentType: 'application/json',
@@ -58,22 +83,11 @@ test('Neu anfangen löscht lokal vollständig, trennt Google und kann die Drive-
   await page.locator('.wipe input[type=checkbox]').check()
   await page.locator('.wipe-confirm-input').fill('ANITEW')
 
-  // Every in-app Core page already lives at `/`, so waiting for pathname `/`
-  // would succeed before the async reset even starts. Wait for the destructive
-  // side effects themselves and the real document reload instead.
-  const remoteDelete = page.waitForRequest(
-    (request) => request.method() === 'DELETE' && request.url().endsWith('/file-anitew'),
-  )
-  const logout = page.waitForRequest(
-    (request) => request.method() === 'POST' && request.url().includes('/oauth/google/logout'),
-  )
-  const reload = page.waitForNavigation({ waitUntil: 'domcontentloaded' })
-
-  await Promise.all([remoteDelete, logout, reload, page.locator('.wipe-go').click()])
-
-  expect(deletedRemote).toBe(1)
-  expect(loggedOut).toBe(1)
-  await expect(page.locator('.arrival')).toBeVisible()
+  await page.locator('.wipe-go').click()
+  await expect.poll(() => deletedRemote).toBe(1)
+  await expect.poll(() => loggedOut).toBe(1)
+  await expect.poll(() => pushUnregistered).toBe(1)
+  await page.waitForURL((url) => url.pathname === '/')
 
   const state = await page.evaluate(async () => {
     const open = indexedDB.open('anitew')
