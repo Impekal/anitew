@@ -69,15 +69,17 @@ test('hält die Breite auf jeder Menüseite — und in der Schublade', async ({ 
   await expect(page.locator('.drawer')).toBeVisible()
   await noHorizontalOverflow(page)
 
-  // Dann jede Seite: Dort steckt der meiste Text, und ein zu breites Wort in
-  // einer Sprache oder eine lange Quelle sprengt zuerst hier. Die Liste wird
-  // abgelesen, nicht behauptet — was im Menü steht, wird geprüft.
-  const labels = await page.locator('.drawer-item > span').allTextContents()
+  // Nur die sichtbare Beschriftung jedes Knotens lesen. MenuIcon bringt ein
+  // eigenes direktes <span> mit; der frühere Selektor sammelte deshalb auch
+  // leere Icon-Spans und `hasText: ''` traf anschließend jeden Menüknopf.
+  const labels = (await page.locator('.drawer-item > span:last-child').allTextContents())
+    .map((label) => label.trim())
+    .filter((label) => label !== '')
   await page.keyboard.press('Escape')
   expect(labels.length).toBeGreaterThan(0)
   for (const label of labels) {
     await page.locator('button.hamburger').click()
-    await page.locator('.drawer-item', { hasText: label }).click()
+    await page.getByRole('button', { name: label, exact: true }).click()
     await page.locator('.page').waitFor()
     await noHorizontalOverflow(page)
     await page.locator('.page-back').click()
@@ -109,7 +111,10 @@ test('bleibt beim Einprägen im Rahmen', async ({ page }) => {
   await startButton(page).click()
   await page.locator('.settle').click()
 
-  const shown = page.locator('.encode-word, .scene, .lesson, .reveal-digits').first()
+  // Alle Einprägeformen haben entweder den gemeinsamen .encode-Wurzelknoten,
+  // eine Szene, eine Lektion oder die spezielle Ziffernanzeige. Nicht auf
+  // einzelne heutige Unterelemente wie .encode-word festlegen.
+  const shown = page.locator('.encode, .scene, .lesson, .reveal-digits').first()
   await expect(shown).toBeVisible({ timeout: 30_000 })
   await noHorizontalOverflow(page)
   await withinViewport(page, shown, 'der Einprägeteil')
