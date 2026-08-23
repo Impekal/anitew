@@ -7,6 +7,7 @@ import '../anitew-core-icon-identity.css'
 import '../anitew-button-aura.css'
 import '../anitew-core-glyph-distinct.css'
 import '../anitew-living-node-shape.css'
+import '../anitew-core-mobile.css'
 import './firstRunExperience.ts'
 import { mountNeuralField, unmountNeuralField } from './NeuralFieldMount.tsx'
 
