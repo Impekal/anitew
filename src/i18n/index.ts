@@ -40,44 +40,44 @@ interface PushTruthCopy {
   readonly whileOpen: string
   readonly scheduled: string
   readonly privacyLead: string
-  readonly privacyPoints: readonly [string, string, string, string, string]
+  readonly privacyPush: string
+  readonly privacyDelete: string
   readonly privacyHonest: string
 }
 
+/*
+ * Nur Aussagen, die sich durch Web Push tatsächlich geändert haben, stehen
+ * hier. Die übrigen drei Datenschutzpunkte kommen aus dem normalen Wörterbuch;
+ * sie ein zweites Mal zu kopieren blähte den Kaltstart ohne Informationsgewinn auf.
+ */
 const PUSH_TRUTH: Readonly<Partial<Record<Language, PushTruthCopy>>> = {
   de: {
     reminderNote:
-      'Ohne ANITEW-Konto. Für Systembenachrichtigungen speichert ANITEW nur die technische Push-Adresse dieses Geräts sowie Uhrzeit und Zeitzone — keine Trainings- oder Erinnerungsinhalte.',
+      'Kein ANITEW-Konto. Push speichert nur Geräteadresse, Uhrzeit und Zeitzone — keine Trainingsdaten.',
     whileOpen:
-      'Auf diesem Gerät kann ANITEW nur erinnern, **solange es offen ist**. Systemmitteilungen nach dem Schließen brauchen Web Push; auf iPhone und iPad funktioniert das nur aus der installierten Home-Screen-App.',
+      'Hier nur **solange es offen ist**. Auf iPhone/iPad braucht Push nach dem Schließen die installierte Home-Screen-App.',
     scheduled: 'Erinnerungen kommen als Systemmitteilung an, auch wenn ANITEW geschlossen ist.',
     privacyLead: 'ANITEW bleibt local-first.',
-    privacyPoints: [
-      'Kein ANITEW-Konto, keine Werbung, keine Tracker.',
-      'Training, Erinnerungen, Messungen und Profil bleiben auf diesem Gerät — außer du wählst selbst Drive-Abgleich oder eine Coach-Frage mit eigenem Schlüssel.',
-      'Für aktivierte Systembenachrichtigungen speichert ANITEW nur die technische Push-Adresse dieses Geräts, Fälligkeit und Zeitzone. Keine Trainings- oder Gedächtnisinhalte werden dafür übertragen.',
-      'Die Push-Adresse wird beim vollständigen Zurücksetzen widerrufen. „Keine Erinnerung“ beendet die tägliche Erinnerung.',
-      'Sicherung und Drive-Abgleich bleiben davon getrennt; die Sicherungsdatei liegt bei dir bzw. in deinem eigenen Google Drive.',
-    ],
+    privacyPush:
+      'Für Push speichert ANITEW nur Geräteadresse, Fälligkeit und Zeitzone — keine Trainings- oder Gedächtnisinhalte.',
+    privacyDelete:
+      '„Keine Erinnerung“ stoppt täglich; „Neu anfangen“ widerruft die Push-Adresse.',
     privacyHonest:
-      'Zum Laden der App sieht der Hoster die üblichen Webserverdaten. Nur wenn du Systembenachrichtigungen aktivierst, braucht der Push-Dienst zusätzlich Netz; das Training selbst bleibt offlinefähig.',
+      'Beim Laden sieht der Hoster übliche Webserverdaten; aktivierter Push braucht zusätzlich Netz. Training bleibt offlinefähig.',
   },
   en: {
     reminderNote:
-      'No ANITEW account. For system notifications ANITEW stores only this device’s technical push address plus time and time zone — no training or memory content.',
+      'No ANITEW account. Push stores only device address, time and time zone — no training data.',
     whileOpen:
-      'On this device ANITEW can only remind you **while it is open**. Notifications after closing need Web Push; on iPhone and iPad that works only from the installed Home Screen app.',
+      'Here only **while it is open**. On iPhone/iPad, push after closing needs the installed Home Screen app.',
     scheduled: 'Reminders arrive as system notifications even when ANITEW is closed.',
     privacyLead: 'ANITEW stays local-first.',
-    privacyPoints: [
-      'No ANITEW account, no ads, no trackers.',
-      'Training, memories, measurements and profile stay on this device unless you explicitly choose Drive sync or a coach question with your own key.',
-      'For enabled system notifications ANITEW stores only this device’s technical push address, due time and time zone. No training or memory content is sent for push.',
-      'A full reset revokes the push address. “No reminder” stops the daily reminder.',
-      'Backup and Drive sync remain separate; the backup file stays with you or in your own Google Drive.',
-    ],
+    privacyPush:
+      'Push stores only device address, due time and time zone — no training or memory content.',
+    privacyDelete:
+      '“No reminder” stops the daily reminder; “Start over” revokes the push address.',
     privacyHonest:
-      'The host sees ordinary web-server data while the app is loaded. Only enabled system notifications need the push service afterwards; training itself remains offline-capable.',
+      'The host sees ordinary web-server data while loading; enabled push also needs network. Training stays offline-capable.',
   },
 }
 
@@ -120,6 +120,7 @@ function withMissionLocation(dictionary: Dictionary, language: Language): Dictio
 function withPushTruth(dictionary: Dictionary, language: Language): Dictionary {
   const copy = PUSH_TRUTH[language] ?? PUSH_TRUTH[FALLBACK_LANGUAGE] ?? PUSH_TRUTH.de
   if (copy === undefined) return dictionary
+  const points = dictionary.privacy.points
   return {
     ...dictionary,
     reminder: {
@@ -131,7 +132,7 @@ function withPushTruth(dictionary: Dictionary, language: Language): Dictionary {
     privacy: {
       ...dictionary.privacy,
       lead: copy.privacyLead,
-      points: copy.privacyPoints,
+      points: [points[0], points[1], points[2], copy.privacyPush, copy.privacyDelete],
       honest: copy.privacyHonest,
     },
   }
