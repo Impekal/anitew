@@ -1,16 +1,19 @@
-// Cloudflare Workers (Static Assets) — Backlog A7.
+// Cloudflare Workers + Static Assets — Backlog A7.
 //
-// Kein Servercode: `wrangler deploy` lädt dist/ als statische Dateien hoch.
-// Das ist kostenlos und bleibt austauschbar — der Build ist ein Ordner, den
-// jeder Hoster ausliefern kann. Es gibt hier ausdrücklich kein Backend
-// (D-009: kein Konto, keine Nutzerdatenbank, kein Server).
+// Die App bleibt local-first und ohne ANITEW-Konto oder Nutzerdatenbank.
+// Servercode läuft ausschließlich für den Google-OAuth-Handschlag: Google
+// liefert den Autorisierungscode an /oauth/google/*, der Worker tauscht ihn
+// gegen Tokens und hält die verschlüsselte Sitzung nur im Browser-Cookie.
+// Trainings-, Erinnerungs- und Sicherungsdaten werden nicht serverseitig
+// gespeichert und laufen weiterhin direkt zwischen Gerät und eigenem Drive.
 {
   "name": "anitew",
-  "compatibility_date": "2026-08-01",
+  "compatibility_date": "2026-08-23",
+  "main": "./worker/index.js",
   "assets": {
     "directory": "./dist",
-    // Die App ist eine einzige Seite; unbekannte Pfade führen zu index.html
-    // statt zu einem 404.
-    "not_found_handling": "single-page-application"
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/oauth/google/*"]
   }
 }
