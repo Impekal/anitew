@@ -1,63 +1,603 @@
-/* ANITEW — Experience refinement V3
+/* ANITEW — Power Identity V4
  *
- * This layer makes the living-memory language explicit without owning any
- * training truth: the neural field becomes a quiet communicating substrate,
- * onboarding gains a readable capability map, Drive is visibly recommended,
- * and the Core close control says what it does.
+ * Eine späte Experience-Schicht: mehr Präsenz, mehr neuronale Identität,
+ * klarere Einführung, echte Hell/Dunkel/System-Wahl. Gedächtniswahrheit,
+ * Scheduler und Messung bleiben unangetastet.
  */
 
-/* ── Neural field: alive, but never a screensaver ----------------------- */
+/* ── Theme: System ist Default, Light/Dark dürfen bewusst übersteuern ----- */
+:root {
+  --v4-mint: #497c73;
+  --v4-mint-hot: #2f6b60;
+  --v4-gold: #a85f22;
+  --v4-gold-hot: #8e4b16;
+  --v4-surface: rgb(255 253 249 / 82%);
+  --v4-surface-strong: rgb(255 253 249 / 96%);
+  --v4-line: rgb(73 124 115 / 22%);
+  --v4-line-hot: rgb(168 95 34 / 44%);
+  --v4-neural: rgb(47 107 96 / 34%);
+  --v4-neural-hot: rgb(168 95 34 / 55%);
+  --v4-start-shadow:
+    0 0 0 1px rgb(168 95 34 / 28%),
+    0 12px 42px -10px rgb(168 95 34 / 54%),
+    0 26px 70px -30px rgb(47 107 96 / 40%);
+  --v4-card-shadow: 0 18px 55px -32px rgb(55 38 18 / 48%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --v4-mint: #8ee7d0;
+    --v4-mint-hot: #b1f2df;
+    --v4-gold: #e5b86d;
+    --v4-gold-hot: #ffd997;
+    --v4-surface: rgb(8 14 12 / 74%);
+    --v4-surface-strong: rgb(8 14 12 / 94%);
+    --v4-line: rgb(158 230 210 / 18%);
+    --v4-line-hot: rgb(229 184 109 / 38%);
+    --v4-neural: rgb(158 230 210 / 26%);
+    --v4-neural-hot: rgb(255 217 151 / 48%);
+    --v4-start-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 8%),
+      0 22px 80px rgb(0 0 0 / 34%),
+      0 0 72px rgb(229 184 109 / 18%),
+      0 0 120px rgb(158 230 210 / 8%);
+    --v4-card-shadow: 0 22px 64px rgb(0 0 0 / 24%);
+  }
+}
+
+html[data-anitew-theme='light'] {
+  color-scheme: light;
+  --paper: #f7f3ec;
+  --paper-glow: #fdf8ee;
+  --card: #fffdf9;
+  --line: #e7ded0;
+  --ink: #241f19;
+  --ink-soft: #6f6558;
+  --ink-faint: #9c917f;
+  --accent: #a85f22;
+  --accent-soft: #f0dcc4;
+  --accent-ink: #fffaf3;
+  --calm: #4a6f6b;
+  --bad: #98392c;
+  --v4-mint: #497c73;
+  --v4-mint-hot: #2f6b60;
+  --v4-gold: #a85f22;
+  --v4-gold-hot: #8e4b16;
+  --v4-surface: rgb(255 253 249 / 82%);
+  --v4-surface-strong: rgb(255 253 249 / 96%);
+  --v4-line: rgb(73 124 115 / 22%);
+  --v4-line-hot: rgb(168 95 34 / 44%);
+  --v4-neural: rgb(47 107 96 / 34%);
+  --v4-neural-hot: rgb(168 95 34 / 55%);
+  --v4-start-shadow:
+    0 0 0 1px rgb(168 95 34 / 28%),
+    0 12px 42px -10px rgb(168 95 34 / 54%),
+    0 26px 70px -30px rgb(47 107 96 / 40%);
+  --v4-card-shadow: 0 18px 55px -32px rgb(55 38 18 / 48%);
+}
+
+html[data-anitew-theme='dark'] {
+  color-scheme: dark;
+  --paper: #0b0f0d;
+  --paper-glow: #14201b;
+  --card: #111915;
+  --line: #25352e;
+  --ink: #f1eee5;
+  --ink-soft: #b8b1a3;
+  --ink-faint: #827b70;
+  --accent: #e5ab6b;
+  --accent-soft: #392b1c;
+  --accent-ink: #181008;
+  --calm: #8fbab0;
+  --bad: #e0897c;
+  --v4-mint: #8ee7d0;
+  --v4-mint-hot: #b1f2df;
+  --v4-gold: #e5b86d;
+  --v4-gold-hot: #ffd997;
+  --v4-surface: rgb(8 14 12 / 74%);
+  --v4-surface-strong: rgb(8 14 12 / 94%);
+  --v4-line: rgb(158 230 210 / 18%);
+  --v4-line-hot: rgb(229 184 109 / 38%);
+  --v4-neural: rgb(158 230 210 / 26%);
+  --v4-neural-hot: rgb(255 217 151 / 48%);
+  --v4-start-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 8%),
+    0 22px 80px rgb(0 0 0 / 34%),
+    0 0 72px rgb(229 184 109 / 18%),
+    0 0 120px rgb(158 230 210 / 8%);
+  --v4-card-shadow: 0 22px 64px rgb(0 0 0 / 24%);
+}
+
+/* Die späte WOW-Schicht war historisch dunkel gedacht. V4 zieht ihre
+   wichtigsten Flächen zurück auf Theme-Variablen, damit Hell wirklich hell
+   und Dunkel wirklich dunkel ist. */
+body::after {
+  opacity: .78 !important;
+  background:
+    conic-gradient(from 18deg at 50% 38%, transparent 0 17%, color-mix(in oklab, var(--v4-mint) 7%, transparent) 24%, transparent 31% 62%, color-mix(in oklab, var(--v4-gold) 6%, transparent) 70%, transparent 78%) !important;
+  filter: blur(25px) !important;
+}
+.note,
+.constellation,
+.drawer,
+.first-run-guide-card {
+  color: var(--ink);
+}
+.note {
+  background: color-mix(in oklab, var(--card) 88%, transparent) !important;
+  border-color: color-mix(in oklab, var(--calm) 18%, var(--line)) !important;
+}
+.drawer {
+  background:
+    radial-gradient(circle at 100% 0, color-mix(in oklab, var(--v4-mint) 10%, transparent), transparent 34%),
+    radial-gradient(circle at 0 78%, color-mix(in oklab, var(--v4-gold) 7%, transparent), transparent 35%),
+    var(--v4-surface-strong) !important;
+}
+.constellation {
+  background:
+    radial-gradient(circle at 50% 48%, color-mix(in oklab, var(--v4-mint) 9%, transparent), transparent 35%),
+    radial-gradient(circle at 70% 25%, color-mix(in oklab, var(--v4-gold) 6%, transparent), transparent 28%),
+    color-mix(in oklab, var(--card) 58%, transparent) !important;
+  border-color: var(--v4-line) !important;
+}
+.constellation-label {
+  fill: var(--ink) !important;
+  stroke: color-mix(in oklab, var(--paper) 86%, transparent) !important;
+}
+
+/* ── Neural field: wieder klar Teil der Identität ------------------------ */
 .neural {
-  opacity: .76 !important;
+  opacity: .94 !important;
   filter:
-    drop-shadow(0 0 7px rgb(140 207 192 / 9%))
-    drop-shadow(0 0 18px rgb(216 168 90 / 3%)) !important;
+    drop-shadow(0 0 8px color-mix(in oklab, var(--v4-mint) 22%, transparent))
+    drop-shadow(0 0 24px color-mix(in oklab, var(--v4-gold) 8%, transparent)) !important;
 }
 .neural-links line {
-  stroke: rgb(140 207 192 / 12%) !important;
-  stroke-width: .22 !important;
+  stroke: var(--v4-neural) !important;
+  stroke-width: .29 !important;
   vector-effect: non-scaling-stroke;
   transition: opacity 700ms ease;
 }
-/* Nur ein kleiner Teil der Verbindungen „spricht“. Das Auge nimmt Bewegung
-   wahr, ohne einem wandernden Punkt folgen zu müssen. */
 .neural-links line:nth-child(7n + 2),
-.neural-links line:nth-child(11n + 5) {
-  stroke: rgb(216 168 90 / 24%) !important;
-  stroke-dasharray: 1.1 3.8;
-  animation: anitew-neural-signal 10s linear infinite;
+.neural-links line:nth-child(11n + 5),
+.neural-links line:nth-child(17n + 3) {
+  stroke: var(--v4-neural-hot) !important;
+  stroke-width: .34 !important;
+  stroke-dasharray: 1.2 3.4;
+  animation: anitew-neural-signal 8.4s linear infinite;
 }
 .neural-links line:nth-child(11n + 5) {
-  stroke: rgb(140 207 192 / 24%) !important;
-  animation-duration: 14s;
+  stroke: color-mix(in oklab, var(--v4-mint-hot) 58%, transparent) !important;
+  animation-duration: 12s;
   animation-direction: reverse;
 }
+.neural-links line:nth-child(17n + 3) {
+  animation-duration: 15s;
+}
 .neural-nodes circle {
-  fill: rgb(140 207 192 / 78%) !important;
-  opacity: .42;
+  fill: var(--v4-mint-hot) !important;
+  opacity: .62;
   transform-box: fill-box;
   transform-origin: center;
-  animation: anitew-neural-node 8.6s ease-in-out infinite !important;
+  filter: drop-shadow(0 0 2px color-mix(in oklab, var(--v4-mint) 62%, transparent));
+  animation: anitew-neural-node 7.6s ease-in-out infinite !important;
 }
 .neural-nodes circle:nth-child(9n + 3),
 .neural-nodes circle:nth-child(13n + 7) {
-  fill: rgb(255 217 144 / 88%) !important;
-  filter: drop-shadow(0 0 2.4px rgb(216 168 90 / 60%));
-  animation-duration: 11.8s !important;
+  fill: var(--v4-gold-hot) !important;
+  filter: drop-shadow(0 0 3.2px color-mix(in oklab, var(--v4-gold) 72%, transparent));
+  animation-duration: 10.2s !important;
 }
 .neural-nodes circle:nth-child(5n + 1) {
-  filter: drop-shadow(0 0 2px rgb(140 207 192 / 52%));
+  opacity: .78;
 }
-/* Im Training zieht sich das Netz zurück. Es bleibt als Ort erhalten, aber
-   konkurriert nicht mit dem einen Wort / Gesicht / Weg im Vordergrund. */
 html[data-focus='on'] .neural {
-  opacity: .22 !important;
+  opacity: .2 !important;
   filter: none !important;
 }
 
-/* ── Core close: the gesture names itself -------------------------------- */
+/* ── Start ritual: mehr Energie, ohne Casino -------------------------------- */
+.challenge {
+  position: relative;
+  isolation: isolate;
+}
+.challenge::before {
+  content: '';
+  position: absolute;
+  inset: 8% -10% 24%;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(circle, color-mix(in oklab, var(--v4-gold) 13%, transparent), transparent 63%);
+  filter: blur(24px);
+  opacity: .7;
+}
+.start {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--v4-line-hot) !important;
+  background:
+    radial-gradient(circle at 50% 36%, color-mix(in oklab, var(--v4-gold) 28%, transparent), transparent 34%),
+    radial-gradient(circle at 50% 78%, color-mix(in oklab, var(--v4-mint) 12%, transparent), transparent 43%),
+    linear-gradient(145deg, color-mix(in oklab, var(--accent) 18%, var(--card)), color-mix(in oklab, var(--calm) 8%, var(--card))) !important;
+  color: var(--ink) !important;
+  box-shadow: var(--v4-start-shadow) !important;
+}
+.start::after {
+  content: '';
+  position: absolute;
+  inset: -45% 20%;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--v4-gold-hot) 13%, transparent), transparent);
+  transform: translateX(-170%) rotate(18deg);
+  animation: anitew-start-scan 7.8s ease-in-out infinite;
+}
+.start-time,
+.start-label {
+  position: relative;
+  z-index: 1;
+}
+.start-time {
+  background: linear-gradient(180deg, var(--ink) 0%, color-mix(in oklab, var(--ink) 72%, var(--v4-gold)) 72%, var(--v4-gold) 130%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  filter: drop-shadow(0 0 19px color-mix(in oklab, var(--v4-gold) 20%, transparent)) !important;
+}
+.start-label {
+  color: var(--v4-gold-hot) !important;
+  text-shadow: 0 0 22px color-mix(in oklab, var(--v4-gold) 24%, transparent) !important;
+}
+.mode {
+  border-color: color-mix(in oklab, var(--v4-mint) 24%, var(--line)) !important;
+  background: color-mix(in oklab, var(--card) 58%, transparent) !important;
+  color: var(--ink-soft) !important;
+  box-shadow: inset 0 1px 0 color-mix(in oklab, white 5%, transparent);
+  backdrop-filter: blur(10px);
+}
+.mode:hover {
+  border-color: color-mix(in oklab, var(--v4-gold) 45%, var(--line)) !important;
+  color: var(--ink) !important;
+  box-shadow: 0 0 25px color-mix(in oklab, var(--v4-gold) 18%, transparent) !important;
+}
+.mode-active {
+  border-color: color-mix(in oklab, var(--v4-gold) 58%, transparent) !important;
+  background:
+    radial-gradient(circle at 50% 0, color-mix(in oklab, var(--v4-gold) 20%, transparent), transparent 70%),
+    color-mix(in oklab, var(--accent) 15%, var(--card)) !important;
+  color: var(--ink) !important;
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 8%, transparent),
+    0 0 0 1px color-mix(in oklab, var(--v4-gold) 18%, transparent),
+    0 0 30px color-mix(in oklab, var(--v4-gold) 22%, transparent) !important;
+}
+
+/* ── First run: weniger Text, mehr visuelle Grammatik ------------------- */
+.onboarding {
+  max-width: 46rem !important;
+}
+.onboarding .brand {
+  position: relative;
+  text-align: center;
+}
+.onboarding .brand h1 {
+  color: var(--ink);
+  font-size: 1.35rem !important;
+  letter-spacing: .34em !important;
+  text-shadow: 0 0 28px color-mix(in oklab, var(--v4-mint) 14%, transparent) !important;
+}
+.onboarding .brand .greeting {
+  max-width: 19ch !important;
+  margin: 18px auto 0 !important;
+  color: var(--ink) !important;
+  font-size: clamp(28px, 7vw, 43px) !important;
+  line-height: 1.02 !important;
+  font-weight: 500;
+}
+.first-run-philosophy {
+  margin: 10px auto 0 !important;
+  color: var(--v4-gold) !important;
+  font-family: var(--mono) !important;
+  font-size: 9px !important;
+  font-weight: 650;
+  letter-spacing: .17em !important;
+  text-transform: uppercase;
+}
+.onboarding .arrival {
+  position: relative;
+  max-width: 760px;
+  margin-inline: auto;
+  padding-bottom: 28px;
+}
+.onboarding .arrival-note {
+  max-width: 45ch !important;
+  margin: 8px auto 0 !important;
+  color: var(--ink-soft) !important;
+  font-family: var(--sans) !important;
+  font-size: clamp(15px, 3.9vw, 18px) !important;
+  line-height: 1.42 !important;
+  font-weight: 450;
+}
+.first-run-adaptive {
+  max-width: 47ch !important;
+  margin: 12px auto 0 !important;
+  color: var(--v4-mint) !important;
+  font-family: var(--sans) !important;
+  font-size: 12px !important;
+  line-height: 1.45 !important;
+}
+.first-run-different {
+  margin: 28px 0 12px !important;
+  color: var(--ink-faint) !important;
+  font-size: 8px !important;
+  letter-spacing: .25em !important;
+}
+.first-run-highlights {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+.first-run-highlight {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 154px;
+  padding: 15px 14px 13px !important;
+  border: 1px solid var(--v4-line);
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 10% 0, color-mix(in oklab, var(--v4-mint) 10%, transparent), transparent 38%),
+    radial-gradient(circle at 100% 100%, color-mix(in oklab, var(--v4-gold) 7%, transparent), transparent 45%),
+    var(--v4-surface);
+  box-shadow: var(--v4-card-shadow);
+  overflow: hidden;
+}
+.first-run-highlight::after {
+  content: '';
+  position: absolute;
+  inset: auto -20% -55% 15%;
+  height: 70%;
+  background: radial-gradient(circle, color-mix(in oklab, var(--v4-mint) 9%, transparent), transparent 68%);
+  pointer-events: none;
+}
+.first-run-highlight-visual {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  margin-bottom: 12px;
+  border: 1px solid color-mix(in oklab, var(--v4-mint) 35%, transparent);
+  border-radius: 13px;
+  color: var(--v4-mint-hot);
+  background: color-mix(in oklab, var(--v4-mint) 8%, transparent);
+  box-shadow: 0 0 24px color-mix(in oklab, var(--v4-mint) 11%, transparent);
+}
+.first-run-highlight[data-capability='technique'] .first-run-highlight-visual,
+.first-run-highlight[data-capability='measure'] .first-run-highlight-visual {
+  color: var(--v4-gold-hot);
+  border-color: color-mix(in oklab, var(--v4-gold) 38%, transparent);
+  background: color-mix(in oklab, var(--v4-gold) 8%, transparent);
+  box-shadow: 0 0 24px color-mix(in oklab, var(--v4-gold) 12%, transparent);
+}
+.first-run-highlight-icon {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.55;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.first-run-highlight strong {
+  position: relative;
+  z-index: 1;
+  color: var(--ink) !important;
+  font-family: var(--serif) !important;
+  font-size: 14px !important;
+  font-weight: 580 !important;
+  line-height: 1.18 !important;
+}
+.first-run-highlight p {
+  position: relative;
+  z-index: 1;
+  margin: 6px 0 0 !important;
+  color: var(--ink-soft) !important;
+  font-size: 10.5px !important;
+  line-height: 1.4 !important;
+}
+.first-run-highlight-badge {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+  margin-top: auto !important;
+  padding-top: 9px;
+  color: var(--v4-gold) !important;
+  font-family: var(--mono);
+  font-size: 7px !important;
+  font-weight: 650;
+  letter-spacing: .11em !important;
+  text-transform: uppercase;
+}
+.first-run-trust {
+  margin: 17px auto 0 !important;
+  color: var(--v4-mint) !important;
+  font-size: 7.5px !important;
+  font-weight: 650;
+  letter-spacing: .15em !important;
+}
+.first-run-drive-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 14px;
+  max-width: 680px;
+  margin: 18px auto 4px !important;
+  padding: 17px 18px 16px !important;
+  border: 1px solid var(--v4-line-hot) !important;
+  border-radius: 22px !important;
+  background:
+    radial-gradient(circle at 100% 0, color-mix(in oklab, var(--v4-gold) 10%, transparent), transparent 42%),
+    radial-gradient(circle at 0 100%, color-mix(in oklab, var(--v4-mint) 9%, transparent), transparent 42%),
+    var(--v4-surface) !important;
+  box-shadow: var(--v4-card-shadow), inset 0 1px 0 color-mix(in oklab, white 5%, transparent) !important;
+}
+.first-run-drive-visual {
+  grid-row: 1 / span 4;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid color-mix(in oklab, var(--v4-gold) 34%, transparent);
+  border-radius: 14px;
+  color: var(--v4-gold-hot);
+  background: color-mix(in oklab, var(--v4-gold) 8%, transparent);
+}
+.first-run-drive-visual .first-run-highlight-icon {
+  width: 22px;
+  height: 22px;
+}
+.first-run-drive-kicker,
+.first-run-drive-title,
+.first-run-drive-body,
+.first-run-drive-actions {
+  grid-column: 2;
+}
+.first-run-drive-kicker {
+  margin: 0 !important;
+  color: var(--v4-gold) !important;
+  font-size: 7px !important;
+  font-weight: 650;
+  letter-spacing: .15em !important;
+}
+.first-run-drive-title {
+  margin: 4px 0 0 !important;
+  color: var(--ink) !important;
+  font-size: 16px !important;
+  font-weight: 580 !important;
+}
+.first-run-drive-body {
+  margin: 5px 0 0 !important;
+  color: var(--ink-soft) !important;
+  font-size: 10.5px !important;
+  line-height: 1.42 !important;
+}
+.first-run-drive-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px 14px;
+  flex-wrap: wrap;
+  margin-top: 11px !important;
+}
+.first-run-drive-connect {
+  min-height: 42px !important;
+  padding: 0 16px !important;
+  border: 1px solid color-mix(in oklab, var(--v4-gold) 42%, transparent) !important;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--v4-gold) 11%, var(--card)) !important;
+  color: var(--ink) !important;
+  font: 600 10px/1 var(--sans) !important;
+  box-shadow: 0 0 24px color-mix(in oklab, var(--v4-gold) 12%, transparent);
+}
+.first-run-drive-connect:disabled { opacity: .58; }
+.first-run-drive-status {
+  margin: 0;
+  color: var(--v4-mint) !important;
+  font-size: 9px !important;
+  line-height: 1.35;
+}
+.first-run-drive-status[data-error='true'] { color: var(--bad) !important; }
+.first-run-questions {
+  max-width: 50ch !important;
+  margin: 16px auto 6px !important;
+  color: var(--ink-soft) !important;
+  font-size: 11px !important;
+  line-height: 1.45 !important;
+}
+.onboarding .arrival-actions {
+  margin-top: 13px !important;
+}
+.onboarding .arrival-begin {
+  min-height: 58px !important;
+  max-width: 310px;
+  margin-inline: auto;
+  padding: 0 24px !important;
+  border-radius: 999px !important;
+  animation-duration: 6.4s !important;
+}
+.onboarding .arrival-begin .start-label {
+  font-size: 11px !important;
+  letter-spacing: .18em !important;
+}
+.first-run-scroll-cue {
+  position: fixed;
+  z-index: 1500;
+  left: 50%;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  translate: -50% 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 84px;
+  border: 0;
+  padding: 8px 12px 7px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--paper) 76%, transparent);
+  color: var(--v4-mint);
+  box-shadow: 0 8px 30px color-mix(in oklab, var(--v4-mint) 13%, transparent);
+  backdrop-filter: blur(14px) saturate(120%);
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+.first-run-scroll-cue[data-hidden='true'] {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(9px);
+}
+.first-run-scroll-label {
+  font-family: var(--mono);
+  font-size: 6.5px;
+  font-weight: 650;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+}
+.first-run-scroll-cue svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  animation: anitew-scroll-cue 1.8s ease-in-out infinite;
+}
+
+/* ── Guided orientation -------------------------------------------------- */
+.first-run-guide-veil {
+  background: color-mix(in oklab, var(--paper) 48%, rgb(0 0 0 / 55%)) !important;
+}
+.first-run-guide-card {
+  border-color: var(--v4-line) !important;
+  background:
+    radial-gradient(circle at 12% 0, color-mix(in oklab, var(--v4-gold) 10%, transparent), transparent 34%),
+    var(--v4-surface-strong) !important;
+  box-shadow: var(--v4-card-shadow), inset 0 1px 0 color-mix(in oklab, white 5%, transparent) !important;
+}
+.first-run-guide-title { color: var(--ink) !important; }
+.first-run-guide-body { color: var(--ink-soft) !important; }
+.first-run-guide-context {
+  margin: 9px 0 0;
+  padding-top: 9px;
+  border-top: 1px solid var(--v4-line);
+  color: var(--v4-mint) !important;
+  font-size: 9.5px;
+  line-height: 1.4;
+}
+
+/* ── Core: sichtbares Konto + Darstellung -------------------------------- */
 .drawer-close {
-  margin-bottom: 52px !important;
+  margin-bottom: 50px !important;
 }
 .drawer-close-label {
   position: absolute;
@@ -66,135 +606,265 @@ html[data-focus='on'] .neural {
   translate: -50% 0;
   width: max-content;
   max-width: min(70vw, 220px);
-  color: rgb(210 222 215 / 62%);
+  color: var(--ink-faint);
   font-family: var(--mono);
-  font-size: 9px;
+  font-size: 8px;
   line-height: 1.2;
-  letter-spacing: .18em;
+  letter-spacing: .17em;
   text-transform: uppercase;
   pointer-events: none;
 }
 .drawer-close:hover .drawer-close-label,
 .drawer-close:focus-visible .drawer-close-label {
-  color: rgb(255 226 169 / 88%);
+  color: var(--v4-gold-hot);
 }
-
-/* ── First run: capabilities before questions ---------------------------- */
-.first-run-highlights {
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+.drawer-google-account {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(100%, 480px);
+  margin: -8px auto 20px;
+  padding: 12px 14px;
+  border: 1px solid var(--v4-line);
+  border-radius: 18px;
+  background: var(--v4-surface);
 }
-.first-run-highlight[data-refinement='true'] {
-  border-top: 1px solid rgb(140 207 192 / 8%);
-}
-.first-run-highlight-badge {
-  display: inline-block;
-  margin-top: 7px;
-  color: rgb(216 168 90 / 68%);
+.drawer-google-avatar {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  border: 1px solid color-mix(in oklab, var(--v4-mint) 38%, transparent);
+  border-radius: 50%;
+  color: var(--v4-mint-hot);
+  background: color-mix(in oklab, var(--v4-mint) 8%, transparent);
   font-family: var(--mono);
-  font-size: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 0 22px color-mix(in oklab, var(--v4-mint) 13%, transparent);
+}
+.drawer-google-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+.drawer-google-copy small {
+  color: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 7px;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+.drawer-google-copy strong {
+  overflow: hidden;
+  margin-top: 2px;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.drawer-google-copy span {
+  overflow: hidden;
+  color: var(--ink-soft);
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.theme-control {
+  position: relative;
+  z-index: 4;
+  pointer-events: auto;
+  margin: 5px 0 13px;
+  padding: 12px;
+  border: 1px solid var(--v4-line);
+  border-radius: 18px;
+  background: color-mix(in oklab, var(--card) 48%, transparent);
+}
+.theme-label {
+  margin: 0 0 8px;
+  color: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 7px;
+  font-weight: 650;
   letter-spacing: .14em;
   text-transform: uppercase;
 }
-.first-run-drive-card {
+.theme-choices {
   position: relative;
-  max-width: 680px;
-  margin: 24px auto 4px;
-  padding: 20px 20px 18px;
-  border: 1px solid rgb(140 207 192 / 16%);
-  border-radius: 24px;
-  background:
-    radial-gradient(circle at 90% 0%, rgb(140 207 192 / 7%), transparent 42%),
-    radial-gradient(circle at 0% 100%, rgb(216 168 90 / 5%), transparent 42%),
-    rgb(6 12 10 / 52%);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 2%);
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
 }
-.first-run-drive-kicker {
-  margin: 0;
-  color: rgb(255 217 144 / 78%);
-  font-family: var(--mono);
-  font-size: 8px;
-  letter-spacing: .2em;
-  text-transform: uppercase;
+.theme-choice {
+  position: relative;
+  z-index: 1;
+  min-height: 38px;
+  border: 1px solid color-mix(in oklab, var(--v4-mint) 18%, var(--line));
+  border-radius: 12px;
+  background: transparent;
+  color: var(--ink-soft);
+  font: 600 9px/1 var(--sans);
+  cursor: pointer;
+  pointer-events: auto;
 }
-.first-run-drive-title {
-  margin: 7px 0 0;
-  color: var(--an-text);
+.theme-choice[aria-pressed='true'] {
+  border-color: color-mix(in oklab, var(--v4-gold) 46%, transparent);
+  background: color-mix(in oklab, var(--v4-gold) 10%, var(--card));
+  color: var(--ink);
+  box-shadow: 0 0 20px color-mix(in oklab, var(--v4-gold) 13%, transparent);
+}
+
+/* ── Drive identity ------------------------------------------------------ */
+.sync-privacy-lead {
+  color: var(--ink) !important;
   font-family: var(--serif);
-  font-size: 18px;
-  font-weight: 520;
+  font-size: 15px !important;
+  line-height: 1.45;
 }
-.first-run-drive-body {
-  margin: 8px 0 0;
-  color: rgb(196 211 201 / 68%);
-  font-size: 12px;
-  line-height: 1.48;
-}
-.first-run-drive-actions {
+.sync-identity {
   display: flex;
   align-items: center;
-  gap: 10px 14px;
-  flex-wrap: wrap;
-  margin-top: 15px;
+  gap: 12px;
+  margin: 16px 0;
+  padding: 13px 14px;
+  border: 1px solid var(--v4-line);
+  border-radius: 18px;
+  background: var(--v4-surface);
+  box-shadow: var(--v4-card-shadow);
 }
-.first-run-drive-connect {
-  min-height: 44px;
-  padding: 0 17px;
-  border: 1px solid rgb(216 168 90 / 28%);
-  border-radius: 999px;
-  background: rgb(216 168 90 / 8%);
-  color: rgb(255 226 169 / 92%);
-  font: 500 11px/1 var(--sans);
-  letter-spacing: .02em;
+.sync-identity-avatar {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  border: 1px solid color-mix(in oklab, var(--v4-mint) 40%, transparent);
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--v4-mint) 10%, transparent);
+  color: var(--v4-mint-hot);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 0 24px color-mix(in oklab, var(--v4-mint) 14%, transparent);
 }
-.first-run-drive-connect:disabled {
-  opacity: .58;
+.sync-identity-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
 }
-.first-run-drive-status {
-  margin: 0;
-  color: rgb(140 207 192 / 66%);
+.sync-identity-copy small {
+  color: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 7px;
+  font-weight: 650;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+.sync-identity-copy strong {
+  margin-top: 2px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 650;
+}
+.sync-account {
+  color: var(--ink-soft);
   font-size: 10px;
-  line-height: 1.35;
-}
-.first-run-drive-status[data-error='true'] {
-  color: rgb(224 137 124 / 82%);
-}
-.first-run-guide-context {
-  margin: 11px 0 0;
-  padding-top: 10px;
-  border-top: 1px solid rgb(140 207 192 / 9%);
-  color: rgb(180 205 188 / 54%);
-  font-size: 10px;
-  line-height: 1.45;
 }
 
 @keyframes anitew-neural-signal {
-  0% { stroke-dashoffset: 0; opacity: .32; }
-  42% { opacity: .82; }
-  100% { stroke-dashoffset: -32; opacity: .34; }
+  0% { stroke-dashoffset: 0; opacity: .36; }
+  40% { opacity: .96; }
+  100% { stroke-dashoffset: -34; opacity: .38; }
 }
 @keyframes anitew-neural-node {
-  0%, 100% { opacity: .28; transform: scale(.78); }
-  38% { opacity: .58; transform: scale(1.08); }
-  54% { opacity: .44; transform: scale(.93); }
+  0%, 100% { opacity: .38; transform: scale(.76); }
+  38% { opacity: .82; transform: scale(1.15); }
+  56% { opacity: .56; transform: scale(.94); }
+}
+@keyframes anitew-start-scan {
+  0%, 58% { transform: translateX(-170%) rotate(18deg); opacity: 0; }
+  66% { opacity: .8; }
+  82% { opacity: .5; }
+  100% { transform: translateX(170%) rotate(18deg); opacity: 0; }
+}
+@keyframes anitew-scroll-cue {
+  0%, 100% { transform: translateY(-1px); opacity: .58; }
+  50% { transform: translateY(4px); opacity: 1; }
 }
 
-@media (max-width: 560px) {
+@media (max-width: 620px) {
+  .first-run-highlights {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  .first-run-highlight {
+    min-height: 146px;
+  }
+}
+
+@media (max-width: 420px) {
+  .onboarding {
+    gap: 1.35rem !important;
+    padding-top: calc(1.7rem + env(safe-area-inset-top)) !important;
+  }
+  .onboarding .brand .greeting {
+    font-size: clamp(27px, 8vw, 35px) !important;
+  }
+  .first-run-highlight {
+    min-height: 142px;
+    padding: 13px 12px 12px !important;
+    border-radius: 17px;
+  }
+  .first-run-highlight-visual {
+    width: 34px;
+    height: 34px;
+    margin-bottom: 9px;
+    border-radius: 11px;
+  }
+  .first-run-highlight-icon {
+    width: 18px;
+    height: 18px;
+  }
+  .first-run-highlight strong { font-size: 12px !important; }
+  .first-run-highlight p { font-size: 9.5px !important; }
+  .first-run-highlight-badge { font-size: 6.3px !important; }
+  .first-run-drive-card {
+    grid-template-columns: 1fr;
+    padding: 15px !important;
+  }
+  .first-run-drive-visual {
+    grid-row: auto;
+    grid-column: 1;
+    margin-bottom: 10px;
+  }
+  .first-run-drive-kicker,
+  .first-run-drive-title,
+  .first-run-drive-body,
+  .first-run-drive-actions {
+    grid-column: 1;
+  }
+}
+
+@media (max-width: 330px) {
   .first-run-highlights {
     grid-template-columns: 1fr !important;
   }
-  .first-run-drive-card {
-    border-radius: 20px;
-    padding: 17px 16px 16px;
+  .first-run-highlight {
+    min-height: 0;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .neural-links line,
-  .neural-nodes circle {
+  .neural-nodes circle,
+  .start::after,
+  .first-run-scroll-cue svg {
     animation: none !important;
   }
   .neural-nodes circle {
-    opacity: .42;
+    opacity: .58;
     transform: none;
   }
 }

@@ -17,6 +17,15 @@
     <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192.png" />
     <script>
+      /* Theme vor dem ersten Paint anwenden. Default bleibt bewusst System. */
+      try {
+        const theme = localStorage.getItem('anitew.theme.v1')
+        document.documentElement.dataset.anitewTheme =
+          theme === 'light' || theme === 'dark' ? theme : 'system'
+      } catch {
+        document.documentElement.dataset.anitewTheme = 'system'
+      }
+
       /*
        * Das fünfsekündige Markenritual gehört nur zum allerersten Öffnen auf
        * diesem Gerät. Danach ist ANITEW sofort wieder ein Werkzeug. Der
@@ -35,6 +44,10 @@
       }
     </script>
     <style>
+      /*
+       * Splash = Marke, nicht Oberfläche. Deshalb ist seine Sprache immer
+       * Englisch und unabhängig von Geräte-, App- und Trainingssprache.
+       */
       #anitew-launch {
         --launch-duration: 1.65s;
         position: fixed;
@@ -43,16 +56,16 @@
         display: grid;
         grid-template-rows: 1fr auto auto auto 1fr;
         place-items: center;
-        gap: 16px;
+        gap: 17px;
         padding:
           max(36px, env(safe-area-inset-top))
           24px
           max(28px, env(safe-area-inset-bottom));
         background:
-          radial-gradient(circle at 50% 43%, rgb(140 207 192 / 8%), transparent 27rem),
-          radial-gradient(circle at 50% 50%, rgb(216 168 90 / 6%), transparent 17rem),
-          linear-gradient(180deg, #030706 0%, #050a08 56%, #020403 100%);
-        color: #f0eee4;
+          radial-gradient(circle at 50% 45%, rgb(142 231 208 / 11%), transparent 24rem),
+          radial-gradient(circle at 58% 51%, rgb(240 184 100 / 8%), transparent 16rem),
+          linear-gradient(180deg, #020605 0%, #050a08 52%, #020403 100%);
+        color: #f4f1e7;
         pointer-events: auto;
         overflow: hidden;
         animation: anitew-launch-away var(--launch-duration) cubic-bezier(.4,0,.2,1) forwards;
@@ -60,106 +73,122 @@
       html[data-anitew-first-launch='true'] #anitew-launch {
         --launch-duration: 5s;
       }
-      #anitew-launch::before {
+      #anitew-launch::before,
+      #anitew-launch::after {
         content: '';
         position: absolute;
         inset: 0;
         pointer-events: none;
-        opacity: .46;
+      }
+      #anitew-launch::before {
+        opacity: .74;
         background-image:
-          radial-gradient(circle at 18% 26%, rgb(140 207 192 / 28%) 0 1px, transparent 1.5px),
-          radial-gradient(circle at 74% 18%, rgb(216 168 90 / 22%) 0 1px, transparent 1.5px),
-          radial-gradient(circle at 84% 71%, rgb(140 207 192 / 20%) 0 1px, transparent 1.5px),
-          radial-gradient(circle at 26% 78%, rgb(216 168 90 / 16%) 0 1px, transparent 1.5px);
-        background-size: 93px 107px, 127px 101px, 149px 137px, 173px 151px;
-        animation: anitew-launch-field 5.8s ease-in-out infinite alternate;
+          radial-gradient(circle at 12% 18%, rgb(142 231 208 / 30%) 0 1px, transparent 1.6px),
+          radial-gradient(circle at 78% 16%, rgb(240 184 100 / 24%) 0 1px, transparent 1.6px),
+          radial-gradient(circle at 88% 72%, rgb(142 231 208 / 23%) 0 1px, transparent 1.6px),
+          radial-gradient(circle at 24% 81%, rgb(240 184 100 / 20%) 0 1px, transparent 1.6px);
+        background-size: 86px 103px, 121px 97px, 143px 131px, 167px 149px;
+        animation: anitew-launch-field 6.4s ease-in-out infinite alternate;
+      }
+      #anitew-launch::after {
+        inset: -28%;
+        opacity: .34;
+        background:
+          conic-gradient(from 12deg at 50% 48%, transparent 0 18%, rgb(142 231 208 / 6%) 23%, transparent 29% 62%, rgb(240 184 100 / 5%) 69%, transparent 76%);
+        filter: blur(34px);
+        animation: anitew-launch-aurora 16s ease-in-out infinite alternate;
       }
       .anitew-launch-terms {
         grid-row: 1;
         align-self: end;
-        margin-bottom: 26px;
-        color: rgb(174 201 190 / 56%);
-        font: 600 8px/1.7 ui-monospace, SFMono-Regular, Menlo, monospace;
-        letter-spacing: .24em;
+        margin-bottom: 29px;
+        color: rgb(188 219 207 / 68%);
+        font: 650 8px/1.7 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: .245em;
         text-align: center;
         text-transform: uppercase;
         opacity: 0;
-        animation: anitew-launch-copy .72s .16s ease forwards;
+        animation: anitew-launch-copy .72s .12s ease forwards;
       }
       .anitew-launch-core {
         grid-row: 2;
-        width: 122px;
-        height: 122px;
+        width: 154px;
+        height: 154px;
         overflow: visible;
         filter:
-          drop-shadow(0 0 20px rgb(216 168 90 / 20%))
-          drop-shadow(0 0 42px rgb(140 207 192 / 8%));
+          drop-shadow(0 0 18px rgb(240 184 100 / 16%))
+          drop-shadow(0 0 48px rgb(142 231 208 / 10%));
       }
-      .anitew-logo-orbit,
-      .anitew-logo-link,
-      .anitew-logo-loop {
+      .anitew-mark-path,
+      .anitew-mark-branch {
         fill: none;
         stroke-linecap: round;
         stroke-linejoin: round;
-        stroke-dasharray: 260;
-        stroke-dashoffset: 260;
-        animation: anitew-launch-draw 920ms cubic-bezier(.16,.84,.22,1) forwards;
+        stroke-dasharray: 170;
+        stroke-dashoffset: 170;
+        vector-effect: non-scaling-stroke;
+        animation: anitew-mark-draw 1.18s cubic-bezier(.16,.84,.22,1) forwards;
       }
-      .anitew-logo-orbit {
-        stroke: rgb(140 207 192 / 32%);
-        stroke-width: 1;
+      .anitew-mark-path {
+        stroke: url(#anitew-mark-gradient);
+        stroke-width: 1.55;
       }
-      .anitew-logo-orbit-b {
-        stroke: rgb(216 168 90 / 34%);
-        stroke-dasharray: 3 8;
-        stroke-dashoffset: 0;
-        animation: anitew-logo-orbit 18s linear infinite;
+      .anitew-mark-branch {
+        stroke: rgb(142 231 208 / 58%);
+        stroke-width: 1.35;
+        animation-delay: .25s;
       }
-      .anitew-logo-link {
-        stroke: rgb(140 207 192 / 50%);
-        stroke-width: 1.15;
-        animation-delay: 90ms;
-      }
-      .anitew-logo-loop {
-        stroke: rgb(216 168 90 / 54%);
-        stroke-width: 1.2;
-        animation-delay: 180ms;
-      }
-      .anitew-logo-node {
-        fill: #8ccfc0;
+      .anitew-mark-halo {
+        fill: none;
+        stroke: rgb(142 231 208 / 9%);
+        stroke-width: .8;
         opacity: 0;
         transform-box: fill-box;
         transform-origin: center;
-        animation: anitew-launch-point 620ms .28s cubic-bezier(.16,.84,.22,1) forwards;
+        animation: anitew-mark-halo 4.8s 1.15s ease-in-out infinite;
       }
-      .anitew-logo-node-gold { fill: #ffd990; }
-      .anitew-logo-core {
-        fill: #ffd990;
+      .anitew-mark-node {
+        fill: #f0b864;
         opacity: 0;
         transform-box: fill-box;
         transform-origin: center;
-        animation:
-          anitew-launch-point 620ms .38s cubic-bezier(.16,.84,.22,1) forwards,
-          anitew-logo-breathe 3.6s 1.1s ease-in-out infinite;
-        filter: drop-shadow(0 0 8px rgb(255 217 144 / 58%));
+        filter: drop-shadow(0 0 5px rgb(240 184 100 / 48%));
+        animation: anitew-mark-node .48s cubic-bezier(.16,.84,.22,1) forwards;
+      }
+      .anitew-mark-node:nth-of-type(1) { animation-delay: .34s; }
+      .anitew-mark-node:nth-of-type(2) { animation-delay: .46s; }
+      .anitew-mark-node:nth-of-type(3) { animation-delay: .58s; }
+      .anitew-mark-node:nth-of-type(4) { animation-delay: .70s; }
+      .anitew-mark-node:nth-of-type(5) { animation-delay: .82s; }
+      .anitew-mark-node-branch {
+        fill: #8ee7d0;
+        filter: drop-shadow(0 0 5px rgb(142 231 208 / 55%));
+        animation-delay: .78s !important;
+      }
+      .anitew-mark-signal {
+        fill: #fff1c9;
+        opacity: 0;
+        filter: drop-shadow(0 0 5px rgb(255 225 167 / 86%));
+        animation: anitew-mark-signal 2.9s 1.05s ease-in-out infinite;
       }
       .anitew-launch-name {
         grid-row: 3;
         opacity: 0;
         transform: translateY(5px);
-        font: 500 19px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        letter-spacing: .44em;
-        text-indent: .44em;
-        animation: anitew-launch-name 520ms .54s ease forwards;
+        font: 520 21px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        letter-spacing: .46em;
+        text-indent: .46em;
+        text-shadow: 0 0 28px rgb(142 231 208 / 12%);
+        animation: anitew-launch-name .56s .62s ease forwards;
       }
       .anitew-launch-powered {
         grid-row: 4;
         margin-top: 3px;
-        color: rgb(205 211 205 / 34%);
+        color: rgb(205 211 205 / 42%);
         font: 500 9px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         letter-spacing: .12em;
         opacity: 0;
-        animation: anitew-launch-copy .55s .78s ease forwards;
+        animation: anitew-launch-copy .55s .84s ease forwards;
       }
       #root .drawer-veil {
         z-index: 3000 !important;
@@ -178,11 +207,21 @@
         z-index: 3 !important;
         pointer-events: auto !important;
       }
-      @keyframes anitew-launch-draw { to { stroke-dashoffset: 0; } }
-      @keyframes anitew-launch-point {
-        0% { opacity: 0; transform: scale(.18); }
-        55% { opacity: 1; transform: scale(1.42); }
+      @keyframes anitew-mark-draw { to { stroke-dashoffset: 0; } }
+      @keyframes anitew-mark-node {
+        0% { opacity: 0; transform: scale(.24); }
+        70% { opacity: 1; transform: scale(1.18); }
         100% { opacity: 1; transform: scale(1); }
+      }
+      @keyframes anitew-mark-halo {
+        0%, 100% { opacity: .1; transform: scale(.78); }
+        50% { opacity: .68; transform: scale(1.35); }
+      }
+      @keyframes anitew-mark-signal {
+        0% { opacity: 0; offset-distance: 0%; }
+        10% { opacity: .95; }
+        88% { opacity: .9; }
+        100% { opacity: 0; offset-distance: 100%; }
       }
       @keyframes anitew-launch-name {
         to { opacity: 1; transform: none; }
@@ -190,15 +229,11 @@
       @keyframes anitew-launch-copy {
         to { opacity: 1; }
       }
-      @keyframes anitew-logo-breathe {
-        0%, 100% { transform: scale(.9); filter: drop-shadow(0 0 7px rgb(255 217 144 / 42%)); }
-        50% { transform: scale(1.18); filter: drop-shadow(0 0 13px rgb(255 217 144 / 72%)); }
-      }
-      @keyframes anitew-logo-orbit {
-        to { stroke-dashoffset: -88; }
-      }
       @keyframes anitew-launch-field {
-        to { transform: translate3d(1.5%, -1%, 0) scale(1.018); opacity: .62; }
+        to { transform: translate3d(1.2%, -1%, 0) scale(1.02); opacity: .92; }
+      }
+      @keyframes anitew-launch-aurora {
+        to { transform: translate3d(2%, 1.4%, 0) rotate(2deg) scale(1.04); opacity: .48; }
       }
       @keyframes anitew-launch-away {
         0%, 84% { opacity: 1; visibility: visible; }
@@ -208,11 +243,12 @@
         #anitew-launch { --launch-duration: .42s; }
         html[data-anitew-first-launch='true'] #anitew-launch { --launch-duration: 5s; }
         #anitew-launch::before,
-        .anitew-logo-orbit,
-        .anitew-logo-link,
-        .anitew-logo-loop,
-        .anitew-logo-node,
-        .anitew-logo-core,
+        #anitew-launch::after,
+        .anitew-mark-path,
+        .anitew-mark-branch,
+        .anitew-mark-halo,
+        .anitew-mark-node,
+        .anitew-mark-signal,
         .anitew-launch-name,
         .anitew-launch-terms,
         .anitew-launch-powered {
@@ -226,17 +262,31 @@
   </head>
   <body>
     <div id="anitew-launch" aria-hidden="true">
-      <div class="anitew-launch-terms">ERINNERN · VERKNÜPFEN · ABRUFEN · FESTIGEN</div>
+      <div class="anitew-launch-terms">MEMORIZE · RECALL · RETAIN · MASTER</div>
       <svg class="anitew-launch-core" viewBox="0 0 120 120" aria-hidden="true">
-        <path class="anitew-logo-orbit" d="M20 66C17 39 34 18 58 16c27-2 47 17 45 44-2 25-19 43-43 44-24 1-40-13-43-34" />
-        <path class="anitew-logo-orbit anitew-logo-orbit-b" d="M29 88C17 69 21 43 39 30c20-15 48-10 61 10" />
-        <path class="anitew-logo-link" d="M24 78C39 72 49 64 60 57C72 49 82 42 96 31M60 57L91 82M60 57L43 25" />
-        <path class="anitew-logo-loop" d="M24 78C28 95 48 101 63 91C76 82 75 66 60 57C45 48 31 56 29 68" />
-        <circle class="anitew-logo-node" cx="24" cy="78" r="3.1" />
-        <circle class="anitew-logo-node anitew-logo-node-gold" cx="43" cy="25" r="2.7" style="animation-delay:.36s" />
-        <circle class="anitew-logo-node" cx="96" cy="31" r="3.3" style="animation-delay:.44s" />
-        <circle class="anitew-logo-node" cx="91" cy="82" r="2.8" style="animation-delay:.52s" />
-        <circle class="anitew-logo-core" cx="60" cy="57" r="6.2" />
+        <defs>
+          <linearGradient id="anitew-mark-gradient" x1="18" y1="84" x2="103" y2="37" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#8ee7d0" stop-opacity=".54" />
+            <stop offset=".48" stop-color="#b7ddbd" stop-opacity=".72" />
+            <stop offset="1" stop-color="#f0b864" stop-opacity=".92" />
+          </linearGradient>
+        </defs>
+        <!-- Das ursprüngliche ANITEW-Prinzip: Wiederholungskurve + echter Seitenzweig. -->
+        <path class="anitew-mark-path" d="M24 79L36 67L54 54L78 43L100 38" />
+        <path class="anitew-mark-branch" d="M54 54L67 76" />
+        <circle class="anitew-mark-halo" cx="78" cy="43" r="8.5" />
+        <circle class="anitew-mark-halo" cx="100" cy="38" r="10" style="animation-delay:1.65s" />
+        <circle class="anitew-mark-node" cx="24" cy="79" r="3.5" />
+        <circle class="anitew-mark-node" cx="36" cy="67" r="3.8" />
+        <circle class="anitew-mark-node" cx="54" cy="54" r="4.2" />
+        <circle class="anitew-mark-node" cx="78" cy="43" r="4.6" />
+        <circle class="anitew-mark-node" cx="100" cy="38" r="5" />
+        <circle class="anitew-mark-node anitew-mark-node-branch" cx="67" cy="76" r="3.2" />
+        <circle
+          class="anitew-mark-signal"
+          r="1.65"
+          style="offset-path:path('M24 79L36 67L54 54L78 43L100 38');offset-rotate:0deg"
+        />
       </svg>
       <div class="anitew-launch-name">ANITEW</div>
       <div class="anitew-launch-powered">Powered by Impekal</div>

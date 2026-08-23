@@ -2,6 +2,7 @@ import '../anitew-experience-refinement.css'
 
 import { createWebPlatform } from '../platform/web/index.ts'
 import {
+  SYNC_ACCOUNT_NAME_SETTING,
   SYNC_ACCOUNT_SETTING,
   SYNC_AT_SETTING,
   SYNC_ON_SETTING,
@@ -9,15 +10,26 @@ import {
   resolveClientId,
 } from './driveSync.ts'
 
+type CapabilityKind = 'adaptive' | 'technique' | 'world' | 'measure' | 'coach' | 'privacy'
+type ThemeChoice = 'system' | 'light' | 'dark'
+
+interface CapabilityCopy {
+  kind: CapabilityKind
+  title: string
+  body: string
+  badge: string
+}
+
 interface RefinementCopy {
   close: string
-  coachTitle: string
-  coachBody: string
-  coachBadge: string
-  driveTitle: string
-  driveBody: string
-  driveBadge: string
+  welcomeTitle: string
+  philosophy: string
+  intro: string
+  adaptive: string
+  different: string
+  capabilities: readonly CapabilityCopy[]
   trust: string
+  questions: string
   driveKicker: string
   driveCardTitle: string
   driveCardBody: string
@@ -26,68 +38,154 @@ interface RefinementCopy {
   driveConnected: string
   driveUnavailable: string
   driveDenied: string
+  scroll: string
+  appearance: string
+  themes: Record<ThemeChoice, string>
+  connectedAccount: string
   guideContext: readonly string[]
 }
 
 const DE: RefinementCopy = {
   close: 'Menü schließen',
-  coachTitle: 'Der Coach übersetzt deinen Verlauf.',
-  coachBody:
-    'Er gibt Hinweise aus deinen echten Trainingsdaten. Freie KI-Fragen sind optional und laufen nur mit deinem eigenen Schlüssel beim gewählten Anbieter.',
-  coachBadge: 'Coach · optional mit KI',
-  driveTitle: 'Deine Daten können dir folgen.',
-  driveBody:
-    'Empfohlen: Mit Google Drive verbinden. ANITEW legt dort den Ordner „Anitew“ an und gleicht deinen Stand automatisch zwischen deinen Geräten ab.',
-  driveBadge: 'Google Drive · empfohlen',
-  trust: 'LOCAL FIRST · OFFLINE · GOOGLE DRIVE OPTIONAL',
-  driveKicker: 'EMPFOHLEN · OPTIONAL',
-  driveCardTitle: 'Google Drive verbinden',
+  welcomeTitle: 'Willkommen in deinem Gedächtnissystem.',
+  philosophy: 'Erinnern. Verknüpfen. Behalten.',
+  intro: 'ANITEW trainiert Namen, Zahlen, Lernstoff und Erinnerungen aus deinem echten Leben.',
+  adaptive: 'Es lernt aus echten Abrufen, lehrt Techniken und passt sich deinem Verlauf an.',
+  different: 'Das macht ANITEW',
+  capabilities: [
+    {
+      kind: 'adaptive',
+      title: 'Adaptives Training',
+      body: 'Wiederholen, wenn dein Verlauf es braucht.',
+      badge: 'Echte Abrufe',
+    },
+    {
+      kind: 'technique',
+      title: 'Gedächtnistechniken',
+      body: 'Palast, Major-System, Geschichten, Verknüpfungen.',
+      badge: 'Lernen + anwenden',
+    },
+    {
+      kind: 'world',
+      title: 'Memory World',
+      body: 'Namen, Lernstoff und persönliche Erinnerungen werden trainierbar.',
+      badge: 'Dein Inhalt',
+    },
+    {
+      kind: 'measure',
+      title: 'Ehrliche Messung',
+      body: 'Training und Messung bleiben bewusst getrennt.',
+      badge: 'Keine Fantasie-Scores',
+    },
+    {
+      kind: 'coach',
+      title: 'Coach',
+      body: 'Liest deinen Verlauf und macht daraus konkrete Hinweise.',
+      badge: 'Optional mit KI',
+    },
+    {
+      kind: 'privacy',
+      title: 'Deine Daten. Deine Kontrolle.',
+      body: 'Lokal auf deinem Gerät — oder in deinem eigenen Google Drive.',
+      badge: 'Private by design',
+    },
+  ],
+  trust: 'PRIVAT · LOKAL ZUERST · DEINE DATEN, DEINE KONTROLLE',
+  questions: 'Zwei kurze, freiwillige Fragen richten ANITEW auf das aus, was du behalten willst und wie viel Zeit du hast.',
+  driveKicker: 'OPTIONAL · EMPFOHLEN FÜR MEHRERE GERÄTE',
+  driveCardTitle: 'Deine Daten. Deine Kontrolle.',
   driveCardBody:
-    'ANITEW legt in deinem Drive einen sichtbaren Ordner „Anitew“ an. Darin liegt dein synchronisierter ANITEW-Stand. Ohne Verbindung bleibt alles ausschließlich lokal auf diesem Gerät; ANITEW hat keinen eigenen Datenserver.',
-  driveConnect: 'Mit Google Drive verbinden',
+    'Standardmäßig bleibt alles auf diesem Gerät. Für mehrere Geräte kannst du dein eigenes Google Drive verbinden. ANITEW synchronisiert dann über deinen sichtbaren Ordner „Anitew“ — ohne zusätzliche ANITEW-Cloudkopie.',
+  driveConnect: 'Google Drive verbinden',
   driveConnecting: 'Google Drive wird verbunden …',
   driveConnected: 'Verbunden. Automatischer Abgleich ist aktiv',
   driveUnavailable: 'Google Drive ist für diesen Build noch nicht eingerichtet.',
   driveDenied: 'Nicht verbunden. Lokal funktioniert ANITEW vollständig weiter.',
+  scroll: 'Mehr entdecken',
+  appearance: 'Darstellung',
+  themes: { system: 'System', light: 'Hell', dark: 'Dunkel' },
+  connectedAccount: 'Verbundenes Google-Konto',
   guideContext: [
-    'Im Core findest du außerdem Coach, Memory DNA, eigene Inhalte, Gedächtnispalast, Google Drive, Backup und Einstellungen.',
-    'Eigene Fakten, Lernstoff und persönliche Erinnerungen werden nicht zu Dekoration: Sie bekommen echte Verbindungen und Wiederholungen.',
-    'Der Coach liest dieselben realen Signale und macht daraus konkrete Hinweise. Für freie KI-Fragen entscheidest du selbst, ob du einen eigenen API-Schlüssel hinterlegst.',
-    'ANITEW bringt Techniken ins Training: Gedächtnispalast, Major-System, Geschichten und Verknüpfungen werden erklärt und danach angewandt.',
-    'Empfohlen ist Google Drive für mehrere Geräte. Ohne Verbindung bleibt alles lokal; Übung und ehrliche Messung bleiben trotzdem vollständig nutzbar.',
+    'Im Core liegen Coach, Memory DNA, eigene Inhalte, Gedächtnispalast, Google Drive, Backup und Einstellungen.',
+    'Eigene Fakten, Lernstoff und persönliche Erinnerungen bekommen echte Verbindungen und Wiederholungen.',
+    'Der Coach liest dieselben realen Signale und macht daraus konkrete Hinweise.',
+    'Gedächtnispalast, Major-System, Geschichten und Verknüpfungen werden erklärt und angewandt.',
+    'Mehrere Geräte: dein eigenes Google Drive. Ohne Verbindung bleibt ANITEW vollständig lokal.',
   ],
 }
 
 const EN: RefinementCopy = {
   close: 'Close menu',
-  coachTitle: 'The Coach translates your history.',
-  coachBody:
-    'It gives guidance from your real training data. Free-form AI questions are optional and use only your own key with the provider you choose.',
-  coachBadge: 'Coach · optional AI',
-  driveTitle: 'Your data can follow you.',
-  driveBody:
-    'Recommended: connect Google Drive. ANITEW creates an “Anitew” folder there and automatically keeps your state in sync across your devices.',
-  driveBadge: 'Google Drive · recommended',
-  trust: 'LOCAL FIRST · OFFLINE · GOOGLE DRIVE OPTIONAL',
-  driveKicker: 'RECOMMENDED · OPTIONAL',
-  driveCardTitle: 'Connect Google Drive',
+  welcomeTitle: 'Welcome to your memory system.',
+  philosophy: 'Remember. Connect. Retain.',
+  intro: 'ANITEW trains names, numbers, study material and memories from your real life.',
+  adaptive: 'It learns from real retrieval, teaches techniques and adapts to your history.',
+  different: 'What ANITEW does',
+  capabilities: [
+    {
+      kind: 'adaptive',
+      title: 'Adaptive training',
+      body: 'Review when your history says it matters.',
+      badge: 'Real retrieval',
+    },
+    {
+      kind: 'technique',
+      title: 'Memory techniques',
+      body: 'Palaces, Major System, stories and linking.',
+      badge: 'Learn + apply',
+    },
+    {
+      kind: 'world',
+      title: 'Memory World',
+      body: 'Names, study material and personal memories become trainable.',
+      badge: 'Your content',
+    },
+    {
+      kind: 'measure',
+      title: 'Honest measurement',
+      body: 'Training and measurement stay deliberately separate.',
+      badge: 'No fantasy scores',
+    },
+    {
+      kind: 'coach',
+      title: 'Coach',
+      body: 'Reads your history and turns it into concrete guidance.',
+      badge: 'Optional AI',
+    },
+    {
+      kind: 'privacy',
+      title: 'Your data. Your control.',
+      body: 'Local on your device — or in your own Google Drive.',
+      badge: 'Private by design',
+    },
+  ],
+  trust: 'PRIVATE · LOCAL FIRST · YOUR DATA, YOUR CONTROL',
+  questions: 'Two short optional questions tune ANITEW to what you want to retain and how much time you have.',
+  driveKicker: 'OPTIONAL · RECOMMENDED FOR MULTIPLE DEVICES',
+  driveCardTitle: 'Your data. Your control.',
   driveCardBody:
-    'ANITEW creates a visible “Anitew” folder in your Drive and stores the synchronized ANITEW state there. Without a connection everything stays local on this device; ANITEW has no data server of its own.',
+    'Everything stays on this device by default. For multiple devices, connect your own Google Drive. ANITEW then syncs through your visible “Anitew” folder — without an additional ANITEW cloud copy.',
   driveConnect: 'Connect Google Drive',
   driveConnecting: 'Connecting Google Drive …',
   driveConnected: 'Connected. Automatic sync is active',
   driveUnavailable: 'Google Drive is not configured for this build yet.',
   driveDenied: 'Not connected. ANITEW continues to work fully locally.',
+  scroll: 'Explore more',
+  appearance: 'Appearance',
+  themes: { system: 'System', light: 'Light', dark: 'Dark' },
+  connectedAccount: 'Connected Google account',
   guideContext: [
-    'The Core also contains Coach, Memory DNA, your own content, memory palace, Google Drive, backup and settings.',
-    'Your own facts, study material and personal memories are not decoration: they receive real links and review schedules.',
-    'The Coach reads those same real signals and turns them into concrete guidance. For free-form AI questions, you decide whether to add your own API key.',
-    'ANITEW brings techniques into training: memory palace, Major System, stories and linking are taught and then applied.',
-    'Google Drive is recommended across devices. Without it everything stays local; training and honest measurement remain fully available.',
+    'The Core contains Coach, Memory DNA, your content, memory palace, Google Drive, backup and settings.',
+    'Your facts, study material and personal memories receive real links and review schedules.',
+    'The Coach reads those same real signals and turns them into concrete guidance.',
+    'Memory palace, Major System, stories and linking are taught and applied.',
+    'Multiple devices: your own Google Drive. Without it ANITEW remains fully local.',
   ],
 }
 
 const platform = createWebPlatform()
+const THEME_KEY = 'anitew.theme.v1'
+const lifecycle = new AbortController()
 
 function copy(): RefinementCopy {
   return document.documentElement.lang.toLowerCase().startsWith('de') ? DE : EN
@@ -102,44 +200,95 @@ function element<K extends keyof HTMLElementTagNameMap>(
   return value
 }
 
-function appendHighlight(
-  container: HTMLElement,
-  titleText: string,
-  bodyText: string,
-  badgeText: string,
-): void {
+function icon(kind: CapabilityKind): SVGSVGElement {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+  svg.setAttribute('viewBox', '0 0 24 24')
+  svg.setAttribute('aria-hidden', 'true')
+  svg.classList.add('first-run-highlight-icon')
+  const paths: Record<CapabilityKind, string> = {
+    adaptive: '<path d="M4 16.5 8.2 12l3 2.8L20 6.5"/><circle cx="4" cy="16.5" r="1.4"/><circle cx="8.2" cy="12" r="1.4"/><circle cx="11.2" cy="14.8" r="1.4"/><circle cx="20" cy="6.5" r="1.4"/>',
+    technique: '<path d="M5 19V9l7-4 7 4v10M8.5 19v-5h7v5M4 19h16"/>',
+    world: '<circle cx="6" cy="12" r="2"/><circle cx="13" cy="6" r="2"/><circle cx="18" cy="15" r="2"/><path d="m7.6 10.8 3.8-3.4m2.7.3 2.8 5.5M8 12.5l8 2"/>',
+    measure: '<path d="M5 18a8 8 0 1 1 14 0M12 18l4-7"/><circle cx="12" cy="18" r="1.4"/>',
+    coach: '<path d="M5 6.5h14v9H9l-4 3v-12Z"/><path d="M9 10h6M9 13h4"/>',
+    privacy: '<path d="M12 3.5 19 6v5.2c0 4.5-2.8 7.7-7 9.3-4.2-1.6-7-4.8-7-9.3V6l7-2.5Z"/><path d="m9 12 2 2 4-4"/>',
+  }
+  svg.innerHTML = paths[kind]
+  return svg
+}
+
+function appendHighlight(container: HTMLElement, itemCopy: CapabilityCopy): void {
   const item = element('article', 'first-run-highlight')
-  item.dataset.refinement = 'true'
-  const dot = element('span', 'first-run-highlight-dot')
-  dot.setAttribute('aria-hidden', 'true')
+  item.dataset.capability = itemCopy.kind
+  const visual = element('span', 'first-run-highlight-visual')
+  visual.append(icon(itemCopy.kind))
   const title = element('strong')
-  title.textContent = titleText
+  title.textContent = itemCopy.title
   const body = element('p')
-  body.textContent = bodyText
+  body.textContent = itemCopy.body
   const badge = element('span', 'first-run-highlight-badge')
-  badge.textContent = badgeText
-  item.append(dot, title, body, badge)
+  badge.textContent = itemCopy.badge
+  item.append(visual, title, body, badge)
   container.append(item)
+}
+
+function addScrollCue(arrival: HTMLElement, t: RefinementCopy): void {
+  if (arrival.querySelector('.first-run-scroll-cue') !== null) return
+  const target = arrival.querySelector<HTMLElement>('.first-run-different')
+  if (target === null) return
+  const cue = element('button', 'first-run-scroll-cue')
+  cue.type = 'button'
+  cue.setAttribute('aria-label', t.scroll)
+  const label = element('span', 'first-run-scroll-label')
+  label.textContent = t.scroll
+  const arrow = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+  arrow.setAttribute('viewBox', '0 0 24 24')
+  arrow.setAttribute('aria-hidden', 'true')
+  arrow.innerHTML = '<path d="m6 9 6 6 6-6"/>'
+  cue.append(label, arrow)
+  cue.addEventListener('click', () => target.scrollIntoView({ behavior: 'smooth', block: 'start' }))
+  const update = () => {
+    cue.dataset.hidden = window.scrollY > 96 ? 'true' : 'false'
+  }
+  window.addEventListener('scroll', update, { passive: true, signal: lifecycle.signal })
+  update()
+  arrival.append(cue)
 }
 
 function enhanceWelcome(): void {
   const arrival = document.querySelector<HTMLElement>('.onboarding .arrival')
-  if (arrival === null || arrival.dataset.experienceRefinement === 'true') return
+  if (arrival === null || arrival.dataset.experienceRefinement === 'v4') return
   const highlights = arrival.querySelector<HTMLElement>('.first-run-highlights')
   const actions = arrival.querySelector<HTMLElement>('.arrival-actions')
   if (highlights === null || actions === null) return
 
-  arrival.dataset.experienceRefinement = 'true'
+  arrival.dataset.experienceRefinement = 'v4'
   const t = copy()
 
-  appendHighlight(highlights, t.coachTitle, t.coachBody, t.coachBadge)
-  appendHighlight(highlights, t.driveTitle, t.driveBody, t.driveBadge)
+  const greeting = document.querySelector<HTMLElement>('.onboarding .brand .greeting')
+  if (greeting !== null) greeting.textContent = t.welcomeTitle
+  const philosophy = document.querySelector<HTMLElement>('.onboarding .first-run-philosophy')
+  if (philosophy !== null) philosophy.textContent = t.philosophy
+  const note = arrival.querySelector<HTMLElement>('.arrival-note')
+  if (note !== null) note.textContent = t.intro
+  const adaptive = arrival.querySelector<HTMLElement>('.first-run-adaptive')
+  if (adaptive !== null) adaptive.textContent = t.adaptive
+  const different = arrival.querySelector<HTMLElement>('.first-run-different')
+  if (different !== null) different.textContent = t.different
+
+  // Sechs klare Fähigkeiten statt sechs Textblöcke aus verschiedenen Phasen.
+  highlights.replaceChildren()
+  t.capabilities.forEach((capability) => appendHighlight(highlights, capability))
 
   const trust = arrival.querySelector<HTMLElement>('.first-run-trust')
   if (trust !== null) trust.textContent = t.trust
+  const questions = arrival.querySelector<HTMLElement>('.first-run-questions')
+  if (questions !== null) questions.textContent = t.questions
 
   const card = element('section', 'first-run-drive-card')
   card.setAttribute('aria-label', t.driveCardTitle)
+  const visual = element('span', 'first-run-drive-visual')
+  visual.append(icon('privacy'))
   const kicker = element('p', 'first-run-drive-kicker')
   kicker.textContent = t.driveKicker
   const title = element('h3', 'first-run-drive-title')
@@ -174,8 +323,12 @@ function enhanceWelcome(): void {
       if (result.account !== undefined) {
         await platform.settings.write(SYNC_ACCOUNT_SETTING, result.account)
       }
+      if (result.accountName !== undefined) {
+        await platform.settings.write(SYNC_ACCOUNT_NAME_SETTING, result.accountName)
+      }
       button.textContent = '✓'
-      status.textContent = `${t.driveConnected}${result.account === undefined ? '' : ` · ${result.account}`}`
+      const identity = result.accountName ?? result.account
+      status.textContent = `${t.driveConnected}${identity === undefined ? '' : ` · ${identity}`}`
     })()
       .catch(() => {
         status.dataset.error = 'true'
@@ -189,11 +342,11 @@ function enhanceWelcome(): void {
   })
 
   driveActions.append(button, status)
-  card.append(kicker, title, body, driveActions)
-
-  const questions = arrival.querySelector('.first-run-questions')
+  card.append(visual, kicker, title, body, driveActions)
   if (questions !== null) arrival.insertBefore(card, questions)
   else arrival.insertBefore(card, actions)
+
+  addScrollCue(arrival, t)
 }
 
 function enhanceMenuClose(): void {
@@ -202,6 +355,94 @@ function enhanceMenuClose(): void {
   const label = element('span', 'drawer-close-label')
   label.textContent = copy().close
   close.append(label)
+}
+
+function readTheme(): ThemeChoice {
+  try {
+    const value = window.localStorage.getItem(THEME_KEY)
+    return value === 'light' || value === 'dark' ? value : 'system'
+  } catch {
+    return 'system'
+  }
+}
+
+function applyTheme(theme: ThemeChoice): void {
+  document.documentElement.dataset.anitewTheme = theme
+  try {
+    if (theme === 'system') window.localStorage.removeItem(THEME_KEY)
+    else window.localStorage.setItem(THEME_KEY, theme)
+  } catch {
+    // Darstellung ist Komfort; sie darf die App nie blockieren.
+  }
+  document.querySelectorAll<HTMLButtonElement>('.theme-choice').forEach((button) => {
+    button.setAttribute('aria-pressed', String(button.dataset.themeValue === theme))
+  })
+}
+
+function enhanceThemeControl(): void {
+  const group = document.querySelector<HTMLElement>('.menu-group-device')
+  if (group === null || group.querySelector('.theme-control') !== null) return
+  const t = copy()
+  const control = element('section', 'theme-control')
+  control.setAttribute('aria-label', t.appearance)
+  const label = element('p', 'theme-label')
+  label.textContent = t.appearance
+  const choices = element('div', 'theme-choices')
+  ;(['system', 'light', 'dark'] as const).forEach((theme) => {
+    const button = element('button', 'theme-choice')
+    button.type = 'button'
+    button.dataset.themeValue = theme
+    button.textContent = t.themes[theme]
+    button.setAttribute('aria-pressed', String(readTheme() === theme))
+    button.addEventListener('click', () => applyTheme(theme))
+    choices.append(button)
+  })
+  control.append(label, choices)
+  const groupLabel = group.querySelector('.menu-label')
+  if (groupLabel?.nextSibling !== null && groupLabel?.nextSibling !== undefined) {
+    group.insertBefore(control, groupLabel.nextSibling)
+  } else group.append(control)
+}
+
+let identityLookupRunning = false
+function enhanceDrawerAccount(): void {
+  const drawer = document.querySelector<HTMLElement>('.drawer')
+  if (drawer === null || drawer.querySelector('.drawer-google-account') !== null) return
+  if (drawer.dataset.identityChecked === 'true' || identityLookupRunning) return
+  drawer.dataset.identityChecked = 'true'
+  identityLookupRunning = true
+  void Promise.all([
+    platform.settings.read<boolean>(SYNC_ON_SETTING).catch(() => undefined),
+    platform.settings.read<string>(SYNC_ACCOUNT_SETTING).catch(() => undefined),
+    platform.settings.read<string>(SYNC_ACCOUNT_NAME_SETTING).catch(() => undefined),
+  ])
+    .then(([on, email, name]) => {
+      if (!drawer.isConnected || on !== true || (email === undefined && name === undefined)) return
+      const t = copy()
+      const card = element('section', 'drawer-google-account')
+      const avatar = element('span', 'drawer-google-avatar')
+      const source = name?.trim() || email?.trim() || 'G'
+      avatar.textContent = source.slice(0, 1).toUpperCase()
+      avatar.setAttribute('aria-hidden', 'true')
+      const text = element('span', 'drawer-google-copy')
+      const kicker = element('small')
+      kicker.textContent = t.connectedAccount
+      const strong = element('strong')
+      strong.textContent = name ?? 'Google Drive'
+      text.append(kicker, strong)
+      if (email !== undefined) {
+        const mail = element('span')
+        mail.textContent = email
+        text.append(mail)
+      }
+      card.append(avatar, text)
+      const firstGroup = drawer.querySelector('.menu-group')
+      if (firstGroup !== null) drawer.insertBefore(card, firstGroup)
+      else drawer.append(card)
+    })
+    .finally(() => {
+      identityLookupRunning = false
+    })
 }
 
 function enhanceGuide(): void {
@@ -220,9 +461,6 @@ function enhanceGuide(): void {
 
   const index = Number(counter.textContent?.split('/')[0]?.trim() ?? '0') - 1
   const next = copy().guideContext[index] ?? ''
-  // Wichtig: Der MutationObserver beobachtet auch diesen Text. Nur schreiben,
-  // wenn sich der Inhalt wirklich geändert hat, sonst löst die Verfeinerung
-  // ihre eigene Mutation immer wieder aus und blockiert die Oberfläche.
   if (context.textContent !== next) context.textContent = next
   context.hidden = next === ''
 }
@@ -230,15 +468,14 @@ function enhanceGuide(): void {
 function refine(): void {
   enhanceWelcome()
   enhanceMenuClose()
+  enhanceThemeControl()
+  enhanceDrawerAccount()
   enhanceGuide()
 }
 
+applyTheme(readTheme())
 refine()
 const observer = new MutationObserver(refine)
-// Der First-Run-Guide wird absichtlich direkt an <body> gehängt, damit sein
-// Overlay nicht vom App-Stacking-Kontext abgeschnitten wird. Deshalb muss die
-// Verfeinerung auch dort beobachten; nur #root zu beobachten ließ den
-// Zusatztext nach Schritt 1 stehen.
 observer.observe(document.body, {
   childList: true,
   subtree: true,
@@ -247,6 +484,9 @@ observer.observe(document.body, {
 
 window.addEventListener(
   'pagehide',
-  () => observer.disconnect(),
+  () => {
+    lifecycle.abort()
+    observer.disconnect()
+  },
   { once: true },
 )

@@ -7,8 +7,8 @@ import { leavePage, openPage, visit } from './helpers.ts'
  *
  * Kein Test spricht mit Google: Identity und Drive-REST werden an der
  * Netzkante ersetzt. Geprüft wird jetzt ausdrücklich der sichtbare Ordner
- * `Anitew`, die Sicherungsdatei darin, das sichere Einmischen und der lokale
- * Modus nach dem Trennen.
+ * `Anitew`, die Sicherungsdatei darin, das sichere Einmischen, die sichtbare
+ * Kontoidentität und der lokale Modus nach dem Trennen.
  */
 
 const GIS_STUB = `
@@ -43,6 +43,7 @@ interface DriveStubOptions {
   fileExists?: boolean
   remote?: unknown
   email?: string
+  name?: string
   uploads?: string[]
   folderCreates?: string[]
 }
@@ -63,7 +64,10 @@ async function installGoogleStub(page: Page, options: DriveStubOptions = {}) {
     if (url.includes('userinfo')) {
       return route.fulfill({
         contentType: 'application/json',
-        body: JSON.stringify({ email: options.email ?? 'mensch@example.com' }),
+        body: JSON.stringify({
+          email: options.email ?? 'mensch@example.com',
+          name: options.name ?? 'Mensch Beispiel',
+        }),
       })
     }
 
@@ -113,7 +117,8 @@ test('sagt ohne Einrichtung die Wahrheit — und nichts sieht kaputt aus', async
   await openPage(page, 'Abgleich')
   await expect(page.locator('.sync-note').filter({ hasText: 'noch nicht eingerichtet' })).toBeVisible()
   await expect(page.locator('.sync-run')).toHaveCount(0)
-  await expect(page.getByText(/Aktuell lokal/)).toBeVisible()
+  await expect(page.getByText(/Lokaler Modus/)).toBeVisible()
+  await expect(page.getByText(/Deine Daten bleiben unter deiner Kontrolle/)).toBeVisible()
 })
 
 test('erster Abgleich legt den sichtbaren Ordner Anitew an und speichert darin', async ({ page }) => {
@@ -177,24 +182,26 @@ test('ersetzt nie eine Datei im Anitew-Ordner, die keine Sicherung ist', async (
   expect(uploads).toHaveLength(0)
 })
 
-test('nennt beim Verbinden das Konto — und Trennen kehrt sichtbar zu lokal zurück', async ({
+test('zeigt Google-Name und E-Mail — und Trennen kehrt sichtbar zu lokal zurück', async ({
   page,
 }) => {
-  await installGoogleStub(page, { email: 'mensch@example.com' })
+  await installGoogleStub(page, { email: 'mensch@example.com', name: 'Mensch Beispiel' })
 
   await visit(page)
   await seedClientId(page)
   await openPage(page, 'Abgleich')
   await page.locator('.sync-run').click()
+  await expect(page.locator('.sync-identity')).toContainText('Mensch Beispiel')
   await expect(page.locator('.sync-account')).toContainText('mensch@example.com')
 
   await page.reload()
   await openPage(page, 'Abgleich')
+  await expect(page.locator('.sync-identity')).toContainText('Mensch Beispiel')
   await expect(page.locator('.sync-account')).toContainText('mensch@example.com')
 
   await page.getByRole('button', { name: /Google Drive trennen/ }).click()
-  await expect(page.locator('.sync-account')).toHaveCount(0)
-  await expect(page.getByText(/Aktuell lokal/)).toBeVisible()
+  await expect(page.locator('.sync-identity')).toHaveCount(0)
+  await expect(page.getByText(/Lokaler Modus/)).toBeVisible()
 })
 
 test('gleicht unsichtbar ab: nach dem Merken wandert der Graph still in Anitew', async ({
