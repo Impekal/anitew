@@ -201,10 +201,10 @@ function installCoreRitual(): void {
         return
       }
 
-      const drive = target.closest('.first-run-drive-connect')
+      const drive = target.closest('.first-run-drive-connect, .sync-run, .sync-stop')
       if (drive instanceof HTMLButtonElement && !drive.disabled) {
-        tactile([7, 18, 7])
-        ritualTone('confirm')
+        tactile(drive.matches('.sync-stop') ? [8] : [7, 18, 7])
+        ritualTone(drive.matches('.sync-stop') ? 'navigate' : 'confirm')
         flashPress()
         return
       }
