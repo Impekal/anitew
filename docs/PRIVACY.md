@@ -50,8 +50,8 @@ kein Nutzungsprofil.
 
 **Klartext:** Nach dem Laden ist das **Training selbst offlinefähig**.
 Netzzugriff wird nur für ausdrücklich gewählte Online-Funktionen benötigt.
-Drive-Abgleich, Coach und Systembenachrichtigungen sind **aus, bis du sie
-anfasst**.
+Drive-Abgleich, Coach und Systembenachrichtigungen sind aus,
+bis du sie anfasst.
 
 ## 5. Sicherung und Wiederherstellung
 
