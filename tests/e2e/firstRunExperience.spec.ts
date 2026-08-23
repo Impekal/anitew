@@ -40,7 +40,7 @@ test('der erste Eindruck trägt die englische Marke fünf Sekunden und erklärt 
   await expect(page.locator('.first-run-highlight-icon')).toHaveCount(7)
   await expect(page.getByText('PRIVAT · LOKAL ZUERST · DEINE DATEN, DEINE KONTROLLE')).toBeVisible()
 
-  await expect(page.getByText('Google Drive verbinden', { exact: true })).toBeVisible()
+  await expect(page.getByText('Anmelden / Daten im Google Drive speichern', { exact: true })).toBeVisible()
   await expect(page.getByText(/sichtbaren Ordner „Anitew“/)).toBeVisible()
   await expect(page.getByText(/ohne zusätzliche ANITEW-Cloudkopie/)).toBeVisible()
 
