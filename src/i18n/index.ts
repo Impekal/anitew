@@ -4,10 +4,6 @@
  * Nachträglich eingezogen kostet i18n das Zehnfache, weil dann jeder Text
  * einzeln aus dem Code gesucht werden muss. Deshalb steht sie schon in M0 —
  * obwohl es bisher nur zwei Sprachen und kaum Texte gibt.
- *
- * Übersetzt sind `de` (Quelle, D-007) und `en`. Die übrigen neun Sprachen aus
- * L2 sind bereits als Sprache bekannt (core/language.ts), aber noch nicht
- * geschrieben; bis dahin zeigt die App für sie Englisch und sagt das auch.
  */
 
 import { FALLBACK_LANGUAGE, type Language } from '../core/index.ts'
@@ -15,36 +11,10 @@ import { FALLBACK_LANGUAGE, type Language } from '../core/index.ts'
 import { de } from './de.ts'
 import { en } from './en.ts'
 
-/**
- * Die Form aller Wörterbücher ergibt sich aus der Quellsprache.
- *
- * `de` ist `as const` und hätte damit die deutschen Texte selbst als Typ —
- * eine Übersetzung müsste wörtlich „Beginnen“ heißen. `Widen` behält deshalb
- * den Aufbau und lässt an den Blättern beliebige Zeichenketten zu. Ergebnis:
- * Ein vergessener Schlüssel in `en.ts` ist ein Übersetzungsfehler, kein leerer
- * Text zur Laufzeit.
- */
 type Widen<T> = T extends string ? string : { [K in keyof T]: Widen<T[K]> }
 
 type SourceDictionary = Widen<typeof de>
 
-/**
- * Missions-Tatsachen und renderer-eigene Module wachsen unabhängig von den
- * vorhandenen UI-Texten.
- *
- * `missionAsk` und `missionPlaceholders` waren ursprünglich aus vier festen
- * Schlüsseln abgeleitet. H2 ergänzt eine fünfte Tatsache (`location`), ohne
- * dafür die komplette Quellübersetzung umzuschreiben: Die beiden Verzeichnisse
- * dürfen zusätzliche String-Schlüssel tragen; `dictionaryFor()` setzt die
- * zwei neuen Texte unten explizit ein.
- *
- * D12 hat mit dem 3×3-Raster einen eigenen Renderer. Sein Einprägebild braucht
- * keinen modulspezifischen Satz aus `encodeHints`; trotzdem muss der generische
- * Session-Zweig typseitig weitere Modulkennungen zulassen, weil die Auswahl
- * erst im JSX auf den Spatial-Renderer verzweigt. Das Record hält diese
- * Typgrenze offen, ohne einen Text zu erfinden, der zur Laufzeit nie gelesen
- * wird.
- */
 export type Dictionary = Omit<SourceDictionary, 'session'> & {
   session: Omit<SourceDictionary['session'], 'missionAsk' | 'missionPlaceholders' | 'encodeHints'> & {
     missionAsk: SourceDictionary['session']['missionAsk'] & Record<string, string>
@@ -65,6 +35,52 @@ const MISSION_LOCATION_COPY: Readonly<
   en: { ask: 'Where was the object?', placeholder: 'Position' },
 }
 
+interface PushTruthCopy {
+  readonly reminderNote: string
+  readonly whileOpen: string
+  readonly scheduled: string
+  readonly privacyLead: string
+  readonly privacyPoints: readonly string[]
+  readonly privacyHonest: string
+}
+
+const PUSH_TRUTH: Readonly<Partial<Record<Language, PushTruthCopy>>> = {
+  de: {
+    reminderNote:
+      'Ohne ANITEW-Konto. Für Systembenachrichtigungen speichert ANITEW nur die technische Push-Adresse dieses Geräts sowie Uhrzeit und Zeitzone — keine Trainings- oder Erinnerungsinhalte.',
+    whileOpen:
+      'Auf diesem Gerät kann ANITEW nur erinnern, **solange es offen ist**. Systemmitteilungen nach dem Schließen brauchen Web Push; auf iPhone und iPad funktioniert das nur aus der installierten Home-Screen-App.',
+    scheduled: 'Erinnerungen kommen als Systemmitteilung an, auch wenn ANITEW geschlossen ist.',
+    privacyLead: 'ANITEW bleibt local-first.',
+    privacyPoints: [
+      'Kein ANITEW-Konto, keine Werbung, keine Tracker.',
+      'Training, Erinnerungen, Messungen und Profil bleiben auf diesem Gerät — außer du wählst selbst Drive-Abgleich oder eine Coach-Frage mit eigenem Schlüssel.',
+      'Für aktivierte Systembenachrichtigungen speichert ANITEW nur die technische Push-Adresse dieses Geräts, Fälligkeit und Zeitzone. Keine Trainings- oder Gedächtnisinhalte werden dafür übertragen.',
+      'Die Push-Adresse wird beim vollständigen Zurücksetzen widerrufen. „Keine Erinnerung“ beendet die tägliche Erinnerung.',
+      'Sicherung und Drive-Abgleich bleiben davon getrennt; die Sicherungsdatei liegt bei dir bzw. in deinem eigenen Google Drive.',
+    ],
+    privacyHonest:
+      'Zum Laden der App sieht der Hoster die üblichen Webserverdaten. Nur wenn du Systembenachrichtigungen aktivierst, braucht der Push-Dienst zusätzlich Netz; das Training selbst bleibt offlinefähig.',
+  },
+  en: {
+    reminderNote:
+      'No ANITEW account. For system notifications ANITEW stores only this device’s technical push address plus time and time zone — no training or memory content.',
+    whileOpen:
+      'On this device ANITEW can only remind you **while it is open**. Notifications after closing need Web Push; on iPhone and iPad that works only from the installed Home Screen app.',
+    scheduled: 'Reminders arrive as system notifications even when ANITEW is closed.',
+    privacyLead: 'ANITEW stays local-first.',
+    privacyPoints: [
+      'No ANITEW account, no ads, no trackers.',
+      'Training, memories, measurements and profile stay on this device unless you explicitly choose Drive sync or a coach question with your own key.',
+      'For enabled system notifications ANITEW stores only this device’s technical push address, due time and time zone. No training or memory content is sent for push.',
+      'A full reset revokes the push address. “No reminder” stops the daily reminder.',
+      'Backup and Drive sync remain separate; the backup file stays with you or in your own Google Drive.',
+    ],
+    privacyHonest:
+      'The host sees ordinary web-server data while the app is loaded. Only enabled system notifications need the push service afterwards; training itself remains offline-capable.',
+  },
+}
+
 export interface MemoryForecastCopy {
   readonly label: string
   readonly value: string
@@ -81,14 +97,6 @@ const MEMORY_FORECAST_COPY: Readonly<Partial<Record<Language, MemoryForecastCopy
   },
 }
 
-/**
- * Ergänzt die H2-Texte ohne das Quellobjekt zu verändern.
- *
- * Das ist wichtig, weil Wörterbücher an mehreren Stellen geteilt werden. Eine
- * Mutation hier würde einen Sprachwechsel davon abhängig machen, welche
- * Sprache vorher geöffnet war. Stattdessen entsteht ein flacher neuer
- * Session-Zweig mit genau den beiden zusätzlichen Schlüsseln.
- */
 function withMissionLocation(dictionary: Dictionary, language: Language): Dictionary {
   const copy =
     MISSION_LOCATION_COPY[language] ??
@@ -109,12 +117,26 @@ function withMissionLocation(dictionary: Dictionary, language: Language): Dictio
   }
 }
 
-/**
- * C3 bleibt absichtlich außerhalb der Wörterbuchform: Es sind zwei kleine
- * Ergänzungstexte, während `memory.types` selbst ein verschachteltes Objekt
- * ist. So bleibt die strenge Quellform unangetastet und der Fallback identisch
- * mit dem übrigen UI-Verhalten.
- */
+function withPushTruth(dictionary: Dictionary, language: Language): Dictionary {
+  const copy = PUSH_TRUTH[language] ?? PUSH_TRUTH[FALLBACK_LANGUAGE] ?? PUSH_TRUTH.de
+  if (copy === undefined) return dictionary
+  return {
+    ...dictionary,
+    reminder: {
+      ...dictionary.reminder,
+      note: copy.reminderNote,
+      whileOpen: copy.whileOpen,
+      scheduled: copy.scheduled,
+    },
+    privacy: {
+      ...dictionary.privacy,
+      lead: copy.privacyLead,
+      points: [...copy.privacyPoints],
+      honest: copy.privacyHonest,
+    },
+  }
+}
+
 export function memoryForecastCopyFor(language: string): MemoryForecastCopy {
   const copy =
     MEMORY_FORECAST_COPY[language as Language] ??
@@ -126,10 +148,9 @@ export function memoryForecastCopyFor(language: string): MemoryForecastCopy {
 export function dictionaryFor(language: Language): Dictionary {
   const resolved = DICTIONARIES[language] ?? DICTIONARIES[FALLBACK_LANGUAGE] ?? de
   const copyLanguage = DICTIONARIES[language] === undefined ? FALLBACK_LANGUAGE : language
-  return withMissionLocation(resolved, copyLanguage)
+  return withPushTruth(withMissionLocation(resolved, copyLanguage), copyLanguage)
 }
 
-/** Gibt es für diese Sprache schon Texte, oder behelfen wir uns mit Englisch? */
 export function isTranslated(language: Language): boolean {
   return DICTIONARIES[language] !== undefined
 }
