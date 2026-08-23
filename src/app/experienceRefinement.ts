@@ -95,22 +95,22 @@ const DE: RefinementCopy = {
   driveKicker: 'OPTIONAL · EMPFOHLEN FÜR MEHRERE GERÄTE',
   driveCardTitle: 'Deine Daten. Deine Kontrolle.',
   driveCardBody:
-    'Standardmäßig bleibt alles auf diesem Gerät. Für mehrere Geräte kannst du dein eigenes Google Drive verbinden. ANITEW synchronisiert dann über deinen sichtbaren Ordner „Anitew“ — ohne zusätzliche ANITEW-Cloudkopie.',
-  driveConnect: 'Google Drive verbinden',
-  driveConnecting: 'Google Drive wird verbunden …',
-  driveConnected: 'Verbunden. Automatischer Abgleich ist aktiv',
-  driveUnavailable: 'Google Drive ist für diesen Build noch nicht eingerichtet.',
-  driveDenied: 'Nicht verbunden. Lokal funktioniert ANITEW vollständig weiter.',
+    'Standardmäßig bleibt alles auf diesem Gerät. Für mehrere Geräte kannst du dich mit Google anmelden und deine ANITEW-Daten in deinem eigenen Google Drive speichern. ANITEW synchronisiert dann über deinen sichtbaren Ordner „Anitew“ — ohne zusätzliche ANITEW-Cloudkopie.',
+  driveConnect: 'Anmelden / Daten im Google Drive speichern',
+  driveConnecting: 'Google-Anmeldung wird geöffnet …',
+  driveConnected: 'Angemeldet. Automatischer Abgleich ist aktiv',
+  driveUnavailable: 'Google-Anmeldung ist für diesen Build noch nicht eingerichtet.',
+  driveDenied: 'Anmeldung nicht abgeschlossen. Lokal funktioniert ANITEW vollständig weiter.',
   scroll: 'Mehr entdecken',
   appearance: 'Darstellung',
   themes: { system: 'System', light: 'Hell', dark: 'Dunkel' },
-  connectedAccount: 'Verbundenes Google-Konto',
+  connectedAccount: 'Angemeldetes Google-Konto',
   guideContext: [
     'Im Core liegen Coach, Memory DNA, eigene Inhalte, Gedächtnispalast, Google Drive, Backup und Einstellungen.',
     'Eigene Fakten, Lernstoff und persönliche Erinnerungen bekommen echte Verbindungen und Wiederholungen.',
     'Der Coach liest dieselben realen Signale und macht daraus konkrete Hinweise.',
     'Gedächtnispalast, Major-System, Geschichten und Verknüpfungen werden erklärt und angewandt.',
-    'Mehrere Geräte: dein eigenes Google Drive. Ohne Verbindung bleibt ANITEW vollständig lokal.',
+    'Mehrere Geräte: mit Google anmelden und im eigenen Google Drive speichern. Ohne Anmeldung bleibt ANITEW vollständig lokal.',
   ],
 }
 
@@ -164,22 +164,22 @@ const EN: RefinementCopy = {
   driveKicker: 'OPTIONAL · RECOMMENDED FOR MULTIPLE DEVICES',
   driveCardTitle: 'Your data. Your control.',
   driveCardBody:
-    'Everything stays on this device by default. For multiple devices, connect your own Google Drive. ANITEW then syncs through your visible “Anitew” folder — without an additional ANITEW cloud copy.',
-  driveConnect: 'Connect Google Drive',
-  driveConnecting: 'Connecting Google Drive …',
-  driveConnected: 'Connected. Automatic sync is active',
-  driveUnavailable: 'Google Drive is not configured for this build yet.',
-  driveDenied: 'Not connected. ANITEW continues to work fully locally.',
+    'Everything stays on this device by default. For multiple devices, sign in with Google and save your ANITEW data in your own Google Drive. ANITEW then syncs through your visible “Anitew” folder — without an additional ANITEW cloud copy.',
+  driveConnect: 'Sign in / save data in Google Drive',
+  driveConnecting: 'Opening Google sign-in …',
+  driveConnected: 'Signed in. Automatic sync is active',
+  driveUnavailable: 'Google sign-in is not configured for this build yet.',
+  driveDenied: 'Sign-in was not completed. ANITEW continues to work fully locally.',
   scroll: 'Explore more',
   appearance: 'Appearance',
   themes: { system: 'System', light: 'Light', dark: 'Dark' },
-  connectedAccount: 'Connected Google account',
+  connectedAccount: 'Signed-in Google account',
   guideContext: [
     'The Core contains Coach, Memory DNA, your content, memory palace, Google Drive, backup and settings.',
     'Your facts, study material and personal memories receive real links and review schedules.',
     'The Coach reads those same real signals and turns them into concrete guidance.',
     'Memory palace, Major System, stories and linking are taught and applied.',
-    'Multiple devices: your own Google Drive. Without it ANITEW remains fully local.',
+    'Multiple devices: sign in with Google and save to your own Google Drive. Without sign-in ANITEW remains fully local.',
   ],
 }
 
@@ -198,6 +198,12 @@ function element<K extends keyof HTMLElementTagNameMap>(
   const value = document.createElement(tag)
   if (className !== undefined) value.className = className
   return value
+}
+
+function oauthDetail(error: unknown): string | undefined {
+  if (typeof error !== 'object' || error === null || !('detail' in error)) return undefined
+  const detail = (error as { detail?: unknown }).detail
+  return typeof detail === 'string' && detail !== '' ? detail : undefined
 }
 
 function icon(kind: CapabilityKind): SVGSVGElement {
@@ -330,9 +336,10 @@ function enhanceWelcome(): void {
       const identity = result.accountName ?? result.account
       status.textContent = `${t.driveConnected}${identity === undefined ? '' : ` · ${identity}`}`
     })()
-      .catch(() => {
+      .catch((error: unknown) => {
         status.dataset.error = 'true'
-        status.textContent = t.driveDenied
+        const detail = oauthDetail(error)
+        status.textContent = `${t.driveDenied}${detail === undefined ? '' : ` · ${detail}`}`
         button.disabled = false
         button.textContent = t.driveConnect
       })
