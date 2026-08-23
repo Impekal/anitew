@@ -1,4 +1,4 @@
-import type { Reminder, ReminderAbility, ReminderPermission, Reminders } from '../../core/index.ts'
+import type { ReminderAbility, ReminderPermission, Reminders } from '../../core/index.ts'
 
 let pushFailed = false
 
@@ -42,32 +42,11 @@ export async function clearWebPushRegistration(): Promise<void> {
 }
 
 /**
- * Erinnerungen im Web.
- *
- * Die kleine Fähigkeitsprüfung bleibt im Startbundle. VAPID-Decoding,
- * Subscription und Servertransport werden erst nach einer echten
- * Erinnerungsaktion geladen. So kostet Web Push keinen normalen ANITEW-Start.
+ * Im Kaltstart bleiben nur zwei synchrone Wahrheiten: darf dieses Gerät Push
+ * versprechen und welche Berechtigung liegt vor. Alles, was tatsächlich etwas
+ * tut — Permission-Dialog, Timer, Subscription, HTTP — lädt erst beim Fingertipp.
  */
 export function createWebReminders(): Reminders {
-  const timers = new Map<string, ReturnType<typeof setTimeout>>()
-
-  const localSchedule = (reminder: Reminder): boolean => {
-    const running = timers.get(reminder.id)
-    if (running !== undefined) clearTimeout(running)
-    const delay = reminder.at - Date.now()
-    if (delay <= 0) return false
-    const timer = setTimeout(() => {
-      timers.delete(reminder.id)
-      try {
-        new Notification(reminder.title, { body: reminder.body, tag: reminder.id })
-      } catch {
-        // Manche Browser erlauben Notifications nur im Service Worker.
-      }
-    }, delay)
-    timers.set(reminder.id, timer)
-    return true
-  }
-
   return {
     ability(): ReminderAbility {
       if (!notificationSupported() || permission() === 'denied') return 'none'
@@ -78,51 +57,24 @@ export function createWebReminders(): Reminders {
 
     async ask(): Promise<ReminderPermission> {
       if (!notificationSupported()) return 'denied'
-      if (Notification.permission === 'default') {
-        await Notification.requestPermission().catch(() => 'denied' as const)
-      }
-      const answer = permission()
-      if (answer === 'granted' && webPushSupported()) {
-        try {
-          const push = await import('./pushReminders.ts')
-          await push.ensureWebPushSubscription()
-        } catch {
-          pushFailed = true
-        }
-      }
-      return answer
+      const actions = await import('./reminderActions.ts')
+      const result = await actions.askReminderPermission(webPushSupported())
+      if (result.pushFailed) pushFailed = true
+      return result.permission
     },
 
-    async schedule(reminder: Reminder): Promise<boolean> {
+    async schedule(reminder): Promise<boolean> {
       if (!notificationSupported() || Notification.permission !== 'granted') return false
-
-      if (webPushSupported()) {
-        try {
-          const push = await import('./pushReminders.ts')
-          await push.scheduleWebPush(reminder)
-          return true
-        } catch {
-          pushFailed = true
-        }
-      }
-
-      return localSchedule(reminder)
+      const actions = await import('./reminderActions.ts')
+      const result = await actions.scheduleReminder(reminder, webPushSupported())
+      if (result.pushFailed) pushFailed = true
+      return result.ok
     },
 
     async cancel(id: string, permanent = false): Promise<void> {
-      const running = timers.get(id)
-      if (running !== undefined) clearTimeout(running)
-      timers.delete(id)
-
-      if (!('serviceWorker' in navigator) || !('PushManager' in window)) return
-      try {
-        const push = await import('./pushReminders.ts')
-        await push.cancelWebPush(id, permanent)
-      } catch {
-        // Bei einem permanenten Aus wurde das Browser-Abo im Transport bereits
-        // widerrufen; ab jetzt darf ability() keinen sicheren Push mehr zusagen.
-        if (permanent) pushFailed = true
-      }
+      const actions = await import('./reminderActions.ts')
+      const result = await actions.cancelReminder(id, permanent)
+      if (result.pushFailed) pushFailed = true
     },
   }
 }
