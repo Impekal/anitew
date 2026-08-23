@@ -1,0 +1,4 @@
+/* Preserve the Living Memory atlas geometry after sensory styling layers load. */
+.drawer-item {
+  border-radius: 50% !important;
+}
