@@ -12,11 +12,7 @@ import './anitew-phase5.css'
 
 // Die Signatur-Schichten sind bewusst kein Startpfad. Erst wenn Dokument,
 // App und Service-Worker-Start vollständig zur Ruhe gekommen sind, holen wir
-// die rein visuelle Tiefe nach. Die Schichten kommen absichtlich nacheinander:
-// Living Memory ist die letzte Autorität und kann ältere Drawer-/Startregeln
-// sicher ersetzen, statt mit parallelen CSS-Chunks um die Reihenfolge zu
-// konkurrieren. V3 sitzt ganz hinten: Sie verfeinert nur Atmosphäre,
-// Einführung und optionale Drive-Verbindung, nie Gedächtniswahrheit.
+// die rein visuelle Tiefe nach.
 let signatureTimer: number | undefined
 let pageIsLeaving = false
 
@@ -33,8 +29,6 @@ const loadSignatureExperience = () => {
       await import('./app/coreRitual.ts')
       if (pageIsLeaving) return
       await import('./app/experienceRefinement.ts')
-      if (pageIsLeaving) return
-      await import('./app/driveAuthWarmup.ts')
     })().catch(() => undefined)
   }, 750)
 }
@@ -56,8 +50,18 @@ keepUpToDate()
 const container = document.getElementById('root')
 if (!container) throw Error('#root fehlt')
 
-createRoot(container).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+function render(): void {
+  createRoot(container).render(
+    <StrictMode>
+      <App />
+    </StrictMode>,
+  )
+}
+
+const oauthReturn = new URL(window.location.href).searchParams.has('googleOAuth')
+if (oauthReturn) {
+  void import('./app/driveRedirectReturn.ts')
+    .then(({ finishGoogleDriveRedirect }) => finishGoogleDriveRedirect())
+    .catch(() => undefined)
+    .finally(render)
+} else render()
