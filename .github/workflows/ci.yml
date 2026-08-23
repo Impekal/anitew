@@ -14,7 +14,7 @@ on:
 # Ein neuer Commit macht den alten CI-Stand desselben Branches wertlos.
 # `head_ref` ist beim PR der Quellbranch, `ref_name` beim Push derselbe Name:
 # Push und PR konkurrieren deshalb absichtlich in EINER Gruppe statt die
-# 15-Minuten-Browsersuite doppelt zu rechnen.
+# Browsersuite doppelt zu rechnen.
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
@@ -42,16 +42,37 @@ jobs:
         run: npm run size
       - name: Browser für die E2E-Tests
         run: npx playwright install --with-deps chromium
-      # Die drei bekannten Problemklassen laufen zuerst. So kostet ein kleiner
-      # Regression-Fix nicht wieder 50 Minuten, bevor derselbe Fehler sichtbar
-      # wird. Das Voll-Gate darunter bleibt unverändert und ist weiterhin die
-      # einzige Grundlage für einen Merge.
+      # Die bekannten Problemklassen laufen zuerst. So kostet ein kleiner
+      # Regression-Fix nicht wieder den gesamten Browserlauf, bevor derselbe
+      # Fehler sichtbar wird. Das Voll-Gate darunter bleibt unverändert.
       - name: E2E-Regressions-Smoke
         run: >-
           npx playwright test --project=chromium
           tests/e2e/achievements.spec.ts
           tests/e2e/palace.spec.ts
           tests/e2e/technique.spec.ts
-          --grep "nennt eine Tatsache|erklärt den Palast|unterrichtet die Technik und lässt sie sofort anwenden"
-      - name: Tests (die gebaute App im Browser)
+          tests/e2e/livingInterface.spec.ts
+          --grep "nennt eine Tatsache|erklärt den Palast|unterrichtet die Technik und lässt sie sofort anwenden|keinen horizontalen iPhone-Overflow"
+      - name: Vollregression Desktop-Chromium
         run: npx playwright test --project=chromium
+      # Releasekritische Telefonpfade werden zusätzlich auf dem Pixel-7-Profil
+      # gefahren. Das ist bewusst kein Ersatz für echtes Safari/iPhone, deckt
+      # aber OAuth/PWA/Offline, Datenmigration, Resilience und die komplette
+      # Session-Interaktion in einer echten mobilen Viewport-/Touch-Konfiguration ab.
+      - name: Mobile Release Gate
+        run: >-
+          npx playwright test --project=mobile
+          tests/e2e/accessibility.spec.ts
+          tests/e2e/install.spec.ts
+          tests/e2e/livingInterface.spec.ts
+          tests/e2e/memory.spec.ts
+          tests/e2e/offlineFirstLaunch.spec.ts
+          tests/e2e/resilience.spec.ts
+          tests/e2e/session.spec.ts
+          tests/e2e/sync.spec.ts
+          tests/e2e/upgrade.spec.ts
+      # Die schnelle Layoutsuite fährt alle sieben Profile aus playwright.config.ts:
+      # iPhone SE, randloses iPhone, iPad hoch/quer, Android-Tablet sowie zwei
+      # Desktopbreiten. Safari-Engine-Eigenheiten bleiben echter Hardware vorbehalten.
+      - name: Layout-Matrix
+        run: npx playwright test tests/e2e/layout.spec.ts
