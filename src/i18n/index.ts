@@ -45,39 +45,24 @@ interface PushTruthCopy {
   readonly privacyHonest: string
 }
 
-/*
- * Nur Aussagen, die sich durch Web Push tatsächlich geändert haben, stehen
- * hier. Die übrigen drei Datenschutzpunkte kommen aus dem normalen Wörterbuch;
- * sie ein zweites Mal zu kopieren blähte den Kaltstart ohne Informationsgewinn auf.
- */
 const PUSH_TRUTH: Readonly<Partial<Record<Language, PushTruthCopy>>> = {
   de: {
-    reminderNote:
-      'Kein ANITEW-Konto. Push speichert nur Geräteadresse, Uhrzeit und Zeitzone — keine Trainingsdaten.',
-    whileOpen:
-      'Hier nur **solange es offen ist**. Auf iPhone/iPad braucht Push nach dem Schließen die installierte Home-Screen-App.',
-    scheduled: 'Erinnerungen kommen als Systemmitteilung an, auch wenn ANITEW geschlossen ist.',
+    reminderNote: 'Kein Konto. Push speichert Geräteadresse, Zeit und Zeitzone — keine Trainingsdaten.',
+    whileOpen: 'Hier nur **solange es offen ist**. iPhone/iPad: nach dem Schließen nur als Home-Screen-App.',
+    scheduled: 'Kommt als Systemmitteilung an, auch wenn ANITEW geschlossen ist.',
     privacyLead: 'ANITEW bleibt local-first.',
-    privacyPush:
-      'Für Push speichert ANITEW nur Geräteadresse, Fälligkeit und Zeitzone — keine Trainings- oder Gedächtnisinhalte.',
-    privacyDelete:
-      '„Keine Erinnerung“ stoppt täglich; „Neu anfangen“ widerruft die Push-Adresse.',
-    privacyHonest:
-      'Beim Laden sieht der Hoster übliche Webserverdaten; aktivierter Push braucht zusätzlich Netz. Training bleibt offlinefähig.',
+    privacyPush: 'Push: Geräteadresse, Fälligkeit, Zeitzone — keine Trainings- oder Gedächtnisinhalte.',
+    privacyDelete: '„Keine Erinnerung“ stoppt täglich; „Neu anfangen“ widerruft Push.',
+    privacyHonest: 'Hoster sieht beim Laden Webserverdaten; Push braucht Netz. Training bleibt offlinefähig.',
   },
   en: {
-    reminderNote:
-      'No ANITEW account. Push stores only device address, time and time zone — no training data.',
-    whileOpen:
-      'Here only **while it is open**. On iPhone/iPad, push after closing needs the installed Home Screen app.',
-    scheduled: 'Reminders arrive as system notifications even when ANITEW is closed.',
+    reminderNote: 'No account. Push stores device address, time and time zone — no training data.',
+    whileOpen: 'Here only **while it is open**. iPhone/iPad: after closing, only as a Home Screen app.',
+    scheduled: 'Arrives as a system notification even when ANITEW is closed.',
     privacyLead: 'ANITEW stays local-first.',
-    privacyPush:
-      'Push stores only device address, due time and time zone — no training or memory content.',
-    privacyDelete:
-      '“No reminder” stops the daily reminder; “Start over” revokes the push address.',
-    privacyHonest:
-      'The host sees ordinary web-server data while loading; enabled push also needs network. Training stays offline-capable.',
+    privacyPush: 'Push: device address, due time, time zone — no training or memory content.',
+    privacyDelete: '“No reminder” stops daily; “Start over” revokes push.',
+    privacyHonest: 'The host sees web-server data while loading; push needs network. Training stays offline-capable.',
   },
 }
 
