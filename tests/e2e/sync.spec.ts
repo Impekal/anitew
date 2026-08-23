@@ -112,17 +112,17 @@ async function installGoogleStub(page: Page, options: DriveStubOptions = {}) {
   await page.route('https://www.googleapis.com/**', handle)
 }
 
-test('stellt Google Drive im normalen ANITEW-Build bereit und bleibt bis zur Verbindung lokal', async ({ page }) => {
+test('stellt Google Drive im normalen ANITEW-Build bereit und bleibt bis zur Anmeldung lokal', async ({ page }) => {
   await visit(page)
   await openPage(page, 'Abgleich')
   await expect(page.locator('.sync-run')).toBeVisible()
-  await expect(page.locator('.sync-run')).toContainText('Google Drive verbinden')
+  await expect(page.locator('.sync-run')).toContainText('Anmelden / Daten im Google Drive speichern')
   await expect(page.locator('.sync-note').filter({ hasText: 'noch nicht eingerichtet' })).toHaveCount(0)
   await expect(page.getByText(/Lokaler Modus/)).toBeVisible()
   await expect(page.getByText(/Deine Daten bleiben unter deiner Kontrolle/)).toBeVisible()
 })
 
-test('erster Abgleich legt den sichtbaren Ordner Anitew an und speichert darin', async ({ page }) => {
+test('erste Anmeldung legt den sichtbaren Ordner Anitew an und speichert darin', async ({ page }) => {
   const uploads: string[] = []
   const folderCreates: string[] = []
   await installGoogleStub(page, { uploads, folderCreates })
@@ -138,7 +138,7 @@ test('erster Abgleich legt den sichtbaren Ordner Anitew an und speichert darin',
   expect(folderCreates[0]).toContain('application/vnd.google-apps.folder')
   expect(uploads.some((body) => body.includes('anitew-backup'))).toBe(true)
   expect(uploads.some((body) => body.includes(FOLDER_ID))).toBe(true)
-  await expect(page.getByRole('button', { name: /Google Drive trennen/ })).toBeVisible()
+  await expect(page.getByRole('button', { name: /Google-Konto trennen/ })).toBeVisible()
 })
 
 test('mischt einen fremden Stand aus Anitew ein und meldet, was neu kam', async ({ page }) => {
@@ -200,7 +200,7 @@ test('zeigt Google-Name und E-Mail — und Trennen kehrt sichtbar zu lokal zurü
   await expect(page.locator('.sync-identity')).toContainText('Mensch Beispiel')
   await expect(page.locator('.sync-account')).toContainText('mensch@example.com')
 
-  await page.getByRole('button', { name: /Google Drive trennen/ }).click()
+  await page.getByRole('button', { name: /Google-Konto trennen/ }).click()
   await expect(page.locator('.sync-identity')).toHaveCount(0)
   await expect(page.getByText(/Lokaler Modus/)).toBeVisible()
 })
