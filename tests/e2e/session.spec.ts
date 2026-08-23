@@ -89,6 +89,7 @@ test('führt durch Einprägen und Abrufen und zählt ehrlich', async ({ page }) 
 
   const learned = await collectItems(page, 8)
   const total = learned.items.length
+  let summaryTotal = total
   expect(total).toBeGreaterThanOrEqual(3)
   expect(total).toBeLessThanOrEqual(8)
   expect(new Set(learned.items).size).toBe(total)
@@ -132,15 +133,22 @@ test('führt durch Einprägen und Abrufen und zählt ehrlich', async ({ page }) 
      *
      * Die Antworten kommen aus `helpers.ts` und richten sich nach der
      * **Frage**, nicht nach der Stelle: Bei einer Mission fragt die App in
-     * einer anderen Reihenfolge, als sie gezeigt hat.
+     * einer anderen Reihenfolge, als sie gezeigt hat. Eine Mission hat dabei
+     * fünf Recall-Fragen, obwohl die Szene vier sichtbare Zeilen hat; für die
+     * Zusammenfassung zählt deshalb die echte Prompt-Anzahl und nicht die Zahl
+     * der sichtbaren Zeilen.
      */
+    const label = (await page.locator('.prompted .hint').last().textContent()) ?? ''
+    summaryTotal = Number(label.split('/')[1]?.trim())
+    expect(summaryTotal, `„${label}“ nennt keine Anzahl`).toBeGreaterThan(0)
+
     await answerRecall(page, learned, 'allButLast')
 
     await expect(page.getByRole('heading', { name: 'Geblieben' })).toBeVisible()
-    await expect(page.locator('.summary-score strong')).toHaveText(String(total - 1))
+    await expect(page.locator('.summary-score strong')).toHaveText(String(summaryTotal - 1))
   }
 
-  await expect(page.locator('.summary-score span')).toHaveText(`/ ${total}`)
+  await expect(page.locator('.summary-score span')).toHaveText(`/ ${summaryTotal}`)
 })
 
 test('hält das Zeitbudget ein, auch wenn niemand etwas tut', async ({ page }) => {
