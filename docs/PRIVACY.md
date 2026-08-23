@@ -1,137 +1,136 @@
 # Datenschutzerklärung
 
-**Stand: 2026-08-19** · Backlog R4
+**Stand: 2026-08-24** · Backlog R4
 
-> Der kurze Teil zuerst: **ANITEW hat keinen Server.** Es gibt kein Konto,
-> keine Anmeldung, keine Werbung, keine Analyse-Dienste und keine Tracker.
-> Alles, was du eingibst oder was beim Training entsteht, bleibt auf deinem
-> Gerät.
+> Der kurze Teil zuerst: **ANITEW bleibt local-first.** Es gibt kein ANITEW-
+> Nutzerkonto, keine Werbung, keine Analyse-Dienste und keine Tracker.
+> Training, Erinnerungen, Messungen und Profil bleiben auf deinem Gerät. Nur
+> Funktionen, die du ausdrücklich einschaltest — Google-Drive-Abgleich, Coach
+> und Systembenachrichtigungen — benutzen dafür notwendige Netzdienste.
 
 Dieses Dokument ist die Quelle für den Datenschutztext im Store-Eintrag und
-für die Fassung in der App. Wo beide dasselbe sagen, gilt derselbe Grundsatz
-wie für alle Texte (F7): **Es steht nur drin, was stimmt.**
+für die Fassung in der App. Es steht nur drin, was die aktuelle Fassung tut.
 
 ---
 
 ## 1. Wer verantwortlich ist
 
-ANITEW wird als quelloffene Anwendung entwickelt. Wer sie betreibt — also
-unter welcher Adresse sie ausgeliefert wird —, steht im Store-Eintrag
-beziehungsweise im Impressum der Webseite. Die Angabe gehört dorthin und nicht
-hierher, weil sie sich ändern kann, ohne dass sich an der Verarbeitung etwas
-ändert.
+Wer ANITEW betreibt und unter welcher Kontaktadresse, steht im Impressum bzw.
+im jeweiligen Store-Eintrag. Diese Angabe gehört dorthin, weil sie sich ändern
+kann, ohne dass sich die technische Verarbeitung ändert.
 
 ## 2. Was auf deinem Gerät gespeichert wird
 
-Alles Folgende liegt ausschließlich im Speicher deines Browsers
-(IndexedDB) und verlässt dein Gerät nicht:
+Im Browserspeicher (IndexedDB) liegen unter anderem:
 
 | Was | Wofür |
 |---|---|
-| Trainingseinheiten und einzelne Antworten (Zeitpunkt, Modul, richtig/falsch, Antwortdauer) | Der Wiederholungsplan und die ehrlichen Zahlen in der Zusammenfassung |
-| Wiederholungstermine je Information | Damit etwas zurückkommt, bevor du es vergisst |
-| Messungen (Anzahl behaltener Wörter je Abruf) | Die einzige Aussage der App über dein Gedächtnis |
-| Einstellungen: Sprache, Trainingssprache, Ton, Lernstand der Merktechniken, dein eigener Gedächtnispalast, die gewählte Erinnerungszeit | Damit die App beim nächsten Start weiß, wo du stehst |
+| Trainingseinheiten und Antworten | Wiederholungsplan und Auswertungen |
+| Wiederholungstermine | Fällige Wiedersehen |
+| Messungen | Vergleich deiner eigenen Messreihe |
+| Eigene Erinnerungen, Karten und Gedächtnispalast | Persönliches Training |
+| Einstellungen wie Sprache, Ton und Erinnerungszeit | Nächster Start |
 
-**Es gibt keine Nutzerkennung.** ANITEW vergibt keine ID, kein Pseudonym und
-keinen Zählwert, mit dem sich Geräte oder Sitzungen verknüpfen ließen.
+Diese Inhalte werden **nicht** für Web Push auf einen ANITEW-Server kopiert.
 
-## 3. Was ANITEW **nicht** tut
+## 3. Was ANITEW nicht tut
 
-- Keine Übertragung deiner Trainingsdaten an uns — es gibt keine Stelle
-  bei uns, an die sie gehen könnten. An Dritte gehen Daten nur in den
-  zwei Fällen aus Abschnitt 9, beide auf deine ausdrückliche Wahl und
-  keiner voreingestellt.
-- Keine Werbung, keine Werbe-IDs, kein Profiling für Werbung.
-- Keine Analyse-Dienste, kein Crash-Reporting, keine Nutzungsstatistik.
-- Keine Cookies. Der Browserspeicher wird für die Funktion gebraucht, nicht
-  zum Wiedererkennen.
-- Kein Zugriff auf Kontakte, Kamera, Mikrofon, Standort oder Dateien —
-  abgesehen von der Datei, die du selbst zum Einlesen einer Sicherung
-  auswählst.
+- Keine Werbung, Werbe-ID oder werbliche Profilbildung.
+- Keine Analyse-Dienste, Nutzungsstatistik oder Tracker.
+- Kein Upload deiner Trainings- oder Gedächtnisinhalte für Push.
+- Kein Zugriff auf Kontakte, Standort, Mikrofon oder Kamera.
+- Keine öffentliche Bestenliste oder soziale Nutzerprofile.
 
-## 4. Was beim Aufruf trotzdem passiert
+## 4. Was beim Aufruf technisch passiert
 
-Ehrlich bleibt auch das Unangenehme: Damit die App **überhaupt** auf dein
-Gerät kommt, muss sie einmal geladen werden. Der Anbieter, der sie
-ausliefert (Webhosting oder App Store), sieht dabei technisch bedingt das,
-was jeder Webserver sieht — IP-Adresse, Zeitpunkt, angeforderte Datei,
-Browserkennung. Darauf haben wir keinen Einfluss, und diese Daten erreichen
-uns nicht.
+Die App wird über Cloudflare Workers/Static Assets ausgeliefert. Wie bei jedem
+Webserver fallen dabei technisch Verbindungsdaten wie IP-Adresse, Zeitpunkt,
+Browser- und Dateianfrage beim Infrastruktur-Anbieter an. ANITEW baut daraus
+kein Nutzungsprofil.
 
-Danach läuft ANITEW **offline**: Der Service Worker legt die App im
-Gerätespeicher ab, und ein Training braucht keine Verbindung mehr.
+Nach dem Laden ist das **Training selbst offlinefähig**. Netzzugriff wird nur
+für ausdrücklich gewählte Online-Funktionen benötigt.
 
 ## 5. Sicherung und Wiederherstellung
 
-Die Sicherung ist eine Datei, die **du** speicherst — auf deinem Gerät, in
-deiner Cloud, in deiner Mail. ANITEW lädt sie nirgends hoch und weiß nicht,
-wohin du sie legst. Sie enthält deine Trainingsgeschichte im Klartext
-(JSON); wer die Datei hat, kann sie lesen. Wähle den Ablageort entsprechend.
+„Sicherung speichern“ erzeugt eine JSON-Datei mit deinem ANITEW-Stand. Du
+entscheidest, wo sie liegt. Wer diese Datei besitzt, kann ihren Inhalt lesen.
 
-## 6. Benachrichtigungen
+Beim optionalen Google-Drive-Abgleich legt ANITEW dieselbe Sicherungsdatei in
+einem eigenen `Anitew`-Ordner deines Google Drive ab. ANITEW fasst andere
+Dateien nicht an.
 
-Wenn du eine Erinnerung einstellst, fragt der Browser dich um Erlaubnis. Die
-Erinnerung entsteht **auf deinem Gerät** — es gibt keinen Push-Dienst, der
-davon erfährt. Die Erlaubnis lässt sich jederzeit in den Einstellungen des
-Browsers oder des Betriebssystems zurücknehmen.
+## 6. Systembenachrichtigungen / Web Push
 
-## 7. Deine Rechte
+Wenn du „Benachrichtigungen erlauben“ ausdrücklich antippst und dein Gerät Web
+Push unterstützt, erzeugt der Browser eine **technische Push-Adresse** für
+dieses Gerät. Für die Zustellung speichert ANITEW serverseitig nur:
 
-Die Datenschutz-Grundverordnung gibt dir Auskunft, Berichtigung, Löschung und
-Übertragbarkeit. Praktisch ist das hier ungewöhnlich einfach, weil niemand
-sonst deine Daten hat:
+- diese technische Push-Adresse,
+- die Kennung der Erinnerung (`daily` oder `benchmark`),
+- den fälligen Zeitpunkt,
+- bei der täglichen Erinnerung Uhrzeit und IANA-Zeitzone,
+- den generischen Benachrichtigungstext.
 
-- **Auskunft und Übertragbarkeit:** „Sicherung speichern“ gibt dir alles, was
-  ANITEW über dich weiß, in einer lesbaren Datei.
-- **Löschung:** Den Browserspeicher für ANITEW leeren oder die App
-  deinstallieren. Damit ist es weg — auch für uns, denn wir hatten es nie.
-- **Berichtigung und Widerspruch:** Es gibt keine Verarbeitung bei uns, gegen
-  die sich widersprechen ließe.
+**Nicht gespeichert werden dafür:** Trainingsantworten, Gedächtnisinhalte,
+Profil, Name, E-Mail-Adresse, Messwerte oder Sicherungsdateien.
 
-## 8. Kinder
+Die Speicherung erfolgt in einem nur aus der Push-Adresse abgeleiteten
+Cloudflare Durable Object. Es gibt dafür kein ANITEW-Nutzerkonto und keine
+plattformübergreifende Nutzer-ID. Der eigentliche Zustellweg läuft über den vom
+Browser/Betriebssystem bestimmten Push-Dienst (auf Apple-Geräten die
+entsprechende Apple-Infrastruktur).
 
-ANITEW richtet sich an niemanden bestimmten und sammelt nichts. Es gibt keine
-Chatfunktion, keine Bestenliste, keinen Kontakt zu anderen Nutzern und keine
-Inhalte von Dritten.
+„Keine Erinnerung“ löscht die tägliche Erinnerung. „Neu anfangen“ versucht,
+den serverseitigen Push-Eintrag zu löschen und widerruft zusätzlich das lokale
+Push-Abonnement; dadurch wird die bisherige Push-Adresse ungültig, selbst wenn
+der Server gerade nicht erreichbar ist. Die Benachrichtigungsberechtigung kann
+außerdem jederzeit in den System-/Browser-Einstellungen entzogen werden.
 
-## 9. Die zwei freiwilligen Übertragungen — und was genau dabei fließt
+Auf iPhone und iPad funktioniert Web Push nur für eine zum Home-Bildschirm
+hinzugefügte Web-App auf unterstützten iOS/iPadOS-Versionen. Wenn Web Push auf
+einem Gerät nicht verfügbar ist, verspricht ANITEW keine geschlossene
+Systembenachrichtigung und fällt auf den Hinweis „nur solange offen“ zurück.
 
-Beide Funktionen sind seit dem 2026-08-19 in der App, beide sind **aus,
-bis du sie anfasst**, und beide laufen ohne uns dazwischen:
+## 7. Löschen und Übertragbarkeit
 
-- **Drive-Abgleich (Backlog N7).** Wenn du auf der Abgleich-Seite „Mit
-  Google anmelden und abgleichen“ wählst, spricht dein Gerät direkt mit
-  Google und legt deine Sicherungsdatei (Abschnitt 5) in einen
-  App-Ordner **deines eigenen Google Drive**. Die App sieht dort nur
-  ihren eigenen Ordner, nichts sonst in deinem Drive; wir sehen gar
-  nichts. Beim Verbinden fragt die App Google außerdem einmal nach der
-  **E-Mail-Adresse** deines Kontos — nur, um dir auf der Abgleich-Seite
-  zu zeigen, als wer du verbunden bist. Sie bleibt auf diesem Gerät,
-  geht nirgendwohin und wird gelöscht, sobald du den Abgleich beendest.
-  Nach dem ersten Abgleich wiederholt die App ihn still — beim Öffnen
-  und nach Änderungen (einer Trainingseinheit, einer neuen Erinnerung);
-  das lässt sich auf derselben Seite jederzeit beenden. Für den Umgang
-  mit deinem Google-Konto gilt Googles Datenschutzerklärung.
-- **Coach mit eigenem Schlüssel (Backlog M).** Wenn du bei einem
-  KI-Anbieter deiner Wahl — Google Gemini, Anthropic, Groq, OpenRouter
-  oder Mistral — einen eigenen Schlüssel anlegst, ihn hinterlegst und
-  eine Frage stellst, gehen diese Frage und ein Zahlenkontext aus deinem
-  Training (Serie, Quoten je Achse, Lehr-Stand — nicht der Inhalt deiner
-  eigenen Karten) direkt an den **gewählten** Anbieter, z. B.
-  `api.anthropic.com`. Der Schlüssel bleibt auf diesem Gerät und lässt
-  sich dort jederzeit entfernen; ohne Schlüssel wird nichts gesendet.
-  Es gilt die Datenschutzerklärung des gewählten Anbieters. Dasselbe
-  gilt für „Mit KI vorschlagen“ im Bereich „Mein Gedächtnis“: Der Text,
-  den du dort eingibst, geht — erst auf deinen Fingertipp, nie von
-  allein — an den gewählten Anbieter, damit er Erinnerungs-Vorschläge
-  daraus macht. Gespeichert wird davon nur, was du danach bestätigst.
+- **Übertragbarkeit:** „Sicherung speichern“ exportiert deinen lokalen Stand.
+- **Vollständiger Neustart:** „Neu anfangen“ löscht die lokalen ANITEW-Daten,
+  trennt Google und widerruft das Push-Abonnement. Optional kann dabei auch
+  ANITEWs eigene Sicherungsdatei in deinem Google Drive gelöscht werden.
+- **Nur Erinnerung aus:** „Keine Erinnerung“ beendet die tägliche Erinnerung,
+  ohne deine Trainingsdaten zu löschen.
 
-Nichts davon ist Voreinstellung, nichts läuft über unsere Server — und
-ohne deine Handlung gilt Abschnitt 3 ohne Einschränkung.
+## 8. Google-Drive-Abgleich
 
-## 10. Änderungen
+Google Drive ist aus, bis du ihn selbst einschaltest. Die Anmeldung erfolgt
+über Google OAuth. Der Cloudflare Worker tauscht den Google-
+Autorisierungscode gegen Tokens und hält die Sitzung verschlüsselt in einem
+`HttpOnly`-Cookie des Browsers; der Token wird nicht in einer ANITEW-
+Nutzerdatenbank gespeichert. Das Gerät nutzt den Zugriff anschließend für den
+ANITEW-Ordner im eigenen Drive. Name/E-Mail, die in der Oberfläche zur
+Kontokontrolle angezeigt werden, werden lokal in ANITEWs Gerätespeicher
+gehalten und beim Trennen entfernt.
 
-Ändert sich etwas an der Verarbeitung, ändert sich zuerst dieses Dokument —
-mit neuem Datum. Eine stillschweigende Änderung wäre derselbe Vertrauensbruch
-wie eine erfundene Zahl (R-1).
+Für Google gelten zusätzlich Googles Datenschutzbedingungen.
+
+## 9. Coach mit eigenem API-Schlüssel
+
+Der Coach ist aus, bis du einen eigenen Schlüssel hinterlegst und eine Frage
+stellst. Dann gehen Frage und der dafür beschriebene Zahlenkontext direkt an
+den von dir gewählten KI-Anbieter. Eigene Erinnerungstexte werden nur bei einer
+von dir ausgelösten KI-Vorschlagsfunktion übertragen. Der API-Schlüssel bleibt
+auf deinem Gerät. Für die Verarbeitung beim jeweiligen Anbieter gilt dessen
+Datenschutzerklärung.
+
+## 10. Kinder
+
+ANITEW hat keine Chatfunktion zwischen Nutzern, keine öffentliche Bestenliste
+und keine Werbung. Die oben beschriebenen freiwilligen Online-Funktionen
+folgen denselben Regeln unabhängig vom Alter.
+
+## 11. Änderungen
+
+Ändert sich die Verarbeitung, wird diese Erklärung mit neuem Datum angepasst.
+Eine Funktion, die zusätzliche Daten überträgt, darf nicht stillschweigend
+unter einem alten Datenschutztext erscheinen.
