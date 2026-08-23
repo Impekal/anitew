@@ -49,7 +49,7 @@ else window.addEventListener('load', loadSignatureExperience, { once: true })
 keepUpToDate()
 
 const container = document.getElementById('root')
-if (container === null) throw new Error('#root fehlt in index.html')
+if (!container) throw Error('#root fehlt')
 
 createRoot(container).render(
   <StrictMode>
