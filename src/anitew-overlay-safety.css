@@ -1,0 +1,14 @@
+/*
+ * Fullscreen overlays own vertical scrolling while they are open.
+ *
+ * The Core atlas has its own `overflow-y: auto` surface. Letting the page
+ * underneath keep the root scrollbar during the lazy signature hand-off can
+ * change the root content width by a few pixels exactly while the atlas is
+ * opening. Besides looking like a tiny sideways nudge, that makes the modal
+ * compete with the page for scroll gestures. Lock only the vertical axis:
+ * genuine horizontal overflow remains observable by the release tests.
+ */
+html:has(.drawer-veil),
+body:has(.drawer-veil) {
+  overflow-y: hidden;
+}
