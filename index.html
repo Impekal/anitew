@@ -10,98 +10,157 @@
     />
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f4f2ee" />
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f1218" />
-    <!--
-      Vom Startbildschirm aus **ohne** Browserleiste starten. Beides gesetzt:
-      `mobile-web-app-capable` ist der heutige Name, `apple-…` der, den iOS
-      weiterhin liest. Eines von beiden wegzulassen kostet auf einer der
-      Seiten die Vollbilddarstellung.
-    -->
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="ANITEW" />
-    <!--
-      Die Statusleiste übernimmt den Seitenhintergrund, statt einen eigenen
-      Balken zu setzen. Zusammen mit `viewport-fit=cover` und den sicheren
-      Rändern im Stylesheet läuft der Hintergrund bis unter die Uhr durch —
-      und der Text bleibt trotzdem unter der Kerbe (Q5).
-    -->
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
-    <!-- iOS skaliert selbst; 192 ist groß genug für die 180 Punkte, die es
-         auf dem Startbildschirm zeichnet. -->
     <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192.png" />
-    <style>
+    <script>
       /*
-       * Der Launch-Moment ist absichtlich direkt im Dokument: Er erscheint,
-       * bevor React, IndexedDB oder ein nachgeladener Experience-Chunk etwas
-       * tun können. Keine Ladeanzeige, sondern ANITEWs Signatur. Nach 1,65 s
-       * gibt er die bereits darunter aufgebaute App frei.
+       * Das fünfsekündige Markenritual gehört nur zum allerersten Öffnen auf
+       * diesem Gerät. Danach ist ANITEW sofort wieder ein Werkzeug. Der
+       * Query-Schalter ist ausschließlich für den expliziten E2E-Vertrag;
+       * normale automatisierte Browser zahlen die fünf Sekunden nicht bei
+       * jedem isolierten Testkontext erneut.
        */
+      try {
+        const key = 'anitew.launch.seen.v3'
+        const forced = new URLSearchParams(location.search).get('firstLaunch') === '1'
+        const first = forced || (navigator.webdriver !== true && localStorage.getItem(key) !== '1')
+        document.documentElement.dataset.anitewFirstLaunch = first ? 'true' : 'false'
+        if (first && !forced) localStorage.setItem(key, '1')
+      } catch {
+        document.documentElement.dataset.anitewFirstLaunch = 'true'
+      }
+    </script>
+    <style>
       #anitew-launch {
+        --launch-duration: 1.65s;
         position: fixed;
         inset: 0;
         z-index: 99999;
         display: grid;
+        grid-template-rows: 1fr auto auto auto 1fr;
         place-items: center;
-        align-content: center;
-        gap: 18px;
+        gap: 16px;
+        padding:
+          max(36px, env(safe-area-inset-top))
+          24px
+          max(28px, env(safe-area-inset-bottom));
         background:
-          radial-gradient(circle at 50% 44%, rgb(140 207 192 / 7%), transparent 28rem),
-          radial-gradient(circle at 50% 48%, rgb(216 168 90 / 5%), transparent 19rem),
-          #030706;
+          radial-gradient(circle at 50% 43%, rgb(140 207 192 / 8%), transparent 27rem),
+          radial-gradient(circle at 50% 50%, rgb(216 168 90 / 6%), transparent 17rem),
+          linear-gradient(180deg, #030706 0%, #050a08 56%, #020403 100%);
         color: #f0eee4;
-        /* Während die Signatur gezeichnet wird, darf kein unsichtbarer
-           Fingertipp das Onboarding darunter überspringen. `visibility:hidden`
-           am Ende nimmt die Fläche anschließend vollständig aus dem Hit-Test. */
         pointer-events: auto;
-        animation: anitew-launch-away 1.65s cubic-bezier(.4,0,.2,1) forwards;
+        overflow: hidden;
+        animation: anitew-launch-away var(--launch-duration) cubic-bezier(.4,0,.2,1) forwards;
+      }
+      html[data-anitew-first-launch='true'] #anitew-launch {
+        --launch-duration: 5s;
+      }
+      #anitew-launch::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        opacity: .46;
+        background-image:
+          radial-gradient(circle at 18% 26%, rgb(140 207 192 / 28%) 0 1px, transparent 1.5px),
+          radial-gradient(circle at 74% 18%, rgb(216 168 90 / 22%) 0 1px, transparent 1.5px),
+          radial-gradient(circle at 84% 71%, rgb(140 207 192 / 20%) 0 1px, transparent 1.5px),
+          radial-gradient(circle at 26% 78%, rgb(216 168 90 / 16%) 0 1px, transparent 1.5px);
+        background-size: 93px 107px, 127px 101px, 149px 137px, 173px 151px;
+        animation: anitew-launch-field 5.8s ease-in-out infinite alternate;
+      }
+      .anitew-launch-terms {
+        grid-row: 1;
+        align-self: end;
+        margin-bottom: 26px;
+        color: rgb(174 201 190 / 56%);
+        font: 600 8px/1.7 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: .24em;
+        text-align: center;
+        text-transform: uppercase;
+        opacity: 0;
+        animation: anitew-launch-copy .72s .16s ease forwards;
       }
       .anitew-launch-core {
-        width: 94px;
-        height: 94px;
+        grid-row: 2;
+        width: 122px;
+        height: 122px;
         overflow: visible;
-        filter: drop-shadow(0 0 20px rgb(216 168 90 / 20%));
+        filter:
+          drop-shadow(0 0 20px rgb(216 168 90 / 20%))
+          drop-shadow(0 0 42px rgb(140 207 192 / 8%));
       }
-      .anitew-launch-ring,
-      .anitew-launch-link {
+      .anitew-logo-orbit,
+      .anitew-logo-link,
+      .anitew-logo-loop {
         fill: none;
         stroke-linecap: round;
-        stroke-dasharray: 220;
-        stroke-dashoffset: 220;
-        animation: anitew-launch-draw 720ms cubic-bezier(.16,.84,.22,1) forwards;
+        stroke-linejoin: round;
+        stroke-dasharray: 260;
+        stroke-dashoffset: 260;
+        animation: anitew-launch-draw 920ms cubic-bezier(.16,.84,.22,1) forwards;
       }
-      .anitew-launch-ring-a { stroke: rgb(216 168 90 / 64%); stroke-width: 1.1; }
-      .anitew-launch-ring-b {
-        stroke: rgb(140 207 192 / 44%);
-        stroke-width: .9;
-        animation-delay: 110ms;
-      }
-      .anitew-launch-link {
-        stroke: rgb(140 207 192 / 36%);
+      .anitew-logo-orbit {
+        stroke: rgb(140 207 192 / 32%);
         stroke-width: 1;
-        animation-delay: 210ms;
       }
-      .anitew-launch-point {
+      .anitew-logo-orbit-b {
+        stroke: rgb(216 168 90 / 34%);
+        stroke-dasharray: 3 8;
+        stroke-dashoffset: 0;
+        animation: anitew-logo-orbit 18s linear infinite;
+      }
+      .anitew-logo-link {
+        stroke: rgb(140 207 192 / 50%);
+        stroke-width: 1.15;
+        animation-delay: 90ms;
+      }
+      .anitew-logo-loop {
+        stroke: rgb(216 168 90 / 54%);
+        stroke-width: 1.2;
+        animation-delay: 180ms;
+      }
+      .anitew-logo-node {
+        fill: #8ccfc0;
+        opacity: 0;
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: anitew-launch-point 620ms .28s cubic-bezier(.16,.84,.22,1) forwards;
+      }
+      .anitew-logo-node-gold { fill: #ffd990; }
+      .anitew-logo-core {
         fill: #ffd990;
         opacity: 0;
-        transform-origin: 47px 47px;
-        animation: anitew-launch-point 620ms 180ms cubic-bezier(.16,.84,.22,1) forwards;
+        transform-box: fill-box;
+        transform-origin: center;
+        animation:
+          anitew-launch-point 620ms .38s cubic-bezier(.16,.84,.22,1) forwards,
+          anitew-logo-breathe 3.6s 1.1s ease-in-out infinite;
+        filter: drop-shadow(0 0 8px rgb(255 217 144 / 58%));
       }
       .anitew-launch-name {
+        grid-row: 3;
         opacity: 0;
         transform: translateY(5px);
-        font: 500 18px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        letter-spacing: .42em;
-        text-indent: .42em;
-        animation: anitew-launch-name 520ms 520ms ease forwards;
+        font: 500 19px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        letter-spacing: .44em;
+        text-indent: .44em;
+        animation: anitew-launch-name 520ms .54s ease forwards;
       }
-      /*
-       * Der Atlas wird als Kind von #root gerendert. Nach dem Schließen der
-       * Einführung muss seine gesamte Interaktionskette über dem restlichen
-       * App-Layer liegen. Nicht nur der Schleier, sondern auch Navigation und
-       * Knoten bekommen deshalb einen expliziten Hit-Test-/Stacking-Kontext.
-       * Der Launch selbst bleibt mit 99999 weiterhin darüber.
-       */
+      .anitew-launch-powered {
+        grid-row: 4;
+        margin-top: 3px;
+        color: rgb(205 211 205 / 34%);
+        font: 500 9px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        letter-spacing: .12em;
+        opacity: 0;
+        animation: anitew-launch-copy .55s .78s ease forwards;
+      }
       #root .drawer-veil {
         z-index: 3000 !important;
         pointer-events: auto !important;
@@ -121,26 +180,43 @@
       }
       @keyframes anitew-launch-draw { to { stroke-dashoffset: 0; } }
       @keyframes anitew-launch-point {
-        0% { opacity: 0; transform: scale(.2); }
-        55% { opacity: 1; transform: scale(1.45); }
+        0% { opacity: 0; transform: scale(.18); }
+        55% { opacity: 1; transform: scale(1.42); }
         100% { opacity: 1; transform: scale(1); }
       }
       @keyframes anitew-launch-name {
         to { opacity: 1; transform: none; }
       }
+      @keyframes anitew-launch-copy {
+        to { opacity: 1; }
+      }
+      @keyframes anitew-logo-breathe {
+        0%, 100% { transform: scale(.9); filter: drop-shadow(0 0 7px rgb(255 217 144 / 42%)); }
+        50% { transform: scale(1.18); filter: drop-shadow(0 0 13px rgb(255 217 144 / 72%)); }
+      }
+      @keyframes anitew-logo-orbit {
+        to { stroke-dashoffset: -88; }
+      }
+      @keyframes anitew-launch-field {
+        to { transform: translate3d(1.5%, -1%, 0) scale(1.018); opacity: .62; }
+      }
       @keyframes anitew-launch-away {
-        0%, 72% { opacity: 1; visibility: visible; }
+        0%, 84% { opacity: 1; visibility: visible; }
         100% { opacity: 0; visibility: hidden; }
       }
       @media (prefers-reduced-motion: reduce) {
-        #anitew-launch {
-          animation-duration: .42s;
-        }
-        .anitew-launch-ring,
-        .anitew-launch-link,
-        .anitew-launch-point,
-        .anitew-launch-name {
-          animation: none;
+        #anitew-launch { --launch-duration: .42s; }
+        html[data-anitew-first-launch='true'] #anitew-launch { --launch-duration: 5s; }
+        #anitew-launch::before,
+        .anitew-logo-orbit,
+        .anitew-logo-link,
+        .anitew-logo-loop,
+        .anitew-logo-node,
+        .anitew-logo-core,
+        .anitew-launch-name,
+        .anitew-launch-terms,
+        .anitew-launch-powered {
+          animation: none !important;
           stroke-dashoffset: 0;
           opacity: 1;
           transform: none;
@@ -150,16 +226,20 @@
   </head>
   <body>
     <div id="anitew-launch" aria-hidden="true">
-      <svg class="anitew-launch-core" viewBox="0 0 94 94" aria-hidden="true">
-        <circle class="anitew-launch-ring anitew-launch-ring-a" cx="47" cy="47" r="31" />
-        <path class="anitew-launch-ring anitew-launch-ring-b" d="M23 55a31 31 0 0 1 43-31" />
-        <path class="anitew-launch-link" d="M47 47 68 35M47 47 28 31M47 47 31 68" />
-        <circle class="anitew-launch-point" cx="47" cy="47" r="5.2" />
-        <circle class="anitew-launch-point" cx="68" cy="35" r="2.2" style="animation-delay:280ms" />
-        <circle class="anitew-launch-point" cx="28" cy="31" r="1.8" style="animation-delay:340ms" />
-        <circle class="anitew-launch-point" cx="31" cy="68" r="1.8" style="animation-delay:400ms" />
+      <div class="anitew-launch-terms">ERINNERN · VERKNÜPFEN · ABRUFEN · FESTIGEN</div>
+      <svg class="anitew-launch-core" viewBox="0 0 120 120" aria-hidden="true">
+        <path class="anitew-logo-orbit" d="M20 66C17 39 34 18 58 16c27-2 47 17 45 44-2 25-19 43-43 44-24 1-40-13-43-34" />
+        <path class="anitew-logo-orbit anitew-logo-orbit-b" d="M29 88C17 69 21 43 39 30c20-15 48-10 61 10" />
+        <path class="anitew-logo-link" d="M24 78C39 72 49 64 60 57C72 49 82 42 96 31M60 57L91 82M60 57L43 25" />
+        <path class="anitew-logo-loop" d="M24 78C28 95 48 101 63 91C76 82 75 66 60 57C45 48 31 56 29 68" />
+        <circle class="anitew-logo-node" cx="24" cy="78" r="3.1" />
+        <circle class="anitew-logo-node anitew-logo-node-gold" cx="43" cy="25" r="2.7" style="animation-delay:.36s" />
+        <circle class="anitew-logo-node" cx="96" cy="31" r="3.3" style="animation-delay:.44s" />
+        <circle class="anitew-logo-node" cx="91" cy="82" r="2.8" style="animation-delay:.52s" />
+        <circle class="anitew-logo-core" cx="60" cy="57" r="6.2" />
       </svg>
       <div class="anitew-launch-name">ANITEW</div>
+      <div class="anitew-launch-powered">Powered by Impekal</div>
     </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>

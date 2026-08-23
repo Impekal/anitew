@@ -5,18 +5,14 @@
  * Datenschicht kennt die Datenbank — hier werden die drei zusammengesteckt
  * und sonst nichts. Auch der stille Abgleich beim Start läuft über genau
  * diesen einen Weg: ein Ablauf, keine zwei Wahrheiten.
+ *
+ * Wichtig für P4: Die konkrete Google-Drive-Implementierung wird erst geladen,
+ * wenn Sync wirklich gebraucht wird. Ein neuer Nutzer ohne Drive-Verbindung
+ * bezahlt dafür also keine Kaltstart-Bytes.
  */
 
 import { type Platform, type SettingsStore, type SyncReport, syncOnce } from '../core/index.ts'
 import { exportBackup, importBackup } from '../data/backup.ts'
-import {
-  DRIVE_CLIENT_SETTING,
-  builtInClientId,
-  downloadDriveBackup,
-  fetchAccountEmail,
-  requestDriveToken,
-  uploadDriveBackup,
-} from '../platform/web/drive.ts'
 
 /** Merkt sich, dass der Abgleich gewollt ist — für den stillen Start. */
 export const SYNC_ON_SETTING = 'sync.on'
@@ -27,6 +23,7 @@ export const SYNC_ACCOUNT_SETTING = 'sync.account'
 
 /** Die Client-Kennung: aus dem Bau — oder aus den Einstellungen (Prüfpfad). */
 export async function resolveClientId(settings: SettingsStore): Promise<string | undefined> {
+  const { DRIVE_CLIENT_SETTING, builtInClientId } = await import('../platform/web/drive.ts')
   const stored = await settings.read<string>(DRIVE_CLIENT_SETTING).catch(() => undefined)
   return stored !== undefined && stored !== '' ? stored : builtInClientId()
 }
@@ -41,26 +38,29 @@ export async function runDriveSync(
   silent: boolean,
   now: number,
 ): Promise<SyncReport> {
+  const { requestDriveToken } = await import('../platform/web/drive.ts')
   const token = await requestDriveToken(clientId, silent)
   return syncWithToken(token, now)
 }
 
 /**
- * Der bewusste erste Weg (V2: das Google-Konto als Identität): hörbar
- * verbinden, dabei einmal fragen, **wessen** Konto das ist — die E-Mail
- * ist Anzeige, kein Tragwerk; fehlt sie, fehlt nur die Zeile.
+ * Der bewusste erste Weg: hörbar verbinden, dabei einmal fragen, wessen
+ * Konto das ist — die E-Mail ist Anzeige, kein Tragwerk; fehlt sie, fehlt
+ * nur die Zeile.
  */
 export async function connectDriveSync(
   clientId: string,
   now: number,
 ): Promise<{ report: SyncReport; account: string | undefined }> {
+  const { requestDriveToken, fetchAccountEmail } = await import('../platform/web/drive.ts')
   const token = await requestDriveToken(clientId, false, true)
   const account = await fetchAccountEmail(token)
   const report = await syncWithToken(token, now)
   return { report, account }
 }
 
-function syncWithToken(token: string, now: number): Promise<SyncReport> {
+async function syncWithToken(token: string, now: number): Promise<SyncReport> {
+  const { downloadDriveBackup, uploadDriveBackup } = await import('../platform/web/drive.ts')
   return syncOnce({
     download: () => downloadDriveBackup(token),
     upload: (file) => uploadDriveBackup(token, file),
@@ -76,12 +76,10 @@ function syncWithToken(token: string, now: number): Promise<SyncReport> {
 }
 
 /*
- * Der unsichtbare Abgleich (V2): Wer ihn einmal gewollt hat, muss nicht
- * mehr daran denken. Nach einer Einheit oder einer Änderung am
- * Memory-Graphen wird — entprellt und still — abgeglichen. Scheitert es
- * (kein Netz, Google will neu fragen), passiert **nichts** Sichtbares:
- * Der nächste Anlass oder der nächste Start versucht es wieder, und die
- * Abgleich-Seite bleibt der hörbare Weg.
+ * Der unsichtbare Abgleich: Wer ihn einmal gewollt hat, muss nicht mehr daran
+ * denken. Nach einer Einheit oder einer Änderung am Memory-Graphen wird —
+ * entprellt und still — abgeglichen. Scheitert es, bleibt die App lokal
+ * vollständig nutzbar und der nächste Anlass versucht es wieder.
  */
 let pendingSync: ReturnType<typeof setTimeout> | undefined
 let syncRunning = false
@@ -90,7 +88,12 @@ export function scheduleDriveSync(platform: Platform, delayMs = 4_000): void {
   if (pendingSync !== undefined) clearTimeout(pendingSync)
   pendingSync = setTimeout(() => {
     pendingSync = undefined
-    if (syncRunning) return
+    // Eine Änderung darf nicht verloren gehen, nur weil der stille Start-
+    // Abgleich noch läuft. In dem Fall versuchen wir kurz danach erneut.
+    if (syncRunning) {
+      scheduleDriveSync(platform, 1_000)
+      return
+    }
     void (async () => {
       const on = await platform.settings.read<boolean>(SYNC_ON_SETTING).catch(() => undefined)
       if (on !== true) return
