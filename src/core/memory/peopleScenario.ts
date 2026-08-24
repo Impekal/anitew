@@ -33,6 +33,9 @@ function clean(value: string, max = 80): string {
  * bestätigbare Graph-Vorschläge um. Gleichlautende Merkmale werden bewusst
  * zu einem gemeinsamen Knoten: Das erlaubt später echte Gegenfragen wie
  * „Wer kommt aus Madrid?“ statt künstlicher Duplikate.
+ *
+ * Eine Person ohne Merkmal bleibt draußen: Ein isolierter Knoten könnte von
+ * der Memory-Mission gar nicht sinnvoll abgefragt werden und wäre nur Datenmüll.
  */
 export function peopleScenarioSuggestions(
   input: readonly PersonScenarioInput[],
@@ -44,11 +47,7 @@ export function peopleScenarioSuggestions(
     const name = clean(entry.name)
     if (name.length < 2) continue
 
-    const personId = memoryNodeId('person', name)
-    if (!nodes.has(personId)) {
-      nodes.set(personId, { id: personId, type: 'person', label: name })
-    }
-
+    const facts: string[] = []
     const seenFacts = new Set<string>()
     for (const rawFact of entry.facts) {
       const fact = clean(rawFact)
@@ -56,8 +55,17 @@ export function peopleScenarioSuggestions(
       const key = fact.toLocaleLowerCase()
       if (seenFacts.has(key)) continue
       seenFacts.add(key)
-      if (seenFacts.size > MAX_FACTS_PER_PERSON) break
+      facts.push(fact)
+      if (facts.length >= MAX_FACTS_PER_PERSON) break
+    }
+    if (facts.length === 0) continue
 
+    const personId = memoryNodeId('person', name)
+    if (!nodes.has(personId)) {
+      nodes.set(personId, { id: personId, type: 'person', label: name })
+    }
+
+    for (const fact of facts) {
       const factId = memoryNodeId('fact', fact)
       if (!nodes.has(factId)) {
         nodes.set(factId, { id: factId, type: 'fact', label: fact })
