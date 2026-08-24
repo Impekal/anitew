@@ -115,9 +115,11 @@ test('hält die Breite auf jeder Menüseite — und in der Schublade', async ({ 
     await noHorizontalOverflow(page)
   }
 
-  await page.keyboard.press('Escape')
-  await expect(drawer).toBeHidden()
-  await expect(page.locator('.challenge')).toBeVisible()
+  // Dieser Gate endet bewusst im offenen Drawer: Schließen per Escape ist
+  // Interaktionsverhalten und wird separat geprüft. Hier zählt nur, dass auch
+  // der letzte gemessene Drawer-Zustand ohne horizontalen Overflow bleibt.
+  await expect(drawer).toBeVisible()
+  await noHorizontalOverflow(page)
 })
 
 test('das Kennenlernen passt auf jedes Gerät', async ({ page }) => {
