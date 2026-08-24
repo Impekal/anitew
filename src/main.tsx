@@ -46,6 +46,8 @@ const loadSignatureExperience = () => {
       if (pageIsLeaving) return
       await import('./app/mobileCoreLayout.ts')
       if (pageIsLeaving) return
+      await import('./app/experienceRefinement.ts')
+      if (pageIsLeaving) return
       await import('./app/driveRedirectFeedback.ts')
     })().catch(() => undefined)
   }, 750)
