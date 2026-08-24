@@ -113,19 +113,36 @@ export async function visit(page: Page) {
 }
 
 /**
- * Öffnet eine Menüseite: Menüknopf, dann der Eintrag mit dieser
- * Beschriftung. Seit dem Menü-Umbau ist jeder Punkt eine eigene Seite —
- * die Prüfungen gehen denselben Weg wie der Finger.
+ * Öffnet eine Core-Seite. Nach der neuen Hierarchie kann der Core bereits
+ * offen sein, etwa direkt nach „Zurück“ aus einer Unterseite. In diesem Fall
+ * darf der Helfer nicht noch einmal auf den hinter dem Overlay liegenden
+ * Core-Knopf klicken.
  */
 export async function openPage(page: Page, label: string) {
-  await page.locator('button.hamburger').click()
+  const drawer = page.locator('.drawer')
+  if (!(await drawer.isVisible())) {
+    await page.locator('button.hamburger').click()
+    await expect(drawer).toBeVisible()
+  }
   await page.locator('.drawer-item', { hasText: label }).click()
   await page.locator('.page').waitFor()
 }
 
-/** Von einer Menüseite zurück auf den Startbildschirm. */
+/**
+ * Verlässt eine Core-Unterseite bewusst bis zum Startbildschirm.
+ * Produktregel bleibt: der erste Zurück-Schritt führt in den Core. Tests, die
+ * danach wieder mit Trainingsknöpfen arbeiten wollen, schließen den Core hier
+ * ausdrücklich als zweiten Schritt.
+ */
 export async function leavePage(page: Page) {
   await page.locator('.page-back').click()
+  await page.locator('.page').waitFor({ state: 'hidden' })
+
+  const drawer = page.locator('.drawer')
+  if (await drawer.isVisible()) {
+    await page.keyboard.press('Escape')
+    await expect(drawer).toBeHidden()
+  }
   await page.locator('.challenge').waitFor()
 }
 
