@@ -9,6 +9,7 @@ import { loadMemoryGraph, saveMemoryGraph } from '../data/memoryStore.ts'
 import { createWebPlatform } from '../platform/web/index.ts'
 import { scheduleDriveSync } from './driveSync.ts'
 import { peopleScenarioCopyForCurrentUi } from './peopleScenarioCopy.ts'
+import './peopleScenario.css'
 
 interface PersonRow {
   readonly id: number
