@@ -12,6 +12,11 @@ import { applyRememberedSuggestions } from '../core/index.ts'
 import { createWebArchitect } from '../platform/web/architect.ts'
 import { scheduleDriveSync } from './driveSync.ts'
 import {
+  inferMemoryDeadlineInput,
+  memoryDeadlineCopyForCurrentUi,
+  parseMemoryDeadline,
+} from './memoryDeadline.ts'
+import {
   COACH_PROVIDERS,
   COACH_PROVIDER_NAMES,
   COACH_PROVIDER_SETTING,
@@ -22,6 +27,7 @@ import {
   coachKeySettingFor,
 } from '../platform/web/coach.ts'
 import type { Dictionary } from '../i18n/index.ts'
+import './memoryDeadline.css'
 
 /**
  * „Etwas merken“ (D-036).
@@ -50,11 +56,15 @@ export function RememberThisPanel({
   initialDraft?: string
 }) {
   const texts = dictionary.memory
+  const deadlineTexts = memoryDeadlineCopyForCurrentUi()
 
   const [draft, setDraft] = useState('')
   const [suggestions, setSuggestions] = useState<RememberSuggestions | undefined>(undefined)
   const [dropped, setDropped] = useState<ReadonlySet<string>>(new Set())
   const [saved, setSaved] = useState(false)
+  const [deadlineInput, setDeadlineInput] = useState('')
+  const [deadlineInferred, setDeadlineInferred] = useState(false)
+  const [deadlineError, setDeadlineError] = useState<string | undefined>()
   const appliedInitialDraft = useRef<string | undefined>(undefined)
 
   useEffect(() => {
@@ -90,7 +100,17 @@ export function RememberThisPanel({
     })().catch(() => undefined)
   }, [platform])
 
+  const inferDeadline = () => {
+    if (deadlineInput !== '') return
+    const inferred = inferMemoryDeadlineInput(draft, platform.clock.now())
+    if (inferred === undefined) return
+    setDeadlineInput(inferred)
+    setDeadlineInferred(true)
+    setDeadlineError(undefined)
+  }
+
   const propose = () => {
+    inferDeadline()
     const next = suggestMemories({ text: draft })
     setSuggestions(next)
     setDropped(new Set())
@@ -100,6 +120,7 @@ export function RememberThisPanel({
   }
 
   const proposeWithAi = () => {
+    inferDeadline()
     setAiBusy(true)
     setAiFailure(undefined)
     void (async () => {
@@ -165,9 +186,22 @@ export function RememberThisPanel({
       edges: suggestions.edges,
     }
     if (confirmed.nodes.length === 0) return
+
+    const now = platform.clock.now()
+    const deadline = deadlineInput === '' ? undefined : parseMemoryDeadline(deadlineInput)
+    if (deadlineInput !== '' && deadline === undefined) {
+      setDeadlineError(deadlineTexts.invalid)
+      return
+    }
+    if (deadline !== undefined && deadline.at <= now) {
+      setDeadlineError(deadlineTexts.past)
+      return
+    }
+    setDeadlineError(undefined)
+
     void (async () => {
       const graph = await loadMemoryGraph()
-      const next = applyRememberedSuggestions(graph, confirmed, platform.clock.now())
+      const next = applyRememberedSuggestions(graph, confirmed, now, deadline)
       const existing = new Set(graph.nodes.map((node) => node.id))
       const newNodeIds = next.nodes.filter((node) => !existing.has(node.id)).map((node) => node.id)
       const existingEdges = new Set(graph.edges.map((edge) => edge.id))
@@ -175,6 +209,8 @@ export function RememberThisPanel({
       const newConnections = next.edges.length - graph.edges.length
       await saveMemoryGraph(next)
       setDraft('')
+      setDeadlineInput('')
+      setDeadlineInferred(false)
       setSuggestions(undefined)
       setFromAi(false)
       setSaved(true)
@@ -202,9 +238,40 @@ export function RememberThisPanel({
         value={draft}
         onChange={(event) => {
           setDraft(event.target.value)
+          if (deadlineInferred) {
+            setDeadlineInput('')
+            setDeadlineInferred(false)
+          }
           setSaved(false)
         }}
       />
+
+      <label className="memory-deadline-field">
+        <span>{deadlineTexts.label}</span>
+        <input
+          type="datetime-local"
+          className="remember-deadline-input"
+          value={deadlineInput}
+          onChange={(event) => {
+            setDeadlineInput(event.target.value)
+            setDeadlineInferred(false)
+            setDeadlineError(undefined)
+            setSaved(false)
+          }}
+        />
+      </label>
+      <p className="hint memory-deadline-hint">{deadlineTexts.hint}</p>
+      {deadlineInferred && (
+        <p className="hint memory-deadline-inferred" role="status">
+          {deadlineTexts.inferred}
+        </p>
+      )}
+      {deadlineError !== undefined && (
+        <p className="memory-deadline-error" role="status" aria-live="polite">
+          {deadlineError}
+        </p>
+      )}
+
       <div className="remember-actions">
         <button
           type="button"
