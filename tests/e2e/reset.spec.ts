@@ -91,7 +91,13 @@ test('Neu anfangen löscht lokal vollständig, trennt Google, Push und optional 
   await expect.poll(() => deletedRemote).toBe(1)
   await expect.poll(() => loggedOut).toBe(1)
   await expect.poll(() => pushUnregistered).toBe(1)
-  await page.waitForURL((url) => url.pathname === '/')
+
+  // Der Reset lädt dieselbe URL (`/`) neu. Auf `waitForURL('/')` zu warten
+  // beweist deshalb keine Navigation: die Bedingung war schon vor dem Klick
+  // erfüllt und konnte mitten im Reload in die IndexedDB-Prüfung laufen.
+  // Der frische Ankommens-Bildschirm existiert dagegen erst, wenn der Reset,
+  // der Reload und das erneute App-Mount wirklich abgeschlossen sind.
+  await expect(page.locator('.arrival')).toBeVisible({ timeout: 10_000 })
 
   const state = await page.evaluate(async () => {
     const open = indexedDB.open('anitew')
