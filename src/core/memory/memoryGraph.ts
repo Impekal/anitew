@@ -14,13 +14,14 @@
  *   allein die Messung (F).
  * - **Terminplanung bleibt FSRS.** Der Graph weiß, *was* zusammengehört
  *   und *wo* es wackelt; *wann* etwas wiederkommt, entscheidet der
- *   bestehende Wiederholungsplan. Ein optionaler `neededByAt`-Zeitpunkt
- *   (I5) darf diesen Plan nur vorziehen und danach beenden — er ersetzt ihn
- *   nicht.
+ *   bestehende Wiederholungsplan. Eine optionale I5-Deadline darf diesen
+ *   Plan nur vorziehen und danach beenden — sie ersetzt ihn nicht.
  *
  * Deterministisch wie der ganze Kern (D-010): Zeitpunkte werden
  * hereingereicht, nie gezogen — dieselbe Eingabe, derselbe Graph.
  */
+
+import type { DayKey } from '../time.ts'
 
 export type MemoryNodeType = 'person' | 'place' | 'fact' | 'number' | 'date' | 'concept' | 'custom'
 
@@ -36,8 +37,10 @@ export interface MemoryNode {
   /** Trainingsstärke 0..1 — Übungsstand, keine Gedächtnisaussage (R-1). */
   readonly strength: number
   readonly lastRecalledAt?: number
-  /** Optionales reales Ziel (I5): bis wann dieser Inhalt gebraucht wird. */
+  /** Optionales reales Ziel (I5): exakter Zeitpunkt, bis wann es gebraucht wird. */
   readonly neededByAt?: number
+  /** Lokaler Kalendertag desselben Ziels — stabile Grenze für den Tagesplan (P6). */
+  readonly neededByDay?: DayKey
   /** Konfliktauflösung für Geräteabgleich: jüngste bewusste Deadline-Änderung gewinnt. */
   readonly neededByUpdatedAt?: number
 }
@@ -82,29 +85,10 @@ export function memoryNodeId(type: MemoryNodeType, label: string): string {
 
 export function addMemoryNode(
   graph: MemoryGraph,
-  input: {
-    id: string
-    type: MemoryNodeType
-    label: string
-    detail?: string
-    strength?: number
-    neededByAt?: number
-  },
+  input: { id: string; type: MemoryNodeType; label: string; detail?: string; strength?: number },
   now: number,
 ): MemoryGraph {
-  const existing = graph.nodes.find((node) => node.id === input.id)
-  if (existing !== undefined) {
-    if (input.neededByAt === undefined || existing.neededByAt === input.neededByAt) return graph
-    return {
-      ...graph,
-      nodes: graph.nodes.map((node) =>
-        node.id === input.id
-          ? { ...node, neededByAt: input.neededByAt, neededByUpdatedAt: now }
-          : node,
-      ),
-    }
-  }
-
+  if (graph.nodes.some((node) => node.id === input.id)) return graph
   const node: MemoryNode = {
     id: input.id,
     type: input.type,
@@ -112,9 +96,6 @@ export function addMemoryNode(
     ...(input.detail === undefined ? {} : { detail: input.detail }),
     createdAt: now,
     strength: clamp(input.strength ?? INITIAL_STRENGTH),
-    ...(input.neededByAt === undefined
-      ? {}
-      : { neededByAt: input.neededByAt, neededByUpdatedAt: now }),
   }
   // Neu gemerkt hebt den Grabstein auf — der Mensch hat es zurückgeholt.
   const removed = { ...graph.removed }
@@ -130,20 +111,30 @@ export function addMemoryNode(
 export function setMemoryDeadline(
   graph: MemoryGraph,
   nodeIds: readonly string[],
-  neededByAt: number | undefined,
+  deadline: { at: number; day: DayKey } | undefined,
   now: number,
 ): MemoryGraph {
   const ids = new Set(nodeIds)
   let changed = false
   const nodes = graph.nodes.map((node) => {
     if (!ids.has(node.id)) return node
-    if (node.neededByAt === neededByAt && node.neededByUpdatedAt === now) return node
-    changed = true
-    if (neededByAt === undefined) {
-      const { neededByAt: _old, ...withoutDeadline } = node
-      return { ...withoutDeadline, neededByUpdatedAt: now }
+    if (
+      deadline !== undefined &&
+      node.neededByAt === deadline.at &&
+      node.neededByDay === deadline.day
+    ) {
+      return node
     }
-    return { ...node, neededByAt, neededByUpdatedAt: now }
+    changed = true
+    const { neededByAt: _at, neededByDay: _day, ...withoutDeadline } = node
+    return deadline === undefined
+      ? { ...withoutDeadline, neededByUpdatedAt: now }
+      : {
+          ...withoutDeadline,
+          neededByAt: deadline.at,
+          neededByDay: deadline.day,
+          neededByUpdatedAt: now,
+        }
   })
   return changed ? { ...graph, nodes } : graph
 }
@@ -277,13 +268,11 @@ export function mergeMemoryGraph(mine: MemoryGraph, theirs: MemoryGraph): Memory
       ...(lastRecalledAt === undefined ? {} : { lastRecalledAt }),
       ...(detail === undefined ? {} : { detail }),
     }
-    const withoutDeadline: MemoryNode = (() => {
-      const { neededByAt: _at, neededByUpdatedAt: _updated, ...rest } = base
-      return rest
-    })()
+    const { neededByAt: _at, neededByDay: _day, neededByUpdatedAt: _updated, ...withoutDeadline } = base
     nodes.set(node.id, {
       ...withoutDeadline,
       ...(deadlineSource.neededByAt === undefined ? {} : { neededByAt: deadlineSource.neededByAt }),
+      ...(deadlineSource.neededByDay === undefined ? {} : { neededByDay: deadlineSource.neededByDay }),
       ...(deadlineSource.neededByUpdatedAt === undefined
         ? {}
         : { neededByUpdatedAt: deadlineSource.neededByUpdatedAt }),
@@ -337,13 +326,20 @@ export function readMemoryGraph(raw: unknown): MemoryGraph {
         typeof (node as MemoryNode).createdAt === 'number' &&
         typeof (node as MemoryNode).strength === 'number',
     )
-    .map((node) => ({
-      ...node,
-      ...(typeof node.neededByAt === 'number' ? { neededByAt: node.neededByAt } : {}),
-      ...(typeof node.neededByUpdatedAt === 'number'
-        ? { neededByUpdatedAt: node.neededByUpdatedAt }
-        : {}),
-    }))
+    .map((node) => {
+      const neededByDay =
+        typeof node.neededByDay === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(node.neededByDay)
+          ? (node.neededByDay as DayKey)
+          : undefined
+      return {
+        ...node,
+        ...(typeof node.neededByAt === 'number' ? { neededByAt: node.neededByAt } : {}),
+        ...(neededByDay === undefined ? {} : { neededByDay }),
+        ...(typeof node.neededByUpdatedAt === 'number'
+          ? { neededByUpdatedAt: node.neededByUpdatedAt }
+          : {}),
+      }
+    })
   const known = new Set(nodes.map((node) => node.id))
   const edges = (Array.isArray(candidate.edges) ? candidate.edges : []).filter(
     (edge): edge is MemoryEdge =>
