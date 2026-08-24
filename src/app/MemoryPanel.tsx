@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { Suspense, lazy, useCallback, useEffect, useState } from 'react'
 
 import {
   type MemoryGraph,
@@ -21,7 +21,16 @@ import { memoryForecastCopyFor, type Dictionary } from '../i18n/index.ts'
 import { MemoryConstellation } from './MemoryConstellation.tsx'
 import { scheduleDriveSync } from './driveSync.ts'
 import { memoryDeadlineCopyForCurrentUi } from './memoryDeadline.ts'
-import { RememberThisPanel } from './RememberThisPanel.tsx'
+
+/*
+ * „Etwas merken“ ist ein tiefer Arbeitsweg innerhalb von „Mein Gedächtnis“.
+ * Er braucht Architekt, Coach/BYOK und die Deadline-Eingabe, aber nichts davon
+ * gehört in den Kaltstart der App. Deshalb erst laden, wenn die Memory-Seite
+ * tatsächlich geöffnet wurde. Das hält P4 ehrlich statt das Budget anzuheben.
+ */
+const RememberThisPanel = lazy(() =>
+  import('./RememberThisPanel.tsx').then((module) => ({ default: module.RememberThisPanel })),
+)
 
 /**
  * Der Memory-Bereich (D-036).
@@ -313,16 +322,18 @@ export function MemoryPanel({
         </>
       )}
 
-      <RememberThisPanel
-        platform={platform}
-        dictionary={dictionary}
-        onSaved={({ nodeIds, edgeIds }) => {
-          setNewNodeIds(new Set(nodeIds))
-          setNewEdgeIds(new Set(edgeIds))
-          setSelectedId(nodeIds[0])
-          reload()
-        }}
-      />
+      <Suspense fallback={null}>
+        <RememberThisPanel
+          platform={platform}
+          dictionary={dictionary}
+          onSaved={({ nodeIds, edgeIds }) => {
+            setNewNodeIds(new Set(nodeIds))
+            setNewEdgeIds(new Set(edgeIds))
+            setSelectedId(nodeIds[0])
+            reload()
+          }}
+        />
+      </Suspense>
     </div>
   )
 }
