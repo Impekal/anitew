@@ -22,6 +22,7 @@ import {
   addMemoryNode,
   connectMemoryNodes,
   memoryNodeId,
+  setMemoryDeadline,
 } from './memoryGraph.ts'
 
 export interface RememberInput {
@@ -152,11 +153,16 @@ export function suggestMemories(input: RememberInput): RememberSuggestions {
  * Bestätigte Vorschläge in den Graphen — nur die bestätigten: Der Mensch
  * hat vorher abgewählt, was nicht stimmt. Kanten, deren Enden abgewählt
  * wurden, fallen still mit (connectMemoryNodes prüft beide Enden).
+ *
+ * `neededByAt` (I5) gehört zur **bewussten Bestätigung** desselben Vorgangs:
+ * Wenn gesetzt, bekommen genau diese bestätigten Knoten denselben realen
+ * Zielzeitpunkt. Ohne Wert bleibt eine bereits vorhandene Deadline unberührt.
  */
 export function applyRememberedSuggestions(
   graph: MemoryGraph,
   suggestions: RememberSuggestions,
   now: number,
+  neededByAt?: number,
 ): MemoryGraph {
   const normalized = normalizeRememberSuggestions(suggestions)
   let next = graph
@@ -165,6 +171,14 @@ export function applyRememberedSuggestions(
   }
   for (const edge of normalized.edges) {
     next = connectMemoryNodes(next, edge, now)
+  }
+  if (neededByAt !== undefined) {
+    next = setMemoryDeadline(
+      next,
+      normalized.nodes.map((node) => node.id),
+      neededByAt,
+      now,
+    )
   }
   return next
 }
