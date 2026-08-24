@@ -191,7 +191,7 @@ test('löscht auf Wunsch alles — aber erst nach einer echten Rückfrage (N4)',
 
   await openPage(page, 'Sicherung')
 
-  // Ein Klick auf „Allöschen“ löscht noch nichts — er fragt.
+  // Ein Klick auf „Alles löschen“ löscht noch nichts — er fragt.
   await page.locator('.wipe').getByRole('button', { name: 'Alles löschen' }).click()
   await expect(page.getByText(/Wirklich alles löschen/)).toBeVisible()
 
@@ -209,9 +209,12 @@ test('löscht auf Wunsch alles — aber erst nach einer echten Rückfrage (N4)',
   })
   expect(beforeCancel).toBe(1)
 
-  // Bewusst bestätigt: jetzt ist wirklich alles weg.
+  // Bewusst bestätigt: zweite Warnstufe plus explizite Eingabe von ANITEW.
   await page.locator('.wipe').getByRole('button', { name: 'Alles löschen' }).click()
   await page.locator('.wipe-warn').waitFor()
+  await expect(page.locator('.wipe-go')).toBeDisabled()
+  await page.locator('.wipe-confirm-input').fill('ANITEW')
+  await expect(page.locator('.wipe-go')).toBeEnabled()
   await page.locator('.wipe-go').click()
   await expect(page.getByText(/Gelöscht\. Wie am ersten Tag/)).toBeVisible()
 
