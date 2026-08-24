@@ -40,3 +40,88 @@ test('macht aus eingefügtem Text Karten — und zeigt, was keine wurde', async 
 
   await leavePage(page)
 })
+
+test('Diktat fügt nur nach bestätigter lokaler Erkennung Text zum Entwurf hinzu', async ({ page }) => {
+  await page.addInitScript(() => {
+    class Recognition {
+      static async available(options: unknown) {
+        ;(window as any).__dictationAvailableOptions = options
+        return 'available' as const
+      }
+
+      lang = ''
+      continuous = false
+      interimResults = false
+      processLocally = false
+      onresult: ((event: any) => void) | null = null
+      onerror: (() => void) | null = null
+      onend: (() => void) | null = null
+
+      start() {
+        ;(window as any).__dictationStartedLocally = this.processLocally
+        queueMicrotask(() => {
+          this.onresult?.({
+            results: {
+              0: { 0: { transcript: 'Notruf: 112' }, length: 1, isFinal: true },
+              length: 1,
+            },
+          })
+        })
+      }
+    }
+
+    ;(window as any).SpeechRecognition = Recognition
+  })
+
+  await visit(page)
+  await openPage(page, 'Eigene Inhalte')
+  await page.locator('.own-input').fill('Hauptstadt von Portugal – Lissabon')
+
+  await page.locator('.own-dictate').click()
+
+  await expect(page.locator('.own-input')).toHaveValue(
+    'Hauptstadt von Portugal – Lissabon\nNotruf: 112',
+  )
+  await expect(page.locator('.own-preview li')).toHaveCount(2)
+  await expect
+    .poll(() => page.evaluate(() => (window as any).__dictationStartedLocally))
+    .toBe(true)
+  await expect
+    .poll(() => page.evaluate(() => (window as any).__dictationAvailableOptions))
+    .toEqual({ langs: ['de'], processLocally: true })
+})
+
+test('Diktat lässt den Entwurf unangetastet, wenn lokales Erkennen nicht verfügbar ist', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    class Recognition {
+      static async available() {
+        return 'downloadable' as const
+      }
+
+      lang = ''
+      continuous = false
+      interimResults = false
+      processLocally = false
+      onresult = null
+      onerror = null
+      onend = null
+
+      start() {
+        throw new Error('darf ohne lokale Verfügbarkeit nicht starten')
+      }
+    }
+
+    ;(window as any).SpeechRecognition = Recognition
+  })
+
+  await visit(page)
+  await openPage(page, 'Eigene Inhalte')
+  await page.locator('.own-input').fill('Hauptstadt von Portugal – Lissabon')
+
+  await page.locator('.own-dictate').click()
+
+  await expect(page.locator('.own-input')).toHaveValue('Hauptstadt von Portugal – Lissabon')
+  await expect(page.locator('.own-dictation-status')).toContainText('nicht verfügbar')
+})
