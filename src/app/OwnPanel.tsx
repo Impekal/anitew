@@ -207,7 +207,7 @@ export function OwnPanel({ language, dictionary }: { language: string; dictionar
         </figure>
       )}
 
-      {draft.trim() !== '' && (
+      {(draft.trim() !== '' || memoryModeOpen) && (
         <div className="own-memory-entry">
           <button
             type="button"
@@ -225,6 +225,8 @@ export function OwnPanel({ language, dictionary }: { language: string; dictionar
                 // Der Rohentwurf hat seinen Zweck erfüllt. Das bestätigte
                 // Material lebt jetzt im Graphen; eine zweite stille Kopie
                 // als Karte wäre genau die Doppelspur, die I3 vermeiden soll.
+                // Der MEMORY MODE bleibt noch sichtbar, damit seine ruhige
+                // Bestätigung nicht im selben Moment verschwindet.
                 setDraft('')
               }}
             />
