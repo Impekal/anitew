@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 import { leavePage, openPage, visit } from './helpers.ts'
 
 /**
- * Eigene Inhalte (Backlog I · D-032 / I3).
+ * Eigene Inhalte (Backlog I · D-032 / I2 / I3).
  *
  * Geprüft wird der Weg des Stoffes: einfügen → Vorschau (samt sichtbar
  * Abgelehntem) → übernehmen → Liste — und dass eine entfernte Karte
@@ -14,6 +14,10 @@ import { leavePage, openPage, visit } from './helpers.ts'
  * geht in den bestehenden MEMORY MODE, wird dort strukturiert und erst nach
  * Bestätigung in den Memory Graph übernommen. Dessen Training + FSRS prüft
  * `memory.spec.ts` vertikal bis in `itemStates`.
+ *
+ * Das Alltagsszenario I2 hält mehrere Menschen als getrennte Anker: Name und
+ * Merkmale werden strukturiert erfasst, gemeinsam geprüft und erst dann in
+ * denselben Graphen übernommen.
  */
 
 test('macht aus eingefügtem Text Karten — und zeigt, was keine wurde', async ({ page }) => {
@@ -106,6 +110,36 @@ test('MEMORY MODE übernimmt den Entwurf über dieselbe Bestätigungstür in den
   await leavePage(page)
   await openPage(page, 'Mein Gedächtnis')
   await expect(page.locator('.memory-counts')).toHaveText('4 Erinnerungen · 3 Verbindungen')
+})
+
+test('Neue Menschen bleiben getrennte persönliche Abrufanker und werden erst nach Bestätigung gemerkt', async ({
+  page,
+}) => {
+  await visit(page)
+  await openPage(page, 'Eigene Inhalte')
+
+  await page.getByRole('button', { name: 'Neue Menschen merken' }).click()
+  await page.getByRole('textbox', { name: 'Name 1' }).fill('Mira')
+  await page.getByRole('textbox', { name: /Merkmale.*1/ }).fill('Cello, Madrid')
+  await page.getByRole('textbox', { name: 'Name 2' }).fill('Daniel')
+  await page.getByRole('textbox', { name: /Merkmale.*2/ }).fill('Gitarre, Berlin')
+
+  // Vor der Vorschau und Bestätigung ist noch nichts im Graphen.
+  await page.getByRole('button', { name: 'Training vorbereiten' }).click()
+  await expect(page.locator('.people-preview li')).toHaveCount(2)
+  await expect(page.locator('.people-preview li').nth(0)).toContainText('Mira')
+  await expect(page.locator('.people-preview li').nth(0)).toContainText('Cello · Madrid')
+  await expect(page.locator('.people-preview li').nth(1)).toContainText('Daniel')
+  await expect(page.locator('.people-preview li').nth(1)).toContainText('Gitarre · Berlin')
+
+  await page.locator('.people-confirm').click()
+  await expect(page.locator('.people-saved')).toBeVisible()
+
+  await leavePage(page)
+  await openPage(page, 'Mein Gedächtnis')
+  await expect(page.locator('.memory-counts')).toHaveText('6 Erinnerungen · 4 Verbindungen')
+  await expect(page.locator('.memoryzone')).toContainText('Mira')
+  await expect(page.locator('.memoryzone')).toContainText('Daniel')
 })
 
 test('Diktat fügt nur nach bestätigter lokaler Erkennung Text zum Entwurf hinzu', async ({ page }) => {
