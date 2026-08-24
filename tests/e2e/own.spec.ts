@@ -41,6 +41,40 @@ test('macht aus eingefügtem Text Karten — und zeigt, was keine wurde', async 
   await leavePage(page)
 })
 
+test('Foto bleibt eine lokale Vorlage und wird nicht als Inhalt gespeichert', async ({ page }) => {
+  await visit(page)
+  await openPage(page, 'Eigene Inhalte')
+
+  const onePixelPng = Buffer.from(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9ZQmcAAAAASUVORK5CYII=',
+    'base64',
+  )
+
+  await page.locator('.own-photo-input').setInputFiles({
+    name: 'notizen.png',
+    mimeType: 'image/png',
+    buffer: onePixelPng,
+  })
+
+  const photo = page.locator('.own-photo-preview img')
+  await expect(photo).toBeVisible()
+  await expect(photo).toHaveAttribute('src', /^blob:/)
+  await expect(page.locator('.own-photo-note')).toContainText('speichert, synchronisiert oder sendet es nicht')
+  await expect(page.locator('.own-list li')).toHaveCount(0)
+
+  // Das Foto ist nur Vorlage. Erst der ausdrücklich bestätigte Text wird Karte.
+  await page.locator('.own-input').fill('Notruf: 112')
+  await page.getByRole('button', { name: 'Karten übernehmen' }).click()
+  await expect(page.locator('.own-list li')).toHaveCount(1)
+
+  // Nach einem Reload ist das Bild weg, die bestätigte Karte bleibt.
+  await page.reload()
+  await openPage(page, 'Eigene Inhalte')
+  await expect(page.locator('.own-photo-preview')).toHaveCount(0)
+  await expect(page.locator('.own-list li')).toHaveCount(1)
+  await expect(page.locator('.own-list')).toContainText('112')
+})
+
 test('Diktat fügt nur nach bestätigter lokaler Erkennung Text zum Entwurf hinzu', async ({ page }) => {
   await page.addInitScript(() => {
     class Recognition {
