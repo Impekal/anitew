@@ -3,12 +3,17 @@ import { expect, test } from '@playwright/test'
 import { leavePage, openPage, visit } from './helpers.ts'
 
 /**
- * Eigene Inhalte (Backlog I · D-032).
+ * Eigene Inhalte (Backlog I · D-032 / I3).
  *
  * Geprüft wird der Weg des Stoffes: einfügen → Vorschau (samt sichtbar
  * Abgelehntem) → übernehmen → Liste — und dass eine entfernte Karte
  * wirklich verschwindet. Alles lokal (I6); die Einheit selbst prüfen die
  * Kerntests des Planers.
+ *
+ * Für zusammenhängendes Material kommt der zweite Weg dazu: derselbe Entwurf
+ * geht in den bestehenden MEMORY MODE, wird dort strukturiert und erst nach
+ * Bestätigung in den Memory Graph übernommen. Dessen Training + FSRS prüft
+ * `memory.spec.ts` vertikal bis in `itemStates`.
  */
 
 test('macht aus eingefügtem Text Karten — und zeigt, was keine wurde', async ({ page }) => {
@@ -73,6 +78,34 @@ test('Foto bleibt eine lokale Vorlage und wird nicht als Inhalt gespeichert', as
   await expect(page.locator('.own-photo-preview')).toHaveCount(0)
   await expect(page.locator('.own-list li')).toHaveCount(1)
   await expect(page.locator('.own-list')).toContainText('112')
+})
+
+test('MEMORY MODE übernimmt den Entwurf über dieselbe Bestätigungstür in den Graphen', async ({
+  page,
+}) => {
+  await visit(page)
+  await openPage(page, 'Eigene Inhalte')
+
+  const material = 'Daniel arbeitet im Museum, kommt aus Madrid und spielt Gitarre.'
+  await page.locator('.own-input').fill(material)
+
+  // Kein zweites Eingabefeld abtippen: Der vorhandene Entwurf reist nur
+  // flüchtig in den bestehenden Memory-Architekten.
+  await page.locator('.own-memory-mode-open').click()
+  await expect(page.locator('.own-memory-mode .remember-input')).toHaveValue(material)
+
+  await page.getByRole('button', { name: 'Vorschläge ansehen' }).click()
+  await expect(page.locator('.own-memory-mode .remember-node')).toHaveCount(4)
+  await expect(page.locator('.own-memory-mode .remember-edges li')).toHaveCount(3)
+
+  // Erst dieser Fingertipp ist die Speichergrenze.
+  await page.getByRole('button', { name: 'Bestätigen und merken' }).click()
+  await expect(page.locator('.own-memory-mode .remember-saved')).toBeVisible()
+  await expect(page.locator('.own-input')).toHaveValue('')
+
+  await leavePage(page)
+  await openPage(page, 'Mein Gedächtnis')
+  await expect(page.locator('.memory-counts')).toHaveText('4 Erinnerungen · 3 Verbindungen')
 })
 
 test('Diktat fügt nur nach bestätigter lokaler Erkennung Text zum Entwurf hinzu', async ({ page }) => {
