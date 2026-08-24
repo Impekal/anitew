@@ -2,8 +2,6 @@ import { expect, test } from '@playwright/test'
 
 import { visit } from './helpers.ts'
 
-const GIS = 'https://accounts.google.com/gsi/client'
-
 test('der Core wird auf dem iPhone zu einem echten mobilen Atlas ohne Überlappung', async ({
   page,
 }) => {
@@ -74,55 +72,4 @@ test('der Core wird auf dem iPhone zu einem echten mobilen Atlas ohne Überlappu
     expect(rect.left, rect.name).toBeGreaterThanOrEqual(0)
     expect(rect.right, rect.name).toBeLessThanOrEqual(390)
   }
-})
-
-test('Google Identity ist vor dem ersten Connect-Tipp bereit — auch bei verzögertem Script', async ({
-  page,
-}) => {
-  await page.setViewportSize({ width: 390, height: 844 })
-
-  let gisRequested = false
-  let releaseScript: (() => void) | undefined
-  const gate = new Promise<void>((resolve) => {
-    releaseScript = resolve
-  })
-
-  await page.route(GIS, async (route) => {
-    gisRequested = true
-    await gate
-    await route.fulfill({
-      contentType: 'text/javascript',
-      body: `
-        window.google = { accounts: { oauth2: { initTokenClient: (config) => ({
-          requestAccessToken: () => {
-            window.__anitewOauthRequested = true;
-            if (config.error_callback) config.error_callback({ type: 'popup_closed' });
-          },
-        }) } } };
-      `,
-    })
-  })
-
-  await page.goto('/')
-  const connect = page.locator('.first-run-drive-connect')
-  await expect(connect).toBeVisible({ timeout: 10_000 })
-  await expect.poll(() => gisRequested).toBe(true)
-
-  // Solange GIS wirklich noch lädt, kann der Mensch keinen wirkungslosen
-  // ersten Tipp verlieren. Sobald es bereit ist, wird der Button freigegeben.
-  await expect(connect).toBeDisabled()
-  releaseScript?.()
-  await expect(connect).toBeEnabled({ timeout: 5_000 })
-  await expect(connect).toHaveAttribute('data-google-auth', 'ready')
-
-  await connect.click()
-  await expect
-    .poll(() =>
-      page.evaluate(
-        () =>
-          (window as unknown as { __anitewOauthRequested?: boolean }).__anitewOauthRequested ===
-          true,
-      ),
-    )
-    .toBe(true)
 })

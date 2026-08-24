@@ -15,9 +15,8 @@ import './anitew-phase5.css'
 // die rein visuelle Tiefe nach. Die Schichten kommen absichtlich nacheinander:
 // Living Memory ist die letzte Autorität und kann ältere Drawer-/Startregeln
 // sicher ersetzen, statt mit parallelen CSS-Chunks um die Reihenfolge zu
-// konkurrieren. V4 sitzt ganz hinten: Refinement, mobile Core-Geometrie und
-// die nur bei sichtbarem Drive-Control vorbereitete Google-Anmeldung teilen
-// sich einen Lazy-Schritt und kosten keine zusätzlichen Kaltstart-Ressourcen.
+// konkurrieren. Mobile Core-Geometrie bleibt ebenfalls in diesem Lazy-Pfad;
+// Drive-Authentifizierung ist davon bewusst getrennt.
 let signatureTimer: number | undefined
 let pageIsLeaving = false
 
@@ -33,7 +32,7 @@ const loadSignatureExperience = () => {
       if (pageIsLeaving) return
       await import('./app/coreRitual.ts')
       if (pageIsLeaving) return
-      await import('./app/mobileCoreDriveFix.ts')
+      await import('./app/mobileCoreLayout.ts')
     })().catch(() => undefined)
   }, 750)
 }
