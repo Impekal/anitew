@@ -6,6 +6,7 @@ import type { Dictionary } from '../i18n/index.ts'
 import { dictateLocally } from '../platform/web/localDictation.ts'
 import { localDictationCopyForCurrentUi } from './localDictationCopy.ts'
 import { localPhotoCopyForCurrentUi } from './localPhotoCopy.ts'
+import { OwnMemoryMode } from './OwnMemoryMode.tsx'
 import './ownPhoto.css'
 
 const MAX_LOCAL_PHOTO_BYTES = 15 * 1024 * 1024
@@ -27,9 +28,13 @@ interface LocalPhoto {
  * Ein Foto ist absichtlich nur eine lokale Arbeitsvorlage: Es lebt als
  * Objekt-URL im Arbeitsspeicher dieser Ansicht, nicht in IndexedDB. Damit
  * kann der Mensch Text daraus tippen oder lokal diktieren, ohne dass ANITEW
- * das Bild speichert, synchronisiert oder an einen Dienst sendet. Echte
- * Foto-Extraktion gehört in den bestätigungspflichtigen MEMORY MODE (I3),
- * nicht als stiller OCR-Fallback hier hinein.
+ * das Bild speichert, synchronisiert oder an einen Dienst sendet.
+ *
+ * Für zusammenhängenden Stoff führt derselbe Entwurf in den MEMORY MODE (I3):
+ * Dort strukturiert der vorhandene Memory-Architekt lokal oder optional mit
+ * dem eigenen KI-Schlüssel, der Mensch prüft die Vorschläge, und erst die
+ * Bestätigung schreibt in den Memory Graph. Danach übernimmt die bestehende
+ * Session-Engine Abruf und FSRS-Wiedersehen — keine zweite Lernmaschine.
  */
 export function OwnPanel({ language, dictionary }: { language: string; dictionary: Dictionary }) {
   const texts = dictionary.own
@@ -45,6 +50,7 @@ export function OwnPanel({ language, dictionary }: { language: string; dictionar
   >('idle')
   const [photo, setPhoto] = useState<LocalPhoto | null>(null)
   const [photoError, setPhotoError] = useState<string | undefined>()
+  const [memoryModeOpen, setMemoryModeOpen] = useState(false)
 
   const reload = useCallback(() => {
     void loadOwnFacts(language)
@@ -73,6 +79,7 @@ export function OwnPanel({ language, dictionary }: { language: string; dictionar
     void addOwnFacts(language, parsed.facts)
       .then(() => {
         setDraft('')
+        setMemoryModeOpen(false)
         reload()
       })
       .catch(() => undefined)
@@ -198,6 +205,31 @@ export function OwnPanel({ language, dictionary }: { language: string; dictionar
             </button>
           </figcaption>
         </figure>
+      )}
+
+      {draft.trim() !== '' && (
+        <div className="own-memory-entry">
+          <button
+            type="button"
+            className="quiet own-memory-mode-open"
+            aria-expanded={memoryModeOpen}
+            onClick={() => setMemoryModeOpen((open) => !open)}
+          >
+            {dictionary.memory.rememberHeading}
+          </button>
+          {memoryModeOpen && (
+            <OwnMemoryMode
+              draft={draft}
+              dictionary={dictionary}
+              onSaved={() => {
+                // Der Rohentwurf hat seinen Zweck erfüllt. Das bestätigte
+                // Material lebt jetzt im Graphen; eine zweite stille Kopie
+                // als Karte wäre genau die Doppelspur, die I3 vermeiden soll.
+                setDraft('')
+              }}
+            />
+          )}
+        </div>
       )}
 
       {parsed.facts.length > 0 && (
