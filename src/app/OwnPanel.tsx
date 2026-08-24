@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react'
 
 import { type OwnFact, factPrompt, parseOwnText } from '../core/index.ts'
 import { addOwnFacts, loadOwnFacts, loadOwnPool, removeOwnFact } from '../data/own.ts'
@@ -6,9 +6,20 @@ import type { Dictionary } from '../i18n/index.ts'
 import { dictateLocally } from '../platform/web/localDictation.ts'
 import { localDictationCopyForCurrentUi } from './localDictationCopy.ts'
 import { localPhotoCopyForCurrentUi } from './localPhotoCopy.ts'
-import { OwnMemoryMode } from './OwnMemoryMode.tsx'
-import { PeopleScenario } from './PeopleScenario.tsx'
 import './ownPhoto.css'
+
+/*
+ * M6 ist ein tiefer Arbeitsbereich, kein Kaltstart-Inhalt. Die beiden großen
+ * Helfer werden deshalb erst geladen, wenn „Eigene Inhalte“ tatsächlich offen
+ * ist. Das hält P4 ehrlich, statt für seltene Eingaben das globale Budget zu
+ * erhöhen. Playwright wartet ohnehin auf die konkreten Bedienelemente.
+ */
+const OwnMemoryMode = lazy(() =>
+  import('./OwnMemoryMode.tsx').then((module) => ({ default: module.OwnMemoryMode })),
+)
+const PeopleScenario = lazy(() =>
+  import('./PeopleScenario.tsx').then((module) => ({ default: module.PeopleScenario })),
+)
 
 const MAX_LOCAL_PHOTO_BYTES = 15 * 1024 * 1024
 
@@ -224,23 +235,27 @@ export function OwnPanel({ language, dictionary }: { language: string; dictionar
             {dictionary.memory.rememberHeading}
           </button>
           {memoryModeOpen && (
-            <OwnMemoryMode
-              draft={draft}
-              dictionary={dictionary}
-              onSaved={() => {
-                // Der Rohentwurf hat seinen Zweck erfüllt. Das bestätigte
-                // Material lebt jetzt im Graphen; eine zweite stille Kopie
-                // als Karte wäre genau die Doppelspur, die I3 vermeiden soll.
-                // Der MEMORY MODE bleibt noch sichtbar, damit seine ruhige
-                // Bestätigung nicht im selben Moment verschwindet.
-                setDraft('')
-              }}
-            />
+            <Suspense fallback={null}>
+              <OwnMemoryMode
+                draft={draft}
+                dictionary={dictionary}
+                onSaved={() => {
+                  // Der Rohentwurf hat seinen Zweck erfüllt. Das bestätigte
+                  // Material lebt jetzt im Graphen; eine zweite stille Kopie
+                  // als Karte wäre genau die Doppelspur, die I3 vermeiden soll.
+                  // Der MEMORY MODE bleibt noch sichtbar, damit seine ruhige
+                  // Bestätigung nicht im selben Moment verschwindet.
+                  setDraft('')
+                }}
+              />
+            </Suspense>
           )}
         </div>
       )}
 
-      <PeopleScenario />
+      <Suspense fallback={null}>
+        <PeopleScenario />
+      </Suspense>
 
       {parsed.facts.length > 0 && (
         <section aria-label={texts.preview}>
