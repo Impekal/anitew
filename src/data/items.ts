@@ -60,13 +60,13 @@ export async function loadDue(language: string): Promise<DueItem[]> {
    * Lesen verbinden wir beides über die stabile Graph-ID, die jedes moderne
    * `memory:`-Item ohnehin in seiner Kennung trägt.
    */
-  let neededBy = new Map<string, number>()
+  let neededBy = new Map<string, DayKey>()
   if (rows.some((row) => row.moduleId === 'memory')) {
     const graph = await loadMemoryGraph()
     neededBy = new Map(
       graph.nodes
-        .filter((node) => node.neededByAt !== undefined)
-        .map((node) => [node.id, node.neededByAt as number]),
+        .filter((node) => node.neededByDay !== undefined)
+        .map((node) => [node.id, node.neededByDay as DayKey]),
     )
   }
 
@@ -74,8 +74,8 @@ export async function loadDue(language: string): Promise<DueItem[]> {
     const item: DueItem = { itemId: row.itemId, memory: toMemory(row) }
     if (row.moduleId !== 'memory') return item
     const nodeId = memoryNodeIdOfItem(wordOf(row.itemId))
-    const neededByAt = nodeId === undefined ? undefined : neededBy.get(nodeId)
-    return neededByAt === undefined ? item : { ...item, neededByAt }
+    const neededByDay = nodeId === undefined ? undefined : neededBy.get(nodeId)
+    return neededByDay === undefined ? item : { ...item, neededByDay }
   })
 }
 
