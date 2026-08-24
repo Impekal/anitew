@@ -4,10 +4,6 @@
  * Nachträglich eingezogen kostet i18n das Zehnfache, weil dann jeder Text
  * einzeln aus dem Code gesucht werden muss. Deshalb steht sie schon in M0 —
  * obwohl es bisher nur zwei Sprachen und kaum Texte gibt.
- *
- * Übersetzt sind `de` (Quelle, D-007) und `en`. Die übrigen neun Sprachen aus
- * L2 sind bereits als Sprache bekannt (core/language.ts), aber noch nicht
- * geschrieben; bis dahin zeigt die App für sie Englisch und sagt das auch.
  */
 
 import { FALLBACK_LANGUAGE, type Language } from '../core/index.ts'
@@ -15,36 +11,10 @@ import { FALLBACK_LANGUAGE, type Language } from '../core/index.ts'
 import { de } from './de.ts'
 import { en } from './en.ts'
 
-/**
- * Die Form aller Wörterbücher ergibt sich aus der Quellsprache.
- *
- * `de` ist `as const` und hätte damit die deutschen Texte selbst als Typ —
- * eine Übersetzung müsste wörtlich „Beginnen“ heißen. `Widen` behält deshalb
- * den Aufbau und lässt an den Blättern beliebige Zeichenketten zu. Ergebnis:
- * Ein vergessener Schlüssel in `en.ts` ist ein Übersetzungsfehler, kein leerer
- * Text zur Laufzeit.
- */
 type Widen<T> = T extends string ? string : { [K in keyof T]: Widen<T[K]> }
 
 type SourceDictionary = Widen<typeof de>
 
-/**
- * Missions-Tatsachen und renderer-eigene Module wachsen unabhängig von den
- * vorhandenen UI-Texten.
- *
- * `missionAsk` und `missionPlaceholders` waren ursprünglich aus vier festen
- * Schlüsseln abgeleitet. H2 ergänzt eine fünfte Tatsache (`location`), ohne
- * dafür die komplette Quellübersetzung umzuschreiben: Die beiden Verzeichnisse
- * dürfen zusätzliche String-Schlüssel tragen; `dictionaryFor()` setzt die
- * zwei neuen Texte unten explizit ein.
- *
- * D12 hat mit dem 3×3-Raster einen eigenen Renderer. Sein Einprägebild braucht
- * keinen modulspezifischen Satz aus `encodeHints`; trotzdem muss der generische
- * Session-Zweig typseitig weitere Modulkennungen zulassen, weil die Auswahl
- * erst im JSX auf den Spatial-Renderer verzweigt. Das Record hält diese
- * Typgrenze offen, ohne einen Text zu erfinden, der zur Laufzeit nie gelesen
- * wird.
- */
 export type Dictionary = Omit<SourceDictionary, 'session'> & {
   session: Omit<SourceDictionary['session'], 'missionAsk' | 'missionPlaceholders' | 'encodeHints'> & {
     missionAsk: SourceDictionary['session']['missionAsk'] & Record<string, string>
@@ -65,6 +35,44 @@ const MISSION_LOCATION_COPY: Readonly<
   en: { ask: 'Where was the object?', placeholder: 'Position' },
 }
 
+interface PushTruthCopy {
+  readonly reminderNote: string
+  readonly whileOpen: string
+  readonly scheduled: string
+  readonly privacyLead: string
+  readonly privacyLocal: string
+  readonly privacyPush: string
+  readonly privacyDelete: string
+  readonly privacyHonest: string
+}
+
+const PUSH_TRUTH: Readonly<Partial<Record<Language, PushTruthCopy>>> = {
+  de: {
+    reminderNote: 'Kein Konto. Push speichert Geräteadresse, Zeit und Zeitzone — keine Trainingsdaten.',
+    whileOpen: 'Hier nur **solange es offen ist**. iPhone/iPad: nach dem Schließen nur als Home-Screen-App.',
+    scheduled: 'Kommt als Systemmitteilung an, auch wenn ANITEW geschlossen ist.',
+    privacyLead: 'ANITEW bleibt local-first.',
+    privacyLocal: 'Training, Erinnerungen, Messungen und Profil bleiben auf diesem Gerät.',
+    privacyPush:
+      'Für Push speichert ANITEW nur die technische Push-Adresse dieses Geräts, Fälligkeit und Zeitzone. Keine Trainings- oder Gedächtnisinhalte.',
+    privacyDelete: '„Keine Erinnerung“ stoppt täglich; „Neu anfangen“ widerruft Push.',
+    privacyHonest:
+      'Beim Laden sieht der Hoster die üblichen Webserverdaten. Wenn du Systembenachrichtigungen aktivierst, braucht Push zusätzlich Netz; das Training selbst bleibt offlinefähig.',
+  },
+  en: {
+    reminderNote: 'No account. Push stores device address, time and time zone — no training data.',
+    whileOpen: 'Here only **while it is open**. iPhone/iPad: after closing, only as a Home Screen app.',
+    scheduled: 'Arrives as a system notification even when ANITEW is closed.',
+    privacyLead: 'ANITEW stays local-first.',
+    privacyLocal: 'Training, memories, measurements and profile stay on this device.',
+    privacyPush:
+      'For push, ANITEW stores only this device’s technical push address, due time and time zone. No training or memory content.',
+    privacyDelete: '“No reminder” stops daily; “Start over” revokes push.',
+    privacyHonest:
+      'While loading, the host sees ordinary web-server data. If you enable system notifications, push also needs network; training itself stays offline-capable.',
+  },
+}
+
 export interface MemoryForecastCopy {
   readonly label: string
   readonly value: string
@@ -81,14 +89,6 @@ const MEMORY_FORECAST_COPY: Readonly<Partial<Record<Language, MemoryForecastCopy
   },
 }
 
-/**
- * Ergänzt die H2-Texte ohne das Quellobjekt zu verändern.
- *
- * Das ist wichtig, weil Wörterbücher an mehreren Stellen geteilt werden. Eine
- * Mutation hier würde einen Sprachwechsel davon abhängig machen, welche
- * Sprache vorher geöffnet war. Stattdessen entsteht ein flacher neuer
- * Session-Zweig mit genau den beiden zusätzlichen Schlüsseln.
- */
 function withMissionLocation(dictionary: Dictionary, language: Language): Dictionary {
   const copy =
     MISSION_LOCATION_COPY[language] ??
@@ -109,12 +109,27 @@ function withMissionLocation(dictionary: Dictionary, language: Language): Dictio
   }
 }
 
-/**
- * C3 bleibt absichtlich außerhalb der Wörterbuchform: Es sind zwei kleine
- * Ergänzungstexte, während `memory.types` selbst ein verschachteltes Objekt
- * ist. So bleibt die strenge Quellform unangetastet und der Fallback identisch
- * mit dem übrigen UI-Verhalten.
- */
+function withPushTruth(dictionary: Dictionary, language: Language): Dictionary {
+  const copy = PUSH_TRUTH[language] ?? PUSH_TRUTH[FALLBACK_LANGUAGE] ?? PUSH_TRUTH.de
+  if (copy === undefined) return dictionary
+  const points = dictionary.privacy.points
+  return {
+    ...dictionary,
+    reminder: {
+      ...dictionary.reminder,
+      note: copy.reminderNote,
+      whileOpen: copy.whileOpen,
+      scheduled: copy.scheduled,
+    },
+    privacy: {
+      ...dictionary.privacy,
+      lead: copy.privacyLead,
+      points: [copy.privacyLocal, points[1], points[2], copy.privacyPush, copy.privacyDelete],
+      honest: copy.privacyHonest,
+    },
+  }
+}
+
 export function memoryForecastCopyFor(language: string): MemoryForecastCopy {
   const copy =
     MEMORY_FORECAST_COPY[language as Language] ??
@@ -126,10 +141,9 @@ export function memoryForecastCopyFor(language: string): MemoryForecastCopy {
 export function dictionaryFor(language: Language): Dictionary {
   const resolved = DICTIONARIES[language] ?? DICTIONARIES[FALLBACK_LANGUAGE] ?? de
   const copyLanguage = DICTIONARIES[language] === undefined ? FALLBACK_LANGUAGE : language
-  return withMissionLocation(resolved, copyLanguage)
+  return withPushTruth(withMissionLocation(resolved, copyLanguage), copyLanguage)
 }
 
-/** Gibt es für diese Sprache schon Texte, oder behelfen wir uns mit Englisch? */
 export function isTranslated(language: Language): boolean {
   return DICTIONARIES[language] !== undefined
 }

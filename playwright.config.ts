@@ -34,6 +34,9 @@ export default defineConfig({
   fullyParallel: false,
   workers: 1,
   forbidOnly: Boolean(process.env.CI),
+  // Ein Retry bleibt Diagnosehilfe, darf einen wackeligen Release-Gate aber
+  // nicht mehr in „grün“ verwandeln. Jeder Flake macht CI absichtlich rot.
+  failOnFlakyTests: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? 'line' : 'list',
   use: {

@@ -64,25 +64,62 @@ test('hält die Breite auf jeder Menüseite — und in der Schublade', async ({ 
   await visit(page)
   await expect(startButton(page)).toBeVisible()
 
+  const hamburger = page.locator('button.hamburger')
+  const drawer = page.locator('.drawer')
+
   // Die Schublade selbst zuerst.
-  await page.locator('button.hamburger').click()
-  await expect(page.locator('.drawer')).toBeVisible()
+  await hamburger.click()
+  await expect(drawer).toBeVisible()
   await noHorizontalOverflow(page)
 
-  // Dann jede Seite: Dort steckt der meiste Text, und ein zu breites Wort in
-  // einer Sprache oder eine lange Quelle sprengt zuerst hier. Die Liste wird
-  // abgelesen, nicht behauptet — was im Menü steht, wird geprüft.
-  const labels = await page.locator('.drawer-item > span').allTextContents()
-  await page.keyboard.press('Escape')
+  // Nur die sichtbare Beschriftung jedes Knotens lesen. MenuIcon bringt ein
+  // eigenes direktes <span> mit; der frühere Selektor sammelte deshalb auch
+  // leere Icon-Spans und `hasText: ''` traf anschließend jeden Menüknopf.
+  const labels = (await page.locator('.drawer-item > span:last-child').allTextContents())
+    .map((label) => label.trim())
+    .filter((label) => label !== '')
   expect(labels.length).toBeGreaterThan(0)
+
+  /*
+   * Hier wird Geometrie geprüft, nicht die Zurück-Navigation — deren Browser-
+   * und Seitenknopf-Verhalten hat `coreNavigation.spec.ts` als eigenen Gate.
+   *
+   * Der Drawer darf beim Öffnen/Zurückkehren animieren. Auf sehr breiten CI-
+   * Viewports kann Playwright einen normalen `.click()` deshalb minutenlang
+   * auf „stable“ warten, obwohl die Seite bereits korrekt im Viewport liegt.
+   * Für diesen Layout-Test löst `force` denselben echten Click-Handler aus,
+   * ohne die Animationsstabilität zu einer zweiten, fachfremden Assertion zu
+   * machen. Falls Core nach einer Unterseite bereits geschlossen ist, öffnen
+   * wir es für die nächste Breitenmessung ausdrücklich wieder.
+   */
   for (const label of labels) {
-    await page.locator('button.hamburger').click()
-    await page.locator('.drawer-item', { hasText: label }).click()
+    if (!(await drawer.isVisible())) {
+      await hamburger.click({ force: true })
+      await expect(drawer).toBeVisible()
+      await noHorizontalOverflow(page)
+    }
+
+    const item = page.getByRole('button', { name: label, exact: true })
+    await expect(item).toBeVisible()
+    await item.click({ force: true })
     await page.locator('.page').waitFor()
     await noHorizontalOverflow(page)
-    await page.locator('.page-back').click()
-    await page.locator('.challenge').waitFor()
+
+    await page.locator('.page-back').click({ force: true })
+    await expect(page.locator('.page')).toBeHidden()
+
+    if (!(await drawer.isVisible())) {
+      await hamburger.click({ force: true })
+    }
+    await expect(drawer).toBeVisible()
+    await noHorizontalOverflow(page)
   }
+
+  // Dieser Gate endet bewusst im offenen Drawer: Schließen per Escape ist
+  // Interaktionsverhalten und wird separat geprüft. Hier zählt nur, dass auch
+  // der letzte gemessene Drawer-Zustand ohne horizontalen Overflow bleibt.
+  await expect(drawer).toBeVisible()
+  await noHorizontalOverflow(page)
 })
 
 test('das Kennenlernen passt auf jedes Gerät', async ({ page }) => {
@@ -109,7 +146,10 @@ test('bleibt beim Einprägen im Rahmen', async ({ page }) => {
   await startButton(page).click()
   await page.locator('.settle').click()
 
-  const shown = page.locator('.encode-word, .scene, .lesson, .reveal-digits').first()
+  // Alle Einprägeformen haben entweder den gemeinsamen .encode-Wurzelknoten,
+  // eine Szene, eine Lektion oder die spezielle Ziffernanzeige. Nicht auf
+  // einzelne heutige Unterelemente wie .encode-word festlegen.
+  const shown = page.locator('.encode, .scene, .lesson, .reveal-digits').first()
   await expect(shown).toBeVisible({ timeout: 30_000 })
   await noHorizontalOverflow(page)
   await withinViewport(page, shown, 'der Einprägeteil')

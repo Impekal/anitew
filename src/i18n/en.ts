@@ -450,7 +450,7 @@ export const en: Dictionary = {
     fresh: 'joins the next session',
   },
   sync: {
-    heading: 'Sync',
+    heading: 'Sync / Sign out',
     intro: 'Your data travels to an app folder in your own Google Drive — the same file as the backup. No account with us, no server in between: this device talks to Google directly, and inside Drive the app sees only its own folder.',
     how: 'Syncing means: first, whatever lies there is fetched and merged by the backup rules — nothing gets deleted. Then the united state is uploaded. Two devices that ran apart both have everything afterwards.',
     start: 'Sign in with Google and sync',

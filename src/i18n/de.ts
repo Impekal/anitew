@@ -683,7 +683,7 @@ export const de = {
       „fremde Datei“ sagt ausdrücklich, dass nichts angerührt wurde —
       ein Abgleich, der bei Zweifel löscht, wäre keiner.
     */
-    heading: 'Abgleich',
+    heading: 'Synchronisieren / Abmelden',
     intro: 'Deine Daten wandern in einen App-Ordner in deinem eigenen Google Drive — dieselbe Datei wie die Sicherung. Kein Konto bei uns, kein Server dazwischen: Dieses Gerät spricht direkt mit Google, und im Drive sieht die App nur ihren eigenen Ordner.',
     how: 'Abgleichen heißt: Erst wird geholt, was dort liegt, und nach den Regeln der Sicherung eingemischt — nichts wird gelöscht. Dann wird der vereinigte Stand hochgelegt. Zwei Geräte, die getrennt liefen, haben danach beide alles.',
     start: 'Mit Google anmelden und abgleichen',

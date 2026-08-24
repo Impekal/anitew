@@ -58,8 +58,10 @@ export type SoundCue =
   | 'connection'
   /** Ein fälliger persönlicher Knoten wird bewusst wieder betreten. */
   | 'return'
-  /** Ein Abruf wurde aufgelöst; richtig oder falsch bleibt visuell, nicht musikalisch gewertet. */
+  /** Ein Abruf wurde aufgelöst. */
   | 'recall'
+  /** Ein persönlicher Abruf blieb vollständig offen — weich, nie strafend. */
+  | 'error'
   /** Mindestens eine persönliche Erinnerung ist tatsächlich wiedergekommen. */
   | 'landing'
   /** Ein Block ist zu Ende. */
@@ -81,15 +83,10 @@ export interface Sound {
 /**
  * Was die Plattform an Erinnerungen wirklich kann (Backlog B8).
  *
- * Diese drei Stufen sind der Grund, warum es diese Schnittstelle überhaupt
- * gibt. Im Web lässt sich eine Benachrichtigung **nicht** verlässlich für
- * später einplanen: Der Weg dafür (`TimestampTrigger`) ist nie über einen
- * Versuch hinausgekommen, und der übliche Ersatz ist ein Server, der pusht —
- * den es hier nicht gibt und nicht geben soll (D-003).
- *
- * Also wird die Fähigkeit **abgefragt und gesagt**, statt sie anzunehmen. Eine
- * App, die eine Erinnerung verspricht und keine schickt, hat schlimmer
- * gelogen, als wenn sie gar keine angeboten hätte (R-2).
+ * `scheduled` heißt: Die Plattform kann die App auch nach dem Schließen wieder
+ * für eine Systembenachrichtigung wecken. Im Web geschieht das über den
+ * Standard Web Push + Service Worker, auf unterstütztem iOS ausschließlich
+ * aus einer installierten Home-Screen-PWA.
  */
 export type ReminderAbility =
   /** Erinnert auch, wenn die App zu ist. */
@@ -115,7 +112,11 @@ export interface Reminders {
   ask(): Promise<ReminderPermission>
   /** Plant eine Erinnerung. Gibt zurück, ob sie **wirklich** geplant wurde. */
   schedule(reminder: Reminder): Promise<boolean>
-  cancel(id: string): Promise<void>
+  /**
+   * Ohne `permanent` darf eine wiederkehrende Tageserinnerung nur den heutigen
+   * Termin überspringen. `permanent=true` bedeutet ausdrücklich „ausschalten“.
+   */
+  cancel(id: string, permanent?: boolean): Promise<void>
 }
 
 /** Alles, was die App von der Plattform bekommt, an einer Stelle. */

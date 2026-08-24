@@ -113,19 +113,44 @@ export async function visit(page: Page) {
 }
 
 /**
- * Öffnet eine Menüseite: Menüknopf, dann der Eintrag mit dieser
- * Beschriftung. Seit dem Menü-Umbau ist jeder Punkt eine eigene Seite —
- * die Prüfungen gehen denselben Weg wie der Finger.
+ * Öffnet eine Core-Seite. Nach der neuen Hierarchie kann der Core bereits
+ * offen sein, etwa direkt nach „Zurück“ aus einer Unterseite. In diesem Fall
+ * darf der Helfer nicht noch einmal auf den hinter dem Overlay liegenden
+ * Core-Knopf klicken. Ist der vorige Core gerade erst am Schließen, warten wir
+ * außerdem auf das Ende des Veil-Übergangs, bevor der nächste Klick kommt.
  */
 export async function openPage(page: Page, label: string) {
-  await page.locator('button.hamburger').click()
+  const drawer = page.locator('.drawer')
+  const veil = page.locator('.drawer-veil')
+  if (!(await drawer.isVisible())) {
+    if (await veil.isVisible().catch(() => false)) {
+      await expect(veil).toBeHidden({ timeout: 5_000 })
+    }
+    await page.locator('button.hamburger').click()
+    await expect(drawer).toBeVisible()
+  }
   await page.locator('.drawer-item', { hasText: label }).click()
   await page.locator('.page').waitFor()
 }
 
-/** Von einer Menüseite zurück auf den Startbildschirm. */
+/**
+ * Verlässt eine Core-Unterseite bewusst bis zum Startbildschirm.
+ * Produktregel bleibt: der erste Zurück-Schritt führt in den Core. Tests, die
+ * danach wieder mit Trainingsknöpfen arbeiten wollen, schließen den Core hier
+ * ausdrücklich als zweiten Schritt. Der Core öffnet nach `popstate` über zwei
+ * Animation-Frames; deshalb warten wir auf ihn, statt seinen Zustand zu früh
+ * mit `isVisible()` abzufragen.
+ */
 export async function leavePage(page: Page) {
   await page.locator('.page-back').click()
+  await page.locator('.page').waitFor({ state: 'hidden' })
+
+  const drawer = page.locator('.drawer')
+  const veil = page.locator('.drawer-veil')
+  await expect(drawer).toBeVisible({ timeout: 5_000 })
+  await page.keyboard.press('Escape')
+  await expect(drawer).toBeHidden()
+  if ((await veil.count()) > 0) await expect(veil).toBeHidden({ timeout: 5_000 })
   await page.locator('.challenge').waitFor()
 }
 

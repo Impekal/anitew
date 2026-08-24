@@ -2,51 +2,76 @@ import { expect, test, type Page } from '@playwright/test'
 
 import { openPage, startButton, visit } from './helpers.ts'
 
-/**
- * Erinnerungen im Browser (Backlog B8 · D-022).
- *
- * Der Punkt dieser Prüfung ist nicht, dass eine Benachrichtigung ankommt —
- * das kann das Web nicht zusagen. Der Punkt ist, dass die App **sagt**, was
- * sie kann, bevor jemand etwas einstellt. Eine App, die eine Erinnerung
- * ankündigt und keine schickt, hat schlimmer gelogen, als wenn sie gar keine
- * angeboten hätte (R-2).
- */
+interface PushMockOptions {
+  permission: NotificationPermission
+  ios?: boolean
+  standalone?: boolean
+}
 
-/**
- * Der CI-Browser ist kein Produktvertrag.
- *
- * Headless Chromium stellt die Notification-API je nach Runner/Version nicht
- * immer bereit. Die App reagiert darauf korrekt mit „nicht unterstützt“ —
- * diese Tests wollen aber ausdrücklich den **unterstützten** Browserpfad
- * prüfen. Deshalb stellen sie die kleine Web-API selbst bereit, statt vom
- * gerade installierten Headless-Build abhängig zu sein.
- */
-async function withNotifications(page: Page, permission: NotificationPermission) {
-  await page.addInitScript((initialPermission) => {
-    let current = initialPermission
+async function withWebPush(page: Page, options: PushMockOptions) {
+  await page.addInitScript((input) => {
+    let current = input.permission
+    ;(window as any).__anitewUnsubscribeCount = 0
+    const subscription = {
+      endpoint: 'https://push.example.invalid/anitew-device',
+      toJSON: () => ({ endpoint: 'https://push.example.invalid/anitew-device' }),
+      unsubscribe: async () => {
+        ;(window as any).__anitewUnsubscribeCount++
+        return true
+      },
+    }
+    const pushManager = {
+      getSubscription: async () => subscription,
+      subscribe: async () => subscription,
+    }
+    const registration = {
+      pushManager,
+      update: async () => undefined,
+    }
 
     class FakeNotification {
       static get permission(): NotificationPermission {
         return current
       }
-
       static async requestPermission(): Promise<NotificationPermission> {
         current = 'granted'
         return current
       }
-
       constructor(_title: string, _options?: NotificationOptions) {}
     }
 
-    Object.defineProperty(window, 'Notification', {
+    Object.defineProperty(window, 'Notification', { configurable: true, value: FakeNotification })
+    Object.defineProperty(window, 'PushManager', { configurable: true, value: class PushManager {} })
+    Object.defineProperty(window, 'isSecureContext', { configurable: true, value: true })
+    Object.defineProperty(navigator, 'serviceWorker', {
       configurable: true,
-      value: FakeNotification,
+      value: {
+        controller: null,
+        ready: Promise.resolve(registration),
+        getRegistration: async () => registration,
+        register: async () => registration,
+        addEventListener: () => undefined,
+        removeEventListener: () => undefined,
+      },
     })
-    Object.defineProperty(window, 'isSecureContext', {
-      configurable: true,
-      value: true,
-    })
-  }, permission)
+    if (input.ios) {
+      Object.defineProperty(navigator, 'userAgent', {
+        configurable: true,
+        value: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148 Safari/604.1',
+      })
+    }
+    if (input.standalone !== undefined) {
+      const original = window.matchMedia.bind(window)
+      window.matchMedia = (query: string) =>
+        query === '(display-mode: standalone)'
+          ? ({ matches: input.standalone } as MediaQueryList)
+          : original(query)
+      Object.defineProperty(navigator, 'standalone', {
+        configurable: true,
+        value: input.standalone,
+      })
+    }
+  }, options)
 }
 
 async function openReminders(page: Page) {
@@ -55,65 +80,97 @@ async function openReminders(page: Page) {
   await openPage(page, 'Erinnerung')
 }
 
-test('sagt zuerst, was dieses Gerät kann — und dann erst die Einstellung', async ({ page }) => {
-  await withNotifications(page, 'default')
+test('fragt erst auf der Erinnerungsseite nach Benachrichtigungen', async ({ page }) => {
+  await withWebPush(page, { permission: 'default' })
   await openReminders(page)
-
-  /*
-   * Ohne erteiltes Recht steht die Frage danach da und **keine** Uhrzeit.
-   * Umgekehrt hätte jemand eine Zeit gewählt und läse hinterher, dass sie
-   * nicht gilt.
-   */
   await expect(page.getByRole('button', { name: 'Benachrichtigungen erlauben' })).toBeVisible()
   await expect(page.locator('.reminder input[type="time"]')).toHaveCount(0)
 })
 
-test('verschweigt die Einschränkung des Browsers nicht', async ({ page }) => {
-  await withNotifications(page, 'granted')
+test('verspricht geschlossenes Push nur, wenn Web Push auf diesem Startmodus wirklich nutzbar ist', async ({ page }) => {
+  await withWebPush(page, { permission: 'granted' })
   await openReminders(page)
-
-  // Der Satz, auf den es ankommt: nur solange die App offen ist. Und er steht
-  // ohne Sternchen da — die Hervorhebung wird gesetzt, nicht getippt.
-  await expect(page.locator('.reminder strong')).toHaveText('solange es offen ist')
-  await expect(page.getByText('**')).toHaveCount(0)
-  await expect(page.getByText(/lässt sich im Browser nicht zusagen/)).toBeVisible()
-  // Und dass die Einstellung trotzdem etwas wert ist.
-  await expect(page.getByText(/als App aus dem Store läuft/)).toBeVisible()
+  await expect(page.getByText(/Systemmitteilung an, auch wenn ANITEW geschlossen ist/)).toBeVisible()
 })
 
-test('merkt sich die Uhrzeit und lässt sie wieder abstellen', async ({ page }) => {
-  await withNotifications(page, 'granted')
+test('verspricht einem normalen iPhone-Safari-Tab kein geschlossenes Push', async ({ page }) => {
+  await withWebPush(page, { permission: 'granted', ios: true, standalone: false })
   await openReminders(page)
+  await expect(page.locator('.reminder strong')).toHaveText('solange es offen ist')
+  await expect(page.getByText(/Home-Screen-App/)).toBeVisible()
+})
 
+test('plant die Tageserinnerung anonym mit Fälligkeit und Zeitzone', async ({ page }) => {
+  await withWebPush(page, { permission: 'granted' })
+  let scheduled: Record<string, any> | undefined
+  await page.route('**/push/schedule', async (route) => {
+    scheduled = route.request().postDataJSON() as Record<string, any>
+    await route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' })
+  })
+  await page.route('**/push/cancel', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }),
+  )
+
+  await openReminders(page)
   const time = page.locator('.reminder input[type="time"]')
   await time.fill('07:15')
   await page.getByRole('button', { name: 'Erinnerung merken' }).click()
-  /*
-   * Eingegrenzt und exakt — zum dritten Mal in diesem Projekt dieselbe Falle:
-   * Playwright vergleicht Text von Haus aus als **Teilzeichenkette**, und
-   * „Aus.“ steckt in mehr, als man denkt. Der Panel ist ohnehin der richtige
-   * Ort für die Frage.
-   */
-  const panel = page.locator('.reminder')
-  await expect(panel.getByText('Gemerkt.', { exact: true })).toBeVisible()
+  await expect(page.locator('.reminder').getByText('Gemerkt.', { exact: true })).toBeVisible()
 
-  // Sie überlebt einen Neustart — sie liegt in denselben Einstellungen wie
-  // alles andere und wandert damit in die Sicherung (N2).
+  await expect.poll(() => scheduled?.reminder?.id).toBe('daily')
+  expect(scheduled?.endpoint).toBe('https://push.example.invalid/anitew-device')
+  expect(scheduled?.reminder?.title).toBe('ANITEW')
+  expect(scheduled?.reminder?.recurrence?.localTime).toBe('07:15')
+  expect(typeof scheduled?.reminder?.recurrence?.timeZone).toBe('string')
+  expect(JSON.stringify(scheduled)).not.toMatch(/profile|memory|training|answer|email/i)
+})
+
+test('merkt die Uhrzeit und schaltet den täglichen Servertermin ausdrücklich dauerhaft aus', async ({ page }) => {
+  await withWebPush(page, { permission: 'granted' })
+  let permanentCancel = false
+  await page.route('**/push/schedule', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }),
+  )
+  await page.route('**/push/cancel', async (route) => {
+    const body = route.request().postDataJSON() as { permanent?: boolean }
+    if (body.permanent === true) permanentCancel = true
+    await route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' })
+  })
+
+  await openReminders(page)
+  await page.locator('.reminder input[type="time"]').fill('07:15')
+  await page.getByRole('button', { name: 'Erinnerung merken' }).click()
+  // „Gemerkt.“ ist der öffentliche Abschluss des asynchronen IndexedDB-Writes.
+  // Erst danach darf ein Reload erwarten, die Uhrzeit dauerhaft wiederzufinden.
+  await expect(page.locator('.reminder').getByText('Gemerkt.', { exact: true })).toBeVisible()
   await page.reload()
   await openPage(page, 'Erinnerung')
   await expect(page.locator('.reminder input[type="time"]')).toHaveValue('07:15')
 
   await page.getByRole('button', { name: 'Keine Erinnerung' }).click()
-  await expect(panel.getByText('Aus.', { exact: true })).toBeVisible()
+  await expect(page.locator('.reminder').getByText('Aus.', { exact: true })).toBeVisible()
+  await expect.poll(() => permanentCancel).toBe(true)
+})
+
+test('macht bei Serverausfall die alte Push-Adresse lokal ungültig', async ({ page }) => {
+  await withWebPush(page, { permission: 'granted' })
+  await page.route('**/push/schedule', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }),
+  )
+  await page.route('**/push/cancel', (route) => route.abort('failed'))
+
+  await openReminders(page)
+  await page.locator('.reminder input[type="time"]').fill('07:15')
+  await page.getByRole('button', { name: 'Erinnerung merken' }).click()
+  await expect(page.locator('.reminder').getByText('Gemerkt.', { exact: true })).toBeVisible()
+
+  await page.getByRole('button', { name: 'Keine Erinnerung' }).click()
+  await expect(page.locator('.reminder').getByText('Aus.', { exact: true })).toBeVisible()
+  await expect.poll(() => page.evaluate(() => (window as any).__anitewUnsubscribeCount)).toBe(1)
 })
 
 test('fragt nicht beim ersten Start nach Benachrichtigungen', async ({ page }) => {
-  /*
-   * Wer eine App öffnet und sofort gefragt wird, lehnt ab — und eine
-   * Ablehnung lässt sich von der App aus nie wieder zurücknehmen. Gefragt
-   * wird erst dort, wo jemand eine Erinnerung wirklich will.
-   */
-  await withNotifications(page, 'default')
+  await withWebPush(page, { permission: 'default' })
   await visit(page)
   await expect(startButton(page)).toBeVisible()
   await expect(page.getByRole('button', { name: 'Benachrichtigungen erlauben' })).toBeHidden()

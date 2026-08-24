@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { SyncError, type Platform, type SyncReport } from '../core/index.ts'
-import type { DriveFailure } from '../platform/web/drive.ts'
+import { disconnectDriveAuthorization, type DriveFailure } from '../platform/web/drive.ts'
 import type { Dictionary } from '../i18n/index.ts'
 
 import {
@@ -12,6 +12,7 @@ import {
   connectDriveSync,
   resolveClientId,
 } from './driveSync.ts'
+import { takeDriveRedirectNotice } from './driveRedirectNotice.ts'
 
 type SyncFailureText = DriveFailure | 'remote-invalid'
 
@@ -26,42 +27,45 @@ interface VisibleDriveCopy {
   firstTime: string
   remoteInvalid: string
   identity: string
+  connected: string
 }
 
 const DRIVE_DE: VisibleDriveCopy = {
   intro:
-    'Deine Daten bleiben unter deiner Kontrolle. Standardmäßig speichert ANITEW lokal auf diesem Gerät. Für mehrere Geräte kannst du optional dein eigenes Google Drive verbinden; ANITEW legt dort den sichtbaren Ordner „Anitew“ an — ohne zusätzliche ANITEW-Cloudkopie.',
+    'Deine Daten bleiben unter deiner Kontrolle. Standardmäßig speichert ANITEW lokal auf diesem Gerät. Für mehrere Geräte kannst du dich mit Google anmelden und deine ANITEW-Daten in deinem eigenen Google Drive speichern; ANITEW legt dort den sichtbaren Ordner „Anitew“ an — ohne zusätzliche ANITEW-Cloudkopie.',
   how:
     'Beim Abgleich führt ANITEW deinen lokalen und deinen Drive-Stand sicher zusammen und schreibt das Ergebnis zurück in deinen eigenen Ordner.',
-  start: 'Google Drive verbinden — empfohlen',
+  start: 'Anmelden / Daten im Google Drive speichern',
   again: 'Jetzt mit Google Drive abgleichen',
   autoNote:
     'Automatischer Abgleich ist aktiv. ANITEW synchronisiert beim Öffnen und nach Änderungen still über dein eigenes Google Drive.',
   localNote:
     'Lokaler Modus: Training, Erinnerungen und Verlauf bleiben ausschließlich auf diesem Gerät.',
-  stop: 'Google Drive trennen · lokal weiter',
+  stop: 'Google-Konto trennen · lokal weiter',
   firstTime: 'Dein Ordner „Anitew“ wurde in Google Drive angelegt und der aktuelle Stand dort gespeichert.',
   remoteInvalid:
     'Im Ordner „Anitew“ liegt eine Datei, die keine gültige ANITEW-Sicherung ist. Sie wurde nicht verändert.',
-  identity: 'Verbundenes Google-Konto',
+  identity: 'Angemeldetes Google-Konto',
+  connected: 'Google-Anmeldung abgeschlossen. Dein Konto ist jetzt verbunden.',
 }
 
 const DRIVE_EN: VisibleDriveCopy = {
   intro:
-    'Your data stays under your control. ANITEW stores locally on this device by default. For multiple devices, you can optionally connect your own Google Drive; ANITEW creates a visible “Anitew” folder there — without an additional ANITEW cloud copy.',
+    'Your data stays under your control. ANITEW stores locally on this device by default. For multiple devices, sign in with Google and save your ANITEW data in your own Google Drive; ANITEW creates a visible “Anitew” folder there — without an additional ANITEW cloud copy.',
   how:
     'Sync safely merges your local state with your Drive state and writes the result back into your own folder.',
-  start: 'Connect Google Drive — recommended',
+  start: 'Sign in / save data in Google Drive',
   again: 'Sync with Google Drive now',
   autoNote:
     'Automatic sync is active. ANITEW quietly syncs on open and after changes through your own Google Drive.',
   localNote:
     'Local mode: training, memories and history stay exclusively on this device.',
-  stop: 'Disconnect Google Drive · stay local',
+  stop: 'Sign out from Google · stay local',
   firstTime: 'Your “Anitew” folder was created in Google Drive and the current state was stored there.',
   remoteInvalid:
     'The “Anitew” folder contains a file that is not a valid ANITEW backup. It was left untouched.',
-  identity: 'Connected Google account',
+  identity: 'Signed-in Google account',
+  connected: 'Google sign-in completed. Your account is now connected.',
 }
 
 function visibleCopy(): VisibleDriveCopy {
@@ -74,6 +78,12 @@ function driveFailure(error: unknown): DriveFailure | undefined {
   return reason === 'denied' || reason === 'offline' || reason === 'drive' ? reason : undefined
 }
 
+function driveFailureDetail(error: unknown): string | undefined {
+  if (typeof error !== 'object' || error === null || !('detail' in error)) return undefined
+  const detail = (error as { detail?: unknown }).detail
+  return typeof detail === 'string' && detail !== '' ? detail : undefined
+}
+
 function initials(name: string | undefined, email: string | undefined): string {
   if (name !== undefined) {
     const parts = name.trim().split(/\s+/u).filter(Boolean)
@@ -83,13 +93,6 @@ function initials(name: string | undefined, email: string | undefined): string {
   return (email?.[0] ?? 'G').toUpperCase()
 }
 
-/**
- * Der Abgleich (N7/N8/N10 · D-033).
- *
- * Datenschutz wird hier nicht als fehlende Infrastruktur verkauft, sondern
- * als Architekturentscheidung: lokal zuerst, optional der eigene Drive,
- * keine zusätzliche ANITEW-Cloudkopie.
- */
 export function SyncPanelImpl({ platform, dictionary }: { platform: Platform; dictionary: Dictionary }) {
   const texts = dictionary.sync
   const drive = visibleCopy()
@@ -101,36 +104,86 @@ export function SyncPanelImpl({ platform, dictionary }: { platform: Platform; di
   const [busy, setBusy] = useState(false)
   const [report, setReport] = useState<SyncReport | undefined>(undefined)
   const [failure, setFailure] = useState<SyncFailureText | undefined>(undefined)
+  const [failureDetail, setFailureDetail] = useState<string | undefined>(undefined)
   const [account, setAccount] = useState<string | undefined>(undefined)
   const [accountName, setAccountName] = useState<string | undefined>(undefined)
+  const [connectionNotice, setConnectionNotice] = useState(false)
+  const connectedRef = useRef(false)
+  const initializedRef = useRef(false)
 
-  useEffect(() => {
-    void resolveClientId(platform.settings).then((id) => {
+  const refreshConnectionState = useCallback(
+    async (announceResume: boolean) => {
+      const [id, on, at, storedAccount, storedAccountName] = await Promise.all([
+        resolveClientId(platform.settings),
+        platform.settings.read<boolean>(SYNC_ON_SETTING).catch(() => undefined),
+        platform.settings.read<number>(SYNC_AT_SETTING).catch(() => undefined),
+        platform.settings.read<string>(SYNC_ACCOUNT_SETTING).catch(() => undefined),
+        platform.settings.read<string>(SYNC_ACCOUNT_NAME_SETTING).catch(() => undefined),
+      ])
+
+      const connected = on === true
       setClientId(id)
       setChecked(true)
-    })
-    void platform.settings
-      .read<boolean>(SYNC_ON_SETTING)
-      .then((on) => setAuto(on === true))
-      .catch(() => undefined)
-    void platform.settings
-      .read<number>(SYNC_AT_SETTING)
-      .then(setLastAt)
-      .catch(() => undefined)
-    void platform.settings
-      .read<string>(SYNC_ACCOUNT_SETTING)
-      .then(setAccount)
-      .catch(() => undefined)
-    void platform.settings
-      .read<string>(SYNC_ACCOUNT_NAME_SETTING)
-      .then(setAccountName)
-      .catch(() => undefined)
-  }, [platform])
+      setAuto(connected)
+      setLastAt(at)
+      setAccount(storedAccount)
+      setAccountName(storedAccountName)
+
+      if (announceResume && initializedRef.current && connected && !connectedRef.current) {
+        setConnectionNotice(true)
+        setFailure(undefined)
+        setFailureDetail(undefined)
+      }
+      connectedRef.current = connected
+      initializedRef.current = true
+    },
+    [platform],
+  )
+
+  useEffect(() => {
+    const applyRedirectNotice = () => {
+      const notice = takeDriveRedirectNotice()
+      if (notice?.kind === 'connected') {
+        setConnectionNotice(true)
+        setFailure(undefined)
+        setFailureDetail(undefined)
+        return
+      }
+      if (notice?.kind === 'error') {
+        setConnectionNotice(false)
+        setFailure('drive')
+        setFailureDetail(notice.detail)
+      }
+    }
+
+    const refresh = (announceResume: boolean) => {
+      void refreshConnectionState(announceResume)
+        .then(applyRedirectNotice)
+        .catch(() => setChecked(true))
+    }
+
+    refresh(false)
+
+    const onResume = () => refresh(true)
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') onResume()
+    }
+    window.addEventListener('pageshow', onResume)
+    window.addEventListener('focus', onResume)
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => {
+      window.removeEventListener('pageshow', onResume)
+      window.removeEventListener('focus', onResume)
+      document.removeEventListener('visibilitychange', onVisibility)
+    }
+  }, [refreshConnectionState])
 
   const sync = () => {
     if (clientId === undefined || busy) return
     setBusy(true)
     setFailure(undefined)
+    setFailureDetail(undefined)
+    setConnectionNotice(false)
     setReport(undefined)
     const now = platform.clock.now()
     void connectDriveSync(clientId, now)
@@ -140,18 +193,18 @@ export function SyncPanelImpl({ platform, dictionary }: { platform: Platform; di
         setLastAt(now)
         setAccount(result.account)
         setAccountName(result.accountName)
+        connectedRef.current = true
         void platform.settings.write(SYNC_ON_SETTING, true).catch(() => undefined)
         void platform.settings.write(SYNC_AT_SETTING, now).catch(() => undefined)
         if (result.account !== undefined) {
           void platform.settings.write(SYNC_ACCOUNT_SETTING, result.account).catch(() => undefined)
         }
         if (result.accountName !== undefined) {
-          void platform.settings
-            .write(SYNC_ACCOUNT_NAME_SETTING, result.accountName)
-            .catch(() => undefined)
+          void platform.settings.write(SYNC_ACCOUNT_NAME_SETTING, result.accountName).catch(() => undefined)
         }
       })
       .catch((error: unknown) => {
+        setFailureDetail(driveFailureDetail(error))
         if (error instanceof SyncError) setFailure(error.reason)
         else setFailure(driveFailure(error) ?? 'drive')
       })
@@ -163,6 +216,11 @@ export function SyncPanelImpl({ platform, dictionary }: { platform: Platform; di
     setAccount(undefined)
     setAccountName(undefined)
     setReport(undefined)
+    setFailure(undefined)
+    setFailureDetail(undefined)
+    setConnectionNotice(false)
+    connectedRef.current = false
+    void disconnectDriveAuthorization()
     void platform.settings.write(SYNC_ON_SETTING, false).catch(() => undefined)
     void platform.settings.remove(SYNC_ACCOUNT_SETTING).catch(() => undefined)
     void platform.settings.remove(SYNC_ACCOUNT_NAME_SETTING).catch(() => undefined)
@@ -202,6 +260,11 @@ export function SyncPanelImpl({ platform, dictionary }: { platform: Platform; di
         {busy ? texts.running : auto ? drive.again : drive.start}
       </button>
 
+      {connectionNotice && (
+        <p className="sync-report" role="status">
+          {drive.connected}
+        </p>
+      )}
       {report !== undefined && (
         <p className="sync-report">
           {!report.hadRemote
@@ -214,6 +277,7 @@ export function SyncPanelImpl({ platform, dictionary }: { platform: Platform; di
       {failure !== undefined && (
         <p className="sync-failure">
           {failure === 'remote-invalid' ? drive.remoteInvalid : texts.errors[failure]}
+          {failureDetail === undefined ? '' : ` · ${failureDetail}`}
         </p>
       )}
 

@@ -191,7 +191,7 @@ test('löscht auf Wunsch alles — aber erst nach einer echten Rückfrage (N4)',
 
   await openPage(page, 'Sicherung')
 
-  // Ein Klick auf „Allöschen“ löscht noch nichts — er fragt.
+  // Ein Klick auf „Alles löschen“ löscht noch nichts — er fragt.
   await page.locator('.wipe').getByRole('button', { name: 'Alles löschen' }).click()
   await expect(page.getByText(/Wirklich alles löschen/)).toBeVisible()
 
@@ -209,20 +209,33 @@ test('löscht auf Wunsch alles — aber erst nach einer echten Rückfrage (N4)',
   })
   expect(beforeCancel).toBe(1)
 
-  // Bewusst bestätigt: jetzt ist wirklich alles weg.
+  // Bewusst bestätigt: zweite Warnstufe plus explizite Eingabe von ANITEW.
   await page.locator('.wipe').getByRole('button', { name: 'Alles löschen' }).click()
   await page.locator('.wipe-warn').waitFor()
-  await page.locator('.wipe-go').click()
-  await expect(page.getByText(/Gelöscht\. Wie am ersten Tag/)).toBeVisible()
+  await expect(page.locator('.wipe-go')).toBeDisabled()
+  await page.locator('.wipe-confirm-input').fill('ANITEW')
+  await expect(page.locator('.wipe-go')).toBeEnabled()
+
+  // Der neue Reset zeigt keine flüchtige Erfolgsmeldung mehr: Nach dem
+  // vollständigen Löschen startet ANITEW absichtlich wie beim ersten Öffnen.
+  const reload = page.waitForNavigation({ waitUntil: 'domcontentloaded' })
+  await Promise.all([reload, page.locator('.wipe-go').click()])
+  await expect(page.locator('.arrival')).toBeVisible()
 
   const afterWipe = await page.evaluate(() => {
     return new Promise<number>((resolve) => {
       const open = indexedDB.open('anitew')
       open.onsuccess = () => {
-        const req = open.result.transaction('itemStates').objectStore('itemStates').count()
+        const database = open.result
+        if (!database.objectStoreNames.contains('itemStates')) {
+          resolve(0)
+          return
+        }
+        const req = database.transaction('itemStates').objectStore('itemStates').count()
         req.onsuccess = () => resolve(req.result)
         req.onerror = () => resolve(-1)
       }
+      open.onerror = () => resolve(-1)
     })
   })
   expect(afterWipe).toBe(0)

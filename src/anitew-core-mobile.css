@@ -1,0 +1,123 @@
+/* ANITEW V4.1.1 — phone Core atlas
+ * Desktop may breathe as a three-column memory map. On a phone the same
+ * geometry becomes too narrow once every destination has a real icon and a
+ * readable label. Mobile therefore uses two compact columns, with Appearance
+ * spanning the full width. Nothing may overlap or depend on text being short.
+ */
+
+@media (max-width: 560px) {
+  .drawer {
+    width: 100% !important;
+    padding:
+      max(52px, env(safe-area-inset-top))
+      14px
+      max(30px, env(safe-area-inset-bottom)) !important;
+  }
+
+  .drawer-close {
+    margin-bottom: 38px !important;
+  }
+
+  .drawer .menu-group,
+  .drawer .menu-group-device {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .drawer .menu-group + .menu-group {
+    margin-top: 32px !important;
+    padding-top: 18px !important;
+  }
+
+  .drawer .menu-label {
+    grid-column: 1 / -1 !important;
+    margin-bottom: 6px !important;
+    font-size: 9px !important;
+  }
+
+  /* The injected theme switch is a section, not a destination. It must never
+     occupy one atlas cell and squeeze the first device destination beside it. */
+  .drawer .menu-group-device .theme-control {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+    margin: 2px 0 6px !important;
+    padding: 11px !important;
+  }
+
+  .drawer .theme-choices {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .drawer .theme-choice {
+    min-width: 0 !important;
+    min-height: 40px !important;
+    padding-inline: 7px !important;
+    font-size: 9px !important;
+  }
+
+  .drawer .menu-group .drawer-item,
+  .drawer .menu-group-device .drawer-item {
+    grid-template-columns: 38px minmax(0, 1fr) !important;
+    place-items: initial !important;
+    align-items: center !important;
+    align-content: center !important;
+    gap: 9px !important;
+    min-width: 0 !important;
+    min-height: 72px !important;
+    padding: 9px 10px !important;
+    border-radius: 22px !important;
+    text-align: left !important;
+  }
+
+  .drawer .menu-group .drawer-item::before,
+  .drawer .menu-group-device .drawer-item::before {
+    inset: 4px !important;
+    border-radius: 19px !important;
+  }
+
+  .drawer .drawer-item .menu-icon {
+    width: 36px !important;
+    height: 36px !important;
+    justify-self: start;
+  }
+
+  .drawer .drawer-item > span,
+  .drawer .drawer-item > span:last-child {
+    display: block;
+    min-width: 0 !important;
+    max-width: none !important;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    hyphens: auto;
+    font-size: 11.5px !important;
+    line-height: 1.16 !important;
+    text-align: left !important;
+    text-wrap: pretty;
+  }
+
+  .drawer .menu-group-device .drawer-item > span,
+  .drawer .menu-group-device .drawer-item > span:last-child {
+    font-size: 10.5px !important;
+    letter-spacing: .015em !important;
+  }
+
+  /* Touch has no hover. Keep the card stable and let the existing press
+     feedback provide the acknowledgement instead of horizontal movement. */
+  .drawer .drawer-item:hover,
+  .drawer .drawer-item:focus-visible {
+    transform: none !important;
+  }
+}
+
+/* Very narrow phones get a calm one-column list instead of crushed labels. */
+@media (max-width: 340px) {
+  .drawer .menu-group,
+  .drawer .menu-group-device {
+    grid-template-columns: 1fr !important;
+  }
+
+  .drawer .menu-group .drawer-item,
+  .drawer .menu-group-device .drawer-item {
+    min-height: 62px !important;
+  }
+}

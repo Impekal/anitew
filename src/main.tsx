@@ -5,18 +5,30 @@ import { App } from './app/App.tsx'
 import { keepUpToDate } from './platform/web/updates.ts'
 import './styles.css'
 import './anitew-redesign.css'
+import './anitew-overlay-safety.css'
 import './anitew-phase4.css'
 import './anitew-phase4-journey.css'
 import './anitew-phase4-landing.css'
 import './anitew-phase5.css'
 
+// Dunkel ist der ANITEW-Erststart. Die Markierung trennt „noch nie gewählt“
+// von einem später ausdrücklich gewählten „System“: System entfernt weiterhin
+// den Theme-Key, darf beim nächsten Start aber nicht wieder zu Dunkel werden.
+try {
+  const themeDefaultSeeded = 'anitew.theme-default.v2'
+  const theme = 'anitew.theme.v1'
+  if (window.localStorage.getItem(themeDefaultSeeded) !== '1') {
+    if (window.localStorage.getItem(theme) === null) window.localStorage.setItem(theme, 'dark')
+    window.localStorage.setItem(themeDefaultSeeded, '1')
+  }
+} catch {
+  // Darstellung ist Komfort. Geblocktes localStorage darf den Start nie stoppen.
+}
+
 // Die Signatur-Schichten sind bewusst kein Startpfad. Erst wenn Dokument,
 // App und Service-Worker-Start vollständig zur Ruhe gekommen sind, holen wir
-// die rein visuelle Tiefe nach. Die Schichten kommen absichtlich nacheinander:
-// Living Memory ist die letzte Autorität und kann ältere Drawer-/Startregeln
-// sicher ersetzen, statt mit parallelen CSS-Chunks um die Reihenfolge zu
-// konkurrieren. V3 sitzt ganz hinten: Sie verfeinert nur Atmosphäre,
-// Einführung und optionale Drive-Verbindung, nie Gedächtniswahrheit.
+// die rein visuelle Tiefe nach. Mobile Core-Geometrie bleibt ebenfalls in
+// diesem Lazy-Pfad; Drive-Authentifizierung ist davon bewusst getrennt.
 let signatureTimer: number | undefined
 let pageIsLeaving = false
 
@@ -35,6 +47,8 @@ const loadSignatureExperience = () => {
       await import('./app/mobileCoreLayout.ts')
       if (pageIsLeaving) return
       await import('./app/experienceRefinement.ts')
+      if (pageIsLeaving) return
+      await import('./app/driveRedirectFeedback.ts')
     })().catch(() => undefined)
   }, 750)
 }
@@ -53,11 +67,27 @@ else window.addEventListener('load', loadSignatureExperience, { once: true })
 
 keepUpToDate()
 
-const container = document.getElementById('root')
-if (!container) throw Error('#root fehlt')
+// Parent-navigation is interactive polish, not cold-start work. Start loading
+// it immediately, but keep its event bridge in a separate async chunk so the
+// strict P4 first-load budget stays reserved for the actual app shell.
+void import('./app/coreNavigationReturn.ts').catch(() => undefined)
 
-createRoot(container).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+const rootContainer = document.getElementById('root')
+if (rootContainer === null) throw Error('#root fehlt')
+const container: HTMLElement = rootContainer
+
+function render(): void {
+  createRoot(container).render(
+    <StrictMode>
+      <App />
+    </StrictMode>,
+  )
+}
+
+const oauthReturn = new URL(window.location.href).searchParams.has('googleOAuth')
+if (oauthReturn) {
+  void import('./app/driveRedirectReturn.ts')
+    .then(({ finishGoogleDriveRedirect }) => finishGoogleDriveRedirect())
+    .catch(() => undefined)
+    .finally(render)
+} else render()

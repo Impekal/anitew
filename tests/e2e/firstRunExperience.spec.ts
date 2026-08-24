@@ -40,7 +40,7 @@ test('der erste Eindruck trägt die englische Marke fünf Sekunden und erklärt 
   await expect(page.locator('.first-run-highlight-icon')).toHaveCount(7)
   await expect(page.getByText('PRIVAT · LOKAL ZUERST · DEINE DATEN, DEINE KONTROLLE')).toBeVisible()
 
-  await expect(page.getByText('Google Drive verbinden', { exact: true })).toBeVisible()
+  await expect(page.getByText('Anmelden / Daten im Google Drive speichern', { exact: true })).toBeVisible()
   await expect(page.getByText(/sichtbaren Ordner „Anitew“/)).toBeVisible()
   await expect(page.getByText(/ohne zusätzliche ANITEW-Cloudkopie/)).toBeVisible()
 
@@ -91,7 +91,7 @@ test('die Orientierung erklärt Core, Coach, Techniken, Memory World, Sync und M
   await expect(page.locator('.first-run-guide')).toHaveCount(0)
 })
 
-test('der Core schließt eindeutig und bietet System, Hell und Dunkel', async ({ page }) => {
+test('der Core schließt eindeutig und startet standardmäßig dunkel', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await visit(page)
 
@@ -106,15 +106,25 @@ test('der Core schließt eindeutig und bietet System, Hell und Dunkel', async ({
   expect(box?.y ?? -1).toBeGreaterThanOrEqual(0)
   expect((box?.y ?? 0) + (box?.height ?? 0)).toBeLessThanOrEqual(844)
 
-  const theme = page.locator('.theme-control')
+  let theme = page.locator('.theme-control')
   await expect(theme).toBeVisible()
-  await expect(theme.getByRole('button', { name: 'System' })).toHaveAttribute('aria-pressed', 'true')
-  await theme.getByRole('button', { name: 'Dunkel' }).click()
   await expect(page.locator('html')).toHaveAttribute('data-anitew-theme', 'dark')
   await expect(theme.getByRole('button', { name: 'Dunkel' })).toHaveAttribute('aria-pressed', 'true')
+
+  // „System“ bleibt eine echte Wahl. Obwohl es den alten Theme-Key entfernt,
+  // darf der neue Dunkel-Default diese ausdrückliche Entscheidung nach einem
+  // Reload nicht wieder überschreiben.
+  await theme.getByRole('button', { name: 'System' }).click()
+  await expect(page.locator('html')).toHaveAttribute('data-anitew-theme', 'system')
+  await page.reload()
+  await expect(page.locator('html')).toHaveAttribute('data-anitew-theme', 'system', { timeout: 8_000 })
+
+  await page.locator('.hamburger').click()
+  theme = page.locator('.theme-control')
+  await expect(theme.getByRole('button', { name: 'System' })).toHaveAttribute('aria-pressed', 'true')
   await theme.getByRole('button', { name: 'Hell' }).click()
   await expect(page.locator('html')).toHaveAttribute('data-anitew-theme', 'light')
 
-  await close.click()
+  await page.locator('.drawer-close').click()
   await expect(page.locator('.drawer')).toBeHidden()
 })

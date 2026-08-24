@@ -1,9 +1,4 @@
 # Prüft jeden Push und jeden Pull Request (Backlog P3).
-#
-# Der Kern wird zweimal übersetzt: einmal als Teil der App, einmal für sich
-# allein ohne DOM. Der zweite Durchgang ist die Durchsetzung von D-010 — wer in
-# src/core/ nach `window` greift, scheitert hier und nicht erst beim Verpacken
-# für die Stores.
 name: CI
 
 on:
@@ -11,10 +6,6 @@ on:
     branches: ['**']
   pull_request:
 
-# Ein neuer Commit macht den alten CI-Stand desselben Branches wertlos.
-# `head_ref` ist beim PR der Quellbranch, `ref_name` beim Push derselbe Name:
-# Push und PR konkurrieren deshalb absichtlich in EINER Gruppe statt die
-# 15-Minuten-Browsersuite doppelt zu rechnen.
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
@@ -28,9 +19,6 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      # The official browser WASI asset package intentionally declares cpu=wasm32.
-      # `--force` is required only so npm materializes that static asset on the
-      # x64 CI host; Vite ships it to the browser and never executes it on x64.
       - run: npm ci --force
       - name: Typen prüfen (App und Kern getrennt)
         run: npm run typecheck
@@ -38,20 +26,62 @@ jobs:
         run: npm test
       - name: Build
         run: npm run build
+      - name: Worker und Web-Push-Konfiguration
+        run: |
+          node --check worker/index.js
+          node --check public/push-sw.js
+          node --check scripts/configure-push.mjs
+          npx wrangler deploy --dry-run --outdir .wrangler-dry
       - name: Kaltstart-Budget (P4)
         run: npm run size
       - name: Browser für die E2E-Tests
         run: npx playwright install --with-deps chromium
-      # Die drei bekannten Problemklassen laufen zuerst. So kostet ein kleiner
-      # Regression-Fix nicht wieder 50 Minuten, bevor derselbe Fehler sichtbar
-      # wird. Das Voll-Gate darunter bleibt unverändert und ist weiterhin die
-      # einzige Grundlage für einen Merge.
       - name: E2E-Regressions-Smoke
         run: >-
           npx playwright test --project=chromium
           tests/e2e/achievements.spec.ts
           tests/e2e/palace.spec.ts
           tests/e2e/technique.spec.ts
-          --grep "nennt eine Tatsache|erklärt den Palast|unterrichtet die Technik und lässt sie sofort anwenden"
-      - name: Tests (die gebaute App im Browser)
+          tests/e2e/livingInterface.spec.ts
+          --grep "nennt eine Tatsache|erklärt den Palast|unterrichtet die Technik und lässt sie sofort anwenden|zeigt nichts an, solange nichts gelehrt ist|keinen horizontalen iPhone-Overflow"
+      # Die zuletzt auf echter Hardware gefundenen Releasepfade laufen früh:
+      # OAuth-Resume, vollständiger Reset, Core-Elternnavigation und Web Push.
+      - name: V4.2 OAuth, Reset, Core und Push
+        run: >-
+          npx playwright test --project=chromium
+          tests/e2e/oauthResume.spec.ts
+          tests/e2e/reset.spec.ts
+          tests/e2e/coreNavigation.spec.ts
+          tests/e2e/reminders.spec.ts
+          tests/e2e/privacy.spec.ts
+      # Core-Unterseiten öffnen/schließen animiert. Diese vier Pfade hatten in
+      # der langen Desktop-Suite alte Annahmen über "Zurück = Start" bzw. den
+      # früheren Reset-Endzustand. Sie laufen deshalb vor der 141er Suite.
+      - name: V4.2 Core-Übergänge und Reset-Endzustand
+        run: >-
+          npx playwright test --project=chromium
+          tests/e2e/memory.spec.ts
+          tests/e2e/profile.spec.ts
+          tests/e2e/resilience.spec.ts
+          --grep "merkt echte Information|trainiert die Erinnerung in der Einheit|schlägt mit KI vor|behält einen räumlichen Schwerpunkt|löscht auf Wunsch alles"
+      - name: Layout-Matrix
+        run: npx playwright test tests/e2e/layout.spec.ts
+      - name: Vollregression Desktop-Chromium
         run: npx playwright test --project=chromium
+      - name: Mobile Release Gate
+        run: >-
+          npx playwright test --project=mobile
+          tests/e2e/accessibility.spec.ts
+          tests/e2e/install.spec.ts
+          tests/e2e/livingInterface.spec.ts
+          tests/e2e/memory.spec.ts
+          tests/e2e/offlineFirstLaunch.spec.ts
+          tests/e2e/resilience.spec.ts
+          tests/e2e/session.spec.ts
+          tests/e2e/sync.spec.ts
+          tests/e2e/oauthResume.spec.ts
+          tests/e2e/reset.spec.ts
+          tests/e2e/coreNavigation.spec.ts
+          tests/e2e/reminders.spec.ts
+          tests/e2e/privacy.spec.ts
+          tests/e2e/upgrade.spec.ts

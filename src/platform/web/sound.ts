@@ -8,10 +8,10 @@ import type { Sound, SoundCue } from '../../core/index.ts'
  * Gesichtern (D-005) — es wiegt nichts, funktioniert offline, hat keine Lizenz
  * und lässt sich unendlich variieren.
  *
- * **Es kann nicht falsch klingen.** Alle Töne stammen aus einer
- * pentatonischen Tonleiter. Die hat keine Halbtonschritte, also gibt es keine
- * Reibung — egal in welcher Reihenfolge die Töne kommen, es klingt stimmig.
- * Genau deshalb steht sie auf Kinderxylophonen.
+ * **Eine Klangfamilie.** Start, Retrieve, Long Return, Completion und Error
+ * stammen aus derselben warmen Pentatonik und denselben zwei weichen
+ * Sinus-Partialen. Der Fehlerklang ist deshalb kein Alarm: Er löst nach unten
+ * auf und sagt nur „noch offen“.
  *
  * **Es ist leise.** Weiche Anschläge, langes Ausklingen, eine Grundlautstärke
  * weit unter dem, was eine Spiele-App nimmt. Ein Ton soll bestätigen, nicht
@@ -58,6 +58,7 @@ function frequency(step: number): number {
 function notesFor(cue: SoundCue, step: number): Note[] {
   switch (cue) {
     case 'start':
+      // Audio-Logo: 0.18 s Attack-Folge, 1.4 s warmer Ausklang.
       return [
         { step: 0, at: 0, decay: 1.1, gain: 0.5 },
         { step: 2, at: 0.09, decay: 1.1, gain: 0.45 },
@@ -89,6 +90,13 @@ function notesFor(cue: SoundCue, step: number): Note[] {
       ]
     case 'recall':
       return [{ step: 4, at: 0, decay: 0.75, gain: 0.28 }]
+    case 'error':
+      // Kein Buzzer, kein dissonanter Alarm: dieselbe Familie, nur offen
+      // nach unten. Kurz genug, dass der folgende Blockwechsel Platz behält.
+      return [
+        { step: 2, at: 0, decay: 0.62, gain: 0.22 },
+        { step: 0, at: 0.1, decay: 0.82, gain: 0.18 },
+      ]
     case 'landing':
       // Signature moment: etwas Persönliches ist wirklich zurückgekommen.
       // Drei sehr leise Stimmen bilden keine Fanfare, sondern einen Raum,
@@ -113,7 +121,7 @@ function notesFor(cue: SoundCue, step: number): Note[] {
  * Nicht bei jedem Wort — das wäre ein zappelndes Telefon. Nur wenn ein Block,
  * eine echte Wiederbegegnung, ein echter persönlicher Abruf oder die Einheit
  * zu Ende ist. RETURN sagt „da — wieder“. LANDING ist noch kleiner und enger:
- * „gefunden“ — ohne Siegesgeste.
+ * „gefunden“ — ohne Siegesgeste. ERROR vibriert absichtlich **nicht**.
  */
 function buzz(cue: SoundCue): void {
   const vibrate = (navigator as { vibrate?: (pattern: number | number[]) => boolean }).vibrate

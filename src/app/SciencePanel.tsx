@@ -1,72 +1,23 @@
-import { STANDING_ORDER, citationOf, claimsWithStanding } from '../core/index.ts'
+import { lazy, Suspense } from 'react'
+
 import type { Dictionary } from '../i18n/index.ts'
 
-import { Emphasis } from './Emphasis.tsx'
-
-/**
- * Die Wissenschaftsseite (Backlog F6, R-2).
- *
- * Der Aufbau ist die Aussage: erst, worauf die App steht, dann die
- * Einschränkung, dann das, was sie **nicht** behauptet — und ganz unten das,
- * was niemand gemessen hat. Wer nur die stützenden Studien zeigt, betreibt
- * Werbung mit Fußnoten; die beiden letzten Blöcke sind der Grund, warum es
- * diese Seite überhaupt gibt.
- *
- * Kein Text hier wird gerechnet oder ausgewählt: Welche Aussage welchen Stand
- * hat, entscheidet `core/science.ts` und prüft ein Test. Diese Datei
- * **zeigt** nur — und ist damit auch die Stelle, die auffällt, wenn dort eine
- * Aussage dazukommt, für die noch kein Text existiert (Übersetzungsfehler
- * statt leerer Absatz).
+/*
+ * Die Wissenschaftsseite ist wichtig, aber kein Kaltstart-Bestandteil. Ihre
+ * Quellen, Claim-Matrix und Darstellung werden erst geladen, wenn der Mensch
+ * diese Menüseite wirklich öffnet. Das hält den harten P4-Startpfad frei,
+ * ohne Inhalt oder Offline-Fähigkeit zu entfernen — der Service Worker nimmt
+ * den Chunk weiterhin mit.
  */
+const SciencePanelImpl = lazy(async () => {
+  const module = await import('./SciencePanelImpl.tsx')
+  return { default: module.SciencePanelImpl }
+})
+
 export function SciencePanel({ dictionary }: { dictionary: Dictionary }) {
-  const t = dictionary.science
-
   return (
-    <div className="science">
-      <p className="hint">{t.note}</p>
-
-      {STANDING_ORDER.map((standing) => {
-        const claims = claimsWithStanding(standing)
-        if (claims.length === 0) return null
-        return (
-          <section key={standing} className={`standing standing-${standing}`}>
-            <h3>{t.standings[standing]}</h3>
-            <p className="hint">{t.standingNotes[standing]}</p>
-
-            {claims.map((claim) => (
-              <article key={claim.id} className="claim">
-                <h4>{t.claims[claim.id].title}</h4>
-                <p>
-                  <Emphasis text={t.claims[claim.id].body} />
-                </p>
-
-                {/*
-                  Woran die App hängt, steht an der Aussage und nicht in einer
-                  Übersicht am Ende: Der Nutzer soll den Weg von der Studie
-                  zur Funktion in einem Blick sehen — und bei „nicht belegt“
-                  sehen, dass dort nichts hängt.
-                */}
-                <p className="rests">
-                  {claim.restsOn.length > 0
-                    ? `${t.restsOn} ${claim.restsOn.join(' · ')}`
-                    : t.nothingRests}
-                </p>
-
-                {claim.sources.length > 0 && (
-                  <details className="details">
-                    <summary>{t.sources}</summary>
-                    <ul className="citations">
-                      {claim.sources.map((source) => (
-                        <li key={citationOf(source)}>{citationOf(source)}</li>
-                      ))}
-                    </ul>
-                  </details>
-                )}
-              </article>
-            ))}
-          </section>
-        )
-      })}
-    </div>
+    <Suspense fallback={null}>
+      <SciencePanelImpl dictionary={dictionary} />
+    </Suspense>
   )
 }

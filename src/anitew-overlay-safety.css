@@ -1,0 +1,50 @@
+/*
+ * Fullscreen overlays own vertical scrolling while they are open.
+ *
+ * The Core atlas has its own `overflow-y: auto` surface. Letting the page
+ * underneath keep the root scrollbar during the lazy signature hand-off can
+ * change the root content width by a few pixels exactly while the atlas is
+ * opening. Besides looking like a tiny sideways nudge, that makes the modal
+ * compete with the page for scroll gestures. Lock only the vertical axis:
+ * genuine horizontal overflow remains observable by the release tests.
+ */
+html:has(.drawer-veil),
+body:has(.drawer-veil) {
+  overflow-y: hidden;
+}
+
+/*
+ * The mobile redesign deliberately tightens the top spacing to 18px, but that
+ * rule used to replace the base `.app` safe-area padding completely. On a
+ * real standalone iPhone PWA this put the page-level "Close" action under the
+ * status bar / Dynamic Island even though Chromium layout profiles were green.
+ *
+ * Keep the compact visual rhythm and add the hardware inset instead. The
+ * custom property makes the contract testable in Chromium by substituting a
+ * representative inset; iOS supplies the real value through `env()`.
+ */
+:root {
+  --anitew-safe-area-top: env(safe-area-inset-top);
+}
+
+@media (max-width: 560px) {
+  .app {
+    padding-top: calc(18px + var(--anitew-safe-area-top));
+  }
+}
+
+/*
+ * When Google Drive is connected, the late Core refinement inserts the
+ * signed-in account immediately below the close control. That layer used a
+ * negative top margin for the account card and visually pulled name/e-mail
+ * into the "Close menu" label on a real iPhone. Keep the two controls as
+ * separate rows. `!important` is intentional: the refinement stylesheet is
+ * lazy-loaded later and must not be allowed to pull the account upward again.
+ */
+.drawer-close {
+  margin-bottom: 68px !important;
+}
+
+.drawer-google-account {
+  margin: 8px auto 20px !important;
+}

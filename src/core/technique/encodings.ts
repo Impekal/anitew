@@ -51,3 +51,41 @@ export function nextEncodingLesson(
   }
   return undefined
 }
+
+/**
+ * V4.2 — der schmale Technik-Matcher.
+ *
+ * Er behauptet **nicht**, welche Technik bei einem Menschen „am besten“
+ * funktioniert. Dafür fehlt ohne spätere Abrufe die Evidenz. Er beantwortet
+ * nur die strukturelle Frage: Welche bereits vorhandene Technik passt zur
+ * Form des Materials überhaupt? So kann die Oberfläche später Vorschläge
+ * machen und deren Wirkung an echten Wiedersehen prüfen, ohne KI-Pflicht und
+ * ohne eine zweite Trainingslogik einzubauen.
+ */
+export type TechniqueMatch = 'major' | 'palace' | 'story' | 'link'
+export type TechniqueMaterial =
+  | 'person'
+  | 'place'
+  | 'number'
+  | 'date'
+  | 'sequence'
+  | 'fact'
+  | 'concept'
+  | 'custom'
+
+export function techniqueForMaterial(
+  material: TechniqueMaterial,
+  itemCount = 1,
+): TechniqueMatch | undefined {
+  if (material === 'person') return 'link'
+  if (material === 'place') return 'palace'
+  if (material === 'number' || material === 'date') return 'major'
+  if (material === 'sequence') return 'story'
+  // Lose Fakten erst dann als Geschichte vorschlagen, wenn wirklich mehrere
+  // Dinge verbunden werden sollen. Für eine einzelne Tatsache wäre das nur
+  // zusätzlicher Aufwand und damit keine sinnvolle Empfehlung.
+  if ((material === 'fact' || material === 'concept' || material === 'custom') && itemCount >= 3) {
+    return 'story'
+  }
+  return undefined
+}

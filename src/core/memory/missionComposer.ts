@@ -23,7 +23,7 @@
  * in keiner Beschriftung vorkommen; die Extraktion wäscht sie heraus.
  */
 
-import { type MemoryGraph, edgesFrom, nodeById, nodesByStrength } from './memoryGraph.ts'
+import { type MemoryGraph, type MemoryNode, edgesFrom, nodeById, nodesByStrength } from './memoryGraph.ts'
 
 /** Trennt Anker und Dinge in der Szenen-Kennung. */
 export const MEMORY_SCENE_SEPARATOR = '\u001f'
@@ -75,20 +75,56 @@ export function memoryLabelsOf(item: string): { subject: string; target: string 
 }
 
 /**
+ * Verbindungen, die von diesem Knoten **weg** zeigen, sind die zuerst
+ * bestätigte Abrufrichtung. Eine eingehende Kante wird erst dann zur
+ * Gegenrichtung, wenn der Knoten selbst schon einmal abgerufen wurde.
+ *
+ * Das ist die V4.2-Regel für echte Rekonstruktion: Aus „Daniel → Madrid“
+ * wird nicht sofort eine zweite künstliche Karte. Erst nachdem Madrid im
+ * Training wirklich aufgetaucht ist, darf auch „Madrid → Daniel“ entstehen.
+ * So wächst aus einer geführten Assoziation eine zweite Abrufroute, ohne
+ * einen neuen Score, Level oder Scheduler einzuführen.
+ */
+function connectedForScene(graph: MemoryGraph, subject: MemoryNode): readonly MemoryNode[] {
+  const connected = new Map<string, MemoryNode>()
+
+  for (const edge of edgesFrom(graph, subject.id)) {
+    const node = nodeById(graph, edge.to)
+    if (node !== undefined) connected.set(node.id, node)
+  }
+
+  if (subject.lastRecalledAt !== undefined) {
+    for (const edge of graph.edges) {
+      if (edge.to !== subject.id) continue
+      const node = nodeById(graph, edge.from)
+      if (node !== undefined) connected.set(node.id, node)
+    }
+  }
+
+  // Nur echte Übungsstärke ordnet um. Bei Gleichstand bleibt die bestätigte
+  // Kantenreihenfolge stabil — bestehende Szenen dürfen durch V4.2 nicht
+  // scheinbar zufällig ihre Reihenfolge wechseln.
+  return [...connected.values()]
+    .sort((a, b) => a.strength - b.strength)
+    .slice(0, MAX_ITEMS_PER_SCENE)
+}
+
+/**
  * Der Vorrat des Memory-Moduls für den Planer: die schwächsten Anker
- * zuerst, jeder mit seinen schwächsten Dingen. Anker ohne Verbindungen
- * tragen keine Frage („Daniel — was gehört dazu?“ ohne Dazu) und bleiben
- * draußen, bis der Mensch ihnen etwas anheftet.
+ * zuerst, jeder mit seinen schwächsten Dingen.
+ *
+ * Beim ersten Lernen gilt nur die **bestätigte Richtung** einer Beziehung.
+ * Nach dem ersten echten Abruf eines Knotens darf er zusätzlich seine
+ * eingehenden Beziehungen als Gegenrichtung tragen. Dadurch entstehen mit
+ * der Zeit mehrere Abrufwege — Person → Ort, später Ort → Person; Ereignis →
+ * Datum, später Datum → Ereignis — ohne Quizlet-Doppelkarte und ohne etwas
+ * Neues zu erfinden. Anker ohne trainierbare Verbindung bleiben draußen.
  */
 export function composeMemoryPool(graph: MemoryGraph, maxScenes = MAX_MEMORY_SCENES): string[] {
   const scenes: string[] = []
   for (const subject of nodesByStrength(graph)) {
     if (scenes.length >= maxScenes) break
-    const connected = edgesFrom(graph, subject.id)
-      .map((edge) => nodeById(graph, edge.to))
-      .filter((node): node is NonNullable<typeof node> => node !== undefined)
-      .sort((a, b) => a.strength - b.strength)
-      .slice(0, MAX_ITEMS_PER_SCENE)
+    const connected = connectedForScene(graph, subject)
     if (connected.length === 0) continue
     scenes.push(
       [

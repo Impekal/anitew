@@ -1,16 +1,32 @@
-// Cloudflare Workers (Static Assets) — Backlog A7.
+// Cloudflare Workers + Static Assets — Backlog A7.
 //
-// Kein Servercode: `wrangler deploy` lädt dist/ als statische Dateien hoch.
-// Das ist kostenlos und bleibt austauschbar — der Build ist ein Ordner, den
-// jeder Hoster ausliefern kann. Es gibt hier ausdrücklich kein Backend
-// (D-009: kein Konto, keine Nutzerdatenbank, kein Server).
+// Die App bleibt local-first und ohne ANITEW-Konto oder Nutzerdatenbank.
+// Servercode läuft nur für ausdrücklich gewählte Infrastruktur: Google OAuth
+// und Web Push. Push speichert ausschließlich die technische Push-Adresse,
+// die gewählte Zeit/Zeitzone und generische Erinnerungstexte — niemals
+// Trainings-, Gedächtnis-, Profil- oder Sicherungsinhalte.
 {
   "name": "anitew",
-  "compatibility_date": "2026-08-01",
+  "compatibility_date": "2026-08-23",
+  "main": "./worker/index.js",
   "assets": {
     "directory": "./dist",
-    // Die App ist eine einzige Seite; unbekannte Pfade führen zu index.html
-    // statt zu einem 404.
-    "not_found_handling": "single-page-application"
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/oauth/google/*", "/push/*"]
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "PUSH_REMINDERS",
+        "class_name": "PushReminder"
+      }
+    ]
+  },
+  "exports": {
+    "PushReminder": {
+      "type": "durable-object",
+      "storage": "sqlite"
+    }
   }
 }
