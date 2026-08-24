@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react'
 
 import { type OwnFact, factPrompt, parseOwnText } from '../core/index.ts'
 import { addOwnFacts, loadOwnFacts, loadOwnPool, removeOwnFact } from '../data/own.ts'
@@ -7,6 +7,19 @@ import { dictateLocally } from '../platform/web/localDictation.ts'
 import { localDictationCopyForCurrentUi } from './localDictationCopy.ts'
 import { localPhotoCopyForCurrentUi } from './localPhotoCopy.ts'
 import './ownPhoto.css'
+
+/*
+ * M6 ist ein tiefer Arbeitsbereich, kein Kaltstart-Inhalt. Die beiden großen
+ * Helfer werden deshalb erst geladen, wenn „Eigene Inhalte“ tatsächlich offen
+ * ist. Das hält P4 ehrlich, statt für seltene Eingaben das globale Budget zu
+ * erhöhen. Playwright wartet ohnehin auf die konkreten Bedienelemente.
+ */
+const OwnMemoryMode = lazy(() =>
+  import('./OwnMemoryMode.tsx').then((module) => ({ default: module.OwnMemoryMode })),
+)
+const PeopleScenario = lazy(() =>
+  import('./PeopleScenario.tsx').then((module) => ({ default: module.PeopleScenario })),
+)
 
 const MAX_LOCAL_PHOTO_BYTES = 15 * 1024 * 1024
 
@@ -27,9 +40,18 @@ interface LocalPhoto {
  * Ein Foto ist absichtlich nur eine lokale Arbeitsvorlage: Es lebt als
  * Objekt-URL im Arbeitsspeicher dieser Ansicht, nicht in IndexedDB. Damit
  * kann der Mensch Text daraus tippen oder lokal diktieren, ohne dass ANITEW
- * das Bild speichert, synchronisiert oder an einen Dienst sendet. Echte
- * Foto-Extraktion gehört in den bestätigungspflichtigen MEMORY MODE (I3),
- * nicht als stiller OCR-Fallback hier hinein.
+ * das Bild speichert, synchronisiert oder an einen Dienst sendet.
+ *
+ * Für zusammenhängenden Stoff führt derselbe Entwurf in den MEMORY MODE (I3):
+ * Dort strukturiert der vorhandene Memory-Architekt lokal oder optional mit
+ * dem eigenen KI-Schlüssel, der Mensch prüft die Vorschläge, und erst die
+ * Bestätigung schreibt in den Memory Graph. Danach übernimmt die bestehende
+ * Session-Engine Abruf und FSRS-Wiedersehen — keine zweite Lernmaschine.
+ *
+ * Das Alltagsszenario „Neue Menschen“ (I2) steht daneben strukturiert bereit:
+ * mehrere Personen dürfen nicht durch denselben Ein-Anker-Freitextparser
+ * laufen. Name und Merkmale werden deshalb explizit erfasst und erst nach
+ * Vorschau und Bestätigung in denselben Graphen geschrieben.
  */
 export function OwnPanel({ language, dictionary }: { language: string; dictionary: Dictionary }) {
   const texts = dictionary.own
@@ -45,6 +67,7 @@ export function OwnPanel({ language, dictionary }: { language: string; dictionar
   >('idle')
   const [photo, setPhoto] = useState<LocalPhoto | null>(null)
   const [photoError, setPhotoError] = useState<string | undefined>()
+  const [memoryModeOpen, setMemoryModeOpen] = useState(false)
 
   const reload = useCallback(() => {
     void loadOwnFacts(language)
@@ -73,6 +96,7 @@ export function OwnPanel({ language, dictionary }: { language: string; dictionar
     void addOwnFacts(language, parsed.facts)
       .then(() => {
         setDraft('')
+        setMemoryModeOpen(false)
         reload()
       })
       .catch(() => undefined)
@@ -199,6 +223,39 @@ export function OwnPanel({ language, dictionary }: { language: string; dictionar
           </figcaption>
         </figure>
       )}
+
+      {(draft.trim() !== '' || memoryModeOpen) && (
+        <div className="own-memory-entry">
+          <button
+            type="button"
+            className="quiet own-memory-mode-open"
+            aria-expanded={memoryModeOpen}
+            onClick={() => setMemoryModeOpen((open) => !open)}
+          >
+            {dictionary.memory.rememberHeading}
+          </button>
+          {memoryModeOpen && (
+            <Suspense fallback={null}>
+              <OwnMemoryMode
+                draft={draft}
+                dictionary={dictionary}
+                onSaved={() => {
+                  // Der Rohentwurf hat seinen Zweck erfüllt. Das bestätigte
+                  // Material lebt jetzt im Graphen; eine zweite stille Kopie
+                  // als Karte wäre genau die Doppelspur, die I3 vermeiden soll.
+                  // Der MEMORY MODE bleibt noch sichtbar, damit seine ruhige
+                  // Bestätigung nicht im selben Moment verschwindet.
+                  setDraft('')
+                }}
+              />
+            </Suspense>
+          )}
+        </div>
+      )}
+
+      <Suspense fallback={null}>
+        <PeopleScenario />
+      </Suspense>
 
       {parsed.facts.length > 0 && (
         <section aria-label={texts.preview}>

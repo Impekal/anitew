@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import {
   type NodeSuggestion,
@@ -37,10 +37,17 @@ export function RememberThisPanel({
   platform,
   dictionary,
   onSaved,
+  initialDraft,
 }: {
   platform: Platform
   dictionary: Dictionary
   onSaved: (created: { nodeIds: readonly string[]; edgeIds: readonly string[] }) => void
+  /**
+   * Flüchtige Übergabe aus „Eigene Inhalte“ (I3). Sie füllt nur ein leeres
+   * Feld und wird nie selbst gespeichert. Sobald der Mensch hier editiert,
+   * gewinnt seine Eingabe — spätere Prop-Änderungen überschreiben nichts.
+   */
+  initialDraft?: string
 }) {
   const texts = dictionary.memory
 
@@ -48,6 +55,19 @@ export function RememberThisPanel({
   const [suggestions, setSuggestions] = useState<RememberSuggestions | undefined>(undefined)
   const [dropped, setDropped] = useState<ReadonlySet<string>>(new Set())
   const [saved, setSaved] = useState(false)
+  const appliedInitialDraft = useRef<string | undefined>(undefined)
+
+  useEffect(() => {
+    if (
+      initialDraft === undefined ||
+      initialDraft.trim() === '' ||
+      appliedInitialDraft.current === initialDraft
+    ) {
+      return
+    }
+    appliedInitialDraft.current = initialDraft
+    setDraft((current) => (current.trim() === '' ? initialDraft : current))
+  }, [initialDraft])
 
   // Der KI-Weg (D-037) ist ein Angebot, kein Pflichtpfad (M2): Er erscheint
   // nur, wenn beim gewählten Coach-Anbieter ein eigener Schlüssel liegt.

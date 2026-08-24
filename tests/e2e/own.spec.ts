@@ -3,12 +3,21 @@ import { expect, test } from '@playwright/test'
 import { leavePage, openPage, visit } from './helpers.ts'
 
 /**
- * Eigene Inhalte (Backlog I · D-032).
+ * Eigene Inhalte (Backlog I · D-032 / I2 / I3).
  *
  * Geprüft wird der Weg des Stoffes: einfügen → Vorschau (samt sichtbar
  * Abgelehntem) → übernehmen → Liste — und dass eine entfernte Karte
  * wirklich verschwindet. Alles lokal (I6); die Einheit selbst prüfen die
  * Kerntests des Planers.
+ *
+ * Für zusammenhängendes Material kommt der zweite Weg dazu: derselbe Entwurf
+ * geht in den bestehenden MEMORY MODE, wird dort strukturiert und erst nach
+ * Bestätigung in den Memory Graph übernommen. Dessen Training + FSRS prüft
+ * `memory.spec.ts` vertikal bis in `itemStates`.
+ *
+ * Das Alltagsszenario I2 hält mehrere Menschen als getrennte Anker: Name und
+ * Merkmale werden strukturiert erfasst, gemeinsam geprüft und erst dann in
+ * denselben Graphen übernommen.
  */
 
 test('macht aus eingefügtem Text Karten — und zeigt, was keine wurde', async ({ page }) => {
@@ -73,6 +82,64 @@ test('Foto bleibt eine lokale Vorlage und wird nicht als Inhalt gespeichert', as
   await expect(page.locator('.own-photo-preview')).toHaveCount(0)
   await expect(page.locator('.own-list li')).toHaveCount(1)
   await expect(page.locator('.own-list')).toContainText('112')
+})
+
+test('MEMORY MODE übernimmt den Entwurf über dieselbe Bestätigungstür in den Graphen', async ({
+  page,
+}) => {
+  await visit(page)
+  await openPage(page, 'Eigene Inhalte')
+
+  const material = 'Daniel arbeitet im Museum, kommt aus Madrid und spielt Gitarre.'
+  await page.locator('.own-input').fill(material)
+
+  // Kein zweites Eingabefeld abtippen: Der vorhandene Entwurf reist nur
+  // flüchtig in den bestehenden Memory-Architekten.
+  await page.locator('.own-memory-mode-open').click()
+  await expect(page.locator('.own-memory-mode .remember-input')).toHaveValue(material)
+
+  await page.getByRole('button', { name: 'Vorschläge ansehen' }).click()
+  await expect(page.locator('.own-memory-mode .remember-node')).toHaveCount(4)
+  await expect(page.locator('.own-memory-mode .remember-edges li')).toHaveCount(3)
+
+  // Erst dieser Fingertipp ist die Speichergrenze.
+  await page.getByRole('button', { name: 'Bestätigen und merken' }).click()
+  await expect(page.locator('.own-memory-mode .remember-saved')).toBeVisible()
+  await expect(page.locator('.own-input')).toHaveValue('')
+
+  await leavePage(page)
+  await openPage(page, 'Mein Gedächtnis')
+  await expect(page.locator('.memory-counts')).toHaveText('4 Erinnerungen · 3 Verbindungen')
+})
+
+test('Neue Menschen bleiben getrennte persönliche Abrufanker und werden erst nach Bestätigung gemerkt', async ({
+  page,
+}) => {
+  await visit(page)
+  await openPage(page, 'Eigene Inhalte')
+
+  await page.getByRole('button', { name: 'Neue Menschen merken' }).click()
+  await page.getByRole('textbox', { name: 'Name 1' }).fill('Mira')
+  await page.getByRole('textbox', { name: /Merkmale.*1/ }).fill('Cello, Madrid')
+  await page.getByRole('textbox', { name: 'Name 2' }).fill('Daniel')
+  await page.getByRole('textbox', { name: /Merkmale.*2/ }).fill('Gitarre, Berlin')
+
+  // Vor der Vorschau und Bestätigung ist noch nichts im Graphen.
+  await page.getByRole('button', { name: 'Training vorbereiten' }).click()
+  await expect(page.locator('.people-preview li')).toHaveCount(2)
+  await expect(page.locator('.people-preview li').nth(0)).toContainText('Mira')
+  await expect(page.locator('.people-preview li').nth(0)).toContainText('Cello · Madrid')
+  await expect(page.locator('.people-preview li').nth(1)).toContainText('Daniel')
+  await expect(page.locator('.people-preview li').nth(1)).toContainText('Gitarre · Berlin')
+
+  await page.locator('.people-confirm').click()
+  await expect(page.locator('.people-saved')).toBeVisible()
+
+  await leavePage(page)
+  await openPage(page, 'Mein Gedächtnis')
+  await expect(page.locator('.memory-counts')).toHaveText('6 Erinnerungen · 4 Verbindungen')
+  await expect(page.locator('.memoryzone')).toContainText('Mira')
+  await expect(page.locator('.memoryzone')).toContainText('Daniel')
 })
 
 test('Diktat fügt nur nach bestätigter lokaler Erkennung Text zum Entwurf hinzu', async ({ page }) => {
