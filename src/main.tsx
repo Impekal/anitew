@@ -27,7 +27,8 @@ try {
 
 // Die Signatur-Schichten sind bewusst kein Startpfad. Erst wenn Dokument,
 // App und Service-Worker-Start vollständig zur Ruhe gekommen sind, holen wir
-// die rein visuelle Tiefe nach.
+// die rein visuelle Tiefe nach. Mobile Core-Geometrie bleibt ebenfalls in
+// diesem Lazy-Pfad; Drive-Authentifizierung ist davon bewusst getrennt.
 let signatureTimer: number | undefined
 let pageIsLeaving = false
 
@@ -43,7 +44,7 @@ const loadSignatureExperience = () => {
       if (pageIsLeaving) return
       await import('./app/coreRitual.ts')
       if (pageIsLeaving) return
-      await import('./app/experienceRefinement.ts')
+      await import('./app/mobileCoreLayout.ts')
       if (pageIsLeaving) return
       await import('./app/driveRedirectFeedback.ts')
     })().catch(() => undefined)
