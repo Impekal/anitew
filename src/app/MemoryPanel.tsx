@@ -20,6 +20,7 @@ import { memoryForecastCopyFor, type Dictionary } from '../i18n/index.ts'
 
 import { MemoryConstellation } from './MemoryConstellation.tsx'
 import { scheduleDriveSync } from './driveSync.ts'
+import { memoryDeadlineCopyForCurrentUi } from './memoryDeadline.ts'
 import { RememberThisPanel } from './RememberThisPanel.tsx'
 
 /**
@@ -46,6 +47,7 @@ export function MemoryPanel({
 }) {
   const texts = dictionary.memory
   const forecastTexts = memoryForecastCopyFor(language)
+  const deadlineTexts = memoryDeadlineCopyForCurrentUi()
 
   const [graph, setGraph] = useState<MemoryGraph>(createMemoryGraph())
   const [selectedId, setSelectedId] = useState<string | undefined>()
@@ -131,6 +133,23 @@ export function MemoryPanel({
       .map((node) => node.id),
   )
 
+  const nextReviewText = (() => {
+    if (selected === undefined) return texts.fsrsScheduled
+    if (dueSoon) return texts.dueSoon
+    if (
+      selected.neededByDay !== undefined &&
+      (reviewDay === undefined || reviewDay >= selected.neededByDay)
+    ) {
+      return deadlineTexts.planBefore
+    }
+    if (reviewDay === undefined) return texts.fsrsScheduled
+    return new Date(`${reviewDay}T12:00:00Z`).toLocaleDateString(language, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    })
+  })()
+
   return (
     <div className="memoryzone">
       <p className="hint">{texts.intro}</p>
@@ -200,19 +219,23 @@ export function MemoryPanel({
                       : new Date(selected.lastRecalledAt).toLocaleDateString(language)}
                   </dd>
                 </div>
+                {selected.neededByAt !== undefined && (
+                  <div className="memory-deadline-detail">
+                    <dt>{deadlineTexts.detailLabel}</dt>
+                    <dd>
+                      {new Date(selected.neededByAt).toLocaleString(language, {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </dd>
+                  </div>
+                )}
                 <div>
                   <dt>{texts.nextReview}</dt>
-                  <dd>
-                    {dueSoon
-                      ? texts.dueSoon
-                      : reviewDay === undefined
-                        ? texts.fsrsScheduled
-                        : new Date(`${reviewDay}T12:00:00Z`).toLocaleDateString(language, {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric',
-                          })}
-                  </dd>
+                  <dd>{nextReviewText}</dd>
                 </div>
                 {selectedForecast !== undefined && (
                   <div>
