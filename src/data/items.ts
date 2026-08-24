@@ -16,12 +16,14 @@ import {
   type Instant,
   isImmediate,
   type Memory,
+  memoryNodeIdOfItem,
   moduleForDimension,
   type ModuleId,
   newMemory,
   review,
 } from '../core/index.ts'
 import { type ItemStateRow, db } from './db.ts'
+import { loadMemoryGraph } from './memoryStore.ts'
 
 /** Das Modul, zu dem die Wortlisten gehören. */
 export const WORD_MODULE = 'words'
@@ -49,8 +51,32 @@ export function wordOf(itemId: string): string {
 
 /** Alle Informationen dieser Sprache, die einen Termin haben. */
 export async function loadDue(language: string): Promise<DueItem[]> {
-  const rows = await db.itemStates.where('language').equals(language).toArray()
-  return rows.filter(hasMemory).map((row) => ({ itemId: row.itemId, memory: toMemory(row) }))
+  const rows = (await db.itemStates.where('language').equals(language).toArray()).filter(hasMemory)
+
+  /*
+   * I5 liegt absichtlich **nicht** in der Item-State-Tabelle: Die reale
+   * Deadline gehört zur bestätigten persönlichen Erinnerung im Memory Graph,
+   * während FSRS dort weiter ausschließlich seinen Lernzustand hält. Beim
+   * Lesen verbinden wir beides über die stabile Graph-ID, die jedes moderne
+   * `memory:`-Item ohnehin in seiner Kennung trägt.
+   */
+  let neededBy = new Map<string, number>()
+  if (rows.some((row) => row.moduleId === 'memory')) {
+    const graph = await loadMemoryGraph()
+    neededBy = new Map(
+      graph.nodes
+        .filter((node) => node.neededByAt !== undefined)
+        .map((node) => [node.id, node.neededByAt as number]),
+    )
+  }
+
+  return rows.map((row) => {
+    const item: DueItem = { itemId: row.itemId, memory: toMemory(row) }
+    if (row.moduleId !== 'memory') return item
+    const nodeId = memoryNodeIdOfItem(wordOf(row.itemId))
+    const neededByAt = nodeId === undefined ? undefined : neededBy.get(nodeId)
+    return neededByAt === undefined ? item : { ...item, neededByAt }
+  })
 }
 
 /**
