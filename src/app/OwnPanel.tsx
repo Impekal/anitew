@@ -3,6 +3,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { type OwnFact, factPrompt, parseOwnText } from '../core/index.ts'
 import { addOwnFacts, loadOwnFacts, loadOwnPool, removeOwnFact } from '../data/own.ts'
 import type { Dictionary } from '../i18n/index.ts'
+import { dictateLocally } from '../platform/web/localDictation.ts'
+import { localDictationCopyForCurrentUi } from './localDictationCopy.ts'
 
 /**
  * Eigene Inhalte (Backlog I · D-032).
@@ -15,10 +17,14 @@ import type { Dictionary } from '../i18n/index.ts'
  */
 export function OwnPanel({ language, dictionary }: { language: string; dictionary: Dictionary }) {
   const texts = dictionary.own
+  const dictationTexts = localDictationCopyForCurrentUi()
 
   const [draft, setDraft] = useState('')
   const [stored, setStored] = useState<readonly OwnFact[]>([])
   const [fresh, setFresh] = useState<ReadonlySet<string>>(new Set())
+  const [dictationState, setDictationState] = useState<
+    'idle' | 'listening' | 'unavailable' | 'failed'
+  >('idle')
 
   const reload = useCallback(() => {
     void loadOwnFacts(language)
@@ -51,6 +57,33 @@ export function OwnPanel({ language, dictionary }: { language: string; dictionar
       .catch(() => undefined)
   }
 
+  const dictate = () => {
+    if (dictationState === 'listening') return
+    setDictationState('listening')
+    void dictateLocally(language)
+      .then((result) => {
+        if (result.status === 'ok') {
+          setDraft((current) => {
+            const separator = current.trim() === '' ? '' : current.endsWith('\n') ? '' : '\n'
+            return `${current}${separator}${result.text}`
+          })
+          setDictationState('idle')
+          return
+        }
+        setDictationState(result.status)
+      })
+      .catch(() => setDictationState('failed'))
+  }
+
+  const dictationStatus =
+    dictationState === 'listening'
+      ? dictationTexts.listening
+      : dictationState === 'unavailable'
+        ? dictationTexts.unavailable
+        : dictationState === 'failed'
+          ? dictationTexts.failed
+          : undefined
+
   return (
     <div className="own">
       <p className="hint">{texts.intro}</p>
@@ -60,8 +93,25 @@ export function OwnPanel({ language, dictionary }: { language: string; dictionar
         rows={5}
         placeholder={texts.placeholder}
         value={draft}
-        onChange={(event) => setDraft(event.target.value)}
+        onChange={(event) => {
+          setDraft(event.target.value)
+          if (dictationState !== 'listening') setDictationState('idle')
+        }}
       />
+
+      <button
+        type="button"
+        className="quiet own-dictate"
+        onClick={dictate}
+        disabled={dictationState === 'listening'}
+      >
+        {dictationState === 'listening' ? dictationTexts.listening : dictationTexts.start}
+      </button>
+      {dictationStatus !== undefined && dictationState !== 'listening' && (
+        <p className="hint own-dictation-status" role="status" aria-live="polite">
+          {dictationStatus}
+        </p>
+      )}
 
       {parsed.facts.length > 0 && (
         <section aria-label={texts.preview}>
