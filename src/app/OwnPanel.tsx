@@ -7,6 +7,7 @@ import { dictateLocally } from '../platform/web/localDictation.ts'
 import { localDictationCopyForCurrentUi } from './localDictationCopy.ts'
 import { localPhotoCopyForCurrentUi } from './localPhotoCopy.ts'
 import { OwnMemoryMode } from './OwnMemoryMode.tsx'
+import { PeopleScenario } from './PeopleScenario.tsx'
 import './ownPhoto.css'
 
 const MAX_LOCAL_PHOTO_BYTES = 15 * 1024 * 1024
@@ -35,6 +36,11 @@ interface LocalPhoto {
  * dem eigenen KI-Schlüssel, der Mensch prüft die Vorschläge, und erst die
  * Bestätigung schreibt in den Memory Graph. Danach übernimmt die bestehende
  * Session-Engine Abruf und FSRS-Wiedersehen — keine zweite Lernmaschine.
+ *
+ * Das Alltagsszenario „Neue Menschen“ (I2) steht daneben strukturiert bereit:
+ * mehrere Personen dürfen nicht durch denselben Ein-Anker-Freitextparser
+ * laufen. Name und Merkmale werden deshalb explizit erfasst und erst nach
+ * Vorschau und Bestätigung in denselben Graphen geschrieben.
  */
 export function OwnPanel({ language, dictionary }: { language: string; dictionary: Dictionary }) {
   const texts = dictionary.own
@@ -233,6 +239,8 @@ export function OwnPanel({ language, dictionary }: { language: string; dictionar
           )}
         </div>
       )}
+
+      <PeopleScenario />
 
       {parsed.facts.length > 0 && (
         <section aria-label={texts.preview}>
