@@ -35,6 +35,47 @@ const MISSION_LOCATION_COPY: Readonly<
   en: { ask: 'Where was the object?', placeholder: 'Position' },
 }
 
+/**
+ * H4/H5: Hotel, Konferenz und Coworking teilen dieselben stabilen Fact-Kinds.
+ * Die Oberfläche darf daraus deshalb keine Hotelbedeutung ableiten. „Zimmer“
+ * und „Restaurant“ wären bei einer Konferenz oder im Coworking sachlich falsch.
+ * Die sichtbaren Begriffe bleiben bewusst knapp und weltneutral; die konkrete
+ * Welt steckt in Person, Gegenstand, Position und Ort der Szene.
+ */
+interface MissionNeutralCopy {
+  readonly numberLabel: string
+  readonly timeLabel: string
+  readonly placeLabel: string
+  readonly numberAsk: string
+  readonly timeAsk: string
+  readonly placeAsk: string
+  readonly numberPlaceholder: string
+  readonly placePlaceholder: string
+}
+
+const MISSION_NEUTRAL_COPY: Readonly<Partial<Record<Language, MissionNeutralCopy>>> = {
+  de: {
+    numberLabel: 'Nummer',
+    timeLabel: 'Zeit',
+    placeLabel: 'Ort',
+    numberAsk: 'Welche Nummer?',
+    timeAsk: 'Wann war es?',
+    placeAsk: 'Wie hieß der Ort?',
+    numberPlaceholder: 'Nummer',
+    placePlaceholder: 'Name',
+  },
+  en: {
+    numberLabel: 'Number',
+    timeLabel: 'Time',
+    placeLabel: 'Place',
+    numberAsk: 'Which number?',
+    timeAsk: 'When was it?',
+    placeAsk: 'What was the place called?',
+    numberPlaceholder: 'Number',
+    placePlaceholder: 'Name',
+  },
+}
+
 interface PushTruthCopy {
   readonly reminderNote: string
   readonly whileOpen: string
@@ -131,6 +172,38 @@ function withMissionLocation(dictionary: Dictionary, language: Language): Dictio
   }
 }
 
+function withMissionNeutralCopy(dictionary: Dictionary, language: Language): Dictionary {
+  const copy =
+    MISSION_NEUTRAL_COPY[language] ??
+    MISSION_NEUTRAL_COPY[FALLBACK_LANGUAGE] ??
+    MISSION_NEUTRAL_COPY.de
+  if (copy === undefined) return dictionary
+
+  return {
+    ...dictionary,
+    mission: {
+      ...dictionary.mission,
+      room: copy.numberLabel,
+      departure: copy.timeLabel,
+      restaurant: copy.placeLabel,
+    },
+    session: {
+      ...dictionary.session,
+      missionAsk: {
+        ...dictionary.session.missionAsk,
+        room: copy.numberAsk,
+        time: copy.timeAsk,
+        place: copy.placeAsk,
+      },
+      missionPlaceholders: {
+        ...dictionary.session.missionPlaceholders,
+        room: copy.numberPlaceholder,
+        place: copy.placePlaceholder,
+      },
+    },
+  }
+}
+
 function withPushTruth(dictionary: Dictionary, language: Language): Dictionary {
   const copy = PUSH_TRUTH[language] ?? PUSH_TRUTH[FALLBACK_LANGUAGE] ?? PUSH_TRUTH.de
   if (copy === undefined) return dictionary
@@ -178,7 +251,10 @@ export function memoryCountCopyFor(language: string): MemoryCountCopy {
 export function dictionaryFor(language: Language): Dictionary {
   const resolved = DICTIONARIES[language] ?? DICTIONARIES[FALLBACK_LANGUAGE] ?? de
   const copyLanguage = DICTIONARIES[language] === undefined ? FALLBACK_LANGUAGE : language
-  return withPushTruth(withMissionLocation(resolved, copyLanguage), copyLanguage)
+  return withMissionNeutralCopy(
+    withPushTruth(withMissionLocation(resolved, copyLanguage), copyLanguage),
+    copyLanguage,
+  )
 }
 
 export function isTranslated(language: Language): boolean {
