@@ -17,12 +17,14 @@ Dieses Dokument beschreibt, was die aktuelle Fassung von ANITEW tatsächlich tut
 
 Verantwortlicher im Sinne der Datenschutz-Grundverordnung (DSGVO):
 
-**[VOLLSTÄNDIGER NAME / RECHTSTRÄGER]**  
-[STRASSE UND HAUSNUMMER]  
-[PLZ UND ORT]  
+**ANITEW by Impekal**  
+Inhaber: **Dr. Mèhèza Kalibani**  
+Holstenwall 24  
+20335 Hamburg  
 Deutschland
 
-E-Mail: [E-MAIL-ADRESSE]
+E-Mail: impekaltech+anitew@gmail.com  
+Telefon: +49 151 12784951
 
 Weitere Anbieterangaben stehen im [Impressum](/impressum.html).
 
