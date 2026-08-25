@@ -11,9 +11,6 @@ import './anitew-phase4-journey.css'
 import './anitew-phase4-landing.css'
 import './anitew-phase5.css'
 
-// Dunkel ist der ANITEW-Erststart. Die Markierung trennt „noch nie gewählt“
-// von einem später ausdrücklich gewählten „System“: System entfernt weiterhin
-// den Theme-Key, darf beim nächsten Start aber nicht wieder zu Dunkel werden.
 try {
   const themeDefaultSeeded = 'anitew.theme-default.v2'
   const theme = 'anitew.theme.v1'
@@ -25,10 +22,6 @@ try {
   // Darstellung ist Komfort. Geblocktes localStorage darf den Start nie stoppen.
 }
 
-// Die Signatur-Schichten sind bewusst kein Startpfad. Erst wenn Dokument,
-// App und Service-Worker-Start vollständig zur Ruhe gekommen sind, holen wir
-// die rein visuelle Tiefe nach. Mobile Core-Geometrie bleibt ebenfalls in
-// diesem Lazy-Pfad; Drive-Authentifizierung ist davon bewusst getrennt.
 let signatureTimer: number | undefined
 let pageIsLeaving = false
 
@@ -66,22 +59,74 @@ if (document.readyState === 'complete') loadSignatureExperience()
 else window.addEventListener('load', loadSignatureExperience, { once: true })
 
 keepUpToDate()
-
-// Parent-navigation is interactive polish, not cold-start work. Start loading
-// it immediately, but keep its event bridge in a separate async chunk so the
-// strict P4 first-load budget stays reserved for the actual app shell.
 void import('./app/coreNavigationReturn.ts').catch(() => undefined)
+void import('./platform/web/diagnostics.ts')
+  .then(({ installLocalDiagnostics }) => installLocalDiagnostics())
+  .catch(() => undefined)
 
 const rootContainer = document.getElementById('root')
 if (rootContainer === null) throw Error('#root fehlt')
 const container: HTMLElement = rootContainer
+const root = createRoot(container)
 
-function render(): void {
-  createRoot(container).render(
+function ensureLegalFooter(): void {
+  if (document.getElementById('anitew-legal-footer') !== null) return
+  const footer = document.createElement('nav')
+  footer.id = 'anitew-legal-footer'
+  footer.setAttribute('aria-label', 'Rechtliches')
+  footer.style.cssText =
+    'position:relative;z-index:1;padding:0 16px max(18px,env(safe-area-inset-bottom));text-align:center;font:500 12px/1.5 system-ui,sans-serif;color:#777;'
+  footer.innerHTML =
+    '<a style="color:inherit" href="/impressum.html">Impressum</a><span aria-hidden="true"> · </span><a style="color:inherit" href="/datenschutz.html">Datenschutz</a>'
+  document.body.append(footer)
+}
+
+function renderApp(): void {
+  root.render(
     <StrictMode>
       <App />
     </StrictMode>,
   )
+  ensureLegalFooter()
+}
+
+function isStandalone(): boolean {
+  return (
+    window.matchMedia('(display-mode: standalone)').matches ||
+    (navigator as { standalone?: boolean }).standalone === true
+  )
+}
+
+function browserContinuationAccepted(): boolean {
+  try {
+    return window.sessionStorage.getItem('anitew.install-gate.continue.v1') === '1'
+  } catch {
+    return false
+  }
+}
+
+function shouldShowInstallGate(): boolean {
+  const forced = new URL(window.location.href).searchParams.get('installGate') === '1'
+  if (forced) return true
+  if (navigator.webdriver === true) return false
+  if (isStandalone()) return false
+  return !browserContinuationAccepted()
+}
+
+function renderEntry(): void {
+  if (!shouldShowInstallGate()) {
+    renderApp()
+    return
+  }
+  void import('./app/install/InstallGate.tsx')
+    .then(({ InstallGate }) => {
+      root.render(
+        <StrictMode>
+          <InstallGate onContinue={renderApp} />
+        </StrictMode>,
+      )
+    })
+    .catch(renderApp)
 }
 
 const oauthReturn = new URL(window.location.href).searchParams.has('googleOAuth')
@@ -89,5 +134,5 @@ if (oauthReturn) {
   void import('./app/driveRedirectReturn.ts')
     .then(({ finishGoogleDriveRedirect }) => finishGoogleDriveRedirect())
     .catch(() => undefined)
-    .finally(render)
-} else render()
+    .finally(renderApp)
+} else renderEntry()
