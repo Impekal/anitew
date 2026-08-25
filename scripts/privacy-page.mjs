@@ -1,17 +1,9 @@
 /**
- * Erzeugt die öffentliche Datenschutz-Seite aus `docs/PRIVACY.md` (N10).
+ * Erzeugt die öffentlichen Rechtstexte aus Markdown.
  *
- * Googles Zustimmungsbildschirm verlangt eine **URL** zur
- * Datenschutzerklärung. Die Wahrheit liegt in `docs/PRIVACY.md` — und
- * bleibt dort: Diese Seite wird bei jedem Build daraus erzeugt, damit es
- * nie zwei Fassungen gibt, die auseinanderlaufen (F7). Der Wandler kann
- * genau das Markdown, das PRIVACY.md benutzt — Überschriften, Absätze,
- * Listen, Tabellen, Fett, Code, Links, Zitate — und keinen Deut mehr:
- * Ein Markdown-Paket wäre eine Abhängigkeit für eine einzige Datei.
- *
- * Läuft nach `vite build` und legt `dist/datenschutz.html` ab. Bewusst
- * nicht im Service-Worker-Vorrat: Die Seite ist für Googles Prüfer und
- * neugierige Menschen, nicht für den Offline-Betrieb.
+ * Die Wahrheit bleibt in `docs/PRIVACY.md` und `docs/IMPRESSUM.md`; der Build
+ * erzeugt daraus zwei statische, skriptfreie Seiten. So laufen App, OAuth-
+ * Prüfung und öffentlich erreichbare Rechtstexte nicht auseinander.
  */
 
 import { readFileSync, writeFileSync } from 'node:fs'
@@ -19,7 +11,6 @@ import { readFileSync, writeFileSync } from 'node:fs'
 const escape = (text) =>
   text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
 
-/** Fett, Code und Links innerhalb einer Zeile. */
 export function inline(text) {
   return escape(text)
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
@@ -27,7 +18,6 @@ export function inline(text) {
     .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2">$1</a>')
 }
 
-/** Der ganze Text, Block für Block. */
 export function render(markdown) {
   const lines = markdown.split('\n')
   const out = []
@@ -69,9 +59,12 @@ export function render(markdown) {
         out.push('<ul>')
         list = true
       }
-      // Folgezeilen eines Listenpunkts (eingerückt) einsammeln.
       let item = trimmed.slice(2)
-      while (at + 1 < lines.length && /^\s{2,}\S/.test(lines[at + 1]) && !lines[at + 1].trim().startsWith('- ')) {
+      while (
+        at + 1 < lines.length &&
+        /^\s{2,}\S/.test(lines[at + 1]) &&
+        !lines[at + 1].trim().startsWith('- ')
+      ) {
         item += ` ${lines[at + 1].trim()}`
         at++
       }
@@ -120,14 +113,13 @@ export function render(markdown) {
   return out.join('\n')
 }
 
-/** Die schlichte Hülle — dieselben Farben wie die App, keine Skripte. */
-export function page(body) {
+export function page(body, title = 'Datenschutzerklärung') {
   return `<!doctype html>
 <html lang="de">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ANITEW · Datenschutzerklärung</title>
+<title>ANITEW · ${escape(title)}</title>
 <style>
   body { margin: 0 auto; max-width: 42rem; padding: 2rem 1.2rem 4rem;
     font: 1rem/1.6 system-ui, sans-serif; color: #241f19; background: #f7f3ec; }
@@ -137,24 +129,41 @@ export function page(body) {
   th, td { border: 1px solid #e7ded0; padding: 0.4em 0.6em; text-align: left; vertical-align: top; }
   blockquote { margin: 1em 0; padding: 0.2em 1em; border-left: 3px solid #e7ded0; }
   a { color: inherit; }
+  .legal-nav { display:flex; flex-wrap:wrap; gap:.7rem; margin:0 0 2rem; font-size:.9rem; }
+  .legal-nav-bottom { margin:2.5rem 0 0; padding-top:1rem; border-top:1px solid #e7ded0; }
   @media (prefers-color-scheme: dark) {
     body { color: #e8e0d3; background: #15120e; }
     code { background: #221c15; }
     th, td { border-color: #3a332a; }
-    blockquote { border-color: #3a332a; }
+    blockquote, .legal-nav-bottom { border-color: #3a332a; }
   }
 </style>
 </head>
 <body>
+<nav class="legal-nav" aria-label="Rechtliches">
+  <a href="/">ANITEW</a>
+  <a href="/impressum.html">Impressum</a>
+  <a href="/datenschutz.html">Datenschutz</a>
+</nav>
 ${body}
+<nav class="legal-nav legal-nav-bottom" aria-label="Rechtliches">
+  <a href="/">ANITEW</a>
+  <a href="/impressum.html">Impressum</a>
+  <a href="/datenschutz.html">Datenschutz</a>
+</nav>
 </body>
 </html>
 `
 }
 
-// Nur beim direkten Aufruf schreiben — die Prüfungen laden nur die Funktionen.
 if (process.argv[1]?.endsWith('privacy-page.mjs')) {
-  const markdown = readFileSync('docs/PRIVACY.md', 'utf8')
-  writeFileSync('dist/datenschutz.html', page(render(markdown)))
-  console.log('dist/datenschutz.html geschrieben (aus docs/PRIVACY.md)')
+  const pages = [
+    ['docs/PRIVACY.md', 'dist/datenschutz.html', 'Datenschutzerklärung'],
+    ['docs/IMPRESSUM.md', 'dist/impressum.html', 'Impressum'],
+  ]
+  for (const [source, target, title] of pages) {
+    const markdown = readFileSync(source, 'utf8')
+    writeFileSync(target, page(render(markdown), title))
+    console.log(`${target} geschrieben (aus ${source})`)
+  }
 }
