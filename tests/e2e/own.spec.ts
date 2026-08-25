@@ -10,14 +10,9 @@ import { leavePage, openPage, visit } from './helpers.ts'
  * wirklich verschwindet. Alles lokal (I6); die Einheit selbst prüfen die
  * Kerntests des Planers.
  *
- * Für zusammenhängendes Material kommt der zweite Weg dazu: derselbe Entwurf
- * geht in den bestehenden MEMORY MODE, wird dort strukturiert und erst nach
- * Bestätigung in den Memory Graph übernommen. Dessen Training + FSRS prüft
- * `memory.spec.ts` vertikal bis in `itemStates`.
- *
- * Das Alltagsszenario I2 hält mehrere Menschen als getrennte Anker: Name und
- * Merkmale werden strukturiert erfasst, gemeinsam geprüft und erst dann in
- * denselben Graphen übernommen.
+ * Fotoanalyse bleibt eine explizite BYOK-Abzweigung: Die Auswahl selbst darf
+ * kein Netz berühren. Erst „Foto auswerten“ sendet die verkleinerte Kopie,
+ * und auch deren Antwort muss durch dieselbe Memory-Bestätigungstür.
  */
 
 test('macht aus eingefügtem Text Karten — und zeigt, was keine wurde', async ({ page }) => {
@@ -28,21 +23,17 @@ test('macht aus eingefügtem Text Karten — und zeigt, was keine wurde', async 
     .locator('.own-input')
     .fill('Hauptstadt von Portugal – Lissabon\nNotruf: 112\nnur ein Wort')
 
-  // Die Vorschau: zwei Karten, eine sichtbar abgelehnte Zeile.
   await expect(page.locator('.own-preview li')).toHaveCount(2)
   await expect(page.locator('.own-rejected li')).toHaveText(['nur ein Wort'])
 
   await page.getByRole('button', { name: 'Karten übernehmen' }).click()
   await expect(page.locator('.own-list li')).toHaveCount(2)
-  // Neue Karten sind noch nicht terminiert — sie kommen in die nächste Einheit.
   await expect(page.locator('.own-card-state').first()).toHaveText('kommt in die nächste Einheit')
 
-  // Die Karten überleben das Neuladen (Einstellungen, nicht Arbeitsspeicher).
   await page.reload()
   await openPage(page, 'Eigene Inhalte')
   await expect(page.locator('.own-list li')).toHaveCount(2)
 
-  // Entfernen wirkt: eine weg, eine bleibt.
   await page.locator('.own-card', { hasText: 'Notruf' }).getByRole('button').click()
   await expect(page.locator('.own-list li')).toHaveCount(1)
   await expect(page.locator('.own-list')).toContainText('Lissabon')
@@ -50,7 +41,13 @@ test('macht aus eingefügtem Text Karten — und zeigt, was keine wurde', async 
   await leavePage(page)
 })
 
-test('Foto bleibt eine lokale Vorlage und wird nicht als Inhalt gespeichert', async ({ page }) => {
+test('Foto bleibt ohne Auswertungs-Tap eine lokale Vorlage und wird nicht gespeichert', async ({ page }) => {
+  let imageRequests = 0
+  await page.route('https://generativelanguage.googleapis.com/**', async (route) => {
+    imageRequests += 1
+    await route.abort()
+  })
+
   await visit(page)
   await openPage(page, 'Eigene Inhalte')
 
@@ -68,20 +65,94 @@ test('Foto bleibt eine lokale Vorlage und wird nicht als Inhalt gespeichert', as
   const photo = page.locator('.own-photo-preview img')
   await expect(photo).toBeVisible()
   await expect(photo).toHaveAttribute('src', /^blob:/)
-  await expect(page.locator('.own-photo-note')).toContainText('speichert, synchronisiert oder sendet es nicht')
+  await expect(page.locator('.own-photo-note')).toContainText('speichert oder synchronisiert es nicht')
+  await expect(page.locator('.own-photo-analysis-note')).toContainText('Nur wenn du')
+  expect(imageRequests).toBe(0)
   await expect(page.locator('.own-list li')).toHaveCount(0)
 
-  // Das Foto ist nur Vorlage. Erst der ausdrücklich bestätigte Text wird Karte.
   await page.locator('.own-input').fill('Notruf: 112')
   await page.getByRole('button', { name: 'Karten übernehmen' }).click()
   await expect(page.locator('.own-list li')).toHaveCount(1)
+  expect(imageRequests).toBe(0)
 
-  // Nach einem Reload ist das Bild weg, die bestätigte Karte bleibt.
   await page.reload()
   await openPage(page, 'Eigene Inhalte')
   await expect(page.locator('.own-photo-preview')).toHaveCount(0)
   await expect(page.locator('.own-list li')).toHaveCount(1)
   await expect(page.locator('.own-list')).toContainText('112')
+})
+
+test('Foto-Auswertung sendet erst auf Tap und speichert erst nach Memory-Bestätigung', async ({ page }) => {
+  let requestSeen = false
+  await page.route('https://generativelanguage.googleapis.com/**', async (route) => {
+    requestSeen = true
+    const request = route.request()
+    expect(request.headers()['x-goog-api-key']).toBe('AIza-foto-test')
+    const body = request.postDataJSON() as any
+    expect(body.system_instruction.parts[0].text).toContain('aus einem Bild')
+    expect(body.contents[0].parts[0].inlineData.mimeType).toBe('image/jpeg')
+    expect(body.contents[0].parts[0].inlineData.data.length).toBeGreaterThan(10)
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        candidates: [
+          {
+            content: {
+              parts: [
+                {
+                  text: JSON.stringify({
+                    nodes: [
+                      { type: 'person', label: 'Mira' },
+                      { type: 'fact', label: 'Cello' },
+                    ],
+                    edges: [{ from: 'Mira', to: 'Cello' }],
+                  }),
+                },
+              ],
+            },
+          },
+        ],
+      }),
+    })
+  })
+
+  // Der normale BYOK-Weg legt den Schlüssel ab; der Foto-Pfad erfindet keinen
+  // zweiten geheimen Speicher und wechselt den Anbieter nicht still.
+  await visit(page)
+  await openPage(page, 'Coach')
+  await page.locator('.coach-key-input').fill('AIza-foto-test')
+  await page.getByRole('button', { name: 'Schlüssel speichern' }).click()
+  await leavePage(page)
+  await openPage(page, 'Eigene Inhalte')
+
+  const onePixelPng = Buffer.from(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9ZQmcAAAAASUVORK5CYII=',
+    'base64',
+  )
+  await page.locator('.own-photo-input').setInputFiles({
+    name: 'mira.png',
+    mimeType: 'image/png',
+    buffer: onePixelPng,
+  })
+
+  expect(requestSeen).toBe(false)
+  await page.getByRole('button', { name: 'Foto auswerten' }).click()
+
+  await expect(page.locator('.own-photo-analysis-status')).toContainText('Vorschläge aus dem Foto')
+  await expect(page.locator('.own-memory-mode .remember-node')).toHaveCount(2)
+  await expect(page.locator('.own-memory-mode .remember-edges li')).toHaveCount(1)
+  expect(requestSeen).toBe(true)
+
+  // Die KI-Antwort ist noch nicht gespeichert. Erst dieselbe Bestätigung wie
+  // bei Text-Memory schreibt in den Graphen.
+  await page.getByRole('button', { name: 'Bestätigen und merken' }).click()
+  await expect(page.locator('.own-memory-mode .remember-saved')).toBeVisible()
+  await expect(page.locator('.own-photo-preview')).toHaveCount(0)
+
+  await leavePage(page)
+  await openPage(page, 'Mein Gedächtnis')
+  await expect(page.locator('.memory-counts')).toHaveText('2 Erinnerungen · 1 Verbindung')
 })
 
 test('MEMORY MODE übernimmt den Entwurf über dieselbe Bestätigungstür in den Graphen', async ({
@@ -93,8 +164,6 @@ test('MEMORY MODE übernimmt den Entwurf über dieselbe Bestätigungstür in den
   const material = 'Daniel arbeitet im Museum, kommt aus Madrid und spielt Gitarre.'
   await page.locator('.own-input').fill(material)
 
-  // Kein zweites Eingabefeld abtippen: Der vorhandene Entwurf reist nur
-  // flüchtig in den bestehenden Memory-Architekten.
   await page.locator('.own-memory-mode-open').click()
   await expect(page.locator('.own-memory-mode .remember-input')).toHaveValue(material)
 
@@ -102,7 +171,6 @@ test('MEMORY MODE übernimmt den Entwurf über dieselbe Bestätigungstür in den
   await expect(page.locator('.own-memory-mode .remember-node')).toHaveCount(4)
   await expect(page.locator('.own-memory-mode .remember-edges li')).toHaveCount(3)
 
-  // Erst dieser Fingertipp ist die Speichergrenze.
   await page.getByRole('button', { name: 'Bestätigen und merken' }).click()
   await expect(page.locator('.own-memory-mode .remember-saved')).toBeVisible()
   await expect(page.locator('.own-input')).toHaveValue('')
@@ -124,7 +192,6 @@ test('Neue Menschen bleiben getrennte persönliche Abrufanker und werden erst na
   await page.getByRole('textbox', { name: 'Name 2' }).fill('Daniel')
   await page.getByRole('textbox', { name: /Merkmale.*2/ }).fill('Gitarre, Berlin')
 
-  // Vor der Vorschau und Bestätigung ist noch nichts im Graphen.
   await page.getByRole('button', { name: 'Training vorbereiten' }).click()
   await expect(page.locator('.people-preview li')).toHaveCount(2)
   await expect(page.locator('.people-preview li').nth(0)).toContainText('Mira')
