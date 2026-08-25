@@ -281,7 +281,7 @@ export function OwnPanel({ language, dictionary }: { language: string; dictionar
           <img src={photo.url} alt={`${photoTexts.alt}: ${photo.name}`} />
           <figcaption className="own-photo-caption">
             <p className="own-photo-note">{photoTexts.note}</p>
-            <p className="own-photo-note">{photoTexts.analyzeNote}</p>
+            <p className="own-photo-note own-photo-analysis-note">{photoTexts.analyzeNote}</p>
             <div className="own-source-actions">
               <button
                 type="button"
