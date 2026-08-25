@@ -7,15 +7,18 @@ import { describe, expect, it } from 'vitest'
 // mehr Zeremonie als Nutzen.
 import { inline, page, render } from '../../scripts/privacy-page.mjs'
 
-/**
- * Die öffentliche Datenschutz-Seite (N10).
- *
- * Die Wahrheit liegt in `docs/PRIVACY.md`; die Seite wird daraus erzeugt.
- * Geprüft wird, dass der kleine Wandler genau das Markdown der Datei
- * wirklich trägt — und dass im Ergebnis keine rohen Markdown-Reste stehen,
- * die Googles Prüfern (und Menschen) entgegenblinken würden.
- */
-describe('die Datenschutz-Seite', () => {
+function assertRendered(markdown: string, html: string): void {
+  const flat = html.replace(/<[^>]+>/g, '')
+  for (const heading of markdown.match(/^## .+$/gm) ?? []) {
+    const text = heading.replace(/^## /, '').replace(/\*\*/g, '')
+    expect(flat, `Abschnitt fehlt: ${text}`).toContain(text.split('—')[0]?.trim() ?? text)
+  }
+  expect(html).not.toMatch(/\*\*/)
+  expect(html).not.toMatch(/^\|/m)
+  expect(html).not.toMatch(/^- /m)
+}
+
+describe('die öffentlichen Rechtstext-Seiten', () => {
   it('wandelt die Zeilenformen: fett, Code, Link', () => {
     expect(inline('**stark** und `wort` und [dahin](https://example.org)')).toBe(
       '<strong>stark</strong> und <code>wort</code> und <a href="https://example.org">dahin</a>',
@@ -26,23 +29,28 @@ describe('die Datenschutz-Seite', () => {
     expect(inline('<script>böse()</script>')).not.toContain('<script>')
   })
 
-  it('trägt die ganze PRIVACY.md ohne rohe Markdown-Reste', () => {
+  it('trägt die ganze PRIVACY.md und verlinkt Impressum und Datenschutz', () => {
     const markdown = readFileSync('docs/PRIVACY.md', 'utf8')
     const html = page(render(markdown)) as string
-
-    // Jede Abschnittsüberschrift kommt an — verglichen ohne Auszeichnung,
-    // denn „**nicht**“ wird im Ergebnis zu Recht ein <strong>.
-    const flat = html.replace(/<[^>]+>/g, '')
-    for (const heading of markdown.match(/^## .+$/gm) ?? []) {
-      const text = heading.replace(/^## /, '').replace(/\*\*/g, '')
-      expect(flat, `Abschnitt fehlt: ${text}`).toContain(text.split('—')[0]?.trim() ?? text)
-    }
-    // Und nichts bleibt unverdaut stehen.
-    expect(html).not.toMatch(/\*\*/)
-    expect(html).not.toMatch(/^\|/m)
-    expect(html).not.toMatch(/^- /m)
-    // Die zwei freiwilligen Übertragungen (D-031/D-033) stehen auch hier.
+    assertRendered(markdown, html)
     expect(html).toContain('Drive-Abgleich')
-    expect(html).toContain('Gemini')
+    expect(html).toContain('Foto auswerten')
+    expect(html).toContain('Verantwortlicher für den Datenschutz')
+    expect(html).toContain('href="/impressum.html"')
+    expect(html).toContain('href="/datenschutz.html"')
+  })
+
+  it('erzeugt ein eigenständiges Impressum mit korrektem Seitentitel', () => {
+    const markdown = readFileSync('docs/IMPRESSUM.md', 'utf8')
+    const html = page(render(markdown), 'Impressum') as string
+    assertRendered(markdown, html)
+    expect(html).toContain('<title>ANITEW · Impressum</title>')
+    expect(html).toContain('§ 5 Digitale-Dienste-Gesetz')
+    expect(html).toContain('href="/datenschutz.html"')
+  })
+
+  it('verhindert einen Release mit Impressums-Platzhaltern', () => {
+    const legal = `${readFileSync('docs/IMPRESSUM.md', 'utf8')}\n${readFileSync('docs/PRIVACY.md', 'utf8')}`
+    expect(legal).not.toMatch(/\[(?:VOLLSTÄNDIGER NAME|STRASSE UND HAUSNUMMER|PLZ UND ORT|E-MAIL-ADRESSE)/)
   })
 })
