@@ -1,10 +1,10 @@
 /**
  * Bilder mit Einzelheiten — das visuelle Modul (Backlog E2: Achse „Visuell“).
  *
- * Eine Szene aus vier einfachen Dingen, jedes in einer Farbe. Eingeprägt
- * wird das Bild als Ganzes; gefragt wird nach der Einzelheit: „Der Schirm —
- * welche Farbe?“ Das ist visuelles Gedächtnis im Alltagsformat — nicht „male
- * das Bild nach“, sondern „war der Schirm rot oder blau?“.
+ * Eine Szene aus vier einfachen Dingen, jedes in einer Farbe. Eingeprägt wird
+ * das Bild als Ganzes; gefragt wird nach der Einzelheit: „Der Schirm — welche
+ * Farbe?“ Das ist visuelles Gedächtnis im Alltagsformat — nicht „male das Bild
+ * nach“, sondern „war der Schirm rot oder blau?“.
  *
  * Gebaut wie der Palast (D-014): Die Szene ist eine **Szene**, keine Liste.
  * Ihre Kennung erzeugt ihren Inhalt (`bild~7` → immer dieselben vier Dinge
@@ -60,6 +60,10 @@ const OBJECT_NAMES: Readonly<Partial<Record<Language, Readonly<Record<GazeObject
     umbrella: 'paraguas', sun: 'sol', boat: 'barco', kite: 'cometa', fish: 'pez',
     bird: 'pájaro', tree: 'árbol', moon: 'luna', key: 'llave', bell: 'campana',
   },
+  it: {
+    umbrella: 'ombrello', sun: 'sole', boat: 'barca', kite: 'aquilone', fish: 'pesce',
+    bird: 'uccello', tree: 'albero', moon: 'luna', key: 'chiave', bell: 'campanella',
+  },
 }
 
 const COLOR_NAMES: Readonly<Partial<Record<Language, Readonly<Record<GazeColor, string>>>>> = {
@@ -67,6 +71,7 @@ const COLOR_NAMES: Readonly<Partial<Record<Language, Readonly<Record<GazeColor, 
   en: { red: 'red', blue: 'blue', green: 'green', yellow: 'yellow', purple: 'purple', orange: 'orange' },
   fr: { red: 'rouge', blue: 'bleu', green: 'vert', yellow: 'jaune', purple: 'violet', orange: 'orange' },
   es: { red: 'rojo', blue: 'azul', green: 'verde', yellow: 'amarillo', purple: 'morado', orange: 'naranja' },
+  it: { red: 'rosso', blue: 'blu', green: 'verde', yellow: 'giallo', purple: 'viola', orange: 'arancione' },
 }
 
 /** Gibt es dieses Modul in dieser Sprache? */
