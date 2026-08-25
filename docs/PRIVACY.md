@@ -2,7 +2,7 @@
 
 **Stand: 2026-08-25**
 
-> Der kurze Teil zuerst: **ANITEW bleibt local-first.** Es gibt **kein ANITEW-Konto**,
+> Der kurze Teil zuerst: **ANITEW bleibt local-first.** Es gibt **kein Konto bei ANITEW**,
 > keine Werbung, keine externen Analyse-Dienste und keine Tracker. Training,
 > Erinnerungen, Messungen und Profil bleiben auf deinem Gerät. Nur Funktionen,
 > die du ausdrücklich einschaltest oder auslöst — Google-Drive-Abgleich, KI-
@@ -91,8 +91,9 @@ kein Nutzungsprofil.
 
 **Klartext:** Nach dem Laden ist das **Training selbst offlinefähig**.
 Netzzugriff wird nur für ausdrücklich gewählte Online-Funktionen benötigt.
-Drive-Abgleich, KI-Funktionen und Systembenachrichtigungen sind aus, bis du sie
-selbst aktivierst oder auslöst.
+Drive-Abgleich, KI-Funktionen und Systembenachrichtigungen sind aus,
+bis du sie anfasst. Erst eine ausdrückliche Aktivierung oder Aktion startet den
+jeweiligen Online-Weg.
 
 ## 6. Sicherung und Wiederherstellung
 
