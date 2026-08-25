@@ -88,6 +88,15 @@ const OBJECTS: Partial<Record<Language, readonly string[]>> = {
     'sfera di vetro', 'snowboard', 'telescopio', 'tostapane', 'trampolino', 'trombone', 'tuba',
     'aspirapolvere', 'xilofono', 'yo-yo', 'manubrio', 'cannone giocattolo', 'maschera subacquea', 'sveglia',
   ],
+  pt: [
+    'acordeão', 'aquário', 'armadura', 'banjo', 'bola de boliche', 'caldeirão', 'xilofone', 'gaiolão',
+    'capacete espacial', 'candelabro', 'dentadura', 'tabuleiro de xadrez', 'patinete', 'espantalho', 'catavento', 'globo terrestre',
+    'gramofone', 'torradeira', 'ouriço', 'relógio cuco', 'binóculo', 'poste de luz', 'manequim', 'microscópio',
+    'motocicleta', 'periscópio', 'trampolim', 'toca-discos', 'aspirador', 'banheira', 'braseiro', 'baú',
+    'crânio', 'diapasão', 'pernas de pau', 'harpa', 'luminária', 'maracas', 'biombo', 'esqueleto',
+    'trombone', 'peruca gigante', 'pinguim', 'sarcófago', 'máquina de escrever', 'cofre', 'cavalo de balanço',
+    'extintor', 'halter', 'paraquedas',
+  ],
 }
 
 function listFor(language: Language): readonly string[] {

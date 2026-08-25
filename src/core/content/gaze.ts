@@ -64,6 +64,10 @@ const OBJECT_NAMES: Readonly<Partial<Record<Language, Readonly<Record<GazeObject
     umbrella: 'ombrello', sun: 'sole', boat: 'barca', kite: 'aquilone', fish: 'pesce',
     bird: 'uccello', tree: 'albero', moon: 'luna', key: 'chiave', bell: 'campanella',
   },
+  pt: {
+    umbrella: 'guarda-chuva', sun: 'sol', boat: 'barco', kite: 'pipa', fish: 'peixe',
+    bird: 'pássaro', tree: 'árvore', moon: 'lua', key: 'chave', bell: 'sino',
+  },
 }
 
 const COLOR_NAMES: Readonly<Partial<Record<Language, Readonly<Record<GazeColor, string>>>>> = {
@@ -72,6 +76,7 @@ const COLOR_NAMES: Readonly<Partial<Record<Language, Readonly<Record<GazeColor, 
   fr: { red: 'rouge', blue: 'bleu', green: 'vert', yellow: 'jaune', purple: 'violet', orange: 'orange' },
   es: { red: 'rojo', blue: 'azul', green: 'verde', yellow: 'amarillo', purple: 'morado', orange: 'naranja' },
   it: { red: 'rosso', blue: 'blu', green: 'verde', yellow: 'giallo', purple: 'viola', orange: 'arancione' },
+  pt: { red: 'vermelho', blue: 'azul', green: 'verde', yellow: 'amarelo', purple: 'roxo', orange: 'laranja' },
 }
 
 /** Gibt es dieses Modul in dieser Sprache? */
