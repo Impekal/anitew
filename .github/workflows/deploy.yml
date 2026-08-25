@@ -50,9 +50,32 @@ jobs:
           cache: npm
       - run: npm ci --force
       - run: npm run build
+      # Web Push darf nicht davon abhängen, dass die drei VAPID-Secrets irgendwann
+      # einmal manuell gesetzt wurden. Das Skript rotiert vorhandene vollständige
+      # Schlüssel ausdrücklich nicht; fehlen alle drei, legt es sie einmalig an,
+      # ein inkonsistenter Teilzustand stoppt den Deploy statt still lokal
+      # zurückzufallen.
+      - name: Web-Push-Schlüssel sicherstellen
+        if: env.CLOUDFLARE_API_TOKEN != ''
+        run: node scripts/configure-push.mjs
       - name: Veröffentlichen
         if: env.CLOUDFLARE_API_TOKEN != ''
         run: npx wrangler deploy
+      # Ein grüner Build beweist keine reale Push-Konfiguration. Nach jeder
+      # Veröffentlichung muss deshalb der öffentliche VAPID-Endpunkt der echten
+      # Production-Worker-Fassung antworten; sonst ist der Deploy rot.
+      - name: Production Web Push prüfen
+        if: env.CLOUDFLARE_API_TOKEN != ''
+        run: |
+          node --input-type=module <<'NODE'
+          const url = 'https://anitew.impekaltech.workers.dev/push/vapid-public'
+          const response = await fetch(url, { cache: 'no-store' })
+          const body = await response.json().catch(() => ({}))
+          if (!response.ok || typeof body.publicKey !== 'string' || body.publicKey.length < 40) {
+            throw new Error(`Production Web Push ist nicht konfiguriert (HTTP ${response.status}).`)
+          }
+          console.log('Production Web Push ist konfiguriert.')
+          NODE
       - name: Hinweis, wenn kein Token hinterlegt ist
         if: env.CLOUDFLARE_API_TOKEN == ''
         run: |
