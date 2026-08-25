@@ -6,7 +6,7 @@ Angaben gemäß § 5 Digitale-Dienste-Gesetz (DDG).
 
 ## Diensteanbieter
 
-**Impekal**  
+**ANITEW by Impekal**  
 Inhaber: **Dr. Mèhèza Kalibani**  
 Holstenwall 24  
 20335 Hamburg  
@@ -14,8 +14,6 @@ Deutschland
 
 E-Mail: impekaltech+anitew@gmail.com  
 Telefon: +49 151 12784951
-
-ANITEW wird unter der Produkt- und Markenbezeichnung **Impekal** angeboten.
 
 ## Verantwortlich für dieses Angebot
 
