@@ -71,7 +71,20 @@ const es = [
   'embudo', 'estatua', 'farol', 'guitarra', 'isla', 'loro', 'nube', 'tractor',
 ]
 
-const POOLS: Partial<Record<Language, readonly string[]>> = { de, en, fr, es }
+const it = [
+  'ancora', 'aquilone', 'aratro', 'barile', 'bicicletta', 'bussola', 'campanile', 'candela',
+  'cannocchiale', 'cascata', 'castello', 'cavalletto', 'cesto', 'chiave', 'chitarra', 'clessidra',
+  'collina', 'corona', 'diga', 'faro', 'fischietto', 'fontana', 'forno', 'fulmine',
+  'gabbia', 'ghiacciaio', 'giostra', 'guanto', 'isola', 'lampione', 'lanterna', 'lente',
+  'mulino', 'nuvola', 'ombrello', 'pappagallo', 'pennello', 'ponte', 'pozzo', 'razzo',
+  'remo', 'ruota', 'sasso', 'scala', 'scarpa', 'secchio', 'slitta', 'specchio',
+  'stella', 'tamburo', 'tenda', 'timone', 'torre', 'tromba', 'tunnel', 'vulcano',
+  'alveare', 'aquila', 'botte', 'carota', 'ciminiera', 'delfino', 'elmetto', 'fenicottero',
+  'fisarmonica', 'foca', 'girasole', 'granaio', 'ippopotamo', 'locomotiva', 'mongolfiera', 'nido',
+  'pala', 'piramide', 'sedia', 'treno', 'violino', 'zoccolo', 'zattera', 'boa',
+]
+
+const POOLS: Partial<Record<Language, readonly string[]>> = { de, en, fr, es, it }
 
 /**
  * Der Wortvorrat einer Sprache.

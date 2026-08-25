@@ -55,6 +55,18 @@ test('lässt die Oberfläche deutsch und den Inhalt englisch werden', async ({ p
   expect(await itemLanguages(page)).toEqual(['en'])
 })
 
+test('trainiert Italienisch als eigene Reihe statt als englischen Rückfall', async ({ page }) => {
+  test.setTimeout(180_000)
+
+  await visit(page)
+  await expect(startButton(page)).toBeVisible()
+  await page.locator('.language-training select').selectOption('it')
+  await expect(page.locator('.language-training select')).toHaveValue('it')
+
+  await trainOnce(page)
+  expect(await itemLanguages(page)).toEqual(['it'])
+})
+
 test('legt für jede Trainingssprache eine eigene Reihe an (L5)', async ({ page }) => {
   test.setTimeout(240_000)
 
@@ -73,14 +85,14 @@ test('legt für jede Trainingssprache eine eigene Reihe an (L5)', async ({ page 
   expect(await itemLanguages(page)).toEqual(['de', 'en'])
 })
 
-test('sagt, warum nicht alle elf Sprachen zur Auswahl stehen', async ({ page }) => {
+test('sagt, warum nur vollständig trainierbare Sprachen zur Auswahl stehen', async ({ page }) => {
   await visit(page)
   await expect(startButton(page)).toBeVisible()
 
   // Angeboten wird nur, wofür es eigenen Inhalt gibt — und die App sagt das,
   // statt eine Sprache zu versprechen, in der sie englische Wörter zeigt.
   const options = await page.locator('.language-training select').locator('option').allTextContents()
-  expect(options).toEqual(['Deutsch', 'English', 'Français', 'Español'])
+  expect(options).toEqual(['Deutsch', 'English', 'Français', 'Español', 'Italiano'])
   await expect(page.getByText(/Eine Sprache anzubieten und dann englische Wörter/)).toBeVisible()
 
   /*
