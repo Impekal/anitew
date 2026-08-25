@@ -311,7 +311,7 @@ export function BackupPanel({
         </div>
       </div>
 
-      <div className="wipe">
+      <div className="wipe wipe-reset">
         <h3>{reset.heading}</h3>
         <p className="hint">{reset.scope}</p>
         {confirmWipe ? (
