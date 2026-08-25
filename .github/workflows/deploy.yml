@@ -48,7 +48,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
+      - run: npm ci --force
       - run: npm run build
       - name: Veröffentlichen
         if: env.CLOUDFLARE_API_TOKEN != ''
