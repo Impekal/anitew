@@ -5,8 +5,8 @@ import { pollFirstModule, startButton, visit } from './helpers.ts'
 /**
  * Memory Missions, im Browser nachgeprüft (Backlog H1, H2, H4).
  *
- * Eine Mission ist eine **Szene**, keine Liste: Person, Zimmer, Gegenstand mit
- * Lage, Uhrzeit, Restaurant — und sie gehören zusammen. Geprüft wird genau
+ * Eine Mission ist eine **Szene**, keine Liste: Person, Raum, Gegenstand mit
+ * Lage, Uhrzeit, Ort — und sie gehören zusammen. Geprüft wird genau
  * das, worauf es dabei ankommt und was in keinem anderen Modul vorkommt:
  *
  * 1. Die Szene steht **auf einmal** da, nicht Stück für Stück.
@@ -14,6 +14,10 @@ import { pollFirstModule, startButton, visit } from './helpers.ts'
  * 3. Gegenstand und Lage werden zusammen eingeprägt, aber getrennt abgefragt.
  * 4. Gezählt wird die richtige Antwort, und die Strenge hängt an der
  *    einzelnen Tatsache.
+ *
+ * H4 erweitert den historischen Hotel-Kontext um weitere reale Welten. Deren
+ * Raumnummern dürfen ein- bis dreistellig sein; das Hotel selbst bleibt im
+ * Kern separat auf seine bisherige dreistellige Form regressionsgeprüft.
  *
  * Der Notfallmodus reicht dafür: Eine Runde ist eine Szene.
  */
@@ -54,7 +58,9 @@ test('zeigt die Szene als Ganzes und fragt sie mit Anker ab', async ({ page }) =
   const place = scene.get('Restaurant') as string
   const [object = '', location = ''] = combinedObject.split(' · ')
 
-  expect(room).toMatch(/^[1-9][0-9]{2}$/)
+  // Hotel bleibt dreistellig; zusätzliche H4-Welten verwenden ebenfalls
+  // positive, reale Raumnummern, dürfen aber kürzer sein.
+  expect(room).toMatch(/^[1-9][0-9]{0,2}$/)
   expect(time).toMatch(/^(0[6-9]|1[0-9]|2[0-3]):[0-5][05]$/)
   expect(object.split(' ')).toHaveLength(2)
   expect(location.length).toBeGreaterThan(5)
@@ -101,13 +107,10 @@ test('zeigt die Szene als Ganzes und fragt sie mit Anker ab', async ({ page }) =
   expect(chips.some((chip) => chip.includes(person))).toBe(true)
 })
 
-/** Vertauscht die letzten beiden Ziffern — dieselbe Ziffern, anderes Zimmer. */
+/** Verändert die letzte Ziffer sicher — dieselbe Form, anderes Zimmer. */
 function swapDigits(value: string): string {
-  const [a, b] = [value.slice(-2, -1), value.slice(-1)]
-  if (a === b) {
-    return value.slice(0, -1) + String((Number(b) + 1) % 10)
-  }
-  return value.slice(0, -2) + b + a
+  const last = value.slice(-1)
+  return value.slice(0, -1) + String((Number(last) + 1) % 10)
 }
 
 /** Die letzten beiden Buchstaben vertauscht — ein Tippfehler, kein anderes Wort. */
