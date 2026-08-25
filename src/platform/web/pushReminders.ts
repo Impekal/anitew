@@ -8,6 +8,16 @@ function fromBase64Url(value: string): ArrayBuffer {
   return bytes.buffer
 }
 
+function sameKey(left: ArrayBuffer | null, right: ArrayBuffer): boolean {
+  if (left === null || left.byteLength !== right.byteLength) return false
+  const a = new Uint8Array(left)
+  const b = new Uint8Array(right)
+  for (let index = 0; index < a.length; index++) {
+    if (a[index] !== b[index]) return false
+  }
+  return true
+}
+
 async function post(path: string, body: unknown): Promise<Response> {
   return fetch(path, {
     method: 'POST',
@@ -19,19 +29,37 @@ async function post(path: string, body: unknown): Promise<Response> {
   })
 }
 
-export async function ensureWebPushSubscription(): Promise<PushSubscription> {
-  const registration = await navigator.serviceWorker.ready
-  const existing = await registration.pushManager.getSubscription()
-  if (existing !== null) return existing
-
+async function applicationServerKey(): Promise<ArrayBuffer> {
   const response = await fetch('/push/vapid-public', { cache: 'no-store' })
   if (!response.ok) throw new Error(`push_key_http_${response.status}`)
   const body = (await response.json()) as { publicKey?: unknown }
   if (typeof body.publicKey !== 'string' || body.publicKey === '') throw new Error('push_key_missing')
+  return fromBase64Url(body.publicKey)
+}
+
+export async function ensureWebPushSubscription(): Promise<PushSubscription> {
+  const registration = await navigator.serviceWorker.ready
+  const key = await applicationServerKey()
+  const existing = await registration.pushManager.getSubscription()
+
+  // Eine Subscription ist an genau den VAPID-Schlüssel gebunden, mit dem sie
+  // angelegt wurde. Falls Production einmal ohne vollständige Push-Secrets lief
+  // oder ein Schlüssel bewusst gewechselt wurde, darf ANITEW eine alte iPhone-
+  // Subscription nicht blind weiterverwenden: Der Server könnte sie sonst nie
+  // gültig signiert erreichen.
+  if (existing !== null && sameKey(existing.options.applicationServerKey, key)) return existing
+
+  if (existing !== null) {
+    // Serverseitigen Alarmzustand der alten Adresse best-effort entfernen. Das
+    // lokale unsubscribe ist die eigentliche Grenze; ein gerade nicht
+    // erreichbarer Worker darf die Reparatur nicht verhindern.
+    await post('/push/unsubscribe', { endpoint: existing.endpoint }).catch(() => undefined)
+    await existing.unsubscribe().catch(() => false)
+  }
 
   return registration.pushManager.subscribe({
     userVisibleOnly: true,
-    applicationServerKey: fromBase64Url(body.publicKey),
+    applicationServerKey: key,
   })
 }
 
