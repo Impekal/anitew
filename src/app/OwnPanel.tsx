@@ -281,7 +281,7 @@ export function OwnPanel({ language, dictionary }: { language: string; dictionar
           <img src={photo.url} alt={`${photoTexts.alt}: ${photo.name}`} />
           <figcaption className="own-photo-caption">
             <p className="own-photo-note">{photoTexts.note}</p>
-            <p className="own-photo-note own-photo-analysis-note">{photoTexts.analyzeNote}</p>
+            <p className="hint own-photo-analysis-note">{photoTexts.analyzeNote}</p>
             <div className="own-source-actions">
               <button
                 type="button"
@@ -296,7 +296,7 @@ export function OwnPanel({ language, dictionary }: { language: string; dictionar
               </button>
             </div>
             {photoAnalysisMessage !== undefined && (
-              <p className="own-photo-note own-photo-analysis-status" role="status" aria-live="polite">
+              <p className="hint own-photo-analysis-status" role="status" aria-live="polite">
                 {photoAnalysisMessage}
               </p>
             )}
