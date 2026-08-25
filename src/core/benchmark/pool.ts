@@ -67,7 +67,18 @@ const it = [
   'zerbino', 'zanzara', 'zucca', 'ceppo',
 ]
 
-const POOLS: Partial<Record<Language, readonly string[]>> = { de, en, fr, es, it }
+const pt = [
+  'alicate', 'almofada', 'antena', 'avental', 'balança', 'bengala', 'bigode', 'boia',
+  'broche', 'cabide', 'caderno', 'cafeteira', 'calça', 'câmera', 'carrinho', 'carteira',
+  'cebola', 'chaleira', 'chinelo', 'colher', 'cortina', 'dado', 'dominó', 'elefante',
+  'envelope', 'escaravelho', 'esponja', 'estante', 'fechadura', 'ferradura', 'fóssil', 'funil',
+  'gravata', 'hélice', 'ímã', 'janela', 'lagarto', 'lápis', 'lenço', 'maçã',
+  'mandolina', 'medalha', 'óculos', 'peruca', 'pinça', 'pregador', 'pulseira', 'raquete',
+  'rinoceronte', 'rolha', 'serrote', 'tesoura', 'tigela', 'torneira', 'travesseiro', 'trevo',
+  'tulipa', 'ventilador', 'xícara', 'iogurte',
+]
+
+const POOLS: Partial<Record<Language, readonly string[]>> = { de, en, fr, es, it, pt }
 
 /** Wörter je Messung. Zwanzig — die Zahl aus F5 („Day 1: 8/20“). */
 export const BENCHMARK_ITEMS = 20
