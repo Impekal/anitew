@@ -281,8 +281,8 @@ export function OwnPanel({ language, dictionary }: { language: string; dictionar
           <img src={photo.url} alt={`${photoTexts.alt}: ${photo.name}`} />
           <figcaption className="own-photo-caption">
             <p className="own-photo-note">{photoTexts.note}</p>
-            <p className="own-photo-analysis-note">{photoTexts.analyzeNote}</p>
-            <div className="own-photo-actions">
+            <p className="own-photo-note">{photoTexts.analyzeNote}</p>
+            <div className="own-source-actions">
               <button
                 type="button"
                 className="quiet own-photo-analyze"
@@ -296,7 +296,7 @@ export function OwnPanel({ language, dictionary }: { language: string; dictionar
               </button>
             </div>
             {photoAnalysisMessage !== undefined && (
-              <p className="own-photo-analysis-status" role="status" aria-live="polite">
+              <p className="own-photo-note own-photo-analysis-status" role="status" aria-live="polite">
                 {photoAnalysisMessage}
               </p>
             )}
@@ -321,9 +321,6 @@ export function OwnPanel({ language, dictionary }: { language: string; dictionar
                 initialSuggestions={photoSuggestions}
                 dictionary={dictionary}
                 onSaved={() => {
-                  // Rohtext und Foto haben ihren Zweck erfüllt. Das bestätigte
-                  // Material lebt jetzt im Graphen; flüchtige Quellen werden
-                  // danach verworfen statt als stille zweite Kopie zu bleiben.
                   setDraft('')
                   clearPhoto()
                 }}
