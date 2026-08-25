@@ -19,26 +19,17 @@ export type MissionWorld = (typeof MISSION_WORLDS)[number]
 export const FACT_SEPARATOR = '#'
 const OBJECT_LOCATION_SEPARATOR = ' · '
 
-export interface MissionFact {
-  kind: FactKind
-  value: string
-}
+export interface MissionFact { kind: FactKind; value: string }
+export interface Mission { person: string; facts: readonly MissionFact[] }
 
-export interface Mission {
-  person: string
-  facts: readonly MissionFact[]
-}
-
-const WORLD_PEOPLE: Record<
-  Exclude<MissionWorld, 'hotel'>,
-  Partial<Record<Language, readonly string[]>>
-> = {
+const WORLD_PEOPLE: Record<Exclude<MissionWorld, 'hotel'>, Partial<Record<Language, readonly string[]>>> = {
   conference: {
     de: ['Amandine', 'Malcolm', 'Beatriz', 'Jasper', 'Cordelia', 'Baptiste', 'Paloma', 'Xavier'],
     en: ['Farida', 'Konrad', 'Amandine', 'Mateo', 'Beatriz', 'Gaspard', 'Paloma', 'Hannes'],
     fr: ['Farida', 'Kenneth', 'Beatriz', 'Konrad', 'Cordelia', 'Mateo', 'Yasmin', 'Jasper'],
     es: ['Farida', 'Kenneth', 'Amandine', 'Konrad', 'Cordelia', 'Gaspard', 'Yasmin', 'Jasper'],
     it: ['Caterina', 'Domenico', 'Fiorella', 'Gregorio', 'Livia', 'Marcello', 'Noemi', 'Saverio'],
+    pt: ['Amália', 'Bernardo', 'Catarina', 'Domingos', 'Eulália', 'Fernando', 'Gisele', 'Horácio'],
   },
   coworking: {
     de: ['Bridget', 'Damien', 'Almudena', 'Leonard', 'Fiona', 'Corentin', 'Candela', 'Quincy'],
@@ -46,6 +37,7 @@ const WORLD_PEOPLE: Record<
     fr: ['Dilara', 'Leonard', 'Almudena', 'Leopold', 'Fiona', 'Oskar', 'Candela', 'Quincy'],
     es: ['Dilara', 'Leonard', 'Violette', 'Leopold', 'Fiona', 'Corentin', 'Bridget', 'Quincy'],
     it: ['Beatrice', 'Corrado', 'Elena', 'Filippo', 'Greta', 'Luciano', 'Marta', 'Roberto'],
+    pt: ['Ícaro', 'Joana', 'Kleber', 'Lorena', 'Natanael', 'Olga', 'Paulo', 'Sabrina'],
   },
 }
 
@@ -70,9 +62,9 @@ export function missionPool(legacyPeople: readonly string[], language: Language)
 }
 
 const WORLD_NAMES: Record<MissionWorld, Partial<Record<Language, string>>> = {
-  hotel: { de: 'Hotel', en: 'Hotel', fr: 'Hôtel', es: 'Hotel', it: 'Hotel' },
-  conference: { de: 'Konferenz', en: 'Conference', fr: 'Conférence', es: 'Conferencia', it: 'Conferenza' },
-  coworking: { de: 'Coworking', en: 'Coworking', fr: 'Espace de travail', es: 'Coworking', it: 'Coworking' },
+  hotel: { de: 'Hotel', en: 'Hotel', fr: 'Hôtel', es: 'Hotel', it: 'Hotel', pt: 'Hotel' },
+  conference: { de: 'Konferenz', en: 'Conference', fr: 'Conférence', es: 'Conferencia', it: 'Conferenza', pt: 'Conferência' },
+  coworking: { de: 'Coworking', en: 'Coworking', fr: 'Espace de travail', es: 'Coworking', it: 'Coworking', pt: 'Coworking' },
 }
 
 export function missionWorldLabel(item: string, language: Language): string {
@@ -80,13 +72,13 @@ export function missionWorldLabel(item: string, language: Language): string {
   return WORLD_NAMES[world][language] ?? WORLD_NAMES[world][FALLBACK_LANGUAGE] ?? world
 }
 
-/** Hotel-Bausteine sind die bereits veröffentlichte Fassung und bleiben exakt. */
 const COLOURS: Partial<Record<Language, readonly string[]>> = {
   de: ['roter', 'blauer', 'grüner', 'gelber', 'schwarzer', 'weißer', 'grauer', 'brauner'],
   en: ['red', 'blue', 'green', 'yellow', 'black', 'white', 'grey', 'brown'],
   fr: ['rouge', 'bleu', 'vert', 'jaune', 'noir', 'blanc', 'gris', 'brun'],
   es: ['rojo', 'azul', 'verde', 'amarillo', 'negro', 'blanco', 'gris', 'marrón'],
   it: ['rosso', 'blu', 'verde', 'giallo', 'nero', 'bianco', 'grigio', 'marrone'],
+  pt: ['vermelho', 'azul', 'verde', 'amarelo', 'preto', 'branco', 'cinza', 'marrom'],
 }
 
 const HOTEL_OBJECTS: Partial<Record<Language, readonly string[]>> = {
@@ -95,6 +87,7 @@ const HOTEL_OBJECTS: Partial<Record<Language, readonly string[]>> = {
   fr: ['sac', 'manteau', 'chapeau', 'foulard', 'gobelet', 'carnet', 'ballon', 'parapluie'],
   es: ['bolso', 'abrigo', 'sombrero', 'pañuelo', 'vaso', 'cuaderno', 'balón', 'paraguas'],
   it: ['trolley', 'ombrello', 'cappotto', 'cappello', 'zaino', 'foulard', 'bicchiere', 'portachiavi'],
+  pt: ['guarda-chuva', 'casaco', 'chapéu', 'cachecol', 'copo', 'chaveiro', 'livro', 'boné'],
 }
 
 const HOTEL_LOCATIONS: Partial<Record<Language, readonly string[]>> = {
@@ -103,6 +96,7 @@ const HOTEL_LOCATIONS: Partial<Record<Language, readonly string[]>> = {
   fr: ['près de la fenêtre', 'sous la table', 'sur la chaise', 'devant la porte', 'derrière le fauteuil', 'près du lit', 'sur la commode', 'sous la lampe'],
   es: ['junto a la ventana', 'debajo de la mesa', 'sobre la silla', 'delante de la puerta', 'detrás del sillón', 'junto a la cama', 'sobre la cómoda', 'debajo de la lámpara'],
   it: ['accanto alla finestra', 'sotto il tavolo', 'sulla sedia', 'davanti alla porta', 'dietro la poltrona', 'accanto al letto', 'sul comò', 'sotto la lampada'],
+  pt: ['ao lado da janela', 'debaixo da mesa', 'sobre a cadeira', 'diante da porta', 'atrás da poltrona', 'ao lado da cama', 'sobre a cômoda', 'debaixo da luminária'],
 }
 
 const HOTEL_PLACES: Partial<Record<Language, readonly string[]>> = {
@@ -111,41 +105,32 @@ const HOTEL_PLACES: Partial<Record<Language, readonly string[]>> = {
   fr: ['Luna', 'Marronnier', 'Orion', 'Bergerie', 'Sirène', 'Ancre', 'Cèdre', 'Aurore'],
   es: ['Luna', 'Olivo', 'Orion', 'Pradera', 'Sirena', 'Áncora', 'Cedro', 'Aurora'],
   it: ['Luna', 'Castagno', 'Orione', 'Corte', 'Sirena', 'Ancora', 'Cedro', 'Aurora'],
+  pt: ['Lua', 'Castanheira', 'Órion', 'Pátio', 'Sereia', 'Âncora', 'Cedro', 'Aurora'],
 }
 
-/**
- * Für die neuen Welten reichen vier klar unterscheidbare Bausteine pro Art.
- * Das hält die Szene kontextuell, ohne redundante Wörter in den Kaltstart zu
- * laden. Die Person + RNG liefern weiterhin deutlich mehr Kombinationen als
- * ein Nutzer in einer Einheit sieht.
- */
 const WORLD_OBJECTS: Record<Exclude<MissionWorld, 'hotel'>, Partial<Record<Language, readonly string[]>>> = {
   conference: {
     de: ['Ausweis', 'Ordner', 'Block', 'Stift'], en: ['badge', 'folder', 'notepad', 'pen'],
     fr: ['badge', 'dossier', 'carnet', 'stylo'], es: ['pase', 'carpeta', 'cuaderno', 'bolígrafo'],
-    it: ['pass', 'fascicolo', 'taccuino', 'pennarello'],
+    it: ['pass', 'fascicolo', 'taccuino', 'pennarello'], pt: ['crachá', 'fichário', 'bloco', 'marcador'],
   },
   coworking: {
     de: ['Kopfhörer', 'Ladekabel', 'Tablet', 'Rucksack'], en: ['headset', 'charger', 'tablet', 'backpack'],
     fr: ['casque', 'chargeur', 'tablette', 'sac'], es: ['auricular', 'cargador', 'tableta', 'bolso'],
-    it: ['cavo', 'caricatore', 'tablet', 'zaino'],
+    it: ['cavo', 'caricatore', 'tablet', 'zaino'], pt: ['fone', 'carregador', 'tablet', 'cabo'],
   },
 }
 
 const WORLD_LOCATIONS: Record<Exclude<MissionWorld, 'hotel'>, Partial<Record<Language, readonly string[]>>> = {
   conference: {
-    de: ['neben der Bühne', 'am Eingang', 'auf dem Pult', 'neben dem Beamer'],
-    en: ['beside the stage', 'at the entrance', 'on the lectern', 'beside the projector'],
-    fr: ['près de la scène', 'à l’entrée', 'sur le pupitre', 'près du projecteur'],
-    es: ['junto al escenario', 'en la entrada', 'sobre el atril', 'junto al proyector'],
-    it: ['accanto al palco', 'all’ingresso', 'sul leggio', 'accanto al proiettore'],
+    de: ['neben der Bühne', 'am Eingang', 'auf dem Pult', 'neben dem Beamer'], en: ['beside the stage', 'at the entrance', 'on the lectern', 'beside the projector'],
+    fr: ['près de la scène', 'à l’entrée', 'sur le pupitre', 'près du projecteur'], es: ['junto al escenario', 'en la entrada', 'sobre el atril', 'junto al proyector'],
+    it: ['accanto al palco', 'all’ingresso', 'sul leggio', 'accanto al proiettore'], pt: ['ao lado do palco', 'na entrada', 'sobre o púlpito', 'ao lado do projetor'],
   },
   coworking: {
-    de: ['am Fenster', 'neben dem Drucker', 'auf dem Sofa', 'auf dem Schreibtisch'],
-    en: ['by the window', 'beside the printer', 'on the sofa', 'on the desk'],
-    fr: ['près de la fenêtre', 'près de l’imprimante', 'sur le canapé', 'sur le bureau'],
-    es: ['junto a la ventana', 'junto a la impresora', 'sobre el sofá', 'sobre el escritorio'],
-    it: ['alla finestra', 'accanto alla stampante', 'sul divano', 'sulla scrivania'],
+    de: ['am Fenster', 'neben dem Drucker', 'auf dem Sofa', 'auf dem Schreibtisch'], en: ['by the window', 'beside the printer', 'on the sofa', 'on the desk'],
+    fr: ['près de la fenêtre', 'près de l’imprimante', 'sur le canapé', 'sur le bureau'], es: ['junto a la ventana', 'junto a la impresora', 'sobre el sofá', 'sobre el escritorio'],
+    it: ['alla finestra', 'accanto alla stampante', 'sul divano', 'sulla scrivania'], pt: ['junto à janela', 'ao lado da impressora', 'sobre o sofá', 'sobre a mesa de trabalho'],
   },
 }
 
@@ -153,12 +138,12 @@ const WORLD_PLACES: Record<Exclude<MissionWorld, 'hotel'>, Partial<Record<Langua
   conference: {
     de: ['Forum Atlas', 'Saal Nord', 'Agora', 'Studio Delta'], en: ['Atlas Forum', 'North Hall', 'Agora', 'Delta Studio'],
     fr: ['Forum Atlas', 'Salle Nord', 'Agora', 'Studio Delta'], es: ['Foro Atlas', 'Sala Norte', 'Ágora', 'Estudio Delta'],
-    it: ['Forum Atlante', 'Sala Nord', 'Agorà', 'Studio Delta'],
+    it: ['Forum Atlante', 'Sala Nord', 'Agorà', 'Studio Delta'], pt: ['Fórum Atlas', 'Sala Norte', 'Ágora', 'Estúdio Delta'],
   },
   coworking: {
     de: ['Atrium', 'Dachraum', 'Bibliothek', 'Innenhof'], en: ['Atrium', 'Roof Room', 'Library', 'Courtyard'],
     fr: ['Atrium', 'Salle du toit', 'Bibliothèque', 'Cour'], es: ['Atrio', 'Sala Terraza', 'Biblioteca', 'Patio'],
-    it: ['Atrio', 'Sala Terrazza', 'Biblioteca', 'Cortile'],
+    it: ['Atrio', 'Sala Terrazza', 'Biblioteca', 'Cortile'], pt: ['Átrio', 'Sala Terraço', 'Biblioteca', 'Pátio Interno'],
   },
 }
 
@@ -166,31 +151,23 @@ function listFor(pools: Partial<Record<Language, readonly string[]>>, language: 
   return pools[language] ?? (pools[FALLBACK_LANGUAGE] as readonly string[])
 }
 
-function worldList(
-  hotel: Partial<Record<Language, readonly string[]>>,
-  worlds: Record<Exclude<MissionWorld, 'hotel'>, Partial<Record<Language, readonly string[]>>>,
-  world: MissionWorld,
-  language: Language,
-): readonly string[] {
+function worldList(hotel: Partial<Record<Language, readonly string[]>>, worlds: Record<Exclude<MissionWorld, 'hotel'>, Partial<Record<Language, readonly string[]>>>, world: MissionWorld, language: Language): readonly string[] {
   return world === 'hotel' ? listFor(hotel, language) : listFor(worlds[world], language)
 }
 
 export function hasMissionPool(language: Language): boolean {
-  return COLOURS[language] !== undefined &&
-    HOTEL_OBJECTS[language] !== undefined && HOTEL_LOCATIONS[language] !== undefined && HOTEL_PLACES[language] !== undefined &&
-    MISSION_WORLDS.slice(1).every((world) => {
-      const next = world as Exclude<MissionWorld, 'hotel'>
-      return WORLD_OBJECTS[next][language] !== undefined && WORLD_LOCATIONS[next][language] !== undefined && WORLD_PLACES[next][language] !== undefined
-    })
+  return COLOURS[language] !== undefined && HOTEL_OBJECTS[language] !== undefined && HOTEL_LOCATIONS[language] !== undefined && HOTEL_PLACES[language] !== undefined && MISSION_WORLDS.slice(1).every((world) => {
+    const next = world as Exclude<MissionWorld, 'hotel'>
+    return WORLD_OBJECTS[next][language] !== undefined && WORLD_LOCATIONS[next][language] !== undefined && WORLD_PLACES[next][language] !== undefined
+  })
 }
 
-const ADJECTIVE_AFTER_NOUN: ReadonlySet<Language> = new Set<Language>(['fr', 'es', 'it'])
+const ADJECTIVE_AFTER_NOUN: ReadonlySet<Language> = new Set<Language>(['fr', 'es', 'it', 'pt'])
 
 export function missionFor(personOrItem: string, language: Language): Mission {
   const person = personOf(personOrItem)
   const world = missionWorldOf(person, language)
   const rng = createRng(world === 'hotel' ? `mission:${language}:${person}` : `mission:${language}:${world}:${person}`)
-
   const room = world === 'hotel' ? String(100 + rng.int(900)) : String(1 + rng.int(80))
   const colour = rng.pick(listFor(COLOURS, language))
   const noun = rng.pick(worldList(HOTEL_OBJECTS, WORLD_OBJECTS, world, language))
@@ -200,43 +177,28 @@ export function missionFor(personOrItem: string, language: Language): Mission {
   const time = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
   const place = rng.pick(worldList(HOTEL_PLACES, WORLD_PLACES, world, language))
   const location = rng.pick(worldList(HOTEL_LOCATIONS, WORLD_LOCATIONS, world, language))
-
-  return {
-    person,
-    facts: [
-      { kind: 'room', value: room },
-      { kind: 'object', value: `${object}${OBJECT_LOCATION_SEPARATOR}${location}` },
-      { kind: 'location', value: location },
-      { kind: 'time', value: time },
-      { kind: 'place', value: place },
-    ],
-  }
+  return { person, facts: [
+    { kind: 'room', value: room },
+    { kind: 'object', value: `${object}${OBJECT_LOCATION_SEPARATOR}${location}` },
+    { kind: 'location', value: location },
+    { kind: 'time', value: time },
+    { kind: 'place', value: place },
+  ] }
 }
 
-export function factId(person: string, kind: FactKind): string {
-  return `${personOf(person)}${FACT_SEPARATOR}${kind}`
-}
-
-export function missionFacts(person: string): readonly string[] {
-  const stablePerson = personOf(person)
-  return FACT_KINDS.map((kind) => factId(stablePerson, kind))
-}
-
+export function factId(person: string, kind: FactKind): string { return `${personOf(person)}${FACT_SEPARATOR}${kind}` }
+export function missionFacts(person: string): readonly string[] { const stablePerson = personOf(person); return FACT_KINDS.map((kind) => factId(stablePerson, kind)) }
 export function factKindOf(item: string): FactKind | undefined {
-  const cut = item.indexOf(FACT_SEPARATOR)
-  if (cut === -1) return undefined
+  const cut = item.indexOf(FACT_SEPARATOR); if (cut === -1) return undefined
   const kind = item.slice(cut + FACT_SEPARATOR.length)
   return (FACT_KINDS as readonly string[]).includes(kind) ? (kind as FactKind) : undefined
 }
-
 export function missionObjectFor(personOrItem: string, language: Language): string {
   const combined = missionFor(personOrItem, language).facts.find((fact) => fact.kind === 'object')?.value ?? ''
   return combined.split(OBJECT_LOCATION_SEPARATOR)[0] ?? combined
 }
-
 export function answerFor(item: string, language: Language): string | undefined {
-  const kind = factKindOf(item)
-  if (kind === undefined) return undefined
+  const kind = factKindOf(item); if (kind === undefined) return undefined
   const value = missionFor(personOf(item), language).facts.find((fact) => fact.kind === kind)?.value
   if (kind !== 'object' || value === undefined) return value
   return value.split(OBJECT_LOCATION_SEPARATOR)[0] ?? value
