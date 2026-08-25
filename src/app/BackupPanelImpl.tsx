@@ -22,6 +22,17 @@ interface ResetCopy {
   cloudFailed: string
 }
 
+interface SupportCopy {
+  heading: string
+  note: string
+  build: string
+  diagnostics: string
+  metrics: string
+  clear: string
+  saved: string
+  cleared: string
+}
+
 const RESET_DE: ResetCopy = {
   heading: 'Neu anfangen',
   scope:
@@ -50,20 +61,53 @@ const RESET_EN: ResetCopy = {
     'The ANITEW backup in Google Drive could not be deleted. Nothing was deleted locally.',
 }
 
+const SUPPORT_DE: SupportCopy = {
+  heading: 'Support & Beta',
+  note:
+    'Berichte werden nur auf diesem Gerät erzeugt und als Datei gespeichert. ANITEW sendet sie nicht automatisch. Diagnoseberichte enthalten keine Erinnerungstexte, Antworten, Fotos, API-Schlüssel oder OAuth-Tokens; der Beta-Bericht enthält nur aggregierte Zählwerte.',
+  build: 'Installierte Fassung',
+  diagnostics: 'Diagnosebericht speichern',
+  metrics: 'Beta-Bericht speichern',
+  clear: 'Lokales Fehlerprotokoll löschen',
+  saved: 'Bericht gespeichert.',
+  cleared: 'Lokales Fehlerprotokoll gelöscht.',
+}
+
+const SUPPORT_EN: SupportCopy = {
+  heading: 'Support & beta',
+  note:
+    'Reports are created only on this device and saved as files. ANITEW never sends them automatically. Diagnostic reports contain no memory text, answers, photos, API keys or OAuth tokens; the beta report contains aggregated counts only.',
+  build: 'Installed build',
+  diagnostics: 'Save diagnostic report',
+  metrics: 'Save beta report',
+  clear: 'Clear local error log',
+  saved: 'Report saved.',
+  cleared: 'Local error log cleared.',
+}
+
 function resetCopy(): ResetCopy {
   return document.documentElement.lang.toLowerCase().startsWith('de') ? RESET_DE : RESET_EN
 }
 
+function supportCopy(): SupportCopy {
+  return document.documentElement.lang.toLowerCase().startsWith('de') ? SUPPORT_DE : SUPPORT_EN
+}
+
+function downloadJson(name: string, value: unknown): void {
+  const blob = new Blob([JSON.stringify(value, null, 2)], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = name
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
 /**
- * Sicherung speichern und einlesen (Backlog N2).
+ * Sicherung, Recovery und freiwillige Support-Berichte.
  *
- * Der Anlass war kein theoretischer: Ein gelöschter Browserspeicher hat eine
- * Trainingshistorie mitgenommen. Deshalb steht der Hinweis hier auch **vor**
- * den Knöpfen und nicht als Kleingedrucktes darunter — wer nicht weiß, dass
- * alles nur auf diesem Gerät liegt, kommt nicht auf die Idee zu sichern.
- *
- * Bewusst zwei einfache Knöpfe und kein Assistent: Sichern ist etwas, das man
- * im Vorbeigehen tut, oder man tut es nie.
+ * Support-/Beta-Berichte bleiben genau wie die Sicherung unter Kontrolle des
+ * Menschen: ein Fingertipp erzeugt eine Datei, es gibt keinen Upload-Endpunkt.
  */
 export function BackupPanel({
   platform,
@@ -74,19 +118,15 @@ export function BackupPanel({
 }) {
   const t = dictionary.backup
   const reset = resetCopy()
+  const support = supportCopy()
   const fileInput = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState<string | undefined>()
-  // N4: Die einzige Rückfrage der App — weil das Löschen unwiderruflich ist.
   const [confirmWipe, setConfirmWipe] = useState(false)
   const [wipeDrive, setWipeDrive] = useState(false)
   const [wipePhrase, setWipePhrase] = useState('')
-  /*
-   * Wie viel Platz belegt ist (N5). Gemessen über navigator.storage, nicht
-   * geschätzt — und „etwa“, weil der Browser den Wert bewusst grob hält.
-   * Nach dem Löschen oder Einlesen neu, deshalb hängt es an `message`.
-   */
   const [usage, setUsage] = useState<string | undefined>()
+
   useEffect(() => {
     let cancelled = false
     void (async () => {
@@ -143,6 +183,50 @@ export function BackupPanel({
       setBusy(false)
       if (fileInput.current !== null) fileInput.current.value = ''
     }
+  }
+
+  const saveDiagnostics = () => {
+    setBusy(true)
+    setMessage(undefined)
+    void import('../platform/web/diagnostics.ts')
+      .then(async ({ createDiagnosticReport }) => {
+        const report = await createDiagnosticReport()
+        downloadJson(`anitew-diagnose-${Date.now()}.json`, report)
+        setMessage(support.saved)
+      })
+      .catch(() => setMessage(t.failed))
+      .finally(() => setBusy(false))
+  }
+
+  const saveMetrics = () => {
+    setBusy(true)
+    setMessage(undefined)
+    void import('../data/productMetrics.ts')
+      .then(async ({ loadProductMetrics }) => {
+        const metrics = await loadProductMetrics()
+        downloadJson(`anitew-beta-${Date.now()}.json`, {
+          build: { ...__ANITEW_BUILD__ },
+          createdAt: new Date().toISOString(),
+          metrics,
+          privacy: {
+            includesMemoryContent: false,
+            includesAnswerContent: false,
+            uploadedAutomatically: false,
+          },
+        })
+        setMessage(support.saved)
+      })
+      .catch(() => setMessage(t.failed))
+      .finally(() => setBusy(false))
+  }
+
+  const clearDiagnostics = () => {
+    void import('../platform/web/diagnostics.ts')
+      .then(({ clearLocalDiagnosticEvents }) => {
+        clearLocalDiagnosticEvents()
+        setMessage(support.cleared)
+      })
+      .catch(() => setMessage(t.failed))
   }
 
   const resetFromScratch = async () => {
@@ -208,7 +292,26 @@ export function BackupPanel({
         </p>
       )}
 
-      <div className="wipe">
+      <div className="wipe support-reports">
+        <h3>{support.heading}</h3>
+        <p className="hint">{support.note}</p>
+        <p className="hint">
+          {support.build}: {__ANITEW_BUILD__.version} · {__ANITEW_BUILD__.commit}
+        </p>
+        <div className="backup-actions">
+          <button type="button" className="quiet" disabled={busy} onClick={saveDiagnostics}>
+            {support.diagnostics}
+          </button>
+          <button type="button" className="quiet" disabled={busy} onClick={saveMetrics}>
+            {support.metrics}
+          </button>
+          <button type="button" className="quiet" disabled={busy} onClick={clearDiagnostics}>
+            {support.clear}
+          </button>
+        </div>
+      </div>
+
+      <div className="wipe wipe-reset">
         <h3>{reset.heading}</h3>
         <p className="hint">{reset.scope}</p>
         {confirmWipe ? (
