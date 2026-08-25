@@ -39,7 +39,7 @@ describe('worin sich trainieren lässt', () => {
   })
 
   it('bietet heute genau die an, die vollständig sind', () => {
-    expect([...trainingLanguages()]).toEqual(['de', 'en', 'fr', 'es', 'it'])
+    expect([...trainingLanguages()]).toEqual(['de', 'en', 'fr', 'es', 'it', 'pt'])
   })
 
   it('folgt ohne eigene Wahl der Oberfläche', () => {
@@ -56,6 +56,7 @@ describe('worin sich trainieren lässt', () => {
     expect(resolveTrainingLanguage('de', 'en')).toBe('de')
     expect(resolveTrainingLanguage('es', 'de')).toBe('es')
     expect(resolveTrainingLanguage('it', 'de')).toBe('it')
+    expect(resolveTrainingLanguage('pt', 'de')).toBe('pt')
   })
 
   it('behält eine Wahl nicht, für die es keinen Inhalt gibt', () => {
