@@ -89,6 +89,28 @@ const MEMORY_FORECAST_COPY: Readonly<Partial<Record<Language, MemoryForecastCopy
   },
 }
 
+export interface MemoryCountCopy {
+  readonly memoryOne: string
+  readonly memoryMany: string
+  readonly connectionOne: string
+  readonly connectionMany: string
+}
+
+const MEMORY_COUNT_COPY: Readonly<Partial<Record<Language, MemoryCountCopy>>> = {
+  de: {
+    memoryOne: 'Erinnerung',
+    memoryMany: 'Erinnerungen',
+    connectionOne: 'Verbindung',
+    connectionMany: 'Verbindungen',
+  },
+  en: {
+    memoryOne: 'memory',
+    memoryMany: 'memories',
+    connectionOne: 'connection',
+    connectionMany: 'connections',
+  },
+}
+
 function withMissionLocation(dictionary: Dictionary, language: Language): Dictionary {
   const copy =
     MISSION_LOCATION_COPY[language] ??
@@ -136,6 +158,21 @@ export function memoryForecastCopyFor(language: string): MemoryForecastCopy {
     MEMORY_FORECAST_COPY[FALLBACK_LANGUAGE] ??
     MEMORY_FORECAST_COPY.de
   return copy ?? { label: 'Forgetting forecast', value: 'FSRS: about {days} days.' }
+}
+
+export function memoryCountCopyFor(language: string): MemoryCountCopy {
+  const copy =
+    MEMORY_COUNT_COPY[language as Language] ??
+    MEMORY_COUNT_COPY[FALLBACK_LANGUAGE] ??
+    MEMORY_COUNT_COPY.de
+  return (
+    copy ?? {
+      memoryOne: 'memory',
+      memoryMany: 'memories',
+      connectionOne: 'connection',
+      connectionMany: 'connections',
+    }
+  )
 }
 
 export function dictionaryFor(language: Language): Dictionary {

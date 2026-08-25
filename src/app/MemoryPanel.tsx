@@ -16,7 +16,7 @@ import {
 import { loadDue } from '../data/items.ts'
 import { loadMemoryGraph, saveMemoryGraph, MEMORY_VISITED_KEY } from '../data/memoryStore.ts'
 import { removeMemoryNode } from '../core/index.ts'
-import { memoryForecastCopyFor, type Dictionary } from '../i18n/index.ts'
+import { memoryCountCopyFor, memoryForecastCopyFor, type Dictionary } from '../i18n/index.ts'
 
 import { MemoryConstellation } from './MemoryConstellation.tsx'
 import { scheduleDriveSync } from './driveSync.ts'
@@ -56,6 +56,7 @@ export function MemoryPanel({
 }) {
   const texts = dictionary.memory
   const forecastTexts = memoryForecastCopyFor(language)
+  const countTexts = memoryCountCopyFor(language)
   const deadlineTexts = memoryDeadlineCopyForCurrentUi()
 
   const [graph, setGraph] = useState<MemoryGraph>(createMemoryGraph())
@@ -141,6 +142,12 @@ export function MemoryPanel({
       )
       .map((node) => node.id),
   )
+  const connectionCount = graphConnectionCount(graph)
+  const graphCountText = `${graph.nodes.length} ${
+    graph.nodes.length === 1 ? countTexts.memoryOne : countTexts.memoryMany
+  } · ${connectionCount} ${
+    connectionCount === 1 ? countTexts.connectionOne : countTexts.connectionMany
+  }`
 
   const nextReviewText = (() => {
     if (selected === undefined) return texts.fsrsScheduled
@@ -260,11 +267,7 @@ export function MemoryPanel({
               </button>
             </section>
           )}
-          <p className="memory-counts">
-            {texts.counts
-              .replace('{nodes}', String(graph.nodes.length))
-              .replace('{edges}', String(graphConnectionCount(graph)))}
-          </p>
+          <p className="memory-counts">{graphCountText}</p>
 
           <div className="memory-lists">
             <section aria-label={texts.weakest}>

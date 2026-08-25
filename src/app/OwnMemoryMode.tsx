@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from 'react'
 
+import type { RememberSuggestions } from '../core/index.ts'
 import type { Dictionary } from '../i18n/index.ts'
 import { createWebPlatform } from '../platform/web/index.ts'
 import { RememberThisPanel } from './RememberThisPanel.tsx'
@@ -8,18 +9,18 @@ import { RememberThisPanel } from './RememberThisPanel.tsx'
  * Der MEMORY-MODE-Einstieg aus „Eigene Inhalte“ (I3).
  *
  * Keine zweite Engine und kein zweiter Datenweg: Wir verwenden exakt den
- * bestehenden Memory-Architekten. Der Entwurf wird nur als flüchtiger
- * Startwert hineingereicht; gespeichert wird weiterhin erst hinter dessen
- * ausdrücklicher Bestätigungstür. Der Plattformadapter zeigt auf dieselben
- * lokalen Einstellungen, denselben optionalen BYOK-Coach und denselben
- * stillen Drive-Abgleich wie „Mein Gedächtnis“.
+ * bestehenden Memory-Architekten. Der Entwurf oder bereits gewaschene
+ * Foto-Vorschläge werden nur flüchtig hineingereicht; gespeichert wird
+ * weiterhin erst hinter dessen ausdrücklicher Bestätigungstür.
  */
 export function OwnMemoryMode({
   draft,
+  initialSuggestions,
   dictionary,
   onSaved,
 }: {
   draft: string
+  initialSuggestions?: RememberSuggestions
   dictionary: Dictionary
   onSaved: () => void
 }) {
@@ -46,6 +47,7 @@ export function OwnMemoryMode({
         platform={platform}
         dictionary={dictionary}
         initialDraft={draft}
+        initialSuggestions={initialSuggestions}
         onSaved={() => onSaved()}
       />
     </div>

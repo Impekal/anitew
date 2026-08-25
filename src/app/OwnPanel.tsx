@@ -1,6 +1,11 @@
 import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react'
 
-import { type OwnFact, factPrompt, parseOwnText } from '../core/index.ts'
+import {
+  type OwnFact,
+  type RememberSuggestions,
+  factPrompt,
+  parseOwnText,
+} from '../core/index.ts'
 import { addOwnFacts, loadOwnFacts, loadOwnPool, removeOwnFact } from '../data/own.ts'
 import type { Dictionary } from '../i18n/index.ts'
 import { dictateLocally } from '../platform/web/localDictation.ts'
@@ -23,9 +28,24 @@ const PeopleScenario = lazy(() =>
 
 const MAX_LOCAL_PHOTO_BYTES = 15 * 1024 * 1024
 
+type PhotoAnalysisState =
+  | 'idle'
+  | 'busy'
+  | 'ready'
+  | 'empty'
+  | 'no-key'
+  | 'bad-key'
+  | 'offline'
+  | 'refused'
+  | 'failed'
+  | 'unsupported-provider'
+  | 'unsupported-image'
+
 interface LocalPhoto {
   readonly name: string
   readonly url: string
+  /** Nur Arbeitsspeicher. Wird nie in IndexedDB/Backup/Drive geschrieben. */
+  readonly file: File
 }
 
 /**
@@ -34,24 +54,13 @@ interface LocalPhoto {
  * Einfügen, ansehen, übernehmen: Die Vorschau zeigt live, welche Zeilen
  * Karten würden — und welche nicht, sichtbar statt verschluckt. Übernommen
  * wird erst auf Fingertipp (I4), gespeichert nur auf diesem Gerät (I6).
- * Jede Karte sagt dazu, wo sie steht: schon im Wiederholungsplan oder noch
- * auf dem Weg in die nächste Einheit.
  *
- * Ein Foto ist absichtlich nur eine lokale Arbeitsvorlage: Es lebt als
- * Objekt-URL im Arbeitsspeicher dieser Ansicht, nicht in IndexedDB. Damit
- * kann der Mensch Text daraus tippen oder lokal diktieren, ohne dass ANITEW
- * das Bild speichert, synchronisiert oder an einen Dienst sendet.
- *
- * Für zusammenhängenden Stoff führt derselbe Entwurf in den MEMORY MODE (I3):
- * Dort strukturiert der vorhandene Memory-Architekt lokal oder optional mit
- * dem eigenen KI-Schlüssel, der Mensch prüft die Vorschläge, und erst die
- * Bestätigung schreibt in den Memory Graph. Danach übernimmt die bestehende
- * Session-Engine Abruf und FSRS-Wiedersehen — keine zweite Lernmaschine.
- *
- * Das Alltagsszenario „Neue Menschen“ (I2) steht daneben strukturiert bereit:
- * mehrere Personen dürfen nicht durch denselben Ein-Anker-Freitextparser
- * laufen. Name und Merkmale werden deshalb explizit erfasst und erst nach
- * Vorschau und Bestätigung in denselben Graphen geschrieben.
+ * Ein Foto beginnt weiterhin als **rein lokale Arbeitsvorlage**. Erst der
+ * zusätzliche, ausdrücklich beschriftete Fingertipp „Foto auswerten“ lädt
+ * den Foto-Architekten nach. Der erstellt im Speicher eine verkleinerte Kopie
+ * ohne Dateimetadaten und sendet genau diese direkt zum **eigenen** gewählten
+ * BYOK-Anbieter. Dessen Antwort ist nur `RememberSuggestions`: Sie landet in
+ * derselben Memory-Mode-Vorschau wie Text-KI und schreibt niemals direkt.
  */
 export function OwnPanel({ language, dictionary }: { language: string; dictionary: Dictionary }) {
   const texts = dictionary.own
@@ -67,6 +76,8 @@ export function OwnPanel({ language, dictionary }: { language: string; dictionar
   >('idle')
   const [photo, setPhoto] = useState<LocalPhoto | null>(null)
   const [photoError, setPhotoError] = useState<string | undefined>()
+  const [photoAnalysisState, setPhotoAnalysisState] = useState<PhotoAnalysisState>('idle')
+  const [photoSuggestions, setPhotoSuggestions] = useState<RememberSuggestions | undefined>()
   const [memoryModeOpen, setMemoryModeOpen] = useState(false)
 
   const reload = useCallback(() => {
@@ -126,6 +137,11 @@ export function OwnPanel({ language, dictionary }: { language: string; dictionar
       .catch(() => setDictationState('failed'))
   }
 
+  const resetPhotoAnalysis = () => {
+    setPhotoAnalysisState('idle')
+    setPhotoSuggestions(undefined)
+  }
+
   const choosePhoto = (file: File | undefined) => {
     if (file === undefined) return
     if (!file.type.startsWith('image/')) {
@@ -137,12 +153,37 @@ export function OwnPanel({ language, dictionary }: { language: string; dictionar
       return
     }
     setPhotoError(undefined)
-    setPhoto({ name: file.name, url: URL.createObjectURL(file) })
+    resetPhotoAnalysis()
+    setPhoto({ name: file.name, url: URL.createObjectURL(file), file })
   }
 
   const clearPhoto = () => {
     setPhoto(null)
     setPhotoError(undefined)
+    resetPhotoAnalysis()
+  }
+
+  const analyzePhoto = () => {
+    if (photo === null || photoAnalysisState === 'busy') return
+    setPhotoAnalysisState('busy')
+    setPhotoSuggestions(undefined)
+    void (async () => {
+      const module = await import('../platform/web/photoArchitect.ts')
+      try {
+        const next = await module.suggestMemoriesFromPhoto(photo.file)
+        setPhotoSuggestions(next)
+        if (next.nodes.length === 0) {
+          setPhotoAnalysisState('empty')
+          return
+        }
+        setPhotoAnalysisState('ready')
+        setMemoryModeOpen(true)
+      } catch (error) {
+        setPhotoAnalysisState(
+          error instanceof module.PhotoArchitectError ? error.reason : 'failed',
+        )
+      }
+    })().catch(() => setPhotoAnalysisState('failed'))
   }
 
   const dictationStatus =
@@ -153,6 +194,29 @@ export function OwnPanel({ language, dictionary }: { language: string; dictionar
         : dictationState === 'failed'
           ? dictationTexts.failed
           : undefined
+
+  const photoAnalysisMessage = (() => {
+    switch (photoAnalysisState) {
+      case 'idle':
+      case 'busy':
+        return undefined
+      case 'ready':
+        return photoTexts.ready
+      case 'empty':
+        return photoTexts.empty
+      case 'no-key':
+        return photoTexts.noKey
+      case 'unsupported-provider':
+        return photoTexts.unsupportedProvider
+      case 'unsupported-image':
+        return photoTexts.unsupportedImage
+      case 'bad-key':
+      case 'offline':
+      case 'refused':
+      case 'failed':
+        return dictionary.coach.errors[photoAnalysisState]
+    }
+  })()
 
   return (
     <div className="own">
@@ -217,9 +281,25 @@ export function OwnPanel({ language, dictionary }: { language: string; dictionar
           <img src={photo.url} alt={`${photoTexts.alt}: ${photo.name}`} />
           <figcaption className="own-photo-caption">
             <p className="own-photo-note">{photoTexts.note}</p>
-            <button type="button" className="quiet own-photo-remove" onClick={clearPhoto}>
-              {photoTexts.remove}
-            </button>
+            <p className="hint own-photo-analysis-note">{photoTexts.analyzeNote}</p>
+            <div className="own-source-actions">
+              <button
+                type="button"
+                className="quiet own-photo-analyze"
+                onClick={analyzePhoto}
+                disabled={photoAnalysisState === 'busy'}
+              >
+                {photoAnalysisState === 'busy' ? photoTexts.analyzing : photoTexts.analyze}
+              </button>
+              <button type="button" className="quiet own-photo-remove" onClick={clearPhoto}>
+                {photoTexts.remove}
+              </button>
+            </div>
+            {photoAnalysisMessage !== undefined && (
+              <p className="hint own-photo-analysis-status" role="status" aria-live="polite">
+                {photoAnalysisMessage}
+              </p>
+            )}
           </figcaption>
         </figure>
       )}
@@ -238,14 +318,11 @@ export function OwnPanel({ language, dictionary }: { language: string; dictionar
             <Suspense fallback={null}>
               <OwnMemoryMode
                 draft={draft}
+                initialSuggestions={photoSuggestions}
                 dictionary={dictionary}
                 onSaved={() => {
-                  // Der Rohentwurf hat seinen Zweck erfüllt. Das bestätigte
-                  // Material lebt jetzt im Graphen; eine zweite stille Kopie
-                  // als Karte wäre genau die Doppelspur, die I3 vermeiden soll.
-                  // Der MEMORY MODE bleibt noch sichtbar, damit seine ruhige
-                  // Bestätigung nicht im selben Moment verschwindet.
                   setDraft('')
+                  clearPhoto()
                 }}
               />
             </Suspense>

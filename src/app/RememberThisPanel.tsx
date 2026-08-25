@@ -44,6 +44,7 @@ export function RememberThisPanel({
   dictionary,
   onSaved,
   initialDraft,
+  initialSuggestions,
 }: {
   platform: Platform
   dictionary: Dictionary
@@ -54,6 +55,12 @@ export function RememberThisPanel({
    * gewinnt seine Eingabe — spätere Prop-Änderungen überschreiben nichts.
    */
   initialDraft?: string
+  /**
+   * Bereits gewaschene Vorschläge, z. B. aus der ausdrücklich ausgelösten
+   * Fotoanalyse. Auch sie landen nur in der Vorschau; dieser Prop ist **kein**
+   * Schreibzugriff. Abwählen, Editieren und Bestätigen bleiben unverändert.
+   */
+  initialSuggestions?: RememberSuggestions
 }) {
   const texts = dictionary.memory
   const deadlineTexts = memoryDeadlineCopyForCurrentUi()
@@ -66,6 +73,14 @@ export function RememberThisPanel({
   const [deadlineInferred, setDeadlineInferred] = useState(false)
   const [deadlineError, setDeadlineError] = useState<string | undefined>()
   const appliedInitialDraft = useRef<string | undefined>(undefined)
+  const appliedInitialSuggestions = useRef<RememberSuggestions | undefined>(undefined)
+
+  // Der KI-Weg (D-037) ist ein Angebot, kein Pflichtpfad (M2): Er erscheint
+  // nur, wenn beim gewählten Coach-Anbieter ein eigener Schlüssel liegt.
+  const [aiProvider, setAiProvider] = useState<CoachProvider | undefined>(undefined)
+  const [aiBusy, setAiBusy] = useState(false)
+  const [aiFailure, setAiFailure] = useState<CoachFailure | undefined>(undefined)
+  const [fromAi, setFromAi] = useState(false)
 
   useEffect(() => {
     if (
@@ -79,12 +94,17 @@ export function RememberThisPanel({
     setDraft((current) => (current.trim() === '' ? initialDraft : current))
   }, [initialDraft])
 
-  // Der KI-Weg (D-037) ist ein Angebot, kein Pflichtpfad (M2): Er erscheint
-  // nur, wenn beim gewählten Coach-Anbieter ein eigener Schlüssel liegt.
-  const [aiProvider, setAiProvider] = useState<CoachProvider | undefined>(undefined)
-  const [aiBusy, setAiBusy] = useState(false)
-  const [aiFailure, setAiFailure] = useState<CoachFailure | undefined>(undefined)
-  const [fromAi, setFromAi] = useState(false)
+  useEffect(() => {
+    if (initialSuggestions === undefined || appliedInitialSuggestions.current === initialSuggestions) {
+      return
+    }
+    appliedInitialSuggestions.current = initialSuggestions
+    setSuggestions(initialSuggestions)
+    setDropped(new Set())
+    setSaved(false)
+    setFromAi(true)
+    setAiFailure(undefined)
+  }, [initialSuggestions])
 
   useEffect(() => {
     void (async () => {
