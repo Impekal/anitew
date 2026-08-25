@@ -12,10 +12,10 @@
  * erzeugten Antworten bleiben für immer unverändert**. Ein gelerntes Zimmer
  * darf nach einem App-Update nicht plötzlich ein anderes sein.
  *
- * Weitere Welten tragen deshalb einen stabilen Suffix am Anker, z. B.
- * `Elena~m:conference#room`. Der alte suffixlose Anker bedeutet weiterhin
- * Hotel. So können neue Szenen hinzukommen, ohne einen einzigen bestehenden
- * FSRS-Termin umzudeuten.
+ * Neue Welten bekommen deshalb **eigene Missionspersonen**, die im bisherigen
+ * Namensvorrat dieser Trainingssprache nicht vorkamen. Ihre IDs bleiben genau
+ * so menschlich lesbar (`Amandine#room`) und brauchen keinen technischen
+ * Suffix im Namen. Die Welt folgt deterministisch aus Name + Trainingssprache.
  */
 
 import { FALLBACK_LANGUAGE, type Language } from '../language.ts'
@@ -27,7 +27,6 @@ export type FactKind = (typeof FACT_KINDS)[number]
 export const MISSION_WORLDS = ['hotel', 'conference', 'coworking'] as const
 export type MissionWorld = (typeof MISSION_WORLDS)[number]
 
-const WORLD_SEPARATOR = '~m:'
 export const FACT_SEPARATOR = '#'
 const OBJECT_LOCATION_SEPARATOR = ' · '
 
@@ -38,58 +37,63 @@ export interface MissionFact {
 }
 
 export interface Mission {
-  /** Der echte Personenname, ohne technischen Welt-Suffix. */
   person: string
   facts: readonly MissionFact[]
 }
 
 /**
- * Der stabile Szenenanker. Das Hotel behält absichtlich die historische Form.
+ * Zusätzliche, kulturspezifische Missionspersonen. Sie stammen bewusst aus
+ * Namen, deren Geschlechtsinformation der Gesichtsgenerator bereits kennt,
+ * aber **nicht** aus dem Basis-Namenspool derselben Sprache. So entstehen neue
+ * stabile IDs, ohne alte Hotel-IDs umzudeuten oder bei Gesichtern neue
+ * Bart-/Gender-Heuristiken einzuführen.
  */
-export function missionAnchor(person: string, world: MissionWorld): string {
-  return world === 'hotel' ? person : `${person}${WORLD_SEPARATOR}${world}`
+const WORLD_PEOPLE: Record<Exclude<MissionWorld, 'hotel'>, Partial<Record<Language, readonly string[]>>> = {
+  conference: {
+    de: ['Amandine', 'Malcolm', 'Beatriz', 'Jasper', 'Cordelia', 'Baptiste', 'Paloma', 'Xavier'],
+    en: ['Farida', 'Konrad', 'Amandine', 'Mateo', 'Beatriz', 'Gaspard', 'Paloma', 'Hannes'],
+    fr: ['Farida', 'Kenneth', 'Beatriz', 'Konrad', 'Cordelia', 'Mateo', 'Yasmin', 'Jasper'],
+    es: ['Farida', 'Kenneth', 'Amandine', 'Konrad', 'Cordelia', 'Gaspard', 'Yasmin', 'Jasper'],
+  },
+  coworking: {
+    de: ['Bridget', 'Damien', 'Almudena', 'Leonard', 'Fiona', 'Corentin', 'Candela', 'Quincy'],
+    en: ['Dilara', 'Corentin', 'Almudena', 'Leopold', 'Violette', 'Damien', 'Candela', 'Oskar'],
+    fr: ['Dilara', 'Leonard', 'Almudena', 'Leopold', 'Fiona', 'Oskar', 'Candela', 'Quincy'],
+    es: ['Dilara', 'Leonard', 'Violette', 'Leopold', 'Fiona', 'Corentin', 'Bridget', 'Quincy'],
+  },
 }
 
-/** Entfernt nur die Tatsachenkennung, nicht den Welt-Suffix. */
-export function missionAnchorOf(item: string): string {
+function peopleFor(world: Exclude<MissionWorld, 'hotel'>, language: Language): readonly string[] {
+  return WORLD_PEOPLE[world][language] ?? (WORLD_PEOPLE[world][FALLBACK_LANGUAGE] as readonly string[])
+}
+
+/** Tatsachenkennung → Person. Die historische Semantik bleibt exakt gleich. */
+export function personOf(item: string): string {
   const cut = item.indexOf(FACT_SEPARATOR)
   return cut === -1 ? item : item.slice(0, cut)
 }
 
-function splitAnchor(anchorOrItem: string): { person: string; world: MissionWorld } {
-  const anchor = missionAnchorOf(anchorOrItem)
-  const cut = anchor.lastIndexOf(WORLD_SEPARATOR)
-  if (cut < 0) return { person: anchor, world: 'hotel' }
-
-  const person = anchor.slice(0, cut)
-  const candidate = anchor.slice(cut + WORLD_SEPARATOR.length)
-  const world = (MISSION_WORLDS as readonly string[]).includes(candidate)
-    ? (candidate as MissionWorld)
-    : 'hotel'
-  // Ein unbekannter Suffix wird nicht umgedeutet: Als historischer/plain Anker
-  // bleibt die ganze Zeichenkette Person im Hotel statt still Daten zu ändern.
-  return world === 'hotel' && candidate !== 'hotel'
-    ? { person: anchor, world: 'hotel' }
-    : { person, world }
-}
-
-/** Der echte Name für Gesicht, Anzeige und Gegenfragen. */
-export function personOf(item: string): string {
-  return splitAnchor(item).person
-}
-
-export function missionWorldOf(item: string): MissionWorld {
-  return splitAnchor(item).world
+/**
+ * Welt eines Ankers. Basisnamen sind immer Hotel; nur die explizit neuen
+ * Missionspersonen dieser Sprache bekommen eine andere Welt.
+ */
+export function missionWorldOf(item: string, language: Language): MissionWorld {
+  const person = personOf(item)
+  if (peopleFor('conference', language).includes(person)) return 'conference'
+  if (peopleFor('coworking', language).includes(person)) return 'coworking'
+  return 'hotel'
 }
 
 /**
- * Eine Person gehört im neuen Vorrat genau **einer** Welt. Dadurch sieht man
- * Vielfalt, ohne dieselbe Person in derselben Lernrotation mit drei parallelen
- * Lebensläufen zu überfrachten. Alte fällige Hotel-Szenen bleiben davon
- * unberührt, weil ihre gespeicherten Kennungen selbsttragend sind.
+ * Alter Hotel-Vorrat + neue Personen aus zwei weiteren Welten. Die Basisliste
+ * bleibt vollständig enthalten; nichts, was früher lernbar war, verschwindet.
  */
-export function missionPool(people: readonly string[]): string[] {
-  return people.map((person, index) => missionAnchor(person, MISSION_WORLDS[index % MISSION_WORLDS.length]!))
+export function missionPool(legacyPeople: readonly string[], language: Language): string[] {
+  return [
+    ...legacyPeople,
+    ...peopleFor('conference', language),
+    ...peopleFor('coworking', language),
+  ]
 }
 
 const WORLD_NAMES: Record<MissionWorld, Partial<Record<Language, string>>> = {
@@ -98,9 +102,9 @@ const WORLD_NAMES: Record<MissionWorld, Partial<Record<Language, string>>> = {
   coworking: { de: 'Coworking', en: 'Coworking', fr: 'Espace de travail', es: 'Coworking' },
 }
 
-/** Trainingskontext für den sichtbaren Szenen-/Abrufanker. */
+/** Trainingskontext für Szenenansicht und späteren Abruf. */
 export function missionWorldLabel(item: string, language: Language): string {
-  const world = missionWorldOf(item)
+  const world = missionWorldOf(item, language)
   return WORLD_NAMES[world][language] ?? WORLD_NAMES[world][FALLBACK_LANGUAGE] ?? world
 }
 
@@ -112,10 +116,7 @@ const COLOURS: Partial<Record<Language, readonly string[]>> = {
   es: ['rojo', 'azul', 'verde', 'amarillo', 'negro', 'blanco', 'gris', 'marrón'],
 }
 
-/**
- * Welt-spezifische Dinge. Die Hotel-Listen sind absichtlich bytegleich zur
- * ersten Fassung, damit suffixlose Alt-Anker exakt dieselben Szenen erzeugen.
- */
+/** Hotel-Listen bleiben exakt die erste Fassung; neue Welten haben eigene. */
 const OBJECTS: Record<MissionWorld, Partial<Record<Language, readonly string[]>>> = {
   hotel: {
     de: ['Koffer', 'Schirm', 'Mantel', 'Hut', 'Rucksack', 'Schal', 'Becher', 'Schlüssel'],
@@ -198,23 +199,21 @@ export function hasMissionPool(language: Language): boolean {
 /** Französisch und Spanisch stellen die Farbe hinter das Substantiv. */
 const ADJECTIVE_AFTER_NOUN: ReadonlySet<Language> = new Set<Language>(['fr', 'es'])
 
-export function missionFor(anchorOrItem: string, language: Language): Mission {
-  const anchor = missionAnchorOf(anchorOrItem)
-  const { person, world } = splitAnchor(anchor)
+export function missionFor(personOrItem: string, language: Language): Mission {
+  const person = personOf(personOrItem)
+  const world = missionWorldOf(person, language)
 
   /*
-   * **Legacy-Garantie:** suffixloses Hotel benutzt exakt den historischen
-   * Seed. Neue Welten dürfen ihren Suffix in den Seed nehmen; das kann keinen
-   * bereits gespeicherten Hotelwert verändern.
+   * **Legacy-Garantie:** Hotelpersonen benutzen exakt den historischen Seed.
+   * Neue Personen existierten vorher nicht und dürfen ihre Welt zusätzlich in
+   * den Seed nehmen. Kein gespeicherter Hotelwert kann sich dadurch ändern.
    */
   const rng = createRng(
-    world === 'hotel' && anchor === person
+    world === 'hotel'
       ? `mission:${language}:${person}`
-      : `mission:${language}:${anchor}`,
+      : `mission:${language}:${world}:${person}`,
   )
 
-  // Alle Welten behalten eine rein numerische Raum-/Stationsnummer: mobile
-  // Eingabe und exakte Bewertung bleiben damit dieselbe verlässliche Aufgabe.
   const room = world === 'hotel' ? String(100 + rng.int(900)) : String(1 + rng.int(80))
   const colour = rng.pick(listFor(COLOURS, language))
   const noun = rng.pick(listFor(OBJECTS[world], language))
@@ -229,8 +228,6 @@ export function missionFor(anchorOrItem: string, language: Language): Mission {
     person,
     facts: [
       { kind: 'room', value: room },
-      // Für die Szenenansicht hängen Gegenstand und Lage sichtbar zusammen.
-      // `answerFor()` trennt sie für die beiden späteren Fragen wieder.
       { kind: 'object', value: `${object} · ${location}` },
       { kind: 'location', value: location },
       { kind: 'time', value: time },
@@ -239,13 +236,13 @@ export function missionFor(anchorOrItem: string, language: Language): Mission {
   }
 }
 
-export function factId(anchor: string, kind: FactKind): string {
-  return `${missionAnchorOf(anchor)}${FACT_SEPARATOR}${kind}`
+export function factId(person: string, kind: FactKind): string {
+  return `${personOf(person)}${FACT_SEPARATOR}${kind}`
 }
 
-export function missionFacts(anchor: string): readonly string[] {
-  const stable = missionAnchorOf(anchor)
-  return FACT_KINDS.map((kind) => factId(stable, kind))
+export function missionFacts(person: string): readonly string[] {
+  const stablePerson = personOf(person)
+  return FACT_KINDS.map((kind) => factId(stablePerson, kind))
 }
 
 export function factKindOf(item: string): FactKind | undefined {
@@ -256,16 +253,16 @@ export function factKindOf(item: string): FactKind | undefined {
 }
 
 /** Der Gegenstand ohne seine Lage — nützlich, wenn die Lage separat gefragt wird. */
-export function missionObjectFor(anchorOrItem: string, language: Language): string {
+export function missionObjectFor(personOrItem: string, language: Language): string {
   const combined =
-    missionFor(anchorOrItem, language).facts.find((fact) => fact.kind === 'object')?.value ?? ''
+    missionFor(personOrItem, language).facts.find((fact) => fact.kind === 'object')?.value ?? ''
   return combined.split(OBJECT_LOCATION_SEPARATOR)[0] ?? combined
 }
 
 export function answerFor(item: string, language: Language): string | undefined {
   const kind = factKindOf(item)
   if (kind === undefined) return undefined
-  const value = missionFor(missionAnchorOf(item), language).facts.find((fact) => fact.kind === kind)?.value
+  const value = missionFor(personOf(item), language).facts.find((fact) => fact.kind === kind)?.value
   if (kind !== 'object' || value === undefined) return value
   return value.split(OBJECT_LOCATION_SEPARATOR)[0] ?? value
 }
