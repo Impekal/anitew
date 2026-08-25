@@ -84,7 +84,20 @@ const it = [
   'pala', 'piramide', 'sedia', 'treno', 'violino', 'zoccolo', 'zattera', 'boa',
 ]
 
-const POOLS: Partial<Record<Language, readonly string[]>> = { de, en, fr, es, it }
+const pt = [
+  'âncora', 'abelha', 'balde', 'barril', 'bicicleta', 'bússola', 'campainha', 'castelo',
+  'cavalo', 'chaminé', 'coelho', 'cometa', 'coroa', 'escada', 'espelho', 'farol',
+  'flauta', 'fogueira', 'fonte', 'garrafa', 'girassol', 'globo', 'guarda-chuva', 'ilha',
+  'lanterna', 'martelo', 'moinho', 'montanha', 'navio', 'ninho', 'panela', 'papagaio',
+  'pincel', 'pirâmide', 'ponte', 'poço', 'remo', 'relógio', 'roda', 'sapato',
+  'sino', 'tambor', 'telescópio', 'tenda', 'trompete', 'túnel', 'vela', 'vulcão',
+  'cachoeira', 'cacto', 'canoa', 'capacete', 'chave', 'cesta', 'colmeia', 'escova',
+  'estátua', 'estrela', 'folha', 'garfo', 'gato', 'geleira', 'guitarra', 'leque',
+  'livro', 'lua', 'macaco', 'mala', 'melancia', 'mochila', 'nuvem', 'pato',
+  'peixe', 'pena', 'pipa', 'prato', 'rio', 'sofá', 'trator', 'zebra',
+]
+
+const POOLS: Partial<Record<Language, readonly string[]>> = { de, en, fr, es, it, pt }
 
 /**
  * Der Wortvorrat einer Sprache.
