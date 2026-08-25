@@ -14,11 +14,14 @@
  *   allein die Messung (F).
  * - **Terminplanung bleibt FSRS.** Der Graph weiß, *was* zusammengehört
  *   und *wo* es wackelt; *wann* etwas wiederkommt, entscheidet der
- *   bestehende Wiederholungsplan.
+ *   bestehende Wiederholungsplan. Eine optionale I5-Deadline darf diesen
+ *   Plan nur vorziehen und danach beenden — sie ersetzt ihn nicht.
  *
  * Deterministisch wie der ganze Kern (D-010): Zeitpunkte werden
  * hereingereicht, nie gezogen — dieselbe Eingabe, derselbe Graph.
  */
+
+import type { DayKey } from '../time.ts'
 
 export type MemoryNodeType = 'person' | 'place' | 'fact' | 'number' | 'date' | 'concept' | 'custom'
 
@@ -34,6 +37,12 @@ export interface MemoryNode {
   /** Trainingsstärke 0..1 — Übungsstand, keine Gedächtnisaussage (R-1). */
   readonly strength: number
   readonly lastRecalledAt?: number
+  /** Optionales reales Ziel (I5): exakter Zeitpunkt, bis wann es gebraucht wird. */
+  readonly neededByAt?: number
+  /** Lokaler Kalendertag desselben Ziels — stabile Grenze für den Tagesplan (P6). */
+  readonly neededByDay?: DayKey
+  /** Konfliktauflösung für Geräteabgleich: jüngste bewusste Deadline-Änderung gewinnt. */
+  readonly neededByUpdatedAt?: number
 }
 
 export interface MemoryEdge {
@@ -88,10 +97,40 @@ export function addMemoryNode(
     createdAt: now,
     strength: clamp(input.strength ?? INITIAL_STRENGTH),
   }
-  // Neu gemerkt hebt den Grabstein auf — der Mensch hat es zurückgeholt.
   const removed = { ...graph.removed }
   delete removed[input.id]
   return { ...graph, nodes: [...graph.nodes, node], removed }
+}
+
+export function setMemoryDeadline(
+  graph: MemoryGraph,
+  nodeIds: readonly string[],
+  deadline: { at: number; day: DayKey } | undefined,
+  now: number,
+): MemoryGraph {
+  const ids = new Set(nodeIds)
+  let changed = false
+  const nodes = graph.nodes.map((node) => {
+    if (!ids.has(node.id)) return node
+    if (
+      deadline !== undefined &&
+      node.neededByAt === deadline.at &&
+      node.neededByDay === deadline.day
+    ) {
+      return node
+    }
+    changed = true
+    const { neededByAt: _at, neededByDay: _day, ...withoutDeadline } = node
+    return deadline === undefined
+      ? { ...withoutDeadline, neededByUpdatedAt: now }
+      : {
+          ...withoutDeadline,
+          neededByAt: deadline.at,
+          neededByDay: deadline.day,
+          neededByUpdatedAt: now,
+        }
+  })
+  return changed ? { ...graph, nodes } : graph
 }
 
 export function connectMemoryNodes(
@@ -119,11 +158,6 @@ export function connectMemoryNodes(
   return { ...graph, edges: [...graph.edges, edge] }
 }
 
-/**
- * Entfernt einen Knoten **und** alle seine Kanten — halbe Kanten gibt es
- * nicht. Zurück bleibt ein Grabstein, damit die Vereinigung mit einem
- * anderen Gerät das Entfernte nicht wieder hereinträgt.
- */
 export function removeMemoryNode(graph: MemoryGraph, nodeId: string, now: number): MemoryGraph {
   return {
     nodes: graph.nodes.filter((node) => node.id !== nodeId),
@@ -143,7 +177,6 @@ export function reinforceMemoryNode(graph: MemoryGraph, nodeId: string, now: num
   }
 }
 
-/** Ein misslungener Abruf: Die Stärke sinkt — die Auswahl übt es bevorzugt. */
 export function weakenMemoryNode(graph: MemoryGraph, nodeId: string, now: number): MemoryGraph {
   return {
     ...graph,
@@ -164,7 +197,6 @@ export function graphStrength(graph: MemoryGraph): number {
   return graph.nodes.reduce((sum, node) => sum + node.strength, 0) / graph.nodes.length
 }
 
-/** Die Kanten, die von einem Knoten ausgehen. */
 export function edgesFrom(graph: MemoryGraph, nodeId: string): readonly MemoryEdge[] {
   return graph.edges.filter((edge) => edge.from === nodeId)
 }
@@ -173,25 +205,14 @@ export function nodeById(graph: MemoryGraph, nodeId: string): MemoryNode | undef
   return graph.nodes.find((node) => node.id === nodeId)
 }
 
-/** Aufsteigend nach Stärke — vorn steht, was am meisten Zuwendung braucht. */
 export function nodesByStrength(graph: MemoryGraph): readonly MemoryNode[] {
   return [...graph.nodes].sort((a, b) => a.strength - b.strength || a.createdAt - b.createdAt)
 }
 
-/** Absteigend nach Alter — vorn das zuletzt Hinzugefügte. */
 export function latestNodes(graph: MemoryGraph, count: number): readonly MemoryNode[] {
   return [...graph.nodes].sort((a, b) => b.createdAt - a.createdAt).slice(0, count)
 }
 
-/**
- * Vereinigung zweier Graphen — die Regel der Sicherung (N9): nie stumm
- * löschen, bei zwei Fassungen desselben Knotens gewinnt die **längere
- * Geschichte** (ältestes createdAt, jüngstes lastRecalledAt, höhere
- * Stärke). Zwei Geräte, die getrennt liefen, haben beide recht — mit
- * einer Ausnahme: Ein Grabstein schlägt jedes **ältere** Lebenszeichen
- * (Entfernen war eine bewusste Tat), und ein jüngeres Lebenszeichen —
- * neu gemerkt oder nach dem Entfernen abgerufen — räumt den Grabstein weg.
- */
 export function mergeMemoryGraph(mine: MemoryGraph, theirs: MemoryGraph): MemoryGraph {
   const removed = new Map<string, number>()
   for (const [id, at] of [...Object.entries(mine.removed), ...Object.entries(theirs.removed)]) {
@@ -210,20 +231,30 @@ export function mergeMemoryGraph(mine: MemoryGraph, theirs: MemoryGraph): Memory
       .filter((at): at is number => at !== undefined)
       .sort((a, b) => b - a)[0]
     const detail = existing.detail ?? node.detail
-    nodes.set(node.id, {
+    const deadlineSource =
+      (node.neededByUpdatedAt ?? -1) > (existing.neededByUpdatedAt ?? -1) ? node : existing
+    const base: MemoryNode = {
       ...existing,
       createdAt: Math.min(existing.createdAt, node.createdAt),
       strength: Math.max(existing.strength, node.strength),
       ...(lastRecalledAt === undefined ? {} : { lastRecalledAt }),
       ...(detail === undefined ? {} : { detail }),
+    }
+    const { neededByAt: _at, neededByDay: _day, neededByUpdatedAt: _updated, ...withoutDeadline } = base
+    nodes.set(node.id, {
+      ...withoutDeadline,
+      ...(deadlineSource.neededByAt === undefined ? {} : { neededByAt: deadlineSource.neededByAt }),
+      ...(deadlineSource.neededByDay === undefined ? {} : { neededByDay: deadlineSource.neededByDay }),
+      ...(deadlineSource.neededByUpdatedAt === undefined
+        ? {}
+        : { neededByUpdatedAt: deadlineSource.neededByUpdatedAt }),
     })
   }
 
-  // Grabstein gegen Lebenszeichen: Bei Gleichstand gewinnt das Entfernen.
   for (const [id, at] of removed) {
     const node = nodes.get(id)
     if (node === undefined) continue
-    const lastSign = Math.max(node.createdAt, node.lastRecalledAt ?? 0)
+    const lastSign = Math.max(node.createdAt, node.lastRecalledAt ?? 0, node.neededByUpdatedAt ?? 0)
     if (lastSign > at) removed.delete(id)
     else nodes.delete(id)
   }
@@ -247,24 +278,45 @@ export function mergeMemoryGraph(mine: MemoryGraph, theirs: MemoryGraph): Memory
   }
 }
 
-/**
- * Liest einen Graphen aus Unbekanntem — Einstellungen können aus einer
- * Sicherung kommen, und eine Sicherung kann alles enthalten. Kaputte
- * Knoten fallen heraus; Kanten ohne beide Enden auch.
- */
 export function readMemoryGraph(raw: unknown): MemoryGraph {
   if (typeof raw !== 'object' || raw === null) return createMemoryGraph()
   const candidate = raw as { nodes?: unknown; edges?: unknown; removed?: unknown }
-  const nodes = (Array.isArray(candidate.nodes) ? candidate.nodes : []).filter(
-    (node): node is MemoryNode =>
-      typeof node === 'object' &&
-      node !== null &&
-      typeof (node as MemoryNode).id === 'string' &&
-      typeof (node as MemoryNode).label === 'string' &&
-      typeof (node as MemoryNode).type === 'string' &&
-      typeof (node as MemoryNode).createdAt === 'number' &&
-      typeof (node as MemoryNode).strength === 'number',
-  )
+  const nodes = (Array.isArray(candidate.nodes) ? candidate.nodes : [])
+    .filter(
+      (node): node is MemoryNode =>
+        typeof node === 'object' &&
+        node !== null &&
+        typeof (node as MemoryNode).id === 'string' &&
+        typeof (node as MemoryNode).label === 'string' &&
+        typeof (node as MemoryNode).type === 'string' &&
+        typeof (node as MemoryNode).createdAt === 'number' &&
+        typeof (node as MemoryNode).strength === 'number',
+    )
+    .map((node) => {
+      /*
+       * Das Spreizen eines fremden Objekts vor der Prüfung würde ungültige
+       * optionale Felder versehentlich wieder mitnehmen. Deshalb werden die
+       * drei I5-Felder zuerst entfernt und nur validierte Werte zurückgesetzt.
+       */
+      const {
+        neededByAt,
+        neededByDay,
+        neededByUpdatedAt,
+        ...withoutDeadline
+      } = node
+      const validDay =
+        typeof neededByDay === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(neededByDay)
+          ? (neededByDay as DayKey)
+          : undefined
+      return {
+        ...withoutDeadline,
+        ...(typeof neededByAt === 'number' && Number.isFinite(neededByAt) ? { neededByAt } : {}),
+        ...(validDay === undefined ? {} : { neededByDay: validDay }),
+        ...(typeof neededByUpdatedAt === 'number' && Number.isFinite(neededByUpdatedAt)
+          ? { neededByUpdatedAt }
+          : {}),
+      }
+    })
   const known = new Set(nodes.map((node) => node.id))
   const edges = (Array.isArray(candidate.edges) ? candidate.edges : []).filter(
     (edge): edge is MemoryEdge =>
@@ -277,7 +329,6 @@ export function readMemoryGraph(raw: unknown): MemoryGraph {
       known.has((edge as MemoryEdge).from) &&
       known.has((edge as MemoryEdge).to),
   )
-  // Ältere Stände (vor den Grabsteinen) tragen keine — das ist ein leeres Feld.
   const removed =
     typeof candidate.removed === 'object' && candidate.removed !== null
       ? Object.fromEntries(

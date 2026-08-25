@@ -16,7 +16,7 @@
  * einzige Weg, der überhaupt zu einem zweiten Tag führt.
  */
 
-import type { DayKey } from '../time.ts'
+import { type DayKey, daysBetween } from '../time.ts'
 
 import { overdueBy } from './memory.ts'
 import type { Memory } from './memory.ts'
@@ -24,21 +24,64 @@ import type { Memory } from './memory.ts'
 export interface DueItem {
   itemId: string
   memory: Memory
+  /**
+   * I5: realer Kalendertag, **vor** dem ein persönlicher Inhalt gebraucht
+   * wird. Der exakte Zeitpunkt bleibt am Graph-Knoten; für den Tagesplan ist
+   * bewusst der lokale Tag die stabile Grenze (P6).
+   */
+  neededByDay?: DayKey
+}
+
+/**
+ * Deadline-Druck als kleine, erklärbare Stufen statt als zweiter Scheduler.
+ *
+ * - mehr als 7 Tage: FSRS allein
+ * - letzte 7 Tage: höchstens alle 2 Kalendertage
+ * - letzte 3 Tage: höchstens einmal pro Kalendertag
+ * - am Zieltag: **nie** — I5 sagt ausdrücklich „davor, nicht danach“
+ *
+ * Der Lerntag selbst wird nie doppelt benutzt. Die Funktion sagt nur, ob die
+ * Deadline einen *früheren* Abruf rechtfertigt; das eigentliche Ergebnis wird
+ * danach weiterhin ganz normal an FSRS zurückgegeben.
+ */
+function deadlineUrgency(item: DueItem, today: DayKey): number {
+  const neededByDay = item.neededByDay
+  if (neededByDay === undefined) return 0
+  const daysLeft = daysBetween(today, neededByDay)
+  if (daysLeft <= 0 || daysLeft > 7) return 0
+
+  const lastDay = item.memory.lastDay
+  if (lastDay === today) return 0
+  const daysSinceReview = lastDay === undefined ? Number.POSITIVE_INFINITY : daysBetween(lastDay, today)
+
+  if (daysLeft === 1) return daysSinceReview >= 1 ? 3 : 0
+  if (daysLeft <= 3) return daysSinceReview >= 1 ? 2 : 0
+  return daysSinceReview >= 2 ? 1 : 0
 }
 
 /**
  * Die fälligen Informationen, nach Dringlichkeit geordnet und gedeckelt.
  *
- * Reihenfolge: **am längsten überfällig zuerst**. Was am weitesten über
- * seinen Termin hinaus ist, ist am ehesten schon vergessen — und je länger es
- * liegen bleibt, desto teurer wird es. Bei gleichem Rückstand entscheidet die
- * Kennung, damit die Auswahl reproduzierbar bleibt (A11).
+ * Ohne Deadline bleibt die historische Regel exakt bestehen: **am längsten
+ * überfällig zuerst**. Bei I5 darf ein real naher Termin davor rücken. Am
+ * Zieltag und danach fällt der termingebundene Inhalt aus diesem Tagesplan —
+ * „für die Präsentation“ heißt nicht „nach der Präsentation“.
  */
 export function selectDue(items: readonly DueItem[], today: DayKey, limit: number): DueItem[] {
   if (limit <= 0) return []
   return items
-    .filter((item) => overdueBy(item.memory, today) >= 0)
+    .filter((item) => {
+      if (item.neededByDay !== undefined && daysBetween(item.neededByDay, today) >= 0) {
+        return false
+      }
+      return overdueBy(item.memory, today) >= 0 || deadlineUrgency(item, today) > 0
+    })
     .sort((a, b) => {
+      const urgency = deadlineUrgency(b, today) - deadlineUrgency(a, today)
+      if (urgency !== 0) return urgency
+      if (a.neededByDay !== undefined && b.neededByDay !== undefined && a.neededByDay !== b.neededByDay) {
+        return a.neededByDay.localeCompare(b.neededByDay)
+      }
       const difference = overdueBy(b.memory, today) - overdueBy(a.memory, today)
       return difference !== 0 ? difference : a.itemId.localeCompare(b.itemId)
     })

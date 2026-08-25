@@ -9,7 +9,9 @@ import { loadMemoryGraph, saveMemoryGraph } from '../data/memoryStore.ts'
 import { createWebPlatform } from '../platform/web/index.ts'
 import { scheduleDriveSync } from './driveSync.ts'
 import { peopleScenarioCopyForCurrentUi } from './peopleScenarioCopy.ts'
+import { memoryDeadlineCopyForCurrentUi, parseMemoryDeadline } from './memoryDeadline.ts'
 import './peopleScenario.css'
+import './memoryDeadline.css'
 
 interface PersonRow {
   readonly id: number
@@ -38,6 +40,7 @@ function splitFacts(value: string): string[] {
  */
 export function PeopleScenario() {
   const copy = peopleScenarioCopyForCurrentUi()
+  const deadlineTexts = memoryDeadlineCopyForCurrentUi()
   const platform = useMemo(() => createWebPlatform(), [])
   const [open, setOpen] = useState(false)
   const [rows, setRows] = useState<readonly PersonRow[]>([blankRow(1), blankRow(2)])
@@ -45,6 +48,7 @@ export function PeopleScenario() {
   const [preview, setPreview] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState<string | undefined>()
+  const [deadlineInput, setDeadlineInput] = useState('')
 
   useEffect(() => {
     let active = true
@@ -99,9 +103,21 @@ export function PeopleScenario() {
 
   const confirm = () => {
     if (!preview || suggestions.edges.length === 0 || saved) return
+    const now = platform.clock.now()
+    const deadline = deadlineInput === '' ? undefined : parseMemoryDeadline(deadlineInput)
+    if (deadlineInput !== '' && deadline === undefined) {
+      setError(deadlineTexts.invalid)
+      return
+    }
+    if (deadline !== undefined && deadline.at <= now) {
+      setError(deadlineTexts.past)
+      return
+    }
+    setError(undefined)
+
     void (async () => {
       const graph = await loadMemoryGraph()
-      const next = applyRememberedSuggestions(graph, suggestions, platform.clock.now())
+      const next = applyRememberedSuggestions(graph, suggestions, now, deadline)
       const newConnections = next.edges.length - graph.edges.length
       await saveMemoryGraph(next)
       platform.sound.play('remember')
@@ -157,6 +173,21 @@ export function PeopleScenario() {
               </div>
             ))}
           </div>
+
+          <label className="memory-deadline-field people-deadline-field">
+            <span>{deadlineTexts.label}</span>
+            <input
+              type="datetime-local"
+              className="people-deadline-input"
+              value={deadlineInput}
+              onChange={(event) => {
+                setDeadlineInput(event.target.value)
+                setSaved(false)
+                setError(undefined)
+              }}
+            />
+          </label>
+          <p className="hint memory-deadline-hint">{deadlineTexts.hint}</p>
 
           <div className="remember-actions">
             {rows.length < MAX_PEOPLE_SCENARIO && (

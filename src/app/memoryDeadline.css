@@ -1,0 +1,26 @@
+.memory-deadline-field {
+  display: grid;
+  gap: .35rem;
+  margin-top: .85rem;
+}
+
+.memory-deadline-field > span {
+  font-size: .82rem;
+  opacity: .78;
+}
+
+.memory-deadline-field input {
+  width: 100%;
+  min-height: 44px;
+  box-sizing: border-box;
+}
+
+.memory-deadline-hint,
+.memory-deadline-inferred {
+  margin-top: .35rem;
+}
+
+.memory-deadline-error {
+  margin-top: .4rem;
+  font-size: .86rem;
+}

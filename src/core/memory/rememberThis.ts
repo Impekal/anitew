@@ -15,6 +15,7 @@
  * Alltagswörter, statt Großschreibung mit Bedeutung zu verwechseln.
  */
 
+import type { DayKey } from '../time.ts'
 import {
   type MemoryGraph,
   type MemoryNodeType,
@@ -22,6 +23,7 @@ import {
   addMemoryNode,
   connectMemoryNodes,
   memoryNodeId,
+  setMemoryDeadline,
 } from './memoryGraph.ts'
 
 export interface RememberInput {
@@ -117,10 +119,7 @@ export function suggestMemories(input: RememberInput): RememberSuggestions {
   capitalized.forEach((candidate, index) => {
     const type: MemoryNodeType =
       index === 0
-        ? // Der erste benannte Gegenstand eines Merksatzes ist fast immer
-          // sein Subjekt — und Merksätze über das eigene Leben handeln
-          // fast immer von Menschen. Der Mensch korrigiert per Abwahl.
-          'person'
+        ? 'person'
         : PLACE_HINTS.has(candidate.before)
           ? 'place'
           : 'concept'
@@ -131,8 +130,6 @@ export function suggestMemories(input: RememberInput): RememberSuggestions {
   for (const match of text.matchAll(NUMBER)) push('number', match[0])
   for (const match of text.matchAll(QUOTED)) push('fact', match[1] ?? '')
 
-  // Gar nichts erkannt: Der ganze Satz wird eine Karte — besser eine
-  // ehrliche als eine geratene Struktur.
   if (nodes.length === 0) {
     push('fact', text.slice(0, 80), text.length > 80 ? text : undefined)
   }
@@ -152,11 +149,17 @@ export function suggestMemories(input: RememberInput): RememberSuggestions {
  * Bestätigte Vorschläge in den Graphen — nur die bestätigten: Der Mensch
  * hat vorher abgewählt, was nicht stimmt. Kanten, deren Enden abgewählt
  * wurden, fallen still mit (connectMemoryNodes prüft beide Enden).
+ *
+ * Die optionale I5-Deadline gehört zur **bewussten Bestätigung** desselben
+ * Vorgangs: Wenn gesetzt, bekommen genau diese bestätigten Knoten denselben
+ * realen Zielzeitpunkt und lokalen Zieltage. Ohne Wert bleibt eine bereits
+ * vorhandene Deadline unberührt.
  */
 export function applyRememberedSuggestions(
   graph: MemoryGraph,
   suggestions: RememberSuggestions,
   now: number,
+  deadline?: { at: number; day: DayKey },
 ): MemoryGraph {
   const normalized = normalizeRememberSuggestions(suggestions)
   let next = graph
@@ -165,6 +168,14 @@ export function applyRememberedSuggestions(
   }
   for (const edge of normalized.edges) {
     next = connectMemoryNodes(next, edge, now)
+  }
+  if (deadline !== undefined) {
+    next = setMemoryDeadline(
+      next,
+      normalized.nodes.map((node) => node.id),
+      deadline,
+      now,
+    )
   }
   return next
 }
