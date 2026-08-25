@@ -46,11 +46,14 @@ const GAZE_COLOR_NAME = new Map([
 
 /** Die Frage einer Mission und das Etikett, unter dem ihre Antwort steht. */
 const MISSION_LABEL_OF_QUESTION = new Map([
-  ['Welche Zimmernummer?', 'Zimmer'],
+  ['Welche Nummer?', 'Nummer'],
+  ['Welche Zimmernummer?', 'Nummer'],
   ['Was hatte sie oder er dabei?', 'Dabei'],
   ['Wo lag der Gegenstand?', 'Dabei'],
-  ['Wann ging es los?', 'Abfahrt'],
-  ['Wie hieß das Restaurant?', 'Restaurant'],
+  ['Wann war es?', 'Zeit'],
+  ['Wann ging es los?', 'Zeit'],
+  ['Wie hieß der Ort?', 'Ort'],
+  ['Wie hieß das Restaurant?', 'Ort'],
 ])
 
 /**
