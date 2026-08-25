@@ -26,31 +26,15 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.4rem;
-}
-
-.own-photo-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.35rem;
 }
 
 .own-photo-note,
-.own-photo-analysis-note,
-.own-photo-analysis-status,
 .own-photo-error {
   margin: 0;
   font-size: 0.82rem;
   line-height: 1.5;
   color: var(--ink-faint);
-}
-
-.own-photo-analysis-note {
-  max-width: 46rem;
-}
-
-.own-photo-analysis-status {
-  color: var(--ink);
 }
 
 .own-photo-error {
