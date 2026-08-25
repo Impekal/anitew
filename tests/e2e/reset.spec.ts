@@ -83,11 +83,12 @@ test('Neu anfangen löscht lokal vollständig, trennt Google, Push und optional 
   })
 
   await openPage(page, 'Sicherung')
-  await page.locator('.wipe').getByRole('button').first().click()
-  await page.locator('.wipe input[type=checkbox]').check()
-  await page.locator('.wipe-confirm-input').fill('ANITEW')
+  const reset = page.locator('.wipe-reset')
+  await reset.getByRole('button').first().click()
+  await reset.locator('input[type=checkbox]').check()
+  await reset.locator('.wipe-confirm-input').fill('ANITEW')
 
-  await page.locator('.wipe-go').click()
+  await reset.locator('.wipe-go').click()
   await expect.poll(() => deletedRemote).toBe(1)
   await expect.poll(() => loggedOut).toBe(1)
   await expect.poll(() => pushUnregistered).toBe(1)
