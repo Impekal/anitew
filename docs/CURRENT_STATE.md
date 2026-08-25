@@ -86,39 +86,40 @@ Palast, Zwillinge, visuelle Details und Benchmark.
 - English: fertig
 - Français: fertig
 - Español: fertig
-- Italiano: vollständig implementiert; finaler PR/Gate läuft am 2026-08-25
-- Português: vollständig implementiert; gezielte lokale Core-/Build-/Budget-/E2E-
-  Abnahme grün, finaler Integrations-PR folgt nach Italienisch
+- Italiano: vollständig implementiert; finaler PR #74 auf Head `b108c87f237d6c06d9f1fa0d4f6d612afe9d1543`. Typecheck, Core, Build, Push/Worker, Kaltstart, Smoke, OAuth/Reset/Core, Core-Endzustände, Layout und Desktop-Vollregression sind grün; Mobile Release Gate läuft noch.
+- Português: vollständig implementiert; bereinigter Head `002ee062dcfe9c3d8a83399c41241d7e7f35244a` lokal gezielt final grün: Core, Build, Kaltstartbudget und 2/2 relevante E2E. Finaler Integrations-PR folgt nach Italienisch.
 - Nederlands, Türkçe, العربية, 中文, 日本語: noch keine vollständigen sieben Pools;
   deshalb bewusst noch nicht als Trainingssprache freigeschaltet
 
+### Mission-UI-Polish
+
+- Branch `anitew-mission-ui-world-labels`
+- Head `935a7ae7df8d587a1178573150a643c7315e18d8`
+- Hotel-only Copy für gemeinsame Mission-Fact-Kinds durch weltneutrale Semantik ersetzt, ohne Mission-Daten, IDs oder Scheduler zu ändern.
+- Lokale gezielte Abnahme final grün: Core-i18n-Test, Build, Kaltstartbudget und Missions-E2E 1/1.
+- Integration erst nach dem laufenden Sprachblock, damit keine redundanten Vollgates entstehen.
+
 ## Echte offene Produktpunkte
 
-1. **Mission-UI-Semantik**
-   - Core-Welten sind korrekt.
-   - Die historische Oberfläche verwendet noch Hotelbegriffe für gemeinsame
-     Fact-Kinds. Ein separater UI-Polish-Branch ersetzt diese durch semantisch
-     korrekte, weltübergreifende Copy ohne IDs oder Scheduler zu ändern.
-
-2. **H3 verzögerte Mission-Abfrage**
+1. **H3 verzögerte Mission-Abfrage**
    - Ein garantiertes Wiederfragen nach 20 Minuten bei geschlossener App ist
      als reine Browser-PWA nicht zuverlässig planbar.
    - Gehört in den Native-/Store-Block; Browsercode soll dafür keine falsche
      Garantie vortäuschen.
 
-3. **Native / Stores**
+2. **Native / Stores**
    - Play-Store-Paketierung und Store-Formulare.
    - iOS-Entscheidung über nativen Mehrwert und Store-Paketierung.
    - iCloud bleibt ein späterer nativer Sync-Pfad; Drive/Backup sind bereits
      vorhanden.
 
-4. **Reale Produktionsabnahme**
+3. **Reale Produktionsabnahme**
    - Kein automatischer Deploy.
    - Nach finalem Produkt-Gate: realer iPhone-Test mit geschlossener Home-Screen-
      PWA, Sperrbildschirm-Push, Google-Anmeldung, sichtbarem Namen/E-Mail,
      Logout und Core-Zurücknavigation.
 
-5. **Weitere Trainingssprachen**
+4. **Weitere Trainingssprachen**
    - Optional für diesen Release. Nicht künstlich halb freischalten.
    - Jede neue Sprache muss wieder alle sieben Inhaltsquellen und eigene
      Abnahmetests erhalten.
@@ -145,10 +146,10 @@ werden:
 
 ## Release-Reihenfolge ab diesem Stand
 
-1. Italienisch final grün → merge.
+1. Italienisch #74: Mobile Gate grün → merge.
 2. Portugiesisch auf neuen Produkt-HEAD → ein finaler Integrations-Gate → merge.
-3. Mission-UI-Polish gezielt testen und integrieren.
-4. Historischen Backlog gegen diese Datei konsolidieren.
+3. Mission-UI-Polish auf neuen Produkt-HEAD → nur notwendige Integrationsprüfung → merge.
+4. Docs-State-Sync integrieren.
 5. Produktions-/Geräteabnahme.
 6. Native-/Store-Arbeit und zusätzliche Trainingssprachen nur danach oder als
    ausdrücklich separater Release-Block.
