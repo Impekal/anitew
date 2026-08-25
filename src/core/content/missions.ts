@@ -38,12 +38,14 @@ const WORLD_PEOPLE: Record<
     en: ['Farida', 'Konrad', 'Amandine', 'Mateo', 'Beatriz', 'Gaspard', 'Paloma', 'Hannes'],
     fr: ['Farida', 'Kenneth', 'Beatriz', 'Konrad', 'Cordelia', 'Mateo', 'Yasmin', 'Jasper'],
     es: ['Farida', 'Kenneth', 'Amandine', 'Konrad', 'Cordelia', 'Gaspard', 'Yasmin', 'Jasper'],
+    it: ['Caterina', 'Domenico', 'Fiorella', 'Gregorio', 'Livia', 'Marcello', 'Noemi', 'Saverio'],
   },
   coworking: {
     de: ['Bridget', 'Damien', 'Almudena', 'Leonard', 'Fiona', 'Corentin', 'Candela', 'Quincy'],
     en: ['Dilara', 'Corentin', 'Almudena', 'Leopold', 'Violette', 'Damien', 'Candela', 'Oskar'],
     fr: ['Dilara', 'Leonard', 'Almudena', 'Leopold', 'Fiona', 'Oskar', 'Candela', 'Quincy'],
     es: ['Dilara', 'Leonard', 'Violette', 'Leopold', 'Fiona', 'Corentin', 'Bridget', 'Quincy'],
+    it: ['Beatrice', 'Corrado', 'Elena', 'Filippo', 'Greta', 'Luciano', 'Marta', 'Roberto'],
   },
 }
 
@@ -68,9 +70,9 @@ export function missionPool(legacyPeople: readonly string[], language: Language)
 }
 
 const WORLD_NAMES: Record<MissionWorld, Partial<Record<Language, string>>> = {
-  hotel: { de: 'Hotel', en: 'Hotel', fr: 'Hôtel', es: 'Hotel' },
-  conference: { de: 'Konferenz', en: 'Conference', fr: 'Conférence', es: 'Conferencia' },
-  coworking: { de: 'Coworking', en: 'Coworking', fr: 'Espace de travail', es: 'Coworking' },
+  hotel: { de: 'Hotel', en: 'Hotel', fr: 'Hôtel', es: 'Hotel', it: 'Hotel' },
+  conference: { de: 'Konferenz', en: 'Conference', fr: 'Conférence', es: 'Conferencia', it: 'Conferenza' },
+  coworking: { de: 'Coworking', en: 'Coworking', fr: 'Espace de travail', es: 'Coworking', it: 'Coworking' },
 }
 
 export function missionWorldLabel(item: string, language: Language): string {
@@ -84,6 +86,7 @@ const COLOURS: Partial<Record<Language, readonly string[]>> = {
   en: ['red', 'blue', 'green', 'yellow', 'black', 'white', 'grey', 'brown'],
   fr: ['rouge', 'bleu', 'vert', 'jaune', 'noir', 'blanc', 'gris', 'brun'],
   es: ['rojo', 'azul', 'verde', 'amarillo', 'negro', 'blanco', 'gris', 'marrón'],
+  it: ['rosso', 'blu', 'verde', 'giallo', 'nero', 'bianco', 'grigio', 'marrone'],
 }
 
 const HOTEL_OBJECTS: Partial<Record<Language, readonly string[]>> = {
@@ -91,6 +94,7 @@ const HOTEL_OBJECTS: Partial<Record<Language, readonly string[]>> = {
   en: ['suitcase', 'umbrella', 'coat', 'hat', 'backpack', 'scarf', 'mug', 'key'],
   fr: ['sac', 'manteau', 'chapeau', 'foulard', 'gobelet', 'carnet', 'ballon', 'parapluie'],
   es: ['bolso', 'abrigo', 'sombrero', 'pañuelo', 'vaso', 'cuaderno', 'balón', 'paraguas'],
+  it: ['trolley', 'ombrello', 'cappotto', 'cappello', 'zaino', 'foulard', 'bicchiere', 'portachiavi'],
 }
 
 const HOTEL_LOCATIONS: Partial<Record<Language, readonly string[]>> = {
@@ -98,6 +102,7 @@ const HOTEL_LOCATIONS: Partial<Record<Language, readonly string[]>> = {
   en: ['beside the window', 'under the table', 'on the chair', 'in front of the door', 'behind the armchair', 'beside the bed', 'on the dresser', 'under the lamp'],
   fr: ['près de la fenêtre', 'sous la table', 'sur la chaise', 'devant la porte', 'derrière le fauteuil', 'près du lit', 'sur la commode', 'sous la lampe'],
   es: ['junto a la ventana', 'debajo de la mesa', 'sobre la silla', 'delante de la puerta', 'detrás del sillón', 'junto a la cama', 'sobre la cómoda', 'debajo de la lámpara'],
+  it: ['accanto alla finestra', 'sotto il tavolo', 'sulla sedia', 'davanti alla porta', 'dietro la poltrona', 'accanto al letto', 'sul comò', 'sotto la lampada'],
 }
 
 const HOTEL_PLACES: Partial<Record<Language, readonly string[]>> = {
@@ -105,6 +110,7 @@ const HOTEL_PLACES: Partial<Record<Language, readonly string[]>> = {
   en: ['Luna', 'Chestnut', 'Orion', 'Fieldhouse', 'Siren', 'Anchor', 'Cedar', 'Daybreak'],
   fr: ['Luna', 'Marronnier', 'Orion', 'Bergerie', 'Sirène', 'Ancre', 'Cèdre', 'Aurore'],
   es: ['Luna', 'Olivo', 'Orion', 'Pradera', 'Sirena', 'Áncora', 'Cedro', 'Aurora'],
+  it: ['Luna', 'Castagno', 'Orione', 'Corte', 'Sirena', 'Ancora', 'Cedro', 'Aurora'],
 }
 
 /**
@@ -117,10 +123,12 @@ const WORLD_OBJECTS: Record<Exclude<MissionWorld, 'hotel'>, Partial<Record<Langu
   conference: {
     de: ['Ausweis', 'Ordner', 'Block', 'Stift'], en: ['badge', 'folder', 'notepad', 'pen'],
     fr: ['badge', 'dossier', 'carnet', 'stylo'], es: ['pase', 'carpeta', 'cuaderno', 'bolígrafo'],
+    it: ['pass', 'fascicolo', 'taccuino', 'pennarello'],
   },
   coworking: {
     de: ['Kopfhörer', 'Ladekabel', 'Tablet', 'Rucksack'], en: ['headset', 'charger', 'tablet', 'backpack'],
     fr: ['casque', 'chargeur', 'tablette', 'sac'], es: ['auricular', 'cargador', 'tableta', 'bolso'],
+    it: ['cavo', 'caricatore', 'tablet', 'zaino'],
   },
 }
 
@@ -130,12 +138,14 @@ const WORLD_LOCATIONS: Record<Exclude<MissionWorld, 'hotel'>, Partial<Record<Lan
     en: ['beside the stage', 'at the entrance', 'on the lectern', 'beside the projector'],
     fr: ['près de la scène', 'à l’entrée', 'sur le pupitre', 'près du projecteur'],
     es: ['junto al escenario', 'en la entrada', 'sobre el atril', 'junto al proyector'],
+    it: ['accanto al palco', 'all’ingresso', 'sul leggio', 'accanto al proiettore'],
   },
   coworking: {
     de: ['am Fenster', 'neben dem Drucker', 'auf dem Sofa', 'auf dem Schreibtisch'],
     en: ['by the window', 'beside the printer', 'on the sofa', 'on the desk'],
     fr: ['près de la fenêtre', 'près de l’imprimante', 'sur le canapé', 'sur le bureau'],
     es: ['junto a la ventana', 'junto a la impresora', 'sobre el sofá', 'sobre el escritorio'],
+    it: ['alla finestra', 'accanto alla stampante', 'sul divano', 'sulla scrivania'],
   },
 }
 
@@ -143,10 +153,12 @@ const WORLD_PLACES: Record<Exclude<MissionWorld, 'hotel'>, Partial<Record<Langua
   conference: {
     de: ['Forum Atlas', 'Saal Nord', 'Agora', 'Studio Delta'], en: ['Atlas Forum', 'North Hall', 'Agora', 'Delta Studio'],
     fr: ['Forum Atlas', 'Salle Nord', 'Agora', 'Studio Delta'], es: ['Foro Atlas', 'Sala Norte', 'Ágora', 'Estudio Delta'],
+    it: ['Forum Atlante', 'Sala Nord', 'Agorà', 'Studio Delta'],
   },
   coworking: {
     de: ['Atrium', 'Dachraum', 'Bibliothek', 'Innenhof'], en: ['Atrium', 'Roof Room', 'Library', 'Courtyard'],
     fr: ['Atrium', 'Salle du toit', 'Bibliothèque', 'Cour'], es: ['Atrio', 'Sala Terraza', 'Biblioteca', 'Patio'],
+    it: ['Atrio', 'Sala Terrazza', 'Biblioteca', 'Cortile'],
   },
 }
 
@@ -172,7 +184,7 @@ export function hasMissionPool(language: Language): boolean {
     })
 }
 
-const ADJECTIVE_AFTER_NOUN: ReadonlySet<Language> = new Set<Language>(['fr', 'es'])
+const ADJECTIVE_AFTER_NOUN: ReadonlySet<Language> = new Set<Language>(['fr', 'es', 'it'])
 
 export function missionFor(personOrItem: string, language: Language): Mission {
   const person = personOf(personOrItem)
