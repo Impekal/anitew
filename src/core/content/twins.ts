@@ -47,7 +47,7 @@ const PAIRS: Readonly<Partial<Record<Language, readonly (readonly [string, strin
   it: [
     ['cassa', 'casa'], ['penna', 'panna'], ['sete', 'seta'], ['mela', 'vela'],
     ['collo', 'colpo'], ['manto', 'mento'], ['sale', 'sole'], ['cane', 'carne'],
-    ['vetro', 'metro'], ['notte', 'botte'], ['palco', 'parco'], ['riso', 'viso'],
+    ['vetro', 'metro'], ['notte', 'note'], ['palco', 'parco'], ['riso', 'viso'],
     ['lana', 'luna'], ['pasta', 'posta'], ['tetto', 'letto'],
   ],
 }
