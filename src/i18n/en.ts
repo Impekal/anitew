@@ -694,5 +694,6 @@ export const en: Dictionary = {
     heading: 'Settings',
     note: 'The same controls are also at the bottom of the start screen.',
     saveFailed: 'This setting could not be saved on the device. The previous one still applies.',
+    resetNote: 'If you want to start completely over: the way there is below. A backup under “Backup” is worth it first — afterwards nothing is left.',
   },
 }

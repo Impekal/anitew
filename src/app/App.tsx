@@ -96,6 +96,7 @@ import { OnboardingScreen } from './onboarding/OnboardingScreen.tsx'
 import { PalacePanel } from './PalacePanel.tsx'
 import { ProfilePanel } from './ProfilePanel.tsx'
 import { ReminderPanel } from './ReminderPanel.tsx'
+import { ResetPanel } from './ResetPanel.tsx'
 import { SciencePanel } from './SciencePanel.tsx'
 import { FoundationPanel } from './FoundationPanel.tsx'
 import { AchievementsLine } from './AchievementsLine.tsx'
@@ -1071,6 +1072,15 @@ export function App() {
               saveFailed={languageSaveFailed || trainingSaveFailed || sound.saveFailed}
             />
             <p className="hint">{dictionary.settings.note}</p>
+            {/*
+              Der Weg zurück auf null gehört dorthin, wo Menschen ihn suchen
+              (Runde 4, Nutzerwunsch) — dieselbe Komponente wie unter
+              „Sicherung", damit es nur einen Löschweg gibt. Der Hinweis
+              nennt vorher die Sicherung: Wer löscht, soll wissen, dass es
+              einen Weg gab, vorher etwas mitzunehmen.
+            */}
+            <p className="hint">{dictionary.settings.resetNote}</p>
+            <ResetPanel platform={platform} dictionary={dictionary} />
           </div>
         ),
       },

@@ -125,3 +125,87 @@ test('Neu anfangen löscht lokal vollständig, trennt Google, Push und optional 
   expect(state.localMarker).toBeNull()
   expect(state.sessionMarker).toBeNull()
 })
+
+test('„Neu anfangen" steht auch in den Einstellungen — und startet die App wie beim ersten Mal', async ({
+  page,
+}) => {
+  /*
+   * Runde 4, Nutzerwunsch: Der Weg zurück auf null lag nur unter
+   * „Sicherung". Dort ist er sachlich richtig aufgehoben, aber niemand
+   * sucht ihn dort — gefragt wird danach in den Einstellungen. Beide Seiten
+   * zeigen dieselbe Komponente; hier wird der Weg von den Einstellungen aus
+   * einmal komplett gegangen.
+   */
+  await visit(page)
+
+  // Etwas Echtes hinterlegen, damit „gelöscht" auch etwas heißt.
+  await page.evaluate(async () => {
+    const open = indexedDB.open('anitew')
+    const database: IDBDatabase = await new Promise((resolve, reject) => {
+      open.onsuccess = () => resolve(open.result)
+      open.onerror = () => reject(open.error)
+    })
+    await new Promise<void>((resolve, reject) => {
+      const tx = database.transaction('settings', 'readwrite')
+      tx.objectStore('settings').put({ key: 'sound', value: false })
+      tx.objectStore('settings').put({ key: 'profile.onboarding', value: { name: 'Testfall' } })
+      tx.oncomplete = () => resolve()
+      tx.onerror = () => reject(tx.error)
+    })
+  })
+  await openPage(page, 'Einstellungen')
+  const reset = page.locator('.wipe-reset')
+  await expect(reset).toBeVisible()
+
+  // Ohne Bestätigung passiert nichts: Erst die Warnung, dann das Wort.
+  await reset.getByRole('button').first().click()
+  await expect(reset.locator('.wipe-warn')).toBeVisible()
+  await expect(reset.locator('.wipe-go')).toBeDisabled()
+
+  await reset.locator('.wipe-confirm-input').fill('ANITEW')
+  await expect(reset.locator('.wipe-go')).toBeEnabled()
+  await reset.locator('.wipe-go').click()
+
+  // Die App startet neu und steht wieder am Anfang — wie frisch installiert.
+  await expect(page.locator('.arrival')).toBeVisible({ timeout: 15_000 })
+
+  const leftovers = await page.evaluate(async () => {
+    const open = indexedDB.open('anitew')
+    const database: IDBDatabase = await new Promise((resolve, reject) => {
+      open.onsuccess = () => resolve(open.result)
+      open.onerror = () => reject(open.error)
+    })
+    const count = (name: string) =>
+      new Promise<number>((resolve, reject) => {
+        const request = database.transaction(name).objectStore(name).count()
+        request.onsuccess = () => resolve(request.result)
+        request.onerror = () => reject(request.error)
+      })
+    return {
+      settings: await count('settings'),
+      sessions: await count('sessions'),
+      events: await count('events'),
+      itemStates: await count('itemStates'),
+      benchmarks: await count('benchmarks'),
+      lokal: window.localStorage.length,
+    }
+  })
+
+  expect(leftovers.sessions).toBe(0)
+  expect(leftovers.events).toBe(0)
+  expect(leftovers.itemStates).toBe(0)
+  expect(leftovers.benchmarks).toBe(0)
+  // Die App darf sich beim Neustart wieder Vorlieben anlegen — aber nichts
+  // von vorher: Der Testfall-Name aus dem Profil ist weg.
+  const profile = await page.evaluate(async () => {
+    const open = indexedDB.open('anitew')
+    const database: IDBDatabase = await new Promise((resolve) => {
+      open.onsuccess = () => resolve(open.result)
+    })
+    return new Promise<unknown>((resolve) => {
+      const request = database.transaction('settings').objectStore('settings').get('profile.onboarding')
+      request.onsuccess = () => resolve(request.result)
+    })
+  })
+  expect(profile).toBeUndefined()
+})
