@@ -208,6 +208,16 @@
 /* Pulse is a signal emerging from the world, not another dashboard card. */
 .memory-pulse {
   position: relative;
+  /*
+    Einspaltig — und das ist kein Geschmack, sondern die Bedingung dafür,
+    dass der Text überhaupt lesbar ist: Das Redesign-Stylesheet setzt hier
+    ein zweispaltiges Raster (`2.5rem 1fr`) mit der Marke in Spalte 1.
+    Unten wird die Marke aber absolut positioniert und damit aus dem Raster
+    genommen; der Textblock rutschte dadurch in die 40 px schmale erste
+    Spalte und lief senkrecht Wort für Wort nach unten (auf echtem iPhone
+    gefunden). Der Platz für die Marke kommt hier aus `padding-left`.
+  */
+  display: block !important;
   margin: 12px 0 4px !important;
   padding: 18px 0 20px 76px !important;
   border: 0 !important;

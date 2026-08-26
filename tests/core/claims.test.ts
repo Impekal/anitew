@@ -322,3 +322,44 @@ describe('Datenschutz-Aussagen sind an den Code gebunden (Runde 2)', () => {
     expect(worker).toMatch(/allowedPushHost/u)
   })
 })
+
+describe('die eigenen Seiten neben der App (Runde 3)', () => {
+  /*
+   * Impressum und Datenschutz sind echte Dateien, keine App-Ansichten. In
+   * der installierten PWA beantwortete der Navigations-Fallback sie mit der
+   * gecachten index.html — ein Tipp darauf sah aus, als starte ANITEW neu
+   * (auf echtem iPhone gefunden). Der Wächter bindet die Ausnahme an die
+   * Adressen, die der Fuß und das Installations-Gate wirklich verlinken.
+   */
+  const config = textOf('vite.config.ts')
+  const denylist = /navigateFallbackDenylist:\s*\[([\s\S]*?)\]/u.exec(config)?.[1] ?? ''
+
+  it('nimmt Impressum und Datenschutz vom PWA-Navigations-Fallback aus', () => {
+    expect(denylist).toMatch(/impressum\\\.html/u)
+    expect(denylist).toMatch(/datenschutz\\\.html/u)
+    // Die Worker-Endpunkte bleiben ebenfalls ausgenommen.
+    expect(denylist).toMatch(/oauth/u)
+    expect(denylist).toMatch(/push/u)
+  })
+
+  it('verlinkt genau die Adressen, die auch ausgenommen sind', () => {
+    for (const source of ['src/main.tsx', 'src/app/install/InstallGate.tsx']) {
+      const text = textOf(source)
+      for (const href of text.matchAll(/href="\/([a-z]+\.html)"/gu)) {
+        const file = href[1] as string
+        expect(
+          denylist.includes(file.replace('.', '\\.')),
+          `${source} verlinkt /${file}, aber der Fallback fängt es ab`,
+        ).toBe(true)
+      }
+    }
+  })
+
+  it('erzeugt beide Seiten aus den Dokumenten, mit Weg zurück in die App', () => {
+    const generator = textOf('scripts/privacy-page.mjs')
+    expect(generator).toMatch(/IMPRESSUM\.md/u)
+    expect(generator).toMatch(/PRIVACY\.md/u)
+    // Ohne Rücklink stünde man in der installierten App in einer Sackgasse.
+    expect(generator).toMatch(/<a href="\/">ANITEW<\/a>/u)
+  })
+})
