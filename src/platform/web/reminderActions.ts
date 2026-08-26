@@ -62,7 +62,13 @@ export async function scheduleReminder(reminder: Reminder, usePush: boolean): Pr
       await scheduleWebPush(reminder)
       return { ok: true, pushFailed: false }
     } catch {
-      return { ok: localSchedule(reminder), pushFailed: true }
+      // Der lokale Timer ist ein nützlicher Best-Effort-Fallback, solange die
+      // Seite offen bleibt. Er darf aber niemals als erfolgreicher
+      // geschlossen-App-Push zurückgemeldet werden: `Reminders.schedule()`
+      // verspricht laut Port genau, ob die angeforderte Erinnerung wirklich
+      // geplant wurde.
+      localSchedule(reminder)
+      return { ok: false, pushFailed: true }
     }
   }
   return { ok: localSchedule(reminder), pushFailed: false }

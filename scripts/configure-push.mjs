@@ -24,7 +24,10 @@ function wrangler(args, input) {
   return result.stdout ?? ''
 }
 
-const listed = wrangler(['secret', 'list', '--name', WORKER, '--json'])
+// Wrangler 4 exposes JSON output for Worker secrets through `--format json`.
+// Keep this explicit instead of relying on the default so parsing cannot change
+// merely because a CLI presentation default changes later.
+const listed = wrangler(['secret', 'list', '--name', WORKER, '--format', 'json'])
 let names = []
 try {
   names = JSON.parse(listed).map((entry) => entry.name)
@@ -61,8 +64,9 @@ const values = {
   VAPID_SUBJECT: SUBJECT,
 }
 
-for (const name of required) {
-  wrangler(['secret', 'put', name, '--name', WORKER], `${values[name]}\n`)
-}
+// `wrangler secret put` publishes a Worker version immediately. Three
+// sequential puts would therefore expose two transient, incomplete VAPID
+// configurations. Bulk uploads all three values in one operation instead.
+wrangler(['secret', 'bulk', '--name', WORKER], `${JSON.stringify(values)}\n`)
 
-console.log('Web-Push-Schlüssel wurden einmalig gesetzt. Private Schlüssel wurden nicht ausgegeben.')
+console.log('Web-Push-Schlüssel wurden einmalig und gemeinsam gesetzt. Private Schlüssel wurden nicht ausgegeben.')
