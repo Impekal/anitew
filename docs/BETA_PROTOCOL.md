@@ -4,6 +4,25 @@
 
 Ziel: Produktreife mit echten Menschen erhöhen, ohne Trackingdienst und ohne laufende Kosten.
 
+## Phase 0 — 3 bis 5 Personen, 7 Tage (Mikropilot)
+
+Vor Phase A: ein kurzer Durchlauf mit Menschen aus dem direkten Umfeld,
+um grobe Stolpersteine zu finden, bevor 20–30 Fremde sie finden.
+
+1. **Ablauf:** installieren → Onboarding ohne Hilfe → 7 Tage freie Nutzung.
+   Am Tag 1 und Tag 7 je ein kurzes Gespräch (die sechs Interviewfragen
+   aus Phase A, gekürzt auf: Was war unklar? Was hat gestört? Bist du
+   wiedergekommen — warum (nicht)?).
+2. **Daten:** ausschließlich der lokale Beta-Bericht (Sicherung →
+   „Beta-Bericht speichern“), vom Teilnehmenden selbst geteilt.
+   `returnOffsets` enthält 1 und 7 → D1/D7 ablesbar, ohne Tracking.
+3. **Abbruchkriterien:** Datenverlust, nicht zustellbarer Push trotz
+   „Gemerkt.“, Installations-/Offline-Startfehler → Pilot stoppen,
+   erst beheben (Prio-1-Regeln aus Phase A gelten ab Tag 1).
+4. **Erfolgskriterium für den Übergang zu Phase A:** alle 3–5 Personen
+   kommen ohne Erklärung durch Onboarding und erste Einheit; keine
+   Prio-1/2-Funde offen.
+
 ## Phase A — 20 bis 30 Personen, 14 Tage
 
 Teilnehmende nutzen ANITEW wie im Alltag. Es gibt keine Pflicht, täglich zu trainieren; gerade die freiwillige Rückkehr ist ein Produktsignal.

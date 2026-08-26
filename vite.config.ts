@@ -49,6 +49,15 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        /*
+          Der FSRS-Optimierer (WASI-Worker + Binding, zusammen ~400 KB) wird
+          bewusst NICHT vorgecached: Seine .wasm-Datei war es nie, offline
+          konnte er also ohnehin nie laufen — der Zyklus ist best-effort und
+          versucht es in der nächsten Online-Sitzung erneut. Ihn trotzdem
+          vorzuladen hieße, jede Veröffentlichung um ~400 KB Update-Verkehr
+          zu verteuern, ohne eine einzige Offline-Fähigkeit zu gewinnen.
+        */
+        globIgnores: ['**/fsrsOptimizerWasi-*.js', '**/wasi-worker-*.js'],
         // Der kleine Push-Handler bleibt eigenes, gut prüfbares JS und wird in
         // den von Workbox erzeugten Service Worker importiert.
         importScripts: ['push-sw.js'],

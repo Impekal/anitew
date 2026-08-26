@@ -48,6 +48,13 @@ Arabic and other RTL interfaces require an actual layout pass after translation:
 
 Japanese/Chinese support additionally requires checking line breaking, system font fallback and free-recall input/IME behaviour. These are product tests, not dictionary-completeness checks.
 
+Konkrete, im Code verifizierte Blocker (Stand 2026-08-26, Review):
+
+- **TR:** `grading.ts` nutzt locale-unabhängiges `toLowerCase()` — `IŞIK`/`ışık` werden falsch gewertet (Fix: `toLocaleLowerCase(language)` durchreichen). One-Edit-Leniency ist bei agglutinierenden Suffixen zu großzügig zu prüfen.
+- **AR:** Ta marbuta (`ة`/`ه`) und Alef maqsura (`ى`/`ي`) werden nicht gefaltet; Tatweel überlebt die Normalisierung; arabisch-indische Ziffern (`٣١٤`) scheitern an ASCII-`\d` in `numbers.ts`; `rememberThis` erkennt ohne Großbuchstaben keine Kandidaten; RTL-Layout: 0 von 27 Stylesheets nutzen logische Richtungen, kein `[dir]`-Selektor, kein RTL-E2E.
+- **ZH/JA:** `splitEntries` kennt weder Fullwidth- (`，`) noch ideografisches Komma (`、`) — freier Abruf unbenutzbar; Typo-Leniency-Schwelle (≥5 Zeichen) ist eine Latin-Annahme; keine Kana-Faltung (JA); Fullwidth-Ziffern scheitern; Missions-Wortstellung ist ein binärer Latin-Schalter; `own.ts`-Trenner verlangen ASCII. Erst `Intl.Segmenter`-basiertes Splitting und schriftspezifische Leniency machen diese Sprachen tragfähig.
+- **NL:** keine technischen Blocker — reiner Inhalts- und Review-Aufwand.
+
 ## 6. Adding a new interface language
 
 A new interface language is accepted only when all of the following are true:

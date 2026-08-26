@@ -2,9 +2,10 @@
 self.addEventListener('push', (event) => {
   event.waitUntil(
     (async () => {
+      const de = (self.navigator?.language ?? 'de').toLowerCase().startsWith('de')
       let notice = {
         title: 'ANITEW',
-        body: 'Zeit für dein Gedächtnis.',
+        body: de ? 'Zeit für dein Gedächtnis.' : 'Time for your memory.',
         tag: 'anitew-reminder',
       }
 

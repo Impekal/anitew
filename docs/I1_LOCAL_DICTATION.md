@@ -31,8 +31,15 @@ A selected or captured photo is deliberately a **temporary visual reference**, n
 - The browser exposes it to the panel through a `blob:` object URL only.
 - ANITEW never writes the photo bytes to IndexedDB, backup or Drive sync.
 - Reloading or leaving the mounted panel destroys the reference; replacing/removing it revokes the old object URL.
-- The photo is never sent to a coach/AI provider.
-- Only image MIME types up to 15 MB are accepted, avoiding accidental giant in-memory files.
+- The photo is never sent anywhere by selection, display or saving alone.
+  Since the later photo-analysis slice (I3), an **explicit** „Foto auswerten“
+  tap may send a downscaled, metadata-free JPEG copy to the user's chosen
+  BYOK vision provider (Gemini, Anthropic or OpenAI) — see PRIVACY §4/§10.
+- Only image MIME types up to 15 MB are accepted for the local reference; the
+  analysis path additionally re-encodes to ≤ 4.5 MB before any upload.
 - The user can type or locally dictate facts while looking at the photo; only the resulting text enters the normal preview/confirmation flow.
 
-Automatic extraction from a photo belongs to the later MEMORY MODE (I3). It must preserve the same rule as text/AI suggestions: **suggest first, human confirms before anything becomes training material**. Adding a large OCR dependency to the cold-start bundle or silently uploading an image would violate ANITEW's local-first and performance rules.
+Photo extraction (I3) has since shipped and preserves the same rule as
+text/AI suggestions: **suggest first, human confirms before anything becomes
+training material** — triggered only by the explicit analyze tap, never by
+selection. Adding a large OCR dependency to the cold-start bundle or silently uploading an image would violate ANITEW's local-first and performance rules.

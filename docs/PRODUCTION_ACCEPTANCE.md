@@ -85,7 +85,7 @@ die Dinge, die Browser-Simulation und GitHub Runner nicht beweisen können.
 7. Erwartet:
    - Foto bleibt lokale Referenz.
    - kein Netzwerkrequest wird durch Auswahl allein ausgelöst.
-8. Mit eigenem unterstützten BYOK-Anbieter `Foto auswerten` auslösen.
+8. Mit eigenem BYOK-Schlüssel bei **Gemini, Anthropic oder OpenAI** (die drei Foto-Anbieter) `Foto auswerten` auslösen.
 9. Erwartet:
    - Vorschläge erscheinen editierbar.
    - Persistenz erst nach derselben Bestätigung wie bei Texteingabe.

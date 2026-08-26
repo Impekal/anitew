@@ -23,6 +23,7 @@ export function useSoundSetting(platform: Platform) {
         if (cancelled || stored === undefined) return
         setEnabled(stored)
         platform.sound.setEnabled(stored)
+        document.documentElement.dataset.anitewSound = stored ? 'on' : 'off'
       })
       .catch(() => undefined)
     return () => {
@@ -38,6 +39,7 @@ export function useSoundSetting(platform: Platform) {
     // träge an. Beim Einschalten hört man gleich, was man eingeschaltet hat;
     // der Tipp ist zugleich die Geste, die iOS für die Tonausgabe verlangt.
     platform.sound.setEnabled(next)
+    document.documentElement.dataset.anitewSound = next ? 'on' : 'off'
     if (next) platform.sound.play('word', 2)
 
     /*

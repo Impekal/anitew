@@ -30,7 +30,7 @@ Weitere Anbieterangaben stehen im [Impressum](/impressum.html).
 
 ## 2. Was auf deinem Gerät gespeichert wird
 
-Im Browserspeicher (IndexedDB) liegen unter anderem:
+Im Browserspeicher (vor allem IndexedDB; daneben localStorage/sessionStorage für Gerätevorlieben wie Theme, Erststart-Marken und flüchtige Hinweise) liegen unter anderem:
 
 | Was | Wofür |
 |---|---|
@@ -114,7 +114,9 @@ dieses Gerät. Für die Zustellung speichert ANITEW serverseitig nur:
 - die Kennung der Erinnerung (`daily` oder `benchmark`),
 - den fälligen Zeitpunkt,
 - bei der täglichen Erinnerung Uhrzeit und IANA-Zeitzone,
-- den generischen Benachrichtigungstext.
+- den generischen Benachrichtigungstext — auch als kurze Zustell-Notiz, die
+  nach dem Auslösen so lange beim Server bereitliegt, bis dein Gerät sie
+  abholt oder das Push-Abonnement endet.
 
 **Nicht gespeichert werden dafür:** Trainingsantworten, Gedächtnisinhalte,
 Profil, Name, E-Mail-Adresse, Messwerte oder Sicherungsdateien.
@@ -148,13 +150,17 @@ Systembenachrichtigung und fällt auf den Hinweis „nur solange offen“ zurüc
 ## 9. Google-Drive-Abgleich
 
 Google Drive ist aus, bis du ihn selbst einschaltest. Die Anmeldung erfolgt
-über Google OAuth. Der Cloudflare Worker tauscht den Google-
-Autorisierungscode gegen Tokens und hält die Sitzung verschlüsselt in einem
-`HttpOnly`-Cookie des Browsers; der Token wird nicht in einer ANITEW-
-Nutzerdatenbank gespeichert. Das Gerät nutzt den Zugriff anschließend für den
-ANITEW-Ordner im eigenen Drive. Name/E-Mail, die in der Oberfläche zur
-Kontokontrolle angezeigt werden, werden lokal in ANITEWs Gerätespeicher
-gehalten und beim Trennen entfernt.
+über Google OAuth. ANITEW fordert dabei neben dem Drive-Zugriff die
+Google-Basisauskunft (`openid email profile`) an — nur damit die Oberfläche
+zeigen kann, als wer du verbunden bist. Der Cloudflare Worker tauscht den
+Google-Autorisierungscode gegen Tokens und hält die Sitzung — einschließlich
+des Google-Refresh-Tokens — verschlüsselt in einem `HttpOnly`-Cookie deines
+Browsers (Laufzeit bis zu 180 Tage; beim Abmelden sofort gelöscht und bei
+Google widerrufen). Es gibt keine ANITEW-Nutzerdatenbank, in der Tokens
+lägen. Das Gerät nutzt den Zugriff anschließend für den ANITEW-Ordner im
+eigenen Drive. Name/E-Mail, die in der Oberfläche zur Kontokontrolle
+angezeigt werden, werden lokal in ANITEWs Gerätespeicher gehalten und beim
+Trennen entfernt.
 
 Für Google gelten zusätzlich Googles Datenschutzbedingungen.
 
@@ -162,12 +168,12 @@ Für Google gelten zusätzlich Googles Datenschutzbedingungen.
 
 Der Coach und KI-Vorschläge sind aus, bis du einen eigenen Schlüssel hinterlegst
 und eine entsprechende Funktion ausdrücklich auslöst. Beim Text-Coach werden je
-nach Auswahl Gemini, Anthropic, Groq, OpenRouter oder Mistral unterstützt. Dann
-gehen Frage und der dafür beschriebene Zahlenkontext direkt an den gewählten
-KI-Anbieter. Eigene Erinnerungstexte werden nur bei einer von dir ausgelösten
-KI-Vorschlagsfunktion übertragen.
+nach Auswahl Gemini, Anthropic, OpenAI, Groq, OpenRouter oder Mistral
+unterstützt. Dann gehen Frage und der dafür beschriebene Zahlenkontext direkt an
+den gewählten KI-Anbieter. Eigene Erinnerungstexte werden nur bei einer von dir
+ausgelösten KI-Vorschlagsfunktion übertragen.
 
-Für Fotoanalyse werden nur Anbieter verwendet, die der aktuelle Foto-Pfad
+Für die Fotoanalyse werden ausschließlich Gemini, Anthropic oder OpenAI
 unterstützt. Wie in Abschnitt 4 beschrieben, wird dabei erst nach „Foto auswerten“
 eine vorbereitete Bildkopie übertragen.
 
@@ -179,7 +185,10 @@ Anbieter gilt zusätzlich dessen Datenschutzerklärung.
 Soweit ANITEW Daten nur auf deinem Gerät verarbeitet, bestimmst du durch Nutzung,
 Export und Löschen über ihren Bestand. Bei freiwillig aktivierten Online-
 Funktionen erfolgt die Verarbeitung zur Bereitstellung der jeweils ausdrücklich
-gewählten Funktion. Technische Infrastrukturprotokolle und Daten bei externen
+gewählten Funktion. Konkrete Fristen: Das verschlüsselte Google-Sitzungs-Cookie
+läuft nach spätestens 180 Tagen ab (beim Abmelden sofort); serverseitige
+Push-Einträge bestehen, bis der Termin zugestellt und abgeholt ist, du die
+Erinnerung beendest oder das Push-Abonnement endet. Technische Infrastrukturprotokolle und Daten bei externen
 Anbietern unterliegen zusätzlich deren gesetzlichen und vertraglichen
 Aufbewahrungsregeln.
 

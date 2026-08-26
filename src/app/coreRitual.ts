@@ -25,6 +25,16 @@ function clearTimer(timer: number | undefined): void {
 }
 
 function soundEnabled(): boolean {
+  /*
+    Die Wahrheit ist die gespeicherte Einstellung, gespiegelt als
+    Wurzel-Attribut (useSoundSetting). Der sichtbare Schalter ist nur auf
+    dem Startbildschirm im DOM — wer ihn abfragte, spielte auf Unterseiten
+    Klang und Haptik trotz ausgeschaltetem Ton. Solange das Attribut noch
+    nicht gesetzt ist (allererste Klicks vor dem Settings-Read), gilt die
+    Voreinstellung „an" — dieselbe wie überall.
+  */
+  const mirrored = root().dataset.anitewSound
+  if (mirrored !== undefined) return mirrored !== 'off'
   return document.querySelector('.sound-toggle')?.getAttribute('aria-pressed') !== 'false'
 }
 

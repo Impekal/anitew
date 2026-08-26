@@ -114,7 +114,13 @@ test('sagt, warum nur vollständig trainierbare Sprachen zur Auswahl stehen', as
    * `<select>` umschließt. Sein Text enthält damit auch alle Optionen, und
    * ein genauer Vergleich findet gar nichts mehr.
    */
-  // Die Oberfläche kann trotzdem alle elf.
+  /*
+    Die Oberfläche bietet nur an, was wirklich übersetzt ist
+    (TRANSLATION_WORKFLOW §6). Neun Einträge, die still auf Englisch
+    zurückfielen — Arabisch sogar als RTL-Dokument mit englischem Text —,
+    wären ein Versprechen ohne Deckung. Eine per Systemsprache aufgelöste,
+    noch unübersetzte Sprache bleibt mit ehrlicher Fußnote nutzbar.
+  */
   const ui = await page.locator('.language:not(.language-training) select').locator('option').allTextContents()
-  expect(ui.length).toBe(11)
+  expect(ui).toEqual(['Deutsch', 'English'])
 })
