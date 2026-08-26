@@ -273,13 +273,14 @@ describe('die Installationsanleitung (Q5)', () => {
   })
 })
 
-describe('Datenschutz-Aussagen sind an den Code gebunden (Runde 2)', () => {
+describe('Datenschutz-Aussagen sind an den Code gebunden (Runde 2, ergänzt in Runde 3)', () => {
   /*
-   * ChatGPTs Testqualitätsurteil traf einen Punkt: Ein Wächter, der nur
-   * prüft, ob PRIVACY bestimmte Wörter enthält, bindet die Aussage nicht an
-   * das Verhalten. Diese Tests binden jede Frist und jeden Ausschluss an die
-   * Stelle im Code, die sie wahr macht — ändert jemand den Code, ohne den
-   * Text zu ändern (oder umgekehrt), wird es rot.
+   * Diese Wächter prüfen, dass Text und Code nicht auseinanderlaufen — mehr
+   * können sie nicht. Dass die Zusagen tatsächlich **eingehalten** werden,
+   * beweisen die Verhaltenstests in `tests/worker/privacyGuarantees.test.ts`
+   * (R3-07, Runde 3): Sie spielen die Sätze aus §7 und §9 als echte Abläufe
+   * durch. Genau diese Arbeitsteilung hat Runde 3 nötig gemacht — ein
+   * Treffer auf `PENDING_TTL_MS` bewies eben nicht, dass die Frist hält.
    */
   const privacy = textOf('docs/PRIVACY.md')
   const worker = textOf('worker/index.js')
@@ -361,5 +362,31 @@ describe('die eigenen Seiten neben der App (Runde 3)', () => {
     expect(generator).toMatch(/PRIVACY\.md/u)
     // Ohne Rücklink stünde man in der installierten App in einer Sackgasse.
     expect(generator).toMatch(/<a href="\/">ANITEW<\/a>/u)
+  })
+})
+
+describe('jede Datenschutz-Zusage hat einen Verhaltenstest (R3-07)', () => {
+  /*
+   * Der Wächter über den Wächtern: Er hält fest, dass die Fristen aus
+   * PRIVACY nicht nur im Text und im Quelltext stehen, sondern in
+   * `tests/worker/privacyGuarantees.test.ts` als Ablauf durchgespielt
+   * werden. Verschwindet dort ein Fall, fällt es hier auf.
+   */
+  const behaviour = textOf('tests/worker/privacyGuarantees.test.ts')
+
+  it('prüft die Höchstfrist der Zustellnotiz am laufenden Durable Object', () => {
+    expect(behaviour).toMatch(/60 Minuten/u)
+    expect(behaviour).toMatch(/neben einer späteren Tageserinnerung/u)
+    expect(behaviour).toMatch(/bei dauerhaft gestörtem Pushdienst/u)
+  })
+
+  it('prüft beide Sitzungsfristen am echten Endpunkt', () => {
+    expect(behaviour).toMatch(/180 Tage/u)
+    expect(behaviour).toMatch(/30 Tagen/u)
+    expect(behaviour).toMatch(/session_expired/u)
+  })
+
+  it('prüft, dass nur die genannten Felder gespeichert werden', () => {
+    expect(behaviour).toMatch(/nur Adresse, Zeit, Zone und den generischen Text/u)
   })
 })

@@ -121,14 +121,25 @@ const MODE_ORDER: readonly TrainingMode[] = ['emergency', 'short', 'daily', 'ext
 
 export function App() {
   const platform = useMemo(() => createWebPlatform(), [])
-  const { language, dictionary, translated, ready, choose } = useLanguage(platform)
+  const {
+    language,
+    dictionary,
+    translated,
+    ready,
+    choose,
+    saveFailed: languageSaveFailed,
+  } = useLanguage(platform)
   /*
    * Worin trainiert wird, ist nicht dasselbe wie worin die App spricht (L7).
    * Ab hier heißt `language` die Oberfläche und `training` der Inhalt — jede
    * Stelle, die Wörter, Namen, Termine oder Messungen anfasst, nimmt
    * `training`.
    */
-  const { training, chooseTraining } = useTrainingLanguage(platform, language)
+  const {
+    training,
+    chooseTraining,
+    saveFailed: trainingSaveFailed,
+  } = useTrainingLanguage(platform, language)
   // Speichert dieses Gerät überhaupt? Sonst wird es gesagt (P7).
   const storagePersists = useStoragePersists(platform)
   const trainable = trainingLanguages()
@@ -725,12 +736,37 @@ export function App() {
       .finally(reloadBenchmark)
   }, [open, reloadBenchmark])
 
+  /*
+   * R3-04 (Runde 3): Der Startvorgang ist sofort gesperrt — synchron im Ref,
+   * damit ein zweiter Tipp gar nicht erst losläuft, und sichtbar über
+   * `starting`, damit der Knopf im selben Moment inaktiv wird. Die eigentliche
+   * Invariante liegt darunter in `beginRun`: Zwei parallele Starts können dort
+   * nicht zwei Messungen anlegen, und vor der Fälligkeit beginnt keine.
+   */
+  const startingBenchmark = useRef(false)
+  const [starting, setStarting] = useState(false)
   const startBenchmark = useCallback(() => {
+    if (startingBenchmark.current) return
+    startingBenchmark.current = true
+    setStarting(true)
     setAborted(undefined)
     void (async () => {
       const now = platform.clock.now()
       const day = dayKeyOf(now, { offsetMinutes: platform.clock.offsetMinutes(now) })
       const started = await beginRun(day, now, training)
+      if (!started.ok) {
+        /*
+         * Abgelehnt heißt: Es läuft bereits eine Messung, oder sie ist noch
+         * nicht fällig. Beides ist kein Fehler — der Stand wird neu gelesen,
+         * damit die Oberfläche zeigt, was wirklich gilt.
+         */
+        const open = await loadOpenRun()
+        if (open !== undefined) {
+          setOpen(open)
+          setMeasuring(true)
+        }
+        return
+      }
       setOpen({
         id: started.id,
         items: started.items,
@@ -738,6 +774,11 @@ export function App() {
       })
       setMeasuring(true)
     })()
+      .catch(() => undefined)
+      .finally(() => {
+        startingBenchmark.current = false
+        setStarting(false)
+      })
   }, [training, platform])
 
 
@@ -899,7 +940,7 @@ export function App() {
                   <h3>{dictionary.benchmark.invite}</h3>
                   <p>{dictionary.benchmark.inviteNote}</p>
                   <div className="note-actions">
-                    <button type="button" className="quiet" onClick={startBenchmark}>
+                    <button type="button" className="quiet" onClick={startBenchmark} disabled={starting}>
                       {dictionary.benchmark.start}
                     </button>
                   </div>
@@ -1027,6 +1068,7 @@ export function App() {
               trainable={trainable}
               translated={translated}
               sound={sound}
+              saveFailed={languageSaveFailed || trainingSaveFailed || sound.saveFailed}
             />
             <p className="hint">{dictionary.settings.note}</p>
           </div>
@@ -1138,7 +1180,7 @@ export function App() {
           */}
           {aborted === 'again' && step.kind === 'invite' && (
             <div className="note-actions">
-              <button type="button" className="quiet" onClick={startBenchmark}>
+              <button type="button" className="quiet" onClick={startBenchmark} disabled={starting}>
                 {dictionary.benchmark.start}
               </button>
             </div>
@@ -1151,7 +1193,7 @@ export function App() {
           <h3>{dictionary.benchmark.invite}</h3>
           <p>{dictionary.benchmark.inviteNote}</p>
           <div className="note-actions">
-            <button type="button" className="quiet" onClick={startBenchmark}>
+            <button type="button" className="quiet" onClick={startBenchmark} disabled={starting}>
               {dictionary.benchmark.start}
             </button>
           </div>
@@ -1326,6 +1368,7 @@ export function App() {
           trainable={trainable}
           translated={translated}
           sound={sound}
+          saveFailed={languageSaveFailed || trainingSaveFailed || sound.saveFailed}
         />
 
         {/*
@@ -1483,6 +1526,7 @@ function LanguageSoundControls({
   trainable,
   translated,
   sound,
+  saveFailed,
 }: {
   dictionary: Dictionary
   language: Language
@@ -1492,6 +1536,8 @@ function LanguageSoundControls({
   trainable: readonly Language[]
   translated: boolean
   sound: ReturnType<typeof useSoundSetting>
+  /** R3-06: Eine der drei Einstellungen ließ sich nicht speichern. */
+  saveFailed: boolean
 }) {
   return (
     <>
@@ -1564,6 +1610,13 @@ function LanguageSoundControls({
             <p className="hint">{dictionary.language.trainingOnly}</p>
           )}
         </>
+      )}
+
+      {/* R3-06: Nicht gespeichert heißt: gesagt, nicht angezeigt. */}
+      {saveFailed && (
+        <p className="coach-failure" role="alert">
+          {dictionary.settings.saveFailed}
+        </p>
       )}
     </>
   )

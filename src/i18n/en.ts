@@ -693,5 +693,6 @@ export const en: Dictionary = {
   settings: {
     heading: 'Settings',
     note: 'The same controls are also at the bottom of the start screen.',
+    saveFailed: 'This setting could not be saved on the device. The previous one still applies.',
   },
 }

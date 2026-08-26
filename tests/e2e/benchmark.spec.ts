@@ -264,3 +264,53 @@ test('hat eine eigene Core-Seite: Einladung wenn fällig, Reihe und Termin danac
   ).toBeHidden()
   await expect(page.getByText(/Die nächste Messung ist ab dem/)).toBeVisible()
 })
+
+test('ein Doppeltipp auf „Messung beginnen" erzeugt nie zwei Messungen (R3-04)', async ({
+  page,
+}) => {
+  await visit(page)
+  await expect(startButton(page)).toBeVisible()
+
+  /*
+   * Der echte Nebenläufigkeitsfall: zwei Klicks, so schnell wie der Browser
+   * sie absetzt. Vorher lasen beide Aufrufe dieselbe höchste Ordnungszahl
+   * und schrieben beide — es entstanden zwei offene Messungen. Jetzt liegt
+   * die Regel in einer Transaktion unter der Oberfläche, und der Knopf ist
+   * schon beim ersten Tipp gesperrt.
+   */
+  // Zwei Klicks im selben Ausführungsschritt — härter als jeder menschliche
+  // Doppeltipp, weil React dazwischen nicht neu zeichnen kann.
+  await page.evaluate(() => {
+    const start = [...document.querySelectorAll('button')].find((button) =>
+      button.textContent?.includes('Messung beginnen'),
+    )
+    start?.click()
+    start?.click()
+  })
+
+  await expect(page.locator('.encode-word')).toBeVisible({ timeout: 30_000 })
+
+  const open = await page.evaluate(async () => {
+    const request = indexedDB.open('anitew')
+    const database: IDBDatabase = await new Promise((resolve, reject) => {
+      request.onsuccess = () => resolve(request.result)
+      request.onerror = () => reject(request.error)
+    })
+    const rows: { completed: boolean; abandoned?: boolean; ordinal: number }[] = await new Promise(
+      (resolve, reject) => {
+        const query = database.transaction('benchmarks').objectStore('benchmarks').getAll()
+        query.onsuccess = () => resolve(query.result as never)
+        query.onerror = () => reject(query.error)
+      },
+    )
+    return {
+      total: rows.length,
+      offen: rows.filter((row) => !row.completed && row.abandoned !== true).length,
+      ordinals: rows.map((row) => row.ordinal),
+    }
+  })
+
+  expect(open.offen, 'höchstens eine offene Messung').toBe(1)
+  expect(open.total, 'kein zweiter Lauf angelegt').toBe(1)
+  expect(open.ordinals).toEqual([1])
+})

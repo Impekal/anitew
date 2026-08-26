@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 
+import { persistThenApply } from './persistThenApply.ts'
+
 import { type Language, type Platform, resolveTrainingLanguage } from '../core/index.ts'
 
 const SETTING_KEY = 'training.language'
@@ -7,6 +9,8 @@ const SETTING_KEY = 'training.language'
 export interface TrainingLanguageState {
   training: Language
   chooseTraining: (language: Language) => void
+  /** Ließ sich die zuletzt gewählte Trainingssprache nicht speichern? (R3-06) */
+  saveFailed: boolean
 }
 
 /**
@@ -35,13 +39,21 @@ export function useTrainingLanguage(platform: Platform, ui: Language): TrainingL
     }
   }, [platform])
 
+  // R3-06: erst speichern, dann anzeigen — wie Sprache und Ton.
+  const [saveFailed, setSaveFailed] = useState(false)
   const chooseTraining = useCallback(
     (next: Language) => {
-      setChosen(next)
-      void platform.settings.write(SETTING_KEY, next).catch(() => undefined)
+      void persistThenApply(
+        () => platform.settings.write(SETTING_KEY, next),
+        () => {
+          setSaveFailed(false)
+          setChosen(next)
+        },
+        () => setSaveFailed(true),
+      )
     },
     [platform],
   )
 
-  return { training: resolveTrainingLanguage(chosen, ui), chooseTraining }
+  return { training: resolveTrainingLanguage(chosen, ui), chooseTraining, saveFailed }
 }

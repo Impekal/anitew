@@ -16,6 +16,20 @@ const PUSH_STATE_KEY = 'push-state-v1'
 const SESSION_MAX_AGE_MS = 1000 * 60 * 60 * 24 * 180
 
 /**
+ * Übergangsfrist für Sitzungen aus der Zeit vor D-049 (R3-02, Runde 3).
+ *
+ * Solche Cookies tragen keinen Anmeldezeitpunkt, und er lässt sich auch
+ * nicht rekonstruieren — raten wäre eine erfundene Zahl. Ihnen erneut volle
+ * 180 Tage zu geben, machte PRIVACYs „höchstens 180 Tage ab Anmeldung“ zur
+ * Falschaussage; sie sofort abzumelden, wäre ein grundloser Datenverlust
+ * für bestehende Nutzer. Sie laufen deshalb 30 Tage nach der ersten
+ * Begegnung mit dieser Fassung ab — kürzer als jede Restlaufzeit, die sie
+ * unter der alten Regel noch gehabt hätten, und in PRIVACY §9/§11 als
+ * Übergangsregel benannt.
+ */
+const LEGACY_SESSION_GRACE_MS = 1000 * 60 * 60 * 24 * 30
+
+/**
  * Die Schreib-Endpunkte unter /push/* sind ohne Konto erreichbar — der
  * CSRF-Schutz (sameOriginRequest) hält Browser fremder Seiten fern, aber
  * kein Skript mit frei gesetzten Headern. Damit der Worker nicht als
@@ -49,6 +63,18 @@ const SCHEDULE_HORIZON_MS = 60 * 86_400_000
  */
 const PENDING_TTL_MS = { daily: 24 * 3_600_000, benchmark: 60 * 60_000 }
 const PENDING_MAX = 8
+
+/**
+ * Wie oft eine Zustellung wiederholt wird, bevor sie aufgegeben wird
+ * (R3-01, Runde 3). Vorher warf der Alarm bei jedem Pushdienst-Fehler, und
+ * die Wiederholung lag allein bei Cloudflare: Sind dessen Versuche
+ * erschöpft, hätte niemand mehr aufgeräumt — die zugesagte Höchstfrist der
+ * Zustellnotiz wäre damit nicht mehr garantiert gewesen. ANITEW steuert die
+ * Wiederholungen deshalb selbst, mit wachsendem Abstand (1, 2, 4, 8 min)
+ * statt eines 250-ms-Dauerfeuers auf einen längst überfälligen Termin.
+ */
+const PUSH_MAX_ATTEMPTS = 5
+const PUSH_RETRY_BASE_MS = 60_000
 const encoder = new TextEncoder()
 const decoder = new TextDecoder()
 
@@ -85,7 +111,7 @@ async function credentialKey(secret) {
   return crypto.subtle.importKey('raw', digest, { name: 'AES-GCM' }, false, ['encrypt', 'decrypt'])
 }
 
-async function seal(value, secret) {
+export async function seal(value, secret) {
   const iv = crypto.getRandomValues(new Uint8Array(12))
   const key = await credentialKey(secret)
   const encrypted = new Uint8Array(
@@ -97,7 +123,7 @@ async function seal(value, secret) {
   return base64Url(packed)
 }
 
-async function unseal(value, secret) {
+export async function unseal(value, secret) {
   try {
     const packed = fromBase64Url(value)
     if (packed.length <= 12) return undefined
@@ -239,13 +265,14 @@ async function handleAccessToken(request, env) {
   }
 
   /*
-   * Altbestand ohne absoluten Ablauf: Die Zählung beginnt jetzt — das ist
-   * die strengste Deutung, die keine bestehende Anmeldung sofort zerstört.
+   * Altbestand ohne absoluten Ablauf bekommt die kurze Übergangsfrist, nicht
+   * ein frisches 180-Tage-Fenster (R3-02). Die Frist wird beim ersten
+   * Refresh mitversiegelt und wächst danach nicht mehr.
    */
   const sessionExpiresAt =
     typeof credential.sessionExpiresAt === 'number'
       ? credential.sessionExpiresAt
-      : Date.now() + SESSION_MAX_AGE_MS
+      : Date.now() + LEGACY_SESSION_GRACE_MS
   if (sessionExpiresAt <= Date.now()) {
     return json({ error: 'session_expired' }, 401, clearCredentialCookie())
   }
@@ -330,6 +357,32 @@ function validReminder(value) {
   } catch {
     return false
   }
+}
+
+/**
+ * Reduziert eine Erinnerung auf genau die Felder, die PRIVACY §7 nennt
+ * (R3-07, Runde 3).
+ *
+ * `validReminder` prüft die bekannten Felder — es warf bisher aber nichts
+ * weg: Was ein Aufrufer sonst noch mitschickte, landete unverändert im
+ * Durable Object. Damit war „speichert serverseitig nur …" eine Zusage, die
+ * von der Höflichkeit des Aufrufers abhing. Gefunden von einem
+ * Verhaltenstest, der den Satz aus der Datenschutzerklärung nachstellt.
+ */
+function normalizeReminder(reminder) {
+  const normalized = {
+    id: reminder.id,
+    at: reminder.at,
+    title: reminder.title,
+    body: reminder.body,
+  }
+  if (reminder.recurrence !== undefined) {
+    normalized.recurrence = {
+      localTime: reminder.recurrence.localTime,
+      timeZone: reminder.recurrence.timeZone,
+    }
+  }
+  return normalized
 }
 
 async function pushStub(env, endpoint) {
@@ -459,7 +512,9 @@ function localToInstant(wanted, timeZone) {
  */
 function firstInstantAfterGap(wanted, timeZone) {
   const base = Date.UTC(wanted.year, wanted.month - 1, wanted.day, wanted.hour, wanted.minute)
-  for (let addMinutes = 5; addMinutes <= 180; addMinutes += 5) {
+  // Minutenweise (R3-05): In Fünf-Minuten-Schritten lieferte etwa 02:31 nicht
+  // die erste existierende Minute nach der Lücke, sondern erst 03:00.
+  for (let addMinutes = 1; addMinutes <= 180; addMinutes += 1) {
     const shifted = new Date(base + addMinutes * 60_000)
     const candidate = localToInstant(
       {
@@ -496,7 +551,7 @@ function nextLocalOccurrence(localTime, timeZone, after) {
 }
 
 function emptyPushState(endpoint = '') {
-  return { endpoint, reminders: {}, pending: [] }
+  return { endpoint, reminders: {}, pending: [], attempts: {} }
 }
 
 /**
@@ -525,22 +580,67 @@ export class PushReminder {
     await this.state.storage.put(PUSH_STATE_KEY, value)
   }
 
+  /**
+   * Der nächste Alarm zeigt auf den **frühesten** Zeitpunkt, an dem etwas zu
+   * tun ist: den nächsten Termin ODER den nächsten Notiz-Ablauf (R3-01).
+   *
+   * Vorher gewann der Termin, sobald es einen gab (`next?.at ?? …`) — eine
+   * Messnotiz mit 60-Minuten-Frist konnte damit neben einer erst am Abend
+   * fälligen Tageserinnerung stundenlang liegen bleiben. Die Frist in
+   * PRIVACY war dann eine Zusage, die der Code nicht hielt.
+   */
   async rearm(value) {
-    const next = Object.values(value.reminders).sort((a, b) => a.at - b.at)[0]
-    /*
-     * Auch reine Zustellnotizen halten den Alarm wach: Ohne Termin, aber mit
-     * wartender Notiz muss später noch jemand aufräumen — sonst läge die
-     * Notiz für immer im Speicher (F-05, Runde 2).
-     */
-    const nextPendingExpiry = value.pending
-      .map((notice) => (typeof notice.expiresAt === 'number' ? notice.expiresAt : 0))
-      .sort((a, b) => a - b)[0]
-    const at = next?.at ?? nextPendingExpiry
-    if (at === undefined) {
+    const times = [
+      ...Object.values(value.reminders).map((reminder) => reminder.at),
+      ...value.pending.map((notice) => notice.expiresAt),
+    ].filter((at) => typeof at === 'number' && Number.isFinite(at))
+
+    if (times.length === 0) {
+      // Nichts geplant, nichts wartend: Der Eintrag verschwindet vollständig.
       await this.state.storage.deleteAlarm()
+      await this.state.storage.deleteAll()
       return
     }
-    await this.state.storage.setAlarm(Math.max(Date.now() + 250, at))
+    await this.state.storage.setAlarm(Math.max(Date.now() + 250, Math.min(...times)))
+  }
+
+  /**
+   * Ein Pushdienst antwortet nicht (5xx, Netzfehler). Der Termin bleibt
+   * erhalten, der nächste Versuch bekommt wachsenden Abstand — und der
+   * Aufräumzeitpunkt der wartenden Notiz wird dabei nie überschritten.
+   * Nach `PUSH_MAX_ATTEMPTS` wird diese eine Zustellung aufgegeben: Die
+   * Tageserinnerung rollt weiter, eine einmalige verschwindet. Aufgeräumt
+   * wird in jedem Fall.
+   */
+  async retryLater(value, due, now) {
+    const attempts = { ...(value.attempts ?? {}) }
+    const count = (attempts[due.id] ?? 0) + 1
+
+    if (count >= PUSH_MAX_ATTEMPTS) {
+      delete attempts[due.id]
+      value.attempts = attempts
+      if (due.id === 'daily' && due.recurrence) {
+        due.at = nextLocalOccurrence(due.recurrence.localTime, due.recurrence.timeZone, now + 1_000)
+        value.reminders.daily = due
+      } else {
+        delete value.reminders[due.id]
+      }
+      await this.save(value)
+      await this.rearm(value)
+      return
+    }
+
+    attempts[due.id] = count
+    value.attempts = attempts
+    await this.save(value)
+
+    const backoff = now + PUSH_RETRY_BASE_MS * 2 ** (count - 1)
+    const expiries = value.pending
+      .map((notice) => notice.expiresAt)
+      .filter((at) => typeof at === 'number' && Number.isFinite(at))
+    // Der Aufräumtermin der Notiz ist eine Obergrenze, keine Verhandlungsmasse.
+    const at = expiries.length === 0 ? backoff : Math.min(backoff, Math.min(...expiries))
+    await this.state.storage.setAlarm(Math.max(now + 1_000, at))
   }
 
   async fetch(request) {
@@ -553,7 +653,8 @@ export class PushReminder {
 
     if (url.pathname === '/schedule') {
       if (!validReminder(body.reminder)) return json({ error: 'invalid_reminder' }, 400)
-      value.reminders[body.reminder.id] = body.reminder
+      // Nur die in PRIVACY §7 genannten Felder werden gespeichert (R3-07).
+      value.reminders[body.reminder.id] = normalizeReminder(body.reminder)
       await this.save(value)
       await this.rearm(value)
       return json({ ok: true })
@@ -580,14 +681,9 @@ export class PushReminder {
       // Veraltetes wird gelöscht statt zugestellt (F-05, Runde 2).
       prunePending(value, Date.now())
       const pending = value.pending.shift()
-      if (Object.keys(value.reminders).length === 0 && value.pending.length === 0) {
-        // Nichts mehr geplant, nichts mehr wartend: Der Eintrag verschwindet.
-        await this.state.storage.deleteAlarm()
-        await this.state.storage.deleteAll()
-      } else {
-        await this.save(value)
-        await this.rearm(value)
-      }
+      await this.save(value)
+      // rearm räumt einen leeren Zustand vollständig weg (R3-01).
+      await this.rearm(value)
       return pending === undefined ? json({ error: 'nothing_pending' }, 404) : json(pending)
     }
 
@@ -613,12 +709,8 @@ export class PushReminder {
       .filter((reminder) => reminder.at <= now + 1_000)
       .sort((a, b) => a.at - b.at)[0]
     if (due === undefined) {
-      if (Object.keys(value.reminders).length === 0 && value.pending.length === 0) {
-        // Der Aufräum-Alarm nach der letzten abgelaufenen Notiz (F-05).
-        await this.state.storage.deleteAlarm()
-        await this.state.storage.deleteAll()
-        return
-      }
+      // Abgelaufene Notizen sind oben schon weg; rearm löscht einen leeren
+      // Eintrag vollständig und setzt sonst den nächsten Zeitpunkt (R3-01).
       await this.save(value)
       await this.rearm(value)
       return
@@ -638,13 +730,31 @@ export class PushReminder {
       await this.save(value)
     }
 
-    const response = await sendEmptyPush(value.endpoint, this.env)
-    if (response.status === 404 || response.status === 410) {
+    /*
+     * Ein Netzfehler ist derselbe Fall wie eine 5xx-Antwort: Der Termin
+     * bleibt, der nächste Versuch bekommt Abstand (R3-01).
+     */
+    let response
+    try {
+      response = await sendEmptyPush(value.endpoint, this.env)
+    } catch {
+      response = undefined
+    }
+
+    if (response !== undefined && (response.status === 404 || response.status === 410)) {
       await this.state.storage.deleteAlarm()
       await this.state.storage.deleteAll()
       return
     }
-    if (!response.ok) throw new Error(`push_http_${response.status}`)
+    if (response === undefined || !response.ok) {
+      await this.retryLater(value, due, now)
+      return
+    }
+
+    // Zugestellt: Der Zähler dieser Erinnerung beginnt wieder bei null.
+    const attempts = { ...(value.attempts ?? {}) }
+    delete attempts[due.id]
+    value.attempts = attempts
 
     if (due.id === 'daily' && due.recurrence) {
       due.at = nextLocalOccurrence(due.recurrence.localTime, due.recurrence.timeZone, now + 1_000)
