@@ -208,15 +208,20 @@ test('Fließtext bekommt echte Zeilenbreite — kein senkrechtes Wort-für-Wort'
       const text = (block.textContent ?? '').trim()
       // Erst ab einem echten Satz ist die Frage sinnvoll.
       if (text.length < 25) continue
-      const parentWidth = block.parentElement?.getBoundingClientRect().width ?? 0
       /*
-       * Zwei Merkmale, beide unabhängig vom Gerät:
-       * 1. Der Block nutzt die Breite seines Elternteils (kein Einklemmen).
-       * 2. Er ist nicht höher als breit — senkrechter Text ist genau das.
+       * Die Signatur des Fehlers, gerätunabhängig: Ein Satz steht in einer
+       * Spalte, die **schmaler als jede lesbare Zeile** ist, und läuft
+       * deshalb nach unten statt nach rechts. Der Memory Pulse maß
+       * 40 × 252 px — Wort für Wort untereinander.
+       *
+       * Der erste Anlauf verglich zusätzlich mit der Elternbreite („nutzt
+       * mindestens 60 %"). Das war zu grob und meldete auf breiten Schirmen
+       * gesunde Zeilen: Eine Tageszeile, die ihre Inhaltsbreite nimmt, ist
+       * 299 von 544 px breit und völlig in Ordnung. Ein Fehlalarm, der zum
+       * Ignorieren erzieht, ist schlimmer als kein Test — deshalb prüft die
+       * Regel jetzt genau das, was den Fehler ausmacht, und nichts sonst.
        */
-      if (parentWidth > 0 && box.width < parentWidth * 0.6) {
-        problems.push(`${block.className}: ${Math.round(box.width)} von ${Math.round(parentWidth)} px`)
-      } else if (box.height > box.width) {
+      if (box.width < 160 && box.height > box.width) {
         problems.push(`${block.className}: ${Math.round(box.width)}×${Math.round(box.height)} px (senkrecht)`)
       }
     }
