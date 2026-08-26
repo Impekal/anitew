@@ -172,6 +172,65 @@ describe('PRIVACY §7 — die Höchstfrist der Zustellnotiz wird eingehalten', (
   })
 })
 
+describe('PRIVACY §7 — die Frist überlebt auch verspätete Wiederholungen (R4-02)', () => {
+  it('legt dieselbe Zustellung nach Fristablauf nicht neu an — auch nicht bei stark verspätetem Alarm', async () => {
+    /*
+      Der Fall, den Runde 3 übersehen hat: Die Tests riefen den Alarm immer
+      exakt zur angeforderten Zeit auf. Läuft ein Wiederholungsalarm aber
+      stark verspätet, war die alte Notiz schon weggeräumt — und dieselbe
+      Zustellung entstand mit einer frischen Stunde neu. Aus der zugesagten
+      Höchstfrist wäre so eine Frist **je Versuch** geworden.
+    */
+    vi.useFakeTimers()
+    const due = Date.UTC(2026, 7, 26, 12, 0)
+    vi.setSystemTime(due)
+    const harness = durableHarness()
+    const target = new PushReminder(harness.state, pushEnv)
+    await call(target, '/schedule', {
+      endpoint: ENDPOINT,
+      reminder: { id: 'benchmark', at: due, title: 'Messung wartet', body: 'B' },
+    })
+
+    // Erster Versuch scheitert: Die Notiz liegt bereit, verankert an `due`.
+    globalThis.fetch = (async () => new Response('', { status: 500 })) as typeof fetch
+    await target.alarm()
+    expect(harness.stored()?.pending[0]?.expiresAt).toBe(due + 60 * 60_000)
+
+    // Der nächste Alarm kommt erst nach 90 Minuten — weit hinter der Frist.
+    const pushes: string[] = []
+    globalThis.fetch = (async (input: RequestInfo | URL) => {
+      pushes.push(String(input))
+      return new Response('', { status: 201 })
+    }) as typeof fetch
+    vi.setSystemTime(due + 90 * 60_000)
+    await target.alarm()
+
+    // Nichts wird verspätet zugestellt, nichts neu angelegt, alles geräumt.
+    expect(pushes, 'kein Push nach Ablauf des Fensters').toEqual([])
+    expect(harness.stored()).toBeUndefined()
+    expect(harness.alarmAt()).toBeUndefined()
+  })
+
+  it('verankert die Frist an der Fälligkeit, nicht am Zeitpunkt des Alarms', async () => {
+    vi.useFakeTimers()
+    const due = Date.UTC(2026, 7, 26, 12, 0)
+    // Der Alarm läuft erst 30 Minuten nach der Fälligkeit.
+    vi.setSystemTime(due)
+    const harness = durableHarness()
+    const target = new PushReminder(harness.state, pushEnv)
+    await call(target, '/schedule', {
+      endpoint: ENDPOINT,
+      reminder: { id: 'benchmark', at: due, title: 'M', body: 'B' },
+    })
+    vi.setSystemTime(due + 30 * 60_000)
+    globalThis.fetch = (async () => new Response('', { status: 500 })) as typeof fetch
+    await target.alarm()
+
+    // 60 Minuten ab Fälligkeit — nicht 60 Minuten ab jetzt.
+    expect(harness.stored()?.pending[0]?.expiresAt).toBe(due + 60 * 60_000)
+  })
+})
+
 describe('PRIVACY §9 — die Sitzungsfristen halten, was der Text sagt', () => {
   const env = {
     GOOGLE_CLIENT_SECRET: SECRET,
@@ -251,6 +310,52 @@ describe('PRIVACY §9 — die Sitzungsfristen halten, was der Text sagt', () => 
     vi.setSystemTime(start + 31 * 86_400_000)
     const expired = await ask(cookie)
     expect(expired.status).toBe(401)
+    expect(expired.headers.getSetCookie()[0]).toContain('Max-Age=0')
+  })
+
+  it('schreibt die 30 Tage schon beim ersten Aufruf fest — auch mit noch gültigem Access-Token (R4-01)', async () => {
+    /*
+      Der Fall, den Runde 3 nicht getroffen hat: Beide bisherigen
+      Alt-Sitzungstests erzeugten ein bereits abgelaufenes Access-Token und
+      landeten damit sofort im Refresh-Pfad. War das Token dagegen noch
+      gültig, kehrte der Worker sofort zurück, ohne ein Cookie mit
+      `sessionExpiresAt` zu schreiben — die Frist begann erst beim nächsten
+      Refresh. Wer nach vier Wochen wiederkam, lebte deutlich länger als die
+      in PRIVACY §9 zugesagten 30 Tage.
+    */
+    vi.useFakeTimers()
+    const start = Date.UTC(2026, 4, 1)
+    vi.setSystemTime(start)
+    // Alt-Cookie OHNE sessionExpiresAt, aber mit frischem Access-Token.
+    const legacy = await seal(
+      { accessToken: 'alt-aber-frisch', expiresAt: start + 3_600_000, refreshToken: 'r' },
+      SECRET,
+    )
+    // Kein Netz nötig: Der gültige-Token-Pfad darf Google gar nicht fragen.
+    const outbound = vi.fn()
+    globalThis.fetch = outbound as unknown as typeof fetch
+
+    const first = await ask(`anitew_google_oauth=${legacy}`)
+    expect(first.status).toBe(200)
+    expect(outbound, 'kein Refresh nötig').not.toHaveBeenCalled()
+    expect(((await first.json()) as { access_token: string }).access_token).toBe('alt-aber-frisch')
+
+    // Entscheidend: Es kommt sofort ein neues Cookie mit der Frist zurück.
+    const sealedNow = first.headers
+      .getSetCookie()
+      .find((entry) => entry.startsWith('anitew_google_oauth='))
+    expect(sealedNow, 'die Frist muss sofort versiegelt werden').toBeDefined()
+    expect(maxAgeOf(first)).toBeLessThanOrEqual(30 * 86_400)
+    expect(maxAgeOf(first)).toBeGreaterThan(29 * 86_400)
+
+    // Und sie gilt: 31 Tage später ist Schluss — unabhängig davon, dass der
+    // Mensch zwischendurch nie wieder da war.
+    vi.setSystemTime(start + 31 * 86_400_000)
+    globalThis.fetch = (async () =>
+      Response.json({ access_token: 'neu', expires_in: 3600 })) as typeof fetch
+    const expired = await ask(cookieOf(first))
+    expect(expired.status).toBe(401)
+    expect(((await expired.json()) as { error: string }).error).toBe('session_expired')
     expect(expired.headers.getSetCookie()[0]).toContain('Max-Age=0')
   })
 })

@@ -266,19 +266,37 @@ async function handleAccessToken(request, env) {
 
   /*
    * Altbestand ohne absoluten Ablauf bekommt die kurze Übergangsfrist, nicht
-   * ein frisches 180-Tage-Fenster (R3-02). Die Frist wird beim ersten
-   * Refresh mitversiegelt und wächst danach nicht mehr.
+   * ein frisches 180-Tage-Fenster (R3-02).
    */
-  const sessionExpiresAt =
-    typeof credential.sessionExpiresAt === 'number'
-      ? credential.sessionExpiresAt
-      : Date.now() + LEGACY_SESSION_GRACE_MS
+  const legacy = typeof credential.sessionExpiresAt !== 'number'
+  const sessionExpiresAt = legacy
+    ? Date.now() + LEGACY_SESSION_GRACE_MS
+    : credential.sessionExpiresAt
   if (sessionExpiresAt <= Date.now()) {
     return json({ error: 'session_expired' }, 401, clearCredentialCookie())
   }
 
   if (typeof credential.expiresAt === 'number' && credential.expiresAt > Date.now() + 30_000) {
-    return json({ access_token: credential.accessToken })
+    /*
+     * R4-01 (Runde 4): Die Frist muss **hier** festgeschrieben werden, nicht
+     * erst beim nächsten Refresh. Vorher berechnete dieser Pfad zwar die
+     * 30 Tage, gab aber kein neues Cookie zurück — war Googles Access-Token
+     * noch gültig, blieb die Alt-Sitzung ohne Ablauf gespeichert. Wer erst
+     * nach vier Wochen wiederkam, bekam die Frist erst dann versiegelt und
+     * lebte damit deutlich länger als die in PRIVACY §9 zugesagten 30 Tage.
+     */
+    if (!legacy) return json({ access_token: credential.accessToken })
+
+    const sealedNow = await seal(
+      { ...credential, sessionExpiresAt },
+      env.GOOGLE_CLIENT_SECRET,
+    )
+    const remainingNow = Math.max(60, Math.floor((sessionExpiresAt - Date.now()) / 1000))
+    return json(
+      { access_token: credential.accessToken },
+      200,
+      credentialCookie(sealedNow, remainingNow),
+    )
   }
 
   if (typeof credential.refreshToken !== 'string' || credential.refreshToken === '') {
@@ -612,21 +630,31 @@ export class PushReminder {
    * Tageserinnerung rollt weiter, eine einmalige verschwindet. Aufgeräumt
    * wird in jedem Fall.
    */
+  /**
+   * Diese eine Zustellung ist erledigt — zugestellt, aufgegeben oder ihr
+   * Fenster ist vorbei. Die Tageserinnerung rollt auf ihren nächsten
+   * Termin, eine einmalige verschwindet.
+   */
+  async retireDelivery(value, due, now) {
+    const attempts = { ...(value.attempts ?? {}) }
+    delete attempts[due.id]
+    value.attempts = attempts
+    if (due.id === 'daily' && due.recurrence) {
+      due.at = nextLocalOccurrence(due.recurrence.localTime, due.recurrence.timeZone, now + 1_000)
+      value.reminders.daily = due
+    } else {
+      delete value.reminders[due.id]
+    }
+    await this.save(value)
+    await this.rearm(value)
+  }
+
   async retryLater(value, due, now) {
     const attempts = { ...(value.attempts ?? {}) }
     const count = (attempts[due.id] ?? 0) + 1
 
     if (count >= PUSH_MAX_ATTEMPTS) {
-      delete attempts[due.id]
-      value.attempts = attempts
-      if (due.id === 'daily' && due.recurrence) {
-        due.at = nextLocalOccurrence(due.recurrence.localTime, due.recurrence.timeZone, now + 1_000)
-        value.reminders.daily = due
-      } else {
-        delete value.reminders[due.id]
-      }
-      await this.save(value)
-      await this.rearm(value)
+      await this.retireDelivery(value, due, now)
       return
     }
 
@@ -716,14 +744,37 @@ export class PushReminder {
       return
     }
 
+    /*
+     * R4-02 (Runde 4): Die Frist hängt an der **ursprünglichen Fälligkeit**,
+     * nicht am Zeitpunkt dieses Alarms.
+     *
+     * Vorher wurde `now + TTL` gerechnet. Lief ein Wiederholungsalarm stark
+     * verspätet, war die alte Notiz oben schon weggeräumt — und dieselbe
+     * Zustellung entstand mit einer **frischen** Stunde neu. Aus der
+     * zugesagten Höchstfrist wurde damit eine Frist je Versuch. Da
+     * `deliveryId` ohnehin aus `due.at` gebildet wird, ist derselbe Anker
+     * schon da; er bleibt über alle Wiederholungen hinweg gleich.
+     */
     const deliveryId = `${due.id}:${due.at}`
+    const expiresAt = due.at + (PENDING_TTL_MS[due.id] ?? 3_600_000)
+
+    if (expiresAt <= now) {
+      /*
+       * Das Fenster dieser Zustellung ist vorbei. Verspätet zuzustellen wäre
+       * genau das, was PRIVACY §7 ausschließt — also wird nicht gepusht,
+       * keine Notiz neu angelegt und die Zustellung zurückgezogen.
+       */
+      await this.retireDelivery(value, due, now)
+      return
+    }
+
     if (!value.pending.some((notice) => notice.deliveryId === deliveryId)) {
       value.pending.push({
         deliveryId,
         title: due.title,
         body: due.body,
         tag: `anitew-${due.id}`,
-        expiresAt: now + (PENDING_TTL_MS[due.id] ?? 3_600_000),
+        expiresAt,
       })
       // Eine harte Obergrenze gegen unbegrenztes Wachstum: Älteste zuerst raus.
       while (value.pending.length > PENDING_MAX) value.pending.shift()
@@ -751,19 +802,8 @@ export class PushReminder {
       return
     }
 
-    // Zugestellt: Der Zähler dieser Erinnerung beginnt wieder bei null.
-    const attempts = { ...(value.attempts ?? {}) }
-    delete attempts[due.id]
-    value.attempts = attempts
-
-    if (due.id === 'daily' && due.recurrence) {
-      due.at = nextLocalOccurrence(due.recurrence.localTime, due.recurrence.timeZone, now + 1_000)
-      value.reminders.daily = due
-    } else {
-      delete value.reminders[due.id]
-    }
-    await this.save(value)
-    await this.rearm(value)
+    // Zugestellt: Zähler zurück auf null, Zustellung zurückziehen.
+    await this.retireDelivery(value, due, now)
   }
 }
 
