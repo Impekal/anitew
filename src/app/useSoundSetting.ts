@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import type { Platform } from '../core/index.ts'
+import { persistThenApply } from './persistThenApply.ts'
 
 const SETTING_KEY = 'sound'
 
@@ -14,6 +15,8 @@ const SETTING_KEY = 'sound'
  */
 export function useSoundSetting(platform: Platform) {
   const [enabled, setEnabled] = useState(true)
+  // R3-06: Ein gescheitertes Speichern wird gesagt, nicht verschluckt.
+  const [saveFailed, setSaveFailed] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -32,32 +35,41 @@ export function useSoundSetting(platform: Platform) {
   }, [platform])
 
   const toggle = useCallback(() => {
-    const next = !platform.sound.isEnabled()
+    const previous = platform.sound.isEnabled()
+    const next = !previous
+    const apply = (on: boolean) => {
+      platform.sound.setEnabled(on)
+      document.documentElement.dataset.anitewSound = on ? 'on' : 'off'
+    }
 
     // Der Klang schaltet sofort um — daran hängt die Rückmeldung, und ein
     // Ton, der erst nach einem Datenbankschreibvorgang kommt, fühlt sich
     // träge an. Beim Einschalten hört man gleich, was man eingeschaltet hat;
     // der Tipp ist zugleich die Geste, die iOS für die Tonausgabe verlangt.
-    platform.sound.setEnabled(next)
-    document.documentElement.dataset.anitewSound = next ? 'on' : 'off'
+    apply(next)
     if (next) platform.sound.play('word', 2)
 
     /*
-     * Die **Anzeige** wechselt dagegen erst, wenn die Wahl geschrieben ist.
-     *
-     * Vorher lief das Schreiben nebenher, und wer sofort danach neu lud, bekam
-     * den alten Zustand zurück — derselbe Fehler wie beim Verwerfen einer
-     * Einheit, und wieder von einem E2E-Test gefunden, der nur im vollen Lauf
-     * fehlschlug. Ein Schalter, der etwas anderes zeigt als das, was
-     * gespeichert ist, ist ein kaputter Schalter. Der Schreibvorgang dauert
-     * wenige Millisekunden; scheitert er, gilt die Wahl immerhin für diese
-     * Sitzung.
+     * Die **Anzeige** wechselt erst, wenn die Wahl geschrieben ist — und
+     * anders als vorher wirklich nur dann (R3-06): Das alte `finally` setzte
+     * sie auch im Fehlerfall, entgegen diesem Kommentar. Scheitert das
+     * Speichern, geht auch die Klangmaschine zurück auf den vorherigen
+     * Stand; ein Schalter, der etwas anderes zeigt oder tut als das
+     * Gespeicherte, ist ein kaputter Schalter.
      */
-    void platform.settings
-      .write(SETTING_KEY, next)
-      .catch(() => undefined)
-      .finally(() => setEnabled(next))
+    void persistThenApply(
+      () => platform.settings.write(SETTING_KEY, next),
+      () => {
+        setSaveFailed(false)
+        setEnabled(next)
+      },
+      () => {
+        apply(previous)
+        setEnabled(previous)
+        setSaveFailed(true)
+      },
+    )
   }, [platform])
 
-  return { enabled, toggle }
+  return { enabled, toggle, saveFailed }
 }

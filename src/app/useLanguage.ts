@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 
+import { persistThenApply } from './persistThenApply.ts'
+
 import {
   type Language,
   type Platform,
@@ -16,6 +18,8 @@ export interface LanguageState {
   translated: boolean
   ready: boolean
   choose: (language: Language) => void
+  /** Ließ sich die zuletzt gewählte Sprache nicht speichern? (R3-06) */
+  saveFailed: boolean
 }
 
 /**
@@ -83,13 +87,23 @@ export function useLanguage(platform: Platform): LanguageState {
     document.documentElement.dir = isRightToLeft(language) ? 'rtl' : 'ltr'
   }, [language])
 
+  /*
+   * R3-06: Dieselbe Regel wie bei Ton und Trainingssprache — die Oberfläche
+   * wechselt erst, wenn die Wahl wirklich gespeichert ist. Vorher wechselte
+   * sie optimistisch und verschluckte den Fehler; nach einem Neuladen stand
+   * dann wieder die alte Sprache da, ohne dass es jemand gesagt hätte.
+   */
+  const [saveFailed, setSaveFailed] = useState(false)
   const choose = useCallback(
     (next: Language) => {
-      setLanguage(next)
-      void platform.settings.write(SETTING_KEY, next).catch(() => {
-        // Die Wahl gilt für diese Sitzung auch dann, wenn sie sich nicht
-        // speichern lässt. Ein Fehlerdialog hilft hier niemandem.
-      })
+      void persistThenApply(
+        () => platform.settings.write(SETTING_KEY, next),
+        () => {
+          setSaveFailed(false)
+          setLanguage(next)
+        },
+        () => setSaveFailed(true),
+      )
     },
     [platform],
   )
@@ -100,6 +114,7 @@ export function useLanguage(platform: Platform): LanguageState {
     translated: isTranslated(language),
     ready,
     choose,
+    saveFailed,
   }
 }
 

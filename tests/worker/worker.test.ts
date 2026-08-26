@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 // @ts-expect-error — der Worker ist bewusst schlichtes JavaScript ohne Typen.
-import workerModule, { PushReminder } from '../../worker/index.js'
+import workerModule, { PushReminder, seal } from '../../worker/index.js'
 
 /**
  * Der Cloudflare-Worker ist die sicherheitskritischste Datei des Projekts:
@@ -234,6 +234,68 @@ describe('der Access-Token-Endpunkt', () => {
         }),
         env,
       )
+      expect(expired.status).toBe(401)
+      expect(((await expired.json()) as { error: string }).error).toBe('session_expired')
+      expect(expired.headers.getSetCookie()[0]).toContain('Max-Age=0')
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('gibt einer Alt-Sitzung ohne Anmeldezeitpunkt nur die kurze Übergangsfrist (R3-02)', async () => {
+    /*
+      Cookies aus der Zeit vor D-049 tragen kein `sessionExpiresAt`. Ihnen
+      erneut volle 180 Tage zu geben, machte PRIVACYs „höchstens 180 Tage ab
+      Anmeldung“ zur Falschaussage; den Anmeldezeitpunkt zu schätzen wäre
+      eine erfundene Zahl. Sie bekommen deshalb 30 Tage ab erster Nutzung —
+      genau so, wie es die Übergangsregel in PRIVACY §9 beschreibt.
+    */
+    vi.useFakeTimers()
+    try {
+      const start = Date.UTC(2026, 0, 1, 12, 0)
+      vi.setSystemTime(start)
+      const env = stubEnv()
+      // Ein echtes Alt-Cookie: versiegelt, aber ohne Sitzungsablauf.
+      const legacy = await seal(
+        { accessToken: 'alt', expiresAt: start - 1_000, refreshToken: 'erneuerung' },
+        SECRET,
+      )
+      const cookieOf = (sealed: string) => `anitew_google_oauth=${sealed}`
+      const ask = (cookie: string) =>
+        workerModule.fetch(
+          new Request(`${ORIGIN}/oauth/google/access-token`, {
+            method: 'POST',
+            headers: { 'x-anitew-request': '1', origin: ORIGIN, cookie },
+          }),
+          env,
+        ) as Promise<Response>
+
+      globalThis.fetch = (async () =>
+        Response.json({ access_token: 'frisch', expires_in: 3600 })) as typeof fetch
+
+      const first: Response = await ask(cookieOf(legacy))
+      expect(first.status).toBe(200)
+      const renewed = first.headers
+        .getSetCookie()
+        .find((entry) => entry.startsWith('anitew_google_oauth=')) as string
+      const firstMaxAge = Number(/Max-Age=(\d+)/u.exec(renewed)?.[1])
+      // 30 Tage, nicht 180 — die Alt-Sitzung wird nicht neu aufgeladen.
+      expect(firstMaxAge).toBeLessThanOrEqual(30 * 86_400)
+      expect(firstMaxAge).toBeGreaterThan(29 * 86_400)
+
+      // Zehn Tage später verlängert ein weiterer Refresh die Frist nicht.
+      vi.setSystemTime(start + 10 * 86_400_000)
+      const second: Response = await ask(renewed.split(';')[0] as string)
+      expect(second.status).toBe(200)
+      const again = second.headers
+        .getSetCookie()
+        .find((entry) => entry.startsWith('anitew_google_oauth=')) as string
+      const secondMaxAge = Number(/Max-Age=(\d+)/u.exec(again)?.[1])
+      expect(secondMaxAge).toBeLessThanOrEqual(20 * 86_400)
+
+      // Nach der Frist: sicher abgemeldet, Cookie gelöscht.
+      vi.setSystemTime(start + 31 * 86_400_000)
+      const expired: Response = await ask(again.split(';')[0] as string)
       expect(expired.status).toBe(401)
       expect(((await expired.json()) as { error: string }).error).toBe('session_expired')
       expect(expired.headers.getSetCookie()[0]).toContain('Max-Age=0')
@@ -571,18 +633,131 @@ describe('das PushReminder-Durable-Object', () => {
     expect(harness.alarmAt()).toBeUndefined()
   })
 
-  it('wirft bei einem Pushdienst-Fehler, damit die Alarm-Wiederholung greift — ohne den Termin zu verlieren', async () => {
+  it('wiederholt einen fehlgeschlagenen Push selbst, mit Abstand statt Dauerfeuer (R3-01)', async () => {
+    /*
+      Vorher warf der Alarm, und die Wiederholung lag allein bei Cloudflare —
+      nach dessen letztem Versuch hätte niemand mehr aufgeräumt. Jetzt bleibt
+      der Termin erhalten, der nächste Versuch bekommt eine Minute Abstand,
+      und der Alarm feuert nicht im 250-ms-Takt auf einen überfälligen Termin.
+    */
+    vi.useFakeTimers()
+    try {
+      const now = Date.UTC(2026, 7, 26, 12, 0)
+      vi.setSystemTime(now)
+      const harness = durableHarness()
+      const target = new PushReminder(harness.state, env)
+      const at = now - 1000
+      await call(target, '/schedule', {
+        endpoint: ENDPOINT,
+        reminder: { id: 'benchmark', at, title: 'M', body: 'B' },
+      })
+
+      globalThis.fetch = (async () => new Response('', { status: 500 })) as typeof fetch
+      await expect(target.alarm()).resolves.toBeUndefined()
+
+      expect(harness.stored()?.reminders['benchmark']?.at).toBe(at)
+      expect(harness.alarmAt()).toBe(now + 60_000)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('hält die 60-Minuten-Frist der Messnotiz auch neben einer erst abends fälligen Tageserinnerung (R3-01)', async () => {
+    /*
+      Der Kern des Runde-3-Funds: Der Alarm zeigte auf den nächsten *Termin*,
+      sobald es einen gab — die Messnotiz mit 60-Minuten-Frist wäre neben
+      einer um 20 Uhr fälligen Tageserinnerung stundenlang liegen geblieben,
+      obwohl PRIVACY die Frist zusagt.
+    */
+    vi.useFakeTimers()
+    try {
+      const now = Date.UTC(2026, 7, 26, 8, 0)
+      vi.setSystemTime(now)
+      const harness = durableHarness()
+      const target = new PushReminder(harness.state, env)
+
+      await call(target, '/schedule', {
+        endpoint: ENDPOINT,
+        reminder: {
+          id: 'daily',
+          at: now + 12 * 3_600_000,
+          title: 'T',
+          body: 'B',
+          recurrence: { localTime: '20:00', timeZone: 'Europe/Berlin' },
+        },
+      })
+      await call(target, '/schedule', {
+        endpoint: ENDPOINT,
+        reminder: { id: 'benchmark', at: now - 1000, title: 'Messung wartet', body: 'B' },
+      })
+
+      globalThis.fetch = (async () => new Response('', { status: 201 })) as typeof fetch
+      await target.alarm()
+
+      const expiresAt = harness.stored()?.pending[0]?.expiresAt
+      expect(expiresAt).toBe(now + 60 * 60_000)
+      // Der nächste Alarm gehört dem Notiz-Ablauf, nicht der Tageserinnerung.
+      expect(harness.alarmAt()).toBe(expiresAt)
+
+      vi.setSystemTime(now + 61 * 60_000)
+      await target.alarm()
+      expect(harness.stored()?.pending).toEqual([])
+      // Die Tageserinnerung lebt weiter — aufgeräumt wurde nur die Notiz.
+      expect(harness.stored()?.reminders['daily']).toBeDefined()
+      expect(harness.alarmAt()).toBe(harness.stored()?.reminders['daily']?.at)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('räumt auch dann auf, wenn der Pushdienst dauerhaft ausfällt (R3-01)', async () => {
+    vi.useFakeTimers()
+    try {
+      let now = Date.UTC(2026, 7, 26, 12, 0)
+      vi.setSystemTime(now)
+      const harness = durableHarness()
+      const target = new PushReminder(harness.state, env)
+      await call(target, '/schedule', {
+        endpoint: ENDPOINT,
+        reminder: { id: 'benchmark', at: now - 1000, title: 'M', body: 'B' },
+      })
+
+      globalThis.fetch = (async () => new Response('', { status: 503 })) as typeof fetch
+
+      // So oft versuchen, wie der Worker es zulässt — jeweils zur Alarmzeit.
+      for (let attempt = 0; attempt < 6; attempt++) {
+        const next = harness.alarmAt()
+        if (next === undefined) break
+        now = Math.max(next, now + 1_000)
+        vi.setSystemTime(now)
+        await target.alarm()
+      }
+
+      // Die Zustellung ist aufgegeben, aber der Eintrag lebt nur noch für den
+      // Ablauf der Notiz — kein ewiger Rest im Speicher.
+      expect(harness.stored()?.reminders['benchmark']).toBeUndefined()
+
+      vi.setSystemTime(Date.UTC(2026, 7, 26, 14, 0))
+      await target.alarm()
+      expect(harness.stored()).toBeUndefined()
+      expect(harness.alarmAt()).toBeUndefined()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('löscht Alarm und Speicher vollständig, sobald nichts mehr geplant und nichts mehr wartend ist (R3-01)', async () => {
     const harness = durableHarness()
     const target = new PushReminder(harness.state, env)
-    const at = Date.now() - 1000
     await call(target, '/schedule', {
       endpoint: ENDPOINT,
-      reminder: { id: 'benchmark', at, title: 'M', body: 'B' },
+      reminder: { id: 'benchmark', at: Date.now() + 60_000, title: 'M', body: 'B' },
     })
+    expect(harness.stored()).toBeDefined()
 
-    globalThis.fetch = (async () => new Response('', { status: 500 })) as typeof fetch
-    await expect(target.alarm()).rejects.toThrow('push_http_500')
-    expect(harness.stored()?.reminders['benchmark']?.at).toBe(at)
+    await call(target, '/cancel', { endpoint: ENDPOINT, id: 'benchmark' })
+    expect(harness.stored()).toBeUndefined()
+    expect(harness.alarmAt()).toBeUndefined()
   })
 
   it('rechnet die nächste lokale Uhrzeit über eine Sommerzeit-Umstellung hinweg richtig', async () => {
@@ -640,6 +815,42 @@ describe('das PushReminder-Durable-Object', () => {
       expect(rolled.at).toBe(Date.UTC(2026, 2, 29, 1, 0))
     } finally {
       vi.useRealTimers()
+    }
+  })
+
+  it('trifft nach der Sommerzeit-Lücke die erste existierende Minute, nicht die nächste Fünferstelle (R3-05)', async () => {
+    /*
+      In Fünf-Minuten-Schritten landete 02:31 auf 03:01 und 02:59 auf 03:04 —
+      beides existiert, beides ist aber nicht die erste Minute nach der
+      Lücke. Minutenweise ist es in beiden Fällen 03:00 Ortszeit.
+    */
+    for (const localTime of ['02:31', '02:59']) {
+      vi.useFakeTimers()
+      try {
+        // Der Ausgangstermin ist derselbe Zeitpunkt am Vortag (MEZ = UTC+1),
+        // damit das Weiterrollen wirklich auf den Umstellungstag zielt.
+        const [hour, minute] = localTime.split(':').map(Number) as [number, number]
+        const before = Date.UTC(2026, 2, 28, hour - 1, minute)
+        vi.setSystemTime(before - 60_000)
+        const harness = durableHarness()
+        const target = new PushReminder(harness.state, env)
+        await call(target, '/schedule', {
+          endpoint: ENDPOINT,
+          reminder: {
+            id: 'daily',
+            at: before,
+            title: 'T',
+            body: 'B',
+            recurrence: { localTime, timeZone: 'Europe/Berlin' },
+          },
+        })
+        await call(target, '/cancel', { endpoint: ENDPOINT, id: 'daily' })
+        const rolled = harness.stored()?.reminders['daily'] as { at: number }
+        // 03:00 MESZ = 01:00 UTC am 29.03.2026.
+        expect(rolled.at, `Ortszeit ${localTime}`).toBe(Date.UTC(2026, 2, 29, 1, 0))
+      } finally {
+        vi.useRealTimers()
+      }
     }
   })
 

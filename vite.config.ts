@@ -61,9 +61,23 @@ export default defineConfig({
         // Der kleine Push-Handler bleibt eigenes, gut prüfbares JS und wird in
         // den von Workbox erzeugten Service Worker importiert.
         importScripts: ['push-sw.js'],
-        // OAuth und Push sind echte Worker-Endpunkte. Der PWA-Navigations-
-        // Fallback darf sie niemals mit einer gecachten index.html beantworten.
-        navigateFallbackDenylist: [/^\/oauth\/google\//, /^\/push\//],
+        /*
+          OAuth und Push sind echte Worker-Endpunkte, Impressum und
+          Datenschutz echte eigene Seiten. Der PWA-Navigations-Fallback darf
+          keine davon mit einer gecachten index.html beantworten.
+
+          Bei den Rechtstexten war genau das der Fehler: Ein Tipp auf
+          „Impressum“ oder „Datenschutz“ lieferte in der installierten App
+          die App-Shell zurück — für den Menschen sah es aus, als starte
+          ANITEW einfach neu (auf echtem iPhone gefunden). Beide Seiten
+          liegen im Precache und funktionieren damit auch offline.
+        */
+        navigateFallbackDenylist: [
+          /^\/oauth\/google\//,
+          /^\/push\//,
+          /^\/impressum\.html$/,
+          /^\/datenschutz\.html$/,
+        ],
         // Bei einem Release soll kein alter App-Shell-Cache weiterleben. Das
         // ist besonders auf iOS wichtig, wo offene/installierte PWAs sonst
         // noch die vorherige JS-Fassung ausliefern koennen.

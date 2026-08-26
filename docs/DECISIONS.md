@@ -1625,3 +1625,65 @@ Default-Branch (`main`) bedient — der Produktbranch ist aber
 `anitew-redesign-v2`. deploy.yml bleibt als manueller Notweg
 (`workflow_dispatch`), bewusst ohne Tor. Branchschutz mit Required
 Checks für den Produktbranch ist eine GitHub-Einstellung (USER ACTION).
+
+## D-051 · 2026-08-26 · Die Notiz-Frist ist eine harte Obergrenze, und Wiederholungen steuert ANITEW selbst (Runde 3, R3-01)
+
+**Entscheidung:** Der Alarm des Durable Objects zeigt immer auf den
+**frühesten** relevanten Zeitpunkt — nächster Termin *oder* nächster
+Notiz-Ablauf. Vorher gewann der Termin, sobald es einen gab; eine
+Messnotiz mit 60-Minuten-Frist konnte neben einer abends fälligen
+Tageserinnerung stundenlang liegen bleiben, entgegen der Zusage in
+PRIVACY §7. Fehlgeschlagene Pushes werden nicht mehr durch einen Wurf an
+Cloudflares Retry übergeben (dessen Versuche enden irgendwann, und danach
+räumte niemand mehr auf), sondern selbst wiederholt: fünf Versuche mit
+wachsendem Abstand (1, 2, 4, 8 min), gedeckelt durch den Notiz-Ablauf.
+Danach gilt die Zustellung als gescheitert — die Tageserinnerung rollt
+weiter, eine einmalige verschwindet. Ein Eintrag ohne Termin und ohne
+Notiz löscht sich vollständig (Alarm **und** Speicher), zentral in
+`rearm()`.
+
+## D-052 · 2026-08-26 · Alt-Sitzungen ohne Anmeldezeitpunkt bekommen 30 Tage, nicht 180 (Runde 3, R3-02)
+
+**Entscheidung:** Cookies aus der Zeit vor D-049 tragen kein
+`sessionExpiresAt`. Der Anmeldezeitpunkt lässt sich nicht rekonstruieren,
+und ihn zu schätzen wäre eine erfundene Zahl (R-1). Ihnen erneut volle
+180 Tage zu geben, machte PRIVACYs „höchstens 180 Tage ab Anmeldung" zur
+Falschaussage; sie sofort abzumelden, wäre grundloser Datenverlust. Sie
+laufen deshalb 30 Tage nach der ersten Nutzung mit der neuen Fassung ab —
+kürzer als jede Restlaufzeit unter der alten Regel — und PRIVACY §9/§11
+nennen diese Übergangsregel ausdrücklich. Neue Sitzungen bleiben strikt
+bei 180 Tagen ab Anmeldung.
+
+## D-053 · 2026-08-26 · Die Startregel der Messung gehört unter die Oberfläche (Runde 3, R3-04)
+
+**Entscheidung:** `benchmarkStartRefusal()` im Kern entscheidet, ob eine
+Messung beginnen darf („läuft schon eine?", „ist sie fällig?"), und
+`beginRun()` prüft das in **einer** Dexie-Transaktion mit dem Schreiben.
+Vorher entschied allein die Sichtbarkeit eines Knopfes: Zwei Klicks im
+selben Ausführungsschritt legten zwei offene Messungen mit derselben
+Ordnungszahl an, und der feste 14-Tage-Abstand — die Grundlage dafür,
+dass eine Messung überhaupt etwas misst (F2b) — hing an der Anzeige.
+Zusätzlich sperrt die Oberfläche den Start synchron beim ersten Tipp.
+
+## D-054 · 2026-08-26 · Einstellungen zeigen nur, was gespeichert ist (Runde 3, R3-06)
+
+**Entscheidung:** Sprache, Trainingssprache und Ton teilen sich
+`persistThenApply()`: angewandt wird erst nach erfolgreichem Schreiben,
+und ein Fehlschlag wird sichtbar gesagt. Vorher wechselten Sprache und
+Trainingssprache optimistisch und verschluckten den Fehler, und der Ton
+setzte seine Anzeige im `finally` — also auch im Fehlerfall, entgegen dem
+eigenen Kommentar daneben. Beim Ton bleibt das sofortige Umschalten der
+Klangmaschine erhalten (iOS verlangt die Nutzergeste), wird bei einem
+Schreibfehler aber zurückgenommen.
+
+## D-055 · 2026-08-26 · Datenschutz-Zusagen werden am Verhalten geprüft (Runde 3, R3-07)
+
+**Entscheidung:** `tests/worker/privacyGuarantees.test.ts` spielt die
+Sätze aus PRIVACY §7 und §9 als echte Abläufe durch (Notiz-Frist neben
+späterem Termin und bei dauerhaft gestörtem Pushdienst, 180-Tage- und
+30-Tage-Sitzung, „speichert nur …"). Die Quelltext-Wächter in
+`claims.test.ts` bleiben daneben bestehen — sie fangen auseinanderlaufende
+Texte, beweisen aber nichts über das Verhalten. Der erste Lauf dieser
+Verhaltenstests hat sofort einen echten Fehler gefunden: Der Worker
+speicherte mitgeschickte Fremdfelder einer Erinnerung unverändert; jetzt
+wird auf die in §7 genannten Felder normalisiert.

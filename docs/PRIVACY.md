@@ -123,7 +123,9 @@ dieses Gerät. Für die Zustellung speichert ANITEW serverseitig nur:
 - den generischen Benachrichtigungstext — auch als kurze Zustell-Notiz, die
   nach dem Auslösen beim Server bereitliegt, bis dein Gerät sie abholt,
   längstens aber 24 Stunden (bei der Messerinnerung 60 Minuten); danach wird
-  sie gelöscht statt verspätet zugestellt. Bleibt weder ein Termin noch eine
+  sie gelöscht statt verspätet zugestellt. Diese Frist gilt unabhängig davon,
+  ob noch spätere Erinnerungen geplant sind oder ob der Pushdienst gerade
+  nicht erreichbar ist. Bleibt weder ein Termin noch eine
   Notiz übrig, wird der gesamte serverseitige Eintrag gelöscht.
 
 **Nicht gespeichert werden dafür:** Trainingsantworten, Gedächtnisinhalte,
@@ -165,7 +167,15 @@ Google-Autorisierungscode gegen Tokens und hält die Sitzung — einschließlich
 des Google-Refresh-Tokens — verschlüsselt in einem `HttpOnly`-Cookie deines
 Browsers (Laufzeit ab Anmeldung fest höchstens 180 Tage — die Frist wird
 durch Nutzung **nicht** verlängert; beim Abmelden sofort gelöscht und bei
-Google widerrufen; danach ist eine neue Anmeldung nötig). Es gibt keine ANITEW-Nutzerdatenbank, in der Tokens
+Google widerrufen; danach ist eine neue Anmeldung nötig).
+
+**Übergangsregel für ältere Anmeldungen:** Sitzungen, die vor Einführung
+dieser festen Frist entstanden sind, tragen keinen Anmeldezeitpunkt in sich;
+er lässt sich nachträglich nicht ermitteln und wird auch nicht geschätzt.
+Solche Sitzungen laufen deshalb spätestens **30 Tage** nach der ersten
+Nutzung mit der neuen Fassung ab — kürzer als jede Restlaufzeit, die sie
+zuvor gehabt hätten. Danach ist eine neue Anmeldung nötig; für diese gilt
+dann die feste 180-Tage-Frist ab Anmeldung. Es gibt keine ANITEW-Nutzerdatenbank, in der Tokens
 lägen. Das Gerät nutzt den Zugriff anschließend für den ANITEW-Ordner im
 eigenen Drive. Name/E-Mail, die in der Oberfläche zur Kontokontrolle
 angezeigt werden, werden lokal in ANITEWs Gerätespeicher gehalten und beim
@@ -196,7 +206,9 @@ Export und Löschen über ihren Bestand. Bei freiwillig aktivierten Online-
 Funktionen erfolgt die Verarbeitung zur Bereitstellung der jeweils ausdrücklich
 gewählten Funktion. Konkrete Fristen: Das verschlüsselte Google-Sitzungs-Cookie
 läuft nach spätestens 180 Tagen ab Anmeldung ab (beim Abmelden sofort) und wird
-durch Nutzung nicht verlängert; serverseitige Push-Einträge bestehen, bis der
+durch Nutzung nicht verlängert; Sitzungen aus der Zeit vor dieser Regel laufen
+nach der Übergangsregel in Abschnitt 9 spätestens 30 Tage nach der ersten
+Nutzung mit der neuen Fassung ab; serverseitige Push-Einträge bestehen, bis der
 Termin zugestellt und abgeholt ist, du die Erinnerung beendest oder das
 Push-Abonnement endet — nicht abgeholte Zustell-Notizen längstens 24 Stunden
 (Messerinnerung: 60 Minuten). Technische Infrastrukturprotokolle und Daten bei externen

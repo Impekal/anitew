@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import {
   type Advice,
@@ -19,6 +19,7 @@ import {
   coachKeySettingFor,
 } from '../platform/web/coach.ts'
 import type { Dictionary } from '../i18n/index.ts'
+import { createLatestOnly, hasStoredCoachKey } from './coachKeyPresence.ts'
 
 export function CoachPanelImpl({
   advice,
@@ -52,15 +53,23 @@ export function CoachPanelImpl({
       .catch(() => undefined)
   }, [platform])
 
+  /*
+   * R3-03 (Runde 3): Nur das jüngste Leseergebnis darf die Anzeige setzen.
+   * Der Lesevorgang ist bei Anthropic zweistufig (Anbieter-Schlüssel, dann
+   * die alte anbieterlose Zeile) und damit langsam genug, dass ein schneller
+   * Wechsel ihn überholt. Ohne Wächter setzte die späte Antwort des alten
+   * Anbieters `hasKey` für den neuen — die Oberfläche behauptete dann einen
+   * Schlüssel, der dort gar nicht liegt.
+   */
+  const latest = useRef(createLatestOnly())
   useEffect(() => {
-    void (async () => {
-      const stored =
-        (await platform.settings.read<string>(coachKeySettingFor(provider))) ??
-        (provider === 'anthropic'
-          ? await platform.settings.read<string>(LEGACY_COACH_KEY_SETTING)
-          : undefined)
-      setHasKey(stored !== undefined && stored.trim() !== '')
-    })().catch(() => undefined)
+    const token = latest.current.begin()
+    void hasStoredCoachKey(platform.settings, provider)
+      .then((has) => {
+        if (latest.current.isCurrent(token)) setHasKey(has)
+      })
+      .catch(() => undefined)
+    return () => latest.current.cancelAll()
   }, [platform, provider])
 
   /*

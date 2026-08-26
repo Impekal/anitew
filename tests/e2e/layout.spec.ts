@@ -181,3 +181,52 @@ test('zentriert den Inhalt auf breiten Schirmen, statt ihn zu strecken', async (
   const rightGap = size.width - (box.x + box.width)
   expect(Math.abs(box.x - rightGap), 'die Spalte steht nicht mittig').toBeLessThan(4)
 })
+
+test('Fließtext bekommt echte Zeilenbreite — kein senkrechtes Wort-für-Wort', async ({ page }) => {
+  /*
+   * Der Memory Pulse lief auf einem echten iPhone senkrecht: ein Wort je
+   * Zeile in einer 40 px schmalen Spalte. Ursache war ein zweispaltiges
+   * Raster aus einem Stylesheet, dessen Marke ein späteres Stylesheet
+   * absolut positionierte — der Text rutschte in die leere erste Spalte.
+   *
+   * Kein Test hat das gesehen: Schmaler Text erzeugt keinen horizontalen
+   * Überlauf, und Sichtbarkeit war gegeben. Diese Prüfung schließt die
+   * Lücke — und zwar allgemein: **Jeder** Fließtextblock muss den Platz
+   * bekommen, den sein Kasten hergibt.
+   */
+  await visit(page)
+  await expect(startButton(page)).toBeVisible()
+
+  const squeezed = await page.evaluate(() => {
+    const problems: string[] = []
+    const blocks = document.querySelectorAll<HTMLElement>(
+      '.memory-pulse-line, .today-line, .greeting, .focus, .note p',
+    )
+    for (const block of blocks) {
+      const box = block.getBoundingClientRect()
+      if (box.width === 0 || box.height === 0) continue
+      const text = (block.textContent ?? '').trim()
+      // Erst ab einem echten Satz ist die Frage sinnvoll.
+      if (text.length < 25) continue
+      /*
+       * Die Signatur des Fehlers, gerätunabhängig: Ein Satz steht in einer
+       * Spalte, die **schmaler als jede lesbare Zeile** ist, und läuft
+       * deshalb nach unten statt nach rechts. Der Memory Pulse maß
+       * 40 × 252 px — Wort für Wort untereinander.
+       *
+       * Der erste Anlauf verglich zusätzlich mit der Elternbreite („nutzt
+       * mindestens 60 %"). Das war zu grob und meldete auf breiten Schirmen
+       * gesunde Zeilen: Eine Tageszeile, die ihre Inhaltsbreite nimmt, ist
+       * 299 von 544 px breit und völlig in Ordnung. Ein Fehlalarm, der zum
+       * Ignorieren erzieht, ist schlimmer als kein Test — deshalb prüft die
+       * Regel jetzt genau das, was den Fehler ausmacht, und nichts sonst.
+       */
+      if (box.width < 160 && box.height > box.width) {
+        problems.push(`${block.className}: ${Math.round(box.width)}×${Math.round(box.height)} px (senkrecht)`)
+      }
+    }
+    return problems
+  })
+
+  expect(squeezed, 'eingeklemmter Fließtext').toEqual([])
+})

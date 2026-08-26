@@ -1009,5 +1009,7 @@ export const de = {
     */
     heading: 'Einstellungen',
     note: 'Dieselben Regler stehen auch unten auf dem Startbildschirm.',
+    // R3-06: Was sich nicht speichern ließ, wird gesagt statt angezeigt.
+    saveFailed: 'Diese Einstellung ließ sich auf dem Gerät nicht speichern. Es gilt weiterhin die vorherige.',
   },
 } as const

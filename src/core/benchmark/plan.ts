@@ -148,3 +148,51 @@ export function nextRunDue(lastRun: BenchmarkRun | undefined): DayKey | undefine
   if (lastRun.immediate === undefined) return lastRun.day
   return addDays(lastRun.day, DAYS_BETWEEN_RUNS)
 }
+
+/**
+ * Eine gespeicherte Messzeile, so weit die Startregel sie braucht.
+ *
+ * Bewusst schmaler als die Datenbankzeile: Was hier steht, ist alles, was
+ * über einen **Start** entscheidet — nicht über eine Auswertung.
+ */
+export interface BenchmarkSlot {
+  ordinal: number
+  day: DayKey
+  completed: boolean
+  abandoned?: boolean
+  immediate?: number
+}
+
+/** Warum eine Messung gerade **nicht** begonnen werden darf. */
+export type BenchmarkStartRefusal = 'open-run' | 'not-due'
+
+/**
+ * Die Startregel der Messung — als Tatsache im Kern, nicht als Zustand der
+ * Oberfläche (R3-04, Runde 3).
+ *
+ * Bisher entschied allein die Oberfläche, ob der Startknopf sichtbar ist.
+ * Das ist keine Invariante: Ein schneller Doppeltipp oder zwei offene
+ * Fenster konnten zwei Messungen anlegen, und der feste Abstand von
+ * vierzehn Tagen war nirgends unterhalb der Anzeige abgesichert. Wer misst,
+ * bis das Ergebnis gefällt, misst nicht mehr sein Gedächtnis (F2b) — deshalb
+ * gehört diese Regel unter die Oberfläche.
+ */
+export function benchmarkStartRefusal(
+  slots: readonly BenchmarkSlot[],
+  today: DayKey,
+): BenchmarkStartRefusal | undefined {
+  if (slots.some((slot) => !slot.completed && slot.abandoned !== true)) return 'open-run'
+
+  const last = [...slots].sort((a, b) => a.ordinal - b.ordinal)[slots.length - 1]
+  if (last === undefined) return undefined
+
+  // `nextRunDue` liest von der Messung nur Tag und Sofortabruf; die Anzahl
+  // spielt für den Termin keine Rolle.
+  const due = nextRunDue({
+    ordinal: last.ordinal,
+    day: last.day,
+    immediate: last.immediate,
+    total: 0,
+  })
+  return due !== undefined && today < due ? 'not-due' : undefined
+}

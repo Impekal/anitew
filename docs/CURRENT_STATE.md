@@ -1,6 +1,6 @@
 # ANITEW — Current State
 
-**Stand: 2026-08-26** (nach Merge von PR #79 „Fix real iPhone closed-app reminders“, dem Reifeprüfungs-Review/PR #80 und der Zweitprüfungs-Runde 2 — F-01…F-13)
+**Stand: 2026-08-26** (nach Runde 3 der Zweitprüfung — R3-01…R3-07, D-051…D-055 — sowie Merge von PR #79 „Fix real iPhone closed-app reminders“, dem Reifeprüfungs-Review/PR #80 und der Zweitprüfungs-Runde 2 — F-01…F-13)
 
 Diese Datei ist die kurze, autoritative Zustandsübersicht. `docs/BACKLOG.md` und
 `PROJECT_STATE.md` bleiben als historische Arbeits- und Entscheidungsprotokolle
