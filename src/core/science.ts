@@ -60,6 +60,7 @@ export const SCIENCE_CLAIMS = [
   'forgetting',
   'mnemonics',
   'brainTraining',
+  'rewards',
   'everyday',
 ] as const
 export type ScienceClaimId = (typeof SCIENCE_CLAIMS)[number]
@@ -163,6 +164,30 @@ export const SCIENCE: readonly ScienceClaim[] = [
         year: 2016,
         title: 'Do "brain-training" programs work?',
         where: 'Psychological Science in the Public Interest, 17(3), 103–186',
+      },
+    ],
+  },
+  {
+    /*
+     * Warum ANITEW keine Punkte, Level und Freischaltungen hat.
+     *
+     * Der Befund ist echt und alt: Erwartete äußere Belohnungen können die
+     * eigene Motivation für eine Tätigkeit verdrängen, die jemand ohnehin
+     * gern tut. Gemessen ist er an Aufgaben im Labor, nicht an App-Serien —
+     * deshalb `narrow` und kein Wort weiter. Dass eine App **ohne** Punkte
+     * besser wirkt, ist nirgends gezeigt; wer das behauptete, machte genau
+     * den Fehler, den diese Seite anprangert.
+     */
+    id: 'rewards',
+    standing: 'narrow',
+    restsOn: ['K7', 'D-019'],
+    sources: [
+      {
+        authors: 'Deci, E. L., Koestner, R. & Ryan, R. M.',
+        year: 1999,
+        title:
+          'A meta-analytic review of experiments examining the effects of extrinsic rewards on intrinsic motivation',
+        where: 'Psychological Bulletin, 125(6), 627–668',
       },
     ],
   },
