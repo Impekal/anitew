@@ -686,16 +686,18 @@ describe('das PushReminder-Durable-Object', () => {
           recurrence: { localTime: '20:00', timeZone: 'Europe/Berlin' },
         },
       })
+      const dueAt = now - 1000
       await call(target, '/schedule', {
         endpoint: ENDPOINT,
-        reminder: { id: 'benchmark', at: now - 1000, title: 'Messung wartet', body: 'B' },
+        reminder: { id: 'benchmark', at: dueAt, title: 'Messung wartet', body: 'B' },
       })
 
       globalThis.fetch = (async () => new Response('', { status: 201 })) as typeof fetch
       await target.alarm()
 
       const expiresAt = harness.stored()?.pending[0]?.expiresAt
-      expect(expiresAt).toBe(now + 60 * 60_000)
+      // R4-02: verankert an der Fälligkeit, nicht am Zeitpunkt des Alarms.
+      expect(expiresAt).toBe(dueAt + 60 * 60_000)
       // Der nächste Alarm gehört dem Notiz-Ablauf, nicht der Tageserinnerung.
       expect(harness.alarmAt()).toBe(expiresAt)
 
@@ -888,9 +890,10 @@ describe('das PushReminder-Durable-Object', () => {
       vi.setSystemTime(Date.UTC(2026, 7, 26, 12, 0))
       const harness = durableHarness()
       const target = new PushReminder(harness.state, env)
+      const dueAt = Date.now() - 1000
       await call(target, '/schedule', {
         endpoint: ENDPOINT,
-        reminder: { id: 'benchmark', at: Date.now() - 1000, title: 'Messung wartet', body: 'B' },
+        reminder: { id: 'benchmark', at: dueAt, title: 'Messung wartet', body: 'B' },
       })
 
       globalThis.fetch = (async () => new Response('', { status: 201 })) as typeof fetch
@@ -901,7 +904,8 @@ describe('das PushReminder-Durable-Object', () => {
       // Notiz hätte für immer im Speicher gelegen.
       const stored = harness.stored() as StoredState
       expect(stored.pending).toHaveLength(1)
-      expect(stored.pending[0]?.expiresAt).toBe(Date.now() + 60 * 60_000)
+      // R4-02: an der Fälligkeit verankert.
+      expect(stored.pending[0]?.expiresAt).toBe(dueAt + 60 * 60_000)
       expect(harness.alarmAt()).toBe(stored.pending[0]?.expiresAt)
 
       // 61 Minuten später ist das Messfenster lange vorbei: nichts mehr

@@ -122,8 +122,10 @@ dieses Gerät. Für die Zustellung speichert ANITEW serverseitig nur:
 - bei der täglichen Erinnerung Uhrzeit und IANA-Zeitzone,
 - den generischen Benachrichtigungstext — auch als kurze Zustell-Notiz, die
   nach dem Auslösen beim Server bereitliegt, bis dein Gerät sie abholt,
-  längstens aber 24 Stunden (bei der Messerinnerung 60 Minuten); danach wird
-  sie gelöscht statt verspätet zugestellt. Diese Frist gilt unabhängig davon,
+  längstens aber 24 Stunden **ab dem fälligen Zeitpunkt** (bei der
+  Messerinnerung 60 Minuten); danach wird sie gelöscht statt verspätet
+  zugestellt. Die Frist zählt ab der Fälligkeit und beginnt durch einen
+  erneuten Zustellversuch nicht neu. Diese Frist gilt unabhängig davon,
   ob noch spätere Erinnerungen geplant sind oder ob der Pushdienst gerade
   nicht erreichbar ist. Bleibt weder ein Termin noch eine
   Notiz übrig, wird der gesamte serverseitige Eintrag gelöscht.

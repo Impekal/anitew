@@ -1687,3 +1687,33 @@ Texte, beweisen aber nichts über das Verhalten. Der erste Lauf dieser
 Verhaltenstests hat sofort einen echten Fehler gefunden: Der Worker
 speicherte mitgeschickte Fremdfelder einer Erinnerung unverändert; jetzt
 wird auf die in §7 genannten Felder normalisiert.
+
+## D-056 · 2026-08-26 · Zwei Fristen, die nur fast hielten (Runde 4, R4-01/R4-02)
+
+**Entscheidung:** Zwei Lücken aus Runde 3 geschlossen, beide von der
+Zweitprüfung am Code gefunden — und beide von den damaligen Tests
+übersehen, weil die Testaufbauten genau am Problemfall vorbeiliefen.
+
+*R4-01:* Bei einer Alt-Sitzung ohne `sessionExpiresAt` berechnete der
+Worker die 30-Tage-Frist zwar, gab aber **kein neues Cookie zurück**,
+solange Googles Access-Token noch gültig war — die Frist wurde erst beim
+nächsten Refresh versiegelt. Wer nach vier Wochen wiederkam, lebte damit
+deutlich länger als die zugesagten 30 Tage. Die Frist wird jetzt beim
+allerersten Zugriff festgeschrieben. Die beiden Runde-3-Tests hatten das
+nie getroffen: Sie erzeugten absichtlich ein abgelaufenes Access-Token und
+landeten sofort im Refresh-Pfad.
+
+*R4-02:* Die Notiz-Frist wurde als `now + TTL` gerechnet. Lief ein
+Wiederholungsalarm stark verspätet, war die alte Notiz bereits geräumt und
+dieselbe Zustellung entstand mit einer **frischen** Frist neu — aus der
+Höchstfrist wurde eine Frist je Versuch. Sie hängt jetzt an der
+ursprünglichen Fälligkeit (`due.at + TTL`, derselbe Anker wie die
+`deliveryId`). Ist das Fenster vorbei, wird nicht mehr gepusht, keine
+Notiz neu angelegt und die Zustellung zurückgezogen. Die Runde-3-Tests
+riefen den Alarm stets exakt zur angeforderten Zeit auf und konnten das
+nicht sehen.
+
+**Lehre für die Testführung:** Ein Verhaltenstest beweist nur den Pfad,
+den sein Aufbau erzwingt. Beide neuen Fälle prüfen deshalb ausdrücklich
+den *anderen* Zweig — gültiges Token statt abgelaufenem, verspäteter
+Alarm statt pünktlichem.
