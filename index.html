@@ -27,11 +27,12 @@
       }
 
       /*
-       * Das fünfsekündige Markenritual gehört nur zum allerersten Öffnen auf
-       * diesem Gerät. Danach ist ANITEW sofort wieder ein Werkzeug. Der
-       * Query-Schalter ist ausschließlich für den expliziten E2E-Vertrag;
-       * normale automatisierte Browser zahlen die fünf Sekunden nicht bei
-       * jedem isolierten Testkontext erneut.
+       * Das sechssekündige Markenritual gehört nur zum allerersten Öffnen auf
+       * diesem Gerät. Spätere echte Dokument-/App-Starts zeigen die kompakte
+       * Drei-Sekunden-Version. Ein bloßer Wechsel aus einer bereits laufenden
+       * PWA heraus und wieder hinein erzeugt kein neues Dokument und deshalb
+       * auch keinen neuen Splash. Der Query-Schalter ist ausschließlich für
+       * den expliziten E2E-Vertrag.
        */
       try {
         const key = 'anitew.launch.seen.v3'
@@ -49,7 +50,7 @@
        * Englisch und unabhängig von Geräte-, App- und Trainingssprache.
        */
       #anitew-launch {
-        --launch-duration: 1.65s;
+        --launch-duration: 3s;
         position: fixed;
         inset: 0;
         z-index: 99999;
@@ -71,7 +72,7 @@
         animation: anitew-launch-away var(--launch-duration) cubic-bezier(.4,0,.2,1) forwards;
       }
       html[data-anitew-first-launch='true'] #anitew-launch {
-        --launch-duration: 5s;
+        --launch-duration: 6s;
       }
       #anitew-launch::before,
       #anitew-launch::after {
@@ -251,8 +252,8 @@
         100% { opacity: 0; visibility: hidden; }
       }
       @media (prefers-reduced-motion: reduce) {
-        #anitew-launch { --launch-duration: .42s; }
-        html[data-anitew-first-launch='true'] #anitew-launch { --launch-duration: 5s; }
+        #anitew-launch { --launch-duration: 3s; }
+        html[data-anitew-first-launch='true'] #anitew-launch { --launch-duration: 6s; }
         #anitew-launch::before,
         #anitew-launch::after,
         .anitew-mark-path,
