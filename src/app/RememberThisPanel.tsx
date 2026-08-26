@@ -69,6 +69,8 @@ export function RememberThisPanel({
   const [suggestions, setSuggestions] = useState<RememberSuggestions | undefined>(undefined)
   const [dropped, setDropped] = useState<ReadonlySet<string>>(new Set())
   const [saved, setSaved] = useState(false)
+  // F-10 (Runde 2): Ein fehlgeschlagenes Speichern wird gesagt, nicht verschluckt.
+  const [saveFailed, setSaveFailed] = useState(false)
   const [deadlineInput, setDeadlineInput] = useState('')
   const [deadlineInferred, setDeadlineInferred] = useState(false)
   const [deadlineError, setDeadlineError] = useState<string | undefined>()
@@ -233,13 +235,22 @@ export function RememberThisPanel({
       setDeadlineInferred(false)
       setSuggestions(undefined)
       setFromAi(false)
+      setSaveFailed(false)
       setSaved(true)
       // Der Ton der Klangsprache fürs Aufheben — leise, kein Jubel (G-1).
       platform.sound.play('remember')
       if (newConnections > 0) platform.sound.play('connection')
       scheduleDriveSync(platform)
       onSaved({ nodeIds: newNodeIds, edgeIds: newEdgeIds })
-    })().catch(() => undefined)
+    })().catch(() => {
+      /*
+       * F-10 (Runde 2): Lehnt IndexedDB den Schreibvorgang ab (z. B. volle
+       * Quota), bleiben Eingabe und Vorschläge stehen — und der Grund steht
+       * sichtbar da, statt dass „Bestätigen“ scheinbar nichts tut.
+       */
+      setSaved(false)
+      setSaveFailed(true)
+    })
   }
 
   const kept = (node: NodeSuggestion) => !dropped.has(node.id)
@@ -396,6 +407,11 @@ export function RememberThisPanel({
       )}
 
       {saved && <p className="remember-saved" role="status" aria-live="polite">{texts.saved}</p>}
+      {saveFailed && (
+        <p className="coach-failure remember-failure" role="alert">
+          {texts.saveFailed}
+        </p>
+      )}
     </section>
   )
 }

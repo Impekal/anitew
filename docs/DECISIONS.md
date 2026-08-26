@@ -1581,3 +1581,47 @@ jede Veröffentlichung trotzdem ~400 KB Optimierer-JS auf jedes Gerät
 vorlud. Der Optimierungszyklus ist best-effort (items.ts fängt den
 Importfehler) und läuft in der nächsten Online-Sitzung. Kein
 Funktionsverlust, spürbar schlankere Updates.
+
+## D-047 · 2026-08-26 · Sicherungen tragen keine gerätegebundenen Einstellungen (Runde 2, F-01)
+
+**Entscheidung:** `makeBackup`/`readBackup` filtern eine feste Liste
+gerätegebundener Einstellungen: `coach.key`, alle `coach.key.*`,
+`sync.account`, `sync.accountName`, `sync.on`, `sync.lastAt`,
+`sync.clientId`. Vorher wanderte die komplette settings-Tabelle in die
+Datei — und damit BYOK-Schlüssel in Downloads und (über den Abgleich) in
+Google Drive, im Widerspruch zu PRIVACY §10. Gefiltert wird an beiden
+Kanten (Schreiben **und** Lesen), damit ältere Dateien die Werte nicht
+wieder einschleppen. Wer je eine Sicherung mit hinterlegtem Schlüssel
+geteilt hat, sollte den Schlüssel beim Anbieter rotieren (USER ACTION).
+
+## D-048 · 2026-08-26 · Push-Endpunkte nur zu echten Pushdiensten, mit Horizont und Notiz-Ablauf (Runde 2, F-03/F-05)
+
+**Entscheidung:** `/push/*` akzeptiert als Ziel nur die Hosts der realen
+Browser-Pushdienste (FCM, Mozilla, Apple, WNS) — der Same-Origin-Schutz
+ist CSRF-Abwehr, keine Authentisierung, und ohne Host-Liste wäre der
+Worker ein signierendes Relais an beliebige HTTPS-Adressen. Dazu: Termine
+höchstens 60 Tage voraus, Zustellnotizen mit hartem Ablauf (täglich 24 h,
+Messung 60 min, maximal 8), Aufräum-Alarm auch für reine Notizen, und
+ein leerer Eintrag löscht sich selbst. Cloudflare-Rate-Limits auf
+`/push/schedule` bleiben als zusätzliche Empfehlung offen (USER ACTION im
+Cloudflare-Dashboard, kein Code).
+
+## D-049 · 2026-08-26 · Google-Sitzung endet absolut nach 180 Tagen (Runde 2, F-04)
+
+**Entscheidung:** Der versiegelte Sitzungsablauf entsteht einmal beim
+Login (`sessionExpiresAt`) und wird bei Refreshes übernommen, nie
+verlängert; das Cookie erhält nur die Restlaufzeit. Vorher setzte jeder
+Refresh erneut 180 Tage — ein rollierendes Fenster, das PRIVACYs
+„spätestens 180 Tage“ falsch machte. Bestehende Sitzungen ohne Feld
+beginnen die Zählung beim nächsten Refresh (strengste Deutung ohne
+Zwangs-Logout). Nach Ablauf: neue Anmeldung.
+
+## D-050 · 2026-08-26 · Produktion nur noch hinter dem vollen CI-Tor (Runde 2, F-12)
+
+**Entscheidung:** Der Deploy ist ein Job in ci.yml (`needs: check`) und
+läuft nur auf `main`/`anitew-redesign-v2` nach vollständig grünem Tor
+desselben Commits. `workflow_run` schied aus, weil GitHub es nur aus dem
+Default-Branch (`main`) bedient — der Produktbranch ist aber
+`anitew-redesign-v2`. deploy.yml bleibt als manueller Notweg
+(`workflow_dispatch`), bewusst ohne Tor. Branchschutz mit Required
+Checks für den Produktbranch ist eine GitHub-Einstellung (USER ACTION).

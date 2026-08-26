@@ -1,6 +1,6 @@
 # ANITEW — Current State
 
-**Stand: 2026-08-26** (nach Merge von PR #79 „Fix real iPhone closed-app reminders“ und dem Reifeprüfungs-Review)
+**Stand: 2026-08-26** (nach Merge von PR #79 „Fix real iPhone closed-app reminders“, dem Reifeprüfungs-Review/PR #80 und der Zweitprüfungs-Runde 2 — F-01…F-13)
 
 Diese Datei ist die kurze, autoritative Zustandsübersicht. `docs/BACKLOG.md` und
 `PROJECT_STATE.md` bleiben als historische Arbeits- und Entscheidungsprotokolle
@@ -9,10 +9,18 @@ erhalten; ältere Statusangaben dort dürfen diesem Stand nicht widersprechen.
 ## Produktlinie
 
 - Produktbranch: `anitew-redesign-v2`
-- Ein Push auf den Produktbranch deployt nach Production (deploy.yml) —
-  inklusive VAPID-Bootstrap (idempotent, rotiert nie vorhandene Schlüssel)
-  und anschließender Live-Prüfung von `/push/vapid-public`. Arbeits- und
-  Feature-Branches deployen nicht.
+- Ein Push auf den Produktbranch deployt nach Production **erst nach dem
+  vollen CI-Tor desselben Commits** (Deploy-Job in ci.yml mit
+  `needs: check`; D-050) — inklusive VAPID-Bootstrap (idempotent, rotiert
+  nie vorhandene Schlüssel) und anschließender Live-Prüfung von
+  `/push/vapid-public`. deploy.yml ist nur noch der manuelle Notweg.
+  Arbeits- und Feature-Branches deployen nicht.
+- Runde 2 der Zweitprüfung (ChatGPT-Review, 2026-08-26) ist umgesetzt:
+  Sicherungen ohne BYOK-Schlüssel/Google-Identität (D-047), Push-Endpunkt-
+  Allowlist + Notiz-Ablauf (D-048), absolute 180-Tage-Sitzung (D-049),
+  ehrliche Benchmark-Formulierungen („Zählunsicherheit“ statt „Zufall“),
+  SW-Update-Fix für Erstbesuchs-Tabs, 401/403/429-Diagnosen, sichtbare
+  Speicherfehler, DST-Lücken-Policy, Einstellungen-Seite im Core.
 - Core bleibt browserfrei und deterministisch; Zeit und Plattform kommen über
   Ports/Adapter.
 - Local-first bleibt die Grundregel. Netzwerk, Drive und BYOK-AI sind optionale

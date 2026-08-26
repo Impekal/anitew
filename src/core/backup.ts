@@ -173,9 +173,50 @@ export type BackupReading =
     }
   | { ok: false; problem: BackupProblem; version?: number }
 
+/*
+ * ── Was eine Sicherung NIE enthalten darf (F-01, Runde 2) ─────────────────
+ *
+ * Die Sicherung ist zum Weitergeben gebaut: Sie liegt als Datei im
+ * Downloadordner und — beim Drive-Abgleich — im Google Drive. BYOK-Schlüssel
+ * und die Google-Identität dieses Geräts gehören dort nicht hinein; PRIVACY
+ * §10 verspricht wörtlich, dass der API-Schlüssel auf dem Gerät bleibt.
+ * Gerätezustand des Syncs (an/aus, Zeitstempel, Client-Kennung) ist keine
+ * Vorliebe, sondern Zustand **dieses** Geräts — auf einem zweiten Gerät wäre
+ * er schlicht falsch.
+ *
+ * Gefiltert wird an beiden Kanten: beim Schreiben (`makeBackup`) und beim
+ * Lesen (`readBackup`) — Letzteres, damit ältere Dateien, die diese Werte
+ * noch enthalten, sie nicht wieder einschleppen.
+ */
+const DEVICE_ONLY_SETTINGS = new Set([
+  'coach.key', // der alte Anthropic-Schlüssel ohne Anbieter (D-031)
+  'sync.account',
+  'sync.accountName',
+  'sync.on',
+  'sync.lastAt',
+  'sync.clientId',
+])
+const DEVICE_ONLY_PREFIXES = ['coach.key.'] as const
+
+/** Darf diese Einstellung das Gerät in einer Sicherung verlassen? */
+export function portableSetting(key: string): boolean {
+  if (DEVICE_ONLY_SETTINGS.has(key)) return false
+  return !DEVICE_ONLY_PREFIXES.some((prefix) => key.startsWith(prefix))
+}
+
+function portableSettings(settings: readonly BackupSetting[]): readonly BackupSetting[] {
+  return settings.filter((setting) => portableSetting(setting.key))
+}
+
 /** Baut die Datei aus den Tabellen. */
 export function makeBackup(tables: BackupTables, now: number, app: string): BackupFile {
-  return { format: BACKUP_FORMAT, version: BACKUP_VERSION, createdAt: now, app, tables }
+  return {
+    format: BACKUP_FORMAT,
+    version: BACKUP_VERSION,
+    createdAt: now,
+    app,
+    tables: { ...tables, settings: portableSettings(tables.settings) },
+  }
 }
 
 /**
@@ -214,7 +255,12 @@ export function readBackup(raw: unknown): BackupReading {
    * Bericht.
    */
   const events = rows.events.filter((event) => isBackupEventKind(event.kind))
-  const tables: BackupTables = { ...rows, events }
+  /*
+   * Geräte-gebundene Einstellungen aus älteren Dateien bleiben draußen —
+   * ein Schlüssel, der einmal fälschlich exportiert wurde, wandert sonst
+   * beim Import auf jedes weitere Gerät (F-01, Runde 2).
+   */
+  const tables: BackupTables = { ...rows, events, settings: portableSettings(rows.settings) }
 
   return {
     ok: true,

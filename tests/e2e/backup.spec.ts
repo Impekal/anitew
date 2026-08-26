@@ -79,6 +79,55 @@ test('trägt die Trainingshistorie auf ein zweites Gerät', async ({ browser }, 
   await second.close()
 })
 
+test('exportiert weder BYOK-Schlüssel noch Google-Identität (F-01, Runde 2)', async ({
+  page,
+}, testInfo) => {
+  await visit(page)
+
+  // Gesät wird direkt in die echte settings-Tabelle — derselbe Ort, aus dem
+  // der Export liest. Kein Mock: Der Test beweist den realen Dateiinhalt.
+  await page.evaluate(async () => {
+    const open = indexedDB.open('anitew')
+    const database: IDBDatabase = await new Promise((resolve, reject) => {
+      open.onsuccess = () => resolve(open.result)
+      open.onerror = () => reject(open.error)
+    })
+    const put = (row: { key: string; value: unknown }) =>
+      new Promise<void>((resolve, reject) => {
+        const request = database
+          .transaction('settings', 'readwrite')
+          .objectStore('settings')
+          .put(row)
+        request.onsuccess = () => resolve()
+        request.onerror = () => reject(request.error)
+      })
+    await put({ key: 'coach.key.gemini', value: 'AIza-geheim-e2e' })
+    await put({ key: 'coach.key', value: 'sk-legacy-e2e' })
+    await put({ key: 'sync.account', value: 'mensch@example.com' })
+    await put({ key: 'sync.accountName', value: 'Mensch Beispiel' })
+  })
+
+  await openBackupPanel(page)
+  const [download] = await Promise.all([
+    page.waitForEvent('download'),
+    page.getByRole('button', { name: 'Sicherung speichern' }).click(),
+  ])
+  const file = fixturePath(testInfo, 'sicherung-schluessel.json')
+  await download.saveAs(file)
+
+  const content = await readFile(file, 'utf8')
+  expect(content).not.toContain('AIza-geheim-e2e')
+  expect(content).not.toContain('sk-legacy-e2e')
+  expect(content).not.toContain('mensch@example.com')
+  expect(content).not.toContain('Mensch Beispiel')
+  const parsed = JSON.parse(content) as { tables: { settings: { key: string }[] } }
+  const keys = parsed.tables.settings.map((setting) => setting.key)
+  expect(keys).not.toContain('coach.key.gemini')
+  expect(keys).not.toContain('coach.key')
+  expect(keys).not.toContain('sync.account')
+  expect(keys).not.toContain('sync.accountName')
+})
+
 test('sagt bei einer fremden Datei, was los ist — und schimpft nicht', async ({
   page,
 }, testInfo) => {

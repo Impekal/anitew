@@ -74,13 +74,34 @@ const MODELS: Readonly<Record<Exclude<CoachProvider, 'openai'>, string>> = {
   mistral: 'mistral-small-latest',
 }
 
-export type CoachFailure = 'no-key' | 'bad-key' | 'offline' | 'refused' | 'failed'
+export type CoachFailure =
+  | 'no-key'
+  | 'bad-key'
+  | 'forbidden'
+  | 'limited'
+  | 'offline'
+  | 'refused'
+  | 'failed'
 
 export class CoachError extends Error {
   constructor(readonly reason: CoachFailure) {
     super(reason)
     this.name = 'CoachError'
   }
+}
+
+/**
+ * Eine HTTP-Antwort der Anbieter in eine ehrliche Diagnose übersetzen
+ * (F-09, Runde 2). 401 und 403 sind **nicht** dasselbe: Groq etwa meldet
+ * 403 bei fehlender Berechtigung trotz gültigem Schlüssel — wer dann
+ * „Schlüssel prüfen“ liest, sucht am falschen Ort. Text- und Fotopfad
+ * benutzen dieselbe Tabelle, damit die Diagnosen nie auseinanderlaufen.
+ */
+export function failureForStatus(status: number): CoachFailure | undefined {
+  if (status === 401) return 'bad-key'
+  if (status === 403) return 'forbidden'
+  if (status === 429) return 'limited'
+  return undefined
 }
 
 interface ProviderCall {
@@ -200,7 +221,8 @@ export function createWebCoach(readConfig: () => Promise<CoachConfig>): CoachPor
         throw new CoachError('offline')
       }
 
-      if (response.status === 401 || response.status === 403) throw new CoachError('bad-key')
+      const classified = failureForStatus(response.status)
+      if (classified !== undefined) throw new CoachError(classified)
       if (!response.ok) throw new CoachError('failed')
 
       const text = call.parse((await response.json()) as unknown).trim()

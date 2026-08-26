@@ -6,6 +6,49 @@ const REVOKE_ENDPOINT = 'https://oauth2.googleapis.com/revoke'
 const CREDENTIAL_COOKIE = 'anitew_google_oauth'
 const STATE_COOKIE = 'anitew_google_oauth_state'
 const PUSH_STATE_KEY = 'push-state-v1'
+
+/**
+ * Absolute Obergrenze einer Google-Sitzung (D-049). PRIVACY verspricht
+ * „läuft nach spätestens 180 Tagen ab“ — deshalb wird der Ablauf beim
+ * ersten Login mit versiegelt und bei jedem Refresh nur **übernommen**,
+ * nie verlängert. Ein rollierendes Fenster wäre eine stille Falschaussage.
+ */
+const SESSION_MAX_AGE_MS = 1000 * 60 * 60 * 24 * 180
+
+/**
+ * Die Schreib-Endpunkte unter /push/* sind ohne Konto erreichbar — der
+ * CSRF-Schutz (sameOriginRequest) hält Browser fremder Seiten fern, aber
+ * kein Skript mit frei gesetzten Headern. Damit der Worker nicht als
+ * Relais für beliebige HTTPS-Adressen taugt (F-03, Runde 2), akzeptiert er
+ * nur die echten Web-Push-Dienste der Browser. Wer einen Browser mit
+ * anderem Pushdienst mitbringt, bekommt eine ehrliche Ablehnung statt
+ * einer stillen — die Liste ist bewusst erweiterbar.
+ */
+const PUSH_ENDPOINT_HOSTS = [
+  'fcm.googleapis.com', // Chrome, Chromium-Familie (FCM)
+  'updates.push.services.mozilla.com', // Firefox
+  'web.push.apple.com', // Safari / iOS
+]
+const PUSH_ENDPOINT_SUFFIXES = [
+  '.push.apple.com', // Apples regionale Varianten
+  '.notify.windows.com', // Edge (WNS)
+]
+
+/**
+ * Wie weit ein Termin in der Zukunft liegen darf. Die App plant nie weiter
+ * als bis morgen; 60 Tage sind großzügig für Uhren, die falsch gehen — und
+ * eng genug, dass niemand Jahre im Voraus Speicher belegt.
+ */
+const SCHEDULE_HORIZON_MS = 60 * 86_400_000
+
+/**
+ * Wie lange eine Zustellnotiz auf ihre Abholung warten darf (F-05, Runde 2).
+ * Die Tagesnotiz ist nach einem Tag vom nächsten Termin überholt; die
+ * Messnotiz gehört zu einem 45-Minuten-Fenster. Danach wird gelöscht statt
+ * veraltet zugestellt — und PRIVACY kann eine echte Höchstfrist nennen.
+ */
+const PENDING_TTL_MS = { daily: 24 * 3_600_000, benchmark: 60 * 60_000 }
+const PENDING_MAX = 8
 const encoder = new TextEncoder()
 const decoder = new TextDecoder()
 
@@ -154,9 +197,13 @@ async function handleCallback(request, env) {
       accessToken: token.access_token,
       expiresAt: Date.now() + Math.max(60, expiresIn - 60) * 1000,
       refreshToken: typeof token.refresh_token === 'string' ? token.refresh_token : undefined,
+      // Der absolute Sitzungsablauf entsteht genau einmal: beim Login.
+      sessionExpiresAt: Date.now() + SESSION_MAX_AGE_MS,
     }
     const sealed = await seal(credential, env.GOOGLE_CLIENT_SECRET)
-    const maxAge = credential.refreshToken ? 60 * 60 * 24 * 180 : Math.max(60, expiresIn)
+    const maxAge = credential.refreshToken
+      ? Math.floor(SESSION_MAX_AGE_MS / 1000)
+      : Math.max(60, expiresIn)
     return appRedirect('complete', undefined, [credentialCookie(sealed, maxAge)])
   } catch (error) {
     return appRedirect('error', error instanceof Error ? error.message : 'token_exchange_failed')
@@ -191,6 +238,18 @@ async function handleAccessToken(request, env) {
     return json({ error: 'invalid_session' }, 401, clearCredentialCookie())
   }
 
+  /*
+   * Altbestand ohne absoluten Ablauf: Die Zählung beginnt jetzt — das ist
+   * die strengste Deutung, die keine bestehende Anmeldung sofort zerstört.
+   */
+  const sessionExpiresAt =
+    typeof credential.sessionExpiresAt === 'number'
+      ? credential.sessionExpiresAt
+      : Date.now() + SESSION_MAX_AGE_MS
+  if (sessionExpiresAt <= Date.now()) {
+    return json({ error: 'session_expired' }, 401, clearCredentialCookie())
+  }
+
   if (typeof credential.expiresAt === 'number' && credential.expiresAt > Date.now() + 30_000) {
     return json({ access_token: credential.accessToken })
   }
@@ -207,13 +266,12 @@ async function handleAccessToken(request, env) {
     accessToken: refreshed.access_token,
     expiresAt: Date.now() + Math.max(60, expiresIn - 60) * 1000,
     refreshToken: credential.refreshToken,
+    sessionExpiresAt,
   }
   const nextSealed = await seal(next, env.GOOGLE_CLIENT_SECRET)
-  return json(
-    { access_token: next.accessToken },
-    200,
-    credentialCookie(nextSealed, 60 * 60 * 24 * 180),
-  )
+  // Das Cookie lebt nur noch die **Rest**laufzeit — kein rollierendes Fenster.
+  const remaining = Math.max(60, Math.floor((sessionExpiresAt - Date.now()) / 1000))
+  return json({ access_token: next.accessToken }, 200, credentialCookie(nextSealed, remaining))
 }
 
 async function handleLogout(request, env) {
@@ -239,10 +297,18 @@ function pushConfigured(env) {
   return Boolean(env.VAPID_PUBLIC_KEY && env.VAPID_PRIVATE_KEY && env.VAPID_SUBJECT)
 }
 
+function allowedPushHost(hostname) {
+  return (
+    PUSH_ENDPOINT_HOSTS.includes(hostname) ||
+    PUSH_ENDPOINT_SUFFIXES.some((suffix) => hostname.endsWith(suffix))
+  )
+}
+
 function validEndpoint(value) {
   if (typeof value !== 'string' || value.length < 12 || value.length > 4096) return false
   try {
-    return new URL(value).protocol === 'https:'
+    const url = new URL(value)
+    return url.protocol === 'https:' && allowedPushHost(url.hostname)
   } catch {
     return false
   }
@@ -251,6 +317,7 @@ function validEndpoint(value) {
 function validReminder(value) {
   if (!value || (value.id !== 'daily' && value.id !== 'benchmark')) return false
   if (!Number.isFinite(value.at) || value.at <= 0) return false
+  if (value.at > Date.now() + SCHEDULE_HORIZON_MS) return false
   if (typeof value.title !== 'string' || value.title.length < 1 || value.title.length > 100) return false
   if (typeof value.body !== 'string' || value.body.length > 300) return false
   if (value.recurrence === undefined) return value.id !== 'daily'
@@ -383,6 +450,32 @@ function localToInstant(wanted, timeZone) {
   return sameLocalMinute(zonedParts(guess, timeZone), wanted) ? guess : undefined
 }
 
+/**
+ * Sommerzeit-Lücke (F-11, Runde 2): Springt die Uhr über die gewünschte
+ * Minute hinweg (z. B. 02:30 am Umstellungssonntag), gibt es diese lokale
+ * Zeit an dem Tag nicht. Die Erinnerung fällt dann **nicht** aus, sondern
+ * kommt zur ersten existierenden Minute nach der Lücke — Lücken sind bis
+ * zu einer Stunde groß (selten 30 Minuten), drei Stunden Suchraum reichen.
+ */
+function firstInstantAfterGap(wanted, timeZone) {
+  const base = Date.UTC(wanted.year, wanted.month - 1, wanted.day, wanted.hour, wanted.minute)
+  for (let addMinutes = 5; addMinutes <= 180; addMinutes += 5) {
+    const shifted = new Date(base + addMinutes * 60_000)
+    const candidate = localToInstant(
+      {
+        year: shifted.getUTCFullYear(),
+        month: shifted.getUTCMonth() + 1,
+        day: shifted.getUTCDate(),
+        hour: shifted.getUTCHours(),
+        minute: shifted.getUTCMinutes(),
+      },
+      timeZone,
+    )
+    if (candidate !== undefined) return candidate
+  }
+  return undefined
+}
+
 function nextLocalOccurrence(localTime, timeZone, after) {
   const [hour, minute] = localTime.split(':').map(Number)
   const here = zonedParts(after, timeZone)
@@ -396,7 +489,7 @@ function nextLocalOccurrence(localTime, timeZone, after) {
       hour,
       minute,
     }
-    const candidate = localToInstant(wanted, timeZone)
+    const candidate = localToInstant(wanted, timeZone) ?? firstInstantAfterGap(wanted, timeZone)
     if (candidate !== undefined && candidate > after) return candidate
   }
   throw new Error('next_local_occurrence_missing')
@@ -404,6 +497,18 @@ function nextLocalOccurrence(localTime, timeZone, after) {
 
 function emptyPushState(endpoint = '') {
   return { endpoint, reminders: {}, pending: [] }
+}
+
+/**
+ * Wirft abgelaufene Zustellnotizen weg (F-05, Runde 2). Notizen ohne
+ * Ablaufdatum stammen aus einer älteren Fassung und gelten als abgelaufen —
+ * lieber eine alte Notiz zu wenig als eine veraltete „Messung wartet“
+ * lange nach ihrem Fenster.
+ */
+function prunePending(value, now) {
+  value.pending = value.pending.filter(
+    (notice) => typeof notice.expiresAt === 'number' && notice.expiresAt > now,
+  )
 }
 
 export class PushReminder {
@@ -422,11 +527,20 @@ export class PushReminder {
 
   async rearm(value) {
     const next = Object.values(value.reminders).sort((a, b) => a.at - b.at)[0]
-    if (next === undefined) {
+    /*
+     * Auch reine Zustellnotizen halten den Alarm wach: Ohne Termin, aber mit
+     * wartender Notiz muss später noch jemand aufräumen — sonst läge die
+     * Notiz für immer im Speicher (F-05, Runde 2).
+     */
+    const nextPendingExpiry = value.pending
+      .map((notice) => (typeof notice.expiresAt === 'number' ? notice.expiresAt : 0))
+      .sort((a, b) => a - b)[0]
+    const at = next?.at ?? nextPendingExpiry
+    if (at === undefined) {
       await this.state.storage.deleteAlarm()
       return
     }
-    await this.state.storage.setAlarm(Math.max(Date.now() + 250, next.at))
+    await this.state.storage.setAlarm(Math.max(Date.now() + 250, at))
   }
 
   async fetch(request) {
@@ -463,8 +577,17 @@ export class PushReminder {
     }
 
     if (url.pathname === '/pending') {
+      // Veraltetes wird gelöscht statt zugestellt (F-05, Runde 2).
+      prunePending(value, Date.now())
       const pending = value.pending.shift()
-      await this.save(value)
+      if (Object.keys(value.reminders).length === 0 && value.pending.length === 0) {
+        // Nichts mehr geplant, nichts mehr wartend: Der Eintrag verschwindet.
+        await this.state.storage.deleteAlarm()
+        await this.state.storage.deleteAll()
+      } else {
+        await this.save(value)
+        await this.rearm(value)
+      }
       return pending === undefined ? json({ error: 'nothing_pending' }, 404) : json(pending)
     }
 
@@ -485,10 +608,18 @@ export class PushReminder {
     }
 
     const now = Date.now()
+    prunePending(value, now)
     const due = Object.values(value.reminders)
       .filter((reminder) => reminder.at <= now + 1_000)
       .sort((a, b) => a.at - b.at)[0]
     if (due === undefined) {
+      if (Object.keys(value.reminders).length === 0 && value.pending.length === 0) {
+        // Der Aufräum-Alarm nach der letzten abgelaufenen Notiz (F-05).
+        await this.state.storage.deleteAlarm()
+        await this.state.storage.deleteAll()
+        return
+      }
+      await this.save(value)
       await this.rearm(value)
       return
     }
@@ -500,7 +631,10 @@ export class PushReminder {
         title: due.title,
         body: due.body,
         tag: `anitew-${due.id}`,
+        expiresAt: now + (PENDING_TTL_MS[due.id] ?? 3_600_000),
       })
+      // Eine harte Obergrenze gegen unbegrenztes Wachstum: Älteste zuerst raus.
+      while (value.pending.length > PENDING_MAX) value.pending.shift()
       await this.save(value)
     }
 

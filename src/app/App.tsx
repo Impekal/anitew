@@ -88,7 +88,7 @@ import {
   loadTaught,
 } from '../data/technique.ts'
 
-import { isTranslated } from '../i18n/index.ts'
+import { type Dictionary, isTranslated } from '../i18n/index.ts'
 import { AboutPanel } from './AboutPanel.tsx'
 import { BackupPanel } from './BackupPanel.tsx'
 import { MenuIcon, type MenuIconKind } from './MenuIcon.tsx'
@@ -871,6 +871,52 @@ export function App() {
           />
         ),
       },
+      /*
+        Die Messung bekommt eine Tür im Core (Runde 2, Nutzerwunsch): Reihe,
+        Eichung und der nächste Termin sind auffindbar — gestartet wird aber
+        weiterhin nur, wenn sie fällig ist. Ein jederzeitiger Startknopf wäre
+        genau das Dauermessen, das die Methode ausschließt (F2b, R-1).
+      */
+      benchmark: {
+        title: dictionary.benchmark.heading,
+        body: (() => {
+          const nextDue = nextRunDue(runs[runs.length - 1])
+          const dueLine =
+            nextDue === undefined
+              ? undefined
+              : dictionary.benchmark.nextDueLine.replace(
+                  '{day}',
+                  new Date(`${nextDue}T00:00:00`).toLocaleDateString(language, {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                  }),
+                )
+          return (
+            <div className="benchmark-page">
+              {step.kind === 'invite' ? (
+                <section className="note" role="status">
+                  <h3>{dictionary.benchmark.invite}</h3>
+                  <p>{dictionary.benchmark.inviteNote}</p>
+                  <div className="note-actions">
+                    <button type="button" className="quiet" onClick={startBenchmark}>
+                      {dictionary.benchmark.start}
+                    </button>
+                  </div>
+                </section>
+              ) : step.kind === 'none' ? (
+                dueLine !== undefined && <p className="hint">{dueLine}</p>
+              ) : (
+                <p className="hint">{dictionary.benchmark.runningNote}</p>
+              )}
+              <BenchmarkPanel runs={runs} language={training} dictionary={dictionary} />
+              {!runs.some(isComplete) && (
+                <p className="hint">{dictionary.benchmark.noneYet}</p>
+              )}
+            </div>
+          )
+        })(),
+      },
       coach: {
         title: dictionary.coach.heading,
         body: (
@@ -967,6 +1013,24 @@ export function App() {
       check: {
         title: dictionary.check.heading,
         body: <FoundationPanel platform={platform} dictionary={dictionary} />,
+      },
+      settings: {
+        title: dictionary.settings.heading,
+        body: (
+          <div className="settings-page">
+            <LanguageSoundControls
+              dictionary={dictionary}
+              language={language}
+              choose={choose}
+              training={training}
+              chooseTraining={chooseTraining}
+              trainable={trainable}
+              translated={translated}
+              sound={sound}
+            />
+            <p className="hint">{dictionary.settings.note}</p>
+          </div>
+        ),
       },
     }
     const entry = pages[pageId]
@@ -1248,76 +1312,21 @@ export function App() {
       </div>
 
       <footer className="footer">
-        <label className="language">
-          <span>{dictionary.language.label}</span>
-          <select value={language} onChange={(event) => choose(event.target.value as Language)}>
-            {/*
-              Nur Sprachen mit echtem Wörterbuch (TRANSLATION_WORKFLOW §6):
-              Ein Eintrag, der auf Englisch zurückfällt — bei Arabisch sogar
-              als RTL-Dokument mit englischem Text —, verspricht eine
-              Übersetzung, die es nicht gibt. Wer die App in einer noch
-              nicht übersetzten Systemsprache öffnet, bekommt weiterhin die
-              ehrliche Fußnote; angeboten wird sie erst, wenn sie fertig ist.
-            */}
-            {SUPPORTED_LANGUAGES.filter((tag) => tag === language || isTranslated(tag)).map(
-              (tag) => (
-                <option key={tag} value={tag}>
-                  {dictionary.language.names[tag]}
-                </option>
-              ),
-            )}
-          </select>
-        </label>
         {/*
-          Die Trainingssprache steht nur da, wenn es überhaupt eine Wahl gibt
-          (L7, G-2). Ein Auswahlfeld mit einem Eintrag wäre Möbel.
+          Sprache und Ton stehen doppelt: hier am Fuß **und** als
+          Core-Seite „Einstellungen“ (Runde 2, Nutzerwunsch) — dieselbe
+          Komponente, kein zweiter Zustand.
         */}
-        {trainable.length > 1 && (
-          <label className="language language-training">
-            <span>{dictionary.language.training}</span>
-            <select
-              value={training}
-              onChange={(event) => chooseTraining(event.target.value as Language)}
-            >
-              {trainable.map((tag) => (
-                <option key={tag} value={tag}>
-                  {dictionary.language.names[tag]}
-                </option>
-              ))}
-            </select>
-          </label>
-        )}
-
-        <button
-          type="button"
-          className="sound-toggle"
-          onClick={sound.toggle}
-          aria-pressed={sound.enabled}
-        >
-          <span aria-hidden="true">{sound.enabled ? '♪' : '·'}</span>
-          {sound.enabled ? dictionary.sound.on : dictionary.sound.off}
-        </button>
-
-        {/*
-          Fehlen Texte oder die eigene Wortliste (Backlog L6), wird auf der
-          Rückfallsprache trainiert. Das ist eine Einschränkung und wird als
-          solche gesagt, statt sie zu verstecken.
-        */}
-        {!translated && <p className="hint">{dictionary.language.incomplete}</p>}
-
-        {/*
-          Der Satz zur Trainingssprache steht bei ihr und nicht bei der
-          Oberfläche — er erklärt, was ein Wechsel bedeutet, und dass er
-          nichts verliert.
-        */}
-        {trainable.length > 1 && (
-          <>
-            <p className="hint">{dictionary.language.trainingNote}</p>
-            {trainable.length < SUPPORTED_LANGUAGES.length && (
-              <p className="hint">{dictionary.language.trainingOnly}</p>
-            )}
-          </>
-        )}
+        <LanguageSoundControls
+          dictionary={dictionary}
+          language={language}
+          choose={choose}
+          training={training}
+          chooseTraining={chooseTraining}
+          trainable={trainable}
+          translated={translated}
+          sound={sound}
+        />
 
         {/*
           Der Systemcheck aus M0 hat seinen Zweck erfüllt und beherrscht den
@@ -1390,6 +1399,10 @@ export function App() {
                 <MenuIcon kind="profile" />
                 <span>{dictionary.profile.heading}</span>
               </button>
+              <button type="button" className="drawer-item" onClick={() => openPage('benchmark')}>
+                <MenuIcon kind="benchmark" />
+                <span>{dictionary.benchmark.heading}</span>
+              </button>
               <button type="button" className="drawer-item" onClick={() => openPage('coach')}>
                 <MenuIcon kind="coach" />
                 <span>{dictionary.coach.heading}</span>
@@ -1443,10 +1456,115 @@ export function App() {
                 <MenuIcon kind="check" />
                 <span>{dictionary.check.heading}</span>
               </button>
+              <button type="button" className="drawer-item" onClick={() => openPage('settings')}>
+                <MenuIcon kind="settings" />
+                <span>{dictionary.settings.heading}</span>
+              </button>
             </section>
           </nav>
         </div>
       )}
     </main>
+  )
+}
+
+/*
+ * Sprache und Ton — als eine Komponente, weil sie an zwei Orten stehen:
+ * am Fuß des Startbildschirms und auf der Core-Seite „Einstellungen“
+ * (Runde 2, Nutzerwunsch). Zwei Abschriften derselben Regler wären der
+ * sichere Weg, dass eine davon veraltet.
+ */
+function LanguageSoundControls({
+  dictionary,
+  language,
+  choose,
+  training,
+  chooseTraining,
+  trainable,
+  translated,
+  sound,
+}: {
+  dictionary: Dictionary
+  language: Language
+  choose: (next: Language) => void
+  training: Language
+  chooseTraining: (next: Language) => void
+  trainable: readonly Language[]
+  translated: boolean
+  sound: ReturnType<typeof useSoundSetting>
+}) {
+  return (
+    <>
+      <label className="language">
+        <span>{dictionary.language.label}</span>
+        <select value={language} onChange={(event) => choose(event.target.value as Language)}>
+          {/*
+            Nur Sprachen mit echtem Wörterbuch (TRANSLATION_WORKFLOW §6):
+            Ein Eintrag, der auf Englisch zurückfällt — bei Arabisch sogar
+            als RTL-Dokument mit englischem Text —, verspricht eine
+            Übersetzung, die es nicht gibt. Wer die App in einer noch
+            nicht übersetzten Systemsprache öffnet, bekommt weiterhin die
+            ehrliche Fußnote; angeboten wird sie erst, wenn sie fertig ist.
+          */}
+          {SUPPORTED_LANGUAGES.filter((tag) => tag === language || isTranslated(tag)).map(
+            (tag) => (
+              <option key={tag} value={tag}>
+                {dictionary.language.names[tag]}
+              </option>
+            ),
+          )}
+        </select>
+      </label>
+      {/*
+        Die Trainingssprache steht nur da, wenn es überhaupt eine Wahl gibt
+        (L7, G-2). Ein Auswahlfeld mit einem Eintrag wäre Möbel.
+      */}
+      {trainable.length > 1 && (
+        <label className="language language-training">
+          <span>{dictionary.language.training}</span>
+          <select
+            value={training}
+            onChange={(event) => chooseTraining(event.target.value as Language)}
+          >
+            {trainable.map((tag) => (
+              <option key={tag} value={tag}>
+                {dictionary.language.names[tag]}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+
+      <button
+        type="button"
+        className="sound-toggle"
+        onClick={sound.toggle}
+        aria-pressed={sound.enabled}
+      >
+        <span aria-hidden="true">{sound.enabled ? '♪' : '·'}</span>
+        {sound.enabled ? dictionary.sound.on : dictionary.sound.off}
+      </button>
+
+      {/*
+        Fehlen Texte oder die eigene Wortliste (Backlog L6), wird auf der
+        Rückfallsprache trainiert. Das ist eine Einschränkung und wird als
+        solche gesagt, statt sie zu verstecken.
+      */}
+      {!translated && <p className="hint">{dictionary.language.incomplete}</p>}
+
+      {/*
+        Der Satz zur Trainingssprache steht bei ihr und nicht bei der
+        Oberfläche — er erklärt, was ein Wechsel bedeutet, und dass er
+        nichts verliert.
+      */}
+      {trainable.length > 1 && (
+        <>
+          <p className="hint">{dictionary.language.trainingNote}</p>
+          {trainable.length < SUPPORTED_LANGUAGES.length && (
+            <p className="hint">{dictionary.language.trainingOnly}</p>
+          )}
+        </>
+      )}
+    </>
   )
 }

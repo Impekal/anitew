@@ -9,6 +9,7 @@
 export type MenuIconKind =
   | 'reached'
   | 'profile'
+  | 'benchmark'
   | 'coach'
   | 'contents'
   | 'memories'
@@ -21,6 +22,7 @@ export type MenuIconKind =
   | 'backup'
   | 'sync'
   | 'check'
+  | 'settings'
 
 function Glyph({ kind }: { kind: MenuIconKind }) {
   switch (kind) {
@@ -93,6 +95,24 @@ function Glyph({ kind }: { kind: MenuIconKind }) {
         <>
           <circle cx="12" cy="12" r="9" />
           <path d="M4.9 12h3.3l1.7-3.6 2.7 7.2 1.8-3.6h4.7" />
+        </>
+      )
+    case 'benchmark':
+      // Eine Stoppuhr: Die Messung ist ein Termin mit fester Frist, kein Spiel.
+      return (
+        <>
+          <circle cx="12" cy="13.2" r="7.3" />
+          <path d="M12 13.2l3.4-3.4M12 3.2v2.7M9.4 3.2h5.2" />
+        </>
+      )
+    case 'settings':
+      // Drei Schieberegler — Einstellungen ohne das abgegriffene Zahnrad.
+      return (
+        <>
+          <path d="M4 7h16M4 12h16M4 17h16" />
+          <circle cx="9.5" cy="7" r="1.7" fill="currentColor" stroke="none" />
+          <circle cx="15" cy="12" r="1.7" fill="currentColor" stroke="none" />
+          <circle cx="7.5" cy="17" r="1.7" fill="currentColor" stroke="none" />
         </>
       )
   }

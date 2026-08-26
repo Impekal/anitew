@@ -196,6 +196,52 @@ describe('der Access-Token-Endpunkt', () => {
     expect(await response.json()).toEqual({ access_token: 'zugriff' })
   })
 
+  it('verlängert die Sitzung beim Refresh nicht — nach 180 Tagen ab Anmeldung ist Schluss (F-04)', async () => {
+    vi.useFakeTimers()
+    try {
+      const signedInAt = Date.UTC(2026, 0, 1, 12, 0)
+      vi.setSystemTime(signedInAt)
+      const env = stubEnv()
+      const cookie = await signIn(env)
+
+      // 100 Tage später: Access-Token längst abgelaufen, Google-Refresh klappt.
+      vi.setSystemTime(signedInAt + 100 * 86_400_000)
+      globalThis.fetch = (async () =>
+        Response.json({ access_token: 'frisch', expires_in: 3600 })) as typeof fetch
+      const refreshed: Response = await workerModule.fetch(
+        new Request(`${ORIGIN}/oauth/google/access-token`, {
+          method: 'POST',
+          headers: { 'x-anitew-request': '1', origin: ORIGIN, cookie },
+        }),
+        env,
+      )
+      expect(refreshed.status).toBe(200)
+      const renewed = refreshed.headers
+        .getSetCookie()
+        .find((entry) => entry.startsWith('anitew_google_oauth=')) as string
+      // Das Cookie trägt nur noch die RESTlaufzeit (~80 Tage), kein neues
+      // 180-Tage-Fenster — sonst wäre PRIVACYs „spätestens 180 Tage“ falsch.
+      const maxAge = Number(/Max-Age=(\d+)/u.exec(renewed)?.[1])
+      expect(maxAge).toBeLessThanOrEqual(80 * 86_400)
+      expect(maxAge).toBeGreaterThan(79 * 86_400)
+
+      // 181 Tage nach der Anmeldung: Sitzung vorbei, Cookie wird gelöscht.
+      vi.setSystemTime(signedInAt + 181 * 86_400_000)
+      const expired: Response = await workerModule.fetch(
+        new Request(`${ORIGIN}/oauth/google/access-token`, {
+          method: 'POST',
+          headers: { 'x-anitew-request': '1', origin: ORIGIN, cookie: renewed.split(';')[0] as string },
+        }),
+        env,
+      )
+      expect(expired.status).toBe(401)
+      expect(((await expired.json()) as { error: string }).error).toBe('session_expired')
+      expect(expired.headers.getSetCookie()[0]).toContain('Max-Age=0')
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   it('löscht eine unlesbare Sitzung, statt sie endlos zurückzugeben', async () => {
     const env = stubEnv()
     const request = new Request(`${ORIGIN}/oauth/google/access-token`, {
@@ -288,7 +334,7 @@ describe('die Push-Endpunkte', () => {
 
     const badReminder = await workerModule.fetch(
       post('/push/schedule', {
-        endpoint: 'https://push.example/abc',
+        endpoint: 'https://fcm.googleapis.com/fcm/send/abc',
         reminder: { id: 'fremd', at: Date.now(), title: 'x', body: 'y' },
       }),
       env,
@@ -297,7 +343,7 @@ describe('die Push-Endpunkte', () => {
 
     const badZone = await workerModule.fetch(
       post('/push/schedule', {
-        endpoint: 'https://push.example/abc',
+        endpoint: 'https://fcm.googleapis.com/fcm/send/abc',
         reminder: {
           id: 'daily',
           at: Date.now() + 1000,
@@ -311,10 +357,67 @@ describe('die Push-Endpunkte', () => {
     expect(badZone.status).toBe(400)
   })
 
+  it('lehnt beliebige HTTPS-Adressen als Relaisziel ab — auch mit gefälschten Same-Origin-Headern (F-03)', async () => {
+    /*
+      Der CSRF-Schutz hält nur fremde Browser fern; ein Skript setzt Origin
+      und x-anitew-request beliebig. Die Verteidigung ist die Host-Liste der
+      echten Pushdienste: Für ein fremdes Ziel darf nicht einmal ein Durable
+      Object angesprochen werden.
+    */
+    const stub = vi.fn(async () => Response.json({ ok: true }))
+    const env = stubEnv({
+      VAPID_PUBLIC_KEY: VAPID_PUBLIC,
+      VAPID_PRIVATE_KEY: vapidKeys.privateKey,
+      VAPID_SUBJECT: 'mailto:push@example.com',
+      PUSH_REMINDERS: { idFromName: (name: string) => name, get: () => ({ fetch: stub }) },
+    })
+    const forged = await workerModule.fetch(
+      post('/push/schedule', {
+        endpoint: 'https://angreifer.example/relay-ziel',
+        reminder: {
+          id: 'daily',
+          at: Date.now() + 1000,
+          title: 'x',
+          body: 'y',
+          recurrence: { localTime: '19:30', timeZone: 'Europe/Berlin' },
+        },
+      }),
+      env,
+    )
+    expect(forged.status).toBe(400)
+    expect(await forged.json()).toEqual({ error: 'invalid_endpoint' })
+    expect(stub).not.toHaveBeenCalled()
+
+    // Die echten Pushdienste der Browser gehen weiterhin durch.
+    for (const allowed of [
+      'https://web.push.apple.com/QOX0abc-geraet',
+      'https://updates.push.services.mozilla.com/wpush/v2/geraet',
+      'https://sg2p.notify.windows.com/w/geraet',
+      'https://fcm.googleapis.com/fcm/send/geraet',
+    ]) {
+      const response = await workerModule.fetch(
+        post('/push/cancel', { endpoint: allowed, id: 'daily' }),
+        env,
+      )
+      expect(response.status).toBe(200)
+    }
+  })
+
+  it('deckelt den Planungshorizont, statt Termine in ferner Zukunft zu speichern (F-03)', async () => {
+    const far = await workerModule.fetch(
+      post('/push/schedule', {
+        endpoint: 'https://fcm.googleapis.com/fcm/send/abc',
+        reminder: { id: 'benchmark', at: Date.now() + 90 * 86_400_000, title: 'x', body: 'y' },
+      }),
+      pushEnv(),
+    )
+    expect(far.status).toBe(400)
+  })
+
   it('meldet 503 statt stillem Erfolg, wenn Push nicht konfiguriert ist', async () => {
     const response = await workerModule.fetch(
       post('/push/schedule', {
-        endpoint: 'https://push.example/abc',
+        endpoint: 'https://fcm.googleapis.com/fcm/send/abc',
         reminder: { id: 'benchmark', at: Date.now() + 1000, title: 'x', body: 'y' },
       }),
       stubEnv(),
@@ -327,7 +430,7 @@ describe('die Push-Endpunkte', () => {
 interface StoredState {
   endpoint: string
   reminders: Record<string, { id: string; at: number; title: string; body: string; recurrence?: { localTime: string; timeZone: string } }>
-  pending: { deliveryId: string; title: string; body: string; tag: string }[]
+  pending: { deliveryId: string; title: string; body: string; tag: string; expiresAt?: number }[]
 }
 
 function durableHarness() {
@@ -350,7 +453,7 @@ function durableHarness() {
 }
 
 describe('das PushReminder-Durable-Object', () => {
-  const ENDPOINT = 'https://push.example/geraet-1'
+  const ENDPOINT = 'https://fcm.googleapis.com/fcm/send/geraet-1'
   const env = {
     VAPID_PUBLIC_KEY: VAPID_PUBLIC,
     VAPID_PRIVATE_KEY: vapidKeys.privateKey,
@@ -508,6 +611,95 @@ describe('das PushReminder-Durable-Object', () => {
       await call(target, '/cancel', { endpoint: ENDPOINT, id: 'daily' })
       const rolled = harness.stored()?.reminders['daily'] as { at: number }
       expect(rolled.at).toBe(Date.UTC(2026, 2, 29, 17, 30)) // 19:30 MESZ (+02:00)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('fällt in der Sommerzeit-Lücke nicht aus: 02:30 wird zur ersten Zeit nach dem Sprung (F-11)', async () => {
+    vi.useFakeTimers()
+    try {
+      // Europa/Berlin, 29.03.2026: 02:00 → 03:00 — eine 02:30 gibt es nicht.
+      const before = Date.UTC(2026, 2, 28, 1, 30) // 28.03. 02:30 MEZ (+01:00)
+      vi.setSystemTime(before - 60_000)
+      const harness = durableHarness()
+      const target = new PushReminder(harness.state, env)
+      await call(target, '/schedule', {
+        endpoint: ENDPOINT,
+        reminder: {
+          id: 'daily',
+          at: before,
+          title: 'T',
+          body: 'B',
+          recurrence: { localTime: '02:30', timeZone: 'Europe/Berlin' },
+        },
+      })
+      await call(target, '/cancel', { endpoint: ENDPOINT, id: 'daily' })
+      const rolled = harness.stored()?.reminders['daily'] as { at: number }
+      // Erste existierende Zeit nach der Lücke: 03:00 MESZ — NICHT erst der 30.03.
+      expect(rolled.at).toBe(Date.UTC(2026, 2, 29, 1, 0))
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('stellt am Herbst-Doppel genau einen Termin, keine zwei (F-11)', async () => {
+    vi.useFakeTimers()
+    try {
+      // Europa/Berlin, 25.10.2026: 03:00 → 02:00 — 02:30 existiert zweimal.
+      const before = Date.UTC(2026, 9, 24, 0, 30) // 24.10. 02:30 MESZ (+02:00)
+      vi.setSystemTime(before - 60_000)
+      const harness = durableHarness()
+      const target = new PushReminder(harness.state, env)
+      await call(target, '/schedule', {
+        endpoint: ENDPOINT,
+        reminder: {
+          id: 'daily',
+          at: before,
+          title: 'T',
+          body: 'B',
+          recurrence: { localTime: '02:30', timeZone: 'Europe/Berlin' },
+        },
+      })
+      await call(target, '/cancel', { endpoint: ENDPOINT, id: 'daily' })
+      const rolled = harness.stored()?.reminders['daily'] as { at: number }
+      // Einer der beiden 02:30-Momente — deterministisch genau einer.
+      expect([Date.UTC(2026, 9, 25, 0, 30), Date.UTC(2026, 9, 25, 1, 30)]).toContain(rolled.at)
+      expect(harness.alarmAt()).toBe(rolled.at)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('liefert eine abgelaufene Zustellnotiz nicht mehr aus und räumt den Eintrag ganz weg (F-05)', async () => {
+    vi.useFakeTimers()
+    try {
+      vi.setSystemTime(Date.UTC(2026, 7, 26, 12, 0))
+      const harness = durableHarness()
+      const target = new PushReminder(harness.state, env)
+      await call(target, '/schedule', {
+        endpoint: ENDPOINT,
+        reminder: { id: 'benchmark', at: Date.now() - 1000, title: 'Messung wartet', body: 'B' },
+      })
+
+      globalThis.fetch = (async () => new Response('', { status: 201 })) as typeof fetch
+      await target.alarm()
+
+      // Die Notiz liegt mit Ablaufdatum bereit; der Aufräum-Alarm steht darauf —
+      // vorher verschwand der Alarm mit der letzten Einmal-Erinnerung, und die
+      // Notiz hätte für immer im Speicher gelegen.
+      const stored = harness.stored() as StoredState
+      expect(stored.pending).toHaveLength(1)
+      expect(stored.pending[0]?.expiresAt).toBe(Date.now() + 60 * 60_000)
+      expect(harness.alarmAt()).toBe(stored.pending[0]?.expiresAt)
+
+      // 61 Minuten später ist das Messfenster lange vorbei: nichts mehr
+      // zustellen, alles löschen — genau das, was PRIVACY jetzt verspricht.
+      vi.setSystemTime(Date.now() + 61 * 60_000)
+      const pending = await call(target, '/pending', { endpoint: ENDPOINT })
+      expect(pending.status).toBe(404)
+      expect(harness.stored()).toBeUndefined()
+      expect(harness.alarmAt()).toBeUndefined()
     } finally {
       vi.useRealTimers()
     }

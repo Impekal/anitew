@@ -198,7 +198,7 @@ export const de = {
     heading: 'Messung',
     // Der Aufruf auf dem Startbildschirm. Sachlich, kein Ausrufezeichen.
     invite: 'Zeit für eine Messung',
-    inviteNote: 'Drei Minuten. Zwanzig Wörter, die im Training nie vorkommen — deshalb misst sie dein Gedächtnis und nicht deine Übung.',
+    inviteNote: 'Drei Minuten. Zwanzig Wörter, die im Training nie vorkommen — gemessen wird, wie viele du davon behältst: getrennt von deiner Übung, ohne Behauptung über deinen Alltag.',
     start: 'Messung beginnen',
     encodeHint: 'Zwanzig Wörter. Sieh sie an.',
     recallNow: 'Was ist geblieben?',
@@ -235,11 +235,19 @@ export const de = {
     changeDown: 'Prozentpunkte weniger behalten als bei der Eichung',
     range: 'Spanne',
     // Der wichtigste Satz der ganzen App.
-    tooClose: 'Kein Unterschied, der sich vom Zufall trennen lässt. Zwanzig Wörter sind eine kleine Stichprobe: Zwei Wörter mehr oder weniger sind schon zehn Prozentpunkte.',
+    tooClose: 'Der Unterschied liegt innerhalb der groben Zählunsicherheit dieser kleinen Stichprobe. Zwanzig Wörter: Zwei mehr oder weniger sind schon zehn Prozentpunkte — mehr sagt die Spanne nicht.',
     explain: 'Was hier gemessen wurde',
     explainNote: 'Zwanzig Wörter, die es sonst nirgends in der App gibt und die nie in den Wiederholungsplan wandern. Gezählt wird, wie viele davon am Folgetag noch da sind — verglichen mit dir selbst bei der Eichung, nie mit anderen. Was hier steht, ist gezählt. Über dein Gedächtnis im Alltag sagt es nichts, solange es niemand dort gemessen hat.',
     series: 'Die Reihe',
-    cycles: 'Ab der {n}. Messung wiederholen sich die Wörter. Ein Wort, das man vor Monaten einmal drei Minuten lang gesehen hat, verfälscht wenig — aber es verfälscht.',
+    cycles: 'Ab der {n}. Messung wiederholen sich die Wörter. Ein Wort, das man bei einer früheren Messung einmal drei Minuten lang gesehen hat, verfälscht wenig — aber es verfälscht.',
+    /*
+      Die Core-Seite „Messung“ (Runde 2, Nutzerwunsch): Ergebnisse und
+      nächster Termin sind jetzt auffindbar, ohne dass die Messung selbst
+      jederzeit startbar würde — der feste Abstand bleibt die Methode.
+    */
+    nextDueLine: 'Die nächste Messung ist ab dem {day} fällig. Früher geht absichtlich nicht — der feste Abstand gehört zur Methode.',
+    runningNote: 'Eine Messung läuft gerade — der Startbildschirm führt dich weiter.',
+    noneYet: 'Noch keine abgeschlossene Messung.',
   },
   science: {
     /*
@@ -387,8 +395,8 @@ export const de = {
     sourceImmediate: 'Quelle: Training · sofort',
     sourceBenchmark: 'Quelle: wissenschaftliche Messung',
     sourceNone: 'Quelle: noch keine Messung vorhanden',
-    benchmarkChange: 'Belastbare Veränderung: Spanne {low} bis {high} Prozentpunkte.',
-    benchmarkNoChange: 'Noch kein vom Zufall trennbarer Unterschied (Spanne {low} bis {high}).',
+    benchmarkChange: 'Veränderung über die Zählunsicherheit hinaus: Spanne {low} bis {high} Prozentpunkte.',
+    benchmarkNoChange: 'Veränderung innerhalb der Zählunsicherheit (Spanne {low} bis {high}).',
     note: 'Gezählt wird nur das Wiedersehen: wie oft eine Information nach Tagen zurückkam und noch da war. Wie gut du am Lerntag selbst abschneidest, steht hier absichtlich nicht — das ist Übung, nicht Gedächtnis.',
     names: {
       words: 'Wörter',
@@ -446,7 +454,7 @@ export const de = {
       facts: 'Eigenes',
       memory: 'Erinnerungen',
     },
-    noWeakest: 'Kein Unterschied zwischen den Achsen, der sich vom Zufall trennen lässt.',
+    noWeakest: 'Kein Unterschied zwischen den Achsen, der über die Zählunsicherheit hinausgeht.',
     empty: 'Noch nichts zu zeigen. Das Profil entsteht aus dem Training — nicht aus einem Test am Anfang.',
   },
   reminder: {
@@ -630,6 +638,9 @@ export const de = {
     confirm: 'Bestätigen und merken',
     cancel: 'Verwerfen',
     saved: 'Gemerkt. Die nächste Einheit nimmt die schwächsten zuerst.',
+    // F-10 (Runde 2): Ein fehlgeschlagener Speichervorgang wird gesagt, die
+    // Eingabe bleibt stehen — kein stilles Nichts nach „Bestätigen“.
+    saveFailed: 'Konnte auf diesem Gerät nicht speichern — nichts wurde übernommen. Deine Eingabe steht noch da: versuch es gleich noch einmal.',
     types: {
       person: 'Person',
       place: 'Ort',
@@ -759,10 +770,16 @@ export const de = {
     errors: {
       'no-key': 'Ohne Schlüssel keine freien Fragen. Die Hinweise oben kommen ohne aus.',
       'bad-key': 'Der Schlüssel wurde nicht angenommen. Prüfe ihn beim Anbieter — oder entferne ihn hier.',
+      // 403 ist kein Schlüsselproblem: Der Schlüssel gilt, darf das aber nicht.
+      forbidden: 'Der Anbieter lehnt die Anfrage trotz gültigem Schlüssel ab — meist fehlt dem Konto dort eine Berechtigung für das Modell. Das regelst du beim Anbieter, nicht hier.',
+      limited: 'Der Anbieter bremst gerade (Rate- oder Kontingentgrenze). Kurz warten und noch einmal — der Schlüssel ist in Ordnung.',
       offline: 'Keine Verbindung zum Anbieter. Später noch einmal — die Hinweise oben funktionieren ohne Netz.',
       refused: 'Auf diese Frage antwortet das Modell nicht. Anders gestellt klappt es oft.',
       failed: 'Die Antwort kam nicht an. Später noch einmal.',
     },
+    // F-02 (Runde 2): Ein fehlgeschlagener Einstellungs-Schreibvorgang wird
+    // gesagt — die Anzeige bleibt bei dem, was wirklich gespeichert ist.
+    saveFailed: 'Konnte auf diesem Gerät nicht speichern. Es gilt weiterhin die vorherige Einstellung.',
   },
   streak: {
     /*
@@ -982,5 +999,15 @@ export const de = {
     close: 'Menü schließen',
     yours: 'Dein Stand',
     device: 'App & Gerät',
+  },
+  settings: {
+    /*
+      Die Einstellungsseite im Core (Runde 2, Nutzerwunsch): dieselben
+      Regler wie am Fuß des Startbildschirms — Sprache und Ton —, nur dort,
+      wo App-Gewohnheit sie sucht. Kein zweiter Zustand: Es sind wörtlich
+      dieselben Bedienelemente mit denselben Handgriffen.
+    */
+    heading: 'Einstellungen',
+    note: 'Dieselben Regler stehen auch unten auf dem Startbildschirm.',
   },
 } as const

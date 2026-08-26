@@ -272,3 +272,53 @@ describe('die Installationsanleitung (Q5)', () => {
     }
   })
 })
+
+describe('Datenschutz-Aussagen sind an den Code gebunden (Runde 2)', () => {
+  /*
+   * ChatGPTs Testqualitätsurteil traf einen Punkt: Ein Wächter, der nur
+   * prüft, ob PRIVACY bestimmte Wörter enthält, bindet die Aussage nicht an
+   * das Verhalten. Diese Tests binden jede Frist und jeden Ausschluss an die
+   * Stelle im Code, die sie wahr macht — ändert jemand den Code, ohne den
+   * Text zu ändern (oder umgekehrt), wird es rot.
+   */
+  const privacy = textOf('docs/PRIVACY.md')
+  const worker = textOf('worker/index.js')
+
+  it('Sicherung ohne Schlüssel: Versprechen und Filter existieren beide', async () => {
+    const { portableSetting } = await import('../../src/core/backup.ts')
+    // Der Filter im Code …
+    expect(portableSetting('coach.key')).toBe(false)
+    expect(portableSetting('coach.key.gemini')).toBe(false)
+    expect(portableSetting('coach.key.openai')).toBe(false)
+    expect(portableSetting('sync.account')).toBe(false)
+    expect(portableSetting('sync.accountName')).toBe(false)
+    expect(portableSetting('language')).toBe(true)
+    expect(portableSetting('memory.graph')).toBe(true)
+    // … und das Versprechen im Text.
+    expect(privacy).toMatch(/Nicht in der Sicherung enthalten/u)
+    expect(privacy).toMatch(/KI-API-Schlüssel/u)
+  })
+
+  it('180-Tage-Sitzung: absolute Grenze im Worker, ehrlicher Satz im Text', () => {
+    // Der Worker versiegelt einen absoluten Ablauf und verlängert ihn nie.
+    expect(worker).toMatch(/SESSION_MAX_AGE_MS = 1000 \* 60 \* 60 \* 24 \* 180/u)
+    expect(worker).toMatch(/sessionExpiresAt/u)
+    // Und PRIVACY behauptet keine rollierende Laufzeit mehr.
+    expect(privacy).toMatch(/wird\s+durch Nutzung \*\*nicht\*\* verlängert/u)
+    expect(privacy).toMatch(/180 Tage/u)
+  })
+
+  it('Zustellnotizen: Ablauffristen im Worker decken die Fristen im Text', () => {
+    expect(worker).toMatch(/PENDING_TTL_MS = \{ daily: 24 \* 3_600_000, benchmark: 60 \* 60_000 \}/u)
+    expect(privacy).toMatch(/längstens (aber )?24 Stunden/u)
+    expect(privacy).toMatch(/60 Minuten/u)
+  })
+
+  it('Push-Relais: Der Worker nimmt nur echte Pushdienste als Ziel an', () => {
+    expect(worker).toMatch(/fcm\.googleapis\.com/u)
+    expect(worker).toMatch(/updates\.push\.services\.mozilla\.com/u)
+    expect(worker).toMatch(/web\.push\.apple\.com/u)
+    expect(worker).toMatch(/\.notify\.windows\.com/u)
+    expect(worker).toMatch(/allowedPushHost/u)
+  })
+})
