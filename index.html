@@ -54,7 +54,7 @@
         inset: 0;
         z-index: 99999;
         display: grid;
-        grid-template-rows: 1fr auto auto auto 1fr;
+        grid-template-rows: 1fr auto auto auto 1fr auto;
         place-items: center;
         gap: 17px;
         padding:
@@ -181,14 +181,25 @@
         text-shadow: 0 0 28px rgb(142 231 208 / 12%);
         animation: anitew-launch-name .56s .62s ease forwards;
       }
-      .anitew-launch-powered {
+      .anitew-launch-tagline {
         grid-row: 4;
-        margin-top: 3px;
+        margin-top: -6px;
+        max-width: min(86vw, 420px);
+        color: rgb(225 232 225 / 68%);
+        font: 500 11px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        letter-spacing: .035em;
+        text-align: center;
+        opacity: 0;
+        animation: anitew-launch-copy .58s .76s ease forwards;
+      }
+      .anitew-launch-powered {
+        grid-row: 6;
+        align-self: end;
         color: rgb(205 211 205 / 42%);
         font: 500 9px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         letter-spacing: .12em;
         opacity: 0;
-        animation: anitew-launch-copy .55s .84s ease forwards;
+        animation: anitew-launch-copy .55s .96s ease forwards;
       }
       #root .drawer-veil {
         z-index: 3000 !important;
@@ -251,6 +262,7 @@
         .anitew-mark-signal,
         .anitew-launch-name,
         .anitew-launch-terms,
+        .anitew-launch-tagline,
         .anitew-launch-powered {
           animation: none !important;
           stroke-dashoffset: 0;
@@ -289,6 +301,7 @@
         />
       </svg>
       <div class="anitew-launch-name">ANITEW</div>
+      <div class="anitew-launch-tagline">Train the memory you actually use. Remember what matters.</div>
       <div class="anitew-launch-powered">Powered by Impekal</div>
     </div>
     <div id="root"></div>
