@@ -13,7 +13,35 @@ test('der erste Eindruck trägt die englische Marke fünf Sekunden und erklärt 
   await expect(launch).toHaveCount(1)
   // Splash-Copy ist Marken-Copy: immer Englisch, auch wenn die App Deutsch spricht.
   await expect(page.getByText('MEMORIZE · RECALL · RETAIN · MASTER')).toBeVisible()
-  await expect(page.getByText('Powered by Impekal')).toBeVisible()
+  const name = page.locator('.anitew-launch-name')
+  const tagline = page.locator('.anitew-launch-tagline')
+  const powered = page.locator('.anitew-launch-powered')
+  await expect(tagline).toHaveText('Train the memory you actually use. Remember what matters.')
+  await expect(tagline).toBeVisible()
+  await expect(powered).toHaveText('Powered by Impekal')
+  await expect(powered).toBeVisible()
+
+  // Claim direkt unter der Marke, Impekal bewusst als Absender ganz unten.
+  const nameBox = await name.boundingBox()
+  const taglineBox = await tagline.boundingBox()
+  const poweredBox = await powered.boundingBox()
+  expect(nameBox).not.toBeNull()
+  expect(taglineBox).not.toBeNull()
+  expect(poweredBox).not.toBeNull()
+  expect(taglineBox?.y ?? 0).toBeGreaterThan((nameBox?.y ?? 0) + (nameBox?.height ?? 0))
+  expect(poweredBox?.y ?? 0).toBeGreaterThan(844 * 0.85)
+
+  const sizes = await page.evaluate(() => {
+    const nameNode = document.querySelector('.anitew-launch-name')
+    const taglineNode = document.querySelector('.anitew-launch-tagline')
+    return {
+      name: nameNode instanceof Element ? Number.parseFloat(getComputedStyle(nameNode).fontSize) : 0,
+      tagline:
+        taglineNode instanceof Element ? Number.parseFloat(getComputedStyle(taglineNode).fontSize) : 0,
+    }
+  })
+  expect(sizes.tagline).toBeLessThan(sizes.name)
+
   await expect(page.locator('.anitew-mark-path')).toHaveCount(1)
   await expect(page.locator('.anitew-mark-node')).toHaveCount(6)
 
