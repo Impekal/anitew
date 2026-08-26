@@ -56,8 +56,20 @@ test('trennt „wirkt“ von „wirkt auf alles“', async ({ page }) => {
 
   const block = page.locator('.standing-narrow')
   await expect(block.getByText('Belegt, aber nur dafür')).toBeVisible()
+
+  /*
+   * Beide Aussagen dieses Standes nennen ausdrücklich, was NICHT folgt —
+   * geprüft je an ihrem eigenen Satz statt an einem Muster, das auf beide
+   * passt. Seit die Belohnungs-Aussage dazukam, traf `/nicht.*gezeigt/`
+   * zwei Absätze; die Prüfung ist damit genauer geworden, nicht lockerer.
+   */
   await expect(block.getByText(/Merktechniken heben die Leistung/)).toBeVisible()
-  await expect(block.getByText(/nicht.*gezeigt/)).toBeVisible()
+  await expect(
+    block.getByText(/Was daraus für Namen, Termine oder deinen Alltag folgt/),
+  ).toBeVisible()
+
+  await expect(block.getByText(/Belohnungen können die eigene Motivation verdrängen/)).toBeVisible()
+  await expect(block.getByText(/ist nirgends gezeigt/)).toBeVisible()
 })
 
 test('hält den ersten Bildschirm davon frei (D-011/G-2)', async ({ page }) => {

@@ -179,6 +179,10 @@ export const en: Dictionary = {
         title: 'Brain training does not make you generally smarter',
         body: 'Large studies keep finding the same thing: you get better at the exercises and nowhere else. Working-memory training lifts neither intelligence nor everyday performance. So ANITEW does not promise it — and that is exactly why the tagline says "a skill, not a gift".',
       },
+      rewards: {
+        title: 'Rewards can crowd out your own motivation',
+        body: 'That is why there are no points, no levels and nothing to unlock here. The finding is well studied — but on laboratory tasks, not on apps: that an app **without** points works better has not been shown anywhere, and ANITEW does not claim it. The decision is a stance, not a deduction: coming back should be worth it because something stays — not because a number would otherwise break. What is here instead comes from your real numbers: the streak with protected days, the growing Memory World and the measurement.',
+      },
       everyday: {
         title: 'Whether ANITEW helps your everyday life',
         body: 'There is no study, because there is no study of this app yet. What we can measure, the measurement measures: how many of twenty words are still there the next day. Anything beyond that would be a guess — and guessing is not done here.',
