@@ -871,6 +871,52 @@ export function App() {
           />
         ),
       },
+      /*
+        Die Messung bekommt eine Tür im Core (Runde 2, Nutzerwunsch): Reihe,
+        Eichung und der nächste Termin sind auffindbar — gestartet wird aber
+        weiterhin nur, wenn sie fällig ist. Ein jederzeitiger Startknopf wäre
+        genau das Dauermessen, das die Methode ausschließt (F2b, R-1).
+      */
+      benchmark: {
+        title: dictionary.benchmark.heading,
+        body: (() => {
+          const nextDue = nextRunDue(runs[runs.length - 1])
+          const dueLine =
+            nextDue === undefined
+              ? undefined
+              : dictionary.benchmark.nextDueLine.replace(
+                  '{day}',
+                  new Date(`${nextDue}T00:00:00`).toLocaleDateString(language, {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                  }),
+                )
+          return (
+            <div className="benchmark-page">
+              {step.kind === 'invite' ? (
+                <section className="note" role="status">
+                  <h3>{dictionary.benchmark.invite}</h3>
+                  <p>{dictionary.benchmark.inviteNote}</p>
+                  <div className="note-actions">
+                    <button type="button" className="quiet" onClick={startBenchmark}>
+                      {dictionary.benchmark.start}
+                    </button>
+                  </div>
+                </section>
+              ) : step.kind === 'none' ? (
+                dueLine !== undefined && <p className="hint">{dueLine}</p>
+              ) : (
+                <p className="hint">{dictionary.benchmark.runningNote}</p>
+              )}
+              <BenchmarkPanel runs={runs} language={training} dictionary={dictionary} />
+              {!runs.some(isComplete) && (
+                <p className="hint">{dictionary.benchmark.noneYet}</p>
+              )}
+            </div>
+          )
+        })(),
+      },
       coach: {
         title: dictionary.coach.heading,
         body: (
@@ -1352,6 +1398,10 @@ export function App() {
               <button type="button" className="drawer-item" onClick={() => openPage('profile')}>
                 <MenuIcon kind="profile" />
                 <span>{dictionary.profile.heading}</span>
+              </button>
+              <button type="button" className="drawer-item" onClick={() => openPage('benchmark')}>
+                <MenuIcon kind="benchmark" />
+                <span>{dictionary.benchmark.heading}</span>
               </button>
               <button type="button" className="drawer-item" onClick={() => openPage('coach')}>
                 <MenuIcon kind="coach" />

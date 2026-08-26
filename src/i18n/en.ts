@@ -139,6 +139,9 @@ export const en: Dictionary = {
     explainNote: 'Twenty words that exist nowhere else in the app and never enter the review plan. Counted is how many are still there the next day — compared with yourself at calibration, never with others. What stands here is counted. About your memory in everyday life it says nothing, as long as nobody has measured it there.',
     series: 'The series',
     cycles: 'From measurement {n} onwards the words repeat. A word seen once for three minutes in an earlier measurement distorts little — but it distorts.',
+    nextDueLine: 'The next measurement is due from {day}. Earlier is deliberately impossible — the fixed interval is part of the method.',
+    runningNote: 'A measurement is in progress — the start screen takes you onward.',
+    noneYet: 'No completed measurement yet.',
   },
   science: {
     heading: 'What is established',

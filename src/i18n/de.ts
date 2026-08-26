@@ -240,6 +240,14 @@ export const de = {
     explainNote: 'Zwanzig Wörter, die es sonst nirgends in der App gibt und die nie in den Wiederholungsplan wandern. Gezählt wird, wie viele davon am Folgetag noch da sind — verglichen mit dir selbst bei der Eichung, nie mit anderen. Was hier steht, ist gezählt. Über dein Gedächtnis im Alltag sagt es nichts, solange es niemand dort gemessen hat.',
     series: 'Die Reihe',
     cycles: 'Ab der {n}. Messung wiederholen sich die Wörter. Ein Wort, das man bei einer früheren Messung einmal drei Minuten lang gesehen hat, verfälscht wenig — aber es verfälscht.',
+    /*
+      Die Core-Seite „Messung“ (Runde 2, Nutzerwunsch): Ergebnisse und
+      nächster Termin sind jetzt auffindbar, ohne dass die Messung selbst
+      jederzeit startbar würde — der feste Abstand bleibt die Methode.
+    */
+    nextDueLine: 'Die nächste Messung ist ab dem {day} fällig. Früher geht absichtlich nicht — der feste Abstand gehört zur Methode.',
+    runningNote: 'Eine Messung läuft gerade — der Startbildschirm führt dich weiter.',
+    noneYet: 'Noch keine abgeschlossene Messung.',
   },
   science: {
     /*

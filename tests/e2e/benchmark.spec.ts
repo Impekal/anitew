@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { startButton, visit } from './helpers.ts'
+import { openPage, startButton, visit } from './helpers.ts'
 
 /**
  * Die Messung, im Browser nachgeprüft (Backlog F1, F2, F2a, F2b, F3, F5).
@@ -235,4 +235,32 @@ test('nimmt nach einem Abbruch andere Wörter', async ({ page }) => {
   await expect(page.locator('.encode-word')).toBeVisible({ timeout: 30_000 })
   const second = ((await page.locator('.encode-word').textContent()) ?? '').trim()
   expect(second).not.toBe(first)
+})
+
+test('hat eine eigene Core-Seite: Einladung wenn fällig, Reihe und Termin danach (Runde 2)', async ({
+  page,
+}) => {
+  await visit(page)
+
+  // Frische Datenbank: Die allererste Messung ist fällig — die Core-Seite
+  // zeigt dieselbe Einladung samt Startknopf wie der Startbildschirm.
+  await openPage(page, 'Messung')
+  await expect(page.locator('.page-title')).toHaveText('Messung')
+  await expect(
+    page.locator('.benchmark-page').getByRole('button', { name: 'Messung beginnen' }),
+  ).toBeVisible()
+  await page.getByRole('button', { name: 'Zurück' }).click()
+
+  // Mit abgeschlossenen Messungen: kein Startknopf (nicht fällig), dafür die
+  // echte Reihe und der nächste Termin — auffindbar ohne Scrollen im Fuß.
+  await seedRuns(page, [
+    { ordinal: 1, day: dayKey(-10), nextDay: 9, complete: true },
+    { ordinal: 2, day: dayKey(-3), nextDay: 10, complete: true },
+  ])
+  await openPage(page, 'Messung')
+  await expect(page.locator('.benchmark-page .measure-series li')).toHaveCount(2)
+  await expect(
+    page.locator('.benchmark-page').getByRole('button', { name: 'Messung beginnen' }),
+  ).toBeHidden()
+  await expect(page.getByText(/Die nächste Messung ist ab dem/)).toBeVisible()
 })

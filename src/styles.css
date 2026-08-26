@@ -2313,3 +2313,10 @@ body::before {
   flex-direction: column;
   gap: 1rem;
 }
+
+/* Die Core-Seite „Messung“ (Runde 2): Reihe und Termin, mit Atem. */
+.benchmark-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
