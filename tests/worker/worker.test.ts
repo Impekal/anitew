@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 // @ts-expect-error — der Worker ist bewusst schlichtes JavaScript ohne Typen.
 import workerModule, { PushReminder } from '../../worker/index.js'
@@ -91,7 +91,7 @@ describe('der OAuth-Callback', () => {
       `${ORIGIN}/oauth/google/callback?state=angreifer&code=egal`,
       { headers: { cookie: 'anitew_google_oauth_state=echt' } },
     )
-    const response = await workerModule.fetch(request, stubEnv())
+    const response: Response = await workerModule.fetch(request, stubEnv())
     expect(response.status).toBe(302)
     expect(response.headers.get('location')).toContain('googleOAuth=error')
     expect(response.headers.get('location')).toContain('state_mismatch')
@@ -110,7 +110,7 @@ describe('der OAuth-Callback', () => {
     const request = new Request(`${ORIGIN}/oauth/google/callback?state=s1&code=c1`, {
       headers: { cookie: 'anitew_google_oauth_state=s1' },
     })
-    const response = await workerModule.fetch(request, stubEnv())
+    const response: Response = await workerModule.fetch(request, stubEnv())
     expect(response.status).toBe(302)
     expect(response.headers.get('location')).toContain('googleOAuth=complete')
 
@@ -131,7 +131,7 @@ describe('der OAuth-Callback', () => {
       `${ORIGIN}/oauth/google/callback?state=s1&error=access_denied`,
       { headers: { cookie: 'anitew_google_oauth_state=s1' } },
     )
-    const response = await workerModule.fetch(request, stubEnv())
+    const response: Response = await workerModule.fetch(request, stubEnv())
     expect(response.headers.get('location')).toContain('detail=access_denied')
   })
 
@@ -139,7 +139,7 @@ describe('der OAuth-Callback', () => {
     const request = new Request(`${ORIGIN}/oauth/google/callback?state=s1&code=c1`, {
       headers: { cookie: 'anitew_google_oauth_state=s1' },
     })
-    const response = await workerModule.fetch(
+    const response: Response = await workerModule.fetch(
       request,
       stubEnv({ GOOGLE_CLIENT_SECRET: undefined }),
     )
@@ -158,7 +158,7 @@ describe('der Access-Token-Endpunkt', () => {
     const request = new Request(`${ORIGIN}/oauth/google/callback?state=s1&code=c1`, {
       headers: { cookie: 'anitew_google_oauth_state=s1' },
     })
-    const response = await workerModule.fetch(request, env)
+    const response: Response = await workerModule.fetch(request, env)
     const cookie = response.headers
       .getSetCookie()
       .find((entry) => entry.startsWith('anitew_google_oauth='))
@@ -191,7 +191,7 @@ describe('der Access-Token-Endpunkt', () => {
       method: 'POST',
       headers: { 'x-anitew-request': '1', origin: ORIGIN, cookie },
     })
-    const response = await workerModule.fetch(request, env)
+    const response: Response = await workerModule.fetch(request, env)
     expect(response.status).toBe(200)
     expect(await response.json()).toEqual({ access_token: 'zugriff' })
   })
@@ -206,7 +206,7 @@ describe('der Access-Token-Endpunkt', () => {
         cookie: 'anitew_google_oauth=kaputt',
       },
     })
-    const response = await workerModule.fetch(request, env)
+    const response: Response = await workerModule.fetch(request, env)
     expect(response.status).toBe(401)
     const cleared = response.headers.getSetCookie()[0]
     expect(cleared).toContain('anitew_google_oauth=;')
@@ -223,7 +223,7 @@ describe('der Logout', () => {
         refresh_token: 'erneuerung',
         expires_in: 3600,
       })) as typeof fetch
-    const callback = await workerModule.fetch(
+    const callback: Response = await workerModule.fetch(
       new Request(`${ORIGIN}/oauth/google/callback?state=s1&code=c1`, {
         headers: { cookie: 'anitew_google_oauth_state=s1' },
       }),

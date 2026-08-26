@@ -1507,3 +1507,77 @@ Ihr Anker ist deterministisch der am stärksten verbundene, dann älteste
 Knoten. Diese Welten steuern räumliche Nähe und Navigation, nicht Leistung.
 Bei großen Graphen bleibt die bestehende Sichtgrenze bestehen; ein Fokus zeigt
 eine Welt statt hunderter gleichzeitiger Punkte.
+
+## D-044 · 2026-08-26 · Die alten Backlog-Ideen, neu entschieden statt blind gebaut
+
+Acht Punkte aus Product Bible und Alt-Backlog wurden gegen den heutigen
+Stand (Web Push, Durable Objects, sechs Trainingssprachen, Memory-Graph)
+**neu bewertet**. Ergebnis — vier bewusste Abschlüsse, kein blinder Nachbau:
+
+1. **H3 verzögerte Mission-Abfrage (~20 min): abgelehnt als Push-Automatik.**
+   Technisch wäre sie heute sauber möglich (dieselbe DO-Alarm-Mechanik wie
+   die Benchmark-Erinnerung, Push bliebe inhaltsleer, die Frage entstünde
+   lokal). Aber der 15–45-Minuten-Slot ist im Produkt bereits **besetzt und
+   besser besetzt**: durch die Messung (F2, mit eigener Push-Erinnerung) —
+   dort zählt der verzögerte Abruf wissenschaftlich —, und durch das
+   FSRS-Wiedersehen auf Tagesskala fürs Training. Eine dritte Push-Quelle
+   nach jeder Einheit wäre Benachrichtigungsdruck (K7) ohne Messgewinn und
+   verwischte die Grenze Training/Messung (R-1). Falls je gewünscht: nur als
+   ausdrückliches Opt-in pro Einheit, Store-Phase.
+2. **Micro-Recall (10–60 s): abgelehnt als eigener Pfad.** Der Zweck —
+   ein Alltagseinstieg unter einer Minute — ist doppelt erfüllt: der
+   60-Sekunden-Modus ist ein echter, streak-erhaltender Trainingslauf
+   derselben Engine, und die Reencounter-Karte holt die fällige persönliche
+   Erinnerung auf den Startbildschirm. Ein dritter Sonderablauf wäre
+   Funktionsdopplung mit eigener Grading-/Fairness-Debatte.
+3. **Focus-Block (Ablenkungen ignorieren): abgelehnt.** Die
+   Aufmerksamkeits-Dimension ist über Twins/Interferenz ehrlich abgedeckt
+   (dimensions.ts sagt ausdrücklich, was sie misst und was nicht). Für
+   transferwirksames „Ablenkungstraining“ ist die Evidenzlage dünn; ein
+   Block, der die 5-Minuten-Einheit voller macht, ohne sie besser zu machen,
+   verstößt gegen G-2.
+4. **Fotorealistische Porträts: abgelehnt.** Die deterministischen
+   SVG-Gesichter sind kein Sparmodus, sondern ein Feature: keine
+   Persönlichkeitsrechte, keine Lizenzen, kein Nachladen, keine
+   Benchmark-Verzerrung durch bekannte Gesichter, identisch offline.
+5. **Unlockable Worlds: abgelehnt als Freischaltmechanik — und in der
+   ehrlichen Form längst gebaut.** Die Memory World wächst sichtbar aus
+   echten Daten (Zusammenhangswelten, D-043; Constellation-Helligkeit =
+   Übungsstand). Kosmetik hinter künstlicher Verknappung wäre genau die
+   Gamification, die D-019/K7 ausschließen.
+6. **AI Response Cache: abgelehnt.** Coach-Antworten sind persönlich und
+   kontextabhängig (Zahlen des Tages); eine gecachte Antwort wäre morgen
+   eine falsche. Gespeicherte KI-Antworten wären zusätzliche Daten ohne
+   Funktion. BYOK-Kosten bleiben die informierte Wahl des Menschen.
+7. **Free AI Allowance: bestätigt abgelehnt.** BYOK ist die Entscheidung
+   (D-002: keine laufenden Kosten; R-3: kein Server, der Fragen mitliest).
+   Eine bezahlte Entwickler-KI-Schicht widerspräche beidem.
+8. **Spendenweg (K9): bleibt gewollt, ist aber auf den Menschen blockiert**
+   (Konto bei Ko-fi/PayPal/GitHub Sponsors). Kein Training hinter einer
+   Schranke; nach Kontoanlage genügt ein stiller Link in „Über“/Impressum.
+
+## D-045 · 2026-08-26 · Der UI-Sprachwähler bietet nur Übersetztes an
+
+**Entscheidung:** Der Oberflächen-Sprachwähler zeigt nur Sprachen mit
+echtem Wörterbuch (heute DE, EN). Vorher standen alle elf zur Wahl; neun
+fielen still auf Englisch zurück — Arabisch sogar als RTL-Dokument mit
+englischem Text. Das verletzte TRANSLATION_WORKFLOW §6 („kein
+Selector-Eintrag vor Nutzbarkeit“). Wer die App in einer noch nicht
+übersetzten **Systemsprache** öffnet, bekommt weiter den ehrlichen
+EN-Fallback samt Fußnote — aufgelöst wird die Systemsprache unverändert.
+Die Trainingssprachen (sechs, aus Inhalten abgeleitet) sind davon
+unberührt. Die technischen Blocker für NL/TR/AR/ZH/JA (türkisches
+Lowercasing, CJK-Worttrennung, Kana-Faltung, arabische Normalisierung und
+Ziffern, RTL-Layout in 27 Stylesheets) sind in TRANSLATION_WORKFLOW §5
+konkretisiert — jede dieser Sprachen ist ein eigener Arbeitsblock mit
+muttersprachlicher Abnahme, keine Listenarbeit.
+
+## D-046 · 2026-08-26 · Der Optimierer wird nicht vorgecached
+
+**Entscheidung:** Die FSRS-Optimierer-Chunks (WASI-Worker + Binding,
+~400 KB) stehen in `globIgnores` des Precache. Ihre `.wasm`-Datei war nie
+im Precache — offline konnte der Optimierer also nie laufen, während
+jede Veröffentlichung trotzdem ~400 KB Optimierer-JS auf jedes Gerät
+vorlud. Der Optimierungszyklus ist best-effort (items.ts fängt den
+Importfehler) und läuft in der nächsten Online-Sitzung. Kein
+Funktionsverlust, spürbar schlankere Updates.

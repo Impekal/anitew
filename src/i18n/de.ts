@@ -576,6 +576,7 @@ export const de = {
     */
     heading: 'Heute',
     systemHeading: 'DEIN GEDÄCHTNISSYSTEM',
+    numberRecord: 'Längste korrekt erinnerte Zahl: {digits} Ziffern.',
     missionHeading: 'Deine Mission heute',
     duration: '{duration} · angepasst an das, was jetzt ansteht',
     quietMission: 'Heute wartet noch nichts Altes — die Mission legt neue Spuren an.',

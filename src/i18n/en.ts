@@ -366,6 +366,7 @@ export const en: Dictionary = {
   today: {
     heading: 'Today',
     systemHeading: 'YOUR MEMORY SYSTEM',
+    numberRecord: 'Longest correctly recalled number: {digits} digits.',
     missionHeading: "Today's mission",
     duration: '{duration} · shaped by what is waiting now',
     quietMission: 'Nothing old is waiting today — this mission will lay down new traces.',

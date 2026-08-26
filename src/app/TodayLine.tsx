@@ -96,9 +96,7 @@ export function TodayLine({
   const numberRecordText =
     numberRecord === undefined
       ? undefined
-      : document.documentElement.lang === 'de'
-        ? `Längste korrekt erinnerte Zahl: ${numberRecord} Ziffern.`
-        : `Longest correctly recalled number: ${numberRecord} digits.`
+      : texts.numberRecord.replace('{digits}', String(numberRecord))
   return (
     <section className={refreshKey > 0 ? 'today today-resolved' : 'today'} aria-label={texts.heading}>
       <p className="today-system">{texts.systemHeading}</p>

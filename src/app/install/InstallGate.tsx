@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 
 import './installGate.css'
-
-type InstallDevice = 'iphone' | 'android' | 'mac' | 'windows'
+import { type InstallDevice, installGateCopy } from './installGateCopy.ts'
 
 type InstallPromptChoice = { outcome: 'accepted' | 'dismissed' }
 
@@ -18,35 +17,6 @@ window.addEventListener('beforeinstallprompt', (event) => {
   deferredPrompt = event as BeforeInstallPromptEvent
 })
 
-const DEVICE_LABELS: Record<InstallDevice, string> = {
-  iphone: 'iPhone / iPad',
-  android: 'Android',
-  mac: 'Mac',
-  windows: 'Windows / anderes Gerät',
-}
-
-const STEPS: Record<InstallDevice, readonly string[]> = {
-  iphone: [
-    'Öffne ANITEW in Safari.',
-    'Tippe auf „Teilen“ und dann auf „Zum Home-Bildschirm“.',
-    'Bestätige mit „Hinzufügen“ und öffne anschließend das neue ANITEW-Symbol.',
-  ],
-  android: [
-    'Öffne das Browsermenü (meist ⋮ oben rechts).',
-    'Wähle „App installieren“ oder „Zum Startbildschirm hinzufügen“.',
-    'Bestätige und öffne ANITEW anschließend über das neue App-Symbol.',
-  ],
-  mac: [
-    'In Chrome/Edge: nutze das Installationssymbol in der Adressleiste oder „App installieren“.',
-    'In Safari: wähle „Ablage“ → „Zum Dock hinzufügen“.',
-    'Öffne ANITEW danach über Dock, Programme oder Launchpad.',
-  ],
-  windows: [
-    'Nutze das Installationssymbol in der Adressleiste oder das Browsermenü.',
-    'Wähle „ANITEW installieren“ bzw. „App installieren“.',
-    'Öffne ANITEW anschließend über das neue App-Symbol.',
-  ],
-}
 
 function detectDevice(): InstallDevice {
   const ua = navigator.userAgent.toLowerCase()
@@ -66,10 +36,11 @@ function writeBrowserContinuation(): void {
 }
 
 export function InstallGate({ onContinue }: { onContinue: () => void }) {
+  const copy = useMemo(installGateCopy, [])
   const [device, setDevice] = useState<InstallDevice>(() => detectDevice())
   const [showSteps, setShowSteps] = useState(false)
   const [installed, setInstalled] = useState(false)
-  const steps = useMemo(() => STEPS[device], [device])
+  const steps = useMemo(() => copy.steps[device], [copy, device])
 
   useEffect(() => {
     const onInstalled = () => {
@@ -104,17 +75,13 @@ export function InstallGate({ onContinue }: { onContinue: () => void }) {
   return (
     <main className="install-gate" aria-labelledby="install-gate-title">
       <section className="install-gate-card">
-        <p className="install-gate-kicker">ANITEW · EINMAL EINRICHTEN</p>
-        <h1 id="install-gate-title">ANITEW als App installieren</h1>
-        <p className="install-gate-time">Meist weniger als eine Minute.</p>
-        <p className="install-gate-lead">
-          ANITEW ist für den App-Modus gebaut: eigener Start vom Home-Bildschirm, zuverlässiger
-          Offline-Zugriff und weniger Browser-Reibung. Auf iPhone und iPad funktionieren
-          geschlossene System-Push-Erinnerungen nur als installierte Web-App.
-        </p>
+        <p className="install-gate-kicker">{copy.kicker}</p>
+        <h1 id="install-gate-title">{copy.title}</h1>
+        <p className="install-gate-time">{copy.time}</p>
+        <p className="install-gate-lead">{copy.lead}</p>
 
         <label className="install-gate-device">
-          <span>Dein Gerät</span>
+          <span>{copy.deviceLabel}</span>
           <select
             value={device}
             onChange={(event) => {
@@ -123,9 +90,9 @@ export function InstallGate({ onContinue }: { onContinue: () => void }) {
               setInstalled(false)
             }}
           >
-            {(Object.keys(DEVICE_LABELS) as InstallDevice[]).map((id) => (
+            {(Object.keys(copy.devices) as InstallDevice[]).map((id) => (
               <option key={id} value={id}>
-                {DEVICE_LABELS[id]}
+                {copy.devices[id]}
               </option>
             ))}
           </select>
@@ -133,13 +100,8 @@ export function InstallGate({ onContinue }: { onContinue: () => void }) {
 
         {showSteps && (
           <div className="install-gate-steps" role="status">
-            <h2>{installed ? 'Installation gestartet' : `Installation auf ${DEVICE_LABELS[device]}`}</h2>
-            {installed && (
-              <p>
-                Öffne ANITEW anschließend über das neue App-Symbol. Dort erscheint diese
-                Installationsseite nicht mehr.
-              </p>
-            )}
+            <h2>{installed ? copy.startedHeading : copy.stepsHeadingFor(copy.devices[device])}</h2>
+            {installed && <p>{copy.startedNote}</p>}
             <ol>
               {steps.map((step) => (
                 <li key={step}>{step}</li>
@@ -150,23 +112,19 @@ export function InstallGate({ onContinue }: { onContinue: () => void }) {
 
         <div className="install-gate-actions">
           <button type="button" className="install-gate-primary" onClick={() => void install()}>
-            App installieren
+            {copy.install}
           </button>
           <button type="button" className="install-gate-secondary" onClick={continueInBrowser}>
-            Nicht installieren, im Browser fortfahren
+            {copy.continueInBrowser}
           </button>
         </div>
 
-        <p className="install-gate-browser-note">
-          Die Browser-Version wird erst mit dem zweiten Button freigegeben. In einer neuen
-          Browser-Sitzung erinnert ANITEW erneut an die Installation; die installierte App sieht
-          diese Seite nie.
-        </p>
+        <p className="install-gate-browser-note">{copy.browserNote}</p>
 
-        <nav className="install-gate-legal" aria-label="Rechtliches">
-          <a href="/impressum.html">Impressum</a>
+        <nav className="install-gate-legal" aria-label={copy.legalLabel}>
+          <a href="/impressum.html">{copy.imprint}</a>
           <span aria-hidden="true">·</span>
-          <a href="/datenschutz.html">Datenschutz</a>
+          <a href="/datenschutz.html">{copy.privacy}</a>
         </nav>
       </section>
     </main>

@@ -140,7 +140,7 @@ export function ReminderPanelImpl({
           </div>
 
           {said !== undefined && (
-            <p className="hint">
+            <p className="hint" role="status" aria-live="polite">
               {said === 'saved' ? (
                 t.saved
               ) : said === 'cleared' ? (

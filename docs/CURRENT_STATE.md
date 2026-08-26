@@ -1,6 +1,6 @@
 # ANITEW — Current State
 
-**Stand: 2026-08-25**
+**Stand: 2026-08-26** (nach Merge von PR #79 „Fix real iPhone closed-app reminders“ und dem Reifeprüfungs-Review)
 
 Diese Datei ist die kurze, autoritative Zustandsübersicht. `docs/BACKLOG.md` und
 `PROJECT_STATE.md` bleiben als historische Arbeits- und Entscheidungsprotokolle
@@ -9,7 +9,10 @@ erhalten; ältere Statusangaben dort dürfen diesem Stand nicht widersprechen.
 ## Produktlinie
 
 - Produktbranch: `anitew-redesign-v2`
-- Kein automatischer Production-Deploy während Entwicklungs-/Release-Gates.
+- Ein Push auf den Produktbranch deployt nach Production (deploy.yml) —
+  inklusive VAPID-Bootstrap (idempotent, rotiert nie vorhandene Schlüssel)
+  und anschließender Live-Prüfung von `/push/vapid-public`. Arbeits- und
+  Feature-Branches deployen nicht.
 - Core bleibt browserfrei und deterministisch; Zeit und Plattform kommen über
   Ports/Adapter.
 - Local-first bleibt die Grundregel. Netzwerk, Drive und BYOK-AI sind optionale
@@ -86,26 +89,24 @@ Palast, Zwillinge, visuelle Details und Benchmark.
 - English: fertig
 - Français: fertig
 - Español: fertig
-- Italiano: vollständig implementiert; finaler PR #74 auf Head `b108c87f237d6c06d9f1fa0d4f6d612afe9d1543`. Typecheck, Core, Build, Push/Worker, Kaltstart, Smoke, OAuth/Reset/Core, Core-Endzustände, Layout und Desktop-Vollregression sind grün; Mobile Release Gate läuft noch.
-- Português: vollständig implementiert; bereinigter Head `002ee062dcfe9c3d8a83399c41241d7e7f35244a` lokal gezielt final grün: Core, Build, Kaltstartbudget und 2/2 relevante E2E. Finaler Integrations-PR folgt nach Italienisch.
+- Italiano: fertig und integriert (`tests/core/italian.test.ts` im Produktbaum).
+- Português: fertig und integriert (`tests/core/portuguese.test.ts` im Produktbaum).
 - Nederlands, Türkçe, العربية, 中文, 日本語: noch keine vollständigen sieben Pools;
   deshalb bewusst noch nicht als Trainingssprache freigeschaltet
 
 ### Mission-UI-Polish
 
-- Branch `anitew-mission-ui-world-labels`
-- Head `935a7ae7df8d587a1178573150a643c7315e18d8`
-- Hotel-only Copy für gemeinsame Mission-Fact-Kinds durch weltneutrale Semantik ersetzt, ohne Mission-Daten, IDs oder Scheduler zu ändern.
-- Lokale gezielte Abnahme final grün: Core-i18n-Test, Build, Kaltstartbudget und Missions-E2E 1/1.
-- Integration erst nach dem laufenden Sprachblock, damit keine redundanten Vollgates entstehen.
+- Integriert (`missionUiCopy.test.ts`, `missionLocationCopy.test.ts` im
+  Produktbaum); der frühere Arbeitsbranch ist Geschichte.
 
 ## Echte offene Produktpunkte
 
-1. **H3 verzögerte Mission-Abfrage**
-   - Ein garantiertes Wiederfragen nach 20 Minuten bei geschlossener App ist
-     als reine Browser-PWA nicht zuverlässig planbar.
-   - Gehört in den Native-/Store-Block; Browsercode soll dafür keine falsche
-     Garantie vortäuschen.
+1. **H3 verzögerte Mission-Abfrage — neu entschieden (D-044):** Mit Web
+   Push/Durable Objects wäre sie heute technisch möglich, wird aber bewusst
+   nicht gebaut: Der 15–45-Minuten-Slot gehört der Messung (mit eigener
+   Push-Erinnerung), das Training dem FSRS-Wiedersehen. Eine dritte
+   Push-Quelle nach jeder Einheit wäre Benachrichtigungsdruck ohne
+   Messgewinn. Falls je: Opt-in pro Einheit, Store-Phase.
 
 2. **Native / Stores**
    - Play-Store-Paketierung und Store-Formulare.
@@ -146,10 +147,16 @@ werden:
 
 ## Release-Reihenfolge ab diesem Stand
 
-1. Italienisch #74: Mobile Gate grün → merge.
-2. Portugiesisch auf neuen Produkt-HEAD → ein finaler Integrations-Gate → merge.
-3. Mission-UI-Polish auf neuen Produkt-HEAD → nur notwendige Integrationsprüfung → merge.
-4. Docs-State-Sync integrieren.
-5. Produktions-/Geräteabnahme.
-6. Native-/Store-Arbeit und zusätzliche Trainingssprachen nur danach oder als
-   ausdrücklich separater Release-Block.
+1. ~~Italienisch~~ / ~~Portugiesisch~~ / ~~Mission-UI-Polish~~ — integriert.
+2. PR #79 (Closed-App-Push-Härtung): **gemergt am 2026-08-26** nach vollem
+   Gate (596 Kern-/Worker-Tests, kompletter Playwright-Lauf; einziger roter
+   Lauf war ein isoliert-grüner Last-Flake).
+3. Reifeprüfungs-Härtung (Worker-Tests, Wahrheitsschicht PRIVACY/INSTALL/
+   STORE/i18n, Claims-Wächter, Sprachwähler-Ehrlichkeit, Precache-Diät,
+   A11y-Kleinigkeiten, D-044…D-046) → PR nach vollem Gate.
+4. **Reale Produktions-/Geräteabnahme** (PRODUCTION_ACCEPTANCE.md; braucht
+   echtes iPhone — der Punkt, an dem Automatisierung endet).
+5. Phase-0-Mikropilot (7 Tage, BETA_PROTOCOL) und Usability-Skript
+   (USABILITY_TEST.md) mit echten Menschen.
+6. Native-/Store-Arbeit und zusätzliche Trainingssprachen als eigene
+   Blöcke danach (Blocker je Sprache: TRANSLATION_WORKFLOW §5).

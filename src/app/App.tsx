@@ -88,6 +88,7 @@ import {
   loadTaught,
 } from '../data/technique.ts'
 
+import { isTranslated } from '../i18n/index.ts'
 import { AboutPanel } from './AboutPanel.tsx'
 import { BackupPanel } from './BackupPanel.tsx'
 import { MenuIcon, type MenuIconKind } from './MenuIcon.tsx'
@@ -1250,11 +1251,21 @@ export function App() {
         <label className="language">
           <span>{dictionary.language.label}</span>
           <select value={language} onChange={(event) => choose(event.target.value as Language)}>
-            {SUPPORTED_LANGUAGES.map((tag) => (
-              <option key={tag} value={tag}>
-                {dictionary.language.names[tag]}
-              </option>
-            ))}
+            {/*
+              Nur Sprachen mit echtem Wörterbuch (TRANSLATION_WORKFLOW §6):
+              Ein Eintrag, der auf Englisch zurückfällt — bei Arabisch sogar
+              als RTL-Dokument mit englischem Text —, verspricht eine
+              Übersetzung, die es nicht gibt. Wer die App in einer noch
+              nicht übersetzten Systemsprache öffnet, bekommt weiterhin die
+              ehrliche Fußnote; angeboten wird sie erst, wenn sie fertig ist.
+            */}
+            {SUPPORTED_LANGUAGES.filter((tag) => tag === language || isTranslated(tag)).map(
+              (tag) => (
+                <option key={tag} value={tag}>
+                  {dictionary.language.names[tag]}
+                </option>
+              ),
+            )}
           </select>
         </label>
         {/*
