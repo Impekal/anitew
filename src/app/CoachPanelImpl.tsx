@@ -40,6 +40,8 @@ export function CoachPanelImpl({
   const [answer, setAnswer] = useState<string | undefined>(undefined)
   const [failure, setFailure] = useState<CoachFailure | undefined>(undefined)
   const [busy, setBusy] = useState(false)
+  // F-02 (Runde 2): Ein fehlgeschlagener Einstellungs-Schreibvorgang wird gesagt.
+  const [saveFailed, setSaveFailed] = useState(false)
 
   useEffect(() => {
     void platform.settings
@@ -61,11 +63,23 @@ export function CoachPanelImpl({
     })().catch(() => undefined)
   }, [platform, provider])
 
+  /*
+   * F-02 (Runde 2): Erst speichern, dann anzeigen. Der Coach liest Anbieter
+   * und Schlüssel vor jeder Frage aus den Einstellungen — würde die Anzeige
+   * optimistisch wechseln und der Schreibvorgang scheitern, zeigte die UI
+   * Anbieter B, während die Frage an Anbieter A ginge. Scheitert das
+   * Speichern, springt die Auswahl sichtbar zurück und der Grund steht da.
+   */
   const choose = (next: CoachProvider) => {
-    setProvider(next)
     setFailure(undefined)
     setAnswer(undefined)
-    void platform.settings.write(COACH_PROVIDER_SETTING, next).catch(() => undefined)
+    void platform.settings
+      .write(COACH_PROVIDER_SETTING, next)
+      .then(() => {
+        setSaveFailed(false)
+        setProvider(next)
+      })
+      .catch(() => setSaveFailed(true))
   }
 
   const line = (entry: Advice): string => {
@@ -86,20 +100,31 @@ export function CoachPanelImpl({
   const saveKey = () => {
     const key = keyDraft.trim()
     if (key === '') return
-    void platform.settings.write(coachKeySettingFor(provider), key).catch(() => undefined)
-    setHasKey(true)
-    setKeyDraft('')
-    setFailure(undefined)
+    void platform.settings
+      .write(coachKeySettingFor(provider), key)
+      .then(() => {
+        setSaveFailed(false)
+        setHasKey(true)
+        setKeyDraft('')
+        setFailure(undefined)
+      })
+      .catch(() => setSaveFailed(true))
   }
 
   const removeKey = () => {
-    void platform.settings.remove(coachKeySettingFor(provider)).catch(() => undefined)
-    if (provider === 'anthropic') {
-      void platform.settings.remove(LEGACY_COACH_KEY_SETTING).catch(() => undefined)
-    }
-    setHasKey(false)
-    setAnswer(undefined)
-    setFailure(undefined)
+    void (async () => {
+      await platform.settings.remove(coachKeySettingFor(provider))
+      if (provider === 'anthropic') {
+        await platform.settings.remove(LEGACY_COACH_KEY_SETTING)
+      }
+    })()
+      .then(() => {
+        setSaveFailed(false)
+        setHasKey(false)
+        setAnswer(undefined)
+        setFailure(undefined)
+      })
+      .catch(() => setSaveFailed(true))
   }
 
   const ask = () => {
@@ -198,6 +223,11 @@ export function CoachPanelImpl({
           </>
         )}
 
+        {saveFailed && (
+          <p className="coach-failure" role="alert">
+            {texts.saveFailed}
+          </p>
+        )}
         {failure !== undefined && <p className="coach-failure">{texts.errors[failure]}</p>}
         {answer !== undefined && <p className="coach-answer">{answer}</p>}
       </section>

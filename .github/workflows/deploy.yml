@@ -15,14 +15,13 @@
 # zu werden — solange niemand deployen will, ist das kein Fehler.
 name: Deploy
 
+# F-12 (Runde 2): Der reguläre Weg in die Produktion ist jetzt der
+# Deploy-Job **in der CI** (ci.yml) — er läuft erst nach dem vollständigen
+# grünen Tor desselben Commits. Vorher liefen Deploy und CI parallel, und
+# ein Push konnte live sein, bevor sein Tor rot wurde. Diese Datei bleibt
+# als bewusster **Handgriff** für den Notfall: manuell gestartet, ohne Tor —
+# und genau deshalb nie automatisch.
 on:
-  push:
-    branches:
-      - main
-      # Der Zweig, an dem gerade gearbeitet wird. Ohne ihn bleibt die
-      # Live-Fassung stumm auf dem letzten Stand, während auf dem Telefon die
-      # Vergangenheit getestet wird.
-      - anitew-redesign-v2
   workflow_dispatch:
 
 # Zwei Veröffentlichungen dürfen sich nie überholen.

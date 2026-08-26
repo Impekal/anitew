@@ -176,3 +176,51 @@ describe('zusammenführen statt überschreiben (N9)', () => {
     expect(keepItemState(one, { ...one })).toEqual(one)
   })
 })
+
+describe('gerätegebundene Einstellungen bleiben draußen (F-01, Runde 2)', () => {
+  const secretSettings = [
+    { key: 'coach.key', value: 'sk-alt-anthropic' },
+    { key: 'coach.key.gemini', value: 'AIza-geheim' },
+    { key: 'coach.key.openai', value: 'sk-geheim' },
+    { key: 'sync.account', value: 'mensch@example.com' },
+    { key: 'sync.accountName', value: 'Mensch' },
+    { key: 'sync.on', value: true },
+    { key: 'sync.lastAt', value: 123 },
+    { key: 'sync.clientId', value: 'geraet-1' },
+  ]
+  const portable = [
+    { key: 'language', value: 'de' },
+    { key: 'sound', value: false },
+    { key: 'training.language', value: 'en' },
+    { key: 'memory.graph', value: { nodes: [], edges: [] } },
+    { key: 'profile.onboarding', value: {} },
+    { key: 'reminders.daily', value: '19:30' },
+  ]
+
+  it('exportiert weder BYOK-Schlüssel noch Google-Identität — Vorlieben schon', () => {
+    const file = makeBackup({ ...empty, settings: [...secretSettings, ...portable] }, 1000, 'x')
+    const keys = file.tables.settings.map((setting) => setting.key)
+    for (const secret of secretSettings) expect(keys).not.toContain(secret.key)
+    for (const keep of portable) expect(keys).toContain(keep.key)
+    // Der Schlüsselwert darf nirgends in der Datei stehen — auch nicht als Text.
+    expect(JSON.stringify(file)).not.toContain('AIza-geheim')
+    expect(JSON.stringify(file)).not.toContain('sk-geheim')
+  })
+
+  it('verwirft solche Werte auch beim Einlesen einer älteren Datei', () => {
+    // Eine Datei, die vor dieser Regel geschrieben wurde, trägt die Werte noch.
+    const old = {
+      format: BACKUP_FORMAT,
+      version: BACKUP_VERSION,
+      createdAt: 1,
+      app: 'alt',
+      tables: { ...empty, settings: [...secretSettings, ...portable] },
+    }
+    const reading = readBackup(JSON.parse(JSON.stringify(old)))
+    expect(reading.ok).toBe(true)
+    if (!reading.ok) return
+    const keys = reading.file.tables.settings.map((setting) => setting.key)
+    for (const secret of secretSettings) expect(keys).not.toContain(secret.key)
+    for (const keep of portable) expect(keys).toContain(keep.key)
+  })
+})

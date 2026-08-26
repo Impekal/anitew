@@ -85,3 +85,55 @@ jobs:
           tests/e2e/reminders.spec.ts
           tests/e2e/privacy.spec.ts
           tests/e2e/upgrade.spec.ts
+
+  # F-12 (Runde 2): Die Veröffentlichung hängt am vollen Tor desselben
+  # Commits — `needs: check` lässt sie erst laufen, wenn Typen, Tests,
+  # Budget und die komplette E2E-Matrix grün sind. Vorher lief der Deploy
+  # als eigener Workflow **parallel** zur CI; ein Commit konnte live sein
+  # und erst danach rot werden. deploy.yml bleibt nur als manueller Notweg.
+  deploy:
+    needs: check
+    if: >-
+      github.event_name == 'push' &&
+      (github.ref_name == 'main' || github.ref_name == 'anitew-redesign-v2')
+    runs-on: ubuntu-latest
+    concurrency:
+      group: deploy-cloudflare
+      cancel-in-progress: false
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || vars.CLOUDFLARE_ACCOUNT_ID || '07613ddfc3f70bf92e9df8a9f9530552' }}
+      VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID || vars.VITE_GOOGLE_CLIENT_ID || '360791045103-jvbjtv7mdatp4f5svtcfj7uabjm7jdok.apps.googleusercontent.com' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --force
+      - run: npm run build
+      # Web Push darf nicht davon abhängen, dass die drei VAPID-Secrets
+      # irgendwann einmal manuell gesetzt wurden (siehe deploy.yml).
+      - name: Web-Push-Schlüssel sicherstellen
+        if: env.CLOUDFLARE_API_TOKEN != ''
+        run: node scripts/configure-push.mjs
+      - name: Veröffentlichen
+        if: env.CLOUDFLARE_API_TOKEN != ''
+        run: npx wrangler deploy
+      # Ein grüner Build beweist keine reale Push-Konfiguration.
+      - name: Production Web Push prüfen
+        if: env.CLOUDFLARE_API_TOKEN != ''
+        run: |
+          node --input-type=module <<'NODE'
+          const url = 'https://anitew.impekaltech.workers.dev/push/vapid-public'
+          const response = await fetch(url, { cache: 'no-store' })
+          const body = await response.json().catch(() => ({}))
+          if (!response.ok || typeof body.publicKey !== 'string' || body.publicKey.length < 40) {
+            throw new Error(`Production Web Push ist nicht konfiguriert (HTTP ${response.status}).`)
+          }
+          console.log('Production Web Push ist konfiguriert.')
+          NODE
+      - name: Hinweis, wenn kein Token hinterlegt ist
+        if: env.CLOUDFLARE_API_TOKEN == ''
+        run: |
+          echo "::notice::Kein CLOUDFLARE_API_TOKEN hinterlegt — gebaut, aber nicht veröffentlicht."

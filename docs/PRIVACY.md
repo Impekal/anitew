@@ -100,6 +100,12 @@ jeweiligen Online-Weg.
 „Sicherung speichern“ erzeugt eine JSON-Datei mit deinem ANITEW-Stand. Du
 entscheidest, wo sie liegt. Wer diese Datei besitzt, kann ihren Inhalt lesen.
 
+**Nicht in der Sicherung enthalten** sind gerätegebundene Werte: hinterlegte
+KI-API-Schlüssel, die Google-Kontoanzeige des Geräts und der technische
+Zustand des Drive-Abgleichs. Sie verlassen das Gerät weder in der Datei noch
+beim Drive-Abgleich; auch beim Einlesen einer älteren Datei, die solche Werte
+noch enthält, werden sie verworfen.
+
 Beim optionalen Google-Drive-Abgleich legt ANITEW dieselbe Sicherungsdatei in
 einem eigenen `Anitew`-Ordner deines Google Drive ab. ANITEW fasst andere
 Dateien nicht an.
@@ -115,8 +121,10 @@ dieses Gerät. Für die Zustellung speichert ANITEW serverseitig nur:
 - den fälligen Zeitpunkt,
 - bei der täglichen Erinnerung Uhrzeit und IANA-Zeitzone,
 - den generischen Benachrichtigungstext — auch als kurze Zustell-Notiz, die
-  nach dem Auslösen so lange beim Server bereitliegt, bis dein Gerät sie
-  abholt oder das Push-Abonnement endet.
+  nach dem Auslösen beim Server bereitliegt, bis dein Gerät sie abholt,
+  längstens aber 24 Stunden (bei der Messerinnerung 60 Minuten); danach wird
+  sie gelöscht statt verspätet zugestellt. Bleibt weder ein Termin noch eine
+  Notiz übrig, wird der gesamte serverseitige Eintrag gelöscht.
 
 **Nicht gespeichert werden dafür:** Trainingsantworten, Gedächtnisinhalte,
 Profil, Name, E-Mail-Adresse, Messwerte oder Sicherungsdateien.
@@ -155,8 +163,9 @@ Google-Basisauskunft (`openid email profile`) an — nur damit die Oberfläche
 zeigen kann, als wer du verbunden bist. Der Cloudflare Worker tauscht den
 Google-Autorisierungscode gegen Tokens und hält die Sitzung — einschließlich
 des Google-Refresh-Tokens — verschlüsselt in einem `HttpOnly`-Cookie deines
-Browsers (Laufzeit bis zu 180 Tage; beim Abmelden sofort gelöscht und bei
-Google widerrufen). Es gibt keine ANITEW-Nutzerdatenbank, in der Tokens
+Browsers (Laufzeit ab Anmeldung fest höchstens 180 Tage — die Frist wird
+durch Nutzung **nicht** verlängert; beim Abmelden sofort gelöscht und bei
+Google widerrufen; danach ist eine neue Anmeldung nötig). Es gibt keine ANITEW-Nutzerdatenbank, in der Tokens
 lägen. Das Gerät nutzt den Zugriff anschließend für den ANITEW-Ordner im
 eigenen Drive. Name/E-Mail, die in der Oberfläche zur Kontokontrolle
 angezeigt werden, werden lokal in ANITEWs Gerätespeicher gehalten und beim
@@ -186,9 +195,11 @@ Soweit ANITEW Daten nur auf deinem Gerät verarbeitet, bestimmst du durch Nutzun
 Export und Löschen über ihren Bestand. Bei freiwillig aktivierten Online-
 Funktionen erfolgt die Verarbeitung zur Bereitstellung der jeweils ausdrücklich
 gewählten Funktion. Konkrete Fristen: Das verschlüsselte Google-Sitzungs-Cookie
-läuft nach spätestens 180 Tagen ab (beim Abmelden sofort); serverseitige
-Push-Einträge bestehen, bis der Termin zugestellt und abgeholt ist, du die
-Erinnerung beendest oder das Push-Abonnement endet. Technische Infrastrukturprotokolle und Daten bei externen
+läuft nach spätestens 180 Tagen ab Anmeldung ab (beim Abmelden sofort) und wird
+durch Nutzung nicht verlängert; serverseitige Push-Einträge bestehen, bis der
+Termin zugestellt und abgeholt ist, du die Erinnerung beendest oder das
+Push-Abonnement endet — nicht abgeholte Zustell-Notizen längstens 24 Stunden
+(Messerinnerung: 60 Minuten). Technische Infrastrukturprotokolle und Daten bei externen
 Anbietern unterliegen zusätzlich deren gesetzlichen und vertraglichen
 Aufbewahrungsregeln.
 

@@ -2304,3 +2304,12 @@ body::before {
   color: var(--ink);
   border: 2px solid var(--accent);
 }
+
+/* Die Core-Seite „Einstellungen“ (Runde 2): dieselben Regler wie am Fuß des
+   Startbildschirms, nur mit eigenem Atem — ohne die zurückgenommene
+   Fuß-Deckkraft, denn hier sind sie der Inhalt der Seite. */
+.settings-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}

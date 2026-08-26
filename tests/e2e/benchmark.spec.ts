@@ -142,7 +142,10 @@ test('verkauft ein Wort mehr nicht als Fortschritt (F3, R-1)', async ({ page }) 
     { ordinal: 3, day: dayKey(-14), nextDay: 11, complete: true },
   ])
 
-  await expect(page.getByText(/Kein Unterschied, der sich vom Zufall trennen lässt/)).toBeVisible()
+  // F-07 (Runde 2): Der Satz behauptet Zählunsicherheit, keine Signifikanz.
+  await expect(
+    page.getByText(/Der Unterschied liegt innerhalb der groben Zählunsicherheit/),
+  ).toBeVisible()
   await expect(page.locator('.measure-headline')).toBeHidden()
 })
 

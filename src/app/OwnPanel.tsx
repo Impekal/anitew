@@ -35,6 +35,8 @@ type PhotoAnalysisState =
   | 'empty'
   | 'no-key'
   | 'bad-key'
+  | 'forbidden'
+  | 'limited'
   | 'offline'
   | 'refused'
   | 'failed'
@@ -211,6 +213,8 @@ export function OwnPanel({ language, dictionary }: { language: string; dictionar
       case 'unsupported-image':
         return photoTexts.unsupportedImage
       case 'bad-key':
+      case 'forbidden':
+      case 'limited':
       case 'offline':
       case 'refused':
       case 'failed':

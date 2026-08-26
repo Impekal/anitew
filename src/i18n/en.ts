@@ -105,7 +105,7 @@ export const en: Dictionary = {
   benchmark: {
     heading: 'Measurement',
     invite: 'Time for a measurement',
-    inviteNote: 'Three minutes. Twenty words that never appear in training — which is why this measures your memory and not your practice.',
+    inviteNote: 'Three minutes. Twenty words that never appear in training — it measures how many of them you keep: separate from your practice, with no claim about your everyday memory.',
     start: 'Start the measurement',
     encodeHint: 'Twenty words. Look at them.',
     recallNow: 'What stayed with you?',
@@ -134,11 +134,11 @@ export const en: Dictionary = {
     changeUp: 'percentage points more kept than at calibration',
     changeDown: 'percentage points less kept than at calibration',
     range: 'Range',
-    tooClose: 'No difference that can be told apart from chance. Twenty words are a small sample: two words more or less is already ten percentage points.',
+    tooClose: 'The difference lies within the rough counting uncertainty of this small sample. Twenty words: two more or less is already ten percentage points — the range says no more than that.',
     explain: 'What was measured here',
     explainNote: 'Twenty words that exist nowhere else in the app and never enter the review plan. Counted is how many are still there the next day — compared with yourself at calibration, never with others. What stands here is counted. About your memory in everyday life it says nothing, as long as nobody has measured it there.',
     series: 'The series',
-    cycles: 'From measurement {n} onwards the words repeat. A word seen once for three minutes months ago distorts little — but it distorts.',
+    cycles: 'From measurement {n} onwards the words repeat. A word seen once for three minutes in an earlier measurement distorts little — but it distorts.',
   },
   science: {
     heading: 'What is established',
@@ -247,8 +247,8 @@ export const en: Dictionary = {
     sourceImmediate: 'Source: training · immediate',
     sourceBenchmark: 'Source: scientific measurement',
     sourceNone: 'Source: no measurement available yet',
-    benchmarkChange: 'Distinguishable change: range {low} to {high} percentage points.',
-    benchmarkNoChange: 'No difference distinguishable from chance yet (range {low} to {high}).',
+    benchmarkChange: 'Change beyond the counting uncertainty: range {low} to {high} percentage points.',
+    benchmarkNoChange: 'Change within the counting uncertainty (range {low} to {high}).',
     note: 'Only returns are counted: how often a piece of information came back after days and was still there. How well you do on the day you learn it is deliberately not here — that is practice, not memory.',
     names: {
       words: 'Words',
@@ -290,7 +290,7 @@ export const en: Dictionary = {
       facts: 'Your material',
       memory: 'Memories',
     },
-    noWeakest: 'No difference between the axes that can be told apart from chance.',
+    noWeakest: 'No difference between the axes beyond the counting uncertainty.',
     empty: 'Nothing to show yet. The profile grows out of the training — not out of a test at the start.',
   },
   reminder: {
@@ -409,6 +409,7 @@ export const en: Dictionary = {
     confirm: 'Confirm and keep',
     cancel: 'Discard',
     saved: 'Kept. The next session takes the weakest first.',
+    saveFailed: 'Could not save on this device — nothing was taken over. Your input is still there: try again in a moment.',
     types: {
       person: 'Person',
       place: 'Place',
@@ -510,10 +511,13 @@ export const en: Dictionary = {
     errors: {
       'no-key': 'No free questions without a key. The notes above work without one.',
       'bad-key': 'The key was not accepted. Check it with the provider — or remove it here.',
+      forbidden: 'The provider rejects the request despite a valid key — usually the account there lacks permission for the model. That is fixed with the provider, not here.',
+      limited: 'The provider is throttling right now (rate or quota limit). Wait a moment and try again — the key is fine.',
       offline: 'No connection to the provider. Try again later — the notes above work offline.',
       refused: 'The model will not answer this question. Rephrased, it often works.',
       failed: 'The answer did not arrive. Try again later.',
     },
+    saveFailed: 'Could not save on this device. The previous setting still applies.',
   },
   streak: {
     days: 'days in a row',
@@ -682,5 +686,9 @@ export const en: Dictionary = {
     close: 'Close menu',
     yours: 'Where you stand',
     device: 'App & device',
+  },
+  settings: {
+    heading: 'Settings',
+    note: 'The same controls are also at the bottom of the start screen.',
   },
 }

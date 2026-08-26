@@ -12,6 +12,7 @@ import {
   DEFAULT_COACH_PROVIDER,
   LEGACY_COACH_KEY_SETTING,
   coachKeySettingFor,
+  failureForStatus,
 } from './coach.ts'
 import { createWebSettings } from './settings.ts'
 
@@ -275,7 +276,8 @@ export async function suggestMemoriesFromPhoto(file: File): Promise<RememberSugg
     throw new PhotoArchitectError('offline')
   }
 
-  if (response.status === 401 || response.status === 403) throw new PhotoArchitectError('bad-key')
+  const classified = failureForStatus(response.status)
+  if (classified !== undefined) throw new PhotoArchitectError(classified)
   if (!response.ok) throw new PhotoArchitectError('failed')
 
   const answer = call.parse((await response.json()) as unknown).trim()
