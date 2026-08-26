@@ -2,15 +2,16 @@ import { expect, test } from '@playwright/test'
 
 import { startButton, visit } from './helpers.ts'
 
-test('der erste Eindruck trägt die englische Marke fünf Sekunden und erklärt ANITEW visuell', async ({
+test('der erste Eindruck trägt die englische Marke sechs Sekunden und erklärt ANITEW visuell', async ({
   page,
 }) => {
-  test.setTimeout(30_000)
+  test.setTimeout(35_000)
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/?firstLaunch=1')
 
   const launch = page.locator('#anitew-launch')
   await expect(launch).toHaveCount(1)
+  await expect(launch).toHaveCSS('animation-duration', '6s')
   // Splash-Copy ist Marken-Copy: immer Englisch, auch wenn die App Deutsch spricht.
   await expect(page.getByText('MEMORIZE · RECALL · RETAIN · MASTER')).toBeVisible()
   const name = page.locator('.anitew-launch-name')
@@ -45,9 +46,9 @@ test('der erste Eindruck trägt die englische Marke fünf Sekunden und erklärt 
   await expect(page.locator('.anitew-mark-path')).toHaveCount(1)
   await expect(page.locator('.anitew-mark-node')).toHaveCount(6)
 
-  // Das allererste Geräte-Ritual dauert wirklich fünf Sekunden, nicht nur
-  // „ungefähr länger als vorher“.
-  await page.waitForTimeout(4_100)
+  // Der CSS-Vertrag ist exakt sechs Sekunden; kurz vor Ende steht die Marke
+  // noch, danach räumt sie den Bildschirm vollständig frei.
+  await page.waitForTimeout(4_700)
   await expect(launch).toBeVisible()
   await expect(launch).toBeHidden({ timeout: 2_000 })
 
@@ -79,6 +80,31 @@ test('der erste Eindruck trägt die englische Marke fünf Sekunden und erklärt 
 
   await expect(page.getByText('Los geht’s', { exact: true })).toBeVisible()
   await expect(page.getByText('Direkt starten', { exact: true })).toBeVisible()
+})
+
+test('spätere echte Starts zeigen drei Sekunden Splash, bloßes Zurückkehren keinen neuen', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/')
+
+  const launch = page.locator('#anitew-launch')
+  await expect(launch).toBeVisible()
+  await expect(launch).toHaveCSS('animation-duration', '3s')
+  await page.waitForTimeout(2_100)
+  await expect(launch).toBeVisible()
+  await expect(launch).toBeHidden({ timeout: 1_500 })
+
+  // App-Wechsel/Zurückkehren erzeugt keinen Dokumentstart. Selbst die
+  // entsprechenden Browser-Ereignisse dürfen den abgeschlossenen Splash
+  // deshalb nicht erneut sichtbar machen.
+  await page.evaluate(() => {
+    window.dispatchEvent(new Event('blur'))
+    document.dispatchEvent(new Event('visibilitychange'))
+    window.dispatchEvent(new Event('focus'))
+  })
+  await page.waitForTimeout(250)
+  await expect(launch).toBeHidden()
 })
 
 test('die Orientierung erklärt Core, Coach, Techniken, Memory World, Sync und Messung', async ({
