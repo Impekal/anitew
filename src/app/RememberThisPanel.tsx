@@ -395,7 +395,7 @@ export function RememberThisPanel({
         </div>
       )}
 
-      {saved && <p className="remember-saved">{texts.saved}</p>}
+      {saved && <p className="remember-saved" role="status" aria-live="polite">{texts.saved}</p>}
     </section>
   )
 }

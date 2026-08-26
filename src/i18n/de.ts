@@ -460,7 +460,7 @@ export const de = {
       als wenn sie gar keine angeboten hätte (R-2).
     */
     heading: 'Erinnerung',
-    note: 'Ohne Konto, ohne Server. Was hier eingestellt wird, bleibt auf dem Gerät.',
+    note: 'Kein Konto. Push speichert Geräteadresse, Zeit, Zeitzone und den generischen Text — keine Trainingsdaten.',
     // Die drei Fähigkeitsstufen, im Klartext.
     whileOpen: 'Auf diesem Gerät kann ANITEW nur erinnern, **solange es offen ist** — auch im Hintergrund, aber nicht nach dem Schließen. Eine feste Uhrzeit am nächsten Tag lässt sich im Browser nicht zusagen. Die Uhrzeit wird trotzdem gemerkt: Sie gilt, sobald ANITEW als App aus dem Store läuft.',
     scheduled: 'Erinnerungen kommen an, auch wenn ANITEW geschlossen ist.',
@@ -488,12 +488,12 @@ export const de = {
       Punkt ist der unbequeme — und er gehört genau deshalb dazu.
     */
     heading: 'Datenschutz',
-    lead: 'ANITEW hat keinen Server.',
+    lead: 'ANITEW bleibt local-first.',
     points: [
       'Kein Konto bei uns, keine Werbung, keine Tracker.',
       'Alles, was beim Training entsteht, bleibt auf diesem Gerät — bis du selbst etwas anderes wählst: den Abgleich mit deinem eigenen Google Drive oder eine Coach-Frage mit eigenem Schlüssel. Beides ist aus, bis du es anfasst.',
       'Die Sicherung ist eine Datei, die du speicherst; der Abgleich legt dieselbe Datei in deinen eigenen Drive-App-Ordner. Zu uns fließt in beiden Fällen nichts.',
-      'Erinnerungen entstehen auf dem Gerät. Es gibt keinen Push-Dienst.',
+      'Für Push speichert ANITEW nur die technische Push-Adresse dieses Geräts, Fälligkeit, Zeitzone und den generischen Benachrichtigungstext. Keine Trainings- oder Gedächtnisinhalte.',
       'Löschen heißt: Browserspeicher leeren oder die App entfernen. Danach ist es weg — auch für uns, denn wir hatten es nie.',
     ],
     honest: 'Was trotzdem passiert: Damit die App überhaupt auf dein Gerät kommt, wird sie einmal geladen. Der Anbieter, der sie ausliefert, sieht dabei das, was jeder Webserver sieht. Danach läuft ANITEW ohne Netz.',
@@ -684,7 +684,7 @@ export const de = {
       ein Abgleich, der bei Zweifel löscht, wäre keiner.
     */
     heading: 'Synchronisieren / Abmelden',
-    intro: 'Deine Daten wandern in einen App-Ordner in deinem eigenen Google Drive — dieselbe Datei wie die Sicherung. Kein Konto bei uns, kein Server dazwischen: Dieses Gerät spricht direkt mit Google, und im Drive sieht die App nur ihren eigenen Ordner.',
+    intro: 'Deine Daten wandern in einen App-Ordner in deinem eigenen Google Drive — dieselbe Datei wie die Sicherung. Kein Konto bei uns, keine ANITEW-Datenbank dazwischen: Die Inhalte laufen direkt zwischen diesem Gerät und Google; nur die Google-Anmeldung geht über ANITEWs kleinen Anmelde-Endpunkt, der nichts davon speichert. Im Drive sieht die App nur ihren eigenen Ordner.',
     how: 'Abgleichen heißt: Erst wird geholt, was dort liegt, und nach den Regeln der Sicherung eingemischt — nichts wird gelöscht. Dann wird der vereinigte Stand hochgelegt. Zwei Geräte, die getrennt liefen, haben danach beide alles.',
     start: 'Mit Google anmelden und abgleichen',
     again: 'Jetzt abgleichen',

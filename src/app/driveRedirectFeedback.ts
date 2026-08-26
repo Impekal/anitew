@@ -48,6 +48,7 @@ async function applyFeedback(): Promise<void> {
 
     delete status.dataset.error
     button.disabled = true
+    button.setAttribute('aria-label', button.textContent ?? copy().connected)
     button.textContent = '✓'
     const identity = accountName ?? account
     status.textContent = `${copy().connected}${identity === undefined ? '' : ` · ${identity}`}`

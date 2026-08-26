@@ -170,12 +170,41 @@ describe('die Datenschutzerklärung (R4)', () => {
      * Empfänger und der Zusage, dass nichts davon Voreinstellung ist.
      */
     expect(privacy).toMatch(/Drive-Abgleich/)
-    // Alle wählbaren Coach-Anbieter (D-034) müssen benannt sein — wer
-    // einen ergänzt, ergänzt ihn auch hier.
-    for (const provider of ['Gemini', 'Anthropic', 'Groq', 'OpenRouter', 'Mistral']) {
-      expect(privacy, `ohne ${provider}`).toContain(provider)
+    /*
+     * Alle wählbaren Coach-Anbieter müssen benannt sein — abgelesen aus dem
+     * Code statt hier abgeschrieben: Als OpenAI dazukam, hat eine
+     * hartkodierte Fünferliste den sechsten Anbieter monatelang übersehen.
+     */
+    const coachSource = textOf('src/platform/web/coach.ts')
+    const providersBlock = /COACH_PROVIDERS = \[([^\]]*)\]/u.exec(coachSource)?.[1] ?? ''
+    const providerIds = [...providersBlock.matchAll(/'([a-z]+)'/gu)].map((match) => match[1])
+    expect(providerIds.length).toBeGreaterThanOrEqual(6)
+    const providerNames: Record<string, string> = {
+      gemini: 'Gemini',
+      anthropic: 'Anthropic',
+      openai: 'OpenAI',
+      groq: 'Groq',
+      openrouter: 'OpenRouter',
+      mistral: 'Mistral',
     }
+    for (const id of providerIds) {
+      const name = providerNames[id as string]
+      expect(name, `unbekannter Anbieter ${id} — Namenszuordnung ergänzen`).toBeDefined()
+      expect(privacy, `ohne ${name}`).toContain(name as string)
+    }
+    // Die Fotoanalyse nennt ihre drei Empfänger ausdrücklich.
+    expect(privacy).toMatch(/Fotoanalyse[^.]*Gemini, Anthropic oder OpenAI/u)
     expect(privacy).toMatch(/aus,\s*bis du sie anfasst/)
+    /*
+     * Web Push ist die dritte Übertragung: Die Erklärung muss die
+     * Push-Adresse, den Speicherort (Durable Object) und die konkrete
+     * Cookie-Laufzeit der Google-Sitzung nennen — der Worker existiert,
+     * also darf kein Text mehr „keinen Server“ behaupten.
+     */
+    expect(privacy).toContain('Push-Adresse')
+    expect(privacy).toContain('Durable Object')
+    expect(privacy).toContain('180 Tage')
+    expect(privacy).not.toMatch(/keinen Server/u)
   })
 
   it('hält auch hier die Sperrliste ein (R5)', () => {
@@ -186,6 +215,28 @@ describe('die Datenschutzerklärung (R4)', () => {
     for (const pattern of FORBIDDEN) {
       expect(pattern.test(privacy), `PRIVACY.md enthält ${pattern}`).toBe(false)
     }
+  })
+})
+
+describe('die Store-Texte bleiben ehrlich', () => {
+  it('behauptet keinen serverlosen Betrieb mehr', () => {
+    const store = textOf('docs/STORE.md')
+    expect(store).not.toMatch(/ohne Server/u)
+    expect(store).not.toMatch(/no server/u)
+  })
+})
+
+describe('die Splash-Signatur', () => {
+  it('bleibt bewusst englisch — nur im Splash, nie im Wörterbuch', () => {
+    /*
+     * „MEMORIZE · RECALL · RETAIN · MASTER“ ist Marke, keine Kopie: Sie
+     * steht fest englisch in index.html und darf von keinem
+     * Übersetzungsdurchgang „vervollständigt“ werden.
+     */
+    const signature = 'MEMORIZE · RECALL · RETAIN · MASTER'
+    expect(textOf('index.html')).toContain(signature)
+    expect(textOf('src/i18n/de.ts')).not.toContain(signature)
+    expect(textOf('src/i18n/en.ts')).not.toContain(signature)
   })
 })
 
@@ -211,7 +262,11 @@ describe('die Installationsanleitung (Q5)', () => {
   it('verspricht durch die Installation nichts, was sie nicht tut', () => {
     const install = textOf('docs/INSTALL.md')
     expect(install).toMatch(/Sie legt kein Konto an/)
-    expect(install).toMatch(/Es gibt keinen Server/)
+    // Seit dem OAuth-/Push-Worker wäre „Es gibt keinen Server“ eine
+    // Falschaussage. Die ehrliche Fassung ist jetzt festgeschrieben.
+    expect(install).toMatch(/keine Trainingsdaten/)
+    expect(install).toMatch(/ohne Nutzerdatenbank/)
+    expect(install).not.toMatch(/Es gibt keinen Server/)
     for (const pattern of FORBIDDEN) {
       expect(pattern.test(install), `INSTALL.md enthält ${pattern}`).toBe(false)
     }

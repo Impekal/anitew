@@ -350,7 +350,8 @@ function enhanceWelcome(): void {
         if (result.accountName !== undefined) {
           await platform.settings.write(SYNC_ACCOUNT_NAME_SETTING, result.accountName)
         }
-        button.textContent = '✓'
+        button.setAttribute('aria-label', button.textContent ?? t.driveKicker)
+    button.textContent = '✓'
         const identity = result.accountName ?? result.account
         status.textContent = `${t.driveConnected}${identity === undefined ? '' : ` · ${identity}`}`
       })

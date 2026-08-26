@@ -89,25 +89,25 @@ interface PushTruthCopy {
 
 const PUSH_TRUTH: Readonly<Partial<Record<Language, PushTruthCopy>>> = {
   de: {
-    reminderNote: 'Kein Konto. Push speichert Geräteadresse, Zeit und Zeitzone — keine Trainingsdaten.',
+    reminderNote: 'Kein Konto. Push speichert Geräteadresse, Zeit, Zeitzone und den generischen Text — keine Trainingsdaten.',
     whileOpen: 'Hier nur **solange es offen ist**. iPhone/iPad: nach dem Schließen nur als Home-Screen-App.',
     scheduled: 'Kommt als Systemmitteilung an, auch wenn ANITEW geschlossen ist.',
     privacyLead: 'ANITEW bleibt local-first.',
     privacyLocal: 'Training, Erinnerungen, Messungen und Profil bleiben auf diesem Gerät.',
     privacyPush:
-      'Für Push speichert ANITEW nur die technische Push-Adresse dieses Geräts, Fälligkeit und Zeitzone. Keine Trainings- oder Gedächtnisinhalte.',
+      'Für Push speichert ANITEW nur die technische Push-Adresse dieses Geräts, Fälligkeit, Zeitzone und den generischen Benachrichtigungstext. Keine Trainings- oder Gedächtnisinhalte.',
     privacyDelete: '„Keine Erinnerung“ stoppt täglich; „Neu anfangen“ widerruft Push.',
     privacyHonest:
       'Beim Laden sieht der Hoster die üblichen Webserverdaten. Wenn du Systembenachrichtigungen aktivierst, braucht Push zusätzlich Netz; das Training selbst bleibt offlinefähig.',
   },
   en: {
-    reminderNote: 'No account. Push stores device address, time and time zone — no training data.',
+    reminderNote: 'No account. Push stores device address, time, time zone and the generic text — no training data.',
     whileOpen: 'Here only **while it is open**. iPhone/iPad: after closing, only as a Home Screen app.',
     scheduled: 'Arrives as a system notification even when ANITEW is closed.',
     privacyLead: 'ANITEW stays local-first.',
     privacyLocal: 'Training, memories, measurements and profile stay on this device.',
     privacyPush:
-      'For push, ANITEW stores only this device’s technical push address, due time and time zone. No training or memory content.',
+      'For push, ANITEW stores only this device’s technical push address, due time, time zone and the generic notification text. No training or memory content.',
     privacyDelete: '“No reminder” stops daily; “Start over” revokes push.',
     privacyHonest:
       'While loading, the host sees ordinary web-server data. If you enable system notifications, push also needs network; training itself stays offline-capable.',

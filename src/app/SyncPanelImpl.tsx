@@ -220,10 +220,13 @@ export function SyncPanelImpl({ platform, dictionary }: { platform: Platform; di
     setFailureDetail(undefined)
     setConnectionNotice(false)
     connectedRef.current = false
+    setLastAt(undefined)
     void disconnectDriveAuthorization()
     void platform.settings.write(SYNC_ON_SETTING, false).catch(() => undefined)
     void platform.settings.remove(SYNC_ACCOUNT_SETTING).catch(() => undefined)
     void platform.settings.remove(SYNC_ACCOUNT_NAME_SETTING).catch(() => undefined)
+    // Im lokalen Modus wäre „Zuletzt abgeglichen“ eine irreführende Zeile.
+    void platform.settings.remove(SYNC_AT_SETTING).catch(() => undefined)
   }
 
   if (!checked) return null

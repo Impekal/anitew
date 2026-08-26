@@ -295,7 +295,7 @@ export const en: Dictionary = {
   },
   reminder: {
     heading: 'Reminder',
-    note: 'No account, no server. What you set here stays on the device.',
+    note: 'No account. Push stores device address, time, time zone and the generic text — no training data.',
     whileOpen: 'On this device ANITEW can only remind you **while it is open** — in the background too, but not after you close it. A fixed time on the next day cannot be promised in a browser. The time is kept anyway: it applies as soon as ANITEW runs as an app from the store.',
     scheduled: 'Reminders arrive even when ANITEW is closed.',
     none: 'Reminders are not possible on this device.',
@@ -313,12 +313,12 @@ export const en: Dictionary = {
   },
   privacy: {
     heading: 'Privacy',
-    lead: 'ANITEW has no server.',
+    lead: 'ANITEW stays local-first.',
     points: [
       'No account with us, no ads, no trackers.',
       'Everything the training produces stays on this device — until you yourself choose otherwise: syncing with your own Google Drive, or a coach question with your own key. Both are off until you touch them.',
       'The backup is a file you save; sync puts that same file into your own Drive app folder. Nothing flows to us either way.',
-      'Reminders are created on the device. There is no push service.',
+      'For push, ANITEW stores only this device’s technical push address, due time, time zone and the generic notification text. No training or memory content.',
       'Deleting means: clear the browser storage or remove the app. Then it is gone — for us too, because we never had it.',
     ],
     honest: 'What does happen: for the app to reach your device at all, it is loaded once. The provider delivering it sees what any web server sees. After that ANITEW runs without a network.',
@@ -451,7 +451,7 @@ export const en: Dictionary = {
   },
   sync: {
     heading: 'Sync / Sign out',
-    intro: 'Your data travels to an app folder in your own Google Drive — the same file as the backup. No account with us, no server in between: this device talks to Google directly, and inside Drive the app sees only its own folder.',
+    intro: 'Your data travels to an app folder in your own Google Drive — the same file as the backup. No account with us, no ANITEW database in between: content travels directly between this device and Google; only the Google sign-in goes through ANITEW’s small sign-in endpoint, which stores none of it. Inside Drive the app sees only its own folder.',
     how: 'Syncing means: first, whatever lies there is fetched and merged by the backup rules — nothing gets deleted. Then the united state is uploaded. Two devices that ran apart both have everything afterwards.',
     start: 'Sign in with Google and sync',
     again: 'Sync now',
