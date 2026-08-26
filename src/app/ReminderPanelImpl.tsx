@@ -5,6 +5,7 @@ import {
   type Platform,
   type TimeOfDay,
   isTimeOfDay,
+  nextDailyAt,
 } from '../core/index.ts'
 import { clearDailyTime, saveDailyTime } from '../data/reminders.ts'
 import type { Dictionary } from '../i18n/index.ts'
@@ -27,7 +28,7 @@ export function ReminderPanelImpl({
   const t = dictionary.reminder
   const [permission, setPermission] = useState(platform.reminders.permission())
   const [time, setTime] = useState<string>(daily ?? suggested ?? '19:30')
-  const [said, setSaid] = useState<'saved' | 'cleared' | undefined>(undefined)
+  const [said, setSaid] = useState<'saved' | 'cleared' | 'failed' | undefined>(undefined)
 
   const [loaded, setLoaded] = useState(daily)
   if (daily !== loaded) {
@@ -39,7 +40,11 @@ export function ReminderPanelImpl({
 
   return (
     <div className="reminder">
-      <p className="hint">{t.note}</p>
+      {/* Bei echtem Web Push liegt die technische Push-Adresse samt Termin
+          notwendigerweise beim Pushdienst/Worker. Der alte Satz „ohne Server,
+          bleibt auf dem Gerät“ gilt nur für den lokalen while-open-Fallback
+          und darf deshalb nicht neben einer Closed-App-Push-Zusage stehen. */}
+      {ability !== 'scheduled' && <p className="hint">{t.note}</p>}
       <p className="hint">
         <Emphasis
           text={
@@ -91,9 +96,27 @@ export function ReminderPanelImpl({
               className="quiet"
               disabled={!isTimeOfDay(time)}
               onClick={() => {
-                void saveDailyTime(time)
-                  .then((ok) => setSaid(ok ? 'saved' : undefined))
-                  .catch(() => undefined)
+                if (!isTimeOfDay(time)) return
+                setSaid(undefined)
+                void (async () => {
+                  const stored = await saveDailyTime(time)
+                  if (!stored) return false
+
+                  // Der Fingertipp plant den Termin selbst und wartet auf die
+                  // Antwort der Plattform. Das verhindert den alten Zustand,
+                  // in dem IndexedDB bereits „Gemerkt.“ meldete, während ein
+                  // kaputter Pushpfad erst in einem separaten Effect scheiterte.
+                  const now = platform.clock.now()
+                  const at = nextDailyAt(time, now, platform.clock.offsetMinutes(now))
+                  return platform.reminders.schedule({
+                    id: DAILY_REMINDER_ID,
+                    at,
+                    title: t.dailyTitle,
+                    body: t.dailyBody,
+                  })
+                })()
+                  .then((scheduled) => setSaid(scheduled ? 'saved' : 'failed'))
+                  .catch(() => setSaid('failed'))
                   .finally(onChange)
               }}
             >
@@ -116,7 +139,17 @@ export function ReminderPanelImpl({
             )}
           </div>
 
-          {said !== undefined && <p className="hint">{said === 'saved' ? t.saved : t.cleared}</p>}
+          {said !== undefined && (
+            <p className="hint">
+              {said === 'saved' ? (
+                t.saved
+              ) : said === 'cleared' ? (
+                t.cleared
+              ) : (
+                <Emphasis text={t.whileOpen} />
+              )}
+            </p>
+          )}
         </>
       )}
     </div>

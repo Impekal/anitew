@@ -2,18 +2,42 @@ import { expect, test, type Page } from '@playwright/test'
 
 import { openPage, startButton, visit } from './helpers.ts'
 
+const PUSH_PUBLIC_KEY = 'BAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0-P0A'
+
 interface PushMockOptions {
   permission: NotificationPermission
   ios?: boolean
   standalone?: boolean
+  staleSubscriptionKey?: boolean
 }
 
 async function withWebPush(page: Page, options: PushMockOptions) {
+  await page.route('**/push/vapid-public', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ publicKey: PUSH_PUBLIC_KEY }),
+    }),
+  )
+
   await page.addInitScript((input) => {
     let current = input.permission
     ;(window as any).__anitewUnsubscribeCount = 0
-    const subscription = {
+    ;(window as any).__anitewSubscribeCount = 0
+
+    const decodeKey = (value: string) => {
+      const padded = value.replaceAll('-', '+').replaceAll('_', '/') + '='.repeat((4 - (value.length % 4)) % 4)
+      const binary = atob(padded)
+      return Uint8Array.from(binary, (char) => char.charCodeAt(0)).buffer
+    }
+    const currentKey = decodeKey(input.publicKey)
+    const staleKey = new Uint8Array(currentKey.byteLength).fill(9).buffer
+    const subscription: any = {
       endpoint: 'https://push.example.invalid/anitew-device',
+      options: {
+        userVisibleOnly: true,
+        applicationServerKey: input.staleSubscriptionKey ? staleKey : currentKey,
+      },
       toJSON: () => ({ endpoint: 'https://push.example.invalid/anitew-device' }),
       unsubscribe: async () => {
         ;(window as any).__anitewUnsubscribeCount++
@@ -22,7 +46,11 @@ async function withWebPush(page: Page, options: PushMockOptions) {
     }
     const pushManager = {
       getSubscription: async () => subscription,
-      subscribe: async () => subscription,
+      subscribe: async (subscribeOptions: PushSubscriptionOptionsInit) => {
+        ;(window as any).__anitewSubscribeCount++
+        subscription.options = subscribeOptions
+        return subscription
+      },
     }
     const registration = {
       pushManager,
@@ -71,7 +99,7 @@ async function withWebPush(page: Page, options: PushMockOptions) {
         value: input.standalone,
       })
     }
-  }, options)
+  }, { ...options, publicKey: PUSH_PUBLIC_KEY })
 }
 
 async function openReminders(page: Page) {
@@ -125,6 +153,44 @@ test('plant die Tageserinnerung anonym mit Fälligkeit und Zeitzone', async ({ p
   expect(JSON.stringify(scheduled)).not.toMatch(/profile|memory|training|answer|email/i)
 })
 
+test('erneuert eine Push-Subscription, die noch an einem alten VAPID-Schlüssel hängt', async ({ page }) => {
+  await withWebPush(page, { permission: 'granted', staleSubscriptionKey: true })
+  await page.route('**/push/unsubscribe', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }),
+  )
+  await page.route('**/push/schedule', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }),
+  )
+  await page.route('**/push/cancel', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }),
+  )
+
+  await openReminders(page)
+  await page.locator('.reminder input[type="time"]').fill('07:15')
+  await page.getByRole('button', { name: 'Erinnerung merken' }).click()
+  await expect(page.locator('.reminder').getByText('Gemerkt.', { exact: true })).toBeVisible()
+  await expect.poll(() => page.evaluate(() => (window as any).__anitewUnsubscribeCount)).toBe(1)
+  await expect.poll(() => page.evaluate(() => (window as any).__anitewSubscribeCount)).toBe(1)
+})
+
+test('meldet einen kaputten Closed-App-Push nicht mehr als erfolgreich gemerkt', async ({ page }) => {
+  await withWebPush(page, { permission: 'granted', ios: true, standalone: true })
+  await page.route('**/push/schedule', (route) =>
+    route.fulfill({ status: 503, contentType: 'application/json', body: '{"error":"push_not_configured"}' }),
+  )
+  await page.route('**/push/cancel', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }),
+  )
+
+  await openReminders(page)
+  await expect(page.getByText(/Systemmitteilung an, auch wenn ANITEW geschlossen ist/)).toBeVisible()
+  await page.locator('.reminder input[type="time"]').fill('07:15')
+  await page.getByRole('button', { name: 'Erinnerung merken' }).click()
+
+  await expect(page.locator('.reminder').getByText('Gemerkt.', { exact: true })).toHaveCount(0)
+  await expect(page.getByText(/solange es offen ist/).first()).toBeVisible()
+})
+
 test('merkt die Uhrzeit und schaltet den täglichen Servertermin ausdrücklich dauerhaft aus', async ({ page }) => {
   await withWebPush(page, { permission: 'granted' })
   let permanentCancel = false
@@ -140,8 +206,8 @@ test('merkt die Uhrzeit und schaltet den täglichen Servertermin ausdrücklich d
   await openReminders(page)
   await page.locator('.reminder input[type="time"]').fill('07:15')
   await page.getByRole('button', { name: 'Erinnerung merken' }).click()
-  // „Gemerkt.“ ist der öffentliche Abschluss des asynchronen IndexedDB-Writes.
-  // Erst danach darf ein Reload erwarten, die Uhrzeit dauerhaft wiederzufinden.
+  // „Gemerkt.“ ist jetzt nicht nur der Abschluss des IndexedDB-Writes,
+  // sondern auch der bestätigten Plattform-Planung.
   await expect(page.locator('.reminder').getByText('Gemerkt.', { exact: true })).toBeVisible()
   await page.reload()
   await openPage(page, 'Erinnerung')
