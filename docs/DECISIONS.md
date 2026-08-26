@@ -1602,9 +1602,31 @@ ist CSRF-Abwehr, keine Authentisierung, und ohne Host-Liste wäre der
 Worker ein signierendes Relais an beliebige HTTPS-Adressen. Dazu: Termine
 höchstens 60 Tage voraus, Zustellnotizen mit hartem Ablauf (täglich 24 h,
 Messung 60 min, maximal 8), Aufräum-Alarm auch für reine Notizen, und
-ein leerer Eintrag löscht sich selbst. Cloudflare-Rate-Limits auf
-`/push/schedule` bleiben als zusätzliche Empfehlung offen (USER ACTION im
-Cloudflare-Dashboard, kein Code).
+ein leerer Eintrag löscht sich selbst.
+
+**Korrektur vom 2026-08-26 (Runde 4):** Der ursprüngliche Satz „Rate-Limits
+bleiben als USER ACTION im Cloudflare-Dashboard" war **nicht ausführbar**
+und wurde beim Aufschreiben nicht zu Ende geprüft. Cloudflares
+Rate-Limiting-Regeln (WAF) gelten nur für Domains in einer eigenen
+Cloudflare-Zone; ANITEW läuft auf `anitew.impekaltech.workers.dev`, einer
+Cloudflare-eigenen Domain, für die sich solche Regeln nicht anlegen
+lassen. Eine Auflage, die niemand erfüllen kann, ist schlimmer als keine —
+deshalb steht hier jetzt, was tatsächlich zur Wahl steht:
+
+1. **Für Phase 0 nichts tun** — die gewählte Entscheidung. Seit der
+   Host-Allowlist kann niemand mehr fremde Adressen anpingen; das
+   Restrisiko ist, dass jemand viele Durable Objects anlegt und damit
+   Speicher belegt. Bei einem unbeworbenen Pilot mit drei bis fünf
+   Personen ist das kein realistischer Angriff.
+2. **Rate-Limit im Worker** über Cloudflares Rate-Limiting-Binding — eine
+   kleine, abgegrenzte Codeänderung. Der Weg, sobald ANITEW öffentlich
+   beworben wird.
+3. **Eigene Domain** in einer Cloudflare-Zone, danach greifen die
+   Dashboard-Regeln. Berührt aber OAuth-Redirect-URI und die
+   Push-Adressen — kein Schritt für die Pilotphase.
+
+Zu erledigen ist damit vor dem Piloten: **nichts**. Nach dem Piloten und
+vor jeder Bewerbung der App: Weg 2.
 
 ## D-049 · 2026-08-26 · Google-Sitzung endet absolut nach 180 Tagen (Runde 2, F-04)
 
@@ -1624,7 +1646,15 @@ desselben Commits. `workflow_run` schied aus, weil GitHub es nur aus dem
 Default-Branch (`main`) bedient — der Produktbranch ist aber
 `anitew-redesign-v2`. deploy.yml bleibt als manueller Notweg
 (`workflow_dispatch`), bewusst ohne Tor. Branchschutz mit Required
-Checks für den Produktbranch ist eine GitHub-Einstellung (USER ACTION).
+Checks für den Produktbranch ist eine GitHub-Einstellung (USER ACTION) —
+ohne ihn bleibt das Tor eine Selbstverpflichtung statt einer Sperre.
+
+**Konkret (ergänzt in Runde 4):** Repo → Settings → Rules → Rulesets →
+New branch ruleset, Enforcement *Active*, Zielmuster
+`anitew-redesign-v2`, dann *Require a pull request before merging*,
+*Require status checks to pass* mit dem Check **`check`** (so heißt der
+Job in ci.yml) und *Block force pushes*. Der klassische Weg über
+Settings → Branches → Add branch protection rule tut dasselbe.
 
 ## D-051 · 2026-08-26 · Die Notiz-Frist ist eine harte Obergrenze, und Wiederholungen steuert ANITEW selbst (Runde 3, R3-01)
 
