@@ -6,8 +6,22 @@ on:
     branches: ['**']
   pull_request:
 
+# Der Ereignistyp gehört in die Gruppe, sonst blockiert sie jeden Merge.
+#
+# Ein Push auf einen Zweig mit offenem PR löst **zwei** Läufe aus: einen für
+# `push`, einen für `pull_request`. Ohne den Ereignistyp ergeben beide denselben
+# Gruppennamen — `github.head_ref` beim PR und `github.ref_name` beim Push sind
+# derselbe Zweig — und `cancel-in-progress` bricht den einen zugunsten des
+# anderen ab. Beide schreiben aber ein `check` auf denselben Commit, und die
+# Branch-Protection sieht dann das abgebrochene: „2 of 2 required status checks
+# are cancelled." Der Merge geht nicht, obwohl der Gate grün ist (erlebt an
+# PR #87).
+#
+# Getrennte Gruppen kosten auf PR-Zweigen die doppelte Laufzeit. Der Anspruch
+# aus Backlog P3 — **jeder** Push wird geprüft — bleibt dafür unangetastet; ihn
+# zu beschneiden wäre der billigere, aber falsche Weg.
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  group: ci-${{ github.workflow }}-${{ github.event_name }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 jobs:

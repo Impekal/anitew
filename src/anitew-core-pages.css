@@ -1,14 +1,19 @@
-/* ANITEW — Stile für den Core und seine Seiten
+/* ANITEW — Stile für die tiefen Core-Seiten
  *
- * Diese Regeln gehören zu Dingen, die im ersten Bild nicht vorkommen: die
- * geöffnete Schublade und die Bildschirme dahinter — „Etwas merken", der
- * Coach-Schlüssel, „Sicherung" und „Neu anfangen". Sie werden deshalb
- * **nachgeladen** und nicht im Kaltstart mitgeschleppt.
+ * Diese Regeln gehören zu Bildschirmen, die erst hinter dem Core liegen:
+ * „Etwas merken", der Coach-Schlüssel, „Sicherung" und „Neu anfangen". Sie
+ * werden deshalb **nachgeladen** und nicht im Kaltstart mitgeschleppt.
  *
  * Die Annahme dahinter, ausgesprochen: Das Blatt kommt 750 ms nach dem Start
- * mit der Signature-Schicht. Bis jemand die Schublade öffnen kann, ist der
- * Splash allein schon drei bis fünf Sekunden gelaufen — der Zeitraum, in dem
- * diese Regeln fehlen könnten, ist keiner, in dem man sie sehen kann.
+ * mit der Signature-Schicht. Diese Bildschirme liegen **zwei** Tipps tief —
+ * erst den Core öffnen, dann eine Seite — und sind in dieser Zeit nicht
+ * erreichbar.
+ *
+ * Der Deck-Streifen hinter dem Schließen-Knopf stand einmal hier und ist
+ * wieder heraus: Die Schublade ist **einen** Tipp entfernt, also kann sie
+ * schneller offen sein als das Blatt da. Genau das ist im CI passiert, an
+ * meinem eigenen Test. Eine Regel, die Verdeckung herstellt, darf nicht von
+ * einer Zeitannahme abhängen.
  *
  * Der Anlass war das Kaltstart-Budget (P4): Mit den Korrekturen aus dem
  * Gesamt-Audit lag das CSS bei 12,1 KB gegen 12 KB. Das Budget zu heben wäre
@@ -51,60 +56,4 @@
   display: inline-block;
   padding: 6px 0;
   min-height: 24px;
-}
-
-/*
- * Der Schließen-Knopf klebt oben — und ließ alles durch sich hindurchlaufen.
- *
- * `.drawer-close` ist `position: sticky`, sein Grund aber praktisch
- * durchsichtig: ein Radialverlauf plus `rgb(140 207 192 / 3%)`. Beim Scrollen
- * lief deshalb jeder Menüeintrag **durch** das ✕. Nachgemessen auf einem
- * iPhone 14 Pro: Bei einem Scrollstand von 120 px stand „Dein Stand" exakt in
- * dem Knopf, bei 260 px „Coach", bei 420 px „Der Gedächtnispalast".
- *
- * Der Knopf selbst bleibt unangetastet — seine Form ist Absicht. Was fehlte,
- * ist ein deckender Streifen dahinter. Er läuft über die **volle Breite** der
- * Schublade, nicht nur über den Knopf: Sonst verschwände der Text zwar hinter
- * der Scheibe, liefe aber links und rechts daran vorbei, und das sähe nicht
- * ruhiger aus, sondern kaputter.
- *
- * Die Farbe kommt aus der Schublade selbst (`--v4-surface-strong`, in beiden
- * Themen definiert) und fällt auf `--paper` zurück, falls die
- * Signature-Schicht noch nicht geladen ist — beim Kaltstart ist sie das nicht.
- */
-.drawer-close {
-  isolation: isolate;
-}
-
-.drawer-close::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  translate: -50% 0;
-  width: 100vw;
-  /* Bis über den oberen Klebe-Rand hinaus, sonst blitzt eine Zeile darüber. */
-  top: calc(-1 * max(12px, env(safe-area-inset-top)) - 16px);
-  bottom: -16px;
-  z-index: -1;
-  /*
-   * Zwei Schichten, und die untere ist der Punkt.
-   *
-   * `--v4-surface-strong` ist die Farbe der Schublade — aber mit 94 %
-   * absichtlich leicht durchscheinend. Ein Streifen aus ihr allein reichte
-   * nicht: „Dein Stand" war hinter dem Knopf immer noch zu lesen, nur blasser.
-   * Darunter liegt deshalb `--paper`, deckend in beiden Themen.
-   *
-   * **Getrennte Eigenschaften, nicht die Kurzschreibweise.** Der erste Anlauf
-   * schrieb `background: var(--v4-surface-strong), var(--paper)` — und das ist
-   * ungültig: In einer Schichtliste darf eine Farbe nur in der **letzten**
-   * Schicht stehen. Der Browser verwirft dann die ganze Deklaration, still.
-   * Gemessen kam `background-color: rgba(0, 0, 0, 0)` heraus, und der Streifen
-   * deckte gar nichts mehr.
-   */
-  background-color: var(--paper);
-  background-image: linear-gradient(
-    var(--v4-surface-strong, transparent),
-    var(--v4-surface-strong, transparent)
-  );
-  pointer-events: none;
 }
