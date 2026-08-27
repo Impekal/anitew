@@ -290,41 +290,77 @@ test('kein Seitwärts-Schieben, wenn man sich Zeit lässt', async ({ page }) => 
   expect(worst, 'die Seite lässt sich seitlich schieben').toBeLessThanOrEqual(1)
 })
 
-test('der Schließen-Knopf lässt beim Scrollen nichts durch sich hindurchlaufen', async ({
-  page,
-}) => {
+test('der Schließen-Knopf lässt beim Scrollen nichts durch sich hindurchlaufen', async ({ page }) => {
   /*
-   * Gemeldet vom Gerät: „«Dein Stand» bleibt genau auf «Menü schließen»."
+   * Vom Gerät gemeldet: „«Dein Stand» bleibt genau auf «Menü schließen»."
    *
-   * Der Knopf klebt oben (`position: sticky`), sein Grund war aber praktisch
-   * durchsichtig — ein Radialverlauf plus `rgb(140 207 192 / 3%)`. Alles, was
-   * daran vorbeiscrollte, lief **durch** das ✕. Nachgemessen auf einem
-   * iPhone 14 Pro: bei Scrollstand 120 px stand „Dein Stand" mitten im Knopf.
+   * Der Knopf klebte mit `position: sticky` oben in der scrollenden Schublade,
+   * und weil sein Grund durchsichtig ist, lief jeder Eintrag durch das ✕
+   * hindurch — bei Scrollstand 80 „Dein Stand", bei 200 „Memory DNA", bei 400
+   * „Der Gedächtnispalast".
    *
-   * Geprüft wird der deckende Streifen dahinter, und zwar über seine Farbe.
-   * Das ist kein Umweg, sondern genau die Stelle, an der die erste Korrektur
-   * scheiterte: `background: <farbe>, <farbe>` ist ungültige Schichtsyntax,
-   * der Browser verwirft die ganze Deklaration still, und übrig bleibt
-   * `rgba(0, 0, 0, 0)` — ein Streifen, der nichts deckt und den man auf einem
-   * Screenshot leicht übersieht.
+   * Zwei Anläufe waren falsch. **Mehr Abstand** verschiebt nur, welcher
+   * Eintrag wann darunterläuft. Ein **deckender Streifen** dahinter löste es,
+   * veränderte aber das Aussehen des Knopfs. Jetzt scrollen die Einträge in
+   * einem eigenen Kasten und der Knopf steht darüber: Der Inhalt wird an der
+   * Oberkante des Kastens abgeschnitten und betritt die Knopffläche nie.
+   *
+   * Geprüft wird über **Punkte**, nicht über Kästen. Ein Eintrag, der im
+   * Kasten nach oben weggescrollt ist, hat weiterhin ein Rechteck, das über
+   * dem Knopf liegt — sichtbar ist er deshalb nicht. Ein erster Anlauf dieses
+   * Tests hat genau das verwechselt und Alarm geschlagen, wo nichts war.
    */
   await visit(page)
   await expect(startButton(page)).toBeVisible()
+
   await page.locator('button.hamburger').click()
-  await expect(page.locator('.drawer')).toBeVisible()
+  const drawer = page.locator('.drawer')
+  await expect(drawer).toBeVisible()
 
-  const backdrop = await page.locator('.drawer-close').evaluate((element) => {
-    const style = getComputedStyle(element, '::after')
-    return { color: style.backgroundColor, width: style.width, content: style.content }
-  })
+  for (const top of [0, 80, 200, 400, 700]) {
+    /*
+     * Gescrollt wird, was scrollt — nicht der Kasten, den die Korrektur
+     * eingeführt hat.
+     *
+     * Der erste Anlauf setzte `scrollTop` nur auf `.drawer-scroll`. Damit war
+     * der Test wertlos: Nimmt man die Korrektur heraus, scrollt wieder die
+     * Schublade selbst, der Kasten bleibt bei null — und der Test meldet
+     * fröhlich Ruhe. Aufgefallen ist das erst in der Gegenprobe, die genau
+     * dafür da ist.
+     */
+    await page.evaluate((value) => {
+      for (const node of document.querySelectorAll<HTMLElement>('.drawer, .drawer-scroll')) {
+        node.scrollTop = value
+      }
+    }, top)
 
-  expect(backdrop.content, 'der Streifen hinter dem Knopf fehlt ganz').not.toBe('none')
+    const durchgelaufen = await page.evaluate(() => {
+      const close = document.querySelector<HTMLElement>('.drawer-close')
+      if (close === null) return 'kein Schließen-Knopf'
 
-  const opaque = /^rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)$/.test(backdrop.color)
-  expect(opaque, `der Streifen deckt nicht: ${backdrop.color}`).toBe(true)
+      /*
+       * Geprüft wird der Knopf **und sein Schild**.
+       *
+       * Gemeldet wurde „«Menü schließen» steht auf «Dein Stand»" — und
+       * „Menü schließen" ist nicht das ✕, sondern die Beschriftung darunter
+       * (`.drawer-close-label`, absolut positioniert unter dem Knopf). Ein
+       * erster Anlauf dieses Tests hat nur die Fläche des ✕ abgetastet und
+       * damit genau die Stelle verfehlt, um die es ging.
+       */
+      const flaechen = [close, close.querySelector<HTMLElement>('.drawer-close-label')]
+      for (const node of flaechen) {
+        if (node === null) continue
+        const box = node.getBoundingClientRect()
+        if (box.width === 0 || box.height === 0) continue
+        for (const share of [0.15, 0.5, 0.85]) {
+          const at = document.elementFromPoint(box.left + box.width * share, box.top + box.height / 2)
+          const text = at?.closest('.drawer-item, .menu-label')
+          if (text !== null && text !== undefined) return (text.textContent ?? '').trim()
+        }
+      }
+      return null
+    })
 
-  // Über die volle Breite, nicht nur über den Knopf: Sonst verschwände der
-  // Text zwar hinter der Scheibe, liefe aber links und rechts daran vorbei.
-  const drawerWidth = await page.locator('.drawer').evaluate((element) => element.clientWidth)
-  expect(Number.parseFloat(backdrop.width)).toBeGreaterThanOrEqual(drawerWidth)
+    expect(durchgelaufen, `bei Scrollstand ${top} läuft Text durch den Knopf`).toBeNull()
+  }
 })

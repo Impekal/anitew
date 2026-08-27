@@ -12,7 +12,6 @@ import {
   type DailyMissionDecision,
   namePool,
   READY_PALACES,
-  STATIONS_PER_WALK,
   type OwnPalace,
   DAILY_REMINDER_ID,
   type DimensionCounts,
@@ -539,8 +538,11 @@ export function App() {
            * denselben Dingen darin.
            */
           palace: walkPool(seed, 30, [
-            ...READY_PALACES.map((id) => ({ id, stationCount: STATIONS_PER_WALK })),
-            ...own.map((palace) => ({ id: palace.id, stationCount: palace.stations.length })),
+            ...READY_PALACES.map((id) => ({ id, stationIds: [] })),
+            ...own.map((palace) => ({
+              id: palace.id,
+              stationIds: palace.stations.map((station) => station.id),
+            })),
           ]),
           /*
            * Rückwärts-Folgen (D7): wie die Zahlen aus dem Seed erzeugt und
@@ -1444,6 +1446,23 @@ export function App() {
                 <path d="M6 6l12 12M18 6L6 18" />
               </svg>
             </button>
+            {/*
+              Die Einträge scrollen in einem eigenen Kasten, der Schließen-Knopf
+              steht darüber.
+
+              Vorher scrollte die ganze Schublade und der Knopf klebte mit
+              `position: sticky` oben — und weil sein Grund durchsichtig ist,
+              lief jeder Eintrag durch das ✕ hindurch. Gemessen auf einem
+              iPhone 14 Pro: bei Scrollstand 80 „Dein Stand", bei 200
+              „Memory DNA", bei 300 „Eigene Inhalte".
+
+              Mehr Abstand hätte das nicht gelöst, sondern nur verschoben,
+              welcher Eintrag wann darunterläuft. Ein deckender Streifen dahinter
+              löste es zwar, veränderte aber das Aussehen des Knopfs. Der Kasten
+              hier löst es an der Wurzel: Sein Inhalt wird an seiner Oberkante
+              abgeschnitten und betritt die Knopffläche gar nicht erst.
+            */}
+            <div className="drawer-scroll">
             <section className="menu-group">
               <h2 className="menu-label">{dictionary.menu.yours}</h2>
               {achievementsOf(achievementInput).length > 0 && (
@@ -1518,6 +1537,7 @@ export function App() {
                 <span>{dictionary.settings.heading}</span>
               </button>
             </section>
+            </div>
           </nav>
         </div>
       )}

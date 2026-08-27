@@ -182,6 +182,11 @@
       .anitew-launch-terms {
         grid-row: 1;
         align-self: start;
+        /*
+         * Nicht ganz an den Rand: `align-self: start` setzte die Zeile direkt
+         * unter den Sicherheitsabstand, und das sah geklebt aus statt gesetzt.
+         */
+        margin-top: 34px;
         margin-bottom: 0;
         color: rgb(229 184 109 / 78%);
         text-shadow: 0 0 18px rgb(229 184 109 / 22%);
@@ -302,7 +307,9 @@
       .anitew-launch-powered {
         grid-row: 6;
         align-self: end;
+        /* Am Fuß, aber nicht auf der Kante — dieselbe Überlegung wie oben. */
         margin-top: 0;
+        margin-bottom: 30px;
         color: rgb(158 230 210 / 38%);
         font: 500 9px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         letter-spacing: .13em;

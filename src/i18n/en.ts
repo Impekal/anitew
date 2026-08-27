@@ -232,7 +232,7 @@ export const en: Dictionary = {
     ownCancel: 'Cancel',
     ownAdd: 'Lay out another route',
     ownAddStation: 'Append a place',
-    ownRemoveStation: 'Remove the last place',
+    ownRemoveStation: 'Remove this place',
     ownDiscard: 'Discard the route',
     ownSaved: 'Kept. It appears in training from now on.',
     ownFailed: 'That did not go through. Nothing was changed.',

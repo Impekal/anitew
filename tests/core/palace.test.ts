@@ -6,6 +6,7 @@ import {
   BUILT_IN_PALACES,
   OWN_MAX_STATIONS,
   OWN_MIN_STATIONS,
+  type OwnStation,
   READY_PALACES,
   STATIONS,
   STATIONS_PER_WALK,
@@ -23,7 +24,7 @@ import {
   palaceOf,
   placementId,
   walkStations,
-  windowStarts,
+  walkWindows,
   planSession,
   sceneItemsOf,
   stationOf,
@@ -309,7 +310,14 @@ describe('die Lektion (G, D-013)', () => {
 })
 
 describe('der eigene Palast (G3)', () => {
-  const good = { id: 'own', name: 'Meine Wohnung', stations: ['Tür', 'Bad', 'Balkon', 'Regal', 'Bett'] }
+  const orte = (...labels: string[]): OwnStation[] =>
+    labels.map((label, index) => ({ id: index + 1, label }))
+  const good = {
+    id: 'own',
+    name: 'Meine Wohnung',
+    stations: orte('Tür', 'Bad', 'Balkon', 'Regal', 'Bett'),
+    nextStation: 6,
+  }
 
   it('nimmt fünf verschiedene, nicht leere Orte mit Namen an', () => {
     expect(isOwnPalace(good)).toBe(true)
@@ -317,26 +325,26 @@ describe('der eigene Palast (G3)', () => {
 
   it('weist ab, was beim Abgehen keine Frage ergäbe', () => {
     expect(isOwnPalace({ ...good, name: '  ' })).toBe(false)
-    expect(isOwnPalace({ ...good, stations: ['Tür', '', 'Balkon', 'Regal', 'Bett'] })).toBe(false)
+    expect(isOwnPalace({ ...good, stations: orte('Tür', '', 'Balkon', 'Regal', 'Bett') })).toBe(false)
     expect(isOwnPalace({ ...good, stations: good.stations.slice(0, 4) })).toBe(false)
     // Zweimal derselbe Ort: „Was lag hier?“ hätte zwei Antworten.
-    expect(isOwnPalace({ ...good, stations: ['Bad', 'Bad', 'Balkon', 'Regal', 'Bett'] })).toBe(false)
-    expect(isOwnPalace({ ...good, stations: ['Bad', 'bad', 'Balkon', 'Regal', 'Bett'] })).toBe(false)
-    expect(isOwnPalace({ ...good, stations: ['x'.repeat(LABEL_MAX + 1), 'a', 'b', 'c', 'd'] })).toBe(
+    expect(isOwnPalace({ ...good, stations: orte('Bad', 'Bad', 'Balkon', 'Regal', 'Bett') })).toBe(false)
+    expect(isOwnPalace({ ...good, stations: orte('Bad', 'bad', 'Balkon', 'Regal', 'Bett') })).toBe(false)
+    expect(isOwnPalace({ ...good, stations: orte('x'.repeat(LABEL_MAX + 1), 'a', 'b', 'c', 'd') })).toBe(
       false,
     )
     expect(isOwnPalace(undefined)).toBe(false)
     expect(isOwnPalace({ name: 'x' })).toBe(false)
     // Ohne Kennung gehört er zu keinem Weg — und seine Termine zu keinem Ort.
-    expect(isOwnPalace({ name: good.name, stations: good.stations })).toBe(false)
+    expect(isOwnPalace({ name: good.name, stations: good.stations, nextStation: 6 })).toBe(false)
     expect(isOwnPalace({ ...good, id: 'home' })).toBe(false)
   })
 
   it('hält die Trennzeichen der Kennungen aus den Schildern heraus', () => {
-    expect(isOwnPalace({ ...good, stations: ['Tür~1', 'Bad', 'Balkon', 'Regal', 'Bett'] })).toBe(
+    expect(isOwnPalace({ ...good, stations: orte('Tür~1', 'Bad', 'Balkon', 'Regal', 'Bett') })).toBe(
       false,
     )
-    expect(isOwnPalace({ ...good, stations: ['Tür#1', 'Bad', 'Balkon', 'Regal', 'Bett'] })).toBe(
+    expect(isOwnPalace({ ...good, stations: orte('Tür#1', 'Bad', 'Balkon', 'Regal', 'Bett') })).toBe(
       false,
     )
   })
@@ -350,7 +358,7 @@ describe('der eigene Palast (G3)', () => {
      */
     expect(walkStations(walkId('own', 1))).toEqual(['own1', 'own2', 'own3', 'own4', 'own5'])
     expect(ownLabelOf(good, 'own3')).toBe('Balkon')
-    expect(ownLabelOf({ ...good, stations: ['Tür', 'Bad', 'Balkontür', 'Regal', 'Bett'] }, 'own3'))
+    expect(ownLabelOf({ ...good, stations: orte('Tür', 'Bad', 'Balkontür', 'Regal', 'Bett') }, 'own3'))
       .toBe('Balkontür')
     expect(ownLabelOf(good, 'kitchen')).toBeUndefined()
   })
@@ -360,8 +368,8 @@ describe('der eigene Palast (G3)', () => {
     expect(walkPool('s', 9).map(palaceOf)).not.toContain('own')
     expect(READY_PALACES).not.toContain('own')
     const withOwn = walkPool('s', 8, [
-      ...READY_PALACES.map((id) => ({ id, stationCount: STATIONS_PER_WALK })),
-      { id: 'own', stationCount: STATIONS_PER_WALK },
+      ...READY_PALACES.map((id) => ({ id, stationIds: [] })),
+      { id: 'own', stationIds: [1, 2, 3, 4, 5] },
     ])
     expect(withOwn.map(palaceOf)).toContain('own')
   })
@@ -378,11 +386,19 @@ describe('der eigene Palast (G3)', () => {
 })
 
 describe('mehrere Paläste und längere Wege (G3)', () => {
-  const base = { id: 'own', name: 'Meine Wohnung', stations: ['Tür', 'Bad', 'Balkon', 'Regal', 'Bett'] }
+  const orte = (...labels: string[]): OwnStation[] =>
+    labels.map((label, index) => ({ id: index + 1, label }))
+  const base = {
+    id: 'own',
+    name: 'Meine Wohnung',
+    stations: orte('Tür', 'Bad', 'Balkon', 'Regal', 'Bett'),
+    nextStation: 6,
+  }
   const long = (count: number) => ({
     id: 'own2',
     name: 'Der lange Weg',
-    stations: Array.from({ length: count }, (_, index) => `Ort ${index + 1}`),
+    stations: Array.from({ length: count }, (_, index) => ({ id: index + 1, label: `Ort ${index + 1}` })),
+    nextStation: count + 1,
   })
 
   it('nimmt mehr als fünf Orte an — aber nicht weniger und nicht beliebig viele', () => {
@@ -402,7 +418,7 @@ describe('mehrere Paläste und längere Wege (G3)', () => {
      * bestehende Nutzer seine Palast-Termine verloren, und zwar unbemerkt.
      */
     expect(walkId('own', 7)).toBe('own~7')
-    expect(walkId('own', 7, 0)).toBe('own~7')
+    expect(walkId('own', 7, [1, 2, 3, 4, 5])).toBe('own~7')
     expect(walkPlacements('own~7')).toEqual([
       'own~7#own1', 'own~7#own2', 'own~7#own3', 'own~7#own4', 'own~7#own5',
     ])
@@ -416,8 +432,8 @@ describe('mehrere Paläste und längere Wege (G3)', () => {
      * Nutzers zu kennen (D-010). Deshalb steht der Abschnitt in der Kennung
      * und nicht in einer Tabelle daneben.
      */
-    const walk = walkId('own2', 4, 10)
-    expect(walk).toBe('own2~4~10')
+    const walk = walkId('own2', 4, [11, 12, 13, 14, 15])
+    expect(walk).toBe('own2~4~11.12.13.14.15')
     expect(palaceOf(walk)).toBe('own2')
     expect(walkStations(walk)).toEqual(['own11', 'own12', 'own13', 'own14', 'own15'])
     expect(walkFor(walk, 'de')).toHaveLength(STATIONS_PER_WALK)
@@ -426,28 +442,31 @@ describe('mehrere Paläste und längere Wege (G3)', () => {
   it('bleibt bei fünf Stationen je Gang, egal wie lang der Weg ist', () => {
     // Sonst wäre die Sechzig-Sekunden-Einheit in einem langen Palast
     // stillschweigend eine andere geworden.
-    for (const offset of [0, 5, 11]) {
-      expect(walkStations(walkId('own2', 1, offset))).toHaveLength(STATIONS_PER_WALK)
+    for (const ids of [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [12, 13, 14, 15, 16]]) {
+      expect(walkStations(walkId('own2', 1, ids))).toHaveLength(STATIONS_PER_WALK)
     }
   })
 
   it('legt die Abschnitte so, dass der letzte nicht ins Leere zeigt', () => {
-    expect(windowStarts(5)).toEqual([0])
-    expect(windowStarts(10)).toEqual([0, 5])
+    const bis = (n: number) => Array.from({ length: n }, (_, index) => index + 1)
+    expect(walkWindows(bis(5))).toEqual([[1, 2, 3, 4, 5]])
+    expect(walkWindows(bis(10))).toEqual([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
     // Zwölf Orte: 1–5, 6–10 und 8–12. Der letzte rückt zurück statt über das
     // Ende hinauszulaufen — lieber eine Überlappung als ein leerer Abschnitt.
-    expect(windowStarts(12)).toEqual([0, 5, 7])
+    expect(walkWindows(bis(12))).toEqual([
+      [1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [8, 9, 10, 11, 12],
+    ])
+    expect(walkWindows(bis(4))).toEqual([])
     for (const count of [5, 6, 9, 12, 17, 20]) {
-      for (const start of windowStarts(count)) {
-        expect(start).toBeGreaterThanOrEqual(0)
-        expect(start + STATIONS_PER_WALK).toBeLessThanOrEqual(count)
+      for (const window of walkWindows(bis(count))) {
+        expect(window).toHaveLength(STATIONS_PER_WALK)
       }
     }
   })
 
   it('schöpft einen langen Weg wirklich aus, statt denselben Abschnitt zu wiederholen', () => {
     // Sonst wäre das Anhängen von Orten eine Zahl ohne Wirkung.
-    const pool = walkPool('seed', 12, [{ id: 'own2', stationCount: 12 }])
+    const pool = walkPool('seed', 12, [{ id: 'own2', stationIds: Array.from({ length: 12 }, (_, i) => i + 1) }])
     const seen = new Set(pool.flatMap((walk) => walkStations(walk)))
     expect(seen.size).toBe(12)
     // Und jeder Gang bleibt eindeutig — zwei gleiche wären ein Wiedersehen,
@@ -475,5 +494,64 @@ describe('mehrere Paläste und längere Wege (G3)', () => {
     expect(ownPalaceGone('own2~1#own3', [base])).toBe(true)
     expect(ownPalaceGone('own~1#own3', [base])).toBe(false)
     expect(ownPalaceGone('home~1#kitchen', [])).toBe(false)
+  })
+})
+
+describe('einen Ort aus der Mitte entfernen (R5)', () => {
+  const weg = (...ids: number[]) => ({
+    id: 'own2',
+    name: 'Der Weg zur Arbeit',
+    stations: ids.map((id) => ({ id, label: `Ort ${id}` })),
+    nextStation: Math.max(...ids) + 1,
+  })
+
+  it('nimmt einen Weg mit Lücken in den Nummern an', () => {
+    // 1, 2, 4, 5, 6 — der dritte Ort wurde entfernt.
+    expect(isOwnPalace(weg(1, 2, 4, 5, 6))).toBe(true)
+  })
+
+  it('lässt die Nummern der übrigen Orte stehen', () => {
+    /*
+     * Der ganze Punkt der Umstellung. Vorher war ein Ort seine **Position**:
+     * Wer den dritten von sechs entfernte, machte aus dem vierten den dritten
+     * — und damit hingen die Termine des vierten Ortes plötzlich am fünften.
+     *
+     * Jetzt ist die Nummer dauerhaft. Ort 4 bleibt Ort 4, auch wenn er an
+     * dritter Stelle steht.
+     */
+    const nachher = weg(1, 2, 4, 5, 6)
+    expect(ownLabelOf(nachher, 'own4')).toBe('Ort 4')
+    expect(ownLabelOf(nachher, 'own5')).toBe('Ort 5')
+    // Und der entfernte Ort hat kein Schild mehr — sein Gang wird übergangen.
+    expect(ownLabelOf(nachher, 'own3')).toBeUndefined()
+  })
+
+  it('vergibt keine Nummer ein zweites Mal', () => {
+    // Sonst erbte ein neuer Ort die Termine des entfernten.
+    expect(isOwnPalace({ ...weg(1, 2, 4, 5, 6), nextStation: 6 })).toBe(false)
+    expect(isOwnPalace({ ...weg(1, 2, 3, 4, 5), nextStation: 5 })).toBe(false)
+  })
+
+  it('baut Gänge aus den tatsächlichen Nummern, nicht aus Positionen', () => {
+    const pool = walkPool('seed', 3, [{ id: 'own2', stationIds: [1, 2, 4, 5, 6] }])
+    for (const walk of pool) {
+      expect(walkStations(walk)).toEqual(['own1', 'own2', 'own4', 'own5', 'own6'])
+    }
+  })
+
+  it('liest beide Altformate der Gang-Kennung weiter', () => {
+    /*
+     * `own~7` ist die Form von vor den mehreren Wegen, `own~7~10` die
+     * Abschnitt-Form, die es nur wenige Stunden gab. „Nur wenige Stunden" ist
+     * keine Begründung, jemandem seine Termine wegzuwerfen.
+     */
+    expect(walkStations('own~7')).toEqual(['own1', 'own2', 'own3', 'own4', 'own5'])
+    expect(walkStations('own2~4~10')).toEqual(['own11', 'own12', 'own13', 'own14', 'own15'])
+    expect(walkStations('own2~4~1.2.4.5.6')).toEqual(['own1', 'own2', 'own4', 'own5', 'own6'])
+  })
+
+  it('bleibt bei fünf Stationen, auch mit Lücken', () => {
+    const pool = walkPool('seed', 4, [{ id: 'own2', stationIds: [1, 2, 4, 5, 6, 9, 10, 11, 12, 13] }])
+    for (const walk of pool) expect(walkStations(walk)).toHaveLength(STATIONS_PER_WALK)
   })
 })

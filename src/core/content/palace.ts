@@ -152,19 +152,34 @@ export function hasPalacePool(language: Language): boolean {
 export const WALK_SEPARATOR = '~'
 export const STATION_SEPARATOR = '#'
 
+/** Trennt die Stationsnummern in einer Gang-Kennung: `own~7~1.2.4.5.6`. */
+export const STATION_LIST_SEPARATOR = '.'
+
 /**
- * Die Kennung eines Gangs: Palast, laufende Nummer und — nur wenn nötig — der
- * Abschnitt des Palastes, den er abgeht.
+ * Die Kennung eines Gangs: Palast, laufende Nummer und — nur wenn nötig — die
+ * Stationen, die er abgeht.
  *
- * Ohne Abschnitt sieht sie aus wie bisher (`own~7`), und das ist kein Zufall:
- * Jeder Gang, der heute in einer Datenbank steht, behält damit genau seine
- * Kennung. An Kennungen hängt der Wiederholungsverlauf — sie umzunummerieren
- * hieße, Geschichte wegzuwerfen.
+ * Bei den ersten fünf Stationen sieht sie aus wie eh und je (`own~7`), und das
+ * ist kein Zufall: Jeder Gang, der heute in einer Datenbank steht, behält damit
+ * genau seine Kennung. An Kennungen hängt der Wiederholungsverlauf — sie
+ * umzunummerieren hieße, Geschichte wegzuwerfen.
+ *
+ * Warum die Stationen **aufgezählt** werden statt als Abschnitt-Nummer: Seit
+ * man jeden Ort entfernen kann, sind die Nummern eines Palastes nicht mehr
+ * lückenlos. `1.2.4.5.6` ist ein Weg, dem der dritte Ort fehlt — mit einer
+ * Abschnitt-Nummer ließe sich das nicht ausdrücken, ohne die dahinter neu zu
+ * nummerieren, und genau das darf nie passieren.
  */
-export function walkId(palace: PalaceId, ordinal: number, offset = 0): string {
-  return offset <= 0
-    ? `${palace}${WALK_SEPARATOR}${ordinal}`
-    : `${palace}${WALK_SEPARATOR}${ordinal}${WALK_SEPARATOR}${offset}`
+export function walkId(
+  palace: PalaceId,
+  ordinal: number,
+  stations: readonly number[] = [],
+): string {
+  const base = `${palace}${WALK_SEPARATOR}${ordinal}`
+  const plain = stations.length === 0
+    || stations.every((id, index) => id === index + 1) && stations.length === STATIONS_PER_WALK
+  if (plain) return base
+  return `${base}${WALK_SEPARATOR}${stations.join(STATION_LIST_SEPARATOR)}`
 }
 
 export function palaceOf(item: string): PalaceId | undefined {
@@ -173,12 +188,30 @@ export function palaceOf(item: string): PalaceId | undefined {
   return isPalaceId(name) ? name : undefined
 }
 
-/** Ab welcher Station des Palastes der Gang läuft (0 = am Anfang). */
-export function offsetOf(walk: string): number {
+/**
+ * Die Stationsnummern eines Gangs durch einen eigenen Palast.
+ *
+ * Drei Formen, weil zwei davon schon in Datenbanken stehen:
+ *
+ * - `own~7` — die ersten fünf. So hieß jeder Gang vor den mehreren Wegen.
+ * - `own~7~10` — eine Zahl: der alte Abschnitt-Anfang, also 11 bis 15. Diese
+ *   Form gab es nur wenige Stunden lang, aber „nur wenige Stunden" ist keine
+ *   Begründung, jemandem seine Termine wegzuwerfen.
+ * - `own~7~1.2.4.5.6` — die Stationen selbst, mit Lücken.
+ */
+export function walkStationNumbers(walk: string): readonly number[] {
   const parts = walkOf(walk).split(WALK_SEPARATOR)
-  if (parts.length < 3) return 0
-  const offset = Number(parts[2])
-  return Number.isInteger(offset) && offset > 0 ? offset : 0
+  const tail = parts[2]
+  if (tail === undefined || tail === '') {
+    return Array.from({ length: STATIONS_PER_WALK }, (_, index) => index + 1)
+  }
+  if (tail.includes(STATION_LIST_SEPARATOR)) {
+    const ids = tail.split(STATION_LIST_SEPARATOR).map(Number)
+    return ids.every((id) => Number.isInteger(id) && id > 0) ? ids : []
+  }
+  const offset = Number(tail)
+  if (!Number.isInteger(offset) || offset < 0) return []
+  return Array.from({ length: STATIONS_PER_WALK }, (_, index) => offset + index + 1)
 }
 
 /**
@@ -193,24 +226,29 @@ export function walkStations(walk: string): readonly string[] {
   const palace = palaceOf(walk)
   if (palace === undefined) return []
   if (!isOwnPalaceId(palace)) return STATIONS[palace as BuiltInPalaceId] ?? []
-  const offset = offsetOf(walk)
-  return Array.from({ length: STATIONS_PER_WALK }, (_, index) => `own${offset + index + 1}`)
+  return walkStationNumbers(walk).map((id) => `own${id}`)
 }
 
 /**
- * Die Anfänge der Abschnitte eines Palastes dieser Länge.
+ * Die Abschnitte eines Palastes, als Listen seiner Stationskennungen.
  *
- * Fünf Orte ergeben einen Gang. Zwölf ergeben drei: 1–5, 6–10 und 8–12 — der
- * letzte rückt zurück, statt über das Ende hinauszulaufen. Lieber eine
- * Überlappung als ein Abschnitt, der ins Leere zeigt.
+ * Fünf Orte ergeben einen Gang. Zwölf ergeben drei: die Orte 1–5, 6–10 und
+ * 8–12 — der letzte rückt zurück, statt über das Ende hinauszulaufen. Lieber
+ * eine Überlappung als ein Abschnitt, der ins Leere zeigt.
+ *
+ * Gearbeitet wird auf den **Kennungen**, nicht auf Positionen: Ein Palast, aus
+ * dem der dritte Ort entfernt wurde, hat die Kennungen 1, 2, 4, 5, 6 — und
+ * sein erster Gang geht genau diese ab.
  */
-export function windowStarts(stationCount: number): readonly number[] {
-  if (stationCount <= STATIONS_PER_WALK) return [0]
-  const last = stationCount - STATIONS_PER_WALK
-  const starts: number[] = []
-  for (let start = 0; start < last; start += STATIONS_PER_WALK) starts.push(start)
-  starts.push(last)
-  return starts
+export function walkWindows(stationIds: readonly number[]): readonly (readonly number[])[] {
+  if (stationIds.length < STATIONS_PER_WALK) return []
+  const windows: number[][] = []
+  const last = stationIds.length - STATIONS_PER_WALK
+  for (let start = 0; start < last; start += STATIONS_PER_WALK) {
+    windows.push(stationIds.slice(start, start + STATIONS_PER_WALK))
+  }
+  windows.push(stationIds.slice(last, last + STATIONS_PER_WALK))
+  return windows
 }
 
 export function walkOf(item: string): string {
@@ -260,15 +298,16 @@ export function objectFor(item: string, language: Language): string | undefined 
   return walkFor(walkOf(item), language).find((entry) => entry.station === station)?.object
 }
 
-/** Ein Palast, so weit der Vorrat ihn kennen muss: Kennung und Länge. */
+/** Ein Palast, so weit der Vorrat ihn kennen muss: Kennung und seine Stationen. */
 export interface PalaceSpec {
   id: PalaceId
-  stationCount: number
+  /** Bei eingebauten Wegen leer — deren Stationen stehen in `STATIONS`. */
+  stationIds: readonly number[]
 }
 
 const READY_SPECS: readonly PalaceSpec[] = BUILT_IN_PALACES.map((id) => ({
   id,
-  stationCount: STATIONS[id].length,
+  stationIds: [],
 }))
 
 /**
@@ -288,10 +327,28 @@ export function walkPool(
   const wheel = palaces.length === 0 ? READY_SPECS : palaces
   return Array.from({ length: count }, (_, index) => {
     const spec = wheel[index % wheel.length] as PalaceSpec
-    const starts = windowStarts(spec.stationCount)
+    const windows = walkWindows(spec.stationIds)
+    if (windows.length === 0) return walkId(spec.id, base + index)
     const round = Math.floor(index / wheel.length)
-    return walkId(spec.id, base + index, starts[round % starts.length] as number)
+    return walkId(spec.id, base + index, windows[round % windows.length] as readonly number[])
   })
+}
+
+/**
+ * Ein Ort auf einem selbst angelegten Weg.
+ *
+ * Die Nummer ist **dauerhaft** und wird nie wiederverwendet — sie steht in der
+ * Item-Kennung (`own~7#own3`), an der der Wiederholungsverlauf hängt. Genau
+ * deshalb darf man jeden Ort entfernen und nicht nur den letzten: Wer den
+ * dritten von sechs herausnimmt, hinterlässt die Nummern 1, 2, 4, 5, 6, und
+ * die vier bleibt die vier. Würden die Nummern nachrücken, hingen die Termine
+ * des vierten Ortes plötzlich am fünften.
+ *
+ * Das Schild darf jederzeit wechseln. Es ist keine Kennung.
+ */
+export interface OwnStation {
+  id: number
+  label: string
 }
 
 /** Ein selbst angelegter Palast (G3). */
@@ -304,7 +361,9 @@ export interface OwnPalace {
    */
   id: PalaceId
   name: string
-  stations: readonly string[]
+  stations: readonly OwnStation[]
+  /** Die nächste zu vergebende Ortsnummer. Sie geht nur nach vorn. */
+  nextStation: number
 }
 
 export const LABEL_MAX = 24
@@ -323,15 +382,29 @@ export function isOwnPalace(value: unknown): value is OwnPalace {
   if (!Array.isArray(stations)) return false
   if (stations.length < OWN_MIN_STATIONS || stations.length > OWN_MAX_STATIONS) return false
 
-  const seen = new Set<string>()
+  const next = candidate['nextStation']
+  if (typeof next !== 'number' || !Number.isInteger(next) || next < 2) return false
+
+  const seenLabel = new Set<string>()
+  const seenId = new Set<number>()
   for (const station of stations) {
-    if (typeof station !== 'string') return false
-    const label = station.trim()
+    if (typeof station !== 'object' || station === null) return false
+    const entry = station as Record<string, unknown>
+    const id = entry['id']
+    if (typeof id !== 'number' || !Number.isInteger(id) || id < 1) return false
+    // Keine Nummer darf je wieder vergeben werden — der Zähler steht darüber.
+    if (id >= next) return false
+    if (seenId.has(id)) return false
+    seenId.add(id)
+
+    if (typeof entry['label'] !== 'string') return false
+    const label = entry['label'].trim()
     if (label === '' || label.length > LABEL_MAX) return false
     if (label.includes(WALK_SEPARATOR) || label.includes(STATION_SEPARATOR)) return false
+    if (label.includes(STATION_LIST_SEPARATOR)) return false
     const key = label.toLocaleLowerCase()
-    if (seen.has(key)) return false
-    seen.add(key)
+    if (seenLabel.has(key)) return false
+    seenLabel.add(key)
   }
   return true
 }
@@ -343,8 +416,8 @@ export function isOwnPalace(value: unknown): value is OwnPalace {
 export function ownLabelOf(own: OwnPalace, station: string): string | undefined {
   const match = OWN_STATION.exec(station)
   if (match === null) return undefined
-  const at = Number(match[1]) - 1
-  return own.stations[at]?.trim()
+  const id = Number(match[1])
+  return own.stations.find((entry) => entry.id === id)?.label.trim()
 }
 
 /**

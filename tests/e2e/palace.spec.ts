@@ -369,3 +369,118 @@ test('übernimmt einen Weg aus der Zeit vor den mehreren Wegen', async ({ page }
   })
   expect(id).toBe('own')
 })
+
+test('entfernt einen Ort aus der Mitte, ohne die Nummern dahinter zu verschieben', async ({ page }) => {
+  /*
+   * Vom Gerät gemeldet: „Es sollte nicht nur möglich sein, den letzten Ort zu
+   * entfernen, man sollte jeden Ort jederzeit entfernen können."
+   *
+   * Möglich wurde das erst, seit ein Ort eine **dauerhafte Nummer** hat statt
+   * einer Position. Genau das prüft dieser Test — und zwar in der Datenbank,
+   * nicht im Formular: Im Formular sieht man nur Schilder, und die verschieben
+   * sich beim Entfernen selbstverständlich. Entscheidend ist, dass die
+   * **Kennungen** stehenbleiben, denn an ihnen hängen die Termine.
+   */
+  test.setTimeout(120_000)
+
+  await visit(page)
+  await expect(startButton(page)).toBeVisible()
+  await openPage(page, 'Der Gedächtnispalast')
+
+  await page.getByLabel('Wie heißt der Weg?').fill('Meine Bude')
+  const orte = ['Tür', 'Bad', 'Balkon', 'Regal', 'Bett']
+  for (const [index, label] of orte.entries()) {
+    await page.getByLabel(`Station ${index + 1}`).fill(label)
+  }
+  await page.getByRole('button', { name: 'Ort anhängen' }).click()
+  await page.getByLabel('Station 6').fill('Küchenfenster')
+  await page.getByRole('button', { name: 'Weg anlegen' }).click()
+  await expect(page.getByText(/Er kommt ab jetzt im Training vor/)).toBeVisible()
+
+  // Den dritten Ort entfernen — mitten aus dem Weg.
+  await page.locator('.own-station-drop').nth(2).click()
+  await expect(page.getByLabel('Station 3')).toHaveValue('Regal')
+  await page.getByRole('button', { name: 'Änderungen merken' }).click()
+  await expect(page.getByText(/Er kommt ab jetzt im Training vor/)).toBeVisible()
+
+  const gespeichert = await page.evaluate(async () => {
+    const open = indexedDB.open('anitew')
+    const database: IDBDatabase = await new Promise((resolve, reject) => {
+      open.onsuccess = () => resolve(open.result)
+      open.onerror = () => reject(open.error)
+    })
+    const row: unknown = await new Promise((resolve, reject) => {
+      const request = database.transaction('settings').objectStore('settings').get('palace.own.v2')
+      request.onsuccess = () => resolve(request.result)
+      request.onerror = () => reject(request.error)
+    })
+    database.close()
+    const stored = row as
+      | { value?: { palaces?: { stations?: { id?: number; label?: string }[]; nextStation?: number }[] } }
+      | undefined
+    const palace = stored?.value?.palaces?.[0]
+    return {
+      nummern: palace?.stations?.map((station) => station.id),
+      schilder: palace?.stations?.map((station) => station.label),
+      next: palace?.nextStation,
+    }
+  })
+
+  // Die drei fehlt, die vier ist die vier geblieben.
+  expect(gespeichert.nummern).toEqual([1, 2, 4, 5, 6])
+  expect(gespeichert.schilder).toEqual(['Tür', 'Bad', 'Regal', 'Bett', 'Küchenfenster'])
+  // Und keine Nummer wird je wieder vergeben.
+  expect(gespeichert.next).toBe(7)
+})
+
+test('legt einen zweiten Weg an, ohne den ersten anzufassen', async ({ page }) => {
+  test.setTimeout(120_000)
+
+  await visit(page)
+  await expect(startButton(page)).toBeVisible()
+  await openPage(page, 'Der Gedächtnispalast')
+
+  /*
+   * Über einem leeren Formular stand der Anlege-Knopf früher ausgegraut da,
+   * ohne ein Wort dazu, warum er nicht geht — die Regel erschien erst nach der
+   * ersten Eingabe. Wer den Bildschirm zum ersten Mal sah, fand eine Sackgasse.
+   */
+  await expect(page.getByText(/Mindestens fünf Orte, alle verschieden, keiner leer/)).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Weg anlegen' })).toBeDisabled()
+
+  await page.getByLabel('Wie heißt der Weg?').fill('Meine Bude')
+  for (const [index, label] of ['Tür', 'Bad', 'Balkon', 'Regal', 'Bett'].entries()) {
+    await page.getByLabel(`Station ${index + 1}`).fill(label)
+  }
+  await expect(page.getByRole('button', { name: 'Weg anlegen' })).toBeEnabled()
+  await page.getByRole('button', { name: 'Weg anlegen' }).click()
+  await expect(page.getByText(/Er kommt ab jetzt im Training vor/)).toBeVisible()
+
+  await page.getByRole('button', { name: 'Weiteren Weg anlegen' }).click()
+  const zweiter = page.locator('.own-palace-entry').last()
+  await zweiter.getByLabel('Wie heißt der Weg?').fill('Weg zur Arbeit')
+  for (const [index, label] of ['Haustür', 'Bushalt', 'Bäcker', 'Ampel', 'Büro'].entries()) {
+    await zweiter.getByLabel(`Station ${index + 1}`).fill(label)
+  }
+  await zweiter.getByRole('button', { name: 'Weg anlegen' }).click()
+
+  /*
+   * Erst warten, bis der Schreibvorgang durch ist — dann neu laden.
+   *
+   * Zwei Wartesignale waren falsch. Ein sofortiges `reload()` kam dem
+   * Schreiben zuvor. Und „zwei Einträge" ebenso: Nach dem Klick auf „Weiteren
+   * Weg anlegen" stehen bereits zwei da — der gespeicherte und das leere
+   * Formular. Die Bedingung war erfüllt, bevor irgendetwas gespeichert war.
+   *
+   * „Weiteren Weg anlegen" kommt dagegen erst zurück, wenn das Formular
+   * abgeräumt ist, und das passiert erst nach dem Schreibversuch.
+   */
+  await expect(page.getByRole('button', { name: 'Weiteren Weg anlegen' })).toBeVisible()
+
+  await page.reload()
+  await openPage(page, 'Der Gedächtnispalast')
+  const eintraege = page.locator('.own-palace-entry')
+  await expect(eintraege).toHaveCount(2)
+  await expect(eintraege.nth(0).getByLabel('Wie heißt der Weg?')).toHaveValue('Meine Bude')
+  await expect(eintraege.nth(1).getByLabel('Wie heißt der Weg?')).toHaveValue('Weg zur Arbeit')
+})
