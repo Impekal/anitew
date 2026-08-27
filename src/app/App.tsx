@@ -205,7 +205,13 @@ export function App() {
    */
   const [pageId, setPageId] = useState<MenuIconKind | undefined>(undefined)
   const [menuOpen, setMenuOpen] = useState(false)
+  /*
+   * Wo die Startseite stand, als eine Core-Seite geöffnet wurde. Beim
+   * Schließen kehrt man dorthin zurück, statt oben zu landen.
+   */
+  const startseitenScroll = useRef(0)
   const openPage = useCallback((id: MenuIconKind) => {
+    startseitenScroll.current = window.scrollY
     setMenuOpen(false)
     setPageId(id)
     window.history.pushState({ page: id }, '')
@@ -219,6 +225,34 @@ export function App() {
       window.history.back()
     }
   }, [])
+  /*
+   * Eine geöffnete Seite fängt oben an.
+   *
+   * Die Core-Seiten sind Zustand, kein Router — es gibt also keinen Browser,
+   * der beim Wechsel von sich aus nach oben scrollt. Wer die Startseite ein
+   * Stück heruntergescrollt hatte und dann eine Seite öffnete, bekam sie mit
+   * genau diesem Versatz zu sehen: Der Schließen-Knopf lag dann um die
+   * gescrollten Pixel zu hoch — auf einem iPhone im Standalone-Modus unter der
+   * Dynamic Island, also außerhalb der Safe Area und nicht mehr sicher
+   * antippbar.
+   *
+   * Das war kein neuer Fehler. Auf f1e9f6a — dem Stand, der bis eben live war
+   * — blieb das Dokument in fünf von sechs Messungen um 62 Pixel gescrollt,
+   * und der Knopf stand bei 3 statt bei 65 Pixeln. Der Test dazu
+   * (`safeArea.spec.ts`) ging nur deshalb meist durch, weil er selbst keinen
+   * definierten Ausgangszustand hatte; einmal ist er auf CI darüber gefallen
+   * (Lauf 1394), und das war zu Recht.
+   *
+   * Beim Schließen geht es dorthin zurück, wo man auf der Startseite war —
+   * sonst wäre das Beheben des einen Ärgernisses das Einführen eines anderen.
+   */
+  useEffect(() => {
+    if (pageId !== undefined) {
+      window.scrollTo(0, 0)
+      return
+    }
+    window.scrollTo(0, startseitenScroll.current)
+  }, [pageId])
   useEffect(() => {
     const onPop = () => {
       setPageId(undefined)
