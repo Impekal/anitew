@@ -24,8 +24,30 @@ concurrency:
   group: ci-${{ github.workflow }}-${{ github.event_name }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
+# ---------------------------------------------------------------------------
+# Warum das Tor in Jobs zerfällt statt in Schritte
+#
+# Vorher war alles **ein** Job mit sechzehn Schritten auf **einer** Maschine,
+# nacheinander. Gemessen am letzten grünen Lauf (#1386): 52 Minuten, davon
+# 34,8 für die Desktop-Vollregression und 7,2 für das Mobile-Tor — 81 % der
+# Zeit in zwei Schritten, die nichts voneinander wissen.
+#
+# `workers: 1` in der Playwright-Konfiguration bleibt unangetastet, und zwar
+# aus dem dort beschriebenen Grund: Mehrere Arbeiter auf **derselben** Maschine
+# nehmen den Tests die Rechenzeit weg, die eine echte Minute absitzen, und
+# machen sie grundlos rot. Eine Aufteilung auf **mehrere Maschinen** hat dieses
+# Problem nicht — jeder Scherben bekommt eine eigene Maschine für sich allein
+# und fährt dort weiterhin mit genau einem Arbeiter.
+#
+# Es werden dieselben Tests ausgeführt wie vorher, in derselben Anzahl. Der
+# Job `zaehlung` rechnet das nach, damit ein verrutschter Scherbenschnitt nicht
+# stillschweigend Tests verschluckt: Wer schneller grün wird, indem er weniger
+# prüft, hat nichts gewonnen.
+# ---------------------------------------------------------------------------
+
 jobs:
-  check:
+  # Alles, was ohne Browser auskommt — und der Build, den alle Scherben teilen.
+  fundament:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -48,57 +70,126 @@ jobs:
           npx wrangler deploy --dry-run --outdir .wrangler-dry
       - name: Kaltstart-Budget (P4)
         run: npm run size
+      # Alle E2E-Jobs prüfen denselben Build, nicht je einen eigenen. Das spart
+      # nicht nur Zeit — es schließt aus, dass Scherbe 3 etwas anderes prüft
+      # als Scherbe 1.
+      - name: Gebauten Stand weiterreichen
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+          retention-days: 1
+
+  e2e:
+    needs: fundament
+    runs-on: ubuntu-latest
+    strategy:
+      # Kein Abbruch der Geschwister: Ein roter Scherben soll den Bericht der
+      # anderen nicht verschlucken. Ein abgebrochener Lauf ist außerdem für die
+      # Branch-Protection kein Fehlschlag, sondern „cancelled" — genau die
+      # Falle aus PR #87.
+      fail-fast: false
+      matrix:
+        include:
+          - name: Desktop-Chromium 1/4
+            args: --project=chromium --shard=1/4
+          - name: Desktop-Chromium 2/4
+            args: --project=chromium --shard=2/4
+          - name: Desktop-Chromium 3/4
+            args: --project=chromium --shard=3/4
+          - name: Desktop-Chromium 4/4
+            args: --project=chromium --shard=4/4
+          # Ein Telefon ist der eigentliche Zielfall. Dieselbe Dateiliste wie
+          # bisher — hier wird nichts weggelassen.
+          - name: Mobile Release Gate
+            args: >-
+              --project=mobile
+              tests/e2e/accessibility.spec.ts
+              tests/e2e/install.spec.ts
+              tests/e2e/livingInterface.spec.ts
+              tests/e2e/memory.spec.ts
+              tests/e2e/offlineFirstLaunch.spec.ts
+              tests/e2e/resilience.spec.ts
+              tests/e2e/session.spec.ts
+              tests/e2e/sync.spec.ts
+              tests/e2e/oauthResume.spec.ts
+              tests/e2e/reset.spec.ts
+              tests/e2e/coreNavigation.spec.ts
+              tests/e2e/reminders.spec.ts
+              tests/e2e/privacy.spec.ts
+              tests/e2e/upgrade.spec.ts
+          # Die Gerätematrix läuft nur den Layouttest, über sieben Profile.
+          - name: Layout-Matrix
+            args: tests/e2e/layout.spec.ts
+    name: ${{ matrix.name }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --force
+      - name: Gebauten Stand holen
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
       - name: Browser für die E2E-Tests
         run: npx playwright install --with-deps chromium
-      - name: E2E-Regressions-Smoke
-        run: >-
-          npx playwright test --project=chromium
-          tests/e2e/achievements.spec.ts
-          tests/e2e/palace.spec.ts
-          tests/e2e/technique.spec.ts
-          tests/e2e/livingInterface.spec.ts
-          --grep "nennt eine Tatsache|erklärt den Palast|unterrichtet die Technik und lässt sie sofort anwenden|zeigt nichts an, solange nichts gelehrt ist|keinen horizontalen iPhone-Overflow"
-      # Die zuletzt auf echter Hardware gefundenen Releasepfade laufen früh:
-      # OAuth-Resume, vollständiger Reset, Core-Elternnavigation und Web Push.
-      - name: V4.2 OAuth, Reset, Core und Push
-        run: >-
-          npx playwright test --project=chromium
-          tests/e2e/oauthResume.spec.ts
-          tests/e2e/reset.spec.ts
-          tests/e2e/coreNavigation.spec.ts
-          tests/e2e/reminders.spec.ts
-          tests/e2e/privacy.spec.ts
-      # Core-Unterseiten öffnen/schließen animiert. Diese vier Pfade hatten in
-      # der langen Desktop-Suite alte Annahmen über "Zurück = Start" bzw. den
-      # früheren Reset-Endzustand. Sie laufen deshalb vor der 141er Suite.
-      - name: V4.2 Core-Übergänge und Reset-Endzustand
-        run: >-
-          npx playwright test --project=chromium
-          tests/e2e/memory.spec.ts
-          tests/e2e/profile.spec.ts
-          tests/e2e/resilience.spec.ts
-          --grep "merkt echte Information|trainiert die Erinnerung in der Einheit|schlägt mit KI vor|behält einen räumlichen Schwerpunkt|löscht auf Wunsch alles"
-      - name: Layout-Matrix
-        run: npx playwright test tests/e2e/layout.spec.ts
-      - name: Vollregression Desktop-Chromium
-        run: npx playwright test --project=chromium
-      - name: Mobile Release Gate
-        run: >-
-          npx playwright test --project=mobile
-          tests/e2e/accessibility.spec.ts
-          tests/e2e/install.spec.ts
-          tests/e2e/livingInterface.spec.ts
-          tests/e2e/memory.spec.ts
-          tests/e2e/offlineFirstLaunch.spec.ts
-          tests/e2e/resilience.spec.ts
-          tests/e2e/session.spec.ts
-          tests/e2e/sync.spec.ts
-          tests/e2e/oauthResume.spec.ts
-          tests/e2e/reset.spec.ts
-          tests/e2e/coreNavigation.spec.ts
-          tests/e2e/reminders.spec.ts
-          tests/e2e/privacy.spec.ts
-          tests/e2e/upgrade.spec.ts
+      - name: ${{ matrix.name }}
+        run: npx playwright test ${{ matrix.args }}
+
+  # Ein verrutschter Scherbenschnitt darf nicht stillschweigend Tests
+  # verschlucken. Die vier Scherben zusammen müssen genau so viele Desktop-
+  # Tests ergeben wie der ungeteilte Lauf.
+  zaehlung:
+    needs: fundament
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --force
+      - name: Scherben decken die ganze Suite ab
+        run: |
+          ganz=$(npx playwright test --project=chromium --list --reporter=json \
+            | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const j=JSON.parse(s);let n=0;const w=x=>{if(x.specs)n+=x.specs.length;(x.suites||[]).forEach(w)};(j.suites||[]).forEach(w);console.log(n)})")
+          summe=0
+          for i in 1 2 3 4; do
+            teil=$(npx playwright test --project=chromium --shard=$i/4 --list --reporter=json \
+              | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const j=JSON.parse(s);let n=0;const w=x=>{if(x.specs)n+=x.specs.length;(x.suites||[]).forEach(w)};(j.suites||[]).forEach(w);console.log(n)})")
+            echo "Scherbe $i/4: $teil Tests"
+            summe=$((summe + teil))
+          done
+          echo "Ungeteilt: $ganz — Scherben zusammen: $summe"
+          if [ "$ganz" != "$summe" ]; then
+            echo "::error::Die Scherben decken nicht die ganze Suite ab ($summe von $ganz)."
+            exit 1
+          fi
+
+  # Der Name dieses Jobs ist Vertrag: Die Branch-Protection verlangt eine
+  # Prüfung namens `check`. Er fasst nur zusammen — und ist ausdrücklich
+  # `always()`, damit er auch dann ein Ergebnis schreibt, wenn ein
+  # vorgelagerter Job abgebrochen wurde, statt selbst zu verschwinden.
+  check:
+    needs: [fundament, e2e, zaehlung]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ergebnis der Teiljobs
+        run: |
+          echo "fundament: ${{ needs.fundament.result }}"
+          echo "e2e:       ${{ needs.e2e.result }}"
+          echo "zaehlung:  ${{ needs.zaehlung.result }}"
+          if [ "${{ needs.fundament.result }}" != "success" ] \
+            || [ "${{ needs.e2e.result }}" != "success" ] \
+            || [ "${{ needs.zaehlung.result }}" != "success" ]; then
+            echo "::error::Das Tor ist nicht grün."
+            exit 1
+          fi
+          echo "Tor grün."
 
   # F-12 (Runde 2): Die Veröffentlichung hängt am vollen Tor desselben
   # Commits — `needs: check` lässt sie erst laufen, wenn Typen, Tests,
