@@ -228,6 +228,7 @@ export function OwnPanel({ language, dictionary }: { language: string; dictionar
 
       <textarea
         className="own-input"
+        aria-label={texts.inputLabel}
         rows={5}
         placeholder={texts.placeholder}
         value={draft}
@@ -340,7 +341,7 @@ export function OwnPanel({ language, dictionary }: { language: string; dictionar
 
       {parsed.facts.length > 0 && (
         <section aria-label={texts.preview}>
-          <h3 className="coach-source">{texts.preview}</h3>
+          <h2 className="coach-source">{texts.preview}</h2>
           <ul className="own-preview">
             {parsed.facts.map((fact) => (
               <li key={fact.prompt}>
@@ -356,7 +357,7 @@ export function OwnPanel({ language, dictionary }: { language: string; dictionar
 
       {parsed.rejected.length > 0 && (
         <section aria-label={texts.rejected}>
-          <h3 className="coach-source">{texts.rejected}</h3>
+          <h2 className="coach-source">{texts.rejected}</h2>
           <ul className="own-rejected">
             {parsed.rejected.map((line) => (
               <li key={line}>{line}</li>
@@ -366,7 +367,7 @@ export function OwnPanel({ language, dictionary }: { language: string; dictionar
       )}
 
       <section aria-label={texts.listHeading}>
-        <h3 className="coach-source">{texts.listHeading}</h3>
+        <h2 className="coach-source">{texts.listHeading}</h2>
         {stored.length === 0 && <p className="hint">{texts.empty}</p>}
         {stored.length > 0 && (
           <ul className="own-list">

@@ -30,12 +30,12 @@ export function SciencePanelImpl({ dictionary }: { dictionary: Dictionary }) {
         if (claims.length === 0) return null
         return (
           <section key={standing} className={`standing standing-${standing}`}>
-            <h3>{t.standings[standing]}</h3>
+            <h2>{t.standings[standing]}</h2>
             <p className="hint">{t.standingNotes[standing]}</p>
 
             {claims.map((claim) => (
               <article key={claim.id} className="claim">
-                <h4>{t.claims[claim.id].title}</h4>
+                <h3>{t.claims[claim.id].title}</h3>
                 <p>
                   <Emphasis text={t.claims[claim.id].body} />
                 </p>

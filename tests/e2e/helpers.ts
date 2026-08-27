@@ -87,6 +87,30 @@ export function startButton(page: Page): Locator {
  * Navigationstests blockieren und sie in lange Click-Timeouts schicken.
  */
 export async function visit(page: Page) {
+  /*
+   * Kein Markenritual für Prüfungen, die nicht davon handeln.
+   *
+   * Der Splash dauert seit dem Umbau drei Sekunden statt 1,65 — eine
+   * Produktentscheidung, die jeden Test, der hier durchgeht, entsprechend
+   * länger macht. Bei rund 370 Tests summiert sich das, und ein Test, der
+   * ohnehin nah an seiner Zeitgrenze lag, kippt daran.
+   *
+   * Die Abkürzung ist keine Sonderbehandlung, sondern ein Zustand, den die App
+   * selbst kennt: „war schon offen" (siehe den Kommentar im Kopf von
+   * index.html). Der Sitzungsmarker sagt genau das, und dann gibt es keinen
+   * Splash — so wie bei einem Menschen, der nur kurz aus dem Fenster war.
+   *
+   * Das Ritual selbst prüft `firstRunExperience.spec.ts` weiterhin
+   * vollständig: über `?firstLaunch=1`, das den Marker aussticht, und über
+   * eigene frische Kontexte.
+   */
+  await page.addInitScript(() => {
+    try {
+      sessionStorage.setItem('anitew.launch.open.v1', '1')
+    } catch {
+      // Ohne Sitzungsspeicher läuft der Test eben mit Splash.
+    }
+  })
   await page.goto('/')
   await page.locator('.arrival, .challenge').first().waitFor()
   if ((await page.locator('.arrival').count()) > 0) {

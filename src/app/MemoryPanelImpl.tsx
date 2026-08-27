@@ -271,7 +271,7 @@ export function MemoryPanel({
 
           <div className="memory-lists">
             <section aria-label={texts.weakest}>
-              <h3 className="coach-source">{texts.weakest}</h3>
+              <h2 className="coach-source">{texts.weakest}</h2>
               <ul className="memory-list">
                 {weakest.map((node) => (
                   <li key={node.id}>
@@ -293,7 +293,7 @@ export function MemoryPanel({
               </ul>
             </section>
             <section aria-label={texts.strongest}>
-              <h3 className="coach-source">{texts.strongest}</h3>
+              <h2 className="coach-source">{texts.strongest}</h2>
               <ul className="memory-list">
                 {strongest.map((node) => (
                   <li key={node.id}>
@@ -308,7 +308,7 @@ export function MemoryPanel({
               </ul>
             </section>
             <section aria-label={texts.latest}>
-              <h3 className="coach-source">{texts.latest}</h3>
+              <h2 className="coach-source">{texts.latest}</h2>
               <ul className="memory-list">
                 {latest.map((node) => (
                   <li key={node.id}>

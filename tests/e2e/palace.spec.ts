@@ -158,7 +158,7 @@ test('lässt einen eigenen Weg anlegen und benutzt ihn (G3)', async ({ page }) =
     await page.getByLabel(`Station ${index + 1}`).fill(label)
   }
 
-  const save = page.getByRole('button', { name: 'Weg merken' })
+  const save = page.getByRole('button', { name: 'Weg anlegen' })
   await expect(save).toBeEnabled()
   await save.click()
   await expect(page.getByText(/Er kommt ab jetzt im Training vor/)).toBeVisible()
@@ -247,6 +247,125 @@ test('nimmt keinen halben Weg an', async ({ page }) => {
   // Zweimal derselbe Ort: „Was lag hier?“ hätte zwei Antworten.
   await page.getByLabel('Station 2').fill('Bad')
 
-  await expect(page.getByRole('button', { name: 'Weg merken' })).toBeDisabled()
-  await expect(page.getByText(/Fünf Orte, alle verschieden, keiner leer/)).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Weg anlegen' })).toBeDisabled()
+  await expect(page.getByText(/Mindestens fünf Orte, alle verschieden, keiner leer/)).toBeVisible()
+})
+
+test('hängt Orte an und legt einen zweiten Weg an (G3)', async ({ page }) => {
+  test.setTimeout(120_000)
+
+  await visit(page)
+  await expect(startButton(page)).toBeVisible()
+  await openPage(page, 'Der Gedächtnispalast')
+
+  // Erster Weg, sieben Orte statt fünf.
+  await page.getByLabel('Wie heißt der Weg?').fill('Meine Bude')
+  const first = ['Wohnungstür', 'Bad', 'Balkon', 'Bücherregal', 'Nachttisch']
+  for (const [index, label] of first.entries()) {
+    await page.getByLabel(`Station ${index + 1}`).fill(label)
+  }
+  await page.getByRole('button', { name: 'Ort anhängen' }).click()
+  await page.getByLabel('Station 6').fill('Küchenfenster')
+  await page.getByRole('button', { name: 'Ort anhängen' }).click()
+  await page.getByLabel('Station 7').fill('Waschmaschine')
+  await page.getByRole('button', { name: 'Weg anlegen' }).click()
+  await expect(page.getByText(/Er kommt ab jetzt im Training vor/)).toBeVisible()
+
+  // Er bleibt liegen, mit allen sieben Orten.
+  await page.reload()
+  await openPage(page, 'Der Gedächtnispalast')
+  await expect(page.getByLabel('Station 7')).toHaveValue('Waschmaschine')
+
+  // Umbenennen: Der Ort bleibt derselbe, nur das Schild wechselt.
+  await page.getByLabel('Wie heißt der Weg?').fill('Meine Wohnung')
+  await page.getByLabel('Station 3').fill('Balkontür')
+  await page.getByRole('button', { name: 'Änderungen merken' }).click()
+  await expect(page.getByText(/Er kommt ab jetzt im Training vor/)).toBeVisible()
+  await page.reload()
+  await openPage(page, 'Der Gedächtnispalast')
+  await expect(page.getByLabel('Wie heißt der Weg?')).toHaveValue('Meine Wohnung')
+  await expect(page.getByLabel('Station 3')).toHaveValue('Balkontür')
+
+  // Zweiter Weg daneben.
+  await page.getByRole('button', { name: 'Weiteren Weg anlegen' }).click()
+  const second = page.locator('.own-palace-entry').last()
+  await second.getByLabel('Wie heißt der Weg?').fill('Der Weg zur Arbeit')
+  const stops = ['Haustür', 'Bushaltestelle', 'Bäckerei', 'Ampel', 'Büroeingang']
+  for (const [index, label] of stops.entries()) {
+    await second.getByLabel(`Station ${index + 1}`).fill(label)
+  }
+  await second.getByRole('button', { name: 'Weg anlegen' }).click()
+  // Erst die Bestätigung abwarten. Ein Neuladen mitten im Schreiben prüft
+  // nicht die App, sondern das Wettrennen.
+  await expect(page.getByText(/Er kommt ab jetzt im Training vor/)).toBeVisible()
+
+  await page.reload()
+  await openPage(page, 'Der Gedächtnispalast')
+  const entries = page.locator('.own-palace-entry')
+  // Zwei angelegte Wege — und das leere Formular für den nächsten erscheint
+  // erst auf Knopfdruck, sobald es einen gibt.
+  await expect(entries).toHaveCount(2)
+  await expect(entries.nth(0).getByLabel('Wie heißt der Weg?')).toHaveValue('Meine Wohnung')
+  await expect(entries.nth(1).getByLabel('Wie heißt der Weg?')).toHaveValue('Der Weg zur Arbeit')
+})
+
+test('übernimmt einen Weg aus der Zeit vor den mehreren Wegen', async ({ page }) => {
+  /*
+   * Die Regel lautet „keine riskanten Datenmigrationen", und dies ist die
+   * Stelle, an der sie hätte brechen können.
+   *
+   * Vor dieser Version stand genau ein Palast unter `palace.own`, ohne
+   * Kennung. Er muss als erster Eintrag der Liste auftauchen und dabei die
+   * Kennung `own` behalten — denn an `own~7#own3` hängt der
+   * Wiederholungsverlauf. Eine neue Nummer hieße: Termine an den falschen Ort.
+   */
+  await visit(page)
+  await expect(startButton(page)).toBeVisible()
+
+  await page.evaluate(async () => {
+    const open = indexedDB.open('anitew')
+    const database: IDBDatabase = await new Promise((resolve, reject) => {
+      open.onsuccess = () => resolve(open.result)
+      open.onerror = () => reject(open.error)
+    })
+    await new Promise<void>((resolve, reject) => {
+      const request = database
+        .transaction('settings', 'readwrite')
+        .objectStore('settings')
+        .put({
+          key: 'palace.own',
+          value: { name: 'Alter Weg', stations: ['Tür', 'Bad', 'Balkon', 'Regal', 'Bett'] },
+        })
+      request.onsuccess = () => resolve()
+      request.onerror = () => reject(request.error)
+    })
+    database.close()
+  })
+
+  await page.reload()
+  await openPage(page, 'Der Gedächtnispalast')
+  await expect(page.getByLabel('Wie heißt der Weg?')).toHaveValue('Alter Weg')
+  await expect(page.getByLabel('Station 3')).toHaveValue('Balkon')
+
+  // Und er behält seine Kennung, sonst wären seine Termine verwaist.
+  await page.getByLabel('Station 3').fill('Balkontür')
+  await page.getByRole('button', { name: 'Änderungen merken' }).click()
+  await expect(page.getByText(/Er kommt ab jetzt im Training vor/)).toBeVisible()
+
+  const id = await page.evaluate(async () => {
+    const open = indexedDB.open('anitew')
+    const database: IDBDatabase = await new Promise((resolve, reject) => {
+      open.onsuccess = () => resolve(open.result)
+      open.onerror = () => reject(open.error)
+    })
+    const stored: unknown = await new Promise((resolve, reject) => {
+      const request = database.transaction('settings').objectStore('settings').get('palace.own.v2')
+      request.onsuccess = () => resolve(request.result)
+      request.onerror = () => reject(request.error)
+    })
+    database.close()
+    const row = stored as { value?: { palaces?: { id?: string }[] } } | undefined
+    return row?.value?.palaces?.[0]?.id
+  })
+  expect(id).toBe('own')
 })

@@ -31,6 +31,15 @@ test('merkt echte Information: Vorschläge, Bestätigung, Constellation, Neulade
   await openPage(page, 'Mein Gedächtnis')
   await expect(page.locator('.memory-empty')).toBeVisible()
 
+  /*
+   * „Behalte, was zählt." stand einmal auf dem Splash, neben dem englischen
+   * Slogan. Dort war es ein Versprechen über ein Ergebnis, für das es keine
+   * Studie gibt (siehe den Anspruch `everyday` in core/science.ts). Hier ist
+   * es eine Aufforderung an der einzigen Stelle, an der man sie befolgen
+   * kann — direkt über dem Feld. Deshalb steht es hier und nirgends sonst.
+   */
+  await expect(page.locator('.remember-tagline')).toHaveText('Behalte, was zählt.')
+
   await page.locator('.remember-input').fill(DANIEL)
   await page.getByRole('button', { name: 'Vorschläge ansehen' }).click()
 

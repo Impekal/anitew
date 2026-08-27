@@ -222,7 +222,7 @@ export function BackupPanel({
       )}
 
       <div className="wipe support-reports">
-        <h3>{support.heading}</h3>
+        <h2>{support.heading}</h2>
         <p className="hint">{support.note}</p>
         <p className="hint">
           {support.build}: {__ANITEW_BUILD__.version} · {__ANITEW_BUILD__.commit}

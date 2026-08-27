@@ -106,7 +106,7 @@ export function ResetPanel({
 
   return (
     <div className="wipe wipe-reset">
-      <h3>{reset.heading}</h3>
+      <h2>{reset.heading}</h2>
       <p className="hint">{reset.scope}</p>
       {confirmWipe ? (
         <>

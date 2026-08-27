@@ -1,0 +1,110 @@
+/* ANITEW — Stile für den Core und seine Seiten
+ *
+ * Diese Regeln gehören zu Dingen, die im ersten Bild nicht vorkommen: die
+ * geöffnete Schublade und die Bildschirme dahinter — „Etwas merken", der
+ * Coach-Schlüssel, „Sicherung" und „Neu anfangen". Sie werden deshalb
+ * **nachgeladen** und nicht im Kaltstart mitgeschleppt.
+ *
+ * Die Annahme dahinter, ausgesprochen: Das Blatt kommt 750 ms nach dem Start
+ * mit der Signature-Schicht. Bis jemand die Schublade öffnen kann, ist der
+ * Splash allein schon drei bis fünf Sekunden gelaufen — der Zeitraum, in dem
+ * diese Regeln fehlen könnten, ist keiner, in dem man sie sehen kann.
+ *
+ * Der Anlass war das Kaltstart-Budget (P4): Mit den Korrekturen aus dem
+ * Gesamt-Audit lag das CSS bei 12,1 KB gegen 12 KB. Das Budget zu heben wäre
+ * der bequeme Weg gewesen und der falsche — eine Regel für eine Seite, die
+ * man erst nach dem dritten Fingertipp sieht, gehört nicht ins erste Bild.
+ */
+
+/*
+ * Der Satz, der vom Splash hierher gezogen ist. Er steht zwischen der
+ * Abschnittsüberschrift und der Erklärung und darf deshalb weder wie die eine
+ * noch wie die andere aussehen: kein Versalsatz, kein Grau — die Mintfarbe der
+ * Signature-Palette, eine Spur größer als der Fließtext daneben.
+ */
+.remember-tagline {
+  margin: 0 0 0.5rem;
+  color: var(--calm);
+  font-size: 1.02rem;
+  line-height: 1.4;
+}
+
+/*
+ * Rang zwei statt drei: Über diesen Karten steht die Seiten-h1, eine Ebene
+ * dazwischen gibt es nicht — ein h3 überspringt sie (WCAG 1.3.1). Die Größe
+ * bleibt die des alten h3, damit sich am Bild nichts ändert.
+ */
+.wipe h2 {
+  margin: 1em 0;
+  font-size: 1.17em;
+  font-weight: 700;
+}
+
+/*
+ * Der Weg zum Schlüssel ist ein Link mitten im Fließtext — und damit
+ * genauso hoch wie eine Zeile (gemessen 163 × 17 px). Für einen Daumen ist
+ * das zu wenig. Die Schrift bleibt Fließtext; nur die Fläche wird auf die
+ * Mindestgröße gepolstert, ohne den Absatz auseinanderzuziehen.
+ */
+
+.coach-key-link {
+  display: inline-block;
+  padding: 6px 0;
+  min-height: 24px;
+}
+
+/*
+ * Der Schließen-Knopf klebt oben — und ließ alles durch sich hindurchlaufen.
+ *
+ * `.drawer-close` ist `position: sticky`, sein Grund aber praktisch
+ * durchsichtig: ein Radialverlauf plus `rgb(140 207 192 / 3%)`. Beim Scrollen
+ * lief deshalb jeder Menüeintrag **durch** das ✕. Nachgemessen auf einem
+ * iPhone 14 Pro: Bei einem Scrollstand von 120 px stand „Dein Stand" exakt in
+ * dem Knopf, bei 260 px „Coach", bei 420 px „Der Gedächtnispalast".
+ *
+ * Der Knopf selbst bleibt unangetastet — seine Form ist Absicht. Was fehlte,
+ * ist ein deckender Streifen dahinter. Er läuft über die **volle Breite** der
+ * Schublade, nicht nur über den Knopf: Sonst verschwände der Text zwar hinter
+ * der Scheibe, liefe aber links und rechts daran vorbei, und das sähe nicht
+ * ruhiger aus, sondern kaputter.
+ *
+ * Die Farbe kommt aus der Schublade selbst (`--v4-surface-strong`, in beiden
+ * Themen definiert) und fällt auf `--paper` zurück, falls die
+ * Signature-Schicht noch nicht geladen ist — beim Kaltstart ist sie das nicht.
+ */
+.drawer-close {
+  isolation: isolate;
+}
+
+.drawer-close::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  translate: -50% 0;
+  width: 100vw;
+  /* Bis über den oberen Klebe-Rand hinaus, sonst blitzt eine Zeile darüber. */
+  top: calc(-1 * max(12px, env(safe-area-inset-top)) - 16px);
+  bottom: -16px;
+  z-index: -1;
+  /*
+   * Zwei Schichten, und die untere ist der Punkt.
+   *
+   * `--v4-surface-strong` ist die Farbe der Schublade — aber mit 94 %
+   * absichtlich leicht durchscheinend. Ein Streifen aus ihr allein reichte
+   * nicht: „Dein Stand" war hinter dem Knopf immer noch zu lesen, nur blasser.
+   * Darunter liegt deshalb `--paper`, deckend in beiden Themen.
+   *
+   * **Getrennte Eigenschaften, nicht die Kurzschreibweise.** Der erste Anlauf
+   * schrieb `background: var(--v4-surface-strong), var(--paper)` — und das ist
+   * ungültig: In einer Schichtliste darf eine Farbe nur in der **letzten**
+   * Schicht stehen. Der Browser verwirft dann die ganze Deklaration, still.
+   * Gemessen kam `background-color: rgba(0, 0, 0, 0)` heraus, und der Streifen
+   * deckte gar nichts mehr.
+   */
+  background-color: var(--paper);
+  background-image: linear-gradient(
+    var(--v4-surface-strong, transparent),
+    var(--v4-surface-strong, transparent)
+  );
+  pointer-events: none;
+}

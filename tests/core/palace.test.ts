@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest'
 import {
   LABEL_MAX,
   MIN_SECONDS_FOR_TEACHING,
-  PALACES,
+  BUILT_IN_PALACES,
+  OWN_MAX_STATIONS,
+  OWN_MIN_STATIONS,
   READY_PALACES,
   STATIONS,
   STATIONS_PER_WALK,
@@ -17,7 +19,11 @@ import {
   isOwnPalace,
   objectFor,
   ownLabelOf,
+  ownPalaceGone,
   palaceOf,
+  placementId,
+  walkStations,
+  windowStarts,
   planSession,
   sceneItemsOf,
   stationOf,
@@ -59,10 +65,10 @@ const pools = (walks: readonly string[]): Pools => ({
 })
 
 describe('der Palast als Datenmodell (G1, G2)', () => {
-  it('hat drei mitgelieferte Wege und einen eigenen, je fünf Stationen', () => {
+  it('hat drei mitgelieferte Wege mit je fünf Stationen', () => {
     expect(READY_PALACES).toHaveLength(3)
-    expect(PALACES).toHaveLength(4)
-    for (const palace of PALACES) {
+    expect(BUILT_IN_PALACES).toHaveLength(3)
+    for (const palace of BUILT_IN_PALACES) {
       expect(STATIONS[palace]).toHaveLength(STATIONS_PER_WALK)
     }
   })
@@ -70,7 +76,7 @@ describe('der Palast als Datenmodell (G1, G2)', () => {
   it('vergibt jede Stationskennung nur einmal', () => {
     // Sonst könnte das Verzeichnis der Beschriftungen in `i18n` nicht flach
     // sein — und eine doppelte Kennung wäre dort eine stille Überschreibung.
-    const all = PALACES.flatMap((palace) => STATIONS[palace])
+    const all = BUILT_IN_PALACES.flatMap((palace) => STATIONS[palace])
     expect(new Set(all).size).toBe(all.length)
   })
 
@@ -303,7 +309,7 @@ describe('die Lektion (G, D-013)', () => {
 })
 
 describe('der eigene Palast (G3)', () => {
-  const good = { name: 'Meine Wohnung', stations: ['Tür', 'Bad', 'Balkon', 'Regal', 'Bett'] }
+  const good = { id: 'own', name: 'Meine Wohnung', stations: ['Tür', 'Bad', 'Balkon', 'Regal', 'Bett'] }
 
   it('nimmt fünf verschiedene, nicht leere Orte mit Namen an', () => {
     expect(isOwnPalace(good)).toBe(true)
@@ -321,6 +327,9 @@ describe('der eigene Palast (G3)', () => {
     )
     expect(isOwnPalace(undefined)).toBe(false)
     expect(isOwnPalace({ name: 'x' })).toBe(false)
+    // Ohne Kennung gehört er zu keinem Weg — und seine Termine zu keinem Ort.
+    expect(isOwnPalace({ name: good.name, stations: good.stations })).toBe(false)
+    expect(isOwnPalace({ ...good, id: 'home' })).toBe(false)
   })
 
   it('hält die Trennzeichen der Kennungen aus den Schildern heraus', () => {
@@ -339,7 +348,7 @@ describe('der eigene Palast (G3)', () => {
      * **nicht**, was er dort abgelegt hat — es ist derselbe Ort, anders
      * geschrieben.
      */
-    expect(STATIONS.own).toEqual(['own1', 'own2', 'own3', 'own4', 'own5'])
+    expect(walkStations(walkId('own', 1))).toEqual(['own1', 'own2', 'own3', 'own4', 'own5'])
     expect(ownLabelOf(good, 'own3')).toBe('Balkon')
     expect(ownLabelOf({ ...good, stations: ['Tür', 'Bad', 'Balkontür', 'Regal', 'Bett'] }, 'own3'))
       .toBe('Balkontür')
@@ -350,15 +359,121 @@ describe('der eigene Palast (G3)', () => {
     // Sonst führte ein Gang an Orte, die niemand benannt hat.
     expect(walkPool('s', 9).map(palaceOf)).not.toContain('own')
     expect(READY_PALACES).not.toContain('own')
-    const withOwn = walkPool('s', 8, [...READY_PALACES, 'own'])
+    const withOwn = walkPool('s', 8, [
+      ...READY_PALACES.map((id) => ({ id, stationCount: STATIONS_PER_WALK })),
+      { id: 'own', stationCount: STATIONS_PER_WALK },
+    ])
     expect(withOwn.map(palaceOf)).toContain('own')
   })
 
   it('baut einen Gang durch den eigenen Palast wie jeden anderen', () => {
     const walk = walkId('own', 3)
     expect(walkPlacements(walk)).toHaveLength(STATIONS_PER_WALK)
-    expect(walkFor(walk, 'de').map((entry) => entry.station)).toEqual([...STATIONS.own])
+    expect(walkFor(walk, 'de').map((entry) => entry.station)).toEqual([
+      'own1', 'own2', 'own3', 'own4', 'own5',
+    ])
     // Und er ist genauso verlässlich — sonst gäbe es kein Wiedersehen (G7).
     expect(walkFor(walk, 'de')).toEqual(walkFor(walk, 'de'))
+  })
+})
+
+describe('mehrere Paläste und längere Wege (G3)', () => {
+  const base = { id: 'own', name: 'Meine Wohnung', stations: ['Tür', 'Bad', 'Balkon', 'Regal', 'Bett'] }
+  const long = (count: number) => ({
+    id: 'own2',
+    name: 'Der lange Weg',
+    stations: Array.from({ length: count }, (_, index) => `Ort ${index + 1}`),
+  })
+
+  it('nimmt mehr als fünf Orte an — aber nicht weniger und nicht beliebig viele', () => {
+    expect(isOwnPalace(long(OWN_MIN_STATIONS))).toBe(true)
+    expect(isOwnPalace(long(12))).toBe(true)
+    expect(isOwnPalace(long(OWN_MAX_STATIONS))).toBe(true)
+    expect(isOwnPalace(long(OWN_MIN_STATIONS - 1))).toBe(false)
+    expect(isOwnPalace(long(OWN_MAX_STATIONS + 1))).toBe(false)
+  })
+
+  it('lässt die Kennung eines bestehenden Gangs unverändert', () => {
+    /*
+     * Der wichtigste Test der ganzen Erweiterung.
+     *
+     * An `own~7#own3` hängt der Wiederholungsverlauf. Ein Gang ohne Abschnitt
+     * muss deshalb exakt so heißen wie vor der Erweiterung — sonst hätte jeder
+     * bestehende Nutzer seine Palast-Termine verloren, und zwar unbemerkt.
+     */
+    expect(walkId('own', 7)).toBe('own~7')
+    expect(walkId('own', 7, 0)).toBe('own~7')
+    expect(walkPlacements('own~7')).toEqual([
+      'own~7#own1', 'own~7#own2', 'own~7#own3', 'own~7#own4', 'own~7#own5',
+    ])
+    expect(palaceOf('own~7#own3')).toBe('own')
+    expect(stationOf('own~7#own3')).toBe('own3')
+  })
+
+  it('trägt den Abschnitt in der Kennung, damit ein Gang sich selbst erklärt', () => {
+    /*
+     * `core/session/planBase.ts` löst Gänge auf, ohne die Einstellungen des
+     * Nutzers zu kennen (D-010). Deshalb steht der Abschnitt in der Kennung
+     * und nicht in einer Tabelle daneben.
+     */
+    const walk = walkId('own2', 4, 10)
+    expect(walk).toBe('own2~4~10')
+    expect(palaceOf(walk)).toBe('own2')
+    expect(walkStations(walk)).toEqual(['own11', 'own12', 'own13', 'own14', 'own15'])
+    expect(walkFor(walk, 'de')).toHaveLength(STATIONS_PER_WALK)
+  })
+
+  it('bleibt bei fünf Stationen je Gang, egal wie lang der Weg ist', () => {
+    // Sonst wäre die Sechzig-Sekunden-Einheit in einem langen Palast
+    // stillschweigend eine andere geworden.
+    for (const offset of [0, 5, 11]) {
+      expect(walkStations(walkId('own2', 1, offset))).toHaveLength(STATIONS_PER_WALK)
+    }
+  })
+
+  it('legt die Abschnitte so, dass der letzte nicht ins Leere zeigt', () => {
+    expect(windowStarts(5)).toEqual([0])
+    expect(windowStarts(10)).toEqual([0, 5])
+    // Zwölf Orte: 1–5, 6–10 und 8–12. Der letzte rückt zurück statt über das
+    // Ende hinauszulaufen — lieber eine Überlappung als ein leerer Abschnitt.
+    expect(windowStarts(12)).toEqual([0, 5, 7])
+    for (const count of [5, 6, 9, 12, 17, 20]) {
+      for (const start of windowStarts(count)) {
+        expect(start).toBeGreaterThanOrEqual(0)
+        expect(start + STATIONS_PER_WALK).toBeLessThanOrEqual(count)
+      }
+    }
+  })
+
+  it('schöpft einen langen Weg wirklich aus, statt denselben Abschnitt zu wiederholen', () => {
+    // Sonst wäre das Anhängen von Orten eine Zahl ohne Wirkung.
+    const pool = walkPool('seed', 12, [{ id: 'own2', stationCount: 12 }])
+    const seen = new Set(pool.flatMap((walk) => walkStations(walk)))
+    expect(seen.size).toBe(12)
+    // Und jeder Gang bleibt eindeutig — zwei gleiche wären ein Wiedersehen,
+    // das keins ist.
+    expect(new Set(pool).size).toBe(pool.length)
+  })
+
+  it('hält mehrere eigene Paläste auseinander', () => {
+    expect(palaceOf('own~1#own2')).toBe('own')
+    expect(palaceOf('own2~1#own2')).toBe('own2')
+    expect(palaceOf('own13~1#own2')).toBe('own13')
+    // Zwei Paläste, dieselbe Stationsnummer — verschiedene Items.
+    expect(placementId('own~1', 'own2')).not.toBe(placementId('own2~1', 'own2'))
+  })
+
+  it('beschriftet Station 12 aus dem zwölften Feld', () => {
+    expect(ownLabelOf(long(12), 'own12')).toBe('Ort 12')
+    expect(ownLabelOf(long(12), 'own13')).toBeUndefined()
+    expect(ownLabelOf(long(12), 'kitchen')).toBeUndefined()
+  })
+
+  it('erkennt einen Gang durch einen weggeworfenen Palast', () => {
+    // Er wird übergangen, nicht gefragt: „Was lag hier?" ohne das „hier" ist
+    // keine Frage. Gelöscht wird trotzdem nichts.
+    expect(ownPalaceGone('own2~1#own3', [base])).toBe(true)
+    expect(ownPalaceGone('own~1#own3', [base])).toBe(false)
+    expect(ownPalaceGone('home~1#kitchen', [])).toBe(false)
   })
 })

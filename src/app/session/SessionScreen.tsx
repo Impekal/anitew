@@ -18,7 +18,7 @@ export function SessionScreen(props: {
   dictionary: Dictionary
   progress: SessionProgress
   taught: readonly number[]
-  own?: OwnPalace
+  own?: readonly OwnPalace[]
   onLeave: () => void
   onComplete: () => void
   onAgain: () => void

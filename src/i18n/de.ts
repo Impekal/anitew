@@ -224,11 +224,6 @@ export const de = {
     // dem Grund, aus dem es sie gibt, statt sie als Regel hinzustellen (R-1).
     abortedLater: 'Der erste Abruf steht schon in der Zeile. Die nächste Messung ist deshalb erst in vierzehn Tagen dran: Wer eine begonnene Messung wiederholen kann, bis das Gefühl dabei stimmt, misst nicht mehr sein Gedächtnis.',
     // Die Ergebnisanzeige.
-    resultTitle: 'Gemessen',
-    ofItems: 'von 20',
-    phaseImmediate: 'sofort',
-    phaseAfter: 'nach 20 Minuten',
-    phaseNextDay: 'am Folgetag',
     calibrating: 'Eichung',
     calibratingNote: 'Auch eine Messung wird durch Gewöhnung an ihren Ablauf ein wenig besser. Die ersten beiden zählen deshalb als Eichung — eine Veränderung steht hier erst ab der dritten.',
     changeUp: 'Prozentpunkte mehr behalten als bei der Eichung',
@@ -354,18 +349,34 @@ export const de = {
       knee: 'Knie',
       foot: 'Fuß',
     },
-    // G3 ist da: Der Satz sagt jetzt, wo es weitergeht, statt eine Lücke
-    // einzuräumen.
-    ownNote: 'Drei fertige Wege raten, wie deine Wohnung aussieht. Einen eigenen legst du unten an — der trägt deutlich besser.',
-    ownIntro: 'Fünf Orte auf einem Weg, den du blind gehen kannst. Immer dieselbe Richtung. Die Arbeit liegt nicht im Tippen, sondern im Überlegen.',
+    /*
+      Mehrere Wege, und Wege dürfen wachsen (G3).
+
+      Der Hinweis nennt beides in einem Satz, weil es dieselbe Sache ist: Wer
+      die Technik benutzt, hat mehrere Wege und längere. Was er **nicht**
+      sagt: dass ein längerer Weg längere Einheiten bedeutet. Tut er nicht —
+      ein Gang bleibt bei fünf Stationen, ein langer Weg liefert stattdessen
+      mehr verschiedene Gänge.
+    */
+    ownIntro: 'Mindestens fünf Orte auf einem Weg, den du blind gehen kannst. Immer dieselbe Richtung. Du kannst Orte anhängen und weitere Wege anlegen — ein Gang geht davon immer fünf Stationen ab, nie den ganzen Weg auf einmal.',
     ownName: 'Wie heißt der Weg?',
     ownNamePlaceholder: 'Meine Wohnung',
     ownStation: 'Station',
     ownStationPlaceholder: 'Ort',
-    ownSave: 'Weg merken',
+    ownSave: 'Änderungen merken',
+    ownCreate: 'Weg anlegen',
+    ownCancel: 'Abbrechen',
+    ownAdd: 'Weiteren Weg anlegen',
+    ownAddStation: 'Ort anhängen',
+    // „Hinten" ist keine Beiläufigkeit: Die Nummer einer Station steht in der
+    // Kennung, an der ihre Termine hängen. Von vorn zu streichen verschöbe alle
+    // dahinter.
+    ownRemoveStation: 'Letzten Ort entfernen',
     ownDiscard: 'Weg verwerfen',
     ownSaved: 'Gemerkt. Er kommt ab jetzt im Training vor.',
-    ownRule: 'Fünf Orte, alle verschieden, keiner leer — und ein Name für den Weg.',
+    ownFailed: 'Das hat nicht geklappt. Es wurde nichts verändert.',
+    ownFull: 'Acht Wege sind genug. Mehr, und man kommt in keinem mehr richtig an.',
+    ownRule: 'Mindestens fünf Orte, alle verschieden, keiner leer — und ein Name für den Weg.',
   },
   returns: {
     /*
@@ -624,8 +635,19 @@ export const de = {
     strengthNote: 'Die Stärke ist dein Übungsstand mit dieser Erinnerung — keine Messung deines Gedächtnisses. Die macht weiterhin nur die Messung.',
     trainNote: 'Trainiert wird im normalen Training: Die Runde zeigt den Anker mit allem, was dazugehört, fragt dann am Anker — und das Wiedersehen kommt nach Tagen über den Wiederholungsplan.',
     rememberHeading: 'Etwas merken',
+    /*
+     * Der zweite Satz des Marken-Slogans. Auf dem Splash stand er neben
+     * „Train the memory you actually use." und versprach dort ein Ergebnis,
+     * für das es keine Studie gibt. Hier ist er kein Versprechen mehr,
+     * sondern eine Aufforderung an genau der Stelle, an der man sie befolgen
+     * kann: über dem Feld, in das man schreibt, was einem wichtig ist.
+     */
+    rememberTagline: 'Behalte, was zählt.',
     rememberIntro: 'Schreib, was du behalten willst — ein Satz genügt. ANITEW schlägt vor, was daraus wird; gespeichert wird erst, was du bestätigst.',
     rememberPlaceholder: 'Daniel arbeitet im Museum, kommt aus Madrid und spielt Gitarre.',
+    // Ein Platzhalter ist keine Beschriftung: Er verschwindet beim Tippen und
+    // wird von Screenreadern nicht zuverlässig als Name des Feldes gelesen.
+    rememberInputLabel: 'Was du behalten willst',
     suggest: 'Vorschläge ansehen',
     /*
       Der KI-Weg (D-037): ein Angebot neben dem eingebauten, kein
@@ -683,6 +705,7 @@ export const de = {
     heading: 'Eigene Inhalte',
     intro: 'Eigener Stoff wird zu Karten: eine Zeile, ein Paar aus Frage und Antwort — getrennt durch „–“, Doppelpunkt oder Tabulator. Die Karten gehen denselben Weg wie alles hier: einprägen, abrufen, Wiedersehen nach Tagen. Alles bleibt auf diesem Gerät.',
     placeholder: 'Hauptstadt von Portugal – Lissabon\nfr: die Ampel – le feu\nNotrufnummer: 112',
+    inputLabel: 'Dein Stoff, Zeile für Zeile',
     preview: 'Das würden Karten:',
     rejected: 'Keine Karte (keine Trennung erkannt):',
     save: 'Karten übernehmen',
@@ -761,6 +784,7 @@ export const de = {
     },
     keyLink: 'Schlüssel-Seite öffnen',
     keyPlaceholder: 'Schlüssel hier einfügen',
+    keyFieldLabel: 'Dein Schlüssel',
     keySave: 'Schlüssel speichern',
     keyRemove: 'Schlüssel entfernen',
     keyPresent: 'Ein Schlüssel ist hinterlegt.',
@@ -913,7 +937,6 @@ export const de = {
     wipeNote: 'Löscht die ganze Trainingsgeschichte auf diesem Gerät — unwiderruflich. Vorher sichern, wenn du sie behalten willst.',
     wipeConfirm: 'Wirklich alles löschen? Das lässt sich nicht rückgängig machen.',
     wipeCancel: 'Abbrechen',
-    wipeDone: 'Gelöscht. Wie am ersten Tag.',
     failed: 'Das Einlesen ist nicht durchgelaufen. Es wurde nichts verändert.',
   },
   check: {

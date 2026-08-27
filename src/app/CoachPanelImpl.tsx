@@ -154,7 +154,7 @@ export function CoachPanelImpl({
   return (
     <div className="coach">
       <section aria-label={texts.adviceHeading}>
-        <h3 className="coach-source">{texts.adviceHeading}</h3>
+        <h2 className="coach-source">{texts.adviceHeading}</h2>
         <ul className="coach-advice">
           {advice.map((entry) => (
             <li key={entry.id}>{line(entry)}</li>
@@ -163,7 +163,7 @@ export function CoachPanelImpl({
       </section>
 
       <section aria-label={texts.askHeading}>
-        <h3 className="coach-source">{texts.askHeading}</h3>
+        <h2 className="coach-source">{texts.askHeading}</h2>
         <p className="hint">{texts.keyNote}</p>
 
         <label className="coach-provider">
@@ -189,6 +189,7 @@ export function CoachPanelImpl({
                 }
                 target="_blank"
                 rel="noreferrer"
+                className="coach-key-link"
               >
                 {texts.keyLink}
               </a>
@@ -197,6 +198,7 @@ export function CoachPanelImpl({
               <input
                 type="password"
                 className="coach-key-input"
+                aria-label={texts.keyFieldLabel}
                 placeholder={texts.keyPlaceholder}
                 value={keyDraft}
                 autoComplete="off"

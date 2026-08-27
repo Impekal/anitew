@@ -12,6 +12,7 @@ import {
   type DailyMissionDecision,
   namePool,
   READY_PALACES,
+  STATIONS_PER_WALK,
   type OwnPalace,
   DAILY_REMINDER_ID,
   type DimensionCounts,
@@ -32,7 +33,7 @@ import {
   profileOf,
   weakest,
   returnsOf,
-  palaceOf,
+  ownPalaceGone,
   walkPool,
   type BenchmarkRun,
   nextRunDue,
@@ -79,7 +80,7 @@ import {
   loadTrainingDays,
 } from '../data/sessions.ts'
 import { abandonRun, beginRun, loadOpenRun, loadRuns } from '../data/benchmark.ts'
-import { loadOwnPalace } from '../data/palace.ts'
+import { loadOwnPalaces } from '../data/palace.ts'
 import { loadDailyTime } from '../data/reminders.ts'
 import {
   loadLinkTaught,
@@ -294,9 +295,9 @@ export function App() {
    * weil die Datenbank beim Start eine Handbreit langsamer war als der
    * Finger. Der Planer lehrt ausdrücklich nur bei `false`.
    */
-  const [own, setOwn] = useState<OwnPalace | undefined>(undefined)
+  const [own, setOwn] = useState<readonly OwnPalace[]>([])
   const reloadOwn = useCallback(() => {
-    void loadOwnPalace()
+    void loadOwnPalaces()
       .then(setOwn)
       .catch(() => undefined)
   }, [])
@@ -479,7 +480,7 @@ export function App() {
            * ohne das „hier“ ist keine Frage. Gelöscht wird deshalb nichts: Wer
            * seinen Palast neu anlegt, hat seine Gänge wieder.
            */
-          if (moduleId === 'palace' && own === undefined && palaceOf(word) === 'own') continue
+          if (moduleId === 'palace' && ownPalaceGone(word, own)) continue
           ;(due[moduleId] ??= []).push(word)
         }
       } catch {
@@ -537,7 +538,10 @@ export function App() {
            * nie aus, und niemand läuft zweimal durch dieselbe Wohnung mit
            * denselben Dingen darin.
            */
-          palace: walkPool(seed, 30, own === undefined ? undefined : [...READY_PALACES, 'own']),
+          palace: walkPool(seed, 30, [
+            ...READY_PALACES.map((id) => ({ id, stationCount: STATIONS_PER_WALK })),
+            ...own.map((palace) => ({ id: palace.id, stationCount: palace.stations.length })),
+          ]),
           /*
            * Rückwärts-Folgen (D7): wie die Zahlen aus dem Seed erzeugt und
            * sprachfrei. Vierzig, nicht zwanzig — der Schwerpunkt kann dem
@@ -689,7 +693,7 @@ export function App() {
       streakBest: streak.best,
       taughtCount: taught.length,
       completedBenchmarks: runs.filter(isComplete).length,
-      hasOwnPalace: own !== undefined,
+      hasOwnPalace: own.length > 0,
       heldBackTotal: heldOf('working'),
       toldApartTotal: heldOf('attention'),
       detailsHeldTotal: heldOf('visual'),
@@ -890,7 +894,7 @@ export function App() {
       counts: dimensionCounts,
       deltas: coachDeltas,
       taughtDigits: taught.length,
-      hasPalace: own !== undefined,
+      hasPalace: own.length > 0,
     }
     const pages: Partial<Record<MenuIconKind, { title: string; body: ReactNode }>> = {
       ...(reached.length > 0
@@ -938,7 +942,7 @@ export function App() {
             <div className="benchmark-page">
               {step.kind === 'invite' ? (
                 <section className="note" role="status">
-                  <h3>{dictionary.benchmark.invite}</h3>
+                  <h2>{dictionary.benchmark.invite}</h2>
                   <p>{dictionary.benchmark.inviteNote}</p>
                   <div className="note-actions">
                     <button type="button" className="quiet" onClick={startBenchmark} disabled={starting}>
@@ -1175,7 +1179,7 @@ export function App() {
       */}
       {aborted !== undefined && (
         <section className="note" role="status">
-          <h3>{dictionary.benchmark.abortedTitle}</h3>
+          <h2>{dictionary.benchmark.abortedTitle}</h2>
           <p>{dictionary.benchmark.abortedNote}</p>
           <p className="hint">
             {aborted === 'again'
@@ -1200,7 +1204,7 @@ export function App() {
 
       {step.kind === 'invite' && aborted === undefined && (
         <section className="note" role="status">
-          <h3>{dictionary.benchmark.invite}</h3>
+          <h2>{dictionary.benchmark.invite}</h2>
           <p>{dictionary.benchmark.inviteNote}</p>
           <div className="note-actions">
             <button type="button" className="quiet" onClick={startBenchmark} disabled={starting}>
@@ -1212,7 +1216,7 @@ export function App() {
 
       {step.kind === 'recall' && (
         <section className="note" role="status">
-          <h3>{dictionary.benchmark.ready}</h3>
+          <h2>{dictionary.benchmark.ready}</h2>
           <div className="note-actions">
             <button type="button" className="quiet" onClick={() => setMeasuring(true)}>
               {dictionary.benchmark.continue}
@@ -1223,7 +1227,7 @@ export function App() {
 
       {step.kind === 'waiting' && (
         <section className="note" role="status">
-          <h3>{dictionary.benchmark.waitingTitle}</h3>
+          <h2>{dictionary.benchmark.waitingTitle}</h2>
           <p>
             {step.phase === 'after20Minutes'
               ? dictionary.benchmark.waitingSoon
@@ -1239,7 +1243,7 @@ export function App() {
       */}
       {step.kind === 'missed' && open !== undefined && (
         <section className="note" role="status">
-          <h3>{dictionary.benchmark.missedTitle}</h3>
+          <h2>{dictionary.benchmark.missedTitle}</h2>
           <p>{dictionary.benchmark.missedNote}</p>
           <div className="note-actions">
             <button
@@ -1259,7 +1263,7 @@ export function App() {
 
       {resumable !== undefined && (
         <section className="note" role="status">
-          <h3>{dictionary.resume.heading}</h3>
+          <h2>{dictionary.resume.heading}</h2>
           <p>{dictionary.resume.body}</p>
           <div className="note-actions">
             <button

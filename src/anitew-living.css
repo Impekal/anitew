@@ -156,7 +156,9 @@
   mask-image: radial-gradient(circle, black 0 64%, transparent 92%);
 }
 .today .constellation svg {
-  transform: translateZ(30px) scale(1.04) !important;
+  /* Ohne die Tiefe, aus demselben Grund wie in anitew-phase4.css: Sie war
+     wirkungslos und machte die Knoten unantippbar. Die Vergrößerung bleibt. */
+  transform: scale(1.04) !important;
 }
 .today-mission {
   position: relative;
