@@ -35,6 +35,8 @@ const loadSignatureExperience = () => {
       if (pageIsLeaving) return
       await import('./anitew-living.css')
       if (pageIsLeaving) return
+      await import('./anitew-core-pages.css')
+      if (pageIsLeaving) return
       await import('./app/coreRitual.ts')
       if (pageIsLeaving) return
       await import('./app/mobileCoreLayout.ts')

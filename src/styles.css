@@ -356,10 +356,11 @@ body::before {
   box-shadow: var(--shadow);
 }
 
+/* Rang zwei, nicht drei: Über diesen Karten steht die Seiten-h1, eine Ebene
+   dazwischen gibt es nicht — ein h3 übersprang sie (WCAG 1.3.1). Die alten
+   h3-Selektoren sind mit weg: Es gibt keinen mehr, auf den sie zeigen. */
 .note h2,
-.note h3,
-.foundation h2,
-.foundation h3 {
+.foundation h2 {
   margin: 0 0 0.7rem;
   font-size: 0.72rem;
   text-transform: uppercase;
@@ -1738,41 +1739,6 @@ body::before {
   gap: 1.4rem;
 }
 
-/*
- * Der Weg zum Schlüssel ist ein Link mitten im Fließtext — und damit
- * genauso hoch wie eine Zeile (gemessen 163 × 17 px). Für einen Daumen ist
- * das zu wenig. Die Schrift bleibt Fließtext; nur die Fläche wird auf die
- * Mindestgröße gepolstert, ohne den Absatz auseinanderzuziehen.
- */
-/*
- * Rang zwei statt drei: Über diesen Karten steht die Seiten-h1, eine Ebene
- * dazwischen gibt es nicht — ein h3 überspringt sie (WCAG 1.3.1). Die Größe
- * bleibt die des alten h3, damit sich am Bild nichts ändert.
- */
-.wipe h2 {
-  margin: 1em 0;
-  font-size: 1.17em;
-  font-weight: 700;
-}
-
-/*
- * Der Satz, der vom Splash hierher gezogen ist. Er steht zwischen der
- * Abschnittsüberschrift und der Erklärung und darf deshalb weder wie die eine
- * noch wie die andere aussehen: kein Versalsatz, kein Grau — die Mintfarbe der
- * Signature-Palette, eine Spur größer als der Fließtext daneben.
- */
-.remember-tagline {
-  margin: 0 0 0.5rem;
-  color: var(--calm);
-  font-size: 1.02rem;
-  line-height: 1.4;
-}
-
-.coach-key-link {
-  display: inline-block;
-  padding: 6px 0;
-  min-height: 24px;
-}
 
 .coach-source {
   margin: 0 0 0.4rem;

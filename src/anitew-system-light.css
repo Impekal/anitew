@@ -74,7 +74,7 @@
     background-size: 8px 8px !important;
   }
 
-  html[data-anitew-theme='system'] :is(.app, .onboarding, .page, .brand h1, .page-title, .today-line, .note h2, .note h3) {
+  html[data-anitew-theme='system'] :is(.app, .onboarding, .page, .brand h1, .page-title, .today-line, .note h2) {
     color: var(--an-text) !important;
   }
   html[data-anitew-theme='system'] :is(.greeting, .tagline, .focus, .page-body, .note, .memory-pulse-line, .hint, .sync-note) {
