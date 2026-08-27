@@ -50,31 +50,75 @@ test('hält den Hauptthread frei — keine lange Aufgabe im Leerlauf', async ({ 
    * das falsch, liefe im Leerlauf eine Schleife im Hauptthread und die Uhr der
    * Einheit stockte. Geprüft wird deshalb, dass in einer Sekunde Ruhe **keine**
    * lange Aufgabe (über 50 ms am Stück) anfällt.
+   *
+   * Der Schwellwert ist null und bleibt null. Was hier hinzukommt, ist der
+   * **Anfang** des Messfensters.
+   *
+   * Vorher begann die Messung, sobald der Startknopf stand — und wo dieser
+   * Moment liegt, entscheidet allein die Maschine: Der Splash läuft nach der
+   * Uhr, die neun nachgeladenen Stücke laufen nach Gerät und Netz. Auf einem
+   * schnellen Rechner war die Startarbeit längst vorbei, auf einem langsamen
+   * ragte sie ins Fenster. Derselbe Baum lief so am selben Tag zweimal grün
+   * und einmal rot (Läufe 1391/1392 gegen 1393), ohne dass sich an der App
+   * etwas geändert hätte.
+   *
+   * Ein Test, der eine **Dauereigenschaft** behauptet, darf seinen Messpunkt
+   * nicht dem Zufall überlassen. Er wartet jetzt auf die Marke, die das Ende
+   * der nachgelagerten Startarbeit anzeigt (siehe `main.tsx`), und misst
+   * danach. Das ist kein weicherer Test — es ist derselbe Test an einer
+   * definierten Stelle.
+   *
+   * Und wenn er doch rot wird, soll er etwas sagen: Er meldet jede lange
+   * Aufgabe mit Versatz im Fenster und Dauer, nicht bloß eine Anzahl. „1"
+   * war beim letzten Mal nicht diagnostizierbar.
    */
   await visit(page)
   await expect(startButton(page)).toBeVisible()
 
+  await page.waitForFunction(
+    () => performance.getEntriesByName('anitew:deferred-ready').length > 0,
+    { timeout: 30_000 },
+  )
+
   const longTasks = await page.evaluate(async () => {
-    return await new Promise<number>((resolve) => {
-      let count = 0
+    return await new Promise<{ versatz: number; dauer: number }[] | null>((resolve) => {
+      const found: { versatz: number; dauer: number }[] = []
       let observer: PerformanceObserver | undefined
+      const begonnen = performance.now()
       try {
         observer = new PerformanceObserver((list) => {
-          count += list.getEntries().length
+          for (const entry of list.getEntries()) {
+            found.push({
+              versatz: Math.round(entry.startTime - begonnen),
+              dauer: Math.round(entry.duration),
+            })
+          }
         })
         observer.observe({ entryTypes: ['longtask'] })
       } catch {
         // Kennt der Browser keine Longtask-API, gilt der Test als bestanden —
         // er kann dann schlicht nichts behaupten.
-        resolve(0)
+        resolve(null)
         return
       }
       setTimeout(() => {
         observer?.disconnect()
-        resolve(count)
+        resolve(found)
       }, 1000)
     })
   })
 
-  expect(longTasks, 'lange Aufgaben im Leerlauf').toBe(0)
+  /*
+   * Kennt der Browser die Longtask-API nicht, behauptet dieser Test nichts —
+   * dann soll er aber auch nicht als „bestanden" im Protokoll stehen. Ein
+   * stiller Freispruch ist die unangenehmste Sorte grün: Er sieht aus wie ein
+   * Beweis und ist keiner.
+   */
+  if (longTasks === null) {
+    test.skip(true, 'Browser kennt die Longtask-API nicht')
+    return
+  }
+
+  const beschreibung = longTasks.map((t) => `${t.dauer} ms bei +${t.versatz} ms`).join(', ')
+  expect(longTasks, `lange Aufgaben im Leerlauf: ${beschreibung}`).toEqual([])
 })

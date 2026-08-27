@@ -52,6 +52,23 @@ const loadSignatureExperience = () => {
       await import('./app/experienceRefinement.ts')
       if (pageIsLeaving) return
       await import('./app/driveRedirectFeedback.ts')
+      /*
+       * Ende der nachgelagerten Startarbeit — als Messpunkt, nicht als
+       * Testhilfe.
+       *
+       * Alles oberhalb laeuft absichtlich **nach** dem ersten Bild: neun
+       * Stuecke nacheinander, jedes mit eigener Anfrage. Wann dieser Zug
+       * durch ist, haengt vom Geraet und vom Netz ab und war bisher von
+       * aussen nicht erkennbar. Wer die Ruhe danach messen will — ein Test
+       * ebenso wie eine spaetere Feldmessung — musste raten.
+       *
+       * Eine Marke kostet nichts und beendet das Raten.
+       */
+      try {
+        performance.mark?.('anitew:deferred-ready')
+      } catch {
+        // Messen ist Diagnose. Fehlt die API, laeuft die App unveraendert weiter.
+      }
     })().catch(() => undefined)
   }, 750)
 }
