@@ -1755,6 +1755,19 @@ body::before {
   font-weight: 700;
 }
 
+/*
+ * Der Satz, der vom Splash hierher gezogen ist. Er steht zwischen der
+ * Abschnittsüberschrift und der Erklärung und darf deshalb weder wie die eine
+ * noch wie die andere aussehen: kein Versalsatz, kein Grau — die Mintfarbe der
+ * Signature-Palette, eine Spur größer als der Fließtext daneben.
+ */
+.remember-tagline {
+  margin: 0 0 0.5rem;
+  color: var(--calm);
+  font-size: 1.02rem;
+  line-height: 1.4;
+}
+
 .coach-key-link {
   display: inline-block;
   padding: 6px 0;

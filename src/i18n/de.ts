@@ -618,6 +618,14 @@ export const de = {
     strengthNote: 'Die Stärke ist dein Übungsstand mit dieser Erinnerung — keine Messung deines Gedächtnisses. Die macht weiterhin nur die Messung.',
     trainNote: 'Trainiert wird im normalen Training: Die Runde zeigt den Anker mit allem, was dazugehört, fragt dann am Anker — und das Wiedersehen kommt nach Tagen über den Wiederholungsplan.',
     rememberHeading: 'Etwas merken',
+    /*
+     * Der zweite Satz des Marken-Slogans. Auf dem Splash stand er neben
+     * „Train the memory you actually use." und versprach dort ein Ergebnis,
+     * für das es keine Studie gibt. Hier ist er kein Versprechen mehr,
+     * sondern eine Aufforderung an genau der Stelle, an der man sie befolgen
+     * kann: über dem Feld, in das man schreibt, was einem wichtig ist.
+     */
+    rememberTagline: 'Behalte, was zählt.',
     rememberIntro: 'Schreib, was du behalten willst — ein Satz genügt. ANITEW schlägt vor, was daraus wird; gespeichert wird erst, was du bestätigst.',
     rememberPlaceholder: 'Daniel arbeitet im Museum, kommt aus Madrid und spielt Gitarre.',
     // Ein Platzhalter ist keine Beschriftung: Er verschwindet beim Tippen und

@@ -397,6 +397,7 @@ export const en: Dictionary = {
     strengthNote: 'Strength is your practice level with this memory — not a measurement of your memory. Only the benchmark makes that claim.',
     trainNote: 'Training happens in the normal session: the round shows the anchor with everything that belongs to it, then asks at the anchor — and the reunion comes after days via the review plan.',
     rememberHeading: 'Remember something',
+    rememberTagline: 'Remember what matters.',
     rememberIntro: 'Write what you want to keep — one sentence is enough. ANITEW suggests what it becomes; nothing is stored until you confirm.',
     rememberPlaceholder: 'Daniel works at the museum, comes from Madrid and plays guitar.',
     rememberInputLabel: 'What you want to keep',

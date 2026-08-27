@@ -13,9 +13,7 @@ test('der erste Eindruck trägt die englische Marke fünf Sekunden und erklärt 
   await expect(launch).toHaveCount(1)
   // Splash-Copy ist Marken-Copy: immer Englisch, auch wenn die App Deutsch spricht.
   await expect(page.getByText('MEMORIZE · RECALL · RETAIN · MASTER')).toBeVisible()
-  await expect(
-    page.getByText('Train the memory you actually use. Remember what matters.'),
-  ).toBeVisible()
+  await expect(page.getByText('Train the memory you actually use.')).toBeVisible()
   await expect(page.getByText('Powered by Impekal')).toBeVisible()
 
   /*

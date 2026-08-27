@@ -260,6 +260,7 @@ export function RememberThisPanel({
   return (
     <section className="remember" aria-label={texts.rememberHeading}>
       <h2 className="coach-source">{texts.rememberHeading}</h2>
+      <p className="remember-tagline">{texts.rememberTagline}</p>
       <p className="hint">{texts.rememberIntro}</p>
 
       <textarea
