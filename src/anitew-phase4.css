@@ -7,7 +7,6 @@
  */
 
 .memoryzone {
-  --world-depth: 24px;
   perspective: 1100px;
 }
 
@@ -64,11 +63,25 @@
  * A remembered node should stay exactly where the person expects it to be;
  * atmosphere may breathe around it, the target itself remains stable.
  */
+/*
+ * Die Neigung bleibt, die Tiefe fällt weg — und zwar nicht aus Geschmack.
+ *
+ * `translateZ(24px)` stand hier für Tiefe, hat aber in dieser Komposition
+ * **keine** erzeugt: Die Box des SVG ist mit und ohne exakt dieselbe (gemessen
+ * 542 × 338,68 px an derselben Stelle). Was es dagegen sehr wohl tat: Es
+ * zwang das SVG in einen 3D-Kontext, und darin trifft Chromiums Treffer-
+ * Prüfung die Kinder nicht mehr. Ein Fingertipp auf einen Erinnerungsknoten
+ * landete auf dem leeren SVG dahinter statt auf dem Knoten.
+ *
+ * Gemessen am selben Aufbau, dreimal nacheinander: mit `translateZ` schlägt
+ * der Klick fehl, ohne es trifft er. Das ist kein Testproblem — es ist die
+ * Memory World, in der man einen Knoten nicht zuverlässig auswählen kann.
+ */
 .constellation svg {
   position: relative;
   z-index: 2;
   transform-origin: 50% 55%;
-  transform: translateZ(var(--world-depth)) rotateX(1.2deg);
+  transform: rotateX(1.2deg);
   transition: transform 420ms var(--ease);
 }
 
@@ -412,7 +425,7 @@
     border-radius: 18px;
   }
   .constellation svg {
-    transform: translateZ(12px);
+    transform: rotateX(1.2deg);
   }
   .session::before {
     width: 92vw;
