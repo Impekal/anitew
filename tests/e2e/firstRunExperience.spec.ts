@@ -13,7 +13,24 @@ test('der erste Eindruck trägt die englische Marke fünf Sekunden und erklärt 
   await expect(launch).toHaveCount(1)
   // Splash-Copy ist Marken-Copy: immer Englisch, auch wenn die App Deutsch spricht.
   await expect(page.getByText('MEMORIZE · RECALL · RETAIN · MASTER')).toBeVisible()
+  await expect(
+    page.getByText('Train the memory you actually use. Remember what matters.'),
+  ).toBeVisible()
   await expect(page.getByText('Powered by Impekal')).toBeVisible()
+
+  /*
+   * Die Reihenfolge ist die Aussage: Erst der Name, dann der Satz, der sagt,
+   * worum es geht, und ganz unten die Herkunft. Geprüft wird die Reihenfolge
+   * im Dokument, nicht die Rasterzeile — die darf sich ändern, die Aussage
+   * nicht.
+   */
+  const order = await page.locator('#anitew-launch > div').evaluateAll((nodes) =>
+    nodes.map((node) => node.className),
+  )
+  expect(order.indexOf('anitew-launch-name')).toBeLessThan(order.indexOf('anitew-launch-slogan'))
+  expect(order.indexOf('anitew-launch-slogan')).toBeLessThan(
+    order.indexOf('anitew-launch-powered'),
+  )
   await expect(page.locator('.anitew-mark-path')).toHaveCount(1)
   await expect(page.locator('.anitew-mark-node')).toHaveCount(6)
 
@@ -58,7 +75,9 @@ test('die Orientierung erklärt Core, Coach, Techniken, Memory World, Sync und M
 }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/')
-  await expect(page.locator('#anitew-launch')).toBeHidden({ timeout: 4_000 })
+  // Jedes weitere Öffnen dauert drei Sekunden (vorher 1,65 s). Der Spielraum
+  // wächst mit der Dauer mit — er verdeckt keine Fehlersuche.
+  await expect(page.locator('#anitew-launch')).toBeHidden({ timeout: 6_000 })
   await expect(page.locator('.first-run-questions')).toBeVisible({ timeout: 8_000 })
 
   await page.locator('.arrival .quiet').click()
@@ -85,7 +104,7 @@ test('die Orientierung erklärt Core, Coach, Techniken, Memory World, Sync und M
   await expect(guide).toBeHidden()
 
   await page.reload()
-  await expect(page.locator('#anitew-launch')).toBeHidden({ timeout: 4_000 })
+  await expect(page.locator('#anitew-launch')).toBeHidden({ timeout: 6_000 })
   await expect(startButton(page)).toBeVisible({ timeout: 15_000 })
   await page.waitForTimeout(1_500)
   await expect(page.locator('.first-run-guide')).toHaveCount(0)
@@ -127,4 +146,47 @@ test('der Core schließt eindeutig und startet standardmäßig dunkel', async ({
 
   await page.locator('.drawer-close').click()
   await expect(page.locator('.drawer')).toBeHidden()
+})
+
+test('drei Sekunden beim Wiederkommen — und gar kein Splash, wenn die App schon offen war', async ({
+  page,
+}) => {
+  test.setTimeout(40_000)
+  await page.setViewportSize({ width: 390, height: 844 })
+
+  /*
+   * Drei Fälle, drei Längen (siehe den Kommentar im Kopf von index.html):
+   * allererstes Öffnen fünf Sekunden, jedes weitere drei, und wer nur kurz
+   * aus dem Fenster war, bekommt gar nichts.
+   *
+   * Der dritte Fall ist der, um den es hier wirklich geht. Er hing vorher an
+   * nichts: Jedes Neuladen — auch das, das iOS einer im Hintergrund
+   * liegenden PWA verordnet — zeigte das volle Ritual noch einmal.
+   */
+
+  // Fall 2: nicht das erste Öffnen (Playwright meldet sich als Automat), also
+  // drei Sekunden. Nach 2,4 s steht der Splash noch, nach 4 s ist er weg.
+  await page.goto('/')
+  const launch = page.locator('#anitew-launch')
+  await expect(launch).toBeVisible()
+  await page.waitForTimeout(2_400)
+  await expect(launch).toBeVisible()
+  await expect(launch).toBeHidden({ timeout: 3_000 })
+
+  // Fall 3: dieselbe Sitzung, erneut geladen — kein Splash mehr. Nicht „schnell
+  // weg“, sondern von Anfang an nicht da.
+  await page.goto('/')
+  await expect(page.locator('#anitew-launch')).toBeHidden()
+  expect(await page.evaluate(() => document.documentElement.dataset.anitewLaunch)).toBe('skip')
+
+  // Und ein wirklich neuer Start zeigt ihn wieder. Ein frischer Kontext ist
+  // das Nächste an „App geschlossen und neu geöffnet“, was ein Browser kennt.
+  const fresh = await page.context().browser()?.newContext({ locale: 'de-DE' })
+  if (fresh !== undefined) {
+    const second = await fresh.newPage()
+    await second.goto('http://127.0.0.1:4173/')
+    await expect(second.locator('#anitew-launch')).toBeVisible()
+    expect(await second.evaluate(() => document.documentElement.dataset.anitewLaunch)).toBe('show')
+    await fresh.close()
+  }
 })
