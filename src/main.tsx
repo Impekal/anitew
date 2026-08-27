@@ -76,8 +76,14 @@ function ensureLegalFooter(): void {
   footer.setAttribute('aria-label', 'Rechtliches')
   footer.style.cssText =
     'position:relative;z-index:1;padding:0 16px max(18px,env(safe-area-inset-bottom));text-align:center;font:500 12px/1.5 system-ui,sans-serif;color:#777;'
+  // Zwölf Pixel hohe Schrift ergibt ein zwölf Pixel hohes Ziel — zu wenig für
+  // einen Daumen und unter der Mindestgröße aus WCAG 2.5.8. Die Schrift bleibt
+  // klein und zurückhaltend; nur die anfassbare Fläche wächst über Polsterung
+  // auf 44 px. Sichtbar ändert sich nichts außer dem Abstand der beiden Links.
+  const linkStyle =
+    'color:inherit;display:inline-flex;align-items:center;min-height:44px;padding:0 10px;'
   footer.innerHTML =
-    '<a style="color:inherit" href="/impressum.html">Impressum</a><span aria-hidden="true"> · </span><a style="color:inherit" href="/datenschutz.html">Datenschutz</a>'
+    `<a style="${linkStyle}" href="/impressum.html">Impressum</a><span aria-hidden="true">·</span><a style="${linkStyle}" href="/datenschutz.html">Datenschutz</a>`
   document.body.append(footer)
 }
 

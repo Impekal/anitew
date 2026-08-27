@@ -24,11 +24,15 @@ import { startButton, visit } from './helpers.ts'
  * Der klassische Layoutfehler: Etwas ragt seitlich hinaus, und die ganze
  * Seite lässt sich hin- und herschieben. Ein Pixel Toleranz gegen Rundung.
  */
-async function noHorizontalOverflow(page: Page) {
-  const overflow = await page.evaluate(() => {
+async function horizontalOverflow(page: Page): Promise<number> {
+  return page.evaluate(() => {
     const root = document.documentElement
     return root.scrollWidth - root.clientWidth
   })
+}
+
+async function noHorizontalOverflow(page: Page) {
+  const overflow = await horizontalOverflow(page)
   expect(overflow, 'die Seite lässt sich seitlich schieben').toBeLessThanOrEqual(1)
 }
 
@@ -229,4 +233,59 @@ test('Fließtext bekommt echte Zeilenbreite — kein senkrechtes Wort-für-Wort'
   })
 
   expect(squeezed, 'eingeklemmter Fließtext').toEqual([])
+})
+
+test('kein Seitwärts-Schieben, wenn man sich Zeit lässt', async ({ page }) => {
+  /*
+   * Diese Lücke war der Grund für den Fund im Gesamt-Audit.
+   *
+   * `visit()` ist auf Tempo gebaut: Es klickt den Ankunftsbildschirm weg,
+   * sobald er da ist, und überspringt die Einführung. Genau dieser Weg ist
+   * der einzige, auf dem die Seite **nicht** seitlich schiebt. Gemessen auf
+   * einem iPhone 14 Pro, jeweils nach demselben Startbildschirm:
+   *
+   * - sofort weiterklicken (der bisherige Gate-Weg): 2 px
+   * - vier Sekunden auf dem Ankunftsbildschirm bleiben: **30 px**
+   * - die Einführung durchklicken statt überspringen: **25 px**
+   *
+   * Der Grund ist keine Animation, sondern der Aufbau: Die lebende Schicht
+   * setzt ihre Zierverläufe erst, wenn der Startbildschirm fertig steht
+   * (`.today::before`, `.challenge::before` mit `inset: 8% -10% 24%`). Die
+   * treten absichtlich über ihre Box hinaus — nur darf daraus keine
+   * schiebbare Seite werden.
+   *
+   * Der Test nimmt sich deshalb bewusst die Zeit, die ein Mensch sich nimmt.
+   */
+  await page.goto('/')
+  await page.locator('.arrival, .challenge').first().waitFor()
+
+  if ((await page.locator('.arrival').count()) > 0) {
+    // So lange, wie jemand braucht, um den Ankunftsbildschirm zu lesen.
+    await page.waitForTimeout(3_000)
+    await page.locator('.arrival .quiet').click()
+    await page.locator('.challenge').waitFor()
+  }
+
+  const skip = page.locator('.first-run-guide-skip')
+  if ((await skip.count()) > 0) {
+    await skip.click()
+    await expect(page.locator('.first-run-guide')).toBeHidden()
+  }
+
+  /*
+   * Nicht einmal messen, sondern über das Ankommen hinweg — und den
+   * schlimmsten Moment nehmen. Die lebende Schicht setzt ihre Verläufe in
+   * Stufen; ein einzelner Blick trifft leicht die Lücke dazwischen und meldet
+   * grün, während die Seite eine halbe Sekunde später schiebt.
+   */
+  let worst = 0
+  for (let step = 0; step < 8; step++) {
+    await page.waitForTimeout(500)
+    worst = Math.max(worst, await horizontalOverflow(page))
+    // Ganz nach unten: Die Zierverläufe von `.today` und `.challenge` liegen
+    // im unteren Teil des Startbildschirms.
+    await page.mouse.wheel(0, 600)
+  }
+
+  expect(worst, 'die Seite lässt sich seitlich schieben').toBeLessThanOrEqual(1)
 })

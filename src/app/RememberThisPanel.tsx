@@ -259,11 +259,12 @@ export function RememberThisPanel({
 
   return (
     <section className="remember" aria-label={texts.rememberHeading}>
-      <h3 className="coach-source">{texts.rememberHeading}</h3>
+      <h2 className="coach-source">{texts.rememberHeading}</h2>
       <p className="hint">{texts.rememberIntro}</p>
 
       <textarea
         className="remember-input"
+        aria-label={texts.rememberInputLabel}
         rows={3}
         placeholder={texts.rememberPlaceholder}
         value={draft}

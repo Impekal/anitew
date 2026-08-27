@@ -149,6 +149,22 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100%;
+  /*
+   * Der Schein darf über den Rand, die Seite nicht.
+   *
+   * Mehrere Zierschichten treten absichtlich über ihre Box hinaus — am
+   * deutlichsten `.challenge::before` mit `inset: 8% -10% 24%`. Das ist so
+   * gewollt: ein Leuchten, das an der Kante endet, sieht abgeschnitten aus.
+   * Auf dem Telefon summierte sich dieses Übertreten aber zu echtem
+   * Seitwärts-Scrollen — gemessen 421 statt 393 px auf einem iPhone 14 Pro,
+   * und ebenso bei 320, 375 und 430 px Breite. Der Inhalt selbst ragt
+   * nirgends heraus; es sind nur die Verläufe.
+   *
+   * `clip` statt `hidden`: `hidden` macht aus dem Wurzelelement einen
+   * Scroll-Container und nimmt damit `position: sticky` die Grundlage.
+   * `clip` schneidet nur ab und lässt die Höhe in Ruhe.
+   */
+  overflow-x: clip;
   color: var(--ink);
   font-family: var(--sans);
   line-height: 1.55;
@@ -340,7 +356,9 @@ body::before {
   box-shadow: var(--shadow);
 }
 
+.note h2,
 .note h3,
+.foundation h2,
 .foundation h3 {
   margin: 0 0 0.7rem;
   font-size: 0.72rem;
@@ -1305,7 +1323,7 @@ body::before {
   border-left-color: var(--bad);
 }
 
-.standing h3 {
+.standing h2 {
   margin: 0;
   font-size: 0.82rem;
   font-weight: 600;
@@ -1321,7 +1339,7 @@ body::before {
   margin-top: 0.4rem;
 }
 
-.claim h4 {
+.claim h3 {
   margin: 0;
   font-family: var(--serif);
   font-size: 1.02rem;
@@ -1718,6 +1736,29 @@ body::before {
   display: flex;
   flex-direction: column;
   gap: 1.4rem;
+}
+
+/*
+ * Der Weg zum Schlüssel ist ein Link mitten im Fließtext — und damit
+ * genauso hoch wie eine Zeile (gemessen 163 × 17 px). Für einen Daumen ist
+ * das zu wenig. Die Schrift bleibt Fließtext; nur die Fläche wird auf die
+ * Mindestgröße gepolstert, ohne den Absatz auseinanderzuziehen.
+ */
+/*
+ * Rang zwei statt drei: Über diesen Karten steht die Seiten-h1, eine Ebene
+ * dazwischen gibt es nicht — ein h3 überspringt sie (WCAG 1.3.1). Die Größe
+ * bleibt die des alten h3, damit sich am Bild nichts ändert.
+ */
+.wipe h2 {
+  margin: 1em 0;
+  font-size: 1.17em;
+  font-weight: 700;
+}
+
+.coach-key-link {
+  display: inline-block;
+  padding: 6px 0;
+  min-height: 24px;
 }
 
 .coach-source {

@@ -224,11 +224,6 @@ export const de = {
     // dem Grund, aus dem es sie gibt, statt sie als Regel hinzustellen (R-1).
     abortedLater: 'Der erste Abruf steht schon in der Zeile. Die nächste Messung ist deshalb erst in vierzehn Tagen dran: Wer eine begonnene Messung wiederholen kann, bis das Gefühl dabei stimmt, misst nicht mehr sein Gedächtnis.',
     // Die Ergebnisanzeige.
-    resultTitle: 'Gemessen',
-    ofItems: 'von 20',
-    phaseImmediate: 'sofort',
-    phaseAfter: 'nach 20 Minuten',
-    phaseNextDay: 'am Folgetag',
     calibrating: 'Eichung',
     calibratingNote: 'Auch eine Messung wird durch Gewöhnung an ihren Ablauf ein wenig besser. Die ersten beiden zählen deshalb als Eichung — eine Veränderung steht hier erst ab der dritten.',
     changeUp: 'Prozentpunkte mehr behalten als bei der Eichung',
@@ -356,7 +351,6 @@ export const de = {
     },
     // G3 ist da: Der Satz sagt jetzt, wo es weitergeht, statt eine Lücke
     // einzuräumen.
-    ownNote: 'Drei fertige Wege raten, wie deine Wohnung aussieht. Einen eigenen legst du unten an — der trägt deutlich besser.',
     ownIntro: 'Fünf Orte auf einem Weg, den du blind gehen kannst. Immer dieselbe Richtung. Die Arbeit liegt nicht im Tippen, sondern im Überlegen.',
     ownName: 'Wie heißt der Weg?',
     ownNamePlaceholder: 'Meine Wohnung',
@@ -626,6 +620,9 @@ export const de = {
     rememberHeading: 'Etwas merken',
     rememberIntro: 'Schreib, was du behalten willst — ein Satz genügt. ANITEW schlägt vor, was daraus wird; gespeichert wird erst, was du bestätigst.',
     rememberPlaceholder: 'Daniel arbeitet im Museum, kommt aus Madrid und spielt Gitarre.',
+    // Ein Platzhalter ist keine Beschriftung: Er verschwindet beim Tippen und
+    // wird von Screenreadern nicht zuverlässig als Name des Feldes gelesen.
+    rememberInputLabel: 'Was du behalten willst',
     suggest: 'Vorschläge ansehen',
     /*
       Der KI-Weg (D-037): ein Angebot neben dem eingebauten, kein
@@ -683,6 +680,7 @@ export const de = {
     heading: 'Eigene Inhalte',
     intro: 'Eigener Stoff wird zu Karten: eine Zeile, ein Paar aus Frage und Antwort — getrennt durch „–“, Doppelpunkt oder Tabulator. Die Karten gehen denselben Weg wie alles hier: einprägen, abrufen, Wiedersehen nach Tagen. Alles bleibt auf diesem Gerät.',
     placeholder: 'Hauptstadt von Portugal – Lissabon\nfr: die Ampel – le feu\nNotrufnummer: 112',
+    inputLabel: 'Dein Stoff, Zeile für Zeile',
     preview: 'Das würden Karten:',
     rejected: 'Keine Karte (keine Trennung erkannt):',
     save: 'Karten übernehmen',
@@ -761,6 +759,7 @@ export const de = {
     },
     keyLink: 'Schlüssel-Seite öffnen',
     keyPlaceholder: 'Schlüssel hier einfügen',
+    keyFieldLabel: 'Dein Schlüssel',
     keySave: 'Schlüssel speichern',
     keyRemove: 'Schlüssel entfernen',
     keyPresent: 'Ein Schlüssel ist hinterlegt.',
@@ -913,7 +912,6 @@ export const de = {
     wipeNote: 'Löscht die ganze Trainingsgeschichte auf diesem Gerät — unwiderruflich. Vorher sichern, wenn du sie behalten willst.',
     wipeConfirm: 'Wirklich alles löschen? Das lässt sich nicht rückgängig machen.',
     wipeCancel: 'Abbrechen',
-    wipeDone: 'Gelöscht. Wie am ersten Tag.',
     failed: 'Das Einlesen ist nicht durchgelaufen. Es wurde nichts verändert.',
   },
   check: {

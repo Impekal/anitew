@@ -938,7 +938,7 @@ export function App() {
             <div className="benchmark-page">
               {step.kind === 'invite' ? (
                 <section className="note" role="status">
-                  <h3>{dictionary.benchmark.invite}</h3>
+                  <h2>{dictionary.benchmark.invite}</h2>
                   <p>{dictionary.benchmark.inviteNote}</p>
                   <div className="note-actions">
                     <button type="button" className="quiet" onClick={startBenchmark} disabled={starting}>
@@ -1175,7 +1175,7 @@ export function App() {
       */}
       {aborted !== undefined && (
         <section className="note" role="status">
-          <h3>{dictionary.benchmark.abortedTitle}</h3>
+          <h2>{dictionary.benchmark.abortedTitle}</h2>
           <p>{dictionary.benchmark.abortedNote}</p>
           <p className="hint">
             {aborted === 'again'
@@ -1200,7 +1200,7 @@ export function App() {
 
       {step.kind === 'invite' && aborted === undefined && (
         <section className="note" role="status">
-          <h3>{dictionary.benchmark.invite}</h3>
+          <h2>{dictionary.benchmark.invite}</h2>
           <p>{dictionary.benchmark.inviteNote}</p>
           <div className="note-actions">
             <button type="button" className="quiet" onClick={startBenchmark} disabled={starting}>
@@ -1212,7 +1212,7 @@ export function App() {
 
       {step.kind === 'recall' && (
         <section className="note" role="status">
-          <h3>{dictionary.benchmark.ready}</h3>
+          <h2>{dictionary.benchmark.ready}</h2>
           <div className="note-actions">
             <button type="button" className="quiet" onClick={() => setMeasuring(true)}>
               {dictionary.benchmark.continue}
@@ -1223,7 +1223,7 @@ export function App() {
 
       {step.kind === 'waiting' && (
         <section className="note" role="status">
-          <h3>{dictionary.benchmark.waitingTitle}</h3>
+          <h2>{dictionary.benchmark.waitingTitle}</h2>
           <p>
             {step.phase === 'after20Minutes'
               ? dictionary.benchmark.waitingSoon
@@ -1239,7 +1239,7 @@ export function App() {
       */}
       {step.kind === 'missed' && open !== undefined && (
         <section className="note" role="status">
-          <h3>{dictionary.benchmark.missedTitle}</h3>
+          <h2>{dictionary.benchmark.missedTitle}</h2>
           <p>{dictionary.benchmark.missedNote}</p>
           <div className="note-actions">
             <button
@@ -1259,7 +1259,7 @@ export function App() {
 
       {resumable !== undefined && (
         <section className="note" role="status">
-          <h3>{dictionary.resume.heading}</h3>
+          <h2>{dictionary.resume.heading}</h2>
           <p>{dictionary.resume.body}</p>
           <div className="note-actions">
             <button

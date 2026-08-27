@@ -256,6 +256,7 @@ body::before {
   color: var(--an-muted);
   box-shadow: 0 10px 35px rgba(0,0,0,.12);
 }
+.note h2,
 .note h3 { color: var(--an-text); font-family: var(--serif); }
 .note-actions .quiet, .quiet {
   border-color: var(--an-line-strong);
