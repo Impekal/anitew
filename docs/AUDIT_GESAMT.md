@@ -255,8 +255,18 @@ Regeln dürfen nachkommen. Die 51 Bytes, die dadurch fehlten, kamen aus
 frühestens eine Minute entfernt ist und trotzdem im ersten Bild mitgeladen
 wurde.
 
+**Und eine Änderung, die niemand brauchte.** Damit `visit()` schneller wird,
+habe ich den Tests beigebracht, den Splash zu überspringen. Anlass war ein
+Test, der auf meiner Maschine in den Timeout lief — auf CI lief er durch. Die
+Abkürzung löste also ein Problem, das dort nicht existierte, und schob dafür
+das Messfenster von `performance.spec.ts` in die Nachladephase: Der Test prüft
+„eine Sekunde Ruhe", und ohne Splash war diese Sekunde keine Ruhe mehr. Wieder
+zurückgenommen.
+
 Die Lehre für den nächsten Durchgang: **Jeder Bildschirm mit Bildlauf gehört
 in mehreren Scrollständen gemessen**, **eine Korrektur, die Verdeckung
 herstellt, ist nicht durch Geometrie belegt** — dafür braucht es die gerenderte
-Farbe oder das Bild — und **eine Begründung, die auf einer Zeitannahme steht,
-muss noch einmal geprüft werden, wenn man an dieser Zeit dreht**.
+Farbe oder das Bild — , **eine Begründung, die auf einer Zeitannahme steht,
+muss noch einmal geprüft werden, wenn man an dieser Zeit dreht** — und
+**Beschleunigungen des Testlaufs sind Änderungen wie andere auch**: Sie
+verschieben Zeitfenster, und in einem davon misst ein Test.
