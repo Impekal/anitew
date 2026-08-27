@@ -9,7 +9,6 @@ import './anitew-overlay-safety.css'
 import './anitew-phase4.css'
 import './anitew-phase4-journey.css'
 import './anitew-phase4-landing.css'
-import './anitew-phase5.css'
 
 try {
   const themeDefaultSeeded = 'anitew.theme-default.v2'
@@ -36,6 +35,15 @@ const loadSignatureExperience = () => {
       await import('./anitew-living.css')
       if (pageIsLeaving) return
       await import('./anitew-core-pages.css')
+      if (pageIsLeaving) return
+      /*
+       * Der Zusammenfassungs-Bildschirm nach einer Einheit — frühestens eine
+       * Minute entfernt, also nichts fürs erste Bild. Er lag bis hierher im
+       * Kaltstart und hat dort rund 600 Bytes belegt, die woanders gefehlt
+       * haben (siehe den Kommentar zum Deck-Streifen in
+       * anitew-overlay-safety.css).
+       */
+      await import('./anitew-phase5.css')
       if (pageIsLeaving) return
       await import('./app/coreRitual.ts')
       if (pageIsLeaving) return

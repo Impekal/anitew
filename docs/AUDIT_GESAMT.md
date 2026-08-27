@@ -239,7 +239,24 @@ der Browser verwirft die Deklaration still, und übrig blieb ein Streifen, der
 nichts deckte. Auf dem Screenshot sah das nach „fast richtig" aus. Erst die
 Messung des Pseudo-Elements zeigte `rgba(0, 0, 0, 0)`.
 
+**Und dann noch einmal, eine Ebene höher.** Um das Kaltstart-Budget zu halten,
+habe ich den Deck-Streifen in ein nachgeladenes Blatt verschoben und im
+Kommentar begründet: „Bis jemand die Schublade öffnen kann, ist der Splash drei
+bis fünf Sekunden gelaufen." Im selben Durchgang habe ich `visit()` beigebracht,
+den Splash zu überspringen — und damit meine eigene Begründung ungültig
+gemacht. Der Gate auf dem Produktbranch fiel an genau dieser Stelle, an meinem
+eigenen Test.
+
+Der Streifen liegt jetzt wieder im Kaltstart. Die Regel dahinter: **Was
+Verdeckung herstellt, darf nicht von einer Zeitannahme abhängen.** Die
+Schublade ist einen Tipp entfernt; die Seiten dahinter sind zwei, und deren
+Regeln dürfen nachkommen. Die 51 Bytes, die dadurch fehlten, kamen aus
+`anitew-phase5.css` — dem Zusammenfassungs-Bildschirm nach einer Einheit, der
+frühestens eine Minute entfernt ist und trotzdem im ersten Bild mitgeladen
+wurde.
+
 Die Lehre für den nächsten Durchgang: **Jeder Bildschirm mit Bildlauf gehört
-in mehreren Scrollständen gemessen**, und **eine Korrektur, die Verdeckung
-herstellt, ist nicht durch Geometrie belegt** — dafür braucht es die
-gerenderte Farbe oder das Bild.
+in mehreren Scrollständen gemessen**, **eine Korrektur, die Verdeckung
+herstellt, ist nicht durch Geometrie belegt** — dafür braucht es die gerenderte
+Farbe oder das Bild — und **eine Begründung, die auf einer Zeitannahme steht,
+muss noch einmal geprüft werden, wenn man an dieser Zeit dreht**.
