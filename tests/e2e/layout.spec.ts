@@ -289,3 +289,42 @@ test('kein Seitwärts-Schieben, wenn man sich Zeit lässt', async ({ page }) => 
 
   expect(worst, 'die Seite lässt sich seitlich schieben').toBeLessThanOrEqual(1)
 })
+
+test('der Schließen-Knopf lässt beim Scrollen nichts durch sich hindurchlaufen', async ({
+  page,
+}) => {
+  /*
+   * Gemeldet vom Gerät: „«Dein Stand» bleibt genau auf «Menü schließen»."
+   *
+   * Der Knopf klebt oben (`position: sticky`), sein Grund war aber praktisch
+   * durchsichtig — ein Radialverlauf plus `rgb(140 207 192 / 3%)`. Alles, was
+   * daran vorbeiscrollte, lief **durch** das ✕. Nachgemessen auf einem
+   * iPhone 14 Pro: bei Scrollstand 120 px stand „Dein Stand" mitten im Knopf.
+   *
+   * Geprüft wird der deckende Streifen dahinter, und zwar über seine Farbe.
+   * Das ist kein Umweg, sondern genau die Stelle, an der die erste Korrektur
+   * scheiterte: `background: <farbe>, <farbe>` ist ungültige Schichtsyntax,
+   * der Browser verwirft die ganze Deklaration still, und übrig bleibt
+   * `rgba(0, 0, 0, 0)` — ein Streifen, der nichts deckt und den man auf einem
+   * Screenshot leicht übersieht.
+   */
+  await visit(page)
+  await expect(startButton(page)).toBeVisible()
+  await page.locator('button.hamburger').click()
+  await expect(page.locator('.drawer')).toBeVisible()
+
+  const backdrop = await page.locator('.drawer-close').evaluate((element) => {
+    const style = getComputedStyle(element, '::after')
+    return { color: style.backgroundColor, width: style.width, content: style.content }
+  })
+
+  expect(backdrop.content, 'der Streifen hinter dem Knopf fehlt ganz').not.toBe('none')
+
+  const opaque = /^rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)$/.test(backdrop.color)
+  expect(opaque, `der Streifen deckt nicht: ${backdrop.color}`).toBe(true)
+
+  // Über die volle Breite, nicht nur über den Knopf: Sonst verschwände der
+  // Text zwar hinter der Scheibe, liefe aber links und rechts daran vorbei.
+  const drawerWidth = await page.locator('.drawer').evaluate((element) => element.clientWidth)
+  expect(Number.parseFloat(backdrop.width)).toBeGreaterThanOrEqual(drawerWidth)
+})

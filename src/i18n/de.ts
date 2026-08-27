@@ -349,17 +349,34 @@ export const de = {
       knee: 'Knie',
       foot: 'Fuß',
     },
-    // G3 ist da: Der Satz sagt jetzt, wo es weitergeht, statt eine Lücke
-    // einzuräumen.
-    ownIntro: 'Fünf Orte auf einem Weg, den du blind gehen kannst. Immer dieselbe Richtung. Die Arbeit liegt nicht im Tippen, sondern im Überlegen.',
+    /*
+      Mehrere Wege, und Wege dürfen wachsen (G3).
+
+      Der Hinweis nennt beides in einem Satz, weil es dieselbe Sache ist: Wer
+      die Technik benutzt, hat mehrere Wege und längere. Was er **nicht**
+      sagt: dass ein längerer Weg längere Einheiten bedeutet. Tut er nicht —
+      ein Gang bleibt bei fünf Stationen, ein langer Weg liefert stattdessen
+      mehr verschiedene Gänge.
+    */
+    ownIntro: 'Mindestens fünf Orte auf einem Weg, den du blind gehen kannst. Immer dieselbe Richtung. Du kannst Orte anhängen und weitere Wege anlegen — ein Gang geht davon immer fünf Stationen ab, nie den ganzen Weg auf einmal.',
     ownName: 'Wie heißt der Weg?',
     ownNamePlaceholder: 'Meine Wohnung',
     ownStation: 'Station',
     ownStationPlaceholder: 'Ort',
-    ownSave: 'Weg merken',
+    ownSave: 'Änderungen merken',
+    ownCreate: 'Weg anlegen',
+    ownCancel: 'Abbrechen',
+    ownAdd: 'Weiteren Weg anlegen',
+    ownAddStation: 'Ort anhängen',
+    // „Hinten" ist keine Beiläufigkeit: Die Nummer einer Station steht in der
+    // Kennung, an der ihre Termine hängen. Von vorn zu streichen verschöbe alle
+    // dahinter.
+    ownRemoveStation: 'Letzten Ort entfernen',
     ownDiscard: 'Weg verwerfen',
     ownSaved: 'Gemerkt. Er kommt ab jetzt im Training vor.',
-    ownRule: 'Fünf Orte, alle verschieden, keiner leer — und ein Name für den Weg.',
+    ownFailed: 'Das hat nicht geklappt. Es wurde nichts verändert.',
+    ownFull: 'Acht Wege sind genug. Mehr, und man kommt in keinem mehr richtig an.',
+    ownRule: 'Mindestens fünf Orte, alle verschieden, keiner leer — und ein Name für den Weg.',
   },
   returns: {
     /*

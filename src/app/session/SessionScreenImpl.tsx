@@ -21,7 +21,9 @@ import {
   factPrompt,
   memorySubjectOf,
   memoryTargetOf,
+  isOwnPalaceId,
   ownLabelOf,
+  ownPalaceFor,
   type OwnPalace,
   palaceOf,
   personOf,
@@ -53,7 +55,7 @@ export function SessionScreen(props: {
   /** Die schon gelehrten Ziffern des Major-Systems (D5). */
   taught: readonly number[]
   /** Der selbst angelegte Palast, wenn es einen gibt (G3). */
-  own?: OwnPalace
+  own?: readonly OwnPalace[]
   onLeave: () => void
   onComplete: () => void
   /** „Noch eine Runde“ vom Abschluss aus (B7). */
@@ -107,7 +109,7 @@ function RunningSession({
   dictionary: Dictionary
   progress: SessionProgress
   taught: readonly number[]
-  own?: OwnPalace
+  own?: readonly OwnPalace[]
   onLeave: () => void
   onAgain: () => void
   onComplete: () => void
@@ -1004,17 +1006,20 @@ function Walk({
   dictionary: Dictionary
   walk: string
   language: string
-  own?: OwnPalace
+  own?: readonly OwnPalace[]
 }) {
   const t = dictionary.palace
   const palace = palaceOf(walk)
   const placements = walkFor(walk, language as Language)
+  // Der Palast dieses Gangs — bei den eingebauten Wegen bleibt es `undefined`,
+  // und die Schilder kommen wie bisher aus `i18n`.
+  const ownPalace = own === undefined ? undefined : ownPalaceFor(walk, own)
 
   return (
     <section className="encode scene walk">
       <p className="hint">{dictionary.session.encodeHints.palace}</p>
       <p className="scene-person">
-        {t.walkLead} {palaceName(palace, dictionary, own)}
+        {t.walkLead} {palaceName(palace, dictionary, ownPalace)}
       </p>
       <dl className="scene-facts">
         {placements.map((placement, index) => (
@@ -1023,7 +1028,7 @@ function Walk({
               <span className="walk-step" aria-hidden="true">
                 {index + 1}
               </span>
-              <span className="walk-station">{labelOf(placement.station, dictionary, own)}</span>
+              <span className="walk-station">{labelOf(placement.station, dictionary, ownPalace)}</span>
             </dt>
             <dd>{placement.object}</dd>
           </div>
@@ -1053,7 +1058,7 @@ function labelOf(station: string, dictionary: Dictionary, own?: OwnPalace): stri
 
 function palaceName(palace: string | undefined, dictionary: Dictionary, own?: OwnPalace): string {
   if (palace === undefined) return ''
-  if (palace === 'own') return own?.name ?? ''
+  if (isOwnPalaceId(palace)) return own?.name ?? ''
   return (dictionary.palace.names as Record<string, string>)[palace] ?? ''
 }
 
@@ -1061,14 +1066,15 @@ function palaceName(palace: string | undefined, dictionary: Dictionary, own?: Ow
 function placeOf(
   item: string,
   dictionary: Dictionary,
-  own?: OwnPalace,
+  own?: readonly OwnPalace[],
 ): { palace: string; station: string } | undefined {
   const palace = palaceOf(item)
   const station = stationOf(item)
   if (palace === undefined || station === undefined) return undefined
+  const ownPalace = own === undefined ? undefined : ownPalaceFor(item, own)
   return {
-    palace: palaceName(palace, dictionary, own),
-    station: labelOf(station, dictionary, own),
+    palace: palaceName(palace, dictionary, ownPalace),
+    station: labelOf(station, dictionary, ownPalace),
   }
 }
 

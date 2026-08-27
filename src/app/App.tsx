@@ -12,6 +12,7 @@ import {
   type DailyMissionDecision,
   namePool,
   READY_PALACES,
+  STATIONS_PER_WALK,
   type OwnPalace,
   DAILY_REMINDER_ID,
   type DimensionCounts,
@@ -32,7 +33,7 @@ import {
   profileOf,
   weakest,
   returnsOf,
-  palaceOf,
+  ownPalaceGone,
   walkPool,
   type BenchmarkRun,
   nextRunDue,
@@ -79,7 +80,7 @@ import {
   loadTrainingDays,
 } from '../data/sessions.ts'
 import { abandonRun, beginRun, loadOpenRun, loadRuns } from '../data/benchmark.ts'
-import { loadOwnPalace } from '../data/palace.ts'
+import { loadOwnPalaces } from '../data/palace.ts'
 import { loadDailyTime } from '../data/reminders.ts'
 import {
   loadLinkTaught,
@@ -294,9 +295,9 @@ export function App() {
    * weil die Datenbank beim Start eine Handbreit langsamer war als der
    * Finger. Der Planer lehrt ausdrücklich nur bei `false`.
    */
-  const [own, setOwn] = useState<OwnPalace | undefined>(undefined)
+  const [own, setOwn] = useState<readonly OwnPalace[]>([])
   const reloadOwn = useCallback(() => {
-    void loadOwnPalace()
+    void loadOwnPalaces()
       .then(setOwn)
       .catch(() => undefined)
   }, [])
@@ -479,7 +480,7 @@ export function App() {
            * ohne das „hier“ ist keine Frage. Gelöscht wird deshalb nichts: Wer
            * seinen Palast neu anlegt, hat seine Gänge wieder.
            */
-          if (moduleId === 'palace' && own === undefined && palaceOf(word) === 'own') continue
+          if (moduleId === 'palace' && ownPalaceGone(word, own)) continue
           ;(due[moduleId] ??= []).push(word)
         }
       } catch {
@@ -537,7 +538,10 @@ export function App() {
            * nie aus, und niemand läuft zweimal durch dieselbe Wohnung mit
            * denselben Dingen darin.
            */
-          palace: walkPool(seed, 30, own === undefined ? undefined : [...READY_PALACES, 'own']),
+          palace: walkPool(seed, 30, [
+            ...READY_PALACES.map((id) => ({ id, stationCount: STATIONS_PER_WALK })),
+            ...own.map((palace) => ({ id: palace.id, stationCount: palace.stations.length })),
+          ]),
           /*
            * Rückwärts-Folgen (D7): wie die Zahlen aus dem Seed erzeugt und
            * sprachfrei. Vierzig, nicht zwanzig — der Schwerpunkt kann dem
@@ -689,7 +693,7 @@ export function App() {
       streakBest: streak.best,
       taughtCount: taught.length,
       completedBenchmarks: runs.filter(isComplete).length,
-      hasOwnPalace: own !== undefined,
+      hasOwnPalace: own.length > 0,
       heldBackTotal: heldOf('working'),
       toldApartTotal: heldOf('attention'),
       detailsHeldTotal: heldOf('visual'),
@@ -890,7 +894,7 @@ export function App() {
       counts: dimensionCounts,
       deltas: coachDeltas,
       taughtDigits: taught.length,
-      hasPalace: own !== undefined,
+      hasPalace: own.length > 0,
     }
     const pages: Partial<Record<MenuIconKind, { title: string; body: ReactNode }>> = {
       ...(reached.length > 0
