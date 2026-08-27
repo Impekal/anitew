@@ -14,6 +14,7 @@
 import {
   OWN_MAX_PALACES,
   type OwnPalace,
+  type OwnStation,
   isOwnPalace,
   ownPalaceId,
 } from '../core/index.ts'
@@ -37,8 +38,37 @@ function cleaned(palace: OwnPalace): OwnPalace {
   return {
     id: palace.id,
     name: palace.name.trim(),
-    stations: palace.stations.map((label) => label.trim()),
+    stations: palace.stations.map((station) => ({ id: station.id, label: station.label.trim() })),
+    nextStation: palace.nextStation,
   }
+}
+
+/**
+ * Aus einer Liste von Schildern wird eine Liste von Orten mit Nummern.
+ *
+ * Nur für den Umstieg: Vor dieser Fassung war ein Ort seine Position im Feld.
+ * Position eins wird Nummer eins — anders wäre es ein Bruch, denn an
+ * `own~7#own3` hängen Termine.
+ */
+function stationsFromLabels(labels: readonly string[]): readonly OwnStation[] {
+  return labels.map((label, index) => ({ id: index + 1, label: label.trim() }))
+}
+
+/** Ein Palast aus einem der beiden Altformate, oder `undefined`. */
+function fromLegacy(value: unknown, id: string): OwnPalace | undefined {
+  if (typeof value !== 'object' || value === null) return undefined
+  const candidate = value as Record<string, unknown>
+  const stations = candidate['stations']
+  if (!Array.isArray(stations) || !stations.every((entry) => typeof entry === 'string')) {
+    return undefined
+  }
+  const migrated: OwnPalace = {
+    id,
+    name: typeof candidate['name'] === 'string' ? candidate['name'] : '',
+    stations: stationsFromLabels(stations as readonly string[]),
+    nextStation: stations.length + 1,
+  }
+  return isOwnPalace(migrated) ? cleaned(migrated) : undefined
 }
 
 /**
@@ -65,11 +95,40 @@ async function loadStore(): Promise<OwnPalaceStore> {
     return { palaces: stored.palaces.map(cleaned), nextOrdinal: stored.nextOrdinal }
   }
 
-  const legacy = (await db.settings.get(LEGACY_KEY))?.value
-  if (typeof legacy === 'object' && legacy !== null) {
-    const migrated = { ...(legacy as Record<string, unknown>), id: 'own' }
-    if (isOwnPalace(migrated)) return { palaces: [cleaned(migrated)], nextOrdinal: 2 }
+  /*
+   * Zwei Altformate, beide werden gelesen.
+   *
+   * `palace.own.v2` hielt die Orte als reine Schilderliste — diese Fassung gab
+   * es nur wenige Stunden. `palace.own` hält genau einen Palast ohne Kennung;
+   * so sah es aus, bevor es mehrere Wege gab. Aus beidem wird dasselbe: Orte
+   * mit Nummern, Position eins wird Nummer eins.
+   */
+  if (typeof stored === 'object' && stored !== null) {
+    const candidate = stored as Record<string, unknown>
+    const list = candidate['palaces']
+    if (Array.isArray(list)) {
+      const palaces = list
+        .map((entry) => {
+          const row = entry as Record<string, unknown>
+          const id = typeof row['id'] === 'string' ? row['id'] : 'own'
+          return fromLegacy(row, id)
+        })
+        .filter((entry): entry is OwnPalace => entry !== undefined)
+      if (palaces.length > 0) {
+        const next = candidate['nextOrdinal']
+        return {
+          palaces,
+          nextOrdinal: typeof next === 'number' && Number.isInteger(next) && next >= 1
+            ? next
+            : palaces.length + 1,
+        }
+      }
+    }
   }
+
+  const legacy = (await db.settings.get(LEGACY_KEY))?.value
+  const migrated = fromLegacy(legacy, 'own')
+  if (migrated !== undefined) return { palaces: [migrated], nextOrdinal: 2 }
   return EMPTY
 }
 
@@ -92,12 +151,17 @@ function isStore(value: unknown): value is OwnPalaceStore {
  */
 export async function createOwnPalace(
   name: string,
-  stations: readonly string[],
+  labels: readonly string[],
 ): Promise<OwnPalace | undefined> {
   const store = await loadStore()
   if (store.palaces.length >= OWN_MAX_PALACES) return undefined
 
-  const palace: OwnPalace = { id: ownPalaceId(store.nextOrdinal), name, stations }
+  const palace: OwnPalace = {
+    id: ownPalaceId(store.nextOrdinal),
+    name,
+    stations: stationsFromLabels(labels),
+    nextStation: labels.length + 1,
+  }
   if (!isOwnPalace(palace)) return undefined
 
   await writeStore({
@@ -148,6 +212,9 @@ async function writeStore(store: OwnPalaceStore): Promise<void> {
   if (first === undefined) return
   await db.settings.put({
     key: LEGACY_KEY,
-    value: { name: first.name, stations: first.stations.slice(0, 5) },
+    value: {
+      name: first.name,
+      stations: first.stations.slice(0, 5).map((station) => station.label),
+    },
   })
 }

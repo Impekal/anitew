@@ -368,10 +368,15 @@ export const de = {
     ownCancel: 'Abbrechen',
     ownAdd: 'Weiteren Weg anlegen',
     ownAddStation: 'Ort anhängen',
-    // „Hinten" ist keine Beiläufigkeit: Die Nummer einer Station steht in der
-    // Kennung, an der ihre Termine hängen. Von vorn zu streichen verschöbe alle
-    // dahinter.
-    ownRemoveStation: 'Letzten Ort entfernen',
+    /*
+      Jeder Ort lässt sich entfernen, nicht nur der letzte.
+
+      Das ging erst, seit ein Ort eine dauerhafte Nummer hat statt einer
+      Position: Wer den dritten von sechs herausnimmt, hinterlässt 1, 2, 4, 5,
+      6 — und die vier bleibt die vier. Vorher wäre aus dem vierten der dritte
+      geworden, und seine Termine hingen plötzlich am falschen Ort.
+    */
+    ownRemoveStation: 'Ort entfernen',
     ownDiscard: 'Weg verwerfen',
     ownSaved: 'Gemerkt. Er kommt ab jetzt im Training vor.',
     ownFailed: 'Das hat nicht geklappt. Es wurde nichts verändert.',

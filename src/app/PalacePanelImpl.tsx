@@ -6,6 +6,7 @@ import {
   OWN_MAX_STATIONS,
   OWN_MIN_STATIONS,
   type OwnPalace,
+  type OwnStation,
   isOwnPalace,
 } from '../core/index.ts'
 import { createOwnPalace, removeOwnPalace, saveOwnPalace } from '../data/palace.ts'
@@ -109,6 +110,17 @@ export function PalacePanel({
   )
 }
 
+/** Die Orte, mit denen das Formular startet — leer bei einem neuen Weg. */
+function freshStations(palace: OwnPalace | undefined): OwnStation[] {
+  if (palace !== undefined) return palace.stations.map((station) => ({ ...station }))
+  return Array.from({ length: OWN_MIN_STATIONS }, (_, index) => ({ id: index + 1, label: '' }))
+}
+
+/** Die nächste freie Ortsnummer. */
+function nextFor(palace: OwnPalace | undefined): number {
+  return palace?.nextStation ?? OWN_MIN_STATIONS + 1
+}
+
 /**
  * Ein Weg im Formular — bestehend oder neu.
  *
@@ -133,11 +145,13 @@ function PalaceEditor({
 }) {
   const t = dictionary.palace
   const [name, setName] = useState(palace?.name ?? '')
-  const [stations, setStations] = useState<string[]>(() =>
-    palace === undefined
-      ? Array.from({ length: OWN_MIN_STATIONS }, () => '')
-      : [...palace.stations],
-  )
+  const [stations, setStations] = useState<OwnStation[]>(() => freshStations(palace))
+  /*
+   * Der Zähler für neue Ortsnummern. Er geht nur nach vorn — auch innerhalb
+   * eines noch nicht gespeicherten Entwurfs: Wer einen Ort anhängt, wieder
+   * entfernt und erneut anhängt, bekommt eine neue Nummer, keine recycelte.
+   */
+  const [nextStation, setNextStation] = useState(() => nextFor(palace))
   const [failed, setFailed] = useState(false)
 
   /** Jede Änderung nimmt die Bestätigung wieder weg — sie gilt dem Stand, der steht. */
@@ -163,7 +177,8 @@ function PalaceEditor({
   if (palace !== loaded) {
     setLoaded(palace)
     setName(palace?.name ?? '')
-    setStations(palace === undefined ? Array.from({ length: OWN_MIN_STATIONS }, () => '') : [...palace.stations])
+    setStations(freshStations(palace))
+    setNextStation(nextFor(palace))
   }
 
   /*
@@ -172,9 +187,8 @@ function PalaceEditor({
    * Speichern greift. Die echte Kennung vergibt `createOwnPalace`, und zwar
    * aus einem Zähler, der nur nach vorn geht.
    */
-  const draft: OwnPalace = { id: palace?.id ?? 'own', name, stations }
+  const draft: OwnPalace = { id: palace?.id ?? 'own', name, stations, nextStation }
   const valid = isOwnPalace(draft)
-  const touched = name !== '' || stations.some((label) => label !== '')
 
   const save = () => {
     setFailed(false)
@@ -183,7 +197,7 @@ function PalaceEditor({
       if (ok) onSaved()
     }
     if (palace === undefined) {
-      void createOwnPalace(name, stations)
+      void createOwnPalace(name, stations.map((station) => station.label))
         .then((created) => done(created !== undefined))
         .catch(() => done(false))
         .finally(onChange)
@@ -217,62 +231,63 @@ function PalaceEditor({
         Nummern sieht, füllt sie als Liste aus.
       */}
       <ol className="own-stations">
-        {stations.map((label, index) => (
-          <li key={index}>
+        {stations.map((station, index) => (
+          <li key={station.id}>
             <span className="walk-step" aria-hidden="true">
               {index + 1}
             </span>
             <input
               type="text"
-              value={label}
+              value={station.label}
               maxLength={LABEL_MAX}
               placeholder={t.ownStationPlaceholder}
               aria-label={`${t.ownStation} ${index + 1}`}
               onChange={(event) => {
                 const next = [...stations]
-                next[index] = event.target.value
+                next[index] = { ...station, label: event.target.value }
                 setStations(next)
                 touch()
               }}
             />
+            {/*
+              Jeder Ort lässt sich entfernen, nicht nur der letzte.
+              Möglich ist das, weil die Nummer eines Ortes dauerhaft ist und
+              nicht seine Position: Wer den dritten von sechs herausnimmt,
+              hinterlässt 1, 2, 4, 5, 6 — und die vier bleibt die vier. Genau
+              deshalb rutschen die Termine der übrigen Orte nicht mit.
+            */}
+            {stations.length > OWN_MIN_STATIONS && (
+              <button
+                type="button"
+                className="own-station-drop"
+                aria-label={`${t.ownRemoveStation}: ${station.label.trim() === '' ? index + 1 : station.label}`}
+                onClick={() => {
+                  setStations(stations.filter((entry) => entry.id !== station.id))
+                  touch()
+                }}
+              >
+                ×
+              </button>
+            )}
           </li>
         ))}
       </ol>
 
-      <div className="note-actions own-station-actions">
-        {stations.length < OWN_MAX_STATIONS && (
+      {stations.length < OWN_MAX_STATIONS && (
+        <div className="note-actions own-station-actions">
           <button
             type="button"
             className="quiet"
             onClick={() => {
-              setStations([...stations, ''])
+              setStations([...stations, { id: nextStation, label: '' }])
+              setNextStation(nextStation + 1)
               touch()
             }}
           >
             {t.ownAddStation}
           </button>
-        )}
-        {/*
-          Entfernt wird nur von hinten, und nur, was über dem Mindestmaß liegt.
-          Der Grund steht in der Datenschicht: Die Nummer einer Station steht
-          in der Item-Kennung (`own~7#own3`), an der der Wiederholungsverlauf
-          hängt. Von hinten kürzen lässt die vorderen Nummern unberührt; einen
-          Ort aus der Mitte zu streichen würde alle dahinter verschieben — und
-          damit die Termine an die falschen Orte hängen.
-        */}
-        {stations.length > OWN_MIN_STATIONS && (
-          <button
-            type="button"
-            className="quiet"
-            onClick={() => {
-              setStations(stations.slice(0, -1))
-              touch()
-            }}
-          >
-            {t.ownRemoveStation}
-          </button>
-        )}
-      </div>
+        </div>
+      )}
 
       <div className="note-actions">
         <button type="button" className="quiet" disabled={!valid} onClick={save}>
@@ -307,9 +322,16 @@ function PalaceEditor({
         )}
       </div>
 
-      {/* Die Regel steht erst da, wenn sie gebraucht wird — nicht als
-          Bedienungsanleitung über einem leeren Formular (G-2). */}
-      {!valid && touched && <p className="hint">{t.ownRule}</p>}
+      {/*
+        Die Regel steht da, solange der Weg unvollständig ist — und zwar auch
+        über einem leeren Formular.
+
+        Sie erschien früher erst nach der ersten Eingabe. Das war als
+        Zurückhaltung gemeint (G-2) und wurde zur Sackgasse: Wer den Bildschirm
+        zum ersten Mal sah, fand einen ausgegrauten „Weg anlegen"-Knopf ohne
+        ein Wort dazu, warum er nicht geht.
+      */}
+      {!valid && <p className="hint own-rule">{t.ownRule}</p>}
       {failed && (
         <p className="hint" role="alert">
           {t.ownFailed}

@@ -12,7 +12,6 @@ import {
   type DailyMissionDecision,
   namePool,
   READY_PALACES,
-  STATIONS_PER_WALK,
   type OwnPalace,
   DAILY_REMINDER_ID,
   type DimensionCounts,
@@ -206,7 +205,13 @@ export function App() {
    */
   const [pageId, setPageId] = useState<MenuIconKind | undefined>(undefined)
   const [menuOpen, setMenuOpen] = useState(false)
+  /*
+   * Wo die Startseite stand, als eine Core-Seite geöffnet wurde. Beim
+   * Schließen kehrt man dorthin zurück, statt oben zu landen.
+   */
+  const startseitenScroll = useRef(0)
   const openPage = useCallback((id: MenuIconKind) => {
+    startseitenScroll.current = window.scrollY
     setMenuOpen(false)
     setPageId(id)
     window.history.pushState({ page: id }, '')
@@ -220,6 +225,34 @@ export function App() {
       window.history.back()
     }
   }, [])
+  /*
+   * Eine geöffnete Seite fängt oben an.
+   *
+   * Die Core-Seiten sind Zustand, kein Router — es gibt also keinen Browser,
+   * der beim Wechsel von sich aus nach oben scrollt. Wer die Startseite ein
+   * Stück heruntergescrollt hatte und dann eine Seite öffnete, bekam sie mit
+   * genau diesem Versatz zu sehen: Der Schließen-Knopf lag dann um die
+   * gescrollten Pixel zu hoch — auf einem iPhone im Standalone-Modus unter der
+   * Dynamic Island, also außerhalb der Safe Area und nicht mehr sicher
+   * antippbar.
+   *
+   * Das war kein neuer Fehler. Auf f1e9f6a — dem Stand, der bis eben live war
+   * — blieb das Dokument in fünf von sechs Messungen um 62 Pixel gescrollt,
+   * und der Knopf stand bei 3 statt bei 65 Pixeln. Der Test dazu
+   * (`safeArea.spec.ts`) ging nur deshalb meist durch, weil er selbst keinen
+   * definierten Ausgangszustand hatte; einmal ist er auf CI darüber gefallen
+   * (Lauf 1394), und das war zu Recht.
+   *
+   * Beim Schließen geht es dorthin zurück, wo man auf der Startseite war —
+   * sonst wäre das Beheben des einen Ärgernisses das Einführen eines anderen.
+   */
+  useEffect(() => {
+    if (pageId !== undefined) {
+      window.scrollTo(0, 0)
+      return
+    }
+    window.scrollTo(0, startseitenScroll.current)
+  }, [pageId])
   useEffect(() => {
     const onPop = () => {
       setPageId(undefined)
@@ -539,8 +572,11 @@ export function App() {
            * denselben Dingen darin.
            */
           palace: walkPool(seed, 30, [
-            ...READY_PALACES.map((id) => ({ id, stationCount: STATIONS_PER_WALK })),
-            ...own.map((palace) => ({ id: palace.id, stationCount: palace.stations.length })),
+            ...READY_PALACES.map((id) => ({ id, stationIds: [] })),
+            ...own.map((palace) => ({
+              id: palace.id,
+              stationIds: palace.stations.map((station) => station.id),
+            })),
           ]),
           /*
            * Rückwärts-Folgen (D7): wie die Zahlen aus dem Seed erzeugt und
@@ -1444,6 +1480,23 @@ export function App() {
                 <path d="M6 6l12 12M18 6L6 18" />
               </svg>
             </button>
+            {/*
+              Die Einträge scrollen in einem eigenen Kasten, der Schließen-Knopf
+              steht darüber.
+
+              Vorher scrollte die ganze Schublade und der Knopf klebte mit
+              `position: sticky` oben — und weil sein Grund durchsichtig ist,
+              lief jeder Eintrag durch das ✕ hindurch. Gemessen auf einem
+              iPhone 14 Pro: bei Scrollstand 80 „Dein Stand", bei 200
+              „Memory DNA", bei 300 „Eigene Inhalte".
+
+              Mehr Abstand hätte das nicht gelöst, sondern nur verschoben,
+              welcher Eintrag wann darunterläuft. Ein deckender Streifen dahinter
+              löste es zwar, veränderte aber das Aussehen des Knopfs. Der Kasten
+              hier löst es an der Wurzel: Sein Inhalt wird an seiner Oberkante
+              abgeschnitten und betritt die Knopffläche gar nicht erst.
+            */}
+            <div className="drawer-scroll">
             <section className="menu-group">
               <h2 className="menu-label">{dictionary.menu.yours}</h2>
               {achievementsOf(achievementInput).length > 0 && (
@@ -1518,6 +1571,7 @@ export function App() {
                 <span>{dictionary.settings.heading}</span>
               </button>
             </section>
+            </div>
           </nav>
         </div>
       )}

@@ -462,9 +462,20 @@ function enhanceDrawerAccount(): void {
         text.append(mail)
       }
       card.append(avatar, text)
+      /*
+       * Vor die erste Gruppe — und zwar in **deren** Elternknoten.
+       *
+       * `drawer.insertBefore(card, firstGroup)` ging so lange gut, wie
+       * `.menu-group` ein direktes Kind der Schublade war. Seit die Einträge in
+       * einem eigenen scrollenden Kasten liegen, ist sie ein Enkel, und
+       * `insertBefore` wirft — die Kontozeile erschien danach gar nicht mehr.
+       * Am Elternknoten der Bezugsstelle festzumachen ist gegen solche
+       * Umbauten gleichgültig.
+       */
       const firstGroup = drawer.querySelector('.menu-group')
-      if (firstGroup !== null) drawer.insertBefore(card, firstGroup)
-      else drawer.append(card)
+      const host = firstGroup?.parentElement ?? null
+      if (firstGroup !== null && host !== null) host.insertBefore(card, firstGroup)
+      else (drawer.querySelector('.drawer-scroll') ?? drawer).append(card)
     })
     .finally(() => {
       identityLookupRunning = false

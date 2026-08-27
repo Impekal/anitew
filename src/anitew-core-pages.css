@@ -57,3 +57,50 @@
   padding: 6px 0;
   min-height: 24px;
 }
+
+/*
+ * Der Palast-Bildschirm: Stationsaktionen und Speicheraktionen trennen.
+ *
+ * „Ort anhängen" und „Weg anlegen" standen in zwei `.note-actions` direkt
+ * untereinander und sahen aus wie ein Block aus zwei Knöpfen — als wäre der
+ * zweite eine Variante des ersten. Sie tun aber ganz Verschiedenes: Der eine
+ * ändert das Formular, der andere schickt es ab.
+ */
+.own-station-actions {
+  margin-bottom: 1.4rem;
+}
+
+.own-palace-entry .note-actions:not(.own-station-actions) {
+  margin-top: 1.2rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--line);
+}
+
+/* Jeder Ort trägt sein eigenes Kreuz — entfernen geht überall, nicht nur hinten. */
+.own-stations li {
+  align-items: center;
+}
+
+.own-station-drop {
+  flex: 0 0 auto;
+  width: 44px;
+  min-height: 44px;
+  margin-left: 6px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink-faint);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.own-station-drop:hover,
+.own-station-drop:focus-visible {
+  color: var(--bad);
+}
+
+/* Die Regel steht jetzt immer da, solange etwas fehlt — sie darf nicht schreien. */
+.own-rule {
+  margin-top: 0.6rem;
+}
