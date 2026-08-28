@@ -209,3 +209,85 @@ test('„Neu anfangen" steht auch in den Einstellungen — und startet die App w
   })
   expect(profile).toBeUndefined()
 })
+
+/*
+ * Gemeldet: „es passiert nichts, wenn ich auf «alles löschen» drücke".
+ *
+ * Es passierte etwas — nur außerhalb des Bildschirms. Auf einem iPhone stand
+ * der Knopf bei 820 Pixeln in einem 852 Pixel hohen Fenster; nach dem
+ * Antippen lag das Eingabefeld bei 936 und der Löschknopf bei 967. Am unteren
+ * Rand tauschte sich nur eine Zeile aus.
+ *
+ * Die beiden Tests oben waren grün, weil Playwright vor jedem Klick von sich
+ * aus scrollt — sie sind den Weg nie so gegangen wie ein Mensch. Dieser Test
+ * misst deshalb **ohne** Klick-Automatik: Er tippt den Knopf über seine
+ * Bildschirmkoordinaten an, genau wie ein Finger es täte, und prüft danach,
+ * dass der nächste Schritt im Bild steht.
+ */
+test('nach dem Antippen steht der Bestätigungsschritt im Bild, nicht darunter', async ({ page }) => {
+  await page.setViewportSize({ width: 393, height: 852 })
+  await visit(page)
+  await openPage(page, 'Einstellungen')
+
+  const reset = page.locator('.wipe-reset')
+  await expect(reset).toBeVisible()
+
+  // Antippen über Bildschirmkoordinaten — ohne Playwrights Scroll-vor-Klick.
+  const knopf = reset.getByRole('button').first()
+  const kasten = await knopf.boundingBox()
+  expect(kasten).not.toBeNull()
+  await page.mouse.click(kasten!.x + kasten!.width / 2, kasten!.y + kasten!.height / 2)
+
+  const feld = reset.locator('.wipe-confirm-input')
+  const knopfLoeschen = reset.locator('.wipe-go')
+  await expect(feld).toBeVisible()
+  await expect(knopfLoeschen).toBeVisible()
+
+  /*
+   * Das Heranholen ist eine weiche Bewegung (und eine harte, wenn jemand
+   * „weniger Bewegung" eingestellt hat). Gemessen wird deshalb der
+   * **Endzustand**, nicht der erste Frame — gemessen braucht die Bewegung
+   * hier rund 400 ms. Kommt der Schritt gar nicht ins Bild, läuft dieser
+   * Wartepunkt in die Zeitgrenze, und der Test wird rot; genau das tut er
+   * ohne die Behebung.
+   */
+  await page.waitForFunction(
+    () => {
+      const element = document.querySelector('.wipe-go')
+      if (element === null) return false
+      return element.getBoundingClientRect().bottom <= window.innerHeight
+    },
+    { timeout: 5_000 },
+  )
+
+  // Beides muss im sichtbaren Fenster liegen, nicht darunter.
+  const lage = await page.evaluate(() => {
+    const box = (auswahl: string) => {
+      const element = document.querySelector(auswahl)
+      if (element === null) return null
+      const rechteck = element.getBoundingClientRect()
+      return { oben: Math.round(rechteck.top), unten: Math.round(rechteck.bottom) }
+    }
+    return {
+      fenster: window.innerHeight,
+      feld: box('.wipe-confirm-input'),
+      knopf: box('.wipe-go'),
+      fokusImFeld: document.activeElement?.classList.contains('wipe-confirm-input') ?? false,
+    }
+  })
+
+  expect(lage.feld, 'kein Eingabefeld gefunden').not.toBeNull()
+  expect(lage.knopf, 'kein Löschknopf gefunden').not.toBeNull()
+  expect(
+    lage.feld!.unten,
+    `Eingabefeld endet bei ${lage.feld!.unten} px, Fenster ist ${lage.fenster} px hoch`,
+  ).toBeLessThanOrEqual(lage.fenster)
+  expect(
+    lage.knopf!.unten,
+    `Löschknopf endet bei ${lage.knopf!.unten} px, Fenster ist ${lage.fenster} px hoch`,
+  ).toBeLessThanOrEqual(lage.fenster)
+  expect(lage.feld!.oben, 'Eingabefeld liegt über dem oberen Rand').toBeGreaterThanOrEqual(0)
+
+  // Und der Fokus steht im Feld, damit ohne Suchen klar ist, was dran ist.
+  expect(lage.fokusImFeld, 'der Fokus steht nicht im Bestätigungsfeld').toBe(true)
+})

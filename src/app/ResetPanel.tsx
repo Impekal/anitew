@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import type { Platform } from '../core/index.ts'
 import type { Dictionary } from '../i18n/index.ts'
@@ -77,6 +77,63 @@ export function ResetPanel({
   const [wipePhrase, setWipePhrase] = useState('')
   const [busy, setBusy] = useState(false)
   const [failed, setFailed] = useState<string | undefined>(undefined)
+  const phraseField = useRef<HTMLInputElement>(null)
+  const goButton = useRef<HTMLButtonElement>(null)
+
+  /*
+   * Den Bestätigungsschritt ins Bild holen.
+   *
+   * Auf einem iPhone stand „Alles löschen" ganz unten am Rand — gemessen bei
+   * 820 Pixeln in einem 852 Pixel hohen Fenster. Nach dem Antippen erschien
+   * die Warnung gerade noch sichtbar, das Eingabefeld für das Wort aber bei
+   * 936 und der eigentliche Löschknopf bei 967: **beide außerhalb des
+   * Bildschirms**, und die Seite scrollte nicht mit. Am unteren Rand tauschte
+   * sich nur eine Zeile aus. Es sah aus, als täte der Knopf nichts — so wurde
+   * es auch gemeldet.
+   *
+   * Die beiden E2E-Tests dazu waren grün, weil Playwright vor jedem Klick von
+   * sich aus scrollt. Sie sind den Weg also nie so gegangen wie ein Mensch mit
+   * einem Telefon in der Hand.
+   *
+   * Der Schritt bleibt unbequem — das ist bei einer unwiderruflichen Löschung
+   * Absicht (PRIVACY §8). Unbequem heißt aber „man muss etwas Bewusstes tun",
+   * nicht „man muss erraten, dass es weiter unten weitergeht".
+   *
+   * Der Fokus liegt danach im Feld, damit ohne Suchen klar ist, was jetzt
+   * dran ist.
+   */
+  useEffect(() => {
+    if (!confirmWipe) return
+    const field = phraseField.current
+    if (field === null) return
+    field.scrollIntoView({
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+      block: 'center',
+    })
+    field.focus({ preventScroll: true })
+  }, [confirmWipe])
+
+  const phraseComplete = wipePhrase.trim().toUpperCase() === 'ANITEW'
+
+  /*
+   * Und derselbe Griff noch einmal für den letzten Schritt.
+   *
+   * Sobald das Wort steht, ist der Löschknopf das Einzige, was noch fehlt —
+   * er steht aber unmittelbar unter dem Eingabefeld, und auf einem Telefon
+   * liegt dort die eingeblendete Tastatur. Eine Zusage, die man nur einlösen
+   * kann, indem man die Tastatur erst wegwischt, ist dieselbe Sackgasse wie
+   * vorher, nur eine Stufe später.
+   *
+   * `block: 'end'` holt ihn an die Unterkante des sichtbaren Bereichs — das
+   * ist die Stelle, die über der Tastatur am ehesten frei bleibt.
+   */
+  useEffect(() => {
+    if (!confirmWipe || !phraseComplete) return
+    goButton.current?.scrollIntoView({
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+      block: 'end',
+    })
+  }, [confirmWipe, phraseComplete])
 
   const resetFromScratch = async () => {
     setBusy(true)
@@ -126,6 +183,7 @@ export function ResetPanel({
           <label className="hint">
             <span>{reset.type}</span>
             <input
+              ref={phraseField}
               className="wipe-confirm-input"
               type="text"
               value={wipePhrase}
@@ -137,9 +195,10 @@ export function ResetPanel({
           </label>
           <div className="backup-actions">
             <button
+              ref={goButton}
               type="button"
               className="quiet wipe-go"
-              disabled={busy || wipePhrase.trim().toUpperCase() !== 'ANITEW'}
+              disabled={busy || !phraseComplete}
               onClick={() => void resetFromScratch()}
             >
               {t.wipe}
