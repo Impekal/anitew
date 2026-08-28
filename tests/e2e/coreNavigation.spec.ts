@@ -40,6 +40,32 @@ test('kehrt per Seitenknopf und Browser-Zurück von einer Core-Seite in den Core
   await expect(page.locator('.drawer')).toBeVisible()
 })
 
+test('Browser-Vorwärts stellt genau die zuvor geöffnete Core-Seite wieder her', async ({ page }) => {
+  await visit(page)
+
+  await page.locator('button.hamburger').click()
+  await page.locator('.drawer-item', { hasText: 'Sicherung' }).click()
+  await expect(page.getByRole('heading', { name: 'Sicherung' })).toBeVisible()
+
+  // Native Browser-Geste: zurück zum Core, dann wieder vorwärts auf denselben
+  // History-Eintrag. Forward darf nicht auf der Startseite landen und auch
+  // keinen zweiten Eintrag erzeugen.
+  await page.goBack()
+  await expect(page.locator('.drawer')).toBeVisible()
+  await expect(page.locator('.app.page')).toHaveCount(0)
+
+  const lengthBeforeForward = await page.evaluate(() => window.history.length)
+  await page.goForward()
+  await expect(page.getByRole('heading', { name: 'Sicherung' })).toBeVisible()
+  await expect(page.locator('.drawer')).toBeHidden()
+  await expect.poll(() => page.evaluate(() => window.history.length)).toBe(lengthBeforeForward)
+
+  // Und Back funktioniert danach weiterhin genau einmal zurück zum Core.
+  await page.goBack()
+  await expect(page.locator('.app.page')).toHaveCount(0)
+  await expect(page.locator('.drawer')).toBeVisible()
+})
+
 test.describe('verbundenes Konto im mobilen Core', () => {
   test.use({ viewport: { width: 390, height: 844 } })
 
