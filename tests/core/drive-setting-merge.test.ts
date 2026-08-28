@@ -22,26 +22,26 @@ describe('Drive-Setting-Konflikte', () => {
 
   it('vereinigt Profilverlauf und nimmt je Dimension den reicheren Messstand', () => {
     const local = [
-      { day: '2026-08-20', counts: { names: { chances: 8, lost: 2 } } },
+      { day: '2026-08-20', counts: { faces: { chances: 8, lost: 2 } } },
       { day: '2026-08-22', counts: { words: { chances: 3, lost: 1 } } },
     ]
     const remote = [
-      { day: '2026-08-19', counts: { names: { chances: 2, lost: 1 } } },
+      { day: '2026-08-19', counts: { faces: { chances: 2, lost: 1 } } },
       {
         day: '2026-08-20',
         counts: {
-          names: { chances: 4, lost: 0 },
+          faces: { chances: 4, lost: 0 },
           words: { chances: 5, lost: 2 },
         },
       },
     ]
 
     expect(mergeDriveSettingValue('profile.history.de', local, remote)).toEqual([
-      { day: '2026-08-19', counts: { names: { chances: 2, lost: 1 } } },
+      { day: '2026-08-19', counts: { faces: { chances: 2, lost: 1 } } },
       {
         day: '2026-08-20',
         counts: {
-          names: { chances: 8, lost: 2 },
+          faces: { chances: 8, lost: 2 },
           words: { chances: 5, lost: 2 },
         },
       },
