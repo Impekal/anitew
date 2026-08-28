@@ -53,12 +53,14 @@ export function useProfile(platform: Platform): ProfileState {
 
   const save = useCallback(
     async (next: OnboardingProfile) => {
-      // Persistenz ist die Commit-Grenze des Onboardings. Auch wenn ein
-      // Browser nicht dauerhaft speichern kann, warten wir auf den Versuch,
-      // bevor die Oberfläche „fertig“ meldet; der Plattform-Layer darf dabei
-      // wie bisher auf seinen flüchtigen Fallback zurückfallen.
-      await platform.settings.write(SETTING_KEY, next).catch(() => undefined)
-      setProfile(next)
+      // Persistenz ist die Commit-Grenze. Der Web-Settings-Layer hat keinen
+      // flüchtigen Ersatzspeicher: Scheitert IndexedDB, darf die Oberfläche
+      // deshalb nicht so tun, als sei die Änderung dauerhaft übernommen.
+      const persisted = await platform.settings
+        .write(SETTING_KEY, next)
+        .then(() => true)
+        .catch(() => false)
+      if (persisted) setProfile(next)
     },
     [platform],
   )
