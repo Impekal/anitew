@@ -14,12 +14,14 @@ export interface ProfileState {
   /** Erst wenn der Speicher gelesen ist, darf das Ankommen entscheiden. */
   ready: boolean
   /**
-   * Erst speichern, dann den sichtbaren Zustand umschalten.
+   * Speichert best effort und übernimmt die Antwort immer für diese laufende
+   * App-Sitzung. Ob sie einen Neustart überlebt, wird separat durch P7 geprüft
+   * und bei fehlender Persistenz global sichtbar gesagt.
    *
-   * Das ist absichtlich ein Promise: Ein sofortiger Reload nach „Ohne Fragen
-   * anfangen“ darf nicht zwischen React-State und IndexedDB-Schreibvorgang
-   * fallen. Sonst ist der Startbildschirm schon sichtbar, obwohl „nie wieder
-   * fragen“ noch gar nicht dauerhaft auf dem Gerät liegt.
+   * Das ist absichtlich ein Promise: Auf einem normalen Gerät wartet ein
+   * sofortiger Reload nach „Direkt starten“ damit weiterhin auf den
+   * IndexedDB-Schreibversuch. Im privaten Modus darf derselbe fehlende
+   * Speicher ANITEW aber nicht im Onboarding festhalten.
    */
   save: (profile: OnboardingProfile) => Promise<void>
 }
@@ -30,7 +32,15 @@ export interface ProfileState {
  * Das `ready`-Tor ist hier kein Komfort, sondern die Bedingung: Ohne es
  * zeigte die App jedem wiederkehrenden Nutzer für einen Wimpernschlag das
  * Ankommen — der Speicher ist asynchron, der erste Render nicht. Wer schon
- * geantwortet hat (und sei es mit „nichts“), wird nie wieder gefragt.
+ * geantwortet hat (und sei es mit „nichts“), wird nie wieder gefragt, solange
+ * der Speicher verfügbar ist.
+ *
+ * Fehlt IndexedDB vollständig oder scheitert ein Schreibvorgang, bleibt das
+ * Profil für diese Sitzung trotzdem im React-State. Das ist kein behaupteter
+ * Dauererfolg: `useStoragePersists` prüft Schreiben + Rücklesen unabhängig und
+ * zeigt in genau diesem Fall die globale Warnung, dass beim Schließen nichts
+ * erhalten bleibt. So bleibt ANITEW auch im privaten Modus benutzbar, ohne
+ * stillen Datenverlust vorzutäuschen.
  */
 export function useProfile(platform: Platform): ProfileState {
   const [profile, setProfile] = useState<OnboardingProfile | undefined>(undefined)
@@ -53,14 +63,13 @@ export function useProfile(platform: Platform): ProfileState {
 
   const save = useCallback(
     async (next: OnboardingProfile) => {
-      // Persistenz ist die Commit-Grenze. Der Web-Settings-Layer hat keinen
-      // flüchtigen Ersatzspeicher: Scheitert IndexedDB, darf die Oberfläche
-      // deshalb nicht so tun, als sei die Änderung dauerhaft übernommen.
-      const persisted = await platform.settings
-        .write(SETTING_KEY, next)
-        .then(() => true)
-        .catch(() => false)
-      if (persisted) setProfile(next)
+      // Persistenz zuerst versuchen, damit ein normaler erfolgreicher Pfad
+      // die Dauerhaftigkeit vor dem sichtbaren Umschalten erreicht. Scheitert
+      // sie, ist der in-memory Fallback trotzdem nötig: P7 verspricht bewusst,
+      // dass Training auch ohne Datenbank weiterläuft und sagt dann separat,
+      // dass beim Schließen nichts erhalten bleibt.
+      await platform.settings.write(SETTING_KEY, next).catch(() => undefined)
+      setProfile(next)
     },
     [platform],
   )
