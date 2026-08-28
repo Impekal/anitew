@@ -12,6 +12,12 @@ import type { Dictionary } from '../i18n/index.ts'
 
 import { Emphasis } from './Emphasis.tsx'
 
+function reminderFailureText(): string {
+  return document.documentElement.lang.toLowerCase().startsWith('de')
+    ? 'Konnte die Erinnerung nicht vollständig ändern. Bitte noch einmal versuchen.'
+    : 'Could not fully change the reminder. Please try again.'
+}
+
 export function ReminderPanelImpl({
   platform,
   dictionary,
@@ -29,6 +35,7 @@ export function ReminderPanelImpl({
   const [permission, setPermission] = useState(platform.reminders.permission())
   const [time, setTime] = useState<string>(daily ?? suggested ?? '19:30')
   const [said, setSaid] = useState<'saved' | 'cleared' | 'failed' | undefined>(undefined)
+  const [busy, setBusy] = useState(false)
 
   const [loaded, setLoaded] = useState(daily)
   if (daily !== loaded) {
@@ -64,11 +71,14 @@ export function ReminderPanelImpl({
           <button
             type="button"
             className="quiet"
+            disabled={busy}
             onClick={() => {
+              setBusy(true)
               void platform.reminders
                 .ask()
                 .then(setPermission)
                 .catch(() => undefined)
+                .finally(() => setBusy(false))
             }}
           >
             {t.ask}
@@ -83,6 +93,7 @@ export function ReminderPanelImpl({
             <input
               type="time"
               value={time}
+              disabled={busy}
               onChange={(event) => {
                 setTime(event.target.value)
                 setSaid(undefined)
@@ -94,9 +105,10 @@ export function ReminderPanelImpl({
             <button
               type="button"
               className="quiet"
-              disabled={!isTimeOfDay(time)}
+              disabled={busy || !isTimeOfDay(time)}
               onClick={() => {
-                if (!isTimeOfDay(time)) return
+                if (!isTimeOfDay(time) || busy) return
+                setBusy(true)
                 setSaid(undefined)
                 void (async () => {
                   const stored = await saveDailyTime(time)
@@ -117,7 +129,10 @@ export function ReminderPanelImpl({
                 })()
                   .then((scheduled) => setSaid(scheduled ? 'saved' : 'failed'))
                   .catch(() => setSaid('failed'))
-                  .finally(onChange)
+                  .finally(() => {
+                    setBusy(false)
+                    onChange()
+                  })
               }}
             >
               {t.save}
@@ -126,12 +141,28 @@ export function ReminderPanelImpl({
               <button
                 type="button"
                 className="quiet"
+                disabled={busy}
                 onClick={() => {
-                  void clearDailyTime()
-                    .then(() => platform.reminders.cancel(DAILY_REMINDER_ID, true))
-                    .catch(() => undefined)
-                    .finally(onChange)
-                  setSaid('cleared')
+                  if (busy) return
+                  setBusy(true)
+                  setSaid(undefined)
+                  /*
+                   * Ausschalten ist eine kleine Transaktion über zwei Welten:
+                   * erst den realen Termin widerrufen, dann die lokale
+                   * Präferenz löschen. Scheitert der Widerruf unerwartet,
+                   * bleibt die Uhrzeit lokal sichtbar und der Nutzer kann
+                   * erneut versuchen. „Aus.“ erscheint erst, wenn beides
+                   * tatsächlich abgeschlossen ist.
+                   */
+                  void platform.reminders
+                    .cancel(DAILY_REMINDER_ID, true)
+                    .then(() => clearDailyTime())
+                    .then(() => setSaid('cleared'))
+                    .catch(() => setSaid('failed'))
+                    .finally(() => {
+                      setBusy(false)
+                      onChange()
+                    })
                 }}
               >
                 {t.off}
@@ -141,13 +172,7 @@ export function ReminderPanelImpl({
 
           {said !== undefined && (
             <p className="hint" role="status" aria-live="polite">
-              {said === 'saved' ? (
-                t.saved
-              ) : said === 'cleared' ? (
-                t.cleared
-              ) : (
-                <Emphasis text={t.whileOpen} />
-              )}
+              {said === 'saved' ? t.saved : said === 'cleared' ? t.cleared : reminderFailureText()}
             </p>
           )}
         </>
