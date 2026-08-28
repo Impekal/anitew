@@ -14,7 +14,7 @@ import {
 } from './driveSync.ts'
 import { takeDriveRedirectNotice } from './driveRedirectNotice.ts'
 
-type SyncFailureText = DriveFailure | 'remote-invalid'
+type SyncFailureText = DriveFailure | 'remote-invalid' | 'storage'
 
 interface VisibleDriveCopy {
   intro: string
@@ -26,6 +26,7 @@ interface VisibleDriveCopy {
   stop: string
   firstTime: string
   remoteInvalid: string
+  storage: string
   identity: string
   connected: string
 }
@@ -45,6 +46,8 @@ const DRIVE_DE: VisibleDriveCopy = {
   firstTime: 'Dein Ordner „Anitew“ wurde in Google Drive angelegt und der aktuelle Stand dort gespeichert.',
   remoteInvalid:
     'Im Ordner „Anitew“ liegt eine Datei, die keine gültige ANITEW-Sicherung ist. Sie wurde nicht verändert.',
+  storage:
+    'Der Abgleich selbst war erreichbar, aber ANITEW konnte den Verbindungszustand auf diesem Gerät nicht dauerhaft speichern. Die Anzeige wurde deshalb nicht umgeschaltet. Bitte versuche es noch einmal.',
   identity: 'Angemeldetes Google-Konto',
   connected: 'Google-Anmeldung abgeschlossen. Dein Konto ist jetzt verbunden.',
 }
@@ -64,6 +67,8 @@ const DRIVE_EN: VisibleDriveCopy = {
   firstTime: 'Your “Anitew” folder was created in Google Drive and the current state was stored there.',
   remoteInvalid:
     'The “Anitew” folder contains a file that is not a valid ANITEW backup. It was left untouched.',
+  storage:
+    'Sync was reachable, but ANITEW could not save the connection state permanently on this device. The display was therefore not switched. Please try again.',
   identity: 'Signed-in Google account',
   connected: 'Google sign-in completed. Your account is now connected.',
 }
@@ -82,6 +87,13 @@ function driveFailureDetail(error: unknown): string | undefined {
   if (typeof error !== 'object' || error === null || !('detail' in error)) return undefined
   const detail = (error as { detail?: unknown }).detail
   return typeof detail === 'string' && detail !== '' ? detail : undefined
+}
+
+class SyncStorageError extends Error {
+  constructor() {
+    super('sync-storage')
+    this.name = 'SyncStorageError'
+  }
 }
 
 function initials(name: string | undefined, email: string | undefined): string {
@@ -125,9 +137,9 @@ export function SyncPanelImpl({ platform, dictionary }: { platform: Platform; di
       setClientId(id)
       setChecked(true)
       setAuto(connected)
-      setLastAt(at)
-      setAccount(storedAccount)
-      setAccountName(storedAccountName)
+      setLastAt(connected ? at : undefined)
+      setAccount(connected ? storedAccount : undefined)
+      setAccountName(connected ? storedAccountName : undefined)
 
       if (announceResume && initializedRef.current && connected && !connectedRef.current) {
         setConnectionNotice(true)
@@ -187,46 +199,73 @@ export function SyncPanelImpl({ platform, dictionary }: { platform: Platform; di
     setReport(undefined)
     const now = platform.clock.now()
     void connectDriveSync(clientId, now)
-      .then((result) => {
+      .then(async (result) => {
+        /*
+         * Die UI darf „verbunden“ erst behaupten, wenn dieser Zustand auch
+         * einen Reload überlebt. `sync.on` wird zuletzt geschrieben und ist
+         * damit der Commit-Marker für die übrigen lokalen Metadaten.
+         */
+        try {
+          await platform.settings.write(SYNC_AT_SETTING, now)
+          if (result.account !== undefined) {
+            await platform.settings.write(SYNC_ACCOUNT_SETTING, result.account)
+          } else await platform.settings.remove(SYNC_ACCOUNT_SETTING)
+          if (result.accountName !== undefined) {
+            await platform.settings.write(SYNC_ACCOUNT_NAME_SETTING, result.accountName)
+          } else await platform.settings.remove(SYNC_ACCOUNT_NAME_SETTING)
+          await platform.settings.write(SYNC_ON_SETTING, true)
+        } catch {
+          // Ohne dauerhaften Commit bleibt ANITEW lokal. Die OAuth-Sitzung
+          // wird best effort wieder geschlossen, damit kein versteckter
+          // „halb verbundener“ Zustand übrig bleibt.
+          void disconnectDriveAuthorization()
+          throw new SyncStorageError()
+        }
+
         setReport(result.report)
         setAuto(true)
         setLastAt(now)
         setAccount(result.account)
         setAccountName(result.accountName)
         connectedRef.current = true
-        void platform.settings.write(SYNC_ON_SETTING, true).catch(() => undefined)
-        void platform.settings.write(SYNC_AT_SETTING, now).catch(() => undefined)
-        if (result.account !== undefined) {
-          void platform.settings.write(SYNC_ACCOUNT_SETTING, result.account).catch(() => undefined)
-        }
-        if (result.accountName !== undefined) {
-          void platform.settings.write(SYNC_ACCOUNT_NAME_SETTING, result.accountName).catch(() => undefined)
-        }
       })
       .catch((error: unknown) => {
         setFailureDetail(driveFailureDetail(error))
-        if (error instanceof SyncError) setFailure(error.reason)
+        if (error instanceof SyncStorageError) setFailure('storage')
+        else if (error instanceof SyncError) setFailure(error.reason)
         else setFailure(driveFailure(error) ?? 'drive')
       })
       .finally(() => setBusy(false))
   }
 
   const stop = () => {
-    setAuto(false)
-    setAccount(undefined)
-    setAccountName(undefined)
+    if (busy) return
+    setBusy(true)
     setReport(undefined)
     setFailure(undefined)
     setFailureDetail(undefined)
     setConnectionNotice(false)
-    connectedRef.current = false
-    setLastAt(undefined)
-    void disconnectDriveAuthorization()
-    void platform.settings.write(SYNC_ON_SETTING, false).catch(() => undefined)
-    void platform.settings.remove(SYNC_ACCOUNT_SETTING).catch(() => undefined)
-    void platform.settings.remove(SYNC_ACCOUNT_NAME_SETTING).catch(() => undefined)
-    // Im lokalen Modus wäre „Zuletzt abgeglichen“ eine irreführende Zeile.
-    void platform.settings.remove(SYNC_AT_SETTING).catch(() => undefined)
+
+    void platform.settings
+      .write(SYNC_ON_SETTING, false)
+      .then(async () => {
+        // `sync.on=false` ist die Commit-Grenze: Ab hier kann auch nach einem
+        // Reload kein stiller Drive-Abgleich mehr starten. Die reinen
+        // Anzeige-Metadaten werden danach entfernt.
+        await Promise.all([
+          platform.settings.remove(SYNC_ACCOUNT_SETTING),
+          platform.settings.remove(SYNC_ACCOUNT_NAME_SETTING),
+          platform.settings.remove(SYNC_AT_SETTING),
+        ])
+        setAuto(false)
+        setAccount(undefined)
+        setAccountName(undefined)
+        connectedRef.current = false
+        setLastAt(undefined)
+        void disconnectDriveAuthorization()
+      })
+      .catch(() => setFailure('storage'))
+      .finally(() => setBusy(false))
   }
 
   if (!checked) return null
@@ -279,7 +318,11 @@ export function SyncPanelImpl({ platform, dictionary }: { platform: Platform; di
       )}
       {failure !== undefined && (
         <p className="sync-failure">
-          {failure === 'remote-invalid' ? drive.remoteInvalid : texts.errors[failure]}
+          {failure === 'remote-invalid'
+            ? drive.remoteInvalid
+            : failure === 'storage'
+              ? drive.storage
+              : texts.errors[failure]}
           {failureDetail === undefined ? '' : ` · ${failureDetail}`}
         </p>
       )}
@@ -292,7 +335,7 @@ export function SyncPanelImpl({ platform, dictionary }: { platform: Platform; di
       {auto ? (
         <>
           <p className="sync-note">{drive.autoNote}</p>
-          <button type="button" className="quiet sync-stop" onClick={stop}>
+          <button type="button" className="quiet sync-stop" onClick={stop} disabled={busy}>
             {drive.stop}
           </button>
         </>
