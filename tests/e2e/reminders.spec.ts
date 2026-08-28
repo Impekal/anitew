@@ -108,6 +108,21 @@ async function openReminders(page: Page) {
   await openPage(page, 'Erinnerung')
 }
 
+async function storedDailyTime(page: Page): Promise<unknown> {
+  return page.evaluate(async () => {
+    const open = indexedDB.open('anitew')
+    const database: IDBDatabase = await new Promise((resolve, reject) => {
+      open.onsuccess = () => resolve(open.result)
+      open.onerror = () => reject(open.error)
+    })
+    return new Promise<unknown>((resolve, reject) => {
+      const request = database.transaction('settings').objectStore('settings').get('reminders.daily')
+      request.onsuccess = () => resolve((request.result as { value?: unknown } | undefined)?.value)
+      request.onerror = () => reject(request.error)
+    })
+  })
+}
+
 test('fragt erst auf der Erinnerungsseite nach Benachrichtigungen', async ({ page }) => {
   await withWebPush(page, { permission: 'default' })
   await openReminders(page)
@@ -216,6 +231,40 @@ test('merkt die Uhrzeit und schaltet den täglichen Servertermin ausdrücklich d
   await page.getByRole('button', { name: 'Keine Erinnerung' }).click()
   await expect(page.locator('.reminder').getByText('Aus.', { exact: true })).toBeVisible()
   await expect.poll(() => permanentCancel).toBe(true)
+  await expect.poll(() => storedDailyTime(page)).toBeUndefined()
+})
+
+test('bestätigt Aus erst nachdem der wirkliche Push-Widerruf abgeschlossen ist', async ({ page }) => {
+  await withWebPush(page, { permission: 'granted' })
+  let cancelStarted = false
+  let releaseCancel!: () => void
+  const heldCancel = new Promise<void>((resolve) => {
+    releaseCancel = resolve
+  })
+
+  await page.route('**/push/schedule', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }),
+  )
+  await page.route('**/push/cancel', async (route) => {
+    cancelStarted = true
+    await heldCancel
+    await route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' })
+  })
+
+  await openReminders(page)
+  await page.locator('.reminder input[type="time"]').fill('07:15')
+  await page.getByRole('button', { name: 'Erinnerung merken' }).click()
+  await expect(page.locator('.reminder').getByText('Gemerkt.', { exact: true })).toBeVisible()
+
+  await page.getByRole('button', { name: 'Keine Erinnerung' }).click()
+  await expect.poll(() => cancelStarted).toBe(true)
+  await expect(page.locator('.reminder').getByText('Aus.', { exact: true })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Keine Erinnerung' })).toBeDisabled()
+  expect(await storedDailyTime(page)).toBe('07:15')
+
+  releaseCancel()
+  await expect(page.locator('.reminder').getByText('Aus.', { exact: true })).toBeVisible()
+  await expect.poll(() => storedDailyTime(page)).toBeUndefined()
 })
 
 test('macht bei Serverausfall die alte Push-Adresse lokal ungültig', async ({ page }) => {
