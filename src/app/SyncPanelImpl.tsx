@@ -250,19 +250,21 @@ export function SyncPanelImpl({ platform, dictionary }: { platform: Platform; di
       .write(SYNC_ON_SETTING, false)
       .then(async () => {
         // `sync.on=false` ist die Commit-Grenze: Ab hier kann auch nach einem
-        // Reload kein stiller Drive-Abgleich mehr starten. Die reinen
-        // Anzeige-Metadaten werden danach entfernt.
-        await Promise.all([
-          platform.settings.remove(SYNC_ACCOUNT_SETTING),
-          platform.settings.remove(SYNC_ACCOUNT_NAME_SETTING),
-          platform.settings.remove(SYNC_AT_SETTING),
-        ])
+        // Reload kein stiller Drive-Abgleich mehr starten. Deshalb folgt die
+        // Oberfläche genau diesem dauerhaften Zustand sofort. Das Entfernen
+        // der reinen Anzeige-Metadaten ist danach nur noch Aufräumarbeit und
+        // darf ein erfolgreiches Trennen nicht wieder als Fehler darstellen.
         setAuto(false)
         setAccount(undefined)
         setAccountName(undefined)
         connectedRef.current = false
         setLastAt(undefined)
         void disconnectDriveAuthorization()
+        await Promise.allSettled([
+          platform.settings.remove(SYNC_ACCOUNT_SETTING),
+          platform.settings.remove(SYNC_ACCOUNT_NAME_SETTING),
+          platform.settings.remove(SYNC_AT_SETTING),
+        ])
       })
       .catch(() => setFailure('storage'))
       .finally(() => setBusy(false))
