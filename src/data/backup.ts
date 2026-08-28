@@ -14,6 +14,7 @@ import {
   type BackupReading,
   type BackupTables,
   eventKey,
+  isPortableSettingKey,
   keepItemState,
   keepSession,
   makeBackup,
@@ -24,15 +25,24 @@ import {
 
 import { db } from './db.ts'
 
-/** Liest die ganze Datenbank in eine Datei ein. */
+/** Liest die portable Datenbank in eine Datei ein. */
 export async function exportBackup(now: number, app: string): Promise<BackupFile> {
-  const [settings, sessions, events, itemStates, benchmarks] = await Promise.all([
+  const [allSettings, sessions, events, itemStates, benchmarks] = await Promise.all([
     db.settings.toArray(),
     db.sessions.toArray(),
     db.events.toArray(),
     db.itemStates.toArray(),
     db.benchmarks.toArray(),
   ])
+
+  /*
+   * Datenschutzgrenze (F-01): Secrets und gerätegebundener Sync-Zustand
+   * gehören weder in eine manuelle Datei noch in den Drive-Abgleich, der
+   * dasselbe Backupformat benutzt. Die Regel lebt im browserfreien Core und
+   * wird beim Import ein zweites Mal angewendet, damit auch ältere Dateien
+   * solche Werte nicht zurückbringen können.
+   */
+  const settings = allSettings.filter((setting) => isPortableSettingKey(setting.key))
 
   /*
    * Die laufende Nummer der Ereignisse fällt weg.
@@ -95,6 +105,12 @@ export async function importBackup(file: BackupFile): Promise<ImportReport> {
        * ob etwas angekommen ist.
        */
       for (const setting of file.tables.settings) {
+        // Alte ANITEW-Sicherungen konnten gerätegebundene Zeilen enthalten.
+        // Sie werden bewusst verworfen — genau wie es die Datenschutzerklärung
+        // verspricht. Vorhandene lokale Secrets/Sync-Metadaten bleiben dabei
+        // unberührt.
+        if (!isPortableSettingKey(setting.key)) continue
+
         /*
          * Der Memory-Graph (D-036) ist die eine Einstellung, die **keine**
          * Vorliebe ist, sondern Geschichte: „Datei gewinnt“ hieße hier,

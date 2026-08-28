@@ -79,7 +79,7 @@ test('trägt die Trainingshistorie auf ein zweites Gerät', async ({ browser }, 
   await second.close()
 })
 
-test('exportiert weder BYOK-Schlüssel noch Google-Identität (F-01, Runde 2)', async ({
+test('exportiert weder BYOK-Schlüssel noch gerätegebundenen Drive-Zustand (F-01, Runde 2)', async ({
   page,
 }, testInfo) => {
   await visit(page)
@@ -103,8 +103,13 @@ test('exportiert weder BYOK-Schlüssel noch Google-Identität (F-01, Runde 2)', 
       })
     await put({ key: 'coach.key.gemini', value: 'AIza-geheim-e2e' })
     await put({ key: 'coach.key', value: 'sk-legacy-e2e' })
+    await put({ key: 'sync.on', value: true })
+    await put({ key: 'sync.lastAt', value: 123456789 })
     await put({ key: 'sync.account', value: 'mensch@example.com' })
     await put({ key: 'sync.accountName', value: 'Mensch Beispiel' })
+    await put({ key: 'sync.clientId', value: 'lokale-client-id' })
+    await put({ key: 'coach.provider', value: 'gemini' })
+    await put({ key: 'language', value: 'en' })
   })
 
   await openBackupPanel(page)
@@ -120,12 +125,64 @@ test('exportiert weder BYOK-Schlüssel noch Google-Identität (F-01, Runde 2)', 
   expect(content).not.toContain('sk-legacy-e2e')
   expect(content).not.toContain('mensch@example.com')
   expect(content).not.toContain('Mensch Beispiel')
-  const parsed = JSON.parse(content) as { tables: { settings: { key: string }[] } }
+  expect(content).not.toContain('lokale-client-id')
+  const parsed = JSON.parse(content) as { tables: { settings: { key: string; value: unknown }[] } }
   const keys = parsed.tables.settings.map((setting) => setting.key)
-  expect(keys).not.toContain('coach.key.gemini')
-  expect(keys).not.toContain('coach.key')
-  expect(keys).not.toContain('sync.account')
-  expect(keys).not.toContain('sync.accountName')
+  expect(keys.some((key) => key.startsWith('coach.key'))).toBe(false)
+  expect(keys.some((key) => key.startsWith('sync.'))).toBe(false)
+  expect(parsed.tables.settings).toContainEqual({ key: 'coach.provider', value: 'gemini' })
+  expect(parsed.tables.settings).toContainEqual({ key: 'language', value: 'en' })
+})
+
+test('verwirft gerätegebundene Werte beim Import einer älteren Sicherung', async ({
+  page,
+}, testInfo) => {
+  await visit(page)
+  await openBackupPanel(page)
+
+  // Zuerst eine garantiert gültige Sicherung erzeugen und so verändern, wie
+  // ältere ANITEW-Fassungen sie früher tatsächlich erzeugen konnten.
+  const [download] = await Promise.all([
+    page.waitForEvent('download'),
+    page.getByRole('button', { name: 'Sicherung speichern' }).click(),
+  ])
+  const source = fixturePath(testInfo, 'sicherung-alt-basis.json')
+  await download.saveAs(source)
+  const legacy = JSON.parse(await readFile(source, 'utf8')) as {
+    tables: { settings: { key: string; value: unknown }[] }
+  }
+  legacy.tables.settings.push(
+    { key: 'coach.key.gemini', value: 'remote-secret-darf-nicht-rein' },
+    { key: 'sync.on', value: true },
+    { key: 'sync.account', value: 'remote@example.com' },
+    { key: 'sync.clientId', value: 'remote-client-id' },
+  )
+  const legacyFile = fixturePath(testInfo, 'sicherung-alt-mit-lokalen-werten.json')
+  await writeFile(legacyFile, JSON.stringify(legacy), 'utf8')
+
+  await page.locator('input[type=file]').setInputFiles(legacyFile)
+  await expect(page.getByText(/Eingelesen:/)).toBeVisible({ timeout: 30_000 })
+
+  const forbidden = await page.evaluate(async () => {
+    const open = indexedDB.open('anitew')
+    const database: IDBDatabase = await new Promise((resolve, reject) => {
+      open.onsuccess = () => resolve(open.result)
+      open.onerror = () => reject(open.error)
+    })
+    const get = (key: string) =>
+      new Promise<unknown>((resolve, reject) => {
+        const request = database.transaction('settings').objectStore('settings').get(key)
+        request.onsuccess = () => resolve(request.result)
+        request.onerror = () => reject(request.error)
+      })
+    return Promise.all([
+      get('coach.key.gemini'),
+      get('sync.on'),
+      get('sync.account'),
+      get('sync.clientId'),
+    ])
+  })
+  expect(forbidden).toEqual([undefined, undefined, undefined, undefined])
 })
 
 test('sagt bei einer fremden Datei, was los ist — und schimpft nicht', async ({
