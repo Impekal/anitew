@@ -205,6 +205,48 @@ ist eine eigene Aufgabe und nichts, was vor dem Piloten begonnen werden sollte.
 
 ---
 
+### A-14 — Die ersten fünf Sekunden blockieren den Hauptthread mehrfach
+
+Gefunden am 28.08. durch einen roten Lauf des Leerlauf-Tests, der seit Runde 5
+meldet, *welche* Aufgabe ihn umgeworfen hat statt nur *dass* eine da war.
+
+Gemessen auf dieser Maschine, ohne jede Drosselung, über vierzehn Sekunden:
+
+| Zeitpunkt | Dauer |
+| --- | --- |
+| 0,7 s | 131 ms |
+| 1,3 s | 220 ms |
+| 1,6 s | 141 ms |
+| 1,8 s | **610 ms** |
+| 3,7 s | 301 ms |
+| 4,0 s | 308 ms |
+| 5,2 s | 195 ms |
+| 5,4 s | 194 ms |
+| ab 5,7 s | nichts mehr, über acht weitere Sekunden |
+
+Auf einer viermal langsameren Maschine werden daraus sechzehn Blockaden.
+
+**Was das bedeutet.** Die App ist früh *sichtbar* — der Startknopf steht nach
+unter einer Sekunde, und das Kaltstart-Budget wacht darüber. Sie ist in den
+ersten Sekunden aber nicht durchgehend *flüssig*: Wer in eine 610-ms-Blockade
+hineintippt, wartet. Auf einem Telefon dauern diese Aufgaben ein Vielfaches.
+
+**Warum es hier nicht behoben wird.** Die Ursache steckt in mehreren Schichten
+gleichzeitig — dem verzögerten Nachladen von fünf Stilblättern und vier
+Skripten, dem Anwenden dieser Stile auf eine große Seite, und den
+Eintrittsanimationen nach dem Splash. Das sauber zu entflechten ist eine eigene
+Runde mit eigenen Messungen, keine Beifang-Änderung in einem Fehlerzweig.
+
+**Was stattdessen geschehen ist.** Der Leerlauf-Test misst jetzt erst nach
+nachweislicher Ruhe (siehe `tests/e2e/performance.spec.ts`). Er prüft damit
+weiterhin genau das, wofür er da ist — eine **dauerhafte** JS-Schleife im
+Hauptthread —, und wird nicht mehr zufällig von der Startlast umgeworfen. Ein
+Tor, das ohne Ursache rot wird, bringt irgendwann jemanden dazu, es zu
+ignorieren; das ist teurer als der Fehler, den es finden soll.
+
+Diese Startlast ist damit **nicht behoben, sondern benannt**. Sie gehört als
+eigener Punkt in die nächste Runde.
+
 ## Ohne Befund
 
 - **Sprachparität**: 539 Schlüssel in DE, 539 in EN, keine abweichenden

@@ -48,36 +48,67 @@ test('hält den Hauptthread frei — keine lange Aufgabe im Leerlauf', async ({ 
   /*
    * Der Hintergrund bewegt sich in CSS (D-011/G-8), nicht in JavaScript. Wäre
    * das falsch, liefe im Leerlauf eine Schleife im Hauptthread und die Uhr der
-   * Einheit stockte. Geprüft wird deshalb, dass in einer Sekunde Ruhe **keine**
-   * lange Aufgabe (über 50 ms am Stück) anfällt.
+   * Einheit stockte. Genau das — eine **dauerhafte** Schleife — soll dieser
+   * Test fangen.
    *
-   * Der Schwellwert ist null und bleibt null. Was hier hinzukommt, ist der
-   * **Anfang** des Messfensters.
+   * Gemessen hat er das bisher zu einem Zeitpunkt, an dem die App noch gar
+   * nicht im Leerlauf war. Über vierzehn Sekunden beobachtet (ungedrosselt):
    *
-   * Vorher begann die Messung, sobald der Startknopf stand — und wo dieser
-   * Moment liegt, entscheidet allein die Maschine: Der Splash läuft nach der
-   * Uhr, die neun nachgeladenen Stücke laufen nach Gerät und Netz. Auf einem
-   * schnellen Rechner war die Startarbeit längst vorbei, auf einem langsamen
-   * ragte sie ins Fenster. Derselbe Baum lief so am selben Tag zweimal grün
-   * und einmal rot (Läufe 1391/1392 gegen 1393), ohne dass sich an der App
-   * etwas geändert hätte.
+   *   0,7–5,6 s   sieben bis acht lange Aufgaben, bis zu 610 ms
+   *   ab 5,7 s    nichts mehr, über acht weitere Sekunden
    *
-   * Ein Test, der eine **Dauereigenschaft** behauptet, darf seinen Messpunkt
-   * nicht dem Zufall überlassen. Er wartet jetzt auf die Marke, die das Ende
-   * der nachgelagerten Startarbeit anzeigt (siehe `main.tsx`), und misst
-   * danach. Das ist kein weicherer Test — es ist derselbe Test an einer
-   * definierten Stelle.
+   * Das Fenster ging aber auf, sobald der Startknopf stand — also mitten in
+   * der ersten Spanne. Ob es eine der Startblockaden erwischte, entschied die
+   * Geschwindigkeit der Maschine. Derselbe Baum lief so am selben Tag zweimal
+   * grün und einmal rot, mit „100 ms bei +65 ms" als Befund.
    *
-   * Und wenn er doch rot wird, soll er etwas sagen: Er meldet jede lange
-   * Aufgabe mit Versatz im Fenster und Dauer, nicht bloß eine Anzahl. „1"
-   * war beim letzten Mal nicht diagnostizierbar.
+   * Diese Startlast ist **echt** und steht als eigener Punkt auf der Liste
+   * (siehe docs/AUDIT_GESAMT.md). Sie hier zufällig mitzumessen hat sie nicht
+   * behoben, sondern nur das Tor unzuverlässig gemacht — und ein Tor, das
+   * ohne Ursache rot wird, bringt irgendwann jemanden dazu, es zu ignorieren.
+   *
+   * Also: erst auf **echte** Ruhe warten, dann die Sekunde messen. Der
+   * Wartepunkt ist dabei selbst die schärfere Prüfung — eine dauerhafte
+   * Schleife im Hauptthread wird nie ruhig, also läuft er in die Zeitgrenze
+   * und der Test wird rot. Der Schwellwert danach bleibt null.
    */
+  await page.addInitScript(() => {
+    const zustand = { letztesEnde: 0 }
+    ;(window as unknown as { __anitewLast: { letztesEnde: number } }).__anitewLast = zustand
+    try {
+      const beobachter = new PerformanceObserver((liste) => {
+        for (const eintrag of liste.getEntries()) {
+          zustand.letztesEnde = Math.max(zustand.letztesEnde, eintrag.startTime + eintrag.duration)
+        }
+      })
+      beobachter.observe({ entryTypes: ['longtask'] })
+    } catch {
+      // Ohne die API bleibt `letztesEnde` bei 0 — der Test überspringt sich unten.
+    }
+  })
+
   await visit(page)
   await expect(startButton(page)).toBeVisible()
 
+  // Erst die nachgelagerte Startarbeit abwarten (siehe `main.tsx`) …
   await page.waitForFunction(
     () => performance.getEntriesByName('anitew:deferred-ready').length > 0,
     { timeout: 30_000 },
+  )
+
+  /*
+   * … dann die Ruhe. Anderthalb Sekunden ohne lange Aufgabe: lang genug, dass
+   * die Startlast (deren letzte Blockade bei 5,6 s endete) sicher vorbei ist,
+   * kurz genug, dass eine echte Dauerschleife — die alle paar Dutzend
+   * Millisekunden zuschlägt — diese Bedingung nie erfüllt.
+   */
+  await page.waitForFunction(
+    () => {
+      const zustand = (window as unknown as { __anitewLast?: { letztesEnde: number } }).__anitewLast
+      if (zustand === undefined) return true
+      return performance.now() - zustand.letztesEnde > 1500
+    },
+    { timeout: 25_000 },
   )
 
   const longTasks = await page.evaluate(async () => {
@@ -96,8 +127,6 @@ test('hält den Hauptthread frei — keine lange Aufgabe im Leerlauf', async ({ 
         })
         observer.observe({ entryTypes: ['longtask'] })
       } catch {
-        // Kennt der Browser keine Longtask-API, gilt der Test als bestanden —
-        // er kann dann schlicht nichts behaupten.
         resolve(null)
         return
       }
