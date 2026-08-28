@@ -35,6 +35,41 @@ test('führt die Tastatur zum Startknopf und zeigt den Fokus', async ({ page }) 
   expect(outlineWidth, 'kein sichtbarer Fokusring').not.toBe('0px')
 })
 
+test('hält den Fokus im offenen Menü und gibt ihn danach zurück', async ({ page }) => {
+  await visit(page)
+  const menu = page.locator('.hamburger')
+  await expect(menu).toHaveAttribute('aria-haspopup', 'dialog')
+
+  await menu.focus()
+  await page.keyboard.press('Enter')
+
+  const dialog = page.locator('.drawer-veil[role="dialog"]')
+  await expect(dialog).toBeVisible()
+  await expect(dialog).toHaveAttribute('aria-modal', 'true')
+  await expect(page.locator('.drawer-close')).toBeFocused()
+
+  expect(
+    await page.evaluate(() => {
+      const drawer = document.querySelector('.drawer')
+      const start = document.querySelector('.challenge')
+      return drawer !== null && start !== null && !drawer.contains(start) && start.closest('[inert]') !== null
+    }),
+    'der Hintergrund blieb trotz modalem Drawer fokussierbar',
+  ).toBe(true)
+
+  for (let step = 0; step < 16; step++) {
+    await page.keyboard.press('Tab')
+    expect(
+      await page.evaluate(() => document.querySelector('.drawer')?.contains(document.activeElement) === true),
+      `Tab ${step + 1} hat den Fokus aus dem Drawer verloren`,
+    ).toBe(true)
+  }
+
+  await page.keyboard.press('Escape')
+  await expect(dialog).toHaveCount(0)
+  await expect(menu).toBeFocused()
+})
+
 test('benennt jedes Bild oder blendet es aus', async ({ page }) => {
   await visit(page)
   await expect(startButton(page)).toBeVisible()

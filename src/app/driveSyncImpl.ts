@@ -1,5 +1,6 @@
 import { type SyncReport, syncOnce } from '../core/index.ts'
 import { exportBackup, importBackup } from '../data/backup.ts'
+import { prepareDriveBackupForImport } from '../data/driveSyncSettings.ts'
 
 function needsInteractiveAuthorization(error: unknown): boolean {
   if (typeof error !== 'object' || error === null) return false
@@ -27,7 +28,8 @@ async function syncWithToken(token: string, now: number): Promise<SyncReport> {
     upload: (file) => uploadDriveBackup(token, file),
     exportLocal: () => exportBackup(now, __ANITEW_BUILD__.commit),
     importRemote: async (file) => {
-      const report = await importBackup(file)
+      const prepared = await prepareDriveBackupForImport(file)
+      const report = await importBackup(prepared)
       const added = Object.values(report.added).reduce((sum, count) => sum + count, 0)
       return { addedTotal: added + report.replaced }
     },
