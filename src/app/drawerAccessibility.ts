@@ -108,14 +108,19 @@ export function installDrawerAccessibility(): () => void {
 
   const sync = () => {
     const drawer = document.querySelector<HTMLElement>('.drawer')
-    const veil = drawer?.closest<HTMLElement>('.drawer-veil')
 
     const hamburger = document.querySelector<HTMLElement>('.hamburger')
     if (hamburger !== null && hamburger.getAttribute('aria-haspopup') !== 'dialog') {
       hamburger.setAttribute('aria-haspopup', 'dialog')
     }
 
-    if (drawer === undefined || drawer === null || veil === null) {
+    if (drawer === null) {
+      if (activeDrawer !== undefined) restore()
+      return
+    }
+
+    const veil = drawer.closest<HTMLElement>('.drawer-veil')
+    if (veil === null) {
       if (activeDrawer !== undefined) restore()
       return
     }
