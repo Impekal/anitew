@@ -17,6 +17,14 @@ try {
     if (window.localStorage.getItem(theme) === null) window.localStorage.setItem(theme, 'dark')
     window.localStorage.setItem(themeDefaultSeeded, '1')
   }
+
+  // Das Theme gehört zum ersten Paint und nicht in eine 20-KB-Refinement-
+  // Schicht, die erst nach dem Start geladen wird. So gibt es beim Wiederstart
+  // keinen dunklen Blitz, bevor eine gespeicherte helle/System-Darstellung
+  // angewandt wird.
+  const storedTheme = window.localStorage.getItem(theme)
+  document.documentElement.dataset.anitewTheme =
+    storedTheme === 'light' || storedTheme === 'dark' ? storedTheme : 'system'
 } catch {
   // Darstellung ist Komfort. Geblocktes localStorage darf den Start nie stoppen.
 }
@@ -25,6 +33,41 @@ let signatureTimer: number | undefined
 let signatureRunning = false
 let signatureReady = false
 let pageIsLeaving = false
+let refinementLoad: Promise<unknown> | undefined
+
+function loadExperienceRefinement(): Promise<unknown> {
+  refinementLoad ??= import('./app/experienceRefinement.ts').catch(() => undefined)
+  return refinementLoad
+}
+
+function refinementIsVisible(): boolean {
+  return document.querySelector('.onboarding, .drawer, .first-run-guide') !== null
+}
+
+/*
+ * A-14: `experienceRefinement` ist kein Startseiten-Kern. Es baut das
+ * Onboarding aus, verfeinert den Core und beobachtet danach DOM-Aenderungen.
+ * Auf jedem normalen Wiederstart nach 750 ms rund 21 KB CSS + 13 KB JS zu
+ * parsen und einen globalen Observer anzuschalten, obwohl keines dieser
+ * Elemente sichtbar ist, erzeugt Arbeit ohne Nutzerwert.
+ *
+ * Auf einem echten Erstbesuch bleibt das Verhalten gleich: Wenn das
+ * Onboarding nach der Ruhephase noch sichtbar ist, wird die Schicht geladen.
+ * Wer vorher schon mit Tastatur oder Finger interagiert, laedt sie bereits bei
+ * der ersten Absicht. Dasselbe gilt fuer den Core. So ist nichts entfernt,
+ * nur aus dem unbeteiligten Startpfad genommen.
+ */
+function prepareRefinementForInteraction(event: Event): void {
+  const target = event.target
+  if (!(target instanceof Element)) return
+  if (
+    target.closest('.hamburger, .onboarding button, .first-run-guide button') !== null
+  ) {
+    void loadExperienceRefinement()
+  }
+}
+document.addEventListener('pointerdown', prepareRefinementForInteraction, true)
+document.addEventListener('focusin', prepareRefinementForInteraction, true)
 
 const deferredLoads: Array<() => Promise<unknown>> = [
   () => import('./anitew-wow.css'),
@@ -41,7 +84,6 @@ const deferredLoads: Array<() => Promise<unknown>> = [
   () => import('./anitew-phase5.css'),
   () => import('./app/coreRitual.ts'),
   () => import('./app/mobileCoreLayout.ts'),
-  () => import('./app/experienceRefinement.ts'),
   () => import('./app/driveRedirectFeedback.ts'),
 ]
 
@@ -56,11 +98,19 @@ async function runSignatureExperience(): Promise<void> {
       await load().catch(() => undefined)
     }
     if (pageIsLeaving) return
+
+    // Fresh onboarding / bereits geoeffneter Core: hier ist die Schicht
+    // sichtbar relevant. Auf einem normalen Startbildschirm bleibt sie bis
+    // zur ersten Core-Interaktion komplett aus dem Hauptthread.
+    if (refinementIsVisible()) await loadExperienceRefinement()
+    if (pageIsLeaving) return
+
     signatureReady = true
     /*
      * Ende der nachgelagerten Startarbeit — als Messpunkt, nicht als
-     * Testhilfe. Die Marke bedeutet: alle Stufen wurden versucht; ein
-     * einzelner optionaler Chunkfehler macht den Rest der App nicht kaputt.
+     * Testhilfe. Die Marke bedeutet: alle fuer diesen Bildschirm relevanten
+     * Stufen wurden versucht; ein optionaler Chunkfehler macht den Rest der
+     * App nicht kaputt.
      */
     try {
       performance.mark?.('anitew:deferred-ready')
