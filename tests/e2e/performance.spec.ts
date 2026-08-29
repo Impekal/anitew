@@ -44,110 +44,110 @@ test('lädt beim zweiten Mal aus dem Cache und bleibt bedienbar (offline)', asyn
   }
 })
 
-test('hält den Hauptthread frei — keine lange Aufgabe im Leerlauf', async ({ page }) => {
+test('hält den Hauptthread frei — kein Dauerlauf von JavaScript', async ({ page }) => {
   /*
-   * Der Hintergrund bewegt sich in CSS (D-011/G-8), nicht in JavaScript. Wäre
-   * das falsch, liefe im Leerlauf eine Schleife im Hauptthread und die Uhr der
-   * Einheit stockte. Genau das — eine **dauerhafte** Schleife — soll dieser
-   * Test fangen.
+   * Die Zusage, um die es geht: **Der Hintergrund bewegt sich in CSS
+   * (D-011/G-8), nicht in JavaScript.** Liefe er in JavaScript, liefe eine
+   * Schleife im Hauptthread — dauerhaft — und die Uhr der Einheit stockte.
    *
-   * Gemessen hat er das bisher zu einem Zeitpunkt, an dem die App noch gar
-   * nicht im Leerlauf war. Über vierzehn Sekunden beobachtet (ungedrosselt):
+   * Dieser Test hat an einem Tag dreimal das Tor umgeworfen, und jedes Mal
+   * habe ich die Messung nachgezogen statt zu fragen, **was** da blockiert.
+   * Mit `long-animation-frame`, die das verursachende Skript nennt, sind es
+   * zwei Dinge, die vorher als eines galten:
    *
-   *   0,7–5,6 s   sieben bis acht lange Aufgaben, bis zu 610 ms
-   *   ab 5,7 s    nichts mehr, über acht weitere Sekunden
+   * 1. Die dekorativen CSS-Animationen. Bei vierfach gedrosselter CPU alle
+   *    ~135 ms ein langer Frame, dauerhaft — aber **ohne ein einziges
+   *    Skript** und mit blockierender Dauer **null**. Sie halten niemanden
+   *    auf. Das ist Gestaltung, kein Fehler.
+   * 2. Ein grosser React-Render rund 3,5 Sekunden nach dem Start, 55 bis
+   *    305 ms, ausgelöst vom Nachladen der Daten aus IndexedDB. Einmalig,
+   *    aber gross. Er steht als B-09 im Auditbericht und ist offen.
    *
-   * Das Fenster ging aber auf, sobald der Startknopf stand — also mitten in
-   * der ersten Spanne. Ob es eine der Startblockaden erwischte, entschied die
-   * Geschwindigkeit der Maschine. Derselbe Baum lief so am selben Tag zweimal
-   * grün und einmal rot, mit „100 ms bei +65 ms" als Befund.
+   * Die Longtask-API kann beides nicht auseinanderhalten — sie meldet „lange
+   * Aufgabe" und verschweigt die Herkunft. Deshalb wurde der Test zufällig
+   * rot, je nachdem, wo sein Fenster hinfiel.
    *
-   * Diese Startlast ist **echt** und steht als eigener Punkt auf der Liste
-   * (siehe docs/AUDIT_GESAMT.md). Sie hier zufällig mitzumessen hat sie nicht
-   * behoben, sondern nur das Tor unzuverlässig gemacht — und ein Tor, das
-   * ohne Ursache rot wird, bringt irgendwann jemanden dazu, es zu ignorieren.
+   * **Die Prüfung ist jetzt der Wartepunkt selbst**, und sie kommt ohne eine
+   * einzige erfundene Zahl aus: Es wird gewartet, bis für drei Sekunden am
+   * Stück **kein** skriptverursachter langer Frame mehr auftritt. Ein
+   * einmaliger Render — und sei er noch so gross — geht vorbei, und die Ruhe
+   * stellt sich ein. Eine **Dauerschleife** wird nie ruhig, egal wie lange man
+   * wartet; der Wartepunkt läuft dann in die Zeitgrenze, und der Test wird rot
+   * und nennt die Verursacher beim Namen.
    *
-   * Also: erst auf **echte** Ruhe warten, dann die Sekunde messen. Der
-   * Wartepunkt ist dabei selbst die schärfere Prüfung — eine dauerhafte
-   * Schleife im Hauptthread wird nie ruhig, also läuft er in die Zeitgrenze
-   * und der Test wird rot. Der Schwellwert danach bleibt null.
+   * Das ist keine weichere Schranke als vorher, sondern eine andere Frage —
+   * und die richtige: nicht „war irgendetwas mal langsam", sondern „hört es
+   * auf".
    */
   await page.addInitScript(() => {
-    const zustand = { letztesEnde: 0 }
-    ;(window as unknown as { __anitewLast: { letztesEnde: number } }).__anitewLast = zustand
+    const zustand: { letztes: number; frames: { versatz: number; dauer: number; wer: string }[] } = {
+      letztes: 0,
+      frames: [],
+    }
+    ;(window as unknown as { __anitewLoaf?: typeof zustand }).__anitewLoaf = zustand
     try {
       const beobachter = new PerformanceObserver((liste) => {
         for (const eintrag of liste.getEntries()) {
-          zustand.letztesEnde = Math.max(zustand.letztesEnde, eintrag.startTime + eintrag.duration)
+          const frame = eintrag as PerformanceEntry & {
+            duration: number
+            scripts?: { sourceURL?: string; name?: string; sourceFunctionName?: string; invoker?: string }[]
+          }
+          const skripte = frame.scripts ?? []
+          if (skripte.length === 0) continue
+          zustand.letztes = Math.max(zustand.letztes, frame.startTime + frame.duration)
+          zustand.frames.push({
+            versatz: Math.round(frame.startTime),
+            dauer: Math.round(frame.duration),
+            wer: skripte
+              .map((x) => `${(x.sourceURL ?? x.name ?? '?').split('/').pop()}·${x.sourceFunctionName || x.invoker || '?'}`)
+              .join(', '),
+          })
         }
       })
-      beobachter.observe({ entryTypes: ['longtask'] })
+      beobachter.observe({ type: 'long-animation-frame' })
     } catch {
-      // Ohne die API bleibt `letztesEnde` bei 0 — der Test überspringt sich unten.
+      // Kennt der Browser die API nicht, bleibt die Liste leer — siehe unten.
     }
   })
 
   await visit(page)
   await expect(startButton(page)).toBeVisible()
 
-  // Erst die nachgelagerte Startarbeit abwarten (siehe `main.tsx`) …
-  await page.waitForFunction(
-    () => performance.getEntriesByName('anitew:deferred-ready').length > 0,
-    { timeout: 30_000 },
+  const kenntApi = await page.evaluate(
+    () => (PerformanceObserver.supportedEntryTypes ?? []).includes('long-animation-frame'),
   )
-
-  /*
-   * … dann die Ruhe. Anderthalb Sekunden ohne lange Aufgabe: lang genug, dass
-   * die Startlast (deren letzte Blockade bei 5,6 s endete) sicher vorbei ist,
-   * kurz genug, dass eine echte Dauerschleife — die alle paar Dutzend
-   * Millisekunden zuschlägt — diese Bedingung nie erfüllt.
-   */
-  await page.waitForFunction(
-    () => {
-      const zustand = (window as unknown as { __anitewLast?: { letztesEnde: number } }).__anitewLast
-      if (zustand === undefined) return true
-      return performance.now() - zustand.letztesEnde > 1500
-    },
-    { timeout: 25_000 },
-  )
-
-  const longTasks = await page.evaluate(async () => {
-    return await new Promise<{ versatz: number; dauer: number }[] | null>((resolve) => {
-      const found: { versatz: number; dauer: number }[] = []
-      let observer: PerformanceObserver | undefined
-      const begonnen = performance.now()
-      try {
-        observer = new PerformanceObserver((list) => {
-          for (const entry of list.getEntries()) {
-            found.push({
-              versatz: Math.round(entry.startTime - begonnen),
-              dauer: Math.round(entry.duration),
-            })
-          }
-        })
-        observer.observe({ entryTypes: ['longtask'] })
-      } catch {
-        resolve(null)
-        return
-      }
-      setTimeout(() => {
-        observer?.disconnect()
-        resolve(found)
-      }, 1000)
-    })
-  })
-
-  /*
-   * Kennt der Browser die Longtask-API nicht, behauptet dieser Test nichts —
-   * dann soll er aber auch nicht als „bestanden" im Protokoll stehen. Ein
-   * stiller Freispruch ist die unangenehmste Sorte grün: Er sieht aus wie ein
-   * Beweis und ist keiner.
-   */
-  if (longTasks === null) {
-    test.skip(true, 'Browser kennt die Longtask-API nicht')
+  if (!kenntApi) {
+    /*
+     * Ein stiller Freispruch ist die unangenehmste Sorte grün: Er sieht aus
+     * wie ein Beweis und ist keiner.
+     */
+    test.skip(true, 'Browser kennt long-animation-frame nicht')
     return
   }
 
-  const beschreibung = longTasks.map((t) => `${t.dauer} ms bei +${t.versatz} ms`).join(', ')
-  expect(longTasks, `lange Aufgaben im Leerlauf: ${beschreibung}`).toEqual([])
+  const kamZurRuhe = await page
+    .waitForFunction(
+      () => {
+        const z = (window as unknown as { __anitewLoaf?: { letztes: number } }).__anitewLoaf
+        if (z === undefined) return true
+        return performance.now() - z.letztes > 3000
+      },
+      { timeout: 25_000 },
+    )
+    .then(() => true)
+    .catch(() => false)
+
+  const frames = await page.evaluate(() => {
+    const z = (window as unknown as {
+      __anitewLoaf: { frames: { versatz: number; dauer: number; wer: string }[] }
+    }).__anitewLoaf
+    // Nur die letzten Vorkommen zeigen — bei einer Schleife sind es Hunderte.
+    return z.frames.slice(-6)
+  })
+
+  const beschreibung = frames.map((f) => `${f.wer} — ${f.dauer} ms bei ${f.versatz} ms`).join('; ')
+  expect(
+    kamZurRuhe,
+    `JavaScript kommt im Hauptthread nicht zur Ruhe. Zuletzt: ${beschreibung}`,
+  ).toBe(true)
 })
