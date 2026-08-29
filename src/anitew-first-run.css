@@ -291,7 +291,11 @@
 .drawer {
   box-sizing: border-box !important;
   width: 100% !important;
-  max-width: min(100vw, 820px) !important;
+  /* `100%` statt `100vw`: Auf einem Telefon (unter 820 px) ist `min(100vw,
+     820px)` genau `100vw` — also der Layout-Viewport, der unter WebKit
+     mitwächst, sobald etwas seitlich übersteht. Siehe die Begründung in
+     `anitew-mobile-core.css`. */
+  max-width: min(100%, 820px) !important;
   overflow-x: hidden !important;
 }
 .drawer-close {
