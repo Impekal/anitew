@@ -31,6 +31,23 @@ body:has(.drawer-veil) {
   .app {
     padding-top: calc(18px + var(--anitew-safe-area-top));
   }
+
+  /*
+   * Mobile Core geometry is correctness, not late polish. The richer mobile
+   * atlas stylesheet remains lazy for startup performance, but a person can
+   * open the Core before that chunk arrives. During that hand-off the old
+   * desktop grid briefly leaked through (and text-heavy device destinations
+   * could appear in two columns). Keep only the essential column contract in
+   * the cold safety layer: personal destinations are two columns, technical
+   * destinations one. The lazy layer still owns all spacing and decoration.
+   */
+  .drawer .menu-group:not(.menu-group-device) {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .drawer .menu-group-device {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
 }
 
 /*
