@@ -39,6 +39,13 @@ let atmosphereIdleId: number | undefined
 let atmosphereMounted = false
 let unmountAtmosphere: (() => void) | undefined
 
+type OptionalIdleBrowser = {
+  requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number
+  cancelIdleCallback?: (handle: number) => void
+}
+
+const idleBrowser = window as unknown as OptionalIdleBrowser
+
 function loadExperienceRefinement(): Promise<unknown> {
   refinementLoad ??= import('./app/experienceRefinement.ts').catch(() => undefined)
   return refinementLoad
@@ -158,8 +165,9 @@ function scheduleAtmosphere(): void {
         })
         .catch(() => undefined)
     }
-    if ('requestIdleCallback' in window) {
-      atmosphereIdleId = window.requestIdleCallback(mount, { timeout: 1_500 })
+    const requestIdle = idleBrowser.requestIdleCallback
+    if (typeof requestIdle === 'function') {
+      atmosphereIdleId = requestIdle(mount, { timeout: 1_500 })
     } else {
       atmosphereIdleId = window.setTimeout(mount, 500)
     }
@@ -204,7 +212,8 @@ window.addEventListener('pagehide', () => {
     atmosphereTimer = undefined
   }
   if (atmosphereIdleId !== undefined) {
-    if ('cancelIdleCallback' in window) window.cancelIdleCallback(atmosphereIdleId)
+    const cancelIdle = idleBrowser.cancelIdleCallback
+    if (typeof cancelIdle === 'function') cancelIdle(atmosphereIdleId)
     else window.clearTimeout(atmosphereIdleId)
     atmosphereIdleId = undefined
   }
