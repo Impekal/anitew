@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { Platform } from '../core/index.ts'
 import type { Dictionary } from '../i18n/index.ts'
 import { wipeEverything } from '../data/reset.ts'
+import { disconnectGoogleAuthorization } from '../platform/web/oauthLogout.ts'
 import { resolveClientId } from './driveSync.ts'
 
 /**
@@ -145,7 +146,6 @@ export function ResetPanel({
         const token = await drive.requestDriveToken(clientId, true)
         await drive.deleteDriveBackup(token)
       }
-      await drive.disconnectDriveAuthorization()
       await wipeEverything()
       try {
         window.localStorage.clear()
@@ -153,6 +153,14 @@ export function ResetPanel({
       } catch {
         // Der eigentliche Nutzerdatenspeicher ist bereits gelöscht.
       }
+      /*
+       * Erst NACH `localStorage.clear()`: Bei einem Offline-Reset kann der
+       * HttpOnly-OAuth-Cookie nicht sofort vom Worker gelöscht werden. Die
+       * Logout-Schicht legt dann eine einzige technische Retry-Marke neu an,
+       * die den Reset überlebt und beim nächsten Online-Start abgearbeitet
+       * wird. Der Drive-Abgleich selbst ist durch die geleerte DB schon aus.
+       */
+      await disconnectGoogleAuthorization()
       // Neustart auf der nackten App — wie nach der ersten Installation.
       window.location.replace('/')
     } catch {
