@@ -104,3 +104,49 @@
 .own-rule {
   margin-top: 0.6rem;
 }
+
+/*
+ * Tap-Ziele auf 44 Pixel (Audit 29.08., B-03).
+ *
+ * Gemessen bei iPhone-Größe waren drei Bedienelemente deutlich unter Apples
+ * 44 × 44: der Ton-Schalter (63 × 30), „Schlüssel-Seite öffnen" (163 × 34) und
+ * die beiden Sprachauswahlen (102 × 34 und 115 × 34). WCAG 2.2 AA (24 × 24)
+ * war überall erfüllt — das ist die niedrigere Latte, und sie ist nicht die,
+ * an der sich ein Daumen misst.
+ *
+ * Zwei Wege, mit Absicht getrennt:
+ *
+ * Bei Knopf und Link wächst nur die **Trefferfläche**, nicht das Aussehen. Ein
+ * unsichtbares `::after` legt sich über den Rand hinaus; die Zeile bleibt
+ * optisch genau so zurückhaltend wie vorher. Ein Ton-Schalter im Fußbereich
+ * soll klein aussehen — er soll nur nicht klein zu treffen sein.
+ *
+ * Bei `<select>` geht das nicht: Ein ersetztes Element rendert keine
+ * Pseudoelemente verlässlich. Dort wächst die Höhe wirklich. Das ist auf einem
+ * Telefon auch richtig so — ein Auswahlfeld darf nach Bedienelement aussehen.
+ *
+ * Dieses Blatt wird verzögert geladen, das Kaltstart-Budget bleibt also
+ * unberührt (B-01 lässt dort nur neun Bytes Luft).
+ */
+.sound-toggle,
+.coach-key-link {
+  position: relative;
+}
+.sound-toggle::after,
+.coach-key-link::after {
+  content: '';
+  position: absolute;
+  inset: -7px -8px;
+  border-radius: inherit;
+}
+/* Die Sprachauswahl steht in `<label class="language">`, die
+   Trainingssprache daneben in derselben Bauform; `.about-field` deckt die
+   Auswahlfelder unter „Über dich" ab. */
+label.language select,
+.language-choice select,
+.about-field select,
+.page select,
+.page input:not([type='checkbox']):not([type='radio']):not([type='file']),
+.coach-key-input {
+  min-height: 44px;
+}

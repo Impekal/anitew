@@ -76,6 +76,9 @@ html[data-anitew-theme='light'] {
   --v4-card-shadow: 0 18px 55px -32px rgb(55 38 18 / 48%);
 }
 
+/* Die zwölf Grundtoken hier sind gleichgehalten mit dem `:root` in
+   `anitew-redesign.css` — die Begründung steht dort. Wer einen davon ändert,
+   ändert beide, sonst springen die Farben 750 ms nach dem Start wieder um. */
 html[data-anitew-theme='dark'] {
   color-scheme: dark;
   --paper: #0b0f0d;
@@ -84,7 +87,8 @@ html[data-anitew-theme='dark'] {
   --line: #25352e;
   --ink: #f1eee5;
   --ink-soft: #b8b1a3;
-  --ink-faint: #827b70;
+  /* #827b70 ergab auf --card nur 4,27:1. Siehe anitew-redesign.css. */
+  --ink-faint: #888176;
   --accent: #e5ab6b;
   --accent-soft: #392b1c;
   --accent-ink: #181008;
