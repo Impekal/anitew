@@ -96,16 +96,27 @@ main.app:has(> .drawer-veil) > .drawer-veil {
 }
 
 /*
- * When Google Drive is connected, the late Core refinement inserts the
- * signed-in account immediately below the close control. That layer used a
- * negative top margin for the account card and visually pulled name/e-mail
- * into the "Close menu" label on a real iPhone. Keep the two controls as
- * separate rows. `!important` is intentional: the refinement stylesheet is
- * lazy-loaded later and must not be allowed to pull the account upward again.
+ * Hier stand eine `margin-bottom: 68px !important` auf `.drawer-close`, mit
+ * der Begründung, das später geladene Verfeinerungsblatt dürfe den Wert nicht
+ * überschreiben.
+ *
+ * Nachgemessen (Audit 29.08.): **Es überschreibt ihn.** Wirksam sind 50 px am
+ * Schreibtisch (`anitew-experience-refinement.css`) und 38 px auf dem Telefon
+ * (`anitew-core-mobile.css`); beide werden nach diesem Blatt geladen, und
+ * `!important` gegen `!important` entscheidet die Reihenfolge, nicht die
+ * Absicht. Die Regel hat den Kampf, für den sie geschrieben wurde, nie
+ * gewonnen — sie stand nur da und sah so aus, als täte sie es.
+ *
+ * Vier Dateien setzten diesen einen Abstand mit vier verschiedenen Werten
+ * (68, 50, 38, 34). Zwei davon waren tot. Sie sind entfernt; wirksam bleiben
+ * die beiden oben genannten.
+ *
+ * Was die Regel eigentlich schützen sollte — dass „Menü schließen" und die
+ * Google-Kontozeile zwei getrennte Zeilen bleiben —, leistet die Regel
+ * darunter (`.drawer-google-account`), und dafür gibt es einen Test:
+ * `coreNavigation.spec.ts` → „hält Menü schließen und Name/E-Mail als
+ * getrennte Zeilen".
  */
-.drawer-close {
-  margin-bottom: 68px !important;
-}
 
 .drawer-google-account {
   margin: 8px auto 20px !important;

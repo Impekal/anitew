@@ -16,6 +16,10 @@
       max(30px, env(safe-area-inset-bottom)) !important;
   }
 
+  /* Der wirksame Abstand auf dem Telefon. Am Schreibtisch gelten 50 px aus
+     `anitew-experience-refinement.css`. Mehr Orte für diesen einen Abstand
+     gibt es nicht mehr — es waren einmal vier, zwei davon tot. Wer einen
+     fünften anlegt, macht es wieder unauffindbar. */
   .drawer-close {
     margin-bottom: 38px !important;
   }

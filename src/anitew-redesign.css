@@ -345,18 +345,45 @@ body::before {
   --motion-quick: 460ms;
   --motion-breathe: 6s;
   --motion-drift: 60s;
-  --paper: #0a100e;
-  --paper-glow: #101815;
-  --card: #121b18;
-  --line: #24322c;
-  --ink: #f0eee4;
-  --ink-soft: #b4bfb4;
-  --ink-faint: #8a978c;
-  --accent: #d8a85a;
-  --accent-soft: #33291a;
-  --accent-ink: #14100a;
-  --calm: #8ccfc0;
-  --bad: #e0715f;
+  /*
+   * Diese zwölf Werte sind **dieselben** wie in
+   * `anitew-experience-refinement.css` unter `html[data-anitew-theme='dark']`.
+   * Das ist keine Doppelung aus Bequemlichkeit, sondern eine bewusst
+   * gleichgehaltene Kopie — und sie muss gleich bleiben.
+   *
+   * Vorher liefen hier zwei dunkle Paletten nebeneinander: diese beim
+   * Kaltstart, jene 750 ms später, wenn `experienceRefinement.ts` sein
+   * Stilblatt nachlädt und das Themen-Attribut setzt. Zwölf Token wichen ab,
+   * und bei zweien war der Sprung sichtbar — `--ink-soft` von grüngrau
+   * (#b4bfb4) nach warmgrau (#b8b1a3), `--calm` von #8ccfc0 nach #8fbab0.
+   * Die Farben der App sprangen also dreiviertel Sekunden nach dem Start um.
+   *
+   * Es gewinnen die späten Werte, weil der Nutzer sie fast die ganze Zeit
+   * sieht; die ersten 750 ms folgen jetzt dem Rest statt umgekehrt.
+   *
+   * Eine Ausnahme: `--ink-faint` war in **beiden** Paletten #827b70 und ergab
+   * auf `--card` nur **4,27:1** — unter den 4,5:1, die diese Datei zwei Absätze
+   * weiter oben zusichert. Der Wert ist deshalb sechs Stufen heller
+   * (#888176): für das Auge derselbe Ton, gemessen **4,64:1 auf `--card`**
+   * und **5,01:1 auf `--paper`**.
+   *
+   * Gemessen (dunkel, gegen `--paper` / `--card`):
+   *   --ink        16,63:1 / 15,42:1      --accent   9,53:1 / 8,83:1
+   *   --ink-soft    9,06:1 /  8,40:1      --calm     9,02:1 / 8,37:1
+   *   --ink-faint   5,01:1 /  4,64:1      --bad      7,39:1 / 6,85:1
+   */
+  --paper: #0b0f0d;
+  --paper-glow: #14201b;
+  --card: #111915;
+  --line: #25352e;
+  --ink: #f1eee5;
+  --ink-soft: #b8b1a3;
+  --ink-faint: #888176;
+  --accent: #e5ab6b;
+  --accent-soft: #392b1c;
+  --accent-ink: #181008;
+  --calm: #8fbab0;
+  --bad: #e0897c;
   --shadow: 0 1px 2px rgb(0 0 0 / 30%), 0 8px 24px -12px rgb(0 0 0 / 55%);
   --shadow-lift: 0 2px 4px rgb(0 0 0 / 35%), 0 18px 40px -18px rgb(0 0 0 / 65%);
 }

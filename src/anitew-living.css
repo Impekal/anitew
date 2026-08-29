@@ -651,7 +651,6 @@
   #challenge-heading { margin-top: 66px !important; }
   .modes { grid-template-columns: repeat(2, 1fr) !important; width: min(100%, 380px); }
   .drawer { padding-left: 15px !important; padding-right: 15px !important; }
-  .drawer-close { margin-bottom: 34px !important; }
   .menu-group { gap: 12px 7px !important; }
   .drawer-item { min-height: 104px !important; }
   .drawer-item > span:last-child { font-size: 12.5px; }
