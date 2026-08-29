@@ -1,6 +1,6 @@
 # Datenschutzerklärung
 
-**Stand: 2026-08-25**
+**Stand: 2026-08-29**
 
 > Der kurze Teil zuerst: **ANITEW bleibt local-first.** Es gibt **kein Konto bei ANITEW**,
 > keine Werbung, keine externen Analyse-Dienste und keine Tracker. Training,
@@ -154,8 +154,12 @@ Systembenachrichtigung und fällt auf den Hinweis „nur solange offen“ zurüc
 
 - **Übertragbarkeit:** „Sicherung speichern“ exportiert deinen lokalen Stand.
 - **Vollständiger Neustart:** „Neu anfangen“ löscht die lokalen ANITEW-Daten,
-  trennt Google und widerruft das Push-Abonnement. Optional kann dabei auch
-  ANITEWs eigene Sicherungsdatei in deinem Google Drive gelöscht werden.
+  schaltet den Google-Abgleich lokal aus und widerruft das Push-Abonnement.
+  Optional kann dabei auch ANITEWs eigene Sicherungsdatei in deinem Google
+  Drive gelöscht werden. Ist der OAuth-Worker beim Neustart gerade nicht
+  erreichbar, wird die technische Browser-Abmeldung beim nächsten erreichbaren
+  Start nachgeholt; ein Drive-Abgleich kann in dieser Zwischenzeit nicht mehr
+  starten, weil sein lokaler Schalter bereits gelöscht ist.
 - **Nur Erinnerung aus:** „Keine Erinnerung“ beendet die tägliche Erinnerung,
   ohne deine Trainingsdaten zu löschen.
 
@@ -167,9 +171,20 @@ Google-Basisauskunft (`openid email profile`) an — nur damit die Oberfläche
 zeigen kann, als wer du verbunden bist. Der Cloudflare Worker tauscht den
 Google-Autorisierungscode gegen Tokens und hält die Sitzung — einschließlich
 des Google-Refresh-Tokens — verschlüsselt in einem `HttpOnly`-Cookie deines
-Browsers (Laufzeit ab Anmeldung fest höchstens 180 Tage — die Frist wird
-durch Nutzung **nicht** verlängert; beim Abmelden sofort gelöscht und bei
-Google widerrufen; danach ist eine neue Anmeldung nötig).
+Browsers. Die Laufzeit ist ab Anmeldung fest auf höchstens 180 Tage begrenzt;
+die Frist wird durch Nutzung **nicht** verlängert.
+
+Beim Antippen von „Google-Konto trennen“ wird der Drive-Abgleich auf dem Gerät
+**sofort dauerhaft ausgeschaltet** und die lokal angezeigte Kontoidentität
+entfernt. Ist der Worker erreichbar, löscht er dabei zugleich den HttpOnly-
+Sitzungscookie und versucht den Google-Token zu widerrufen. Ist der Worker
+vorübergehend nicht erreichbar — etwa weil das Gerät offline ist — kann der
+Browser den HttpOnly-Cookie technisch nicht selbst löschen. ANITEW merkt dann
+nur diesen ausstehenden technischen Logout lokal vor und versucht ihn beim
+nächsten Start bzw. beim nächsten Online-Werden erneut. Der Drive-Abgleich
+bleibt währenddessen aus; der liegengebliebene Cookie allein aktiviert ihn
+nicht. Unabhängig davon endet die versiegelte Sitzung spätestens mit ihrer
+festen 180-Tage-Frist.
 
 **Übergangsregel für ältere Anmeldungen:** Sitzungen, die vor Einführung
 dieser festen Frist entstanden sind, tragen keinen Anmeldezeitpunkt in sich;
@@ -207,14 +222,17 @@ Soweit ANITEW Daten nur auf deinem Gerät verarbeitet, bestimmst du durch Nutzun
 Export und Löschen über ihren Bestand. Bei freiwillig aktivierten Online-
 Funktionen erfolgt die Verarbeitung zur Bereitstellung der jeweils ausdrücklich
 gewählten Funktion. Konkrete Fristen: Das verschlüsselte Google-Sitzungs-Cookie
-läuft nach spätestens 180 Tagen ab Anmeldung ab (beim Abmelden sofort) und wird
-durch Nutzung nicht verlängert; Sitzungen aus der Zeit vor dieser Regel laufen
-nach der Übergangsregel in Abschnitt 9 spätestens 30 Tage nach der ersten
-Nutzung mit der neuen Fassung ab; serverseitige Push-Einträge bestehen, bis der
-Termin zugestellt und abgeholt ist, du die Erinnerung beendest oder das
+läuft spätestens 180 Tage nach Anmeldung ab und wird durch Nutzung nicht
+verlängert. Bei einer Abmeldung wird der lokale Drive-Abgleich sofort beendet;
+der Worker löscht den Cookie beim bestätigten Logout. Kann der Worker in diesem
+Moment nicht erreicht werden, wird genau dieser technische Logout beim nächsten
+Online-Start erneut versucht. Sitzungen aus der Zeit vor der 180-Tage-Regel
+laufen nach der Übergangsregel in Abschnitt 9 spätestens 30 Tage nach der
+ersten Nutzung mit der neuen Fassung ab. Serverseitige Push-Einträge bestehen,
+bis der Termin zugestellt und abgeholt ist, du die Erinnerung beendest oder das
 Push-Abonnement endet — nicht abgeholte Zustell-Notizen längstens 24 Stunden
-(Messerinnerung: 60 Minuten). Technische Infrastrukturprotokolle und Daten bei externen
-Anbietern unterliegen zusätzlich deren gesetzlichen und vertraglichen
+(Messerinnerung: 60 Minuten). Technische Infrastrukturprotokolle und Daten bei
+externen Anbietern unterliegen zusätzlich deren gesetzlichen und vertraglichen
 Aufbewahrungsregeln.
 
 ## 12. Deine Rechte
