@@ -34,6 +34,10 @@ let signatureRunning = false
 let signatureReady = false
 let pageIsLeaving = false
 let refinementLoad: Promise<unknown> | undefined
+let atmosphereTimer: number | undefined
+let atmosphereIdleId: number | undefined
+let atmosphereMounted = false
+let unmountAtmosphere: (() => void) | undefined
 
 function loadExperienceRefinement(): Promise<unknown> {
   refinementLoad ??= import('./app/experienceRefinement.ts').catch(() => undefined)
@@ -130,6 +134,62 @@ function loadSignatureExperience(): void {
   }, 750)
 }
 
+/**
+ * Das neuronale Feld ist reine Atmosphäre. Vorher wurde sein React/SVG-Baum
+ * mitten in derselben 0,7–5,6-s-Phase aufgebaut, in der A-14 bis zu 610-ms-
+ * Long Tasks gemessen hat. Es bekommt deshalb einen eigenen, späten Idle-
+ * Slot: frühestens 5,5 s nach dem Start und dann erst, wenn der Browser Luft
+ * meldet. Das Feld bleibt vollständig erhalten; es konkurriert nur nicht mehr
+ * mit dem ersten Tippen des Nutzers.
+ */
+function scheduleAtmosphere(): void {
+  if (pageIsLeaving || atmosphereMounted || atmosphereTimer !== undefined || atmosphereIdleId !== undefined) return
+  atmosphereTimer = window.setTimeout(() => {
+    atmosphereTimer = undefined
+    const mount = () => {
+      atmosphereIdleId = undefined
+      if (pageIsLeaving || atmosphereMounted) return
+      void import('./app/NeuralFieldMount.tsx')
+        .then(({ mountNeuralField, unmountNeuralField }) => {
+          if (pageIsLeaving || atmosphereMounted) return
+          mountNeuralField()
+          atmosphereMounted = true
+          unmountAtmosphere = unmountNeuralField
+        })
+        .catch(() => undefined)
+    }
+    if ('requestIdleCallback' in window) {
+      atmosphereIdleId = window.requestIdleCallback(mount, { timeout: 1_500 })
+    } else {
+      atmosphereIdleId = window.setTimeout(mount, 500)
+    }
+  }, 5_500)
+}
+
+const GOOGLE_LOGOUT_PENDING_KEY = 'anitew.google-oauth.logout-pending.v1'
+
+/**
+ * Offline auf „Google-Konto trennen“: `sync.on` ist bereits aus, der HttpOnly-
+ * Cookie kann aber nur der Worker löschen. Die kleine lokale Marke startet
+ * beim nächsten Seitenstart oder Online-Ereignis genau diesen Aufräumschritt
+ * erneut. Normalerweise wird dafür kein zusätzlicher Chunk geladen.
+ */
+function resumePendingGoogleLogout(): void {
+  let pending = false
+  try {
+    pending = window.localStorage.getItem(GOOGLE_LOGOUT_PENDING_KEY) === '1'
+  } catch {
+    return
+  }
+  if (!pending) return
+  void import('./platform/web/oauthLogout.ts')
+    .then(({ retryPendingGoogleLogout }) => retryPendingGoogleLogout())
+    .catch(() => undefined)
+}
+
+window.addEventListener('online', resumePendingGoogleLogout)
+resumePendingGoogleLogout()
+
 window.addEventListener('pagehide', () => {
   // `pagehide` bedeutet bei BFCache nicht, dass dieses Dokument stirbt. Wir
   // stoppen nur die Arbeit waehrend es eingefroren ist und koennen sie nach
@@ -139,16 +199,35 @@ window.addEventListener('pagehide', () => {
     window.clearTimeout(signatureTimer)
     signatureTimer = undefined
   }
+  if (atmosphereTimer !== undefined) {
+    window.clearTimeout(atmosphereTimer)
+    atmosphereTimer = undefined
+  }
+  if (atmosphereIdleId !== undefined) {
+    if ('cancelIdleCallback' in window) window.cancelIdleCallback(atmosphereIdleId)
+    else window.clearTimeout(atmosphereIdleId)
+    atmosphereIdleId = undefined
+  }
+  unmountAtmosphere?.()
+  unmountAtmosphere = undefined
+  atmosphereMounted = false
 })
 
 window.addEventListener('pageshow', (event) => {
   if (!event.persisted) return
   pageIsLeaving = false
   loadSignatureExperience()
+  scheduleAtmosphere()
+  resumePendingGoogleLogout()
 })
 
-if (document.readyState === 'complete') loadSignatureExperience()
-else window.addEventListener('load', loadSignatureExperience, { once: true })
+if (document.readyState === 'complete') {
+  loadSignatureExperience()
+  scheduleAtmosphere()
+} else {
+  window.addEventListener('load', loadSignatureExperience, { once: true })
+  window.addEventListener('load', scheduleAtmosphere, { once: true })
+}
 
 keepUpToDate()
 void import('./app/coreNavigationReturn.ts').catch(() => undefined)
