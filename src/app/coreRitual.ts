@@ -79,6 +79,7 @@ function ritualTone(kind: ToneKind): void {
       window.AudioContext ??
       (window as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
     if (Ctor === undefined) return
+    if (ritualAudio?.state === 'closed') ritualAudio = undefined
     ritualAudio ??= new Ctor()
     if (ritualAudio.state === 'suspended') void ritualAudio.resume().catch(() => undefined)
 
@@ -192,6 +193,13 @@ function noticeSessionArrival(): void {
   }, 760)
 }
 
+function prewarmInteraction(event: Event): void {
+  const target = event.target
+  if (!(target instanceof Element)) return
+  if (target.closest('.hamburger, .drawer-item') !== null) void ensureCoreStyles()
+  if (target.closest('.arrival-begin') !== null) void ensureFirstRunExperience()
+}
+
 function installCoreRitual(): void {
   if (installed) return
   installed = true
@@ -201,18 +209,11 @@ function installCoreRitual(): void {
   // Experience. Auf jedem späteren Start wird dieser Code gar nicht geladen.
   if (document.querySelector('.onboarding') !== null) void ensureFirstRunExperience()
 
-  // Bereits beim Finger-down beginnt das Laden der Core-spezifischen Blätter,
-  // also vor dem folgenden click, der die Schublade öffnet.
-  document.addEventListener(
-    'pointerdown',
-    (event) => {
-      const target = event.target
-      if (!(target instanceof Element)) return
-      if (target.closest('.hamburger, .drawer-item') !== null) void ensureCoreStyles()
-      if (target.closest('.arrival-begin') !== null) void ensureFirstRunExperience()
-    },
-    true,
-  )
+  // Finger wie Tastatur: Vor der eigentlichen Aktivierung beginnen die
+  // Core-spezifischen Blätter zu laden. Das vermeidet einen ungestylten Frame
+  // beim Öffnen, ohne sie auf jedem Start vorab zu parsen.
+  document.addEventListener('pointerdown', prewarmInteraction, true)
+  document.addEventListener('focusin', prewarmInteraction, true)
 
   document.addEventListener(
     'click',
@@ -271,24 +272,30 @@ function installCoreRitual(): void {
     true,
   )
 
+  // Dieser Observer darf bei BFCache nicht dauerhaft getrennt werden: das
+  // Dokument wird nur eingefroren und später mit demselben Modul fortgesetzt.
+  // Beim echten Verlassen entsorgt der Browser ihn ohnehin zusammen mit dem
+  // Dokument.
   const observer = new MutationObserver(noticeSessionArrival)
   observer.observe(document.getElementById('root') ?? document.body, {
     childList: true,
     subtree: true,
   })
 
-  window.addEventListener(
-    'pagehide',
-    () => {
-      observer.disconnect()
-      clearTimer(coreTimer)
-      clearTimer(enteringFallback)
-      clearTimer(arrivalTimer)
-      clearTimer(pressTimer)
-      if (ritualAudio !== undefined) void ritualAudio.close().catch(() => undefined)
-    },
-    { once: true },
-  )
+  window.addEventListener('pagehide', () => {
+    clearTimer(coreTimer)
+    clearTimer(enteringFallback)
+    clearTimer(arrivalTimer)
+    clearTimer(pressTimer)
+    delete root().dataset.anitewCoreOpening
+    delete root().dataset.anitewEntering
+    delete root().dataset.anitewSessionArriving
+    if (ritualAudio !== undefined) {
+      const closing = ritualAudio
+      ritualAudio = undefined
+      void closing.close().catch(() => undefined)
+    }
+  })
 }
 
 installCoreRitual()
