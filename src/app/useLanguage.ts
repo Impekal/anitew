@@ -11,6 +11,35 @@ import {
 import { type Dictionary, dictionaryFor, isTranslated } from '../i18n/index.ts'
 
 const SETTING_KEY = 'language'
+const LANGUAGE_CHANGE_EVENT = 'anitew:interface-language-change'
+
+function announceLanguageChange(language: Language): void {
+  window.dispatchEvent(
+    new CustomEvent<Language>(LANGUAGE_CHANGE_EVENT, {
+      detail: language,
+    }),
+  )
+}
+
+/**
+ * Persistiert eine Sprachwahl außerhalb des regulären Einstellungs-Panels.
+ *
+ * Der First-Run braucht denselben Wahrheitsvertrag wie die Einstellungen:
+ * erst speichern, dann sichtbar umschalten. Das Ereignis hält den bereits
+ * gemounteten App-Hook synchron, ohne eine zweite Sprachquelle einzuführen.
+ */
+export async function persistInterfaceLanguageChoice(
+  platform: Platform,
+  next: Language,
+): Promise<boolean> {
+  try {
+    await platform.settings.write(SETTING_KEY, next)
+    announceLanguageChange(next)
+    return true
+  } catch {
+    return false
+  }
+}
 
 export interface LanguageState {
   language: Language
@@ -62,6 +91,7 @@ export function useLanguage(platform: Platform): LanguageState {
     resolveLanguage(undefined, systemLanguages()),
   )
   const [ready, setReady] = useState(false)
+  const [saveFailed, setSaveFailed] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -88,12 +118,30 @@ export function useLanguage(platform: Platform): LanguageState {
   }, [language])
 
   /*
+   * Der First-Run sitzt innerhalb derselben App, bekommt `dictionary` aber als
+   * Prop. Wenn dort die Sprache gespeichert wurde, teilt dieses Ereignis dem
+   * bereits laufenden Hook die neue Wahrheit mit; dadurch übersetzt sich der
+   * Welcome-Screen sofort, ohne Neuladen und ohne zweiten Sprachzustand.
+   */
+  useEffect(() => {
+    const onLanguageChange = (event: Event) => {
+      const detail = (event as CustomEvent<string>).detail
+      if (typeof detail !== 'string') return
+      const next = resolveLanguage(detail, [detail])
+      if (next !== detail) return
+      setSaveFailed(false)
+      setLanguage(next)
+    }
+    window.addEventListener(LANGUAGE_CHANGE_EVENT, onLanguageChange)
+    return () => window.removeEventListener(LANGUAGE_CHANGE_EVENT, onLanguageChange)
+  }, [])
+
+  /*
    * R3-06: Dieselbe Regel wie bei Ton und Trainingssprache — die Oberfläche
    * wechselt erst, wenn die Wahl wirklich gespeichert ist. Vorher wechselte
    * sie optimistisch und verschluckte den Fehler; nach einem Neuladen stand
    * dann wieder die alte Sprache da, ohne dass es jemand gesagt hätte.
    */
-  const [saveFailed, setSaveFailed] = useState(false)
   const choose = useCallback(
     (next: Language) => {
       void persistThenApply(
@@ -101,6 +149,7 @@ export function useLanguage(platform: Platform): LanguageState {
         () => {
           setSaveFailed(false)
           setLanguage(next)
+          announceLanguageChange(next)
         },
         () => setSaveFailed(true),
       )

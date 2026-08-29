@@ -13,6 +13,56 @@ import { openPage, startButton } from './helpers.ts'
  * beantwortet (auch mit „nichts“) kommt keine Frage wieder (D-015).
  */
 
+test('erlaubt die Sprachwahl schon auf dem ersten Screen und merkt sie dauerhaft', async ({
+  page,
+}) => {
+  await page.goto('/')
+
+  const language = page.locator('.arrival-language')
+  await expect(language).toBeVisible()
+  await expect(page.getByText('Dein Gedächtnis, trainiert.')).toBeVisible()
+
+  await language.getByRole('button', { name: 'English' }).click()
+
+  // Kein Reload als Übersetzungstrick: Der bereits sichtbare Welcome-Screen
+  // muss sofort aus demselben App-Zustand heraus Englisch sprechen.
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en')
+  await expect(page.getByText('Your memory, trained.')).toBeVisible()
+  await expect(language.getByRole('button', { name: 'English' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  )
+
+  // Die Wahl ist nicht nur optisch: erst die persistierte Wahrheit macht sie
+  // dauerhaft. Beim nächsten Öffnen bleibt der allererste Screen Englisch.
+  await expect
+    .poll(
+      () =>
+        page.evaluate(async () => {
+          const open = indexedDB.open('anitew')
+          const database: IDBDatabase = await new Promise((resolve, reject) => {
+            open.onsuccess = () => resolve(open.result)
+            open.onerror = () => reject(open.error)
+          })
+          const row: { value?: string } | undefined = await new Promise((resolve, reject) => {
+            const request = database
+              .transaction('settings', 'readonly')
+              .objectStore('settings')
+              .get('language')
+            request.onsuccess = () => resolve(request.result)
+            request.onerror = () => reject(request.error)
+          })
+          return row?.value
+        }),
+      { timeout: 10_000 },
+    )
+    .toBe('en')
+
+  await page.reload()
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en')
+  await expect(page.getByText('Your memory, trained.')).toBeVisible()
+})
+
 test('erzeugt in unter drei Schritten die erste echte Erinnerung, ohne ein Urteil', async ({
   page,
 }) => {
