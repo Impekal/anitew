@@ -217,10 +217,10 @@ export function SyncPanelImpl({ platform, dictionary }: { platform: Platform; di
           await platform.settings.write(SYNC_ON_SETTING, true)
         } catch {
           // Ohne dauerhaften Commit bleibt ANITEW lokal. Die OAuth-Sitzung
-          // wird best effort wieder geschlossen, damit kein versteckter
-          // „halb verbundener“ Zustand übrig bleibt. Falls das Gerät gerade
-          // offline ist, merkt die Logout-Schicht den Versuch für später vor.
-          void disconnectGoogleAuthorization()
+          // wird wieder geschlossen, damit kein versteckter „halb verbundener“
+          // Zustand übrig bleibt. Die Logout-Schicht hat eine harte 5-s-Grenze;
+          // offline merkt sie den Versuch für später vor.
+          await disconnectGoogleAuthorization()
           throw new SyncStorageError()
         }
 
@@ -261,10 +261,11 @@ export function SyncPanelImpl({ platform, dictionary }: { platform: Platform; di
         setAccountName(undefined)
         connectedRef.current = false
         setLastAt(undefined)
-        // Der Worker löscht den HttpOnly-Cookie. Ist er gerade nicht
-        // erreichbar, bleibt lokal eine Retry-Marke stehen; Sync bleibt
-        // trotzdem aus und der Cookie wird beim nächsten Online-Start geräumt.
-        void disconnectGoogleAuthorization()
+        // Der Worker löscht den HttpOnly-Cookie. Bis die Antwort da ist (oder
+        // die bounded 5-s-Grenze greift), bleibt das Panel beschäftigt; so kann
+        // kein neuer Login von einer verspäteten Logout-Antwort wieder gelöscht
+        // werden. Offline bleibt nur die Retry-Marke, Sync selbst ist schon aus.
+        await disconnectGoogleAuthorization()
         await Promise.allSettled([
           platform.settings.remove(SYNC_ACCOUNT_SETTING),
           platform.settings.remove(SYNC_ACCOUNT_NAME_SETTING),
