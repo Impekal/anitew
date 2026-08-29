@@ -435,14 +435,38 @@
   overflow-y: auto !important;
   overscroll-behavior: contain;
 }
+/*
+ * Zentriert wird ueber automatische Aussenabstaende, nicht ueber `left: 50%`.
+ *
+ * Hier stand `left: 50% !important; translate: -50% 0` zusammen mit
+ * `margin: 0 0 46px !important`. Beides zusammen ergibt nur dann die Mitte,
+ * wenn der Knopf statisch schon links am Rand beginnt. Genau das tat er, weil
+ * `anitew-first-run.css` `margin: 0 auto` und `left: auto` setzte — dieses
+ * Blatt wird jedoch **nur beim ersten Besuch** geladen.
+ *
+ * Ohne es blieb `left: 50%` allein stehen und schob den Knopf zusaetzlich zu
+ * seiner (durch `align-self: flex-end` ohnehin schon rechten) Position um
+ * weitere 171 px nach rechts. Gemessen im iPhone-Profil, zweiter Besuch:
+ * Knopf bei x=428, `scrollWidth` der Schublade 522 gegen 374 sichtbare Pixel.
+ * Der Ueberstand machte die Schublade zu einem Scrollbehaelter, WebKit merkte
+ * sich `scrollLeft: 120` — und `overflow-x: hidden` verhinderte danach das
+ * Zurueckscrollen. Das ist die vom Geraet gemeldete „halbe, nicht scrollbare"
+ * Anzeige.
+ *
+ * `margin: 0 auto` zentriert in allen drei Kontexten, in denen dieser Knopf
+ * vorkommt: Blockfluss, Flex-Spalte (automatische Abstaende auf der
+ * Querachse schlagen `align-self`) und Grid. Eine Verschiebung, die von der
+ * Anwesenheit eines anderen Blattes abhaengt, gibt es damit nicht mehr.
+ */
 .drawer-close {
   position: relative !important;
-  left: 50% !important;
+  left: auto !important;
+  right: auto !important;
   top: auto !important;
-  translate: -50% 0;
+  translate: none !important;
   width: 72px !important;
   height: 72px !important;
-  margin: 0 0 46px !important;
+  margin: 0 auto 46px !important;
   border: 0 !important;
   border-radius: 50% !important;
   background:

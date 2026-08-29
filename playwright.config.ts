@@ -10,6 +10,25 @@ import { defineConfig, devices } from '@playwright/test'
 /** Der Layouttest läuft auf der Gerätematrix, alles andere nicht. */
 const LAYOUT = /layout\.spec\.ts/
 
+/*
+ * Die WebKit-Sonde (Gerätemeldung 29.08.: Der Core steht auf dem iPhone
+ * seitlich verschoben).
+ *
+ * Alle Geräteprofile hier laufen auf Chromium — auch die, die „iphone" heißen;
+ * `defaultBrowserType: 'chromium'` steht ausdrücklich darüber. Damit ist noch
+ * **nie** unter der Engine geprüft worden, auf der der Fehler auftritt. Zwei
+ * Behebungsversuche (PR #93 und #95) sind gescheitert, weil beide auf einer
+ * Vermutung beruhten statt auf einer Messung.
+ *
+ * WebKit lässt sich in der Entwicklungsumgebung nicht installieren (der
+ * Netzzugang zu Playwrights Download-Hosts ist gesperrt), auf dem Baurechner
+ * aber schon. Das Projekt existiert deshalb nur, wenn `ANITEW_WEBKIT=1`
+ * gesetzt ist — so bleibt jeder normale Lauf unverändert, und niemand
+ * stolpert über einen Browser, den es lokal nicht gibt.
+ */
+const WEBKIT_SONDE = /webkitDrawer\.spec\.ts/
+const MIT_WEBKIT = process.env.ANITEW_WEBKIT === '1'
+
 export default defineConfig({
   testDir: './tests/e2e',
   /*
@@ -59,10 +78,10 @@ export default defineConfig({
      * Die **funktionalen** Projekte fahren die ganze Suite — außer dem
      * Layouttest. Zwei genügen: der Schreibtisch und ein Telefon.
      */
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] }, testIgnore: LAYOUT },
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] }, testIgnore: [LAYOUT, WEBKIT_SONDE] },
     // Ein Telefon ist der eigentliche Zielfall — eine App, die nur am
     // Schreibtisch geprüft wird, ist am Telefon ungeprüft.
-    { name: 'mobile', use: { ...devices['Pixel 7'] }, testIgnore: LAYOUT },
+    { name: 'mobile', use: { ...devices['Pixel 7'] }, testIgnore: [LAYOUT, WEBKIT_SONDE] },
 
     /*
      * Die **Geräteprojekte** fahren nur `layout.spec.ts` — schnelle Prüfungen
@@ -84,6 +103,20 @@ export default defineConfig({
     { name: 'android-tablet', testMatch: LAYOUT, use: { ...devices['Galaxy Tab S4'], defaultBrowserType: 'chromium' } },
     { name: 'desktop-small', testMatch: LAYOUT, use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 720 } } },
     { name: 'desktop-wide', testMatch: LAYOUT, use: { ...devices['Desktop Chrome'], viewport: { width: 1920, height: 1080 } } },
+
+    /*
+     * Echtes WebKit, iPhone-Größe. Nur mit `ANITEW_WEBKIT=1` vorhanden und nur
+     * für die Sonde — sie misst, sie behauptet nichts.
+     */
+    ...(MIT_WEBKIT
+      ? [
+          {
+            name: 'webkit-iphone',
+            testMatch: WEBKIT_SONDE,
+            use: { ...devices['iPhone 14 Pro'], defaultBrowserType: 'webkit' as const },
+          },
+        ]
+      : []),
   ],
   webServer: {
     command: 'npm run preview -- --host 127.0.0.1 --port 4173 --strictPort',

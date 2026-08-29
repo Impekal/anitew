@@ -296,6 +296,8 @@
      mitwächst, sobald etwas seitlich übersteht. Siehe die Begründung in
      `anitew-mobile-core.css`. */
   max-width: min(100%, 820px) !important;
+  /* Die Achsen-Regel steht in `anitew-overlay-safety.css` auf `nav.drawer`
+     und ist spezifischer als dieser Selektor — hier nichts wiederholen. */
   overflow-x: hidden !important;
 }
 .drawer-close {

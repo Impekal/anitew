@@ -150,8 +150,30 @@ main.app:has(> .drawer-veil) > .drawer-veil {
  * gewinnt unabhängig von der Reihenfolge — das ist stabiler, als an der
  * Ladefolge zu drehen, die aus ganz anderen Gründen so ist, wie sie ist.
  */
+/*
+ * `clip` statt `hidden` — und auf **beiden** Achsen, das ist der Punkt.
+ *
+ * `hidden` macht aus der Schublade einen Scrollbehaelter: Steht etwas
+ * kurzzeitig seitlich ueber, kann der Browser dorthin scrollen und sich den
+ * Versatz merken — zurueck kommt der Nutzer dann nicht mehr, weil `hidden`
+ * genau das verbietet. Auf dem iPhone war das der Endzustand: Schublade um
+ * 120 px verschoben, halb abgeschnitten, nicht scrollbar. `clip` schneidet
+ * ebenso ab, erzeugt aber gar keinen Scrollbehaelter — ein Versatz kann damit
+ * nicht mehr entstehen.
+ *
+ * Warum beide Achsen: Ist eine Achse `hidden`, rechnet der Browser ein `clip`
+ * auf der anderen wieder zu `hidden` zurueck (CSS Overflow 3). Ein einzelnes
+ * `overflow-x: clip` neben `overflow-y: hidden` waere also eine Zeile ohne
+ * Wirkung. Nachgemessen: `getComputedStyle(...).overflowX` meldete weiterhin
+ * `hidden`.
+ *
+ * Gescrollt wird ohnehin in `.drawer-scroll`, nicht hier — die Schublade
+ * selbst hat nichts zu scrollen. Die `hidden`-Zeile bleibt als Rueckfall fuer
+ * Engines ohne `clip` davor stehen.
+ */
 nav.drawer {
-  overflow-y: hidden !important;
+  overflow: hidden !important;
+  overflow: clip !important;
 }
 
 nav.drawer .drawer-scroll {
@@ -161,6 +183,11 @@ nav.drawer .drawer-scroll {
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
+  /* Hier bleibt es bei `hidden`, und zwar begruendet: Diese Flaeche **muss**
+     senkrecht scrollen. Neben `overflow-y: auto` rechnet der Browser ein
+     `overflow-x: clip` wieder zu `hidden` zurueck — die Zeile waere also nur
+     eine Behauptung ohne Wirkung. Der Riegel gegen einen bleibenden Versatz
+     sitzt eine Ebene darueber auf `nav.drawer`. */
   overflow-x: hidden !important;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -168,9 +195,22 @@ nav.drawer .drawer-scroll {
   -webkit-overflow-scrolling: touch;
 }
 
-/* Nicht mehr kleben — er steht ja jetzt über dem, was scrollt. */
+/* Nicht mehr kleben — er steht ja jetzt über dem, was scrollt.
+ *
+ * Die waagerechte Lage steht aus demselben Grund hier mit: Sie darf nicht
+ * davon abhaengen, welche Blaetter dieser Besuch geladen hat. Zwei Regeln
+ * haben den Knopf zentriert (`anitew-first-run.css`) und zwei ihn verschoben
+ * (`styles.css`, `anitew-living.css`) — und das erste Blatt laedt nur beim
+ * allerersten Besuch. Beide Ursachen sind an ihrer Quelle behoben; dieser
+ * Selektor mit Vorfahren gewinnt zusaetzlich unabhaengig von der Ladefolge,
+ * damit kein spaeteres Blatt den Knopf erneut seitlich schieben kann. */
 nav.drawer .drawer-close {
   position: relative !important;
   top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  translate: none !important;
+  align-self: center !important;
+  margin-inline: auto !important;
   flex: 0 0 auto;
 }
