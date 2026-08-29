@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { SyncError, type Platform, type SyncReport } from '../core/index.ts'
-import { disconnectDriveAuthorization, type DriveFailure } from '../platform/web/drive.ts'
+import { type DriveFailure } from '../platform/web/drive.ts'
+import { disconnectGoogleAuthorization } from '../platform/web/oauthLogout.ts'
 import type { Dictionary } from '../i18n/index.ts'
 
 import {
@@ -217,8 +218,9 @@ export function SyncPanelImpl({ platform, dictionary }: { platform: Platform; di
         } catch {
           // Ohne dauerhaften Commit bleibt ANITEW lokal. Die OAuth-Sitzung
           // wird best effort wieder geschlossen, damit kein versteckter
-          // „halb verbundener“ Zustand übrig bleibt.
-          void disconnectDriveAuthorization()
+          // „halb verbundener“ Zustand übrig bleibt. Falls das Gerät gerade
+          // offline ist, merkt die Logout-Schicht den Versuch für später vor.
+          void disconnectGoogleAuthorization()
           throw new SyncStorageError()
         }
 
@@ -259,7 +261,10 @@ export function SyncPanelImpl({ platform, dictionary }: { platform: Platform; di
         setAccountName(undefined)
         connectedRef.current = false
         setLastAt(undefined)
-        void disconnectDriveAuthorization()
+        // Der Worker löscht den HttpOnly-Cookie. Ist er gerade nicht
+        // erreichbar, bleibt lokal eine Retry-Marke stehen; Sync bleibt
+        // trotzdem aus und der Cookie wird beim nächsten Online-Start geräumt.
+        void disconnectGoogleAuthorization()
         await Promise.allSettled([
           platform.settings.remove(SYNC_ACCOUNT_SETTING),
           platform.settings.remove(SYNC_ACCOUNT_NAME_SETTING),
