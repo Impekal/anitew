@@ -12,6 +12,35 @@
  */
 let coreReturnArmed = false
 
+/**
+ * A hard reload does not restore App.tsx's transient `pageId`: ANITEW starts
+ * deliberately on the daily home screen again. The browser, however, keeps
+ * the current History entry and therefore also its `{ page }` payload.
+ *
+ * Leaving that payload behind creates a phantom Core child. If the person
+ * opens another Core page after the reload, Back lands on the stale entry and
+ * the Forward-restoration logic below legitimately interprets it as a child
+ * page, reopening the old screen instead of returning home.
+ *
+ * Keep history and the actually rendered screen in agreement as soon as this
+ * document starts. Other state fields are preserved; only ANITEW's transient
+ * page marker is removed. Same-document Back/Forward is unaffected because
+ * this module runs once per document, before a person can open a Core child.
+ */
+function normalizeReloadedPageState(): void {
+  const state = window.history.state
+  if (state === null || typeof state !== 'object' || Array.isArray(state)) return
+
+  const record = state as Record<string, unknown>
+  if (typeof record.page !== 'string') return
+
+  const next = { ...record }
+  delete next.page
+  window.history.replaceState(Object.keys(next).length === 0 ? null : next, '')
+}
+
+normalizeReloadedPageState()
+
 // Remember the parent while entering a Core child, not only when the visible
 // back button is used. A native iOS/browser back gesture has no click on
 // `.page-back`, so arming at entry is the reliable signal for both paths.
