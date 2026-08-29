@@ -112,7 +112,28 @@ test('hält die Breite auf jeder Menüseite — und in der Schublade', async ({ 
     await page.locator('.page-back').click({ force: true })
     await expect(page.locator('.page')).toBeHidden()
 
-    if (!(await drawer.isVisible())) {
+    /*
+     * Zurück führt in den Core, und die Schublade öffnet animiert.
+     *
+     * Hier stand eine einzelne Momentaufnahme: „ist die Schublade sichtbar?
+     * Wenn nein, Hamburger antippen." Genau dieses Fenster wird getroffen —
+     * steht die Schublade noch nicht, tippt der Test den Hamburger an und
+     * **schließt damit die Schublade, die gerade aufgeht.** Die Zeile danach
+     * wartet dann dreißig Sekunden auf etwas, das der Test selbst zugemacht
+     * hat. Zweimal auf `desktop-wide` erlebt (Läufe 1458 und 1465), lokal in
+     * neun Wiederholungen nie — es braucht eine ausgelastete Maschine, damit
+     * die Momentaufnahme früh genug fällt.
+     *
+     * Gewartet wird deshalb auf den Zustand, der nach dem Zurück **gilt**.
+     * Der Hamburger bleibt als Rückfall, falls der Core einmal nicht von
+     * selbst aufgeht — dann soll dieser Test weiterlaufen und nicht die
+     * Breitenprüfung an einer fremden Frage scheitern.
+     */
+    const coreOeffnetVonSelbst = await drawer
+      .waitFor({ state: 'visible', timeout: 4_000 })
+      .then(() => true)
+      .catch(() => false)
+    if (!coreOeffnetVonSelbst) {
       await hamburger.click({ force: true })
     }
     await expect(drawer).toBeVisible()
