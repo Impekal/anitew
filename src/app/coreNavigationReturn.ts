@@ -41,17 +41,38 @@ function normalizeReloadedPageState(): void {
 
 normalizeReloadedPageState()
 
-// Remember the parent while entering a Core child, not only when the visible
-// back button is used. A native iOS/browser back gesture has no click on
-// `.page-back`, so arming at entry is the reliable signal for both paths.
+// Remember the parent while entering a Core child. A native iOS/browser back
+// gesture has no click on `.page-back`, so arming at entry is the reliable
+// signal for both paths.
+//
+// The visible page-back button needs one extra rule. App.tsx used to clear its
+// transient page state immediately and only then call `history.back()`. That
+// creates a short but real false-home window: the page is already gone while
+// the browser is still on the child history entry. A very fast next Core tap
+// can land in that window and then be erased by the late popstate. Intercept
+// only the normal child-history case here, let the browser move first, and let
+// App.tsx's existing popstate listener close the page atomically with that
+// transition. If no child marker exists, React keeps its fallback close path.
 document.addEventListener(
   'click',
   (event) => {
     const target = event.target
     if (!(target instanceof Element)) return
-    if (target.closest('.drawer-item') !== null || target.closest('.page-back') !== null) {
+
+    if (target.closest('.drawer-item') !== null) {
       coreReturnArmed = true
+      return
     }
+
+    if (target.closest('.page-back') === null) return
+    coreReturnArmed = true
+
+    const state = window.history.state as { page?: unknown } | null
+    if (typeof state?.page !== 'string') return
+
+    event.preventDefault()
+    event.stopPropagation()
+    window.history.back()
   },
   true,
 )
