@@ -2013,22 +2013,12 @@ body::before {
   animation: none;
 }
 
-.arrival-name {
-  font: inherit;
-  font-family: var(--serif);
-  font-size: 1.2rem;
-  padding: 0.75rem 1rem;
-  border-radius: 1rem;
-  border: 1px solid var(--line);
-  background: var(--card);
-  color: var(--ink);
-  width: 100%;
-}
-
-.arrival-name:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
+/* `.arrival-name` stand hier — das Namensfeld des alten Ankommens. Die Klasse
+   kommt in keiner Vorlage und in keinem erzeugten Knoten mehr vor (geprueft
+   ueber die gesamte Quelle, nicht nur ueber die Vorlagen: `standing-*`,
+   `session-phase-*` und `constellation-node-*` sehen ebenso tot aus, werden
+   aber zur Laufzeit zusammengesetzt). Zwei tote Regeln im Kaltstart-Blatt
+   kosten jeden Besucher Bytes. */
 
 .choices {
   display: flex;
@@ -2145,7 +2135,21 @@ body::before {
 }
 
 .drawer-close {
-  align-self: flex-end;
+  /* Hier stand `align-self: flex-end` — aus der Zeit, als der Schliessknopf in
+   * der Ecke einer Kopfzeile sass. Heute ist er ein zentrierter Kreis, und die
+   * Zentrierung kam ausschliesslich aus `anitew-first-run.css`. Dieses Blatt
+   * wird aber **nur beim allerersten Besuch** geladen (firstRunExperience.ts
+   * haengt an `.arrival-begin` / `.onboarding`); auf jedem spaeteren Besuch
+   * fehlte es, und dann stand der Knopf rechts — gemessen im iPhone-Profil bei
+   * x=293 statt mittig. Die zweite Haelfte desselben Fehlers steht in
+   * `anitew-living.css`.
+   *
+   * Die Ausrichtung steht jetzt an genau **einer** Stelle: bei
+   * `nav.drawer .drawer-close` in `anitew-overlay-safety.css`. Dieser Knopf
+   * kommt nur dort vor (App.tsx), jenes Blatt laedt ebenfalls im Kaltstart und
+   * gewinnt mit Vorfahren-Selektor unabhaengig von der Ladefolge. Eine zweite
+   * Ausrichtungsregel hier waere genau die Doppelung, aus der der Fehler
+   * entstanden ist. */
   border: none;
   background: transparent;
   color: var(--ink-faint);

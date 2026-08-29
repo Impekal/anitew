@@ -277,11 +277,9 @@ body::before {
 .footer .language,
 .footer .sound-toggle { opacity: .72; }
 
-/* The technical stack is still available, but no longer dominates the daily experience. */
-.footer .benchmark-panel,
-.footer .science-panel,
-.footer .backup-panel,
-.footer .sync-panel { opacity: .72; }
+/* Hier stand eine Regel fuer vier Fusszeilen-Kacheln — `benchmark-panel`,
+   `science-panel`, `backup-panel`, `sync-panel`. Keine dieser Klassen kommt
+   in der App noch vor; die Bereiche sind laengst in den Core gewandert. */
 
 .drawer-veil { background: rgba(2,6,5,.76) !important; backdrop-filter: blur(18px); }
 .drawer {

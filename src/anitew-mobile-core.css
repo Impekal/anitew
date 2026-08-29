@@ -40,7 +40,12 @@
    */
   .drawer-veil {
     inset: 0 !important;
-    overflow-x: hidden !important;
+    /* `clip` statt `hidden`: `hidden` erzeugt einen Scrollbehaelter, in dem
+       sich ein kurzzeitiger Ueberstand als bleibender Versatz einnisten kann
+       — genau der Zustand, den das iPhone gemeldet hat. `clip` schneidet ab,
+       ohne scrollbar zu sein. Die `hidden`-Zeile bleibt als Rueckfall. */
+    overflow: hidden !important;
+    overflow: clip !important;
   }
 
   .drawer-veil > .drawer {
@@ -48,7 +53,11 @@
     max-width: 100% !important;
     min-width: 0 !important;
     box-sizing: border-box !important;
-    overflow-x: hidden !important;
+    /* Beide Achsen `clip` — dieser Selektor ist spezifischer als
+       `nav.drawer` in `anitew-overlay-safety.css` und wuerde dessen Riegel
+       sonst wieder auf `hidden` zuruecksetzen. Begruendung dort. */
+    overflow: hidden !important;
+    overflow: clip !important;
     padding-left: max(16px, env(safe-area-inset-left)) !important;
     padding-right: max(16px, env(safe-area-inset-right)) !important;
   }
