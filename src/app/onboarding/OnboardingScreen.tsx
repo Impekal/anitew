@@ -1,17 +1,27 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import {
+  type Language,
   type OnboardingProfile,
   TRAINING_MODES,
   type TrainingMode,
 } from '../../core/index.ts'
 import type { Dictionary } from '../../i18n/index.ts'
+import { createWebPlatform } from '../../platform/web/index.ts'
+import { persistInterfaceLanguageChoice } from '../useLanguage.ts'
 
 type Step = 'welcome' | 'memory' | 'time'
+
+const FIRST_RUN_LANGUAGES = ['de', 'en'] as const satisfies readonly Language[]
 
 interface OnboardingScreenProps {
   dictionary: Dictionary
   onDone: (profile: OnboardingProfile, firstMemory?: string) => void
+}
+
+function initialInterfaceLanguage(): Language {
+  const language = document.documentElement.lang.toLowerCase()
+  return language.startsWith('en') ? 'en' : 'de'
 }
 
 /**
@@ -26,7 +36,24 @@ export function OnboardingScreen({ dictionary, onDone }: OnboardingScreenProps) 
   const [step, setStep] = useState<Step>('welcome')
   const [draft, setDraft] = useState<OnboardingProfile>({})
   const [firstMemory, setFirstMemory] = useState('')
+  const [interfaceLanguage, setInterfaceLanguage] = useState<Language>(initialInterfaceLanguage)
+  const [languageBusy, setLanguageBusy] = useState(false)
+  const [languageSaveFailed, setLanguageSaveFailed] = useState(false)
+  const languagePlatform = useMemo(() => createWebPlatform(), [])
   const texts = dictionary.onboarding
+
+  const changeInterfaceLanguage = async (next: Language) => {
+    if (languageBusy || next === interfaceLanguage) return
+    setLanguageBusy(true)
+    setLanguageSaveFailed(false)
+    const saved = await persistInterfaceLanguageChoice(languagePlatform, next)
+    if (saved) {
+      setInterfaceLanguage(next)
+    } else {
+      setLanguageSaveFailed(true)
+    }
+    setLanguageBusy(false)
+  }
 
   const finishOrAdvance = (
     current: Exclude<Step, 'welcome'>,
@@ -44,6 +71,34 @@ export function OnboardingScreen({ dictionary, onDone }: OnboardingScreenProps) 
   return (
     <main className="app onboarding">
       <header className="brand">
+        {step === 'welcome' && (
+          <>
+            <div className="arrival-language" role="group" aria-label={dictionary.language.label}>
+              {FIRST_RUN_LANGUAGES.map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  className={
+                    tag === interfaceLanguage
+                      ? 'arrival-language-choice arrival-language-choice-active'
+                      : 'arrival-language-choice'
+                  }
+                  aria-label={dictionary.language.names[tag]}
+                  aria-pressed={tag === interfaceLanguage}
+                  disabled={languageBusy}
+                  onClick={() => void changeInterfaceLanguage(tag)}
+                >
+                  {tag.toUpperCase()}
+                </button>
+              ))}
+            </div>
+            {languageSaveFailed && (
+              <p className="arrival-language-error" role="alert">
+                {dictionary.settings.saveFailed}
+              </p>
+            )}
+          </>
+        )}
         <h1>{dictionary.app.name}</h1>
         <p className="greeting">{texts.welcomeTitle}</p>
       </header>

@@ -11,6 +11,7 @@
  * returns to an entry carrying `{ page }`.
  */
 let coreReturnArmed = false
+let coreToggleGeneration = 0
 
 /**
  * A hard reload does not restore App.tsx's transient `pageId`: ANITEW starts
@@ -58,6 +59,16 @@ document.addEventListener(
   (event) => {
     const target = event.target
     if (!(target instanceof Element)) return
+
+    // Returning from a child schedules an automatic Core reopen two frames
+    // later. If the person taps Core themselves in that small window, that
+    // explicit choice wins. Counting the tap lets the scheduled reopen detect
+    // that somebody already acted instead of toggling the drawer a second
+    // time and accidentally closing it again.
+    if (target.closest('button.hamburger') !== null) {
+      coreToggleGeneration += 1
+      return
+    }
 
     if (target.closest('.drawer-item') !== null) {
       coreReturnArmed = true
@@ -134,7 +145,16 @@ window.addEventListener('popstate', (event) => {
   // React's popstate handler closes the page in the same event turn. Wait for
   // that commit before opening Core again. Two frames also cover Safari/PWA,
   // where resuming a standalone window may defer the paint by one frame.
+  //
+  // A real Core tap in those two frames cancels this automatic reopen. Without
+  // that guard, the late `openCore()` could observe stale aria-expanded state
+  // and turn an already-open drawer straight back off — exactly the race seen
+  // on very fast desktop-wide navigation and possible with a fast finger too.
+  const generationAtPop = coreToggleGeneration
   window.requestAnimationFrame(() => {
-    window.requestAnimationFrame(openCore)
+    window.requestAnimationFrame(() => {
+      if (coreToggleGeneration !== generationAtPop) return
+      openCore()
+    })
   })
 })

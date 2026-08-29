@@ -20,6 +20,49 @@
   line-height: 1.08 !important;
   text-wrap: balance;
 }
+.onboarding .arrival-language {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: min(760px, 100%);
+  margin: 0 auto 18px;
+}
+.onboarding .arrival-language-choice {
+  display: grid;
+  place-items: center;
+  min-width: 48px;
+  min-height: 44px;
+  padding: 0 13px;
+  border: 1px solid rgb(140 207 192 / 18%);
+  border-radius: 999px;
+  background: rgb(8 14 12 / 58%);
+  color: rgb(180 205 188 / 68%);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: .16em;
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease, color 160ms ease, box-shadow 160ms ease;
+}
+.onboarding .arrival-language-choice-active {
+  border-color: rgb(216 168 90 / 48%);
+  background: rgb(216 168 90 / 10%);
+  color: rgb(255 226 169 / 96%);
+  box-shadow: 0 0 22px rgb(216 168 90 / 10%);
+}
+.onboarding .arrival-language-choice:disabled {
+  cursor: wait;
+  opacity: .62;
+}
+.onboarding .arrival-language-error {
+  max-width: 42ch;
+  margin: -7px auto 14px;
+  color: rgb(238 184 164 / 82%);
+  font-size: 11px;
+  line-height: 1.45;
+  text-align: center;
+}
 .first-run-philosophy {
   margin: 8px auto 0;
   color: rgb(216 168 90 / 78%);
@@ -334,6 +377,9 @@ main.app:has(> .drawer-veil) > .drawer-veil .drawer-close {
     animation: none !important;
   }
   .first-run-focus {
+    transition: none !important;
+  }
+  .onboarding .arrival-language-choice {
     transition: none !important;
   }
 }

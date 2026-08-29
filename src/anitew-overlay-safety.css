@@ -79,6 +79,20 @@ main.app:has(> .drawer-veil) > .drawer-veil {
   .drawer .menu-group-device {
     grid-template-columns: minmax(0, 1fr) !important;
   }
+
+  /*
+   * Every atlas child must size against the visible phone column, never an
+   * earlier desktop intrinsic width. This is deliberately part of the cold
+   * safety layer so the lazy Core styles cannot create a wide intermediate
+   * layout that WebKit then remembers as a horizontal scroll position.
+   */
+  .drawer .menu-group,
+  .drawer .theme-control {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
 }
 
 /*
@@ -103,7 +117,7 @@ main.app:has(> .drawer-veil) > .drawer-veil {
  * Bis hierher scrollte die ganze Schublade, und der Schließen-Knopf klebte
  * mit `position: sticky` oben. Weil sein Grund durchsichtig ist, lief jeder
  * Menüeintrag durch das ✕ hindurch — gemessen auf einem iPhone 14 Pro: bei
- * Scrollstand 80 „Dein Stand", bei 200 „Memory DNA", bei 300 „Eigene Inhalte".
+ * Scrollstand 80 „Dein Stand“, bei 200 „Memory DNA“, bei 300 „Eigene Inhalte“.
  *
  * Zwei Wege wurden verworfen. **Mehr Abstand** löst nichts: Er verschiebt nur,
  * welcher Eintrag bei welchem Scrollstand darunterläuft. Ein **deckender
@@ -131,10 +145,15 @@ nav.drawer {
 
 nav.drawer .drawer-scroll {
   flex: 1 1 auto;
+  min-width: 0;
   min-height: 0;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden !important;
   overflow-y: auto;
   overscroll-behavior: contain;
+  touch-action: pan-y;
   -webkit-overflow-scrolling: touch;
 }
 
