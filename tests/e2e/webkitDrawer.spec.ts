@@ -168,11 +168,39 @@ test('sonde: Maße der Schublade unter WebKit — nach dem Neuladen', async ({ p
         zuBreit.push(`${name} x=${Math.round(r.x)} b=${Math.round(r.width)}`)
       }
     }
+    /*
+     * Der eigentliche Fund: `nav.drawer` hat scrollWidth 532 bei 393 sichtbar
+     * und steht auf scrollLeft 139. Wer macht die 139 Pixel Ueberbreite?
+     * Gemessen wird im **Inhaltskasten der Schublade**, nicht im Fenster —
+     * sonst misst man nur die Folgen des Scrollens.
+     */
+    const schublade = document.querySelector('nav.drawer') as HTMLElement | null
+    const taeter: string[] = []
+    if (schublade !== null) {
+      const dr = schublade.getBoundingClientRect()
+      const versatz = schublade.scrollLeft - dr.left
+      for (const el of Array.from(schublade.querySelectorAll('*')) as HTMLElement[]) {
+        const r = el.getBoundingClientRect()
+        const rechts = Math.round(r.right + versatz)
+        const links = Math.round(r.left + versatz)
+        if (rechts > schublade.clientWidth + 1) {
+          const st = getComputedStyle(el)
+          const name =
+            el.tagName.toLowerCase() + (el.className ? '.' + String(el.className).split(' ')[0] : '')
+          taeter.push(
+            `${name} links=${links} rechts=${rechts} b=${Math.round(r.width)} pos=${st.position} w=${st.width} minw=${st.minWidth} ws=${st.whiteSpace}`,
+          )
+        }
+      }
+    }
+
     return {
       fenster: window.innerWidth,
       dokBreite: Math.round(document.documentElement.scrollWidth),
       scrollX: Math.round(window.scrollX),
       scrollLinksDok: Math.round(document.scrollingElement?.scrollLeft ?? -1),
+      taeter: taeter.slice(0, 14),
+      anzahlTaeter: taeter.length,
       veil: kasten('.drawer-veil'),
       drawer: kasten('nav.drawer'),
       scrollKasten: kasten('.drawer-scroll'),
