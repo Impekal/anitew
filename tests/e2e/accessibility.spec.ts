@@ -48,15 +48,13 @@ test('hält den Fokus im offenen Menü und gibt ihn danach zurück', async ({ pa
   await expect(dialog).toHaveAttribute('aria-modal', 'true')
   await expect(page.locator('.drawer-close')).toBeFocused()
 
-  expect(
-    await page.evaluate(() => {
-      const drawer = document.querySelector('.drawer')
-      const start = document.querySelector('.challenge')
-      return drawer !== null && start !== null && !drawer.contains(start) && start.closest('[inert]') !== null
-    }),
-    'der Hintergrund blieb trotz modalem Drawer fokussierbar',
-  ).toBe(true)
-
+  /*
+   * Die eigentliche Zusage ist Verhalten: Bei offenem Modal kann Tab den
+   * Drawer nicht verlassen. Ein früherer Test verlangte zusätzlich `[inert]`
+   * auf dem React-Hintergrund. Das war eine Implementierungsforderung und
+   * machte in Chromium die sichtbaren Drawer-Einträge selbst unanklickbar,
+   * weil Overlay und Hintergrund im selben #root leben.
+   */
   for (let step = 0; step < 16; step++) {
     await page.keyboard.press('Tab')
     expect(
@@ -65,6 +63,19 @@ test('hält den Fokus im offenen Menü und gibt ihn danach zurück', async ({ pa
     ).toBe(true)
   }
 
+  // Pointer und Tastatur müssen gleichzeitig funktionieren — genau diese
+  // Kombination hat der fragile inert-Ansatz zuvor zerstört.
+  const firstItem = page.locator('.drawer-item').first()
+  await expect(firstItem).toBeVisible()
+  await firstItem.click()
+  await expect(page.locator('.page')).toBeVisible()
+
+  // Noch einmal öffnen und Escape als echten Modal-Ausgang prüfen.
+  await page.locator('.page-back').click()
+  await expect(menu).toBeVisible()
+  await menu.focus()
+  await page.keyboard.press('Enter')
+  await expect(dialog).toBeVisible()
   await page.keyboard.press('Escape')
   await expect(dialog).toHaveCount(0)
   await expect(menu).toBeFocused()
