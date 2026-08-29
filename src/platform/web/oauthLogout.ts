@@ -1,4 +1,5 @@
 const LOGOUT_PENDING_KEY = 'anitew.google-oauth.logout-pending.v1'
+const LOGOUT_TIMEOUT_MS = 5_000
 
 /**
  * Eine lokale Marke ist nötig, weil das eigentliche OAuth-Cookie HttpOnly ist:
@@ -36,18 +37,29 @@ function clearGoogleLogoutPending(): void {
  * Drive weiter synchronisiert: die aufrufende UI schaltet `sync.on` vorher
  * dauerhaft aus. Es bedeutet nur, dass der Worker gerade nicht bestätigt hat,
  * den HttpOnly-Cookie gelöscht zu haben. Dann bleibt die Retry-Marke stehen.
+ *
+ * Die fünf Sekunden sind zugleich eine Race-Grenze: Während dieses kleinen
+ * Fensters bleibt der Trennknopf im aufrufenden Panel beschäftigt; danach ist
+ * entweder der Cookie bestätigt weg oder ein späterer Retry vorgemerkt. So
+ * kann ein schneller erneuter Login nicht von einer verspäteten Logout-Antwort
+ * wieder abgemeldet werden.
  */
 export async function disconnectGoogleAuthorization(): Promise<boolean> {
   markGoogleLogoutPending()
+  const controller = new AbortController()
+  const timeout = window.setTimeout(() => controller.abort(), LOGOUT_TIMEOUT_MS)
   let response: Response
   try {
     response = await fetch('/oauth/google/logout', {
       method: 'POST',
       credentials: 'same-origin',
       headers: { 'x-anitew-request': '1' },
+      signal: controller.signal,
     })
   } catch {
     return false
+  } finally {
+    window.clearTimeout(timeout)
   }
   if (!response.ok) return false
   clearGoogleLogoutPending()
