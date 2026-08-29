@@ -14,6 +14,37 @@ body:has(.drawer-veil) {
 }
 
 /*
+ * Hit testing is Core correctness, not late first-run polish. `.app` enters
+ * with a transform-producing animation. In Chromium a fixed descendant can
+ * otherwise keep that animated shell as its containing block after a fast
+ * reload: the Drawer looks visible, while pointer hit testing lands on the
+ * page behind it. These rules used to live only in the lazy first-run sheet,
+ * leaving a real race before that chunk arrived.
+ */
+main.app:has(> .drawer-veil) {
+  animation: none !important;
+  transform: none !important;
+  filter: none !important;
+  perspective: none !important;
+  transform-style: flat !important;
+  clip-path: none !important;
+  contain: none !important;
+}
+
+#root:has(.drawer-veil) .drawer-veil {
+  z-index: 2147483647 !important;
+  pointer-events: auto !important;
+}
+
+main.app:has(> .drawer-veil) > :not(.drawer-veil) {
+  pointer-events: none !important;
+}
+
+main.app:has(> .drawer-veil) > .drawer-veil {
+  pointer-events: auto !important;
+}
+
+/*
  * The mobile redesign deliberately tightens the top spacing to 18px, but that
  * rule used to replace the base `.app` safe-area padding completely. On a
  * real standalone iPhone PWA this put the page-level "Close" action under the
