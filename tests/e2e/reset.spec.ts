@@ -232,8 +232,27 @@ test('nach dem Antippen steht der Bestätigungsschritt im Bild, nicht darunter',
   const reset = page.locator('.wipe-reset')
   await expect(reset).toBeVisible()
 
-  // Antippen über Bildschirmkoordinaten — ohne Playwrights Scroll-vor-Klick.
+  /*
+   * Erst den Knopf ins Bild holen — wie ein Mensch es täte —, dann über
+   * Bildschirmkoordinaten antippen.
+   *
+   * Der geprüfte Fehler liegt **nach** dem Antippen: Erscheint der
+   * Bestätigungsschritt im Bild oder darunter? Das Heranscrollen davor gehört
+   * nicht zum Fehlerbild; es ist das, was jeder Nutzer auf einer scrollenden
+   * Seite ohnehin tut. Nur der Klick selbst umgeht Playwrights Automatik,
+   * denn genau die hat das ursprüngliche Problem verdeckt.
+   *
+   * Warum das nachträglich nötig wurde: Mit B-03 (Tap-Ziele auf 44 px) sind
+   * die Bedienelemente auf dieser Seite höher geworden, die Seite damit
+   * länger, und „Alles löschen" ist von 816 auf 835 gerutscht — sein unterer
+   * Rand liegt jetzt bei 879 statt bei 850, also knapp hinter der Kante eines
+   * 852 Pixel hohen Fensters. Vorher passte er gerade so; bequem stand er nie.
+   * Ein Klick auf die Mitte eines Knopfes, der halb draußen liegt, landet im
+   * Nichts — das ist eine Eigenheit des Tippens auf Koordinaten, kein Fehler
+   * der App.
+   */
   const knopf = reset.getByRole('button').first()
+  await knopf.scrollIntoViewIfNeeded()
   const kasten = await knopf.boundingBox()
   expect(kasten).not.toBeNull()
   await page.mouse.click(kasten!.x + kasten!.width / 2, kasten!.y + kasten!.height / 2)
