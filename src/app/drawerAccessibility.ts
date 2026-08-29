@@ -7,11 +7,6 @@ const FOCUSABLE = [
   '[tabindex]:not([tabindex="-1"])',
 ].join(',')
 
-interface InertSnapshot {
-  element: HTMLElement
-  inert: boolean
-}
-
 function visibleFocusable(drawer: HTMLElement): HTMLElement[] {
   return [...drawer.querySelectorAll<HTMLElement>(FOCUSABLE)].filter(
     (element) => !element.hidden && element.getClientRects().length > 0,
@@ -20,23 +15,27 @@ function visibleFocusable(drawer: HTMLElement): HTMLElement[] {
 
 /**
  * Ergänzt dem React-Drawer die Semantik und Fokusregeln eines modalen
- * Dialogs, ohne das visuelle Layout anzufassen. Der Helfer bleibt absichtlich
- * DOM-seitig: Der Drawer ist ein kurzlebiges Portal-artiges Overlay und kann
- * so unabhängig von den vielen App-Zuständen abgesichert werden.
+ * Dialogs, ohne das visuelle Layout anzufassen.
+ *
+ * Wichtig: Der Drawer lebt derzeit innerhalb von `#root` und nicht in einem
+ * echten Body-Portal. Frühere Audit-Fassungen setzten deshalb die Geschwister
+ * entlang dieses Baums auf `inert`. Chromium retargetete daraufhin reale
+ * Pointer-Treffer im Drawer auf `#root` — sichtbare Menüeinträge waren nicht
+ * mehr anklickbar. `aria-modal`, der vollflächige Veil und der Fokus-Trap
+ * liefern hier die richtige Modalität, ohne einen Vorfahren des Overlays in
+ * die Hit-Test-Sperre zu ziehen. Falls der Drawer später in ein echtes Portal
+ * wandert, kann `#root` dort gefahrlos inert gesetzt werden.
  */
 export function installDrawerAccessibility(): () => void {
   let activeDrawer: HTMLElement | undefined
   let activeVeil: HTMLElement | undefined
   let opener: HTMLElement | null = null
-  let inertSnapshots: InertSnapshot[] = []
   let keydown: ((event: KeyboardEvent) => void) | undefined
 
   const restore = () => {
     if (activeDrawer !== undefined && keydown !== undefined) {
       activeDrawer.removeEventListener('keydown', keydown)
     }
-    for (const snapshot of inertSnapshots) snapshot.element.inert = snapshot.inert
-    inertSnapshots = []
     activeDrawer = undefined
     activeVeil = undefined
     keydown = undefined
@@ -44,20 +43,6 @@ export function installDrawerAccessibility(): () => void {
     const target = opener
     opener = null
     if (target?.isConnected) queueMicrotask(() => target.focus())
-  }
-
-  const inertOutside = (veil: HTMLElement) => {
-    let branch: HTMLElement = veil
-    while (branch.parentElement !== null) {
-      const parent = branch.parentElement
-      for (const sibling of [...parent.children]) {
-        if (!(sibling instanceof HTMLElement) || sibling === branch) continue
-        inertSnapshots.push({ element: sibling, inert: sibling.inert })
-        sibling.inert = true
-      }
-      if (parent === document.body) break
-      branch = parent
-    }
   }
 
   const enhance = (drawer: HTMLElement, veil: HTMLElement) => {
@@ -73,9 +58,12 @@ export function installDrawerAccessibility(): () => void {
     const hamburger = document.querySelector<HTMLElement>('.hamburger')
     hamburger?.setAttribute('aria-haspopup', 'dialog')
 
-    inertOutside(veil)
-
     keydown = (event) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        drawer.querySelector<HTMLButtonElement>('.drawer-close')?.click()
+        return
+      }
       if (event.key !== 'Tab') return
       const focusable = visibleFocusable(drawer)
       if (focusable.length === 0) {
