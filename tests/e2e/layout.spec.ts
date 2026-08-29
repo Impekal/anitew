@@ -120,9 +120,15 @@ test('hält die Breite auf jeder Menüseite — und in der Schublade', async ({ 
      * steht die Schublade noch nicht, tippt der Test den Hamburger an und
      * **schließt damit die Schublade, die gerade aufgeht.** Die Zeile danach
      * wartet dann dreißig Sekunden auf etwas, das der Test selbst zugemacht
-     * hat. Zweimal auf `desktop-wide` erlebt (Läufe 1458 und 1465), lokal in
-     * neun Wiederholungen nie — es braucht eine ausgelastete Maschine, damit
-     * die Momentaufnahme früh genug fällt.
+     * hat. Zweimal auf `desktop-wide` erlebt (Läufe 1458 und 1465, an zwei
+     * verschiedenen Zeilen dieser Schleife).
+     *
+     * **Nachgewiesen ist der Zusammenhang nicht.** Lokal ist der Fehlschlag in
+     * neun Wiederholungen nie aufgetreten, auch nicht in einem A/B-Versuch
+     * zwischen alter und neuer Fassung bei sechsfach gedrosselter CPU (je drei
+     * Läufe, alle grün). Was hier steht, ist eine Härtung mit plausibler
+     * Begründung, kein bewiesener Fix: Sie nimmt eine Möglichkeit weg und
+     * kostet nichts. Fällt der Test wieder um, ist diese Erklärung falsch.
      *
      * Gewartet wird deshalb auf den Zustand, der nach dem Zurück **gilt**.
      * Der Hamburger bleibt als Rückfall, falls der Core einmal nicht von
