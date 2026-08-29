@@ -1,0 +1,42 @@
+# WebKit-Sonde — misst, prüft nicht.
+#
+# Der Core steht auf dem iPhone seitlich verschoben (Gerätemeldung 29.08.).
+# Zwei Behebungsversuche sind gescheitert, beide auf einer Vermutung gebaut.
+# Der Grund fürs Raten: Alle Geräteprofile dieses Projekts laufen auf
+# Chromium — auch die, die „iphone" heißen. Unter der Engine, auf der der
+# Fehler auftritt, wurde nie gemessen.
+#
+# In der Entwicklungsumgebung lässt sich WebKit nicht installieren (der
+# Netzzugang zu Playwrights Download-Hosts ist dort gesperrt). Hier schon.
+#
+# Läuft nur auf Zuruf und nur auf Sondierungszweigen — dieser Arbeitsablauf
+# veröffentlicht nichts und blockiert nichts.
+name: WebKit-Sonde
+
+on:
+  push:
+    branches:
+      - 'claude/anitew-webkit**'
+  workflow_dispatch:
+
+concurrency:
+  group: webkit-sonde-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  messen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --force
+      - run: npm run build
+      - name: WebKit holen
+        run: npx playwright install --with-deps webkit
+      - name: Messen
+        env:
+          ANITEW_WEBKIT: '1'
+        run: npx playwright test --project=webkit-iphone --reporter=line
