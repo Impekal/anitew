@@ -17,6 +17,12 @@
 function enhanceLesson(lesson: HTMLElement): void {
   if (lesson.dataset.explicitContinue === 'true') return
 
+  // Manche Lektionen (z. B. der Gedächtnispalast) besitzen bereits einen
+  // expliziten React-Weiterknopf. Dort darf der Adapter keinen zweiten
+  // `.lesson-continue` erzeugen: Der native Bedienweg ist bereits korrekt und
+  // zwei gleichartige Controls wären semantisch wie für Tests mehrdeutig.
+  if (lesson.querySelector('.lesson-continue') !== null) return
+
   const card = lesson.querySelector<HTMLButtonElement>('.lesson-card')
   const hints = [...lesson.querySelectorAll<HTMLElement>(':scope > .hint')]
   const ready = hints.at(-1)
