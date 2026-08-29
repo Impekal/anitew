@@ -123,7 +123,9 @@ Palast, Zwillinge, visuelle Details und Benchmark.
      vorhanden.
 
 3. **Reale Produktionsabnahme**
-   - Kein automatischer Deploy.
+   - Ein Push auf `anitew-redesign-v2` wird nach dem vollständigen grünen
+     CI-Tor automatisch nach Production veröffentlicht; Arbeitsbranches
+     deployen nicht. Die **Geräteabnahme selbst bleibt bewusst manuell**.
    - Nach finalem Produkt-Gate: realer iPhone-Test mit geschlossener Home-Screen-
      PWA, Sperrbildschirm-Push, Google-Anmeldung, sichtbarem Namen/E-Mail,
      Logout und Core-Zurücknavigation.

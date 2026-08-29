@@ -1,8 +1,10 @@
 /* ANITEW V4.1.1 — phone Core atlas
  * Desktop may breathe as a three-column memory map. On a phone the same
  * geometry becomes too narrow once every destination has a real icon and a
- * readable label. Mobile therefore uses two compact columns, with Appearance
- * spanning the full width. Nothing may overlap or depend on text being short.
+ * readable label. Mobile therefore uses two compact columns for personal
+ * destinations, while technical/device destinations use one calm column.
+ * Appearance spans the full width. Nothing may overlap or depend on text
+ * being short.
  */
 
 @media (max-width: 560px) {
@@ -18,9 +20,13 @@
     margin-bottom: 38px !important;
   }
 
-  .drawer .menu-group,
-  .drawer .menu-group-device {
+  .drawer .menu-group:not(.menu-group-device) {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .drawer .menu-group-device {
+    grid-template-columns: minmax(0, 1fr) !important;
     gap: 10px !important;
   }
 

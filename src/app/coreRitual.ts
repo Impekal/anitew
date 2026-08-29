@@ -2,14 +2,8 @@ import '../anitew-living-adaptive.css'
 import '../anitew-core-ritual.css'
 import '../anitew-sensory-light.css'
 import '../anitew-system-light.css'
-import '../anitew-core-menu-contrast.css'
-import '../anitew-core-icon-identity.css'
 import '../anitew-button-aura.css'
-import '../anitew-core-glyph-distinct.css'
 import '../anitew-living-node-shape.css'
-import '../anitew-core-mobile.css'
-import './firstRunExperience.ts'
-import { mountNeuralField, unmountNeuralField } from './NeuralFieldMount.tsx'
 
 let installed = false
 let coreTimer: number | undefined
@@ -17,11 +11,33 @@ let enteringFallback: number | undefined
 let arrivalTimer: number | undefined
 let pressTimer: number | undefined
 let ritualAudio: AudioContext | undefined
+let coreStylesLoad: Promise<unknown> | undefined
+let firstRunLoad: Promise<unknown> | undefined
 
 const root = () => document.documentElement
 
 function clearTimer(timer: number | undefined): void {
   if (timer !== undefined) window.clearTimeout(timer)
+}
+
+/**
+ * A-14: Diese vier Blätter gestalten ausschließlich den geöffneten Core.
+ * Früher wurden sie bei jedem Start nach 750 ms geparst und auf den gesamten
+ * DOM angewandt, obwohl der Nutzer den Core vielleicht gar nicht öffnet.
+ */
+function ensureCoreStyles(): Promise<unknown> {
+  coreStylesLoad ??= Promise.all([
+    import('../anitew-core-menu-contrast.css'),
+    import('../anitew-core-icon-identity.css'),
+    import('../anitew-core-glyph-distinct.css'),
+    import('../anitew-core-mobile.css'),
+  ]).catch(() => undefined)
+  return coreStylesLoad
+}
+
+function ensureFirstRunExperience(): Promise<unknown> {
+  firstRunLoad ??= import('./firstRunExperience.ts').catch(() => undefined)
+  return firstRunLoad
 }
 
 function soundEnabled(): boolean {
@@ -63,6 +79,7 @@ function ritualTone(kind: ToneKind): void {
       window.AudioContext ??
       (window as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
     if (Ctor === undefined) return
+    if (ritualAudio?.state === 'closed') ritualAudio = undefined
     ritualAudio ??= new Ctor()
     if (ritualAudio.state === 'suspended') void ritualAudio.resume().catch(() => undefined)
 
@@ -176,11 +193,27 @@ function noticeSessionArrival(): void {
   }, 760)
 }
 
+function prewarmInteraction(event: Event): void {
+  const target = event.target
+  if (!(target instanceof Element)) return
+  if (target.closest('.hamburger, .drawer-item') !== null) void ensureCoreStyles()
+  if (target.closest('.arrival-begin') !== null) void ensureFirstRunExperience()
+}
+
 function installCoreRitual(): void {
   if (installed) return
   installed = true
-  mountNeuralField()
   root().dataset.anitewRitualReady = 'true'
+
+  // Auf einem echten Erstlauf gehört die Einführung weiterhin zur Signature-
+  // Experience. Auf jedem späteren Start wird dieser Code gar nicht geladen.
+  if (document.querySelector('.onboarding') !== null) void ensureFirstRunExperience()
+
+  // Finger wie Tastatur: Vor der eigentlichen Aktivierung beginnen die
+  // Core-spezifischen Blätter zu laden. Das vermeidet einen ungestylten Frame
+  // beim Öffnen, ohne sie auf jedem Start vorab zu parsen.
+  document.addEventListener('pointerdown', prewarmInteraction, true)
+  document.addEventListener('focusin', prewarmInteraction, true)
 
   document.addEventListener(
     'click',
@@ -190,6 +223,7 @@ function installCoreRitual(): void {
 
       const firstRun = target.closest('.arrival-begin')
       if (firstRun !== null) {
+        void ensureFirstRunExperience()
         tactile([6, 22, 10])
         ritualTone('core')
         flashPress()
@@ -198,6 +232,7 @@ function installCoreRitual(): void {
 
       const core = target.closest('.hamburger')
       if (core !== null && core.getAttribute('aria-expanded') !== 'true') {
+        void ensureCoreStyles()
         pulseCore()
         flashPress()
         return
@@ -228,6 +263,7 @@ function installCoreRitual(): void {
 
       const drawerItem = target.closest('.drawer-item')
       if (drawerItem instanceof HTMLButtonElement && !drawerItem.disabled) {
+        void ensureCoreStyles()
         tactile([5])
         ritualTone('navigate')
         flashPress()
@@ -236,25 +272,30 @@ function installCoreRitual(): void {
     true,
   )
 
+  // Dieser Observer darf bei BFCache nicht dauerhaft getrennt werden: das
+  // Dokument wird nur eingefroren und später mit demselben Modul fortgesetzt.
+  // Beim echten Verlassen entsorgt der Browser ihn ohnehin zusammen mit dem
+  // Dokument.
   const observer = new MutationObserver(noticeSessionArrival)
   observer.observe(document.getElementById('root') ?? document.body, {
     childList: true,
     subtree: true,
   })
 
-  window.addEventListener(
-    'pagehide',
-    () => {
-      observer.disconnect()
-      clearTimer(coreTimer)
-      clearTimer(enteringFallback)
-      clearTimer(arrivalTimer)
-      clearTimer(pressTimer)
-      unmountNeuralField()
-      if (ritualAudio !== undefined) void ritualAudio.close().catch(() => undefined)
-    },
-    { once: true },
-  )
+  window.addEventListener('pagehide', () => {
+    clearTimer(coreTimer)
+    clearTimer(enteringFallback)
+    clearTimer(arrivalTimer)
+    clearTimer(pressTimer)
+    delete root().dataset.anitewCoreOpening
+    delete root().dataset.anitewEntering
+    delete root().dataset.anitewSessionArriving
+    if (ritualAudio !== undefined) {
+      const closing = ritualAudio
+      ritualAudio = undefined
+      void closing.close().catch(() => undefined)
+    }
+  })
 }
 
 installCoreRitual()
