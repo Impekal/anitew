@@ -844,6 +844,7 @@ export function App() {
     return (
       <OnboardingScreen
         dictionary={dictionary}
+        language={language}
         onDone={(answers, firstMemory) => {
           void (async () => {
             if (firstMemory !== undefined) {
