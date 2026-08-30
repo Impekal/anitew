@@ -189,6 +189,12 @@
         margin-top: 34px;
         margin-bottom: 0;
         color: rgb(229 184 109 / 78%);
+        /*
+         * Nur EIN Schein, und zwar der goldene: Hier stand zusätzlich ein
+         * zweites `text-shadow` in Mint aus der Grau-Fassung — die spätere
+         * Deklaration gewann, und der oben begründete Gold-Schein war nie zu
+         * sehen (gemessen 30.08.: berechnet rgba(142 231 208 / 10%)).
+         */
         text-shadow: 0 0 18px rgb(229 184 109 / 22%);
         font: 650 10px/1.7 ui-monospace, SFMono-Regular, Menlo, monospace;
         letter-spacing: .27em;
@@ -196,7 +202,6 @@
         text-transform: uppercase;
         opacity: 0;
         transform: translateY(4px);
-        text-shadow: 0 0 18px rgb(142 231 208 / 10%);
         animation: anitew-launch-copy .7s .08s ease forwards;
       }
       .anitew-launch-core {

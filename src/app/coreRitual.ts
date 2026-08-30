@@ -5,6 +5,8 @@ import '../anitew-system-light.css'
 import '../anitew-button-aura.css'
 import '../anitew-living-node-shape.css'
 
+import { firstRunGuidePending } from './firstRunGuideState.ts'
+
 let installed = false
 let coreTimer: number | undefined
 let enteringFallback: number | undefined
@@ -205,9 +207,17 @@ function installCoreRitual(): void {
   installed = true
   root().dataset.anitewRitualReady = 'true'
 
-  // Auf einem echten Erstlauf gehört die Einführung weiterhin zur Signature-
-  // Experience. Auf jedem späteren Start wird dieser Code gar nicht geladen.
-  if (document.querySelector('.onboarding') !== null) void ensureFirstRunExperience()
+  /*
+   * Auf einem echten Erstlauf gehört die Einführung weiterhin zur Signature-
+   * Experience. Dazu kommt der eine Fall, in dem ein späterer Start sie doch
+   * braucht: Wer die App mitten in der Führung geschlossen hat, trägt
+   * `pending=1` im Speicher — ohne das Modul konnte diese Marke nie wieder
+   * etwas zeigen (gemessen 30.08., siehe firstRunGuideState.ts). Auf jedem
+   * anderen Start wird dieser Code weiterhin gar nicht geladen.
+   */
+  if (document.querySelector('.onboarding') !== null || firstRunGuidePending()) {
+    void ensureFirstRunExperience()
+  }
 
   // Finger wie Tastatur: Vor der eigentlichen Aktivierung beginnen die
   // Core-spezifischen Blätter zu laden. Das vermeidet einen ungestylten Frame

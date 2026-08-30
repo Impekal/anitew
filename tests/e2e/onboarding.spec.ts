@@ -22,12 +22,35 @@ test('erlaubt die Sprachwahl schon auf dem ersten Screen und merkt sie dauerhaft
   await expect(language).toBeVisible()
   await expect(page.getByText('Dein Gedächtnis, trainiert.')).toBeVisible()
 
+  /*
+   * Erst den fertig ausgebauten Bildschirm abwarten, dann wechseln — das ist
+   * der Weg des Menschen, der erst liest und sich dann entscheidet. Genau in
+   * diesem Zustand blieb der Wechsel vorher halb stecken: Die beiden
+   * Enhancement-Schichten markieren das `.arrival`-Element als erledigt, und
+   * ohne Remount (key in OnboardingScreen.tsx) sprachen Überschrift und
+   * Knöpfe danach Englisch, aber Philosophie, alle sechs Karten, Trust-Zeile,
+   * Fragen-Absatz, Drive-Karte und Scroll-Cue weiter Deutsch (gemessen
+   * 30.08.). Die alte Fassung dieses Tests prüfte nur die Begrüßungszeile —
+   * die einzige, die React selbst umschreibt — und blieb deshalb grün.
+   */
+  await expect(page.locator('.first-run-drive-card')).toBeVisible({ timeout: 10_000 })
+  await expect(page.locator('.first-run-philosophy')).toHaveText('Erinnern. Verknüpfen. Behalten.')
+
   await language.getByRole('button', { name: 'English' }).click()
 
   // Kein Reload als Übersetzungstrick: Der bereits sichtbare Welcome-Screen
-  // muss sofort aus demselben App-Zustand heraus Englisch sprechen.
+  // muss sofort aus demselben App-Zustand heraus Englisch sprechen — und
+  // zwar ganz, bis in die imperativ eingebauten Teile hinein.
   await expect(page.locator('html')).toHaveAttribute('lang', 'en')
-  await expect(page.getByText('Your memory, trained.')).toBeVisible()
+  await expect(page.getByText('Welcome to your memory system.')).toBeVisible()
+  await expect(page.locator('.first-run-philosophy')).toHaveText('Remember. Connect. Retain.')
+  await expect(page.getByText('What ANITEW does')).toBeVisible()
+  await expect(page.getByText('Adaptive training', { exact: true })).toBeVisible()
+  await expect(page.getByText('PRIVATE · LOCAL FIRST · YOUR DATA, YOUR CONTROL')).toBeVisible()
+  await expect(
+    page.getByText('Sign in / save data in Google Drive', { exact: true }),
+  ).toBeVisible()
+  await expect(page.locator('.first-run-scroll-label')).toHaveText('Explore more')
   await expect(language.getByRole('button', { name: 'English' })).toHaveAttribute(
     'aria-pressed',
     'true',
@@ -60,7 +83,41 @@ test('erlaubt die Sprachwahl schon auf dem ersten Screen und merkt sie dauerhaft
 
   await page.reload()
   await expect(page.locator('html')).toHaveAttribute('lang', 'en')
-  await expect(page.getByText('Your memory, trained.')).toBeVisible()
+  // Der belastbare Endzustand ist der fertig ausgebaute Bildschirm — nicht
+  // die React-Zeile, die die Enhancement-Schicht gleich darauf überschreibt.
+  await expect(page.getByText('Welcome to your memory system.')).toBeVisible({ timeout: 10_000 })
+  await expect(page.locator('.first-run-philosophy')).toHaveText('Remember. Connect. Retain.')
+})
+
+test('markiert bei unübersetzter Systemsprache die englische Fassung als aktiv', async ({
+  browser,
+}) => {
+  /*
+   * Türkisch steht in SUPPORTED_LANGUAGES, ist aber (noch) nicht übersetzt —
+   * die Oberfläche fällt auf Englisch zurück (FALLBACK_LANGUAGE). Vorher
+   * markierte der erste Screen trotzdem „DE“ als aktiv, samt
+   * `aria-pressed="true"` auf einer Sprache, die nicht zu sehen war
+   * (gemessen 30.08. mit tr-TR).
+   */
+  const context = await browser.newContext({ locale: 'tr-TR' })
+  const page = await context.newPage()
+  await page.goto('http://127.0.0.1:4173/')
+
+  await expect(page.locator('html')).toHaveAttribute('lang', 'tr')
+  await expect(page.locator('.first-run-drive-card')).toBeVisible({ timeout: 10_000 })
+  await expect(page.locator('.first-run-philosophy')).toHaveText('Remember. Connect. Retain.')
+
+  const language = page.locator('.arrival-language')
+  await expect(language.getByRole('button', { name: 'English' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  )
+  await expect(language.getByRole('button', { name: 'Deutsch' })).toHaveAttribute(
+    'aria-pressed',
+    'false',
+  )
+
+  await context.close()
 })
 
 test('erzeugt in unter drei Schritten die erste echte Erinnerung, ohne ein Urteil', async ({

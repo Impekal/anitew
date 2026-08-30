@@ -46,6 +46,9 @@ test('blockiert den Browser bis zur bewussten Installationsentscheidung', async 
   await page.goto('/?installGate=1')
 
   await expect(page.getByRole('heading', { name: 'ANITEW als App installieren' })).toBeVisible()
+  // Das Gate rendert vor useLanguage; `<html lang>` muss trotzdem zur
+  // angezeigten Fassung passen (hier Deutsch, siehe den englischen Fall unten).
+  await expect(page.locator('html')).toHaveAttribute('lang', 'de')
   await expect(page.getByText('Meist weniger als eine Minute.')).toBeVisible()
   await expect(page.getByLabel('Dein Gerät')).toBeVisible()
   await expect(page.getByRole('button', { name: 'App installieren' })).toBeVisible()
@@ -80,6 +83,23 @@ test('zeigt auf dem iPhone die echte Home-Screen-Anleitung', async ({ browser })
   await expect(page.getByText(/Öffne ANITEW in Safari/)).toBeVisible()
   await expect(page.getByText(/Zum Home-Bildschirm/)).toBeVisible()
   await expect(page.getByText(/Bestätige mit „Hinzufügen“/)).toBeVisible()
+
+  await context.close()
+})
+
+test('spricht das Install-Gate englisch, sagt es das auch dem Dokument', async ({ browser }) => {
+  /*
+   * index.html steht fest auf `lang="de"`, und das Gate rendert vor der App.
+   * Ein englisches Gerät bekam englische Texte unter deutschem `<html lang>`
+   * — ein Screenreader las sie mit deutscher Aussprache vor (gemessen
+   * 30.08. mit en-US). Das Gate trägt seine Sprache jetzt selbst ein.
+   */
+  const context = await browser.newContext({ locale: 'en-US' })
+  const page = await context.newPage()
+  await page.goto('http://127.0.0.1:4173/?installGate=1')
+
+  await expect(page.getByRole('heading', { name: 'Install ANITEW as an app' })).toBeVisible()
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en')
 
   await context.close()
 })

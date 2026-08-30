@@ -13,6 +13,17 @@ test('der erste Eindruck trägt die englische Marke fünf Sekunden und erklärt 
   await expect(launch).toHaveCount(1)
   // Splash-Copy ist Marken-Copy: immer Englisch, auch wenn die App Deutsch spricht.
   await expect(page.getByText('MEMORIZE · RECALL · RETAIN · MASTER')).toBeVisible()
+  /*
+   * Der Schein der vier Wörter ist Gold, nicht Mint: In der Regel stand ein
+   * zweites `text-shadow` aus der Grau-Fassung, die spätere Deklaration
+   * gewann, und der im Kommentar begründete Gold-Schein war nie zu sehen
+   * (gemessen 30.08.: berechnet rgba(142 231 208 / 10%)). Geprüft wird der
+   * berechnete Wert — die Stelle, an der der Fehler sichtbar war.
+   */
+  const termsShine = await page
+    .locator('.anitew-launch-terms')
+    .evaluate((el) => getComputedStyle(el).textShadow)
+  expect(termsShine).toContain('229, 184, 109')
   await expect(page.getByText('Train the memory you actually use.')).toBeVisible()
   await expect(page.getByText('Powered by Impekal')).toBeVisible()
 
@@ -103,6 +114,38 @@ test('die Orientierung erklärt Core, Coach, Techniken, Memory World, Sync und M
 
   await page.reload()
   await expect(page.locator('#anitew-launch')).toBeHidden({ timeout: 6_000 })
+  await expect(startButton(page)).toBeVisible({ timeout: 15_000 })
+  await page.waitForTimeout(1_500)
+  await expect(page.locator('.first-run-guide')).toHaveCount(0)
+})
+
+test('eine angefangene Führung übersteht das Schließen der App', async ({ page }) => {
+  /*
+   * Die Führung merkt sich ihr „angefangen, nicht beendet“ absichtlich in
+   * localStorage (pending=1) — ihr einziger Zweck ist, einen Abbruch zu
+   * überleben. Genau das konnte sie nicht: `firstRunExperience.ts` wurde nur
+   * geladen, wenn `.onboarding` im DOM steht, und das gibt es nach dem
+   * Erstbesuch nie wieder. Gemessen 30.08.: Neuladen mit pending=1 — keine
+   * Führung, nie wieder. Seither lädt coreRitual das Modul auch dann, wenn
+   * eine angefangene Führung aussteht.
+   */
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/')
+  await expect(page.locator('.first-run-questions')).toBeVisible({ timeout: 8_000 })
+  await page.locator('.arrival .quiet').click()
+  await expect(startButton(page)).toBeVisible({ timeout: 15_000 })
+  await expect(page.locator('.first-run-guide')).toBeVisible({ timeout: 8_000 })
+
+  // Die App schließt mitten in der Führung — kein Skip, kein „ANITEW öffnen“.
+  await page.reload()
+  await expect(startButton(page)).toBeVisible({ timeout: 15_000 })
+  await expect(page.locator('.first-run-guide')).toBeVisible({ timeout: 8_000 })
+  await expect(page.getByText('Der ANITEW Core', { exact: true })).toBeVisible()
+
+  // Beendet bleibt beendet: Nach „ANITEW öffnen“/Überspringen ist Ruhe.
+  await page.locator('.first-run-guide-skip').click()
+  await expect(page.locator('.first-run-guide')).toBeHidden()
+  await page.reload()
   await expect(startButton(page)).toBeVisible({ timeout: 15_000 })
   await page.waitForTimeout(1_500)
   await expect(page.locator('.first-run-guide')).toHaveCount(0)

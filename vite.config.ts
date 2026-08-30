@@ -79,7 +79,7 @@ export default defineConfig({
           schon fertig war. Nachgemessen im erzeugten `dist/sw.js` — kein
           Treffer. Das Skript schreibt jetzt vorher nach `public/`, also gilt
           der Satz mittlerweile. Die Liste selbst steht in
-          `scripts/navigation-denylist.mjs`; dort steht auch, warum beide
+          `scripts/navigation-denylist.ts`; dort steht auch, warum beide
           Schreibweisen darin vorkommen müssen.
         */
         navigateFallbackDenylist: [...NAVIGATION_DENYLIST],
