@@ -18,7 +18,7 @@ test('erlaubt die Sprachwahl schon auf dem ersten Screen und merkt sie dauerhaft
 }) => {
   await page.goto('/')
 
-  const language = page.locator('.arrival-language')
+  const language = page.locator('.arrival-language:not(.arrival-language-training)')
   await expect(language).toBeVisible()
   await expect(page.getByText('Dein Gedächtnis, trainiert.')).toBeVisible()
 
@@ -89,6 +89,46 @@ test('erlaubt die Sprachwahl schon auf dem ersten Screen und merkt sie dauerhaft
   await expect(page.locator('.first-run-philosophy')).toHaveText('Remember. Connect. Retain.')
 })
 
+test('bietet die Trainingssprache schon beim Ankommen an — die Wahl gilt über das Ankommen hinaus', async ({
+  page,
+}) => {
+  await page.goto('/')
+  const training = page.locator('.arrival-language-training')
+  await expect(training).toBeVisible()
+
+  /*
+   * Angeboten wird der volle Inhaltsbestand (L7), abgeleitet aus
+   * trainingLanguages() — nicht zwei abgeschriebene Kürzel. Als M5 die
+   * sechste Sprache brachte, stand sie in den Einstellungen, aber nicht
+   * hier; genau dieses Auseinanderlaufen bewacht die vollständige Liste.
+   */
+  await expect(training.getByRole('button')).toHaveText(['DE', 'EN', 'FR', 'ES', 'IT', 'PT'])
+
+  // Die Wahl ist vom ersten Tipp an eigenständig: Training Französisch,
+  // die App-Sprache bleibt unberührt Deutsch (zwei Regeln, zwei Reihen).
+  await training.getByRole('button', { name: 'Français' }).click()
+  await expect(training.getByRole('button', { name: 'Français' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  )
+  await expect(page.locator('html')).toHaveAttribute('lang', 'de')
+  await expect(
+    page.locator('.arrival-language:not(.arrival-language-training)').getByRole('button', { name: 'Deutsch' }),
+  ).toHaveAttribute('aria-pressed', 'true')
+
+  // Sofort gespeichert, nicht nur angezeigt: Neuladen behält die Wahl.
+  await page.reload()
+  await expect(
+    page.locator('.arrival-language-training').getByRole('button', { name: 'Français' }),
+  ).toHaveAttribute('aria-pressed', 'true')
+
+  // Und sie gilt hinter dem Ankommen weiter: Dieselbe Einstellung, die die
+  // Einstellungen am Startbildschirm zeigen — eine Quelle, kein zweiter Ort.
+  await page.locator('.arrival .quiet').click()
+  await expect(page.locator('.challenge')).toBeVisible({ timeout: 15_000 })
+  await expect(page.locator('.language-training select')).toHaveValue('fr')
+})
+
 test('markiert bei unübersetzter Systemsprache die englische Fassung als aktiv', async ({
   browser,
 }) => {
@@ -107,7 +147,7 @@ test('markiert bei unübersetzter Systemsprache die englische Fassung als aktiv'
   await expect(page.locator('.first-run-drive-card')).toBeVisible({ timeout: 10_000 })
   await expect(page.locator('.first-run-philosophy')).toHaveText('Remember. Connect. Retain.')
 
-  const language = page.locator('.arrival-language')
+  const language = page.locator('.arrival-language:not(.arrival-language-training)')
   await expect(language.getByRole('button', { name: 'English' })).toHaveAttribute(
     'aria-pressed',
     'true',

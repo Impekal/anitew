@@ -845,6 +845,10 @@ export function App() {
       <OnboardingScreen
         dictionary={dictionary}
         language={language}
+        training={training}
+        chooseTraining={chooseTraining}
+        trainable={trainable}
+        trainingSaveFailed={trainingSaveFailed}
         onDone={(answers, firstMemory) => {
           void (async () => {
             if (firstMemory !== undefined) {
