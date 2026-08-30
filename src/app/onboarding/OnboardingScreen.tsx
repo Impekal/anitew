@@ -1,29 +1,45 @@
 import { useMemo, useState } from 'react'
 
 import {
+  FALLBACK_LANGUAGE,
   type Language,
   type OnboardingProfile,
+  SUPPORTED_LANGUAGES,
   TRAINING_MODES,
   type TrainingMode,
 } from '../../core/index.ts'
-import type { Dictionary } from '../../i18n/index.ts'
+import { type Dictionary, isTranslated } from '../../i18n/index.ts'
 import { createWebPlatform } from '../../platform/web/index.ts'
 import { persistInterfaceLanguageChoice } from '../useLanguage.ts'
 
 type Step = 'welcome' | 'memory' | 'time'
 
-const FIRST_RUN_LANGUAGES = ['de', 'en'] as const satisfies readonly Language[]
+/*
+ * Die App-Sprachen des ersten Bildschirms: nur echte Übersetzungen, wie in
+ * den Einstellungen (TRANSLATION_WORKFLOW §6) — abgeleitet statt
+ * abgeschrieben, damit die Reihe mit jeder fertigen Übersetzung von selbst
+ * wächst. Die Trainingssprachen kommen getrennt herein (`trainable`), denn
+ * für sie gilt die andere Regel: vollständiger Inhalt, nicht Übersetzung.
+ */
+const FIRST_RUN_LANGUAGES: readonly Language[] = SUPPORTED_LANGUAGES.filter(isTranslated)
 
 interface OnboardingScreenProps {
   dictionary: Dictionary
   /** Die aufgelöste App-Sprache aus useLanguage — dieselbe Quelle wie überall. */
   language: Language
+  /** Die geltende Trainingssprache aus useTrainingLanguage (L7). */
+  training: Language
+  chooseTraining: (next: Language) => void
+  /** Sprachen mit vollständigem Trainingsinhalt — trainingLanguages(). */
+  trainable: readonly Language[]
+  /** R3-06: Ließ sich die Trainingssprache nicht speichern? */
+  trainingSaveFailed: boolean
   onDone: (profile: OnboardingProfile, firstMemory?: string) => void
 }
 
 /**
- * Welche der beiden übersetzten Fassungen tatsächlich auf dem Bildschirm
- * steht. Für unübersetzte Sprachen fällt `dictionaryFor` auf Englisch zurück
+ * Welche der übersetzten Fassungen tatsächlich auf dem Bildschirm steht.
+ * Für unübersetzte Sprachen fällt `dictionaryFor` auf Englisch zurück
  * (FALLBACK_LANGUAGE) — dann ist Englisch die ehrliche aktive Wahl.
  *
  * Vorher wurde hier aus `document.documentElement.lang` geraten, mit Deutsch
@@ -31,8 +47,8 @@ interface OnboardingScreenProps {
  * sprach Englisch (Fallback), markiert war „DE“ — samt `aria-pressed="true"`
  * auf einer Sprache, die gar nicht zu sehen war.
  */
-function shownFirstRunLanguage(language: Language): (typeof FIRST_RUN_LANGUAGES)[number] {
-  return language === 'de' ? 'de' : 'en'
+function shownFirstRunLanguage(language: Language): Language {
+  return isTranslated(language) ? language : FALLBACK_LANGUAGE
 }
 
 /**
@@ -43,7 +59,15 @@ function shownFirstRunLanguage(language: Language): (typeof FIRST_RUN_LANGUAGES)
  * später unter „Über dich“ gepflegt und gehören deshalb nicht als tote,
  * unerreichbare Screens in den Kaltstart.
  */
-export function OnboardingScreen({ dictionary, language, onDone }: OnboardingScreenProps) {
+export function OnboardingScreen({
+  dictionary,
+  language,
+  training,
+  chooseTraining,
+  trainable,
+  trainingSaveFailed,
+  onDone,
+}: OnboardingScreenProps) {
   const [step, setStep] = useState<Step>('welcome')
   const [draft, setDraft] = useState<OnboardingProfile>({})
   const [firstMemory, setFirstMemory] = useState('')
@@ -87,6 +111,14 @@ export function OnboardingScreen({ dictionary, language, onDone }: OnboardingScr
         {step === 'welcome' && (
           <>
             <div className="arrival-language" role="group" aria-label={dictionary.language.label}>
+              {/*
+                Beide Reihen tragen ihre Caption sichtbar, seit es zwei sind:
+                Zwei anonyme Pillenreihen übereinander wären ein Ratespiel,
+                welche die App und welche das Training umschaltet.
+              */}
+              <span className="arrival-language-caption" aria-hidden="true">
+                {dictionary.language.label}
+              </span>
               {FIRST_RUN_LANGUAGES.map((tag) => (
                 <button
                   key={tag}
@@ -106,6 +138,47 @@ export function OnboardingScreen({ dictionary, language, onDone }: OnboardingScr
               ))}
             </div>
             {languageSaveFailed && (
+              <p className="arrival-language-error" role="alert">
+                {dictionary.settings.saveFailed}
+              </p>
+            )}
+            {/*
+              Worin trainiert wird, ist vom ersten Tipp an eine eigene Wahl
+              (L7): Wer die App englisch bedient und Französisch lernt, soll
+              dafür nicht erst die Einstellungen finden müssen. Angeboten
+              wird — wie dort — nur, wofür vollständiger Inhalt existiert;
+              mit einer einzigen Sprache wäre die Reihe Möbel und entfällt.
+              Die aktive Pille folgt der App-Sprache mit, bis jemand selbst
+              wählt — dieselbe Vorrangregel wie in resolveTrainingLanguage.
+            */}
+            {trainable.length > 1 && (
+              <div
+                className="arrival-language arrival-language-training"
+                role="group"
+                aria-label={dictionary.language.training}
+              >
+                <span className="arrival-language-caption" aria-hidden="true">
+                  {dictionary.language.training}
+                </span>
+                {trainable.map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    className={
+                      tag === training
+                        ? 'arrival-language-choice arrival-language-choice-active'
+                        : 'arrival-language-choice'
+                    }
+                    aria-label={dictionary.language.names[tag]}
+                    aria-pressed={tag === training}
+                    onClick={() => chooseTraining(tag)}
+                  >
+                    {tag.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+            )}
+            {trainingSaveFailed && (
               <p className="arrival-language-error" role="alert">
                 {dictionary.settings.saveFailed}
               </p>
