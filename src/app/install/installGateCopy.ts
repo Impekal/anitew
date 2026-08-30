@@ -1,6 +1,8 @@
 export type InstallDevice = 'iphone' | 'android' | 'mac' | 'windows'
 
 export interface InstallGateCopy {
+  /** Die Sprache dieser Fassung — fürs `<html lang>`, solange das Gate steht. */
+  readonly lang: 'de' | 'en'
   readonly kicker: string
   readonly title: string
   readonly time: string
@@ -20,6 +22,7 @@ export interface InstallGateCopy {
 }
 
 const DE: InstallGateCopy = {
+  lang: 'de',
   kicker: 'ANITEW · EINMAL EINRICHTEN',
   title: 'ANITEW als App installieren',
   time: 'Meist weniger als eine Minute.',
@@ -68,6 +71,7 @@ const DE: InstallGateCopy = {
 }
 
 const EN: InstallGateCopy = {
+  lang: 'en',
   kicker: 'ANITEW · ONE-TIME SETUP',
   title: 'Install ANITEW as an app',
   time: 'Usually takes less than a minute.',

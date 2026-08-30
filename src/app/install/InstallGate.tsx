@@ -42,6 +42,17 @@ export function InstallGate({ onContinue }: { onContinue: () => void }) {
   const [installed, setInstalled] = useState(false)
   const steps = useMemo(() => copy.steps[device], [copy, device])
 
+  /*
+   * index.html steht fest auf `lang="de"`, die App-Sprache setzt erst
+   * useLanguage — das Gate rendert aber vor der App. Ohne diese Zeile las
+   * ein Screenreader die englische Fassung mit deutscher Aussprache vor
+   * (gemessen 30.08.: en-US-Gerät, Gate englisch, `<html lang>` blieb "de").
+   * Nach „Im Browser fortfahren“ übernimmt useLanguage wie bisher.
+   */
+  useEffect(() => {
+    document.documentElement.lang = copy.lang
+  }, [copy])
+
   useEffect(() => {
     const onInstalled = () => {
       deferredPrompt = undefined
