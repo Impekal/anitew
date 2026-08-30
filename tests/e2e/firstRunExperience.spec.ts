@@ -108,6 +108,38 @@ test('die Orientierung erklärt Core, Coach, Techniken, Memory World, Sync und M
   await expect(page.locator('.first-run-guide')).toHaveCount(0)
 })
 
+test('eine angefangene Führung übersteht das Schließen der App', async ({ page }) => {
+  /*
+   * Die Führung merkt sich ihr „angefangen, nicht beendet“ absichtlich in
+   * localStorage (pending=1) — ihr einziger Zweck ist, einen Abbruch zu
+   * überleben. Genau das konnte sie nicht: `firstRunExperience.ts` wurde nur
+   * geladen, wenn `.onboarding` im DOM steht, und das gibt es nach dem
+   * Erstbesuch nie wieder. Gemessen 30.08.: Neuladen mit pending=1 — keine
+   * Führung, nie wieder. Seither lädt coreRitual das Modul auch dann, wenn
+   * eine angefangene Führung aussteht.
+   */
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/')
+  await expect(page.locator('.first-run-questions')).toBeVisible({ timeout: 8_000 })
+  await page.locator('.arrival .quiet').click()
+  await expect(startButton(page)).toBeVisible({ timeout: 15_000 })
+  await expect(page.locator('.first-run-guide')).toBeVisible({ timeout: 8_000 })
+
+  // Die App schließt mitten in der Führung — kein Skip, kein „ANITEW öffnen“.
+  await page.reload()
+  await expect(startButton(page)).toBeVisible({ timeout: 15_000 })
+  await expect(page.locator('.first-run-guide')).toBeVisible({ timeout: 8_000 })
+  await expect(page.getByText('Der ANITEW Core', { exact: true })).toBeVisible()
+
+  // Beendet bleibt beendet: Nach „ANITEW öffnen“/Überspringen ist Ruhe.
+  await page.locator('.first-run-guide-skip').click()
+  await expect(page.locator('.first-run-guide')).toBeHidden()
+  await page.reload()
+  await expect(startButton(page)).toBeVisible({ timeout: 15_000 })
+  await page.waitForTimeout(1_500)
+  await expect(page.locator('.first-run-guide')).toHaveCount(0)
+})
+
 test('der Core schließt eindeutig und startet standardmäßig dunkel', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await visit(page)

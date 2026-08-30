@@ -1,5 +1,7 @@
 import '../anitew-first-run.css'
 
+import { GUIDE_DONE_KEY, GUIDE_PENDING_KEY } from './firstRunGuideState.ts'
+
 type FirstRunCopy = {
   slogan: string
   philosophy: string
@@ -149,8 +151,11 @@ const EN: FirstRunCopy = {
   ],
 }
 
-const GUIDE_DONE = 'anitew.first-run-guide.v2'
-const GUIDE_PENDING = 'anitew.first-run-guide.pending.v2'
+// Die Schlüssel liegen in firstRunGuideState.ts — eine Quelle für dieses
+// Modul und coreRitual.ts, damit eine Versionierung nicht an einer der
+// beiden Stellen vorbeiläuft.
+const GUIDE_DONE = GUIDE_DONE_KEY
+const GUIDE_PENDING = GUIDE_PENDING_KEY
 let guideOpen = false
 let tourIndex = 0
 let focusedTarget: Element | undefined
