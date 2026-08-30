@@ -157,9 +157,24 @@ ${body}
 }
 
 if (process.argv[1]?.endsWith('privacy-page.mjs')) {
+  /*
+   * Ziel ist `public/`, nicht `dist/` — und das ist der Unterschied zwischen
+   * einer Behauptung und einer Tatsache.
+   *
+   * Vorher lief dieses Skript **nach** `vite build` und schrieb direkt nach
+   * `dist/`. Der Workbox-Precache wird aber während des Builds aus dem
+   * damaligen Stand von `dist/` erzeugt. Die beiden Rechtstexte kamen also
+   * immer zu spät und standen nie im Precache — während der Kommentar in
+   * `vite.config.ts` genau das behauptete. Nachgemessen im erzeugten
+   * `dist/sw.js`: kein einziger Treffer auf „impressum" oder „datenschutz".
+   *
+   * Aus `public/` kopiert Vite sie in `dist/`, bevor der Precache entsteht.
+   * Damit sind sie wirklich offline verfügbar. Beide Dateien sind erzeugt und
+   * stehen deshalb in `.gitignore`.
+   */
   const pages = [
-    ['docs/PRIVACY.md', 'dist/datenschutz.html', 'Datenschutzerklärung'],
-    ['docs/IMPRESSUM.md', 'dist/impressum.html', 'Impressum'],
+    ['docs/PRIVACY.md', 'public/datenschutz.html', 'Datenschutzerklärung'],
+    ['docs/IMPRESSUM.md', 'public/impressum.html', 'Impressum'],
   ]
   for (const [source, target, title] of pages) {
     const markdown = readFileSync(source, 'utf8')

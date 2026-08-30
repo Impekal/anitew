@@ -4,6 +4,8 @@ import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
+import { NAVIGATION_DENYLIST } from './scripts/navigation-denylist.ts'
+
 const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')) as {
   version: string
 }
@@ -69,15 +71,18 @@ export default defineConfig({
           Bei den Rechtstexten war genau das der Fehler: Ein Tipp auf
           „Impressum“ oder „Datenschutz“ lieferte in der installierten App
           die App-Shell zurück — für den Menschen sah es aus, als starte
-          ANITEW einfach neu (auf echtem iPhone gefunden). Beide Seiten
-          liegen im Precache und funktionieren damit auch offline.
+          ANITEW einfach neu (auf echtem iPhone gefunden).
+
+          Hier stand außerdem, beide Seiten lägen im Precache und wären damit
+          offline verfügbar. Das war nicht wahr: `scripts/privacy-page.mjs`
+          lief nach dem Build und schrieb nach `dist/`, während der Precache
+          schon fertig war. Nachgemessen im erzeugten `dist/sw.js` — kein
+          Treffer. Das Skript schreibt jetzt vorher nach `public/`, also gilt
+          der Satz mittlerweile. Die Liste selbst steht in
+          `scripts/navigation-denylist.mjs`; dort steht auch, warum beide
+          Schreibweisen darin vorkommen müssen.
         */
-        navigateFallbackDenylist: [
-          /^\/oauth\/google\//,
-          /^\/push\//,
-          /^\/impressum\.html$/,
-          /^\/datenschutz\.html$/,
-        ],
+        navigateFallbackDenylist: [...NAVIGATION_DENYLIST],
         // Bei einem Release soll kein alter App-Shell-Cache weiterleben. Das
         // ist besonders auf iOS wichtig, wo offene/installierte PWAs sonst
         // noch die vorherige JS-Fassung ausliefern koennen.

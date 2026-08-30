@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run typecheck && vite build && node scripts/privacy-page.mjs",
+    "build": "npm run typecheck && node scripts/privacy-page.mjs && vite build",
     "preview": "vite preview",
     "typecheck": "tsc -p tsconfig.json --noEmit && npm run typecheck:core",
     "typecheck:core": "tsc -p tsconfig.core.json --noEmit",

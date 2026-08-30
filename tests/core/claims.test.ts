@@ -4,6 +4,8 @@ import { fileURLToPath } from 'node:url'
 
 import { describe, expect, it } from 'vitest'
 
+import { NAVIGATION_DENYLIST } from '../../scripts/navigation-denylist.ts'
+
 /**
  * Die Sperrliste als Test (Backlog F7, R-2, R5).
  *
@@ -332,25 +334,47 @@ describe('die eigenen Seiten neben der App (Runde 3)', () => {
    * (auf echtem iPhone gefunden). Der Wächter bindet die Ausnahme an die
    * Adressen, die der Fuß und das Installations-Gate wirklich verlinken.
    */
-  const config = textOf('vite.config.ts')
-  const denylist = /navigateFallbackDenylist:\s*\[([\s\S]*?)\]/u.exec(config)?.[1] ?? ''
+  /*
+   * Hier stand ein Wächter, der den **Text** der Sperrliste aus
+   * `vite.config.ts` gelesen und auf `impressum\.html` geprüft hat. Er war
+   * grün — und der Weg war trotzdem kaputt. Ein Test, der eine Schreibweise
+   * abschreibt statt eine Wirkung zu prüfen, schreibt den Fehler fest,
+   * statt ihn zu finden: Cloudflare leitet `/impressum.html` auf
+   * `/impressum` um, und genau diese Form fehlte.
+   *
+   * Deshalb wird jetzt die Liste selbst benutzt und gefragt, ob sie die
+   * Adressen trifft, die tatsächlich vorkommen. Die Herleitung steht in
+   * `scripts/navigation-denylist.ts`, die Fälle in
+   * `tests/core/navigationDenylist.test.ts`.
+   */
+  const trifft = (pfad: string): boolean =>
+    NAVIGATION_DENYLIST.some((muster) => muster.test(pfad))
 
   it('nimmt Impressum und Datenschutz vom PWA-Navigations-Fallback aus', () => {
-    expect(denylist).toMatch(/impressum\\\.html/u)
-    expect(denylist).toMatch(/datenschutz\\\.html/u)
+    expect(trifft('/impressum.html')).toBe(true)
+    expect(trifft('/datenschutz.html')).toBe(true)
     // Die Worker-Endpunkte bleiben ebenfalls ausgenommen.
-    expect(denylist).toMatch(/oauth/u)
-    expect(denylist).toMatch(/push/u)
+    expect(trifft('/oauth/google/start')).toBe(true)
+    expect(trifft('/push/subscribe')).toBe(true)
   })
 
   it('verlinkt genau die Adressen, die auch ausgenommen sind', () => {
     for (const source of ['src/main.tsx', 'src/app/install/InstallGate.tsx']) {
       const text = textOf(source)
-      for (const href of text.matchAll(/href="\/([a-z]+\.html)"/gu)) {
-        const file = href[1] as string
+      for (const href of text.matchAll(/href="(\/[a-z]+)\.html"/gu)) {
+        const ohneEndung = href[1] as string
         expect(
-          denylist.includes(file.replace('.', '\\.')),
-          `${source} verlinkt /${file}, aber der Fallback fängt es ab`,
+          trifft(`${ohneEndung}.html`),
+          `${source} verlinkt ${ohneEndung}.html, aber der Fallback fängt es ab`,
+        ).toBe(true)
+        /*
+         * Und die Form, auf die Cloudflare umleitet. Ohne sie liefert der
+         * Service Worker nach der Umleitung die App-Shell — der Nutzer landet
+         * auf dem Startbildschirm, ohne Text. Genau das war die Meldung.
+         */
+        expect(
+          trifft(ohneEndung),
+          `${source} verlinkt ${ohneEndung}.html; die Umleitung auf ${ohneEndung} wird abgefangen`,
         ).toBe(true)
       }
     }
@@ -360,6 +384,18 @@ describe('die eigenen Seiten neben der App (Runde 3)', () => {
     const generator = textOf('scripts/privacy-page.mjs')
     expect(generator).toMatch(/IMPRESSUM\.md/u)
     expect(generator).toMatch(/PRIVACY\.md/u)
+    /*
+     * Ziel muss `public/` sein, nicht `dist/`. Aus `dist/` geschrieben kämen
+     * die Seiten nach dem Precache und wären offline nicht da — die Zusage in
+     * `vite.config.ts` war genau deshalb einmal unwahr.
+     */
+    expect(generator).toMatch(/public\/datenschutz\.html/u)
+    expect(generator).toMatch(/public\/impressum\.html/u)
+    const build = JSON.parse(textOf('package.json')).scripts.build as string
+    expect(
+      build.indexOf('privacy-page.mjs') < build.indexOf('vite build'),
+      'privacy-page.mjs muss vor `vite build` laufen, sonst fehlt der Precache',
+    ).toBe(true)
     // Ohne Rücklink stünde man in der installierten App in einer Sackgasse.
     expect(generator).toMatch(/<a href="\/">ANITEW<\/a>/u)
   })
