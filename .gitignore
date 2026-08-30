@@ -13,3 +13,8 @@ playwright-report/
 # Prüfbögen aus scripts/facesheet.mjs — Werkzeug, kein Ergebnis
 facesheet*.html
 facesheet*.png
+
+# Aus docs/IMPRESSUM.md und docs/PRIVACY.md erzeugt (scripts/privacy-page.mjs).
+# Sie liegen in public/, damit Vite sie vor dem Precache nach dist/ kopiert.
+public/impressum.html
+public/datenschutz.html
