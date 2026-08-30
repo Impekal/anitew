@@ -13,6 +13,17 @@ test('der erste Eindruck trägt die englische Marke fünf Sekunden und erklärt 
   await expect(launch).toHaveCount(1)
   // Splash-Copy ist Marken-Copy: immer Englisch, auch wenn die App Deutsch spricht.
   await expect(page.getByText('MEMORIZE · RECALL · RETAIN · MASTER')).toBeVisible()
+  /*
+   * Der Schein der vier Wörter ist Gold, nicht Mint: In der Regel stand ein
+   * zweites `text-shadow` aus der Grau-Fassung, die spätere Deklaration
+   * gewann, und der im Kommentar begründete Gold-Schein war nie zu sehen
+   * (gemessen 30.08.: berechnet rgba(142 231 208 / 10%)). Geprüft wird der
+   * berechnete Wert — die Stelle, an der der Fehler sichtbar war.
+   */
+  const termsShine = await page
+    .locator('.anitew-launch-terms')
+    .evaluate((el) => getComputedStyle(el).textShadow)
+  expect(termsShine).toContain('229, 184, 109')
   await expect(page.getByText('Train the memory you actually use.')).toBeVisible()
   await expect(page.getByText('Powered by Impekal')).toBeVisible()
 
