@@ -122,6 +122,11 @@ export function useLanguage(platform: Platform): LanguageState {
    * Prop. Wenn dort die Sprache gespeichert wurde, teilt dieses Ereignis dem
    * bereits laufenden Hook die neue Wahrheit mit; dadurch übersetzt sich der
    * Welcome-Screen sofort, ohne Neuladen und ohne zweiten Sprachzustand.
+   *
+   * „Sofort übersetzt“ galt dabei nur für die React-eigenen Texte: Die
+   * imperativ eingebauten Teile hängen am Remount des `.arrival`-Elements
+   * (key in OnboardingScreen.tsx, gemessen 30.08.) — erst beides zusammen
+   * macht den Satz oben wahr.
    */
   useEffect(() => {
     const onLanguageChange = (event: Event) => {
