@@ -120,7 +120,12 @@ test('sagt, warum nur vollständig trainierbare Sprachen zur Auswahl stehen', as
     zurückfielen — Arabisch sogar als RTL-Dokument mit englischem Text —,
     wären ein Versprechen ohne Deckung. Eine per Systemsprache aufgelöste,
     noch unübersetzte Sprache bleibt mit ehrlicher Fußnote nutzbar.
+
+    Seit den sechs Oberflächensprachen ist die gedeckte Menge
+    TRANSLATED_LANGUAGES — exakt diese sechs, exakt in dieser Reihenfolge.
+    Die Genau-Gleichheit bleibt der Wächter: eine siebte, nur halb
+    übersetzte Sprache dürfte hier wieder nicht auftauchen.
   */
   const ui = await page.locator('.language:not(.language-training) select').locator('option').allTextContents()
-  expect(ui).toEqual(['Deutsch', 'English'])
+  expect(ui).toEqual(['Deutsch', 'English', 'Français', 'Español', 'Italiano', 'Português'])
 })

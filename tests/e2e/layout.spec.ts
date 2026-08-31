@@ -64,6 +64,22 @@ test('der Startbildschirm passt, ohne seitlich zu schieben', async ({ page }) =>
   }
 })
 
+
+/*
+ * Klicken ohne Koordinaten. Ein force-Klick feuert auf die **zuletzt
+ * bekannte** Stelle — orbitiert der Menüknoten gerade weiter, geht er
+ * daneben (in #94 dokumentiert, auf android-tablet in Lauf 33385906424
+ * wieder getroffen). Auf Positionsruhe warten geht auch nicht: Die
+ * Dauerdeko (living-orbit u. a.) ruht nie, ein Ruhe-Warte-Helfer hat hier
+ * gemessen an jeder Klickstelle sein volles Frame-Budget verbrannt und den
+ * Test auf desktop-wide in den 30s-Timeout getrieben. Deshalb löst dieser
+ * Helfer den echten Click-Handler direkt am Element aus. Dieser Test prüft
+ * Seitenbreite, nicht Trefferflächen — dafür gibt es tapTargets.spec.
+ */
+async function clickDirect(target: Locator): Promise<void> {
+  await target.evaluate((el) => (el as HTMLElement).click())
+}
+
 test('hält die Breite auf jeder Menüseite — und in der Schublade', async ({ page }) => {
   await visit(page)
   await expect(startButton(page)).toBeVisible()
@@ -91,25 +107,26 @@ test('hält die Breite auf jeder Menüseite — und in der Schublade', async ({ 
    * Der Drawer darf beim Öffnen/Zurückkehren animieren. Auf sehr breiten CI-
    * Viewports kann Playwright einen normalen `.click()` deshalb minutenlang
    * auf „stable“ warten, obwohl die Seite bereits korrekt im Viewport liegt.
-   * Für diesen Layout-Test löst `force` denselben echten Click-Handler aus,
-   * ohne die Animationsstabilität zu einer zweiten, fachfremden Assertion zu
-   * machen. Falls Core nach einer Unterseite bereits geschlossen ist, öffnen
-   * wir es für die nächste Breitenmessung ausdrücklich wieder.
+   * Für diesen Layout-Test löst `clickDirect` denselben echten Click-Handler
+   * aus, ohne die Animationsstabilität zu einer zweiten, fachfremden
+   * Assertion zu machen. Falls Core nach einer Unterseite bereits
+   * geschlossen ist, öffnen wir es für die nächste Breitenmessung
+   * ausdrücklich wieder.
    */
   for (const label of labels) {
     if (!(await drawer.isVisible())) {
-      await hamburger.click({ force: true })
+      await clickDirect(hamburger)
       await expect(drawer).toBeVisible()
       await noHorizontalOverflow(page)
     }
 
     const item = page.getByRole('button', { name: label, exact: true })
     await expect(item).toBeVisible()
-    await item.click({ force: true })
+    await clickDirect(item)
     await page.locator('.page').waitFor()
     await noHorizontalOverflow(page)
 
-    await page.locator('.page-back').click({ force: true })
+    await clickDirect(page.locator('.page-back'))
     await expect(page.locator('.page')).toBeHidden()
 
     /*
@@ -140,7 +157,7 @@ test('hält die Breite auf jeder Menüseite — und in der Schublade', async ({ 
       .then(() => true)
       .catch(() => false)
     if (!coreOeffnetVonSelbst) {
-      await hamburger.click({ force: true })
+      await clickDirect(hamburger)
     }
     await expect(drawer).toBeVisible()
     await noHorizontalOverflow(page)
