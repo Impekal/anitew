@@ -23,14 +23,85 @@ export type Dictionary = Omit<SourceDictionary, 'session'> & {
   }
 }
 
+/*
+ * Übersetzte Oberflächensprachen — die statische Wahrheit für die Auswahl.
+ *
+ * Getrennt vom Ladezustand, und zwar absichtlich: Ob eine Sprache angeboten
+ * wird, entscheidet diese Liste; ob ihr Wörterbuch schon im Speicher ist,
+ * entscheidet die Registry darunter. de/en liegen im Kaltstart (Englisch ist
+ * die Rückfallsprache und muss synchron da sein); fr/es/it/pt kommen als
+ * eigene, vorab gecachte Chunks — vier volle Wörterbücher im Kaltstart
+ * hätten das Budget (P4) um ein Vielfaches der restlichen Luft gesprengt.
+ */
+export const TRANSLATED_LANGUAGES = ['de', 'en', 'fr', 'es', 'it', 'pt'] as const
+
 const DICTIONARIES: Partial<Record<Language, Dictionary>> = {
   de,
   en,
 }
 
-const MISSION_LOCATION_COPY: Readonly<
-  Partial<Record<Language, { ask: string; placeholder: string }>>
-> = {
+/** Die Overlay-Texte eines nachgeladenen Sprachpakets (Wahrheitsschicht). */
+export interface LanguageExtras {
+  readonly missionLocation: { readonly ask: string; readonly placeholder: string }
+  readonly missionNeutral: MissionNeutralCopy
+  readonly pushTruth: PushTruthCopy
+  readonly memoryForecast: MemoryForecastCopy
+  readonly memoryCount: MemoryCountCopy
+}
+
+const pendingLoads: Partial<Record<Language, Promise<void>>> = {}
+
+function registerLanguage(tag: Language, dictionary: Dictionary, extras: LanguageExtras): void {
+  DICTIONARIES[tag] = dictionary
+  MISSION_LOCATION_COPY[tag] = extras.missionLocation
+  MISSION_NEUTRAL_COPY[tag] = extras.missionNeutral
+  PUSH_TRUTH[tag] = extras.pushTruth
+  MEMORY_FORECAST_COPY[tag] = extras.memoryForecast
+  MEMORY_COUNT_COPY[tag] = extras.memoryCount
+}
+
+/**
+ * Lädt das Wörterbuch einer übersetzten Sprache nach, falls es noch fehlt.
+ *
+ * Wer hier wartet, bevor er die Sprache sichtbar umschaltet, zeigt nie einen
+ * halbübersetzten Zustand: `dictionaryFor` fällt bis dahin geschlossen auf
+ * Englisch zurück. Ein fehlgeschlagenes Laden (kein Netz und noch kein
+ * Cache-Eintrag) lässt den Fallback einfach stehen — beim nächsten Versuch
+ * wird erneut geladen.
+ */
+export async function ensureDictionary(tag: Language): Promise<void> {
+  if (DICTIONARIES[tag] !== undefined || !isTranslated(tag)) return
+  const running = pendingLoads[tag]
+  if (running !== undefined) return running
+  const load = (async () => {
+    try {
+      if (tag === 'fr') {
+        const m = await import('./fr.ts')
+        registerLanguage('fr', m.fr, m.frExtras)
+      } else if (tag === 'es') {
+        const m = await import('./es.ts')
+        registerLanguage('es', m.es, m.esExtras)
+      } else if (tag === 'it') {
+        const m = await import('./it.ts')
+        registerLanguage('it', m.it, m.itExtras)
+      } else if (tag === 'pt') {
+        const m = await import('./pt.ts')
+        registerLanguage('pt', m.pt, m.ptExtras)
+      }
+    } finally {
+      delete pendingLoads[tag]
+    }
+  })()
+  pendingLoads[tag] = load
+  return load
+}
+
+/** Ist das Wörterbuch dieser Sprache gerade im Speicher? */
+export function isDictionaryLoaded(tag: Language): boolean {
+  return DICTIONARIES[tag] !== undefined
+}
+
+const MISSION_LOCATION_COPY: Partial<Record<Language, { ask: string; placeholder: string }>> = {
   de: { ask: 'Wo lag der Gegenstand?', placeholder: 'Position' },
   en: { ask: 'Where was the object?', placeholder: 'Position' },
 }
@@ -53,7 +124,7 @@ interface MissionNeutralCopy {
   readonly placePlaceholder: string
 }
 
-const MISSION_NEUTRAL_COPY: Readonly<Partial<Record<Language, MissionNeutralCopy>>> = {
+const MISSION_NEUTRAL_COPY: Partial<Record<Language, MissionNeutralCopy>> = {
   de: {
     numberLabel: 'Nummer',
     timeLabel: 'Zeit',
@@ -87,7 +158,7 @@ interface PushTruthCopy {
   readonly privacyHonest: string
 }
 
-const PUSH_TRUTH: Readonly<Partial<Record<Language, PushTruthCopy>>> = {
+const PUSH_TRUTH: Partial<Record<Language, PushTruthCopy>> = {
   de: {
     reminderNote: 'Kein Konto. Push speichert Geräteadresse, Zeit, Zeitzone und den generischen Text — keine Trainingsdaten.',
     whileOpen: 'Hier nur **solange es offen ist**. iPhone/iPad: nach dem Schließen nur als Home-Screen-App.',
@@ -119,7 +190,7 @@ export interface MemoryForecastCopy {
   readonly value: string
 }
 
-const MEMORY_FORECAST_COPY: Readonly<Partial<Record<Language, MemoryForecastCopy>>> = {
+const MEMORY_FORECAST_COPY: Partial<Record<Language, MemoryForecastCopy>> = {
   de: {
     label: 'Vergessensprognose',
     value: 'FSRS schätzt etwa {days} Tage bis zur 90%-Schwelle — aus mindestens drei echten Wiedersehen.',
@@ -137,7 +208,7 @@ export interface MemoryCountCopy {
   readonly connectionMany: string
 }
 
-const MEMORY_COUNT_COPY: Readonly<Partial<Record<Language, MemoryCountCopy>>> = {
+const MEMORY_COUNT_COPY: Partial<Record<Language, MemoryCountCopy>> = {
   de: {
     memoryOne: 'Erinnerung',
     memoryMany: 'Erinnerungen',
@@ -258,5 +329,5 @@ export function dictionaryFor(language: Language): Dictionary {
 }
 
 export function isTranslated(language: Language): boolean {
-  return DICTIONARIES[language] !== undefined
+  return (TRANSLATED_LANGUAGES as readonly string[]).includes(language)
 }

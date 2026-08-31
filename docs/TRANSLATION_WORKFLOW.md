@@ -81,3 +81,27 @@ This workflow specifically prevents:
 - adding a language selector entry before the language is actually usable.
 
 The CI typecheck is the mechanical guard; human language review and browser acceptance are the semantic guard.
+## Review-Stand
+
+**2026-08-30 — fr/es/it/pt eingeführt (Interface).** Vier vollständige
+Wörterbücher aus der deutschen Quelle (Kaltstart unberührt: de/en statisch,
+die vier als vorab gecachte Lazy-Chunks; Wörterbuch wird vor dem sichtbaren
+Umschalten geladen, nie halbübersetzt). Ebenfalls übersetzt: die fünf
+Overlay-Pakete der Wahrheitsschicht, das Install-Gate und die beiden
+First-Run-Schichten (jetzt eine gemeinsame Quelle in
+`src/app/firstRunLayerCopy.ts` statt binärer de/en-Blöcke je Schicht).
+Je Sprache ein E2E-Smoke-Pfad (`tests/e2e/languages.spec.ts`, §6) und ein
+Browser-Durchgang des Hauptflusses.
+
+Status nach §4: **Modell-Entwurf, Muttersprachler-Review offen** (USER
+ACTION). Bis dahin gilt: Entwurfsqualität ist eingebaut, nicht beworben —
+Wortlaut-Korrekturen ändern nur die Sprachdateien.
+
+Bekannte, bewusste Lücke (§2.4): Diese Copy-Inseln außerhalb des
+Wörterbuchs sprechen bei fr/es/it/pt weiterhin Englisch (der dokumentierte
+Fallback der App), alle in verzögerten Panels außerhalb des Erstkontakts:
+`ReminderPanelImpl.tsx`, `driveRedirectFeedback.ts`, `ResetPanel.tsx`,
+`localPhotoCopy.ts`, `localDictationCopy.ts`, `BackupPanelImpl.tsx`
+(Support-Text), `SyncPanelImpl.tsx` (Drive-Text), `peopleScenarioCopy.ts`,
+`memoryDeadline.ts`. Nachziehen heißt: dieselben vier Sprachen dort
+ergänzen — keine neue Mechanik nötig.

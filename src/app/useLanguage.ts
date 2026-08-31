@@ -8,7 +8,7 @@ import {
   isRightToLeft,
   resolveLanguage,
 } from '../core/index.ts'
-import { type Dictionary, dictionaryFor, isTranslated } from '../i18n/index.ts'
+import { type Dictionary, dictionaryFor, ensureDictionary, isTranslated } from '../i18n/index.ts'
 
 const SETTING_KEY = 'language'
 const LANGUAGE_CHANGE_EVENT = 'anitew:interface-language-change'
@@ -34,6 +34,10 @@ export async function persistInterfaceLanguageChoice(
 ): Promise<boolean> {
   try {
     await platform.settings.write(SETTING_KEY, next)
+    // Erst das Wörterbuch, dann das Ereignis: Wer das Ereignis vor dem
+    // Laden feuerte, zeigte für einen Moment fremde Texte unter richtig
+    // markierter Sprache — genau die Halbwahrheit, die F-2 beseitigt hat.
+    await ensureDictionary(next)
     announceLanguageChange(next)
     return true
   } catch {
@@ -104,7 +108,17 @@ export function useLanguage(platform: Platform): LanguageState {
         chosen = undefined
       }
       if (cancelled) return
-      setLanguage(resolveLanguage(chosen, systemLanguages()))
+      const resolved = resolveLanguage(chosen, systemLanguages())
+      /*
+       * Nachladbare Sprache (fr/es/it/pt): erst das Wörterbuch, dann die
+       * Freigabe. `ready` hält die Anzeige ohnehin zurück, bis die
+       * gespeicherte Wahl gelesen ist — dieselbe Wartezeit deckt jetzt auch
+       * den kleinen Sprachchunk ab (vorab gecacht, offline eingeschlossen).
+       * Schlägt das Laden fehl, zeigt dictionaryFor geschlossen Englisch.
+       */
+      await ensureDictionary(resolved).catch(() => undefined)
+      if (cancelled) return
+      setLanguage(resolved)
       setReady(true)
     })()
     return () => {
@@ -134,8 +148,12 @@ export function useLanguage(platform: Platform): LanguageState {
       if (typeof detail !== 'string') return
       const next = resolveLanguage(detail, [detail])
       if (next !== detail) return
-      setSaveFailed(false)
-      setLanguage(next)
+      void ensureDictionary(next)
+        .catch(() => undefined)
+        .then(() => {
+          setSaveFailed(false)
+          setLanguage(next)
+        })
     }
     window.addEventListener(LANGUAGE_CHANGE_EVENT, onLanguageChange)
     return () => window.removeEventListener(LANGUAGE_CHANGE_EVENT, onLanguageChange)
@@ -150,7 +168,13 @@ export function useLanguage(platform: Platform): LanguageState {
   const choose = useCallback(
     (next: Language) => {
       void persistThenApply(
-        () => platform.settings.write(SETTING_KEY, next),
+        async () => {
+          await platform.settings.write(SETTING_KEY, next)
+          // Gehört zum Wahrheitsvertrag: sichtbar wird erst der vollständig
+          // geladene Zustand, nie ein englischer Zwischenstand unter
+          // fremdem Etikett.
+          await ensureDictionary(next)
+        },
         () => {
           setSaveFailed(false)
           setLanguage(next)

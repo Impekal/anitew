@@ -2,7 +2,7 @@ export type InstallDevice = 'iphone' | 'android' | 'mac' | 'windows'
 
 export interface InstallGateCopy {
   /** Die Sprache dieser Fassung — fürs `<html lang>`, solange das Gate steht. */
-  readonly lang: 'de' | 'en'
+  readonly lang: 'de' | 'en' | 'fr' | 'es' | 'it' | 'pt'
   readonly kicker: string
   readonly title: string
   readonly time: string
@@ -119,6 +119,203 @@ const EN: InstallGateCopy = {
   privacy: 'Privacy',
 }
 
+
+const FR: InstallGateCopy = {
+  lang: 'fr',
+  kicker: 'ANITEW · À CONFIGURER UNE FOIS',
+  title: 'Installer ANITEW comme app',
+  time: 'En général moins d’une minute.',
+  lead:
+    'ANITEW est fait pour le mode app : son propre lancement depuis l’écran d’accueil, un accès hors ligne fiable et moins de frictions de navigateur. Sur iPhone et iPad, les rappels push système app fermée ne fonctionnent que comme web-app installée.',
+  deviceLabel: 'Ton appareil',
+  devices: {
+    iphone: 'iPhone / iPad',
+    android: 'Android',
+    mac: 'Mac',
+    windows: 'Windows / autre appareil',
+  },
+  steps: {
+    iphone: [
+      'Ouvre ANITEW dans Safari.',
+      'Touche « Partager », puis « Sur l’écran d’accueil ».',
+      'Confirme avec « Ajouter », puis ouvre la nouvelle icône ANITEW.',
+    ],
+    android: [
+      'Ouvre le menu du navigateur (souvent ⋮ en haut à droite).',
+      'Choisis « Installer l’application » ou « Ajouter à l’écran d’accueil ».',
+      'Confirme, puis ouvre ANITEW depuis la nouvelle icône.',
+    ],
+    mac: [
+      'Dans Chrome/Edge : utilise l’icône d’installation dans la barre d’adresse ou « Installer l’app ».',
+      'Dans Safari : choisis « Fichier » → « Ajouter au Dock ».',
+      'Ouvre ensuite ANITEW depuis le Dock, Applications ou le Launchpad.',
+    ],
+    windows: [
+      'Utilise l’icône d’installation dans la barre d’adresse ou le menu du navigateur.',
+      'Choisis « Installer ANITEW » ou « Installer l’application ».',
+      'Ouvre ensuite ANITEW depuis la nouvelle icône.',
+    ],
+  },
+  startedHeading: 'Installation lancée',
+  stepsHeadingFor: (device) => `Installation sur ${device}`,
+  startedNote:
+    'Ouvre ensuite ANITEW depuis la nouvelle icône. Cette page d’installation n’y apparaît plus.',
+  install: 'Installer l’app',
+  continueInBrowser: 'Ne pas installer, continuer dans le navigateur',
+  browserNote:
+    'La version navigateur ne se débloque qu’avec le second bouton. Dans une nouvelle session de navigateur, ANITEW rappellera l’installation ; l’app installée ne voit jamais cette page.',
+  legalLabel: 'Mentions légales',
+  imprint: 'Mentions légales',
+  privacy: 'Confidentialité',
+}
+
+const ES: InstallGateCopy = {
+  lang: 'es',
+  kicker: 'ANITEW · CONFIGURAR UNA VEZ',
+  title: 'Instalar ANITEW como app',
+  time: 'Normalmente menos de un minuto.',
+  lead:
+    'ANITEW está hecho para el modo app: arranque propio desde la pantalla de inicio, acceso sin conexión fiable y menos fricción de navegador. En iPhone y iPad, los recordatorios push del sistema con la app cerrada solo funcionan como web-app instalada.',
+  deviceLabel: 'Tu dispositivo',
+  devices: {
+    iphone: 'iPhone / iPad',
+    android: 'Android',
+    mac: 'Mac',
+    windows: 'Windows / otro dispositivo',
+  },
+  steps: {
+    iphone: [
+      'Abre ANITEW en Safari.',
+      'Toca «Compartir» y luego «Añadir a pantalla de inicio».',
+      'Confirma con «Añadir» y abre después el nuevo icono de ANITEW.',
+    ],
+    android: [
+      'Abre el menú del navegador (normalmente ⋮ arriba a la derecha).',
+      'Elige «Instalar aplicación» o «Añadir a pantalla de inicio».',
+      'Confirma y abre ANITEW después desde el nuevo icono.',
+    ],
+    mac: [
+      'En Chrome/Edge: usa el icono de instalación en la barra de direcciones o «Instalar app».',
+      'En Safari: elige «Archivo» → «Añadir al Dock».',
+      'Abre ANITEW después desde el Dock, Aplicaciones o el Launchpad.',
+    ],
+    windows: [
+      'Usa el icono de instalación en la barra de direcciones o el menú del navegador.',
+      'Elige «Instalar ANITEW» o «Instalar aplicación».',
+      'Abre ANITEW después desde el nuevo icono.',
+    ],
+  },
+  startedHeading: 'Instalación iniciada',
+  stepsHeadingFor: (device) => `Instalación en ${device}`,
+  startedNote:
+    'Abre ANITEW después desde el nuevo icono. Ahí esta página de instalación ya no aparece.',
+  install: 'Instalar app',
+  continueInBrowser: 'No instalar, seguir en el navegador',
+  browserNote:
+    'La versión de navegador se desbloquea solo con el segundo botón. En una nueva sesión de navegador, ANITEW recordará de nuevo la instalación; la app instalada nunca ve esta página.',
+  legalLabel: 'Legal',
+  imprint: 'Aviso legal',
+  privacy: 'Privacidad',
+}
+
+const IT: InstallGateCopy = {
+  lang: 'it',
+  kicker: 'ANITEW · DA CONFIGURARE UNA VOLTA',
+  title: 'Installare ANITEW come app',
+  time: 'Di solito meno di un minuto.',
+  lead:
+    'ANITEW è fatta per la modalità app: avvio proprio dalla schermata iniziale, accesso offline affidabile e meno attriti del browser. Su iPhone e iPad i promemoria push di sistema ad app chiusa funzionano solo come web-app installata.',
+  deviceLabel: 'Il tuo dispositivo',
+  devices: {
+    iphone: 'iPhone / iPad',
+    android: 'Android',
+    mac: 'Mac',
+    windows: 'Windows / altro dispositivo',
+  },
+  steps: {
+    iphone: [
+      'Apri ANITEW in Safari.',
+      'Tocca «Condividi», poi «Aggiungi a schermata Home».',
+      'Conferma con «Aggiungi», poi apri la nuova icona ANITEW.',
+    ],
+    android: [
+      'Apri il menu del browser (di solito ⋮ in alto a destra).',
+      'Scegli «Installa app» oppure «Aggiungi a schermata Home».',
+      'Conferma, poi apri ANITEW dalla nuova icona.',
+    ],
+    mac: [
+      'In Chrome/Edge: usa l’icona di installazione nella barra degli indirizzi o «Installa app».',
+      'In Safari: scegli «File» → «Aggiungi al Dock».',
+      'Apri poi ANITEW dal Dock, da Applicazioni o dal Launchpad.',
+    ],
+    windows: [
+      'Usa l’icona di installazione nella barra degli indirizzi o il menu del browser.',
+      'Scegli «Installa ANITEW» oppure «Installa app».',
+      'Apri poi ANITEW dalla nuova icona.',
+    ],
+  },
+  startedHeading: 'Installazione avviata',
+  stepsHeadingFor: (device) => `Installazione su ${device}`,
+  startedNote:
+    'Apri poi ANITEW dalla nuova icona. Lì questa pagina di installazione non compare più.',
+  install: 'Installare l’app',
+  continueInBrowser: 'Non installare, continuare nel browser',
+  browserNote:
+    'La versione browser si sblocca solo col secondo pulsante. In una nuova sessione del browser ANITEW ricorderà di nuovo l’installazione; l’app installata non vede mai questa pagina.',
+  legalLabel: 'Note legali',
+  imprint: 'Note legali',
+  privacy: 'Privacy',
+}
+
+const PT: InstallGateCopy = {
+  lang: 'pt',
+  kicker: 'ANITEW · CONFIGURAR UMA VEZ',
+  title: 'Instalar a ANITEW como app',
+  time: 'Normalmente menos de um minuto.',
+  lead:
+    'A ANITEW é feita para o modo app: arranque próprio a partir do ecrã inicial, acesso offline fiável e menos atrito de navegador. No iPhone e iPad, os lembretes push do sistema com a app fechada só funcionam como web-app instalada.',
+  deviceLabel: 'O teu aparelho',
+  devices: {
+    iphone: 'iPhone / iPad',
+    android: 'Android',
+    mac: 'Mac',
+    windows: 'Windows / outro aparelho',
+  },
+  steps: {
+    iphone: [
+      'Abre a ANITEW no Safari.',
+      'Toca em «Partilhar» e depois em «Adicionar ao ecrã principal».',
+      'Confirma com «Adicionar» e abre depois o novo ícone da ANITEW.',
+    ],
+    android: [
+      'Abre o menu do navegador (normalmente ⋮ em cima à direita).',
+      'Escolhe «Instalar aplicação» ou «Adicionar ao ecrã inicial».',
+      'Confirma e abre a ANITEW depois pelo novo ícone.',
+    ],
+    mac: [
+      'No Chrome/Edge: usa o ícone de instalação na barra de endereço ou «Instalar app».',
+      'No Safari: escolhe «Ficheiro» → «Adicionar à Dock».',
+      'Abre depois a ANITEW pela Dock, Aplicações ou Launchpad.',
+    ],
+    windows: [
+      'Usa o ícone de instalação na barra de endereço ou o menu do navegador.',
+      'Escolhe «Instalar ANITEW» ou «Instalar aplicação».',
+      'Abre depois a ANITEW pelo novo ícone.',
+    ],
+  },
+  startedHeading: 'Instalação iniciada',
+  stepsHeadingFor: (device) => `Instalação em ${device}`,
+  startedNote:
+    'Abre depois a ANITEW pelo novo ícone. Lá esta página de instalação já não aparece.',
+  install: 'Instalar app',
+  continueInBrowser: 'Não instalar, continuar no navegador',
+  browserNote:
+    'A versão de navegador só se desbloqueia com o segundo botão. Numa nova sessão de navegador a ANITEW voltará a lembrar a instalação; a app instalada nunca vê esta página.',
+  legalLabel: 'Legal',
+  imprint: 'Ficha legal',
+  privacy: 'Privacidade',
+}
+
 /**
  * Das Gate rendert VOR der App und damit vor useLanguage — die Sprachwahl
  * kommt deshalb direkt vom Gerät (dasselbe Muster wie die übrigen
@@ -131,6 +328,10 @@ export function installGateCopy(): InstallGateCopy {
     const base = (tag ?? '').toLowerCase().split('-')[0]
     if (base === 'de') return DE
     if (base === 'en') return EN
+    if (base === 'fr') return FR
+    if (base === 'es') return ES
+    if (base === 'it') return IT
+    if (base === 'pt') return PT
   }
   // Noch nicht übersetzte Sprachen fallen wie die App selbst auf Englisch.
   return EN
