@@ -10,189 +10,23 @@ import {
   resolveClientId,
 } from './driveSync.ts'
 import { prepareDriveAuth } from './driveAuthBridge.ts'
-
-type CapabilityKind = 'adaptive' | 'technique' | 'world' | 'measure' | 'coach' | 'privacy'
-type ThemeChoice = 'system' | 'light' | 'dark'
-
-interface CapabilityCopy {
-  kind: CapabilityKind
-  title: string
-  body: string
-  badge: string
-}
-
-interface RefinementCopy {
-  close: string
-  welcomeTitle: string
-  philosophy: string
-  intro: string
-  adaptive: string
-  different: string
-  capabilities: readonly CapabilityCopy[]
-  trust: string
-  questions: string
-  driveKicker: string
-  driveCardTitle: string
-  driveCardBody: string
-  driveConnect: string
-  drivePreparing: string
-  driveConnecting: string
-  driveConnected: string
-  driveUnavailable: string
-  driveDenied: string
-  scroll: string
-  appearance: string
-  themes: Record<ThemeChoice, string>
-  connectedAccount: string
-  guideContext: readonly string[]
-}
-
-const DE: RefinementCopy = {
-  close: 'Menü schließen',
-  welcomeTitle: 'Willkommen in deinem Gedächtnissystem.',
-  philosophy: 'Erinnern. Verknüpfen. Behalten.',
-  intro: 'ANITEW trainiert Namen, Zahlen, Lernstoff und Erinnerungen aus deinem echten Leben.',
-  adaptive: 'Es lernt aus echten Abrufen, lehrt Techniken und passt sich deinem Verlauf an.',
-  different: 'Das macht ANITEW',
-  capabilities: [
-    {
-      kind: 'adaptive',
-      title: 'Adaptives Training',
-      body: 'Wiederholen, wenn dein Verlauf es braucht.',
-      badge: 'Echte Abrufe',
-    },
-    {
-      kind: 'technique',
-      title: 'Gedächtnistechniken',
-      body: 'Palast, Major-System, Geschichten, Verknüpfungen.',
-      badge: 'Lernen + anwenden',
-    },
-    {
-      kind: 'world',
-      title: 'Memory World',
-      body: 'Namen, Lernstoff und persönliche Erinnerungen werden trainierbar.',
-      badge: 'Dein Inhalt',
-    },
-    {
-      kind: 'measure',
-      title: 'Ehrliche Messung',
-      body: 'Training und Messung bleiben bewusst getrennt.',
-      badge: 'Keine Fantasie-Scores',
-    },
-    {
-      kind: 'coach',
-      title: 'Coach',
-      body: 'Liest deinen Verlauf und macht daraus konkrete Hinweise.',
-      badge: 'Optional mit KI',
-    },
-    {
-      kind: 'privacy',
-      title: 'Deine Daten. Deine Kontrolle.',
-      body: 'Lokal auf deinem Gerät — oder in deinem eigenen Google Drive.',
-      badge: 'Private by design',
-    },
-  ],
-  trust: 'PRIVAT · LOKAL ZUERST · DEINE DATEN, DEINE KONTROLLE',
-  questions: 'Zwei kurze, freiwillige Fragen richten ANITEW auf das aus, was du behalten willst und wie viel Zeit du hast.',
-  driveKicker: 'OPTIONAL · EMPFOHLEN FÜR MEHRERE GERÄTE',
-  driveCardTitle: 'Deine Daten. Deine Kontrolle.',
-  driveCardBody:
-    'Standardmäßig bleibt alles auf diesem Gerät. Für mehrere Geräte kannst du dich mit Google anmelden und deine ANITEW-Daten in deinem eigenen Google Drive speichern. ANITEW synchronisiert dann über deinen sichtbaren Ordner „Anitew“ — ohne zusätzliche ANITEW-Cloudkopie.',
-  driveConnect: 'Anmelden / Daten im Google Drive speichern',
-  drivePreparing: 'Google-Anmeldung wird vorbereitet …',
-  driveConnecting: 'Google-Anmeldung wird geöffnet …',
-  driveConnected: 'Angemeldet. Automatischer Abgleich ist aktiv',
-  driveUnavailable: 'Google-Anmeldung konnte nicht vorbereitet werden.',
-  driveDenied: 'Anmeldung nicht abgeschlossen. Lokal funktioniert ANITEW vollständig weiter.',
-  scroll: 'Mehr entdecken',
-  appearance: 'Darstellung',
-  themes: { system: 'System', light: 'Hell', dark: 'Dunkel' },
-  connectedAccount: 'Angemeldetes Google-Konto',
-  guideContext: [
-    'Im Core liegen Coach, Memory DNA, eigene Inhalte, Gedächtnispalast, Google Drive, Backup und Einstellungen.',
-    'Eigene Fakten, Lernstoff und persönliche Erinnerungen bekommen echte Verbindungen und Wiederholungen.',
-    'Der Coach liest dieselben realen Signale und macht daraus konkrete Hinweise.',
-    'Gedächtnispalast, Major-System, Geschichten und Verknüpfungen werden erklärt und angewandt.',
-    'Mehrere Geräte: mit Google anmelden und im eigenen Google Drive speichern. Ohne Anmeldung bleibt ANITEW vollständig lokal.',
-  ],
-}
-
-const EN: RefinementCopy = {
-  close: 'Close menu',
-  welcomeTitle: 'Welcome to your memory system.',
-  philosophy: 'Remember. Connect. Retain.',
-  intro: 'ANITEW trains names, numbers, study material and memories from your real life.',
-  adaptive: 'It learns from real retrieval, teaches techniques and adapts to your history.',
-  different: 'What ANITEW does',
-  capabilities: [
-    {
-      kind: 'adaptive',
-      title: 'Adaptive training',
-      body: 'Review when your history says it matters.',
-      badge: 'Real retrieval',
-    },
-    {
-      kind: 'technique',
-      title: 'Memory techniques',
-      body: 'Palaces, Major System, stories and linking.',
-      badge: 'Learn + apply',
-    },
-    {
-      kind: 'world',
-      title: 'Memory World',
-      body: 'Names, study material and personal memories become trainable.',
-      badge: 'Your content',
-    },
-    {
-      kind: 'measure',
-      title: 'Honest measurement',
-      body: 'Training and measurement stay deliberately separate.',
-      badge: 'No fantasy scores',
-    },
-    {
-      kind: 'coach',
-      title: 'Coach',
-      body: 'Reads your history and turns it into concrete guidance.',
-      badge: 'Optional AI',
-    },
-    {
-      kind: 'privacy',
-      title: 'Your data. Your control.',
-      body: 'Local on your device — or in your own Google Drive.',
-      badge: 'Private by design',
-    },
-  ],
-  trust: 'PRIVATE · LOCAL FIRST · YOUR DATA, YOUR CONTROL',
-  questions: 'Two short optional questions tune ANITEW to what you want to retain and how much time you have.',
-  driveKicker: 'OPTIONAL · RECOMMENDED FOR MULTIPLE DEVICES',
-  driveCardTitle: 'Your data. Your control.',
-  driveCardBody:
-    'Everything stays on this device by default. For multiple devices, sign in with Google and save your ANITEW data in your own Google Drive. ANITEW then syncs through your visible “Anitew” folder — without an additional ANITEW cloud copy.',
-  driveConnect: 'Sign in / save data in Google Drive',
-  drivePreparing: 'Preparing Google sign-in …',
-  driveConnecting: 'Opening Google sign-in …',
-  driveConnected: 'Signed in. Automatic sync is active',
-  driveUnavailable: 'Google sign-in could not be prepared.',
-  driveDenied: 'Sign-in was not completed. ANITEW continues to work fully locally.',
-  scroll: 'Explore more',
-  appearance: 'Appearance',
-  themes: { system: 'System', light: 'Light', dark: 'Dark' },
-  connectedAccount: 'Signed-in Google account',
-  guideContext: [
-    'The Core contains Coach, Memory DNA, your content, memory palace, Google Drive, backup and settings.',
-    'Your facts, study material and personal memories receive real links and review schedules.',
-    'The Coach reads those same real signals and turns them into concrete guidance.',
-    'Memory palace, Major System, stories and linking are taught and applied.',
-    'Multiple devices: sign in with Google and save to your own Google Drive. Without sign-in ANITEW remains fully local.',
-  ],
-}
+import {
+  type CapabilityCopy,
+  type CapabilityKind,
+  type RefinementCopy,
+  type ThemeChoice,
+  refinementCopyFor,
+} from './firstRunLayerCopy.ts'
 
 const platform = createWebPlatform()
 const THEME_KEY = 'anitew.theme.v1'
 const lifecycle = new AbortController()
 
 function copy(): RefinementCopy {
-  return document.documentElement.lang.toLowerCase().startsWith('de') ? DE : EN
+  // Alle übersetzten Sprachen aus einer Quelle (firstRunLayerCopy) — das
+  // binäre de/en hinterließ bei fr/es/it/pt englische Einbauten unter
+  // richtig markierter Sprache (gemessen 30.08., fr-FR-Erstbesuch).
+  return refinementCopyFor(document.documentElement.lang)
 }
 
 function element<K extends keyof HTMLElementTagNameMap>(
