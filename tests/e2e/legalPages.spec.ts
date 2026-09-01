@@ -48,3 +48,54 @@ test('die Rechtstexte sind aus der Fußzeile erreichbar und zeigen ihren Text', 
   await page.waitForLoadState('domcontentloaded')
   await expect(page.locator('.challenge, .arrival').first()).toBeVisible({ timeout: 15_000 })
 })
+
+/**
+ * Und in der Sprache, in der die App gerade spricht (Gerätebefund 01.09.).
+ *
+ * Gemeldet: „Impressum und Datenschutz: auch bereits übersetzt? Text wird nur
+ * in Deutsch angezeigt." Die Kurzfassung in der App lag in sechs Sprachen, die
+ * beiden öffentlichen Seiten nur auf Deutsch — und die Fußzeile verlinkte
+ * immer die deutschen.
+ *
+ * Geprüft wird der Weg, den der Mensch geht: Sprache wählen, Fußzeile
+ * antippen, Text lesen. Nicht geprüft wird, ob die Übersetzung juristisch
+ * trägt — das steht als USER ACTION im Backlog.
+ */
+const RECHTSTEXTE = [
+  { tag: 'fr', pill: 'Français', skip: 'Commencer sans questions', fuss: 'Mentions légales', titel: /Mentions légales/ },
+  { tag: 'es', pill: 'Español', skip: 'Empezar sin preguntas', fuss: 'Aviso legal', titel: /Aviso legal/ },
+] as const
+
+for (const sprache of RECHTSTEXTE) {
+  test(`die Rechtstexte sprechen ${sprache.pill}`, async ({ page }) => {
+    test.setTimeout(120_000)
+    await page.goto('/')
+    const zeile = page.locator('.arrival-language:not(.arrival-language-training)')
+    await expect(zeile).toBeVisible()
+    await expect(page.locator('.first-run-drive-card')).toBeVisible({ timeout: 10_000 })
+    await zeile.getByRole('button', { name: sprache.pill }).click()
+    await expect(page.locator('html')).toHaveAttribute('lang', sprache.tag)
+
+    await page.reload()
+    await expect(page.locator('html')).toHaveAttribute('lang', sprache.tag)
+    await page.getByRole('button', { name: sprache.skip }).click()
+    await expect(page.locator('.challenge')).toBeVisible({ timeout: 15_000 })
+
+    // Die Fußzeile trägt die Sprache — und zeigt auf die Seite in dieser Sprache.
+    const fusszeile = page.locator('#anitew-legal-footer')
+    const links = fusszeile.locator('a')
+    await expect(links.nth(0)).toHaveText(sprache.fuss)
+    await expect(links.nth(0)).toHaveAttribute('href', `/impressum.${sprache.tag}.html`)
+
+    await links.nth(0).click()
+    await page.waitForLoadState('domcontentloaded')
+    await expect(page).toHaveTitle(sprache.titel)
+    await expect(page.locator('html')).toHaveAttribute('lang', sprache.tag)
+
+    // Und der Sprachumschalter führt zurück zur verbindlichen Fassung.
+    await page.locator('.legal-langs a', { hasText: 'Deutsch' }).first().click()
+    await page.waitForLoadState('domcontentloaded')
+    await expect(page).toHaveTitle(/Impressum/)
+    await expect(page.locator('html')).toHaveAttribute('lang', 'de')
+  })
+}

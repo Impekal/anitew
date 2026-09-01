@@ -32,7 +32,16 @@ const ROOT = new URL('../../src/', import.meta.url).pathname
  * blieben unentdeckt, bis der naechste Geraetebefund kam. Ein Waechter, der
  * eine Schreibweise kennt und die andere nicht, ist kein Waechter.
  */
-const MUSTER = /startsWith\((['"])de\1\)/u
+/*
+ * Zwei Schreibweisen derselben Insel.
+ *
+ * Dieser Wächter kannte zuerst nur `startsWith('de')`, und im Commit dazu
+ * stand, das Muster sei „aus dem Quelltext heraus". Das stimmte zur Hälfte:
+ * Fünf weitere Stellen fragten `document.documentElement.lang === 'de'` und
+ * blieben unentdeckt, bis der nächste Gerätebefund kam. Ein Wächter, der eine
+ * Schreibweise kennt und die andere nicht, ist keiner.
+ */
+const MUSTER = /startsWith\((['"])de\1\)|lang\s*[!=]==\s*(['"])de\2/u
 
 function quellen(verzeichnis: string): string[] {
   const gefunden: string[] = []

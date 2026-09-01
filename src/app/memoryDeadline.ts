@@ -35,9 +35,60 @@ export interface ParsedMemoryDeadline {
   readonly day: DayKey
 }
 
-/** Complete interface dictionaries currently exist for DE/EN; same fallback rule as I1. */
+const fr: MemoryDeadlineCopy = {
+  label: 'J’en ai besoin pour le',
+  hint: 'Facultatif. ANITEW place des révisions supplémentaires avant cette date — jamais le jour même ni après.',
+  inferred: 'Proposé d’après ton texte. Vérifie l’heure avant de confirmer.',
+  invalid: 'Choisis une date et une heure valides.',
+  past: 'Le moment doit être dans le futur.',
+  detailLabel: 'Nécessaire pour le',
+  planBefore: 'Révisions uniquement avant cette échéance',
+}
+
+const es: MemoryDeadlineCopy = {
+  label: 'Lo necesito para el',
+  hint: 'Opcional. ANITEW coloca repasos adicionales antes de esa fecha, nunca el mismo día ni después.',
+  inferred: 'Propuesto a partir de tu texto. Comprueba la hora antes de confirmar.',
+  invalid: 'Elige una fecha y una hora válidas.',
+  past: 'El momento debe estar en el futuro.',
+  detailLabel: 'Necesario para el',
+  planBefore: 'Repasos solo antes de esta fecha límite',
+}
+
+const it: MemoryDeadlineCopy = {
+  label: 'Mi serve entro il',
+  hint: 'Facoltativo. ANITEW colloca ripassi aggiuntivi prima di quella data — mai il giorno stesso né dopo.',
+  inferred: 'Proposto dal tuo testo. Controlla l’ora prima di confermare.',
+  invalid: 'Scegli una data e un’ora valide.',
+  past: 'Il momento deve essere nel futuro.',
+  detailLabel: 'Necessario entro il',
+  planBefore: 'Ripassi solo prima di questa scadenza',
+}
+
+const pt: MemoryDeadlineCopy = {
+  label: 'Preciso disto até',
+  hint: 'Facultativo. A ANITEW coloca revisões adicionais antes dessa data — nunca no próprio dia nem depois.',
+  inferred: 'Proposto a partir do teu texto. Verifica a hora antes de confirmar.',
+  invalid: 'Escolhe uma data e uma hora válidas.',
+  past: 'O momento tem de estar no futuro.',
+  detailLabel: 'Necessário até',
+  planBefore: 'Revisões só antes deste prazo',
+}
+
+const COPY: Record<string, MemoryDeadlineCopy> = { de, en, fr, es, it, pt }
+
+/**
+ * Hier stand `lang === 'de' ? de : en` mit dem Kommentar „complete interface
+ * dictionaries currently exist for DE/EN". Das galt einmal; seit den sechs
+ * App-Sprachen sah ein französisches Gerät hier Englisch. Deutsch bleibt der
+ * Rückfall (D-007).
+ */
+export function memoryDeadlineCopyFor(language: string): MemoryDeadlineCopy {
+  return COPY[language.toLowerCase().slice(0, 2)] ?? de
+}
+
 export function memoryDeadlineCopyForCurrentUi(): MemoryDeadlineCopy {
-  return document.documentElement.lang === 'de' ? de : en
+  return memoryDeadlineCopyFor(document.documentElement.lang)
 }
 
 /** `datetime-local` is deliberately interpreted in the device's current local timezone (P6). */
@@ -70,11 +121,25 @@ function tomorrowAt(now: number, hour: number, minute: number): string {
  * therefore leaves the field empty and lets the person choose manually.
  */
 export function inferMemoryDeadlineInput(text: string, now: number): string | undefined {
-  const locale = document.documentElement.lang === 'de' ? 'de' : 'en'
-  const pattern =
-    locale === 'de'
-      ? /\bmorgen\s+(?:um\s+)?([01]?\d|2[0-3])(?:[:.]([0-5]\d))?(?:\s*uhr)?\b/iu
-      : /\btomorrow\s+(?:at\s+)?([01]?\d|2[0-3])(?::([0-5]\d))?(?:\s*(?:am|pm))?\b/iu
+  /*
+   * Nur wo ein Muster wirklich existiert.
+   *
+   * Vorher galt: alles außer Deutsch wird nach dem englischen Muster gelesen.
+   * Für eine französische Oberfläche hieß das, ein englischer Satz würde
+   * erkannt und ein französischer nicht — eine Regel, die niemand erwartet.
+   *
+   * Für fr/es/it/pt gibt es hier **absichtlich** kein Muster: Diese Funktion
+   * rät bewusst nicht (siehe oben). Wo nichts erkannt wird, bleibt das Feld
+   * leer und der Mensch wählt selbst — das ist der ehrlichere Ausgang als eine
+   * geratene Uhrzeit. Kommen später Muster dazu, gehören sie hierher.
+   */
+  const patterns: Record<string, RegExp> = {
+    de: /\bmorgen\s+(?:um\s+)?([01]?\d|2[0-3])(?:[:.]([0-5]\d))?(?:\s*uhr)?\b/iu,
+    en: /\btomorrow\s+(?:at\s+)?([01]?\d|2[0-3])(?::([0-5]\d))?(?:\s*(?:am|pm))?\b/iu,
+  }
+  const locale = document.documentElement.lang.toLowerCase().slice(0, 2)
+  const pattern = patterns[locale]
+  if (pattern === undefined) return undefined
   const match = pattern.exec(text)
   if (match === null) return undefined
 
