@@ -77,3 +77,24 @@ export async function loadLinkTaught(): Promise<boolean> {
 export async function markLinkTaught(): Promise<void> {
   await db.settings.put({ key: LINK_KEY, value: true })
 }
+
+/**
+ * Das **Verfahren** des Major-Systems (D5, Gerätemeldung 01.09.).
+ *
+ * Getrennt von den zehn Ziffern, weil es etwas anderes ist: Die Ziffern sind
+ * zehn Zuordnungen, das Verfahren ist der eine Gedanke dahinter. Wer die
+ * zweite Ziffer lernt und den Gedanken nie gehört hat, hält die Zuordnung für
+ * eine Marotte — genau so wurde es gemeldet.
+ *
+ * Der Schlüssel endet auf `.taught`, damit der Drive-Abgleich ihn wie die
+ * anderen Ja/Nein-Lektionen behandelt (Vereinigung statt Zurückdrehen).
+ */
+const METHOD_KEY = 'technique.major.method.taught'
+
+export async function loadMajorMethodTaught(): Promise<boolean> {
+  return (await db.settings.get(METHOD_KEY))?.value === true
+}
+
+export async function markMajorMethodTaught(): Promise<void> {
+  await db.settings.put({ key: METHOD_KEY, value: true })
+}

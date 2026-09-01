@@ -891,7 +891,40 @@ export const de = {
     */
     heading: 'Merktechnik',
     majorName: 'Das Major-System',
-    // Nur beim allerersten Mal. Danach wäre es das Möbel aus G-2.
+    /*
+      Das Verfahren, bevor die erste Ziffer verlangt wird (Gerätemeldung 01.09.).
+
+      Gemeldet wurde: „Man sagt plötzlich ‚die kleine 2 hat 2 Striche wie n‘
+      und dann wird von einem erwartet, dass man 6-stellige Zahlen inklusive 2
+      behält … da hat man keine Ahnung, worum es geht.“
+
+      Der Befund war strukturell und nicht Geschmack: Palast, Geschichte und
+      Verknüpfung hatten je eine Lektion mit drei Schritten — das
+      Major-System, die Technik mit den meisten Teilen, hatte keine. Seine
+      erste Lektion war bereits die Ziffer 1.
+
+      Deshalb hier dieselbe Form, und das Beispiel bewusst in **beide**
+      Richtungen: Wer nur 4–7 → „Rakete“ liest, weiß immer noch nicht, wie
+      er aus dem Bild die Ziffern zurückbekommt — und genau das verlangt der
+      Abruf.
+    */
+    method: {
+      steps: [
+        'Jede Ziffer bekommt einen festen Konsonanten: die Eins ein t, die Zwei ein n — zehn Ziffern, zehn Laute.',
+        'Vokale zählen nicht mit. Aus 4–7 wird r–k, daraus „Rakete“.',
+        'Das Bild bleibt. Beim Abruf liest du zurück: Rakete → r–k → 4–7.',
+      ],
+      build: 'Du lernst eine Ziffer nach der anderen. Die Wörter baust du selbst — vorgesetzte halten nicht.',
+      ready: 'Weiter zur Ziffer.',
+    },
+    /*
+      Steht über **jeder** Ziffernlektion.
+
+      Früher nur beim allerersten Mal — danach stand dort nur noch der Name
+      der Technik. Der Gedanke war G-2 (kein Möbel), die Wirkung war die
+      gemeldete: Ab der zweiten Ziffer erklärte nichts mehr, was zu tun ist.
+      Ein Name ist keine Erklärung, und ein Satz ist kein Möbel.
+    */
     intro: 'Ziffern sind schwer zu behalten, Bilder nicht. Jede Ziffer bekommt einen Laut — daraus wird ein Wort, und ein Wort merkt man sich.',
     // Der Satz nach der Lektion. Kein Lob (G-5), nur der nächste Schritt.
     ready: 'Ab jetzt steht sie unter den Zahlen.',
@@ -912,9 +945,6 @@ export const de = {
     // Steht unter der Zahl beim Einprägen, sobald die erste Ziffer sitzt.
     hint: 'Mach ein Wort daraus. Vokale sind frei.',
     progress: 'Ziffern gelernt',
-    // Im Fußbereich nachzulesen — wer die Technik vertiefen will, soll nicht
-    // auf die nächste Lektion warten müssen.
-    note: 'Die Vokale zählen nicht mit, nur die Konsonanten. Aus 4–7 wird r–k, daraus „Rakete“ oder „Rock“ — welches Bild du nimmst, ist deine Sache. Selbst gebaute Bilder sitzen besser als vorgesetzte, deshalb liefert ANITEW keins.',
   },
   summary: {
     heading: 'Geblieben',

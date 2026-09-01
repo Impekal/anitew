@@ -48,11 +48,15 @@ async function currentBlockSeconds(page: Page): Promise<number> {
 
 /**
  * Setzt den Lernstand, bevor die Einheit beginnt.
+ *
+ * `method` sagt, ob das **Verfahren** des Major-Systems schon erklärt ist.
+ * Voreingestellt ja: Die meisten Prüfungen hier handeln von den einzelnen
+ * Ziffern, und die Verfahrenslektion stünde ihnen sonst jedes Mal davor.
  */
-async function seedTaught(page: Page, digits: readonly number[]) {
+async function seedTaught(page: Page, digits: readonly number[], method = true) {
   await visit(page)
   await expect(startButton(page)).toBeVisible()
-  await page.evaluate(async (value) => {
+  await page.evaluate(async ({ value, method }) => {
     const open = indexedDB.open('anitew')
     const database: IDBDatabase = await new Promise((resolve, reject) => {
       open.onsuccess = () => resolve(open.result)
@@ -65,11 +69,12 @@ async function seedTaught(page: Page, digits: readonly number[]) {
       store.put({ key: 'technique.palace.taught', value: true })
       /* Geschichte und Verknüpfung ebenso; ihre Semantik hat eigene Prüfungen. */
       store.put({ key: 'technique.story.taught', value: true })
-      const request = store.put({ key: 'technique.link.taught', value: true })
+      store.put({ key: 'technique.link.taught', value: true })
+      const request = store.put({ key: 'technique.major.method.taught', value: method })
       request.onsuccess = () => resolve()
       request.onerror = () => reject(request.error)
     })
-  }, digits)
+  }, { value: digits, method })
   await page.reload()
 }
 
@@ -236,5 +241,39 @@ test('hält beim nächsten Mal die nächste Lektion', async ({ page }) => {
   await startShort(page)
 
   await expect(page.locator('.lesson-digit')).toHaveText('2', { timeout: 30_000 })
-  await expect(page.getByText('Ziffern sind schwer zu behalten')).toBeHidden()
+  /*
+   * Hier stand bis zur Gerätemeldung vom 01.09. das Gegenteil: Ab der
+   * zweiten Ziffer sollte der Zweck **verschwinden** (G-2, kein Möbel). Der
+   * Melder hat gezeigt, was das in der Hand bedeutet — „die kleine 2 hat
+   * 2 Striche wie n“ ohne ein Wort dazu, worum es überhaupt geht. Der
+   * Anspruch ist deshalb umgedreht, nicht gelockert: Der Satz muss stehen.
+   */
+  await expect(page.getByText('Ziffern sind schwer zu behalten')).toBeVisible()
+})
+
+test('erklärt erst das Verfahren, dann die erste Ziffer (D5)', async ({ page }) => {
+  test.setTimeout(120_000)
+
+  // Nichts gelernt, Verfahren nie erklärt — der Zustand jedes neuen Menschen
+  // und, bis heute, auch der jedes bestehenden.
+  await seedTaught(page, [], false)
+  await startShort(page)
+
+  await expect(page.locator('.lesson')).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByText('Das Major-System')).toBeVisible()
+  // Das Beispiel muss in beide Richtungen dastehen: Wer nur 4–7 → „Rakete“
+  // liest, weiß immer noch nicht, wie er aus dem Bild die Ziffern zurückholt.
+  await expect(page.getByText(/Aus 4–7 wird r–k/)).toBeVisible()
+  await expect(page.getByText(/Rakete → r–k → 4–7/)).toBeVisible()
+  // Und keine Ziffernkarte: Das Verfahren ist ein eigener Schritt.
+  await expect(page.locator('.lesson-digit')).toHaveCount(0)
+
+  await continueLesson(page)
+
+  // Unmittelbar danach, in derselben Einheit, die erste Ziffer.
+  await expect(page.locator('.lesson-digit')).toHaveText('1', { timeout: 30_000 })
+  await expect(page.locator('.lesson-letters')).toHaveText('t · d')
+
+  await continueLesson(page)
+  await expect(page.locator('.encode-word')).toBeVisible({ timeout: 30_000 })
 })

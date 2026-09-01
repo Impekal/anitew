@@ -477,6 +477,21 @@ export interface PlanInput {
   storyTaught?: boolean
   linkTaught?: boolean
   /**
+   * Wurde das **Verfahren** des Major-Systems schon erklärt (D5)?
+   *
+   * Nicht dasselbe wie `taught`: Dort stehen die einzelnen Ziffern, hier
+   * steht, ob jemand überhaupt weiß, worum es geht — Ziffer → Laut → Wort →
+   * Bild, zehn Ziffern nacheinander. Eine Gerätemeldung hat gezeigt, warum
+   * das getrennt gehört: Wer die zweite Ziffer lernt und das Verfahren nie
+   * erklärt bekam, hält „die kleine 2 hat zwei Abstriche“ für eine Marotte.
+   *
+   * Fehlt der Wert, wird das Verfahren nicht gelehrt — die Ziffern aber
+   * weiterhin. Anders als bei `taught` kostet ein ausgelassener Wert hier
+   * nichts als eine ausgebliebene Erklärung, und ein Aufrufer ohne diese
+   * Angabe soll deshalb nicht plötzlich ganz ohne Unterricht dastehen.
+   */
+  majorMethodTaught?: boolean
+  /**
    * Die adaptive Verschiebung je Modul (D2): ein Stück mehr, eines
    * weniger, oder nichts — gerechnet aus den letzten Antworten
    * (`itemsDeltaFor`), nie gespeichert. Die Grenzen der Runde halten
@@ -682,10 +697,25 @@ export function planSession(input: PlanInput): SessionPlan {
     return others[(offset + Math.floor(round / 2) - 1 + others.length) % others.length] as ModuleId
   }
 
+  /*
+   * Das Verfahren geht der ersten Ziffer voraus — und zwar in **derselben**
+   * Einheit (Gerätemeldung 01.09.).
+   *
+   * Nicht als eigener Tag: Eine Erklärung, die einen Tag vor ihrer Anwendung
+   * liegt, hat man bei der Anwendung nicht mehr. Genau deshalb steht auch
+   * jede andere Lektion vor der ersten Runde und nicht danach.
+   *
+   * Wer schon Ziffern gelernt hat, bekommt sie nachgereicht: Bis hierhin gab
+   * es diese Lektion gar nicht, und wer bei der Zwei steht, hat das Verfahren
+   * nie erklärt bekommen.
+   */
+  const teachesMethod = teachesNumbers && input.majorMethodTaught === false
+
   // Gelehrt wird nur mit Gegenstand: Das Major-System zu erklären und dann
   // keine einzige Zahl zu zeigen wäre Unterricht ohne Anlass.
   const teachSeconds =
-    teachesPalace || teachesNumbers || encodingLesson !== undefined ? TEACH_SECONDS : 0
+    (teachesPalace || teachesNumbers || encodingLesson !== undefined ? TEACH_SECONDS : 0) +
+    (teachesMethod ? TEACH_SECONDS : 0)
   const roundBudgets = share(learnSeconds - teachSeconds, rounds)
   const blocks: BlockPlan[] = []
 
@@ -699,7 +729,7 @@ export function planSession(input: PlanInput): SessionPlan {
       kind: 'teach',
       moduleId: 'palace',
       round: 1,
-      seconds: teachSeconds,
+      seconds: TEACH_SECONDS,
       /*
        * Kein Gegenstand — die Lektion erklärt die Technik und nicht einen
        * bestimmten Palast. Welcher gleich drankommt, entscheidet die erste
@@ -716,11 +746,28 @@ export function planSession(input: PlanInput): SessionPlan {
       // Runde gehört ihm (Versatz oben).
       moduleId: encodingModuleOf(encodingLesson),
       round: 1,
-      seconds: teachSeconds,
+      seconds: TEACH_SECONDS,
       // Kein Gegenstand — die Lektion erklärt die Technik.
       items: [],
     })
   } else if (teachesNumbers) {
+    if (teachesMethod) {
+      blocks.push({
+        id: 'teach-major-method',
+        kind: 'teach',
+        moduleId: 'numbers',
+        round: 1,
+        seconds: TEACH_SECONDS,
+        /*
+         * Kein Gegenstand — die Lektion erklärt das Verfahren und nicht eine
+         * bestimmte Ziffer. Der leere Gegenstand ist auch der Grund, warum
+         * der Bildschirm sie nicht versehentlich als gelernte Ziffer zählt:
+         * Dort wird aus `items[0]` eine Zahl gelesen, und aus nichts wird
+         * keine.
+         */
+        items: [],
+      })
+    }
     blocks.push({
       id: 'teach-major',
       kind: 'teach',
@@ -729,7 +776,7 @@ export function planSession(input: PlanInput): SessionPlan {
       // ist keine eigene. Sonst zählte der Kopf des Bildschirms sie mit und
       // zeigte „Runde 0 von 3“.
       round: 1,
-      seconds: teachSeconds,
+      seconds: TEACH_SECONDS,
       // Die Ziffer, um die es geht — als Zeichenkette, wie jeder andere
       // Gegenstand auch. Der Block wird nicht bewertet.
       items: [String(nextToTeach(input.taught ?? []))],

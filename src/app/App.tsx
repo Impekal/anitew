@@ -83,6 +83,7 @@ import { loadOwnPalaces } from '../data/palace.ts'
 import { loadDailyTime } from '../data/reminders.ts'
 import {
   loadLinkTaught,
+  loadMajorMethodTaught,
   loadPalaceTaught,
   loadStoryTaught,
   loadTaught,
@@ -355,12 +356,17 @@ export function App() {
   // `undefined` heißt „noch nicht nachgesehen“, und dann lehrt der Planer nicht.
   const [storyTaught, setStoryTaught] = useState<boolean | undefined>(undefined)
   const [linkTaught, setLinkTaught] = useState<boolean | undefined>(undefined)
+  // Das Verfahren des Major-Systems (D5): ein Ja/Nein wie die drei anderen.
+  const [majorMethodTaught, setMajorMethodTaught] = useState<boolean | undefined>(undefined)
   useEffect(() => {
     void loadStoryTaught()
       .then(setStoryTaught)
       .catch(() => undefined)
     void loadLinkTaught()
       .then(setLinkTaught)
+      .catch(() => undefined)
+    void loadMajorMethodTaught()
+      .then(setMajorMethodTaught)
       .catch(() => undefined)
   }, [running])
 
@@ -634,6 +640,7 @@ export function App() {
         palaceTaught,
         storyTaught,
         linkTaught,
+        majorMethodTaught,
         /*
          * D2: ein Stück mehr oder weniger je Modul, aus der eigenen
          * Trefferquote gerechnet. Keine Anzeige — Planung, keine Aussage
@@ -660,7 +667,7 @@ export function App() {
       setRunning(progress)
       void beginSession(progress, day, now).catch(() => undefined)
     })()
-  }, [training, mode, platform, taught, palaceTaught, storyTaught, linkTaught, own, focus, recentByModule, dimensionCounts])
+  }, [training, mode, platform, taught, palaceTaught, storyTaught, linkTaught, majorMethodTaught, own, focus, recentByModule, dimensionCounts])
 
   const leave = useCallback(() => {
     setRunning(undefined)
