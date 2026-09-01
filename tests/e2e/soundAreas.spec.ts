@@ -133,16 +133,23 @@ test('der zuletzt angetippte Bereich sieht nicht aus wie der eingeschaltete', as
    *
    * Der erste Anlauf las die Deckkraft mit einem Zahlenmuster aus dem
    * Farbwert — und lag falsch, sobald der Browser `oklab(…)` zurückgibt:
-   * Aus „oklab(0.86 -0.09 0.006 / 0.62)" wurde eine Deckkraft von 1. Die
-   * Aussage braucht die Zahl gar nicht: Abgeschaltet heißt **keine** Fläche.
+   * Aus „oklab(0.86 -0.09 0.006 / 0.62)" wurde eine Deckkraft von 1.
+   *
+   * Der zweite Anlauf forderte, abgeschaltet heiße **keine** Fläche. Das gilt
+   * auf dem Telefon, wo `:hover` gar nicht mehr greift — auf dem Schreibtisch
+   * fiel er durch, und zu Recht: Dort steht der Zeiger nach dem Klick noch auf
+   * der Zeile, und dass er etwas anzeigt, ist richtig. Die Forderung, um die
+   * es wirklich geht, ist enger und gilt überall: Abgeschaltet darf nicht
+   * aussehen wie eingeschaltet.
    */
-  const durchsichtig = (farbe: string): boolean =>
-    farbe === 'transparent' || farbe === 'rgba(0, 0, 0, 0)' || /\/\s*0\s*\)/u.test(farbe)
-
   await beruhigt(page)
   const abgeschaltet = await aus.evaluate((element) => getComputedStyle(element).backgroundColor)
+  const eingeschaltet = await an.evaluate((element) => getComputedStyle(element).backgroundColor)
 
-  expect(durchsichtig(abgeschaltet), `abgeschaltet, aber gefüllt: ${abgeschaltet}`).toBe(true)
+  expect(
+    abgeschaltet,
+    `abgeschaltet sieht aus wie eingeschaltet: ${abgeschaltet}`,
+  ).not.toBe(eingeschaltet)
 })
 
 test('mehrere Bereiche sind gleichzeitig an — und sehen auch so aus', async ({ page }) => {
