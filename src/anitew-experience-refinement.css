@@ -150,11 +150,20 @@ body::after {
 }
 
 /* ── Neural field: wieder klar Teil der Identität ------------------------ */
+/*
+  Kein Filter über dem Netz (Gerätemeldung 01.09.: „Le téléphone chauffe
+  toujours").
+
+  Hier standen zwei `drop-shadow`. Ein Filter auf dem Container zwingt den
+  Browser, den **ganzen** Teilbaum in eine eigene Ebene zu zeichnen und sie
+  weichzuzeichnen — und zwar in jedem Bild, in dem sich darin etwas bewegt.
+  Darin bewegten sich rund achtzig Elemente. Das war die Wärme.
+
+  Das Leuchten kommt jetzt aus der Farbe statt aus einem Filter: Es kostet
+  nichts und ist bei Punkten von drei bis fünf Pixeln kaum zu unterscheiden.
+*/
 .neural {
   opacity: .94 !important;
-  filter:
-    drop-shadow(0 0 8px color-mix(in oklab, var(--v4-mint) 22%, transparent))
-    drop-shadow(0 0 24px color-mix(in oklab, var(--v4-gold) 8%, transparent)) !important;
 }
 .neural-links line {
   stroke: var(--v4-neural) !important;
@@ -162,35 +171,42 @@ body::after {
   vector-effect: non-scaling-stroke;
   transition: opacity 700ms ease;
 }
+/*
+  Die hellen Fäden bleiben, ihr Wandersignal nicht: `stroke-dashoffset` ist
+  eine Zeichen-Eigenschaft. Jede Änderung malt den Pfad neu — dreißigmal
+  gleichzeitig, sechzigmal je Sekunde. Ein Netz, das man ohnehin eher spüren
+  als sehen soll (G-8), ist das nicht wert.
+*/
 .neural-links line:nth-child(7n + 2),
 .neural-links line:nth-child(11n + 5),
 .neural-links line:nth-child(17n + 3) {
   stroke: var(--v4-neural-hot) !important;
   stroke-width: .34 !important;
-  stroke-dasharray: 1.2 3.4;
-  animation: anitew-neural-signal 8.4s linear infinite;
 }
 .neural-links line:nth-child(11n + 5) {
   stroke: color-mix(in oklab, var(--v4-mint-hot) 58%, transparent) !important;
-  animation-duration: 12s;
-  animation-direction: reverse;
 }
-.neural-links line:nth-child(17n + 3) {
-  animation-duration: 15s;
-}
+/*
+  Die Punkte stehen still, bis auf jeden vierten.
+
+  Vorher trug **jeder** der fünfzig ein eigenes `drop-shadow` und eine eigene
+  Dauerbewegung — fünfzig Filterebenen, die pro Bild neu gezeichnet wurden.
+  Ein Netz, das leise atmet, braucht keine fünfzig Atemzüge gleichzeitig;
+  ein Dutzend sieht genauso lebendig aus und kostet einen Bruchteil.
+*/
 .neural-nodes circle {
   fill: var(--v4-mint-hot) !important;
   opacity: .62;
   transform-box: fill-box;
   transform-origin: center;
-  filter: drop-shadow(0 0 2px color-mix(in oklab, var(--v4-mint) 62%, transparent));
+  animation: none !important;
+}
+.neural-nodes circle:nth-child(4n + 1) {
   animation: anitew-neural-node 7.6s ease-in-out infinite !important;
 }
 .neural-nodes circle:nth-child(9n + 3),
 .neural-nodes circle:nth-child(13n + 7) {
   fill: var(--v4-gold-hot) !important;
-  filter: drop-shadow(0 0 3.2px color-mix(in oklab, var(--v4-gold) 72%, transparent));
-  animation-duration: 10.2s !important;
 }
 .neural-nodes circle:nth-child(5n + 1) {
   opacity: .78;
@@ -551,7 +567,8 @@ html[data-focus='on'] .neural {
   background: color-mix(in oklab, var(--paper) 76%, transparent);
   color: var(--v4-mint);
   box-shadow: 0 8px 30px color-mix(in oklab, var(--v4-mint) 13%, transparent);
-  backdrop-filter: blur(14px) saturate(120%);
+  /* Kein Weichzeichner: Darin wippt dauerhaft ein Pfeil, und jede Bewegung
+     hinter oder in einer `backdrop-filter`-Fläche rechnet sie neu. */
   transition: opacity 220ms ease, transform 220ms ease;
 }
 .first-run-scroll-cue[data-hidden='true'] {
@@ -778,11 +795,6 @@ html[data-focus='on'] .neural {
   font-size: 10px;
 }
 
-@keyframes anitew-neural-signal {
-  0% { stroke-dashoffset: 0; opacity: .36; }
-  40% { opacity: .96; }
-  100% { stroke-dashoffset: -34; opacity: .38; }
-}
 @keyframes anitew-neural-node {
   0%, 100% { opacity: .38; transform: scale(.76); }
   38% { opacity: .82; transform: scale(1.15); }

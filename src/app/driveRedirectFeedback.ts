@@ -1,3 +1,4 @@
+import { driveCopyForCurrentUi } from '../i18n/driveCopy.ts'
 import { createWebPlatform } from '../platform/web/index.ts'
 import {
   SYNC_ACCOUNT_NAME_SETTING,
@@ -8,17 +9,10 @@ import { takeDriveRedirectNotice } from './driveRedirectNotice.ts'
 
 const platform = createWebPlatform()
 
-function copy() {
-  const de = document.documentElement.lang.toLowerCase().startsWith('de')
-  return de
-    ? {
-        connected: 'Angemeldet. Daten im eigenen Google Drive gespeichert',
-        failed: 'Google-Anmeldung konnte nicht abgeschlossen werden.',
-      }
-    : {
-        connected: 'Signed in. Data saved in your own Google Drive',
-        failed: 'Google sign-in could not be completed.',
-      }
+/* Dieselbe Quelle wie der Drive-Bildschirm — sechs Sprachen, keine Insel. */
+function copy(): { connected: string; failed: string } {
+  const texts = driveCopyForCurrentUi()
+  return { connected: texts.redirectConnected, failed: texts.redirectFailed }
 }
 
 let applying = false

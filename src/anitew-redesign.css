@@ -69,11 +69,14 @@ body::before {
   background-size: 37px 37px, 61px 61px;
   opacity: .65;
   pointer-events: none;
-  /* Drift über die Rasterposition, nicht per Rotation: Eine rotierende
-     Layout-Box ragt diagonal über den Rahmen und schiebt die Seite
-     seitlich — die Layout-Matrix hat es gefangen. Die Rasterweiten (37/61)
-     machen die Schleife nahtlos. */
-  animation: dot-drift var(--motion-drift) linear infinite;
+  /* Die Scheibe steht still (Gerätemeldung 01.09.).
+
+     Hier wanderte die Rasterposition. `background-position` ist eine
+     Zeichen-Eigenschaft: Der Browser malt die Fläche in jedem Bild neu, und
+     das dauerhaft, auf jedem Bildschirm — und weil die Scheibe hinter dem
+     Startknopf liegt, rechnete sie dessen Weichzeichner gleich mit neu.
+     Eine Drift, die so langsam ist, dass sie kaum auffällt, ist diesen
+     Preis nicht wert. Das Punktraster bleibt. */
 }
 
 .brand {
@@ -313,11 +316,6 @@ body::before {
   0%, 100% { transform: scale(.82); opacity: .24; }
   50% { transform: scale(1.08); opacity: .65; }
 }
-@keyframes dot-drift {
-  from { background-position: 0 0, 0 0; }
-  to { background-position: 37px 74px, -61px 61px; }
-}
-
 @media (max-width: 560px) {
   .app { width: min(100% - 22px, 760px); padding-top: 18px; }
   .challenge { padding: 24px 16px 18px; border-radius: 22px; }
@@ -806,7 +804,10 @@ body::before {
 .memory-pulse-mark::after,
 .memory-pulse-mark span { content: ''; position: absolute; inset: 50% auto auto 50%; border-radius: 50%; transform: translate(-50%, -50%); }
 .memory-pulse-mark::before { width: .45rem; height: .45rem; background: var(--an-gold); box-shadow: 0 0 14px rgba(216,168,90,.4); }
-.memory-pulse-mark::after { width: 1.5rem; height: 1.5rem; border: 1px solid rgba(140,207,192,.35); animation: pulse-orbit var(--motion-breathe) ease-in-out infinite; }
+/* Ohne Dauerpuls (Gerätemeldung 01.09.): Der Ring sitzt in einer Karte mit
+   `backdrop-filter`. Jede Bewegung darin lässt den Weichzeichner in jedem
+   Bild neu rechnen — für einen Ring, der still genauso aussieht. */
+.memory-pulse-mark::after { width: 1.5rem; height: 1.5rem; border: 1px solid rgba(140,207,192,.35); }
 .memory-pulse-label { margin: 0 0 .25rem; color: var(--an-cyan); font: .65rem var(--mono); letter-spacing: .18em; }
 .memory-pulse-line { margin: .15rem 0; color: var(--an-text); font: 1rem var(--serif); }
 

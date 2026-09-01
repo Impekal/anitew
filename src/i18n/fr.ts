@@ -500,6 +500,7 @@ export const fr: Dictionary = {
     account: 'Connecté comme {account}.',
     errors: {
       denied: 'La connexion n’a pas abouti. Au prochain essai, Google redemandera.',
+      blocked: 'Google Drive a refusé cette demande. La connexion elle-même a fonctionné — se reconnecter n’y changera rien. La raison donnée par Google est indiquée à la suite.',
       offline: 'Pas de connexion à Google. Plus tard — l’entraînement marche sans.',
       drive: 'Google Drive n’a pas répondu comme il devrait. Plus tard.',
       'remote-invalid': 'Le dossier d’app contient un fichier qui n’est pas une sauvegarde ANITEW. Il n’a pas été touché. Regarde-le avant de resynchroniser.',

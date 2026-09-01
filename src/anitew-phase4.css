@@ -317,7 +317,7 @@
 .session-bar > span {
   position: relative;
   box-shadow: 0 0 12px rgba(140, 207, 192, .18);
-  transition: width 900ms linear;
+  /* Kein Übergang auf `width` — Begründung in styles.css. */
 }
 
 .session-bar > span::after {

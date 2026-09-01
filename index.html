@@ -233,10 +233,22 @@
         width: clamp(164px, 22vw, 182px);
         height: clamp(164px, 22vw, 182px);
         overflow: visible;
-        filter:
-          drop-shadow(0 0 16px rgb(240 184 100 / 18%))
-          drop-shadow(0 0 44px rgb(142 231 208 / 13%))
-          drop-shadow(0 0 90px rgb(142 231 208 / 5%));
+        /*
+          Kein Weichzeichner ueber der Marke (Geraetemeldung 01.09.).
+
+          Hier standen drei `drop-shadow`, der groesste mit 90 px Radius, ueber
+          einer Flaeche von 182 x 182 px — und darin laufen zwei endlose
+          Bewegungen. Ein Filter auf dem Container zwingt den ganzen Teilbaum
+          in eine eigene Ebene, die neu gezeichnet wird, sobald sich darin
+          etwas ruehrt. Das lief auf dem Startbildschirm, also genau dann, wenn
+          das Geraet ohnehin am meisten zu tun hat.
+
+          Das Leuchten kommt jetzt aus einem ruhenden Verlauf dahinter: Der
+          wird einmal gezeichnet und nicht je Bild.
+        */
+        background:
+          radial-gradient(circle at 50% 50%, rgb(240 184 100 / 9%), transparent 58%),
+          radial-gradient(circle at 50% 50%, rgb(142 231 208 / 6%), transparent 72%);
         transform-origin: 50% 50%;
         animation: anitew-core-arrive .85s cubic-bezier(.16,.84,.22,1) both;
       }
@@ -290,9 +302,9 @@
       .anitew-mark-signal {
         fill: #fff4d6;
         opacity: 0;
-        filter:
-          drop-shadow(0 0 4px rgb(255 225 167 / 95%))
-          drop-shadow(0 0 9px rgb(142 231 208 / 45%));
+        /* Ohne eigenen Weichzeichner: Der Punkt wandert endlos, und ein Filter
+           an einem endlos bewegten Element wird in jedem Bild neu gerechnet.
+           Bei drei Pixeln Groesse traegt die helle Fuellung das Leuchten. */
         animation: anitew-mark-signal 2.75s .92s cubic-bezier(.4,0,.2,1) infinite;
       }
       .anitew-launch-name {

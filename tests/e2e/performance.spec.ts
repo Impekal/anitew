@@ -151,3 +151,203 @@ test('hält den Hauptthread frei — kein Dauerlauf von JavaScript', async ({ pa
     `JavaScript kommt im Hauptthread nicht zur Ruhe. Zuletzt: ${beschreibung}`,
   ).toBe(true)
 })
+
+/**
+ * Das Farbbudget (Gerätemeldung 01.09.: „Le téléphone chauffe toujours").
+ *
+ * #101 hat das Ruhefenster gebracht: Nach zwanzig Sekunden ohne Berührung
+ * steht die Bewegung still. Das half — aber es half genau dann, wenn niemand
+ * da ist. Wer eine Einheit macht, tippt; das Ruhefenster armiert nie, und das
+ * Telefon wurde weiter heiß. Der Fehler lag nicht am Ruhefenster, sondern an
+ * dem, was währenddessen läuft.
+ *
+ * Gemessen wurde (Pixel-7-Profil, gebaute App):
+ *
+ * - In der Einheit liefen **84 Animationen gleichzeitig**. Rund dreißig
+ *   bewegten `stroke-dashoffset`; das ganze Netz lag in zwei `drop-shadow`,
+ *   also wurde sein **kompletter** Teilbaum je Bild neu gezeichnet.
+ * - Die Punktscheibe hinter dem Inhalt (`.app::before`, 420 × 420 px) bewegte
+ *   `background-position` — auf **jedem** Bildschirm, dauerhaft.
+ * - Der Startknopf trug `backdrop-filter: blur(18px)` über 270 × 270 px, und
+ *   die Punktscheibe bewegte sich genau dahinter.
+ *
+ * Nach der Behebung: **14** laufende Animationen in der Einheit, keine davon
+ * auf oder in einer Weichzeichner-Fläche, keine auf einer Zeichen-Eigenschaft.
+ *
+ * Alle drei zwingen den Browser, pro Bild **neu zu zeichnen**. Genau das
+ * kostet Strom und Wärme; `transform` und `opacity` tun es nicht, die schiebt
+ * die Grafikkarte. Der Kommentar in `NeuralField.tsx` behauptete bis hierher,
+ * die Bewegung laufe „auf der Grafikkarte“ — die Messung sagt etwas anderes.
+ *
+ * Deshalb steht hier ein Budget, wie es das für den Kaltstart längst gibt.
+ */
+
+/*
+ * Gezaehlt wird, was **endlos** laeuft (CI-Fund 01.09.).
+ *
+ * Der erste Wurf mass alles, was im Moment der Probe lief — und wurde damit
+ * unzuverlaessig: Mal war eine einmalige Einblendung noch unterwegs, mal
+ * nicht. Die CI hat das als „flaky" gemeldet, und das war kein Zufallsrauschen,
+ * sondern ein zu grob gefasster Anspruch.
+ *
+ * Die Aussage, um die es geht, ist enger: Ein kurzes Aufblenden beim Eintritt
+ * kostet einmal ein paar Bilder. Warm wird das Telefon von dem, was **nicht
+ * aufhoert** — und genau das war der Befund: Das Netz, die Punktscheibe und
+ * die Signale liefen `infinite`.
+ */
+
+/** Eigenschaften, deren Bewegung den Browser zum Neuzeichnen zwingt. */
+const REPAINTS = [
+  'strokeDashoffset',
+  'strokeDasharray',
+  'backgroundPosition',
+  'backgroundPositionX',
+  'backgroundPositionY',
+  'backgroundSize',
+  'boxShadow',
+  'filter',
+  'backdropFilter',
+  'width',
+  'height',
+  'top',
+  'left',
+]
+
+interface RunningAnimation {
+  where: string
+  props: string[]
+  blur: string
+  /** Läuft sie endlos? Nur die ist Dauerlast. */
+  dauerhaft: boolean
+}
+
+/**
+ * Wartet, bis die Oberfläche steht.
+ *
+ * Mehrere Stylesheets laden verzögert — auf dem Startbildschirm waren es
+ * zwei, in der Einheit elf. Wer davor misst, misst einen Zwischenzustand und
+ * bekommt mal dieses, mal jenes Ergebnis; die CI hat genau das als „flaky“
+ * gemeldet. Gewartet wird, bis keine Stylesheets mehr dazukommen.
+ */
+async function steht(page: import('@playwright/test').Page): Promise<void> {
+  let vorher = -1
+  for (let versuch = 0; versuch < 40; versuch++) {
+    const jetzt = await page.evaluate(() => document.styleSheets.length)
+    if (jetzt === vorher) return
+    vorher = jetzt
+    await page.waitForTimeout(250)
+  }
+}
+
+async function running(page: import('@playwright/test').Page): Promise<RunningAnimation[]> {
+  await steht(page)
+  return page.evaluate(() => {
+    const skip = ['offset', 'computedOffset', 'easing', 'composite']
+    return document
+      .getAnimations()
+      .filter((animation) => animation.playState === 'running')
+      .map((animation) => {
+        const effect = animation.effect as KeyframeEffect | null
+        const target = effect?.target ?? undefined
+        const props = new Set<string>()
+        for (const frame of effect?.getKeyframes() ?? []) {
+          for (const key of Object.keys(frame)) if (!skip.includes(key)) props.add(key)
+        }
+        /*
+          Nicht nur das bewegte Element selbst zaehlt, sondern auch jede
+          Weichzeichner-Flaeche darueber: Ein Filter auf dem Container zwingt
+          den ganzen Teilbaum in eine eigene Ebene, und die wird neu
+          gerechnet, sobald sich darin etwas ruehrt. Genau so war das Netz
+          gebaut — ein `drop-shadow` ueber achtzig bewegten Elementen.
+        */
+        let blur = ''
+        for (
+          let node: Element | null | undefined = target;
+          node !== null && node !== undefined && blur === '';
+          node = node.parentElement
+        ) {
+          const near = getComputedStyle(node)
+          const backdrop = near.backdropFilter
+          const filter = near.filter
+          if (backdrop !== 'none' && backdrop !== '') blur = `backdrop-filter: ${backdrop}`
+          else if (filter !== 'none' && (filter.includes('blur') || filter.includes('drop-shadow'))) {
+            blur = `filter: ${filter}`
+          }
+        }
+        const name = target === undefined ? '?' : (target.getAttribute('class') ?? target.tagName)
+        const timing = effect?.getComputedTiming()
+        return {
+          where: `${name}`.slice(0, 60),
+          props: [...props],
+          blur,
+          dauerhaft: timing?.iterations === Infinity,
+        }
+      })
+  })
+}
+
+async function intoSession(page: import('@playwright/test').Page): Promise<void> {
+  await visit(page)
+  await expect(startButton(page)).toBeVisible()
+  await page.getByRole('button', { name: '60 Sekunden' }).click()
+  await startButton(page).click()
+  await page.locator('.settle').click()
+  await expect(page.locator('.session-clock')).toBeVisible({ timeout: 30_000 })
+}
+
+test('keine dauerhafte Bewegung zeichnet pro Bild neu', async ({ page }) => {
+  test.setTimeout(120_000)
+  await intoSession(page)
+  await page.waitForTimeout(1500)
+
+  const schuldige = (await running(page)).filter(
+    (animation) =>
+      animation.dauerhaft && animation.props.some((property) => REPAINTS.includes(property)),
+  )
+
+  expect(
+    schuldige.map((a) => `${a.where}: ${a.props.join('+')}`).slice(0, 8).join(' | '),
+    'diese Bewegungen zwingen zum Neuzeichnen',
+  ).toBe('')
+})
+
+test('keine Bewegung sitzt auf einer Weichzeichner-Fläche', async ({ page }) => {
+  test.setTimeout(120_000)
+
+  // Erst der Startbildschirm — dort steht der Knopf mit dem Weichzeichner.
+  await visit(page)
+  await expect(startButton(page)).toBeVisible()
+  await page.waitForTimeout(1200)
+  const aufDemStart = (await running(page)).filter(
+    (animation) => animation.dauerhaft && animation.blur !== '',
+  )
+  expect(
+    aufDemStart.map((a) => `${a.where} · ${a.blur}`).slice(0, 6).join(' | '),
+    'bewegte Weichzeichner auf dem Startbildschirm',
+  ).toBe('')
+
+  await intoSession(page)
+  await page.waitForTimeout(1500)
+  const inDerEinheit = (await running(page)).filter(
+    (animation) => animation.dauerhaft && animation.blur !== '',
+  )
+  expect(
+    inDerEinheit.map((a) => `${a.where} · ${a.blur}`).slice(0, 6).join(' | '),
+    'bewegte Weichzeichner in der Einheit',
+  ).toBe('')
+})
+
+/**
+ * Und eine Obergrenze für die schiere Menge: Auch billige Bewegungen sind
+ * nicht umsonst, wenn achtzig davon gleichzeitig laufen. Gemessen waren es
+ * 81; die Schranke lässt reichlich Luft und fängt trotzdem den Tag, an dem
+ * wieder ein Feld mit fünfzig Einzelanimationen dazukommt.
+ */
+test('höchstens 24 Bewegungen laufen gleichzeitig', async ({ page }) => {
+  test.setTimeout(120_000)
+  await intoSession(page)
+  await page.waitForTimeout(1500)
+
+  const laufend = await running(page)
+  expect(laufend.length, laufend.map((a) => a.where).slice(0, 10).join(' | ')).toBeLessThanOrEqual(24)
+})

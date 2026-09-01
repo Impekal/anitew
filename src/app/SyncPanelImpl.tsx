@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { SyncError, type Platform, type SyncReport } from '../core/index.ts'
 import { type DriveFailure } from '../platform/web/drive.ts'
 import { disconnectGoogleAuthorization } from '../platform/web/oauthLogout.ts'
+import { driveCopyForCurrentUi } from '../i18n/driveCopy.ts'
 import type { Dictionary } from '../i18n/index.ts'
 
 import {
@@ -17,66 +18,16 @@ import { takeDriveRedirectNotice } from './driveRedirectNotice.ts'
 
 type SyncFailureText = DriveFailure | 'remote-invalid' | 'storage'
 
-interface VisibleDriveCopy {
-  intro: string
-  how: string
-  start: string
-  again: string
-  autoNote: string
-  localNote: string
-  stop: string
-  firstTime: string
-  remoteInvalid: string
-  storage: string
-  identity: string
-  connected: string
-}
+/*
+  Die Texte stehen in `i18n/driveCopy.ts`, in allen sechs App-Sprachen.
 
-const DRIVE_DE: VisibleDriveCopy = {
-  intro:
-    'Deine Daten bleiben unter deiner Kontrolle. Standardmäßig speichert ANITEW lokal auf diesem Gerät. Für mehrere Geräte kannst du dich mit Google anmelden und deine ANITEW-Daten in deinem eigenen Google Drive speichern; ANITEW legt dort den sichtbaren Ordner „Anitew“ an — ohne zusätzliche ANITEW-Cloudkopie.',
-  how:
-    'Beim Abgleich führt ANITEW deinen lokalen und deinen Drive-Stand sicher zusammen und schreibt das Ergebnis zurück in deinen eigenen Ordner.',
-  start: 'Anmelden / Daten im Google Drive speichern',
-  again: 'Jetzt mit Google Drive abgleichen',
-  autoNote:
-    'Automatischer Abgleich ist aktiv. ANITEW synchronisiert beim Öffnen und nach Änderungen still über dein eigenes Google Drive.',
-  localNote:
-    'Lokaler Modus: Training, Erinnerungen und Verlauf bleiben ausschließlich auf diesem Gerät.',
-  stop: 'Google-Konto trennen · lokal weiter',
-  firstTime: 'Dein Ordner „Anitew“ wurde in Google Drive angelegt und der aktuelle Stand dort gespeichert.',
-  remoteInvalid:
-    'Im Ordner „Anitew“ liegt eine Datei, die keine gültige ANITEW-Sicherung ist. Sie wurde nicht verändert.',
-  storage:
-    'Der Abgleich selbst war erreichbar, aber ANITEW konnte den Verbindungszustand auf diesem Gerät nicht dauerhaft speichern. Die Anzeige wurde deshalb nicht umgeschaltet. Bitte versuche es noch einmal.',
-  identity: 'Angemeldetes Google-Konto',
-  connected: 'Google-Anmeldung abgeschlossen. Dein Konto ist jetzt verbunden.',
-}
-
-const DRIVE_EN: VisibleDriveCopy = {
-  intro:
-    'Your data stays under your control. ANITEW stores locally on this device by default. For multiple devices, sign in with Google and save your ANITEW data in your own Google Drive; ANITEW creates a visible “Anitew” folder there — without an additional ANITEW cloud copy.',
-  how:
-    'Sync safely merges your local state with your Drive state and writes the result back into your own folder.',
-  start: 'Sign in / save data in Google Drive',
-  again: 'Sync with Google Drive now',
-  autoNote:
-    'Automatic sync is active. ANITEW quietly syncs on open and after changes through your own Google Drive.',
-  localNote:
-    'Local mode: training, memories and history stay exclusively on this device.',
-  stop: 'Sign out from Google · stay local',
-  firstTime: 'Your “Anitew” folder was created in Google Drive and the current state was stored there.',
-  remoteInvalid:
-    'The “Anitew” folder contains a file that is not a valid ANITEW backup. It was left untouched.',
-  storage:
-    'Sync was reachable, but ANITEW could not save the connection state permanently on this device. The display was therefore not switched. Please try again.',
-  identity: 'Signed-in Google account',
-  connected: 'Google sign-in completed. Your account is now connected.',
-}
-
-function visibleCopy(): VisibleDriveCopy {
-  return document.documentElement.lang.toLowerCase().startsWith('de') ? DRIVE_DE : DRIVE_EN
-}
+  Hier standen `DRIVE_DE` und `DRIVE_EN` und dazwischen
+  `startsWith('de') ? DRIVE_DE : DRIVE_EN`. Ein Foto vom Telefon hat gezeigt,
+  was das anrichtet: App auf Franzoesisch, dieser Bildschirm auf Englisch,
+  und darunter eine franzoesische Fehlerzeile aus dem Woerterbuch — zwei
+  Sprachen uebereinander. `tests/core/languageIslands.test.ts` haelt das
+  Muster jetzt aus dem Quelltext heraus.
+*/
 
 function driveFailure(error: unknown): DriveFailure | undefined {
   if (typeof error !== 'object' || error === null || !('reason' in error)) return undefined
@@ -108,7 +59,7 @@ function initials(name: string | undefined, email: string | undefined): string {
 
 export function SyncPanelImpl({ platform, dictionary }: { platform: Platform; dictionary: Dictionary }) {
   const texts = dictionary.sync
-  const drive = visibleCopy()
+  const drive = driveCopyForCurrentUi()
 
   const [clientId, setClientId] = useState<string | undefined>(undefined)
   const [checked, setChecked] = useState(false)

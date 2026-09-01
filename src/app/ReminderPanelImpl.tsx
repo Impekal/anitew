@@ -8,14 +8,14 @@ import {
   nextDailyAt,
 } from '../core/index.ts'
 import { clearDailyTime, saveDailyTime } from '../data/reminders.ts'
+import { reminderFailureFor } from '../i18n/panelCopy.ts'
 import type { Dictionary } from '../i18n/index.ts'
 
 import { Emphasis } from './Emphasis.tsx'
 
+/* Sechs Sprachen aus `i18n/panelCopy.ts` — hier stand eine Zwei-Sprachen-Insel. */
 function reminderFailureText(): string {
-  return document.documentElement.lang.toLowerCase().startsWith('de')
-    ? 'Konnte die Erinnerung nicht vollständig ändern. Bitte noch einmal versuchen.'
-    : 'Could not fully change the reminder. Please try again.'
+  return reminderFailureFor(document.documentElement.lang)
 }
 
 export function ReminderPanelImpl({
