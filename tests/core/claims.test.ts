@@ -389,22 +389,35 @@ describe('die eigenen Seiten neben der App (Runde 3)', () => {
 
   it('erzeugt beide Seiten aus den Dokumenten, mit Weg zurück in die App', () => {
     const generator = textOf('scripts/privacy-page.mjs')
-    expect(generator).toMatch(/IMPRESSUM\.md/u)
-    expect(generator).toMatch(/PRIVACY\.md/u)
+    expect(generator).toMatch(/IMPRESSUM/u)
+    expect(generator).toMatch(/PRIVACY/u)
+
     /*
-     * Ziel muss `public/` sein, nicht `dist/`. Aus `dist/` geschrieben kämen
-     * die Seiten nach dem Precache und wären offline nicht da — die Zusage in
-     * `vite.config.ts` war genau deshalb einmal unwahr.
+     * Geprüft wird das **Ergebnis**, nicht der Quelltext.
+     *
+     * Hier stand `expect(generator).toMatch(/public\/datenschutz\.html/)` —
+     * also die Suche nach einem Literal im Skript. Das ging gut, solange der
+     * Pfad wörtlich dort stand; als er am 01.09. für sechs Sprachen aus Teilen
+     * zusammengesetzt wurde, schlug der Test fehl, obwohl die Seiten weiterhin
+     * korrekt entstehen. Ein Test, der den Quelltext liest, prüft die
+     * Schreibweise und nicht die Wirkung.
+     *
+     * Das Ziel muss `public/` sein, nicht `dist/`: Aus `dist/` geschrieben
+     * kämen die Seiten nach dem Precache und wären offline nicht da — die
+     * Zusage in `vite.config.ts` war genau deshalb einmal unwahr.
      */
-    expect(generator).toMatch(/public\/datenschutz\.html/u)
-    expect(generator).toMatch(/public\/impressum\.html/u)
+    for (const datei of ['public/datenschutz.html', 'public/impressum.html']) {
+      const seite = textOf(datei)
+      expect(seite, `${datei} fehlt oder ist leer`).toMatch(/^<!doctype html>/u)
+      // Ohne Rücklink stünde man in der installierten App in einer Sackgasse.
+      expect(seite, `${datei} ohne Weg zurück in die App`).toMatch(/<a href="\/">ANITEW<\/a>/u)
+    }
+
     const build = JSON.parse(textOf('package.json')).scripts.build as string
     expect(
       build.indexOf('privacy-page.mjs') < build.indexOf('vite build'),
       'privacy-page.mjs muss vor `vite build` laufen, sonst fehlt der Precache',
     ).toBe(true)
-    // Ohne Rücklink stünde man in der installierten App in einer Sackgasse.
-    expect(generator).toMatch(/<a href="\/">ANITEW<\/a>/u)
   })
 })
 

@@ -23,6 +23,15 @@ import { describe, expect, it } from 'vitest'
  */
 
 const ROOT = new URL('../../src/', import.meta.url).pathname
+/*
+ * Zwei Schreibweisen derselben Insel.
+ *
+ * Der Waechter vom 01.09. kannte nur `startsWith('de')` und meldete danach
+ * „das Muster ist aus dem Quelltext heraus". Das stimmte nur zur Haelfte:
+ * Fuenf weitere Stellen fragten `document.documentElement.lang === 'de'` und
+ * blieben unentdeckt, bis der naechste Geraetebefund kam. Ein Waechter, der
+ * eine Schreibweise kennt und die andere nicht, ist kein Waechter.
+ */
 const MUSTER = /startsWith\((['"])de\1\)/u
 
 function quellen(verzeichnis: string): string[] {

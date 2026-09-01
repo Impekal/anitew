@@ -19,3 +19,5 @@ facesheet*.png
 public/impressum.html
 public/datenschutz.html
 tsconfig.tsbuildinfo
+public/impressum.*.html
+public/datenschutz.*.html
