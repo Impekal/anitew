@@ -107,6 +107,7 @@ export const es: Dictionary = {
     memoryPlaceholder: 'Lo que va con ello',
     recallPlaceholder: 'Una palabra por línea',
     recallNumbersPlaceholder: 'Un número por línea',
+    recallNextNumber: 'Siguiente número',
     doneWithBlock: 'Listo',
     abort: 'Cancelar',
   },

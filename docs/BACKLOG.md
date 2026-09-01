@@ -260,6 +260,7 @@ Anforderung wie jede andere. Die acht Regeln G-1 bis G-8 stehen in
 | O13 | **Das Netz im Hintergrund** (G-8): Knoten und Verbindungen, die atmen | ✅ 2026-08-17 | 30 Knoten, in CSS bewegt statt in JavaScript, aus einem Seed gebaut. Eine Maske hält die Mitte frei — ein Hintergrund, der mit dem Inhalt streitet, ist ein Fehler | M |
 | O14 | **Abwechslung** (G-7): nie zweimal derselbe Tag | 🟨 2026-08-17 | wechselnde Begrüßung, aus dem Tagesschlüssel gezogen. Der große Teil kommt mit den Missionen (H) | S |
 | O15 | Ergebnis als kleines Netz statt als Liste darstellen | ✅ 2026-08-25 | Erledigt: `MemoryConstellation`/`NeuralField` + Profil-Netz (`profileNetwork.spec.ts`) — nur gemessene Achsen, keine erfundenen Nullen | M |
+| O16 | Eingabe passt zur Tastatur, die das Gerät wirklich zeigt | ✅ 2026-09-01 | Gerätemeldung 31.08.: Der freie Zahlabruf verlangte „eine Zahl pro Zeile“, der iOS-Ziffernblock (`inputmode="numeric"`, O5-Grund: keine Buchstabensuche für sechsstellige Zahlen) hat aber **keine Return-Taste** — es blieb bei einer Zahl. Die App gibt den Zeilenwechsel jetzt selbst (`.recall-next`, sechs Sprachen, ohne Fokusverlust, damit die Tastatur offen bleibt). Im selben Zug ein zweiter, sichtbarer Widerspruch behoben: Die Marken unter dem Feld zerlegten mit der Wort-Regel und zeigten „12 345“ als **zwei** Stücke, während die Bewertung das Gruppierungsleerzeichen richtig als eine Zahl las. Angezeigt wird jetzt, was gezählt wird. `tests/e2e/numberRecall.spec.ts`, Gegenprobe beides rot | S |
 
 ## P. Qualität
 
