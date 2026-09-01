@@ -43,3 +43,25 @@
 .sound-area[aria-pressed='false'] .sound-area-name {
   color: var(--ink-soft);
 }
+
+/*
+  Eingeschaltet trägt eine Fläche (Gerätemeldung 01.09.: „Das ist entweder
+  oder. Man kann nicht mehrere aktivieren").
+
+  Der Zustand hing vorher an einem ♪ gegen einen Punkt. Daneben füllte
+  `:hover` die zuletzt berührte Zeile ganz aus — und auf einem Telefon
+  bleibt das kleben. Das Auge glaubt der Fläche, nicht dem Zeichen: Also
+  bekommt der eingeschaltete Bereich die Fläche, und zwar dieselbe für alle
+  drei, unabhängig davon, welchen man zuletzt berührt hat.
+
+  Dieselbe Sprache wie bei `.mode-active`, dem einzigen anderen Schalter der
+  App, der eine Auswahl trägt.
+*/
+.sound-area[aria-pressed='true'] {
+  background: var(--accent-soft);
+  border-color: color-mix(in oklab, var(--accent) 42%, transparent);
+}
+
+.sound-area[aria-pressed='true'] .sound-area-name {
+  color: var(--ink);
+}

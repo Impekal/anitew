@@ -390,9 +390,20 @@ body::before {
   transition: background var(--step) var(--ease), border-color var(--step) var(--ease);
 }
 
-.quiet:hover {
-  background: var(--accent-soft);
-  border-color: transparent;
+/*
+  Nur dort, wo es wirklich einen Zeiger gibt (Gerätemeldung 01.09.).
+
+  Auf einem Telefon bleibt `:hover` an dem Element kleben, das man zuletzt
+  berührt hat. Damit sah immer die zuletzt angetippte Fläche „ausgewählt“
+  aus — bei den Ton-Bereichen las sich das als Entweder-oder, obwohl alle
+  drei unabhängig schalten. Gemessen: die **abgeschaltete** Fläche war mit
+  0,43 gefüllt, die eingeschaltete mit 0.
+*/
+@media (hover: hover) and (pointer: fine) {
+  .quiet:hover {
+    background: var(--accent-soft);
+    border-color: transparent;
+  }
 }
 
 /* ── Fuß und Nebensachen ──────────────────────────────────────────────── */
