@@ -55,6 +55,19 @@ export const fr: Dictionary = {
   sound: {
     on: 'Son activé',
     off: 'Son coupé',
+    /*
+     * Die Bereiche einzeln (Geraetewunsch 31.08.). `honest` ist die Zeile, die
+     * verhindert, dass aus einem angenehmen Klang ein Wirkungsversprechen wird
+     * (R-1): Die App misst keinen Konzentrationseffekt und behauptet keinen.
+     */
+    heading: 'Ce qui sonne',
+    feedback: 'Retour',
+    feedbackNote: 'Les sons courts pendant l’utilisation.',
+    arrival: 'Arrivée',
+    arrivalNote: 'La mélodie des trois secondes avant la séance.',
+    focus: 'Son pendant la séance',
+    focusNote: 'Un son continu très discret pendant l’entraînement.',
+    honest: 'Un son continu aide-t-il à mémoriser ? Cela dépend des personnes — certaines ont besoin de silence. Nous ne l’avons pas mesuré, donc nous ne l’affirmons pas.',
   },
   session: {
     settle: 'Arriver',

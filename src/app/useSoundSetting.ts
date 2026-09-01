@@ -1,9 +1,21 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import type { Platform } from '../core/index.ts'
+import {
+  ALL_SOUND_ON,
+  type SoundCategory,
+  type SoundCategorySetting,
+} from '../core/sound/categories.ts'
 import { persistThenApply } from './persistThenApply.ts'
 
 const SETTING_KEY = 'sound'
+/*
+ * Eigener Schluessel, nicht im alten mit drin: Wer die App schon benutzt,
+ * hat unter 'sound' ein `boolean` stehen. Ein Feld, das mal ein Wahrheitswert
+ * und mal ein Objekt ist, ist eine Falle fuer jede spaetere Lesung — und die
+ * bestehende Wahl soll den Hauptschalter unveraendert weiter steuern.
+ */
+const CATEGORY_KEY = 'sound.categories'
 
 /**
  * Ton an oder aus (Backlog O6, D-011/G-9).
@@ -15,6 +27,7 @@ const SETTING_KEY = 'sound'
  */
 export function useSoundSetting(platform: Platform) {
   const [enabled, setEnabled] = useState(true)
+  const [categories, setCategories] = useState<SoundCategorySetting>(ALL_SOUND_ON)
   // R3-06: Ein gescheitertes Speichern wird gesagt, nicht verschluckt.
   const [saveFailed, setSaveFailed] = useState(false)
 
@@ -29,10 +42,65 @@ export function useSoundSetting(platform: Platform) {
         document.documentElement.dataset.anitewSound = stored ? 'on' : 'off'
       })
       .catch(() => undefined)
+
+    /*
+     * Die Bereiche werden **zusammengefuehrt**, nicht ersetzt: Ein
+     * gespeicherter Stand von frueher kennt einen spaeter hinzugekommenen
+     * Bereich nicht, und der soll dann an sein (Voreinstellung), nicht
+     * fehlen.
+     */
+    void platform.settings
+      .read<Partial<SoundCategorySetting>>(CATEGORY_KEY)
+      .then((stored) => {
+        if (cancelled || stored === undefined) return
+        const merged = { ...ALL_SOUND_ON, ...stored }
+        setCategories(merged)
+        platform.sound.setCategories(merged)
+      })
+      .catch(() => undefined)
+
     return () => {
       cancelled = true
     }
   }, [platform])
+
+  /**
+   * Einen einzelnen Bereich umschalten (Geraetewunsch 31.08.).
+   *
+   * Wie beim Hauptschalter: Der Klang folgt sofort, die Anzeige erst mit dem
+   * geschriebenen Stand (R3-06). Beim Einschalten kommt eine kurze Probe des
+   * Bereichs — man soll hoeren, was man gerade eingeschaltet hat.
+   */
+  const toggleCategory = useCallback(
+    (category: SoundCategory) => {
+      const previous = platform.sound.categories()
+      const next = { ...previous, [category]: !previous[category] }
+
+      platform.sound.setCategories(next)
+      if (next[category] && enabled) {
+        if (category === 'arrival') platform.sound.play('arrival')
+        else if (category === 'feedback') platform.sound.play('word', 2)
+        // `focus` probiert sich nicht selbst an: Ein Dauerklang, der auf einer
+        // Einstellungsseite anfaengt und dort bliebe, waere genau die
+        // Dauerlast, die er nicht sein soll.
+      }
+      if (category === 'focus' && !next.focus) platform.sound.stopAmbient()
+
+      void persistThenApply(
+        () => platform.settings.write(CATEGORY_KEY, next),
+        () => {
+          setSaveFailed(false)
+          setCategories(next)
+        },
+        () => {
+          platform.sound.setCategories(previous)
+          setCategories(previous)
+          setSaveFailed(true)
+        },
+      )
+    },
+    [platform, enabled],
+  )
 
   const toggle = useCallback(() => {
     const previous = platform.sound.isEnabled()
@@ -71,5 +139,5 @@ export function useSoundSetting(platform: Platform) {
     )
   }, [platform])
 
-  return { enabled, toggle, saveFailed }
+  return { enabled, toggle, categories, toggleCategory, saveFailed }
 }

@@ -116,6 +116,7 @@ import { useLanguage } from './useLanguage.ts'
 import { useProfile } from './useProfile.ts'
 import { useStoragePersists } from './useStoragePersists.ts'
 import { useTrainingLanguage } from './useTrainingLanguage.ts'
+import { SoundAreas } from './SoundAreas.tsx'
 import { useSoundSetting } from './useSoundSetting.ts'
 
 const MODE_ORDER: readonly TrainingMode[] = ['emergency', 'short', 'daily', 'extended']
@@ -1663,6 +1664,17 @@ function LanguageSoundControls({
         <span aria-hidden="true">{sound.enabled ? '♪' : '·'}</span>
         {sound.enabled ? dictionary.sound.on : dictionary.sound.off}
       </button>
+
+      {/*
+        Die drei Bereiche einzeln (Geraetewunsch 31.08.: „Toene nach
+        individuellen Bereichen aktivierbar oder alle auf einmal").
+
+        Sie stehen nur da, wenn der Hauptschalter an ist: Bei stiller App
+        waeren drei Schalter, die nichts bewirken, genau die Art Moebel, die
+        G-2 verbietet — und der eine Schalter darueber ist bereits das „alle
+        auf einmal". Der Inhalt wird verzoegert geladen (P4).
+      */}
+      {sound.enabled && <SoundAreas dictionary={dictionary} sound={sound} />}
 
       {/*
         Fehlen Texte oder die eigene Wortliste (Backlog L6), wird auf der

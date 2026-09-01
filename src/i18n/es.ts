@@ -55,6 +55,19 @@ export const es: Dictionary = {
   sound: {
     on: 'Sonido activado',
     off: 'Sonido apagado',
+    /*
+     * Die Bereiche einzeln (Geraetewunsch 31.08.). `honest` ist die Zeile, die
+     * verhindert, dass aus einem angenehmen Klang ein Wirkungsversprechen wird
+     * (R-1): Die App misst keinen Konzentrationseffekt und behauptet keinen.
+     */
+    heading: 'Qué suena',
+    feedback: 'Respuesta',
+    feedbackNote: 'Los sonidos breves al usar la app.',
+    arrival: 'Llegada',
+    arrivalNote: 'La melodía de los tres segundos antes de la sesión.',
+    focus: 'Sonido durante la sesión',
+    focusNote: 'Un sonido continuo muy suave mientras practicas.',
+    honest: 'Si un sonido continuo ayuda a recordar depende de cada persona — algunas necesitan silencio. No lo hemos medido, así que no lo afirmamos.',
   },
   session: {
     settle: 'Llegar',
