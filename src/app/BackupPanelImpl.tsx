@@ -7,47 +7,14 @@ import {
   dayKeyOf,
   totalRecords,
 } from '../core/index.ts'
+import { type SupportCopy, supportCopyFor } from '../i18n/panelCopy.ts'
 import type { Dictionary } from '../i18n/index.ts'
 import { type ImportReport, exportBackup, importBackup, readBackupFile } from '../data/backup.ts'
 import { ResetPanel } from './ResetPanel.tsx'
 
-interface SupportCopy {
-  heading: string
-  note: string
-  build: string
-  diagnostics: string
-  metrics: string
-  clear: string
-  saved: string
-  cleared: string
-}
-
-const SUPPORT_DE: SupportCopy = {
-  heading: 'Support & Beta',
-  note:
-    'Berichte werden nur auf diesem Gerät erzeugt und als Datei gespeichert. ANITEW sendet sie nicht automatisch. Diagnoseberichte enthalten keine Erinnerungstexte, Antworten, Fotos, API-Schlüssel oder OAuth-Tokens; der Beta-Bericht enthält nur aggregierte Zählwerte.',
-  build: 'Installierte Fassung',
-  diagnostics: 'Diagnosebericht speichern',
-  metrics: 'Beta-Bericht speichern',
-  clear: 'Lokales Fehlerprotokoll löschen',
-  saved: 'Bericht gespeichert.',
-  cleared: 'Lokales Fehlerprotokoll gelöscht.',
-}
-
-const SUPPORT_EN: SupportCopy = {
-  heading: 'Support & beta',
-  note:
-    'Reports are created only on this device and saved as files. ANITEW never sends them automatically. Diagnostic reports contain no memory text, answers, photos, API keys or OAuth tokens; the beta report contains aggregated counts only.',
-  build: 'Installed build',
-  diagnostics: 'Save diagnostic report',
-  metrics: 'Save beta report',
-  clear: 'Clear local error log',
-  saved: 'Report saved.',
-  cleared: 'Local error log cleared.',
-}
-
+/* Die Texte stehen in `i18n/panelCopy.ts`, in allen sechs App-Sprachen. */
 function supportCopy(): SupportCopy {
-  return document.documentElement.lang.toLowerCase().startsWith('de') ? SUPPORT_DE : SUPPORT_EN
+  return supportCopyFor(document.documentElement.lang)
 }
 
 function downloadJson(name: string, value: unknown): void {
