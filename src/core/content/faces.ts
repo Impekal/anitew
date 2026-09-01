@@ -119,3 +119,29 @@ function beardOf(roll: number, name: string): 0 | 1 | 2 {
   if (roll < 0.24) return 2
   return 0
 }
+
+/**
+ * Die Merkmale, an denen man zwei Menschen aus zwei Metern unterscheidet.
+ *
+ * Bewusst nur die kategorischen: Frisur, Haarfarbe, Hautton, Bart, Brille,
+ * Nase, Mund. Die feinen Maße (Kopfbreite, Kinn, Augenabstand, Ohren) machen
+ * ein Gesicht eigen, aber sie taugen nicht zum Auseinanderhalten — zwei
+ * Gesichter, die sich nur um drei Prozent Kopfbreite unterscheiden, sind für
+ * den Abruf dasselbe Gesicht.
+ */
+const STRONG_FEATURES = ['hairStyle', 'hair', 'skin', 'beard', 'glasses', 'nose', 'mouth'] as const
+
+/**
+ * Wie viele auffällige Merkmale trennen zwei Gesichter? (0 bis 7)
+ *
+ * Gerätemeldung 01.09.: „die Menschen sehen sich zu ähnlich aus. Im echten
+ * Leben ist es nicht so." Der Vorrat ist vielfältig — aber wer eine Runde
+ * sieht, sieht sechs Gesichter, und die wurden unabhängig voneinander
+ * gezogen. Greta und Zora etwa teilen alles außer dem Hautton. Diese Zahl
+ * macht „sieht ähnlich aus" prüfbar; wer sie nutzt, steht in `planBase.ts`.
+ */
+export function faceDistance(oneName: string, otherName: string): number {
+  const one = faceFor(oneName)
+  const other = faceFor(otherName)
+  return STRONG_FEATURES.filter((feature) => one[feature] !== other[feature]).length
+}
