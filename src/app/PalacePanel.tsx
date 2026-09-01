@@ -1,6 +1,6 @@
 import { Suspense, lazy } from 'react'
 
-import type { OwnPalace } from '../core/index.ts'
+import type { OwnPalace, Platform } from '../core/index.ts'
 import type { Dictionary } from '../i18n/index.ts'
 
 /*
@@ -22,6 +22,7 @@ export function PalacePanel(props: {
   dictionary: Dictionary
   own: readonly OwnPalace[]
   onChange: () => void
+  platform: Platform
 }) {
   return (
     <Suspense fallback={null}>

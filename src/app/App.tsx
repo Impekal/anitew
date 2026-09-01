@@ -1032,7 +1032,7 @@ export function App() {
       },
       contents: {
         title: dictionary.own.heading,
-        body: <OwnPanel language={training} dictionary={dictionary} />,
+        body: <OwnPanel language={training} dictionary={dictionary} platform={platform} />,
       },
       memories: {
         title: dictionary.memory.heading,
@@ -1052,7 +1052,14 @@ export function App() {
       },
       palace: {
         title: dictionary.palace.heading,
-        body: <PalacePanel dictionary={dictionary} own={own} onChange={reloadOwn} />,
+        body: (
+          <PalacePanel
+            dictionary={dictionary}
+            own={own}
+            onChange={reloadOwn}
+            platform={platform}
+          />
+        ),
       },
       reminder: {
         title: dictionary.reminder.heading,

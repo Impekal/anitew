@@ -15,6 +15,7 @@ import {
   OWN_MAX_PALACES,
   type OwnPalace,
   type OwnStation,
+  activeOwnPalaces,
   isOwnPalace,
   ownPalaceId,
 } from '../core/index.ts'
@@ -25,6 +26,15 @@ import { db } from './db.ts'
 const LEGACY_KEY = 'palace.own'
 /** Der neue: eine Liste und der Zähler für die nächste Kennung. */
 const KEY = 'palace.own.v2'
+/**
+ * Was weggeworfen wurde, mit Zeitpunkt.
+ *
+ * Nötig, seit die Paläste über Drive vereinigt werden (`core/sync/ownContent.ts`):
+ * Ohne diesen Merkzettel brächte das andere Gerät jeden gelöschten Palast beim
+ * nächsten Abgleich zurück. Eine eigene Zeile und kein neues Feld im Speicher —
+ * so liest eine ältere App den Palastspeicher unverändert weiter.
+ */
+const REMOVED_KEY = 'palace.own.removed'
 
 interface OwnPalaceStore {
   palaces: readonly OwnPalace[]
@@ -89,7 +99,18 @@ export async function loadOwnPalaces(): Promise<readonly OwnPalace[]> {
   return (await loadStore()).palaces
 }
 
+/**
+ * Der Speicher ohne das, was weggeworfen wurde.
+ *
+ * Der Merkzettel wirkt an **einer** Stelle und damit für alle Formate: Auch
+ * ein aus dem Altformat gelesener Palast bleibt weg, wenn er weggeworfen wurde.
+ */
 async function loadStore(): Promise<OwnPalaceStore> {
+  const removed = (await db.settings.get(REMOVED_KEY))?.value
+  return activeOwnPalaces(await loadRawStore(), removed)
+}
+
+async function loadRawStore(): Promise<OwnPalaceStore> {
   const stored = (await db.settings.get(KEY))?.value
   if (isStore(stored)) {
     return { palaces: stored.palaces.map(cleaned), nextOrdinal: stored.nextOrdinal }
@@ -192,8 +213,16 @@ export async function saveOwnPalace(palace: OwnPalace): Promise<boolean> {
  * Vorrat ohne diesen Palast auch keine neuen Gänge dorthin, und ein fälliger
  * alter wird übergangen statt ohne Schild gefragt.
  */
-export async function removeOwnPalace(id: string): Promise<void> {
+export async function removeOwnPalace(id: string, now: number): Promise<void> {
   const store = await loadStore()
+  const marks = (await db.settings.get(REMOVED_KEY))?.value
+  await db.settings.put({
+    key: REMOVED_KEY,
+    value: {
+      ...(typeof marks === 'object' && marks !== null && !Array.isArray(marks) ? marks : {}),
+      [id]: now,
+    },
+  })
   await writeStore({ ...store, palaces: store.palaces.filter((entry) => entry.id !== id) })
 }
 
