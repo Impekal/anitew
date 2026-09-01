@@ -17,6 +17,7 @@ export type MenuIconKind =
   | 'palace'
   | 'reminder'
   | 'science'
+  | 'brainCare'
   | 'install'
   | 'privacy'
   | 'backup'
@@ -55,6 +56,18 @@ function Glyph({ kind }: { kind: MenuIconKind }) {
           <path d="M7.3 15.2h9.4" />
           <circle cx="10" cy="17.2" r=".65" fill="currentColor" stroke="none" />
           <circle cx="14.3" cy="16.5" r=".45" fill="currentColor" stroke="none" />
+        </>
+      )
+    case 'brainCare':
+      /*
+        Ein Kopf im Profil mit einem wachen Punkt darin — kein Gehirn mit
+        Hantel, keine Glühbirne. „Geistig aktiv bleiben" ist kein
+        Leistungsversprechen, und das Zeichen soll auch keines machen.
+      */
+      return (
+        <>
+          <path d="M15.6 20.6v-2.4c2.2-1 3.7-3.3 3.7-5.9 0-3.9-3.2-7-7.1-7-3.4 0-6.2 2.3-6.9 5.4l-1.6 3.2a.8.8 0 0 0 .7 1.2h1.4v2.2c0 1.3 1 2.3 2.3 2.3h1.6v1z" />
+          <circle cx="13.4" cy="11.6" r="1.6" />
         </>
       )
     case 'install':

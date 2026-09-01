@@ -97,6 +97,13 @@ import { PalacePanel } from './PalacePanel.tsx'
 import { ProfilePanel } from './ProfilePanel.tsx'
 import { ReminderPanel } from './ReminderPanel.tsx'
 import { ResetPanel } from './ResetPanel.tsx'
+import { BrainCarePanel } from './BrainCarePanel.tsx'
+/*
+ * Nur die Ueberschrift, nicht die Tipps: Sie steht im Menue und im Seitenkopf,
+ * also im Kaltstart. Die Texte selbst liegen im verzoegerten Chunk (P4).
+ */
+import { brainCareHeading } from './brainCareHeading.ts'
+import { DailyTipMount } from './DailyTipMount.tsx'
 import { SciencePanel } from './SciencePanel.tsx'
 import { FoundationPanel } from './FoundationPanel.tsx'
 import { AchievementsLine } from './AchievementsLine.tsx'
@@ -1058,6 +1065,24 @@ export function App() {
         title: dictionary.science.heading,
         body: <SciencePanel dictionary={dictionary} />,
       },
+      /*
+        „Geistig aktiv bleiben" steht direkt neben „Was belegt ist" — die
+        beiden gehoeren zusammen: Hier stehen Gewohnheiten mit ihrem
+        Belegstand, dort die Grundlagen der App mit ihrem. Wer den einen Ton
+        kennt, erkennt den anderen wieder (Geraetewunsch 31.08.).
+      */
+      brainCare: {
+        title: brainCareHeading(language),
+        body: (
+          <BrainCarePanel
+            dictionary={dictionary}
+            onDemanding={() => {
+              setMode('extended')
+              closePage()
+            }}
+          />
+        ),
+      },
       ...(advice.kind === 'ios'
         ? {
             install: {
@@ -1409,6 +1434,14 @@ export function App() {
         <ReturnsLine returns={returns} dictionary={dictionary} />
       </div>
 
+      {/*
+        Der Tipp des Tages (Geraetewunsch 31.08.) — hoechstens einmal taeglich,
+        wegtippbar, mit dem Abschalter in sich selbst. Er sitzt bewusst hier
+        und nicht ueber dem Start: Er soll begleiten, nicht den Weg
+        versperren (D-015).
+      */}
+      <DailyTipMount platform={platform} today={today} />
+
       <footer className="footer">
         {/*
           Sprache und Ton stehen doppelt: hier am Fuß **und** als
@@ -1549,6 +1582,10 @@ export function App() {
               <button type="button" className="drawer-item" onClick={() => openPage('science')}>
                 <MenuIcon kind="science" />
                 <span>{dictionary.science.heading}</span>
+              </button>
+              <button type="button" className="drawer-item" onClick={() => openPage('brainCare')}>
+                <MenuIcon kind="brainCare" />
+                <span>{brainCareHeading(language)}</span>
               </button>
               {advice.kind === 'ios' && (
                 <button type="button" className="drawer-item" onClick={() => openPage('install')}>
