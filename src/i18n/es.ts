@@ -500,6 +500,7 @@ export const es: Dictionary = {
     account: 'Conectado como {account}.',
     errors: {
       denied: 'El inicio de sesión no se completó. La próxima vez Google preguntará de nuevo.',
+      blocked: 'Google Drive rechazó esta petición. El inicio de sesión sí funcionó: volver a iniciarla no ayuda aquí. El motivo que da Google aparece a continuación.',
       offline: 'Sin conexión con Google. Más tarde — entrenar funciona sin ella.',
       drive: 'Google Drive no respondió como debía. Más tarde.',
       'remote-invalid': 'En la carpeta de app hay un archivo que no es una copia de ANITEW. No se tocó. Míralo antes de volver a sincronizar.',

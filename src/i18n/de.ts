@@ -761,6 +761,12 @@ export const de = {
     account: 'Verbunden als {account}.',
     errors: {
       denied: 'Die Anmeldung kam nicht zustande. Beim nächsten Versuch fragt Google erneut.',
+      /*
+        Der Fall vom Geraetebild 01.09.: Anmeldung erfolgreich, Drive lehnt ab.
+        Frueher stand hier `denied` — „die Anmeldung kam nicht zustande, beim
+        naechsten Versuch fragt Google erneut“. Das schickte im Kreis.
+      */
+      blocked: 'Google Drive hat diese Anfrage abgelehnt. Die Anmeldung selbst hat geklappt — noch einmal anmelden hilft hier nicht. Was Google als Grund nennt, steht dahinter.',
       offline: 'Keine Verbindung zu Google. Später noch einmal — trainieren geht ohne.',
       drive: 'Google Drive hat nicht geantwortet, wie es sollte. Später noch einmal.',
       'remote-invalid': 'Im App-Ordner liegt eine Datei, die keine ANITEW-Sicherung ist. Sie wurde nicht angerührt. Bitte sieh sie dir an, bevor wieder abgeglichen wird.',

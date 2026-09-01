@@ -492,6 +492,7 @@ export const en: Dictionary = {
     account: 'Connected as {account}.',
     errors: {
       denied: 'The sign-in did not go through. Google will ask again on the next try.',
+      blocked: 'Google Drive refused this request. The sign-in itself worked — signing in again will not help here. Google’s own reason is shown after this.',
       offline: 'No connection to Google. Try again later — training works without it.',
       drive: 'Google Drive did not answer as it should. Try again later.',
       'remote-invalid': 'The app folder holds a file that is not an ANITEW backup. It was left untouched. Please look at it before syncing again.',

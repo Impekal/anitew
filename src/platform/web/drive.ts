@@ -21,7 +21,15 @@ export function builtInClientId(): string | undefined {
   return id === undefined || id === '' ? undefined : id
 }
 
-export type DriveFailure = 'denied' | 'offline' | 'drive'
+/**
+ * `denied` heisst: Die **Anmeldung** traegt nicht mehr (401) — beim naechsten
+ * Versuch fragt Google erneut. `blocked` heisst: Die Anmeldung traegt, aber
+ * Google Drive lehnt die Anfrage ab (403). Das ist nicht dasselbe, und die
+ * Verwechslung war auf dem Geraet zu sehen: Der Bildschirm sagte „die
+ * Anmeldung kam nicht zustande", obwohl sie gerade funktioniert hatte — wer
+ * daraufhin noch einmal zustimmt, landet beim selben 403.
+ */
+export type DriveFailure = 'denied' | 'offline' | 'drive' | 'blocked'
 
 export class DriveError extends Error {
   constructor(
@@ -125,11 +133,42 @@ async function driveFetch(token: string, url: string, init?: RequestInit): Promi
   } catch {
     throw new DriveError('offline', 'drive_fetch_failed')
   }
-  if (response.status === 401 || response.status === 403) {
-    throw new DriveError('denied', `drive_http_${response.status}`)
+  if (response.status === 401) throw new DriveError('denied', 'drive_http_401')
+  if (response.status === 403) {
+    throw new DriveError('blocked', `drive_403_${await googleReason(response)}`)
   }
   if (!response.ok) throw new DriveError('drive', `drive_http_${response.status}`)
   return response
+}
+
+/**
+ * Googles eigener Grund, statt einer nackten Zahl.
+ *
+ * Google legt ihn in den Antwortkoerper (`error.errors[0].reason`, sonst
+ * `error.status`): `accessNotConfigured`, wenn die Drive-API fuer das Projekt
+ * nicht freigeschaltet ist; `insufficientPermissions`, wenn die erteilte
+ * Freigabe nicht reicht; `storageQuotaExceeded`, wenn das Drive voll ist;
+ * `rateLimitExceeded` bei zu vielen Anfragen. Das sind vier voellig
+ * verschiedene Lagen mit vier verschiedenen Auswegen — und `drive_http_403`
+ * unterschied sie nicht.
+ *
+ * Kein Wort aus dem Koerper wird uebersetzt oder ausgeschmueckt: Was hier
+ * steht, ist Googles Kennung, damit sie sich nachschlagen laesst.
+ */
+async function googleReason(response: Response): Promise<string> {
+  try {
+    const body = (await response.json()) as {
+      error?: { errors?: { reason?: unknown }[]; status?: unknown }
+    }
+    const reason = body.error?.errors?.[0]?.reason
+    if (typeof reason === 'string' && reason !== '') return reason
+    const status = body.error?.status
+    if (typeof status === 'string' && status !== '') return status
+  } catch {
+    // Kein lesbarer Koerper — dann bleibt die Zahl, und das ist ehrlicher
+    // als ein erfundener Grund.
+  }
+  return 'ohne_grund'
 }
 
 export interface DriveAccountProfile {
