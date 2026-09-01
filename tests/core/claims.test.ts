@@ -392,32 +392,52 @@ describe('die eigenen Seiten neben der App (Runde 3)', () => {
     expect(generator).toMatch(/IMPRESSUM/u)
     expect(generator).toMatch(/PRIVACY/u)
 
-    /*
-     * Geprüft wird das **Ergebnis**, nicht der Quelltext.
-     *
-     * Hier stand `expect(generator).toMatch(/public\/datenschutz\.html/)` —
-     * also die Suche nach einem Literal im Skript. Das ging gut, solange der
-     * Pfad wörtlich dort stand; als er am 01.09. für sechs Sprachen aus Teilen
-     * zusammengesetzt wurde, schlug der Test fehl, obwohl die Seiten weiterhin
-     * korrekt entstehen. Ein Test, der den Quelltext liest, prüft die
-     * Schreibweise und nicht die Wirkung.
-     *
-     * Das Ziel muss `public/` sein, nicht `dist/`: Aus `dist/` geschrieben
-     * kämen die Seiten nach dem Precache und wären offline nicht da — die
-     * Zusage in `vite.config.ts` war genau deshalb einmal unwahr.
-     */
-    for (const datei of ['public/datenschutz.html', 'public/impressum.html']) {
-      const seite = textOf(datei)
-      expect(seite, `${datei} fehlt oder ist leer`).toMatch(/^<!doctype html>/u)
-      // Ohne Rücklink stünde man in der installierten App in einer Sackgasse.
-      expect(seite, `${datei} ohne Weg zurück in die App`).toMatch(/<a href="\/">ANITEW<\/a>/u)
-    }
-
     const build = JSON.parse(textOf('package.json')).scripts.build as string
     expect(
       build.indexOf('privacy-page.mjs') < build.indexOf('vite build'),
       'privacy-page.mjs muss vor `vite build` laufen, sonst fehlt der Precache',
     ).toBe(true)
+
+    /*
+     * Und das Ziel muss `public/` sein, nicht `dist/`: Aus `dist/` geschrieben
+     * kämen die Seiten nach dem Precache und wären offline nicht da — die
+     * Zusage in `vite.config.ts` war genau deshalb einmal unwahr.
+     */
+    expect(generator).toMatch(/`public\//u)
+    expect(generator).not.toMatch(/writeFileSync\(\s*`?dist\//u)
+  })
+
+  /**
+   * Der Erzeuger wird **ausgeführt**, nicht gelesen.
+   *
+   * Zwei Anläufe davor lagen daneben, beide auf dieselbe Art zu bequem:
+   *
+   * 1. Der ursprüngliche Test suchte `public/datenschutz.html` als Literal im
+   *    Skript. Das prüfte die Schreibweise, nicht die Wirkung — und schlug
+   *    fehl, sobald der Pfad für sechs Sprachen zusammengesetzt wurde.
+   * 2. Mein erster Ersatz las die **erzeugte** Datei aus `public/`. Lokal lag
+   *    sie da, in der CI nicht: Die Unit-Tests laufen vor dem Bau, und die
+   *    Seiten stehen in `.gitignore`. Grün auf dem Rechner, rot in der
+   *    Auslieferung — genau die Falle, an der dieses Haus schon einmal hing.
+   *
+   * Der Ausweg ist keiner von beiden: Die Funktionen des Erzeugers werden
+   * aufgerufen und ihr Ergebnis geprüft. Das hängt weder an einer Reihenfolge
+   * noch an einer Datei, die es im Arbeitsverzeichnis geben mag oder nicht.
+   */
+  it('macht aus beiden Dokumenten eine Seite mit Weg zurück in die App', async () => {
+    const modul = await import('../../scripts/privacy-page.mjs')
+
+    for (const [quelle, art] of [
+      ['docs/PRIVACY.md', 'privacy'],
+      ['docs/IMPRESSUM.md', 'imprint'],
+    ] as const) {
+      const html = modul.page(modul.render(textOf(quelle)), 'ANITEW', 'de', art)
+      expect(html, `${quelle} ergibt kein Dokument`).toMatch(/^<!doctype html>/u)
+      // Ohne Rücklink stünde man in der installierten App in einer Sackgasse.
+      expect(html, `${quelle} ohne Weg zurück in die App`).toMatch(/<a href="\/">ANITEW<\/a>/u)
+      // Und der Text selbst muss ankommen, nicht nur das Gerüst.
+      expect(html).toMatch(/<h1>/u)
+    }
   })
 })
 

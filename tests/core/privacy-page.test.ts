@@ -2,9 +2,13 @@ import { readFileSync } from 'node:fs'
 
 import { describe, expect, it } from 'vitest'
 
-// @ts-expect-error — bewusst ein Skript ohne Typdeklaration: Der Wandler
-// lebt bei den Build-Skripten, und eine .d.ts für drei Funktionen wäre
-// mehr Zeremonie als Nutzen.
+/*
+  Hier stand ein `@ts-expect-error` mit der Begründung, eine Deklaration für
+  drei Funktionen wäre „mehr Zeremonie als Nutzen". Seit dem 01.09. gibt es
+  `scripts/privacy-page.d.mts` — und der Grund dafür war handfest: Ein anderer
+  Test wollte den Erzeuger aufrufen statt seinen Quelltext zu lesen, und dafür
+  braucht er die Schnittstelle. Die Zeremonie hat sich also bezahlt gemacht.
+*/
 import { inline, page, render } from '../../scripts/privacy-page.mjs'
 
 function assertRendered(markdown: string, html: string): void {
