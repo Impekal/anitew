@@ -1,0 +1,61 @@
+/* ── Tipp des Tages (Gerätewunsch 31.08.) ──────────────────────────────────
+   Ein Blatt am unteren Rand, kein Vorhang: Der Startknopf bleibt sichtbar
+   und bedienbar, während der Tipp dasteht (D-015 — nichts blockiert, nichts
+   fordert). Es kommt einmal am Tag und geht mit einem Tipp wieder weg. */
+.daily-tip {
+  position: fixed;
+  left: 50%;
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  translate: -50% 0;
+  z-index: 900;
+  width: min(100% - 1.6rem, 34rem);
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--card);
+  box-shadow: 0 18px 50px rgb(0 0 0 / 28%);
+  animation: daily-tip-in 320ms cubic-bezier(0.16, 0.84, 0.22, 1) both;
+}
+
+.daily-tip-label {
+  margin: 0;
+  color: var(--ink-soft);
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.daily-tip-text {
+  margin: 0;
+  color: var(--ink);
+  text-wrap: pretty;
+}
+
+.daily-tip-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.daily-tip-off {
+  color: var(--ink-soft);
+}
+
+@keyframes daily-tip-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+/* „Weniger Bewegung“ heißt auch hier: es ist einfach da (O4). */
+@media (prefers-reduced-motion: reduce) {
+  .daily-tip {
+    animation: none;
+  }
+}
+

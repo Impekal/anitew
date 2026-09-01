@@ -37,6 +37,13 @@ const SURFACES = [
   'docs/STORE.md',
   'src/i18n/de.ts',
   'src/i18n/en.ts',
+  /*
+   * Die Tipps von „Geistig aktiv bleiben" liegen in einer eigenen Datei,
+   * damit sie nicht im Kaltstart haengen (P4). Sie stehen trotzdem in der
+   * App — also gilt die Sperrliste dort genauso. Ohne diese Zeile waere das
+   * Auslagern ein Weg an der Regel vorbei.
+   */
+  'src/i18n/brainCareCopy.ts',
 ]
 
 /**
