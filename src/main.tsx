@@ -239,6 +239,11 @@ if (document.readyState === 'complete') {
 }
 
 keepUpToDate()
+// Ruhefenster gegen Dauerlast (Akku/Wärme) — eigener kleiner Chunk, damit
+// das Kaltstart-Budget unberührt bleibt; Begründung in restWindow.ts.
+void import('./app/restWindow.ts')
+  .then(({ installRestWindow }) => installRestWindow())
+  .catch(() => undefined)
 void import('./app/coreNavigationReturn.ts').catch(() => undefined)
 void import('./app/drawerAccessibility.ts')
   .then(({ installDrawerAccessibility }) => installDrawerAccessibility())
