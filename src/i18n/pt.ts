@@ -595,6 +595,15 @@ export const pt: Dictionary = {
     },
     heading: 'Mnemónica',
     majorName: 'O sistema Major',
+    method: {
+      steps: [
+        'Cada algarismo recebe uma consoante fixa: o um um t, o dois um n — dez algarismos, dez sons.',
+        'As vogais não contam. De 4–7 vem r–k, e daí «arca».',
+        'A imagem fica. Ao recordar lês ao contrário: arca → r–k → 4–7.',
+      ],
+      build: 'Aprendes um algarismo de cada vez. As palavras constróis tu — as servidas não seguram.',
+      ready: 'Vamos ao algarismo.',
+    },
     intro: 'Algarismos são difíceis de guardar, imagens não. Cada algarismo recebe um som — daí sai uma palavra, e uma palavra fica.',
     ready: 'A partir de agora está ali, debaixo dos números.',
     hooks: {
@@ -611,7 +620,6 @@ export const pt: Dictionary = {
     },
     hint: 'Faz disso uma palavra. As vogais são livres.',
     progress: 'algarismos aprendidos',
-    note: 'As vogais não contam, só as consoantes. De 4–7 vem r–k, e daí «arca» ou «roca» — que imagem tomas é contigo. Imagens construídas por ti seguram melhor do que as servidas, por isso a ANITEW não entrega nenhuma.',
   },
   summary: {
     heading: 'Ficou',

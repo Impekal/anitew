@@ -345,13 +345,10 @@ function RunningSession({
         />
       ) : block.kind === 'teach' && block.moduleId === 'palace' ? (
         <PalaceLesson dictionary={dictionary} onDone={() => advance()} />
+      ) : block.id === 'teach-major-method' ? (
+        <MethodLesson dictionary={dictionary} onDone={() => advance()} />
       ) : block.kind === 'teach' ? (
-        <Lesson
-          dictionary={dictionary}
-          digit={Number(block.items[0])}
-          first={taught.length === 0}
-          onDone={() => advance()}
-        />
+        <Lesson dictionary={dictionary} digit={Number(block.items[0])} onDone={() => advance()} />
       ) : block.kind === 'encode' && block.moduleId === 'palace' ? (
         /*
           Ein Gang wird **als Ganzes** gezeigt, aus demselben Grund wie eine
@@ -946,13 +943,10 @@ function formatSeconds(seconds: number): string {
 function Lesson({
   dictionary,
   digit,
-  first,
   onDone,
 }: {
   dictionary: Dictionary
   digit: number
-  /** Beim allerersten Mal steht der Zweck darüber, danach nicht mehr (G-2). */
-  first: boolean
   onDone: () => void
 }) {
   const t = dictionary.technique
@@ -964,7 +958,13 @@ function Lesson({
 
   return (
     <section className="lesson">
-      <p className="hint">{first ? t.intro : t.majorName}</p>
+      {/*
+        Der Zweck steht über **jeder** Lektion, nicht nur über der ersten.
+        Früher stand ab der zweiten Ziffer nur noch der Name der Technik —
+        gemeldet wurde genau der Effekt: „Da hat man keine Ahnung, worum es
+        geht.“ Ein Name erklärt nichts.
+      */}
+      <p className="hint">{t.intro}</p>
       <button type="button" className="lesson-card" onClick={onDone}>
         <span className="lesson-digit">{digit}</span>
         <span className="lesson-letters">{lettersFor(digit)}</span>
@@ -1066,6 +1066,34 @@ function EncodingLessonView({
       </button>
       <p className="lesson-hook">{t.build}</p>
       <p className="hint">{t.ready}</p>
+    </section>
+  )
+}
+
+/**
+ * Das Verfahren des Major-Systems (D5, Gerätemeldung 01.09.).
+ *
+ * Dieselbe ruhige Karte wie bei Palast, Geschichte und Verknüpfung — und aus
+ * demselben Grund: Eine Technik, die man anwenden soll, gehört vorher
+ * erklärt. Sie kommt einmal, unmittelbar vor der ersten Ziffer, in derselben
+ * Einheit.
+ */
+function MethodLesson({ dictionary, onDone }: { dictionary: Dictionary; onDone: () => void }) {
+  const t = dictionary.technique
+
+  return (
+    <section className="lesson">
+      <p className="hint">{t.heading}</p>
+      <button type="button" className="lesson-card lesson-wide" onClick={onDone}>
+        <span className="lesson-intro">{t.majorName}</span>
+        <ol className="lesson-steps">
+          {t.method.steps.map((step) => (
+            <li key={step}>{step}</li>
+          ))}
+        </ol>
+      </button>
+      <p className="lesson-hook">{t.method.build}</p>
+      <p className="hint">{t.method.ready}</p>
     </section>
   )
 }

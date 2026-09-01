@@ -20,7 +20,13 @@ import {
 } from '../../core/index.ts'
 import { recordOutcome } from '../../data/items.ts'
 import { applyMemoryOutcome } from '../../data/memoryStore.ts'
-import { markLinkTaught, markPalaceTaught, markStoryTaught, markTaught } from '../../data/technique.ts'
+import {
+  markLinkTaught,
+  markMajorMethodTaught,
+  markPalaceTaught,
+  markStoryTaught,
+  markTaught,
+} from '../../data/technique.ts'
 import {
   type RoundResult,
   type SessionProgress,
@@ -130,15 +136,21 @@ export function useSessionRunner(
        */
       if (block.kind === 'teach') {
         /*
-         * Vier Techniken, vier Merker: die Ziffer beim Major-System, je ein
-         * schlichtes Ja bei Palast, Geschichte und Verknüpfung — die drei
-         * werden nur einmal erklärt (G, D5). Geschichte/Verknüpfung erkennt
+         * Vier Techniken, fünf Merker: beim Major-System die einzelne Ziffer
+         * **und** ein schlichtes Ja für sein Verfahren, dazu je ein Ja bei
+         * Palast, Geschichte und Verknüpfung — die werden nur einmal erklärt
+         * (G, D5). Geschichte, Verknüpfung und das Major-Verfahren erkennt
          * man an der Block-Kennung, nicht am Modul: Ihr Modul ist das
-         * Anwendungsmodul (words/faces), und das lehrt auch Ziffern nie.
+         * Anwendungsmodul (words/faces/numbers), und aus dem allein ginge
+         * nicht hervor, welche Lektion gerade lief.
          */
         if (block.id === 'teach-story') void markStoryTaught().catch(() => undefined)
         else if (block.id === 'teach-link') void markLinkTaught().catch(() => undefined)
-        else if (block.moduleId === 'palace') void markPalaceTaught().catch(() => undefined)
+        else if (block.id === 'teach-major-method') {
+          // Das Verfahren des Major-Systems — ein fünfter Merker, kein Ersatz
+          // für die Ziffern: Die kommt gleich danach als eigener Block.
+          void markMajorMethodTaught().catch(() => undefined)
+        } else if (block.moduleId === 'palace') void markPalaceTaught().catch(() => undefined)
         else void markTaught(Number(block.items[0])).catch(() => undefined)
       }
 

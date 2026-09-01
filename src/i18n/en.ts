@@ -585,6 +585,15 @@ export const en: Dictionary = {
     },
     heading: 'Technique',
     majorName: 'The Major System',
+    method: {
+      steps: [
+        'Every digit gets a fixed consonant: one a t, two an n — ten digits, ten sounds.',
+        'Vowels do not count. 4–7 becomes r–k, and from that "rocket".',
+        'The picture stays. To recall, you read it back: rocket → r–k → 4–7.',
+      ],
+      build: 'You learn one digit at a time. The words you build yourself — handed-out ones do not hold.',
+      ready: 'On to the digit.',
+    },
     intro: 'Digits are hard to hold, pictures are not. Every digit gets a sound — the sounds make a word, and a word stays.',
     ready: 'From now on it sits under the numbers.',
     hooks: {
@@ -601,7 +610,6 @@ export const en: Dictionary = {
     },
     hint: 'Make a word of it. Vowels are free.',
     progress: 'digits learned',
-    note: 'Vowels do not count, only consonants. 4–7 becomes r–k, and from that "rocket" or "rock" — which picture you take is yours. Pictures you build yourself stay better than ones handed to you, which is why ANITEW hands you none.',
   },
   summary: {
     heading: 'Stayed',

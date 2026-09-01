@@ -593,6 +593,15 @@ export const es: Dictionary = {
     },
     heading: 'Mnemotecnia',
     majorName: 'El sistema Major',
+    method: {
+      steps: [
+        'Cada cifra recibe una consonante fija: el uno una t, el dos una n — diez cifras, diez sonidos.',
+        'Las vocales no cuentan. De 4–7 sale r–k, y de ahí «roca».',
+        'La imagen queda. Al recordar lees al revés: roca → r–k → 4–7.',
+      ],
+      build: 'Aprendes una cifra cada vez. Las palabras las construyes tú — las servidas no aguantan.',
+      ready: 'Vamos a la cifra.',
+    },
     intro: 'Las cifras cuestan de retener, las imágenes no. Cada cifra recibe un sonido — de ahí sale una palabra, y una palabra se recuerda.',
     ready: 'Desde ahora está ahí, debajo de los números.',
     hooks: {
@@ -609,7 +618,6 @@ export const es: Dictionary = {
     },
     hint: 'Haz una palabra con ello. Las vocales son libres.',
     progress: 'cifras aprendidas',
-    note: 'Las vocales no cuentan, solo las consonantes. De 4–7 sale r–k, y de ahí «roca» o «arco» — qué imagen tomas es cosa tuya. Las imágenes construidas por ti aguantan mejor que las servidas, por eso ANITEW no entrega ninguna.',
   },
   summary: {
     heading: 'Se quedó',

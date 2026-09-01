@@ -593,6 +593,15 @@ export const fr: Dictionary = {
     },
     heading: 'Technique de mémorisation',
     majorName: 'Le système Major',
+    method: {
+      steps: [
+        'Chaque chiffre reçoit une consonne fixe : le un un t, le deux un n — dix chiffres, dix sons.',
+        'Les voyelles ne comptent pas. De 4–7 vient r–k, et de là « roc ».',
+        'L’image reste. Au rappel tu relis à l’envers : roc → r–k → 4–7.',
+      ],
+      build: 'Tu apprends un chiffre à la fois. Les mots, tu les construis toi-même — les tout faits ne tiennent pas.',
+      ready: 'On passe au chiffre.',
+    },
     intro: 'Les chiffres sont durs à garder, pas les images. Chaque chiffre reçoit un son — cela fait un mot, et un mot se retient.',
     ready: 'À partir de maintenant, elle est là sous les nombres.',
     hooks: {
@@ -609,7 +618,6 @@ export const fr: Dictionary = {
     },
     hint: 'Fais-en un mot. Les voyelles sont libres.',
     progress: 'chiffres appris',
-    note: 'Les voyelles ne comptent pas, seulement les consonnes. De 4–7 vient r–k, et de là « roc » ou « raquette » — l’image que tu prends t’appartient. Les images construites soi-même tiennent mieux que les toutes faites, c’est pourquoi ANITEW n’en fournit aucune.',
   },
   summary: {
     heading: 'Resté',
