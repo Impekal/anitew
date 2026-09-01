@@ -310,7 +310,9 @@
     inset 0 0 60px rgb(140 207 192 / 4%),
     0 26px 90px rgb(0 0 0 / 36%),
     0 0 70px rgb(216 168 90 / 10%) !important;
-  backdrop-filter: blur(18px) saturate(116%);
+  /* Kein `backdrop-filter` (Gerätemeldung 01.09.): 270 × 270 px Weichzeichner
+     über einer Fläche, in der sich etwas bewegt, werden in jedem Bild neu
+     gerechnet. Die drei Verläufe darüber tragen den Knopf auch ohne. */
   transform-style: preserve-3d;
 }
 .start::before {

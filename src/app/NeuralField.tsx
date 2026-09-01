@@ -13,10 +13,22 @@ import { createRng } from '../core/index.ts'
  * - **Es wird einmal gerechnet.** Die Anordnung kommt aus einem Seed und
  *   ändert sich nie neu (A11: kein `Math.random()`). Kein Neuzeichnen, kein
  *   Rechnen pro Bild.
- * - **Es bewegt sich in CSS**, nicht in JavaScript. Der Browser macht das auf
- *   der Grafikkarte; der Hauptthread bleibt frei für die Uhr der Einheit.
+ * - **Es bewegt sich in CSS**, nicht in JavaScript. Der Hauptthread bleibt
+ *   frei für die Uhr der Einheit.
  * - **Es ist klein.** 50 Knoten. Ein dichteres Netz sähe nach
  *   Bildschirmschoner aus, ein weiteres nach Sternbild.
+ *
+ * Hier stand bis zur Gerätemeldung vom 01.09. („Le téléphone chauffe
+ * toujours“), der Browser mache die Bewegung „auf der Grafikkarte“. Das war
+ * falsch, und es war der teure Irrtum: Das Stylesheet legte zwei
+ * `drop-shadow` über das ganze Feld und gab **jedem** der fünfzig Knoten
+ * einen eigenen Filter dazu. Ein Filter zwingt den Teilbaum in eine eigene
+ * Ebene, die neu **gezeichnet** wird, sobald sich darin etwas rührt — von
+ * der Grafikkarte geschoben wird da nichts. Gemessen liefen in einer Einheit
+ * 84 Animationen gleichzeitig; heute sind es 14.
+ *
+ * Wer hier wieder etwas hinzufügt: `tests/e2e/performance.spec.ts` hält das
+ * Budget. Kein Filter über dem Feld, kein Filter je Knoten.
  *
  * Das Feld ist **hochkant** (100 × 210), nicht quadratisch. Das war der Fehler
  * im ersten Anlauf: Ein quadratisches Feld wird von `slice` auf einem

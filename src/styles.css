@@ -724,7 +724,14 @@ body::before {
   height: 100%;
   background: var(--accent);
   opacity: 0.55;
-  transition: width 240ms linear;
+  /*
+    Kein Übergang auf `width` (Gerätemeldung 01.09.).
+
+    Die Breite ändert sich ohnehin nur einmal je Sekunde — der Runner rundet
+    die Restzeit auf ganze Sekunden. Der Übergang machte daraus 900 ms
+    Neuzeichnen je Schritt, über die ganze Einheit hinweg. Ein Balken von
+    zwei Pixeln Höhe, der einmal je Sekunde weiterrückt, ist das nicht wert.
+  */
 }
 
 /* ── Einprägen ────────────────────────────────────────────────────────── */
