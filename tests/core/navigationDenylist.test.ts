@@ -32,6 +32,28 @@ describe('Navigations-Sperrliste des Service Workers', () => {
     expect(treffer(pfad)).toBe(true)
   })
 
+  /*
+   * Seit dem 01.09. gibt es die Rechtstexte in sechs Sprachen, mit eigenen
+   * Adressen. Für sie gilt dieselbe Kette — und derselbe Fehler wäre möglich:
+   * Cloudflare leitet `/impressum.fr.html` auf `/impressum.fr` um. Fehlte die
+   * Sprachform in der Sperrliste, käme wieder die App-Shell statt des Textes,
+   * und wieder nur in der Auslieferung, nie in `vite preview`.
+   */
+  it.each([
+    '/impressum.en.html',
+    '/impressum.en',
+    '/impressum.fr.html',
+    '/impressum.fr',
+    '/datenschutz.es.html',
+    '/datenschutz.es',
+    '/datenschutz.it.html',
+    '/datenschutz.it',
+    '/impressum.pt.html',
+    '/datenschutz.pt',
+  ])('%s wird nicht von der App-Shell beantwortet', (pfad) => {
+    expect(treffer(pfad)).toBe(true)
+  })
+
   it.each([
     '/oauth/google/start',
     '/push/subscribe',

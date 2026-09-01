@@ -113,9 +113,67 @@ export function render(markdown) {
   return out.join('\n')
 }
 
-export function page(body, title = 'Datenschutzerklärung') {
+/**
+ * Die Beschriftungen der Rechtsseiten, je App-Sprache (Geraetebefund 01.09.).
+ *
+ * Gemeldet: „Impressum und Datenschutz: auch bereits uebersetzt? Text wird nur
+ * in Deutsch angezeigt." Nein — die Kurzfassung IN der App lag in sechs
+ * Sprachen, die beiden oeffentlichen Seiten nur auf Deutsch, mit fest
+ * eingetragenem `lang="de"`.
+ *
+ * Deutsch bleibt die verbindliche Fassung; jede Uebersetzung sagt das in ihrem
+ * eigenen Text. Hier stehen nur Navigation und Sprachwahl.
+ */
+export const LEGAL_LANGUAGES = ['de', 'en', 'fr', 'es', 'it', 'pt']
+
+const LABELS = {
+  de: { imprint: 'Impressum', privacy: 'Datenschutz', nav: 'Rechtliches', pick: 'Sprache' },
+  en: { imprint: 'Legal notice', privacy: 'Privacy', nav: 'Legal', pick: 'Language' },
+  fr: { imprint: 'Mentions légales', privacy: 'Confidentialité', nav: 'Mentions légales', pick: 'Langue' },
+  es: { imprint: 'Aviso legal', privacy: 'Privacidad', nav: 'Aviso legal', pick: 'Idioma' },
+  it: { imprint: 'Note legali', privacy: 'Privacy', nav: 'Note legali', pick: 'Lingua' },
+  pt: { imprint: 'Informação legal', privacy: 'Privacidade', nav: 'Legal', pick: 'Idioma' },
+}
+
+const ENDONYMS = {
+  de: 'Deutsch',
+  en: 'English',
+  fr: 'Français',
+  es: 'Español',
+  it: 'Italiano',
+  pt: 'Português',
+}
+
+/** Deutsch behaelt die kurzen Adressen — sie stehen in Links und Berichten. */
+export function legalPath(kind, language) {
+  const base = kind === 'imprint' ? '/impressum' : '/datenschutz'
+  return language === 'de' ? `${base}.html` : `${base}.${language}.html`
+}
+
+function nav(language, extra = '') {
+  const label = LABELS[language] ?? LABELS.de
+  return `<nav class="legal-nav${extra}" aria-label="${escape(label.nav)}">
+  <a href="/">ANITEW</a>
+  <a href="${legalPath('imprint', language)}">${escape(label.imprint)}</a>
+  <a href="${legalPath('privacy', language)}">${escape(label.privacy)}</a>
+</nav>`
+}
+
+function languagePicker(kind, language) {
+  const label = LABELS[language] ?? LABELS.de
+  const links = LEGAL_LANGUAGES.map((tag) =>
+    tag === language
+      ? `<strong lang="${tag}">${escape(ENDONYMS[tag])}</strong>`
+      : `<a lang="${tag}" href="${legalPath(kind, tag)}">${escape(ENDONYMS[tag])}</a>`,
+  ).join('\n  ')
+  return `<nav class="legal-langs" aria-label="${escape(label.pick)}">
+  ${links}
+</nav>`
+}
+
+export function page(body, title = 'Datenschutzerklärung', language = 'de', kind = 'privacy') {
   return `<!doctype html>
-<html lang="de">
+<html lang="${language}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -129,8 +187,10 @@ export function page(body, title = 'Datenschutzerklärung') {
   th, td { border: 1px solid #e7ded0; padding: 0.4em 0.6em; text-align: left; vertical-align: top; }
   blockquote { margin: 1em 0; padding: 0.2em 1em; border-left: 3px solid #e7ded0; }
   a { color: inherit; }
-  .legal-nav { display:flex; flex-wrap:wrap; gap:.7rem; margin:0 0 2rem; font-size:.9rem; }
+  .legal-nav { display:flex; flex-wrap:wrap; gap:.7rem; margin:0 0 1rem; font-size:.9rem; }
   .legal-nav-bottom { margin:2.5rem 0 0; padding-top:1rem; border-top:1px solid #e7ded0; }
+  .legal-langs { display:flex; flex-wrap:wrap; gap:.6rem; margin:0 0 2rem; font-size:.85rem; opacity:.85; }
+  .legal-langs strong { font-weight:600; }
   @media (prefers-color-scheme: dark) {
     body { color: #e8e0d3; background: #15120e; }
     code { background: #221c15; }
@@ -140,17 +200,10 @@ export function page(body, title = 'Datenschutzerklärung') {
 </style>
 </head>
 <body>
-<nav class="legal-nav" aria-label="Rechtliches">
-  <a href="/">ANITEW</a>
-  <a href="/impressum.html">Impressum</a>
-  <a href="/datenschutz.html">Datenschutz</a>
-</nav>
+${nav(language)}
+${languagePicker(kind, language)}
 ${body}
-<nav class="legal-nav legal-nav-bottom" aria-label="Rechtliches">
-  <a href="/">ANITEW</a>
-  <a href="/impressum.html">Impressum</a>
-  <a href="/datenschutz.html">Datenschutz</a>
-</nav>
+${nav(language, ' legal-nav-bottom')}
 </body>
 </html>
 `
@@ -172,13 +225,21 @@ if (process.argv[1]?.endsWith('privacy-page.mjs')) {
    * Damit sind sie wirklich offline verfügbar. Beide Dateien sind erzeugt und
    * stehen deshalb in `.gitignore`.
    */
-  const pages = [
-    ['docs/PRIVACY.md', 'public/datenschutz.html', 'Datenschutzerklärung'],
-    ['docs/IMPRESSUM.md', 'public/impressum.html', 'Impressum'],
+  const kinds = [
+    { kind: 'privacy', deutsch: 'docs/PRIVACY.md', name: 'PRIVACY', ziel: 'datenschutz' },
+    { kind: 'imprint', deutsch: 'docs/IMPRESSUM.md', name: 'IMPRESSUM', ziel: 'impressum' },
   ]
-  for (const [source, target, title] of pages) {
-    const markdown = readFileSync(source, 'utf8')
-    writeFileSync(target, page(render(markdown), title))
-    console.log(`${target} geschrieben (aus ${source})`)
+
+  for (const { kind, deutsch, name, ziel } of kinds) {
+    for (const language of LEGAL_LANGUAGES) {
+      const source = language === 'de' ? deutsch : `docs/legal/${name}.${language}.md`
+      const markdown = readFileSync(source, 'utf8')
+      // Der Titel steht in der Quelle selbst — so bleibt er in jeder Sprache
+      // das, was oben auf der Seite steht, und wird nicht daneben erfunden.
+      const title = (markdown.match(/^#\s+(.+)$/mu) ?? [, 'ANITEW'])[1].trim()
+      const target = `public/${ziel}${language === 'de' ? '' : `.${language}`}.html`
+      writeFileSync(target, page(render(markdown), title, language, kind))
+      console.log(`${target} geschrieben (aus ${source})`)
+    }
   }
 }

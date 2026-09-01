@@ -28,7 +28,13 @@ export const NAVIGATION_DENYLIST: readonly RegExp[] = [
   // Echte Worker-Endpunkte, keine Seiten der App.
   /^\/oauth\/google\//,
   /^\/push\//,
-  // Die Rechtstexte sind eigene Dokumente. Mit und ohne `.html`, siehe oben.
-  /^\/impressum(\.html)?$/,
-  /^\/datenschutz(\.html)?$/,
+  /*
+   * Die Rechtstexte sind eigene Dokumente. Mit und ohne `.html`, siehe oben —
+   * und seit dem 01.09. mit Sprachkennung: `/impressum.fr.html` wird von
+   * Cloudflare auf `/impressum.fr` umgeleitet, also muss auch diese Form
+   * hier stehen. Sonst wiederholte sich der Fehler vom 30.08. für jede
+   * uebersetzte Fassung.
+   */
+  /^\/impressum(\.[a-z]{2})?(\.html)?$/,
+  /^\/datenschutz(\.[a-z]{2})?(\.html)?$/,
 ]

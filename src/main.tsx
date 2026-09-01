@@ -259,12 +259,44 @@ const root = createRoot(container)
 
 let legalLanguageObserver: MutationObserver | undefined
 
+/**
+ * Die Fußzeile spricht alle sechs App-Sprachen — und verlinkt die Seite in
+ * derselben Sprache (Gerätebefund 01.09.).
+ *
+ * Hier stand `lang === 'de' ? 'Impressum' : 'Imprint'`, und beide Links zeigten
+ * immer auf die deutschen Seiten. Auf einem französischen Gerät stand also
+ * „Imprint" und führte zu einem deutschen Text — die gemeldete Beobachtung,
+ * an ihrer letzten Stelle.
+ */
+const LEGAL_FOOTER: Record<string, { nav: string; imprint: string; privacy: string }> = {
+  de: { nav: 'Rechtliches', imprint: 'Impressum', privacy: 'Datenschutz' },
+  en: { nav: 'Legal information', imprint: 'Legal notice', privacy: 'Privacy' },
+  fr: { nav: 'Mentions légales', imprint: 'Mentions légales', privacy: 'Confidentialité' },
+  es: { nav: 'Aviso legal', imprint: 'Aviso legal', privacy: 'Privacidad' },
+  it: { nav: 'Note legali', imprint: 'Note legali', privacy: 'Privacy' },
+  pt: { nav: 'Informação legal', imprint: 'Informação legal', privacy: 'Privacidade' },
+}
+
+/** Deutsch behält die kurzen Adressen; siehe `scripts/privacy-page.mjs`. */
+function legalHref(kind: 'imprint' | 'privacy', tag: string): string {
+  const base = kind === 'imprint' ? '/impressum' : '/datenschutz'
+  return tag === 'de' ? `${base}.html` : `${base}.${tag}.html`
+}
+
 function syncLegalFooterLanguage(footer: HTMLElement): void {
-  const german = document.documentElement.lang === 'de'
-  footer.setAttribute('aria-label', german ? 'Rechtliches' : 'Legal information')
+  const tag = document.documentElement.lang.toLowerCase().slice(0, 2)
+  const copy = LEGAL_FOOTER[tag] ?? LEGAL_FOOTER.de!
+  const known = LEGAL_FOOTER[tag] === undefined ? 'de' : tag
+  footer.setAttribute('aria-label', copy.nav)
   const links = footer.querySelectorAll<HTMLAnchorElement>('a')
-  if (links[0] !== undefined) links[0].textContent = german ? 'Impressum' : 'Imprint'
-  if (links[1] !== undefined) links[1].textContent = german ? 'Datenschutz' : 'Privacy'
+  if (links[0] !== undefined) {
+    links[0].textContent = copy.imprint
+    links[0].href = legalHref('imprint', known)
+  }
+  if (links[1] !== undefined) {
+    links[1].textContent = copy.privacy
+    links[1].href = legalHref('privacy', known)
+  }
 }
 
 function ensureLegalFooter(): void {
