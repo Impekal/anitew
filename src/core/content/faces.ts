@@ -79,7 +79,30 @@ export interface Face {
  * (D8). Ohne diese Verlässlichkeit wäre die Wiederholung sinnlos — man würde
  * jedes Mal ein neues Gesicht zum alten Namen lernen.
  */
+/*
+ * Dasselbe Wort ergibt dasselbe Gesicht — dann muss es auch nur einmal
+ * gerechnet werden.
+ *
+ * Gemessen: 50 000 Gesichter frisch zu wuerfeln kostet 23 ms, aus dem
+ * Speicher zu holen 2 ms. Gebraucht wird das an zwei Stellen oft — beim
+ * Zeichnen jedes Gesichts und seit dieser Aenderung in `spreadFaces`, das
+ * beim Planen jeden Namen mit jedem vergleicht. Rechenarbeit ist auf einem
+ * Telefon Waerme (BACKLOG P9), und diese hier ist vermeidbar.
+ *
+ * Der Speicher ist von Natur aus klein und begrenzt: Es gibt je Sprache rund
+ * fuenfzig Namen, und mehr Namen als im Vorrat kann niemand anfragen.
+ */
+const cache = new Map<string, Face>()
+
 export function faceFor(name: string): Face {
+  const known = cache.get(name)
+  if (known !== undefined) return known
+  const face = buildFace(name)
+  cache.set(name, face)
+  return face
+}
+
+function buildFace(name: string): Face {
   const rng = createRng(`face:${name}`)
   return {
     width: 0.88 + rng.next() * 0.24,

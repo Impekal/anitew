@@ -32,7 +32,13 @@ const STRONG_FEATURES = 7
 /** Ab hier sind zwei Gesichter im Alltag sicher zu trennen. */
 const MIN_DISTANCE = 3
 
-function pools(): Pools {
+/*
+ * Einmal gebaut, nicht je Einheit: `planSession` mischt sich seine eigenen
+ * Kopien, der Vorrat selbst bleibt unberuehrt. Vorher baute dieser Test die
+ * Woerter- und Namenslisten dreihundertmal neu — das war die ganze Laufzeit
+ * und hat ihn auf dem CI-Rechner in Vitests Fuenf-Sekunden-Grenze getrieben.
+ */
+const POOLS: Pools = (() => {
   return {
     words: [...wordPool('de')],
     faces: [...namePool('de')],
@@ -45,7 +51,7 @@ function pools(): Pools {
     facts: [],
     memory: [],
   }
-}
+})()
 
 describe('Gesichter einer Runde (Gerätemeldung 01.09.)', () => {
   it('misst Ähnlichkeit an den Merkmalen, die man aus zwei Metern sieht', () => {
@@ -66,7 +72,7 @@ describe('Gesichter einer Runde (Gerätemeldung 01.09.)', () => {
         day: '2026-09-01',
         language: 'de',
         seed: `variety-${index}`,
-        pools: pools(),
+        pools: POOLS,
         modules: ['faces'],
       })
 
