@@ -182,6 +182,20 @@ test('hält den Hauptthread frei — kein Dauerlauf von JavaScript', async ({ pa
  * Deshalb steht hier ein Budget, wie es das für den Kaltstart längst gibt.
  */
 
+/*
+ * Gezaehlt wird, was **endlos** laeuft (CI-Fund 01.09.).
+ *
+ * Der erste Wurf mass alles, was im Moment der Probe lief — und wurde damit
+ * unzuverlaessig: Mal war eine einmalige Einblendung noch unterwegs, mal
+ * nicht. Die CI hat das als „flaky" gemeldet, und das war kein Zufallsrauschen,
+ * sondern ein zu grob gefasster Anspruch.
+ *
+ * Die Aussage, um die es geht, ist enger: Ein kurzes Aufblenden beim Eintritt
+ * kostet einmal ein paar Bilder. Warm wird das Telefon von dem, was **nicht
+ * aufhoert** — und genau das war der Befund: Das Netz, die Punktscheibe und
+ * die Signale liefen `infinite`.
+ */
+
 /** Eigenschaften, deren Bewegung den Browser zum Neuzeichnen zwingt. */
 const REPAINTS = [
   'strokeDashoffset',
@@ -203,9 +217,30 @@ interface RunningAnimation {
   where: string
   props: string[]
   blur: string
+  /** Läuft sie endlos? Nur die ist Dauerlast. */
+  dauerhaft: boolean
+}
+
+/**
+ * Wartet, bis die Oberfläche steht.
+ *
+ * Mehrere Stylesheets laden verzögert — auf dem Startbildschirm waren es
+ * zwei, in der Einheit elf. Wer davor misst, misst einen Zwischenzustand und
+ * bekommt mal dieses, mal jenes Ergebnis; die CI hat genau das als „flaky“
+ * gemeldet. Gewartet wird, bis keine Stylesheets mehr dazukommen.
+ */
+async function steht(page: import('@playwright/test').Page): Promise<void> {
+  let vorher = -1
+  for (let versuch = 0; versuch < 40; versuch++) {
+    const jetzt = await page.evaluate(() => document.styleSheets.length)
+    if (jetzt === vorher) return
+    vorher = jetzt
+    await page.waitForTimeout(250)
+  }
 }
 
 async function running(page: import('@playwright/test').Page): Promise<RunningAnimation[]> {
+  await steht(page)
   return page.evaluate(() => {
     const skip = ['offset', 'computedOffset', 'easing', 'composite']
     return document
@@ -240,7 +275,13 @@ async function running(page: import('@playwright/test').Page): Promise<RunningAn
           }
         }
         const name = target === undefined ? '?' : (target.getAttribute('class') ?? target.tagName)
-        return { where: `${name}`.slice(0, 60), props: [...props], blur }
+        const timing = effect?.getComputedTiming()
+        return {
+          where: `${name}`.slice(0, 60),
+          props: [...props],
+          blur,
+          dauerhaft: timing?.iterations === Infinity,
+        }
       })
   })
 }
@@ -254,13 +295,14 @@ async function intoSession(page: import('@playwright/test').Page): Promise<void>
   await expect(page.locator('.session-clock')).toBeVisible({ timeout: 30_000 })
 }
 
-test('keine Bewegung zeichnet pro Bild neu', async ({ page }) => {
+test('keine dauerhafte Bewegung zeichnet pro Bild neu', async ({ page }) => {
   test.setTimeout(120_000)
   await intoSession(page)
   await page.waitForTimeout(1500)
 
-  const schuldige = (await running(page)).filter((animation) =>
-    animation.props.some((property) => REPAINTS.includes(property)),
+  const schuldige = (await running(page)).filter(
+    (animation) =>
+      animation.dauerhaft && animation.props.some((property) => REPAINTS.includes(property)),
   )
 
   expect(
@@ -276,7 +318,9 @@ test('keine Bewegung sitzt auf einer Weichzeichner-Fläche', async ({ page }) =>
   await visit(page)
   await expect(startButton(page)).toBeVisible()
   await page.waitForTimeout(1200)
-  const aufDemStart = (await running(page)).filter((animation) => animation.blur !== '')
+  const aufDemStart = (await running(page)).filter(
+    (animation) => animation.dauerhaft && animation.blur !== '',
+  )
   expect(
     aufDemStart.map((a) => `${a.where} · ${a.blur}`).slice(0, 6).join(' | '),
     'bewegte Weichzeichner auf dem Startbildschirm',
@@ -284,7 +328,9 @@ test('keine Bewegung sitzt auf einer Weichzeichner-Fläche', async ({ page }) =>
 
   await intoSession(page)
   await page.waitForTimeout(1500)
-  const inDerEinheit = (await running(page)).filter((animation) => animation.blur !== '')
+  const inDerEinheit = (await running(page)).filter(
+    (animation) => animation.dauerhaft && animation.blur !== '',
+  )
   expect(
     inDerEinheit.map((a) => `${a.where} · ${a.blur}`).slice(0, 6).join(' | '),
     'bewegte Weichzeichner in der Einheit',

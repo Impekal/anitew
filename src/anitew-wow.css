@@ -29,9 +29,13 @@ body::after {
   animation: wow-aurora 28s ease-in-out infinite alternate;
 }
 
+/* Kein zweiter Filter ueber dem Netz (Geraetemeldung 01.09.): Derselbe
+   Fehler stand in `anitew-experience-refinement.css` und wurde dort
+   entfernt — hier stand er noch einmal. Ein Filter auf dem Container zieht
+   den ganzen Teilbaum in eine eigene Ebene, die neu gezeichnet wird, sobald
+   sich darin etwas ruehrt. */
 .neural {
   opacity: .62;
-  filter: drop-shadow(0 0 7px rgb(158 230 210 / 8%));
 }
 .neural-links line {
   stroke: rgb(158 230 210 / 10%);

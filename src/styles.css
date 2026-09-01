@@ -272,9 +272,17 @@ body::before {
   font: inherit;
   box-shadow: var(--shadow-lift), var(--glow-soft);
   transition: transform var(--step) var(--ease), box-shadow var(--step) var(--ease);
-  /* Der Knopf atmet, sehr langsam. Nicht um Aufmerksamkeit zu fordern,
-     sondern damit der Bildschirm lebt, solange niemand etwas tut (G-7). */
-  animation: button-breathe 5.5s ease-in-out infinite;
+  /*
+    Der Knopf atmet weiter — aber nicht mehr ueber `box-shadow`
+    (Geraetemeldung 01.09.).
+
+    Hier lief `button-breathe` endlos und bewegte den Schatten zwischen zwei
+    Staerken. Ein Schatten ist eine Zeichen-Eigenschaft: Der Browser malt ihn
+    in jedem Bild neu, auf dem groessten Element des Startbildschirms, und das
+    dauerhaft. Das Atmen kommt jetzt vom Ring darueber (`.start::before`,
+    `living-core-breathe`) — der bewegt Groesse und Deckkraft, und die schiebt
+    die Grafikkarte. G-7 bleibt erfuellt, der Bildschirm lebt weiter.
+  */
 }
 
 .start:hover {
@@ -628,13 +636,17 @@ body::before {
  * mit einem weichen Schein. Sie liegen dadurch optisch vor dem übrigen Netz,
  * und das reicht schon, damit der Hintergrund nicht flach wirkt.
  *
- * Nur jeder siebte, weil `drop-shadow` je Element gerechnet wird: sieben
- * leuchtende Punkte kosten nichts, fünfzig würden auf einem älteren Telefon
- * die Uhr der Einheit ins Stocken bringen.
+ * Hier stand: „Nur jeder siebte, weil `drop-shadow` je Element gerechnet
+ * wird“ — die Kosten waren also bekannt, nur zu niedrig veranschlagt. Sieben
+ * Filter sind billiger als fünfzig und trotzdem nicht umsonst: Jeder zwingt
+ * sein Element in eine eigene Ebene, die neu **gezeichnet** wird, solange die
+ * Bewegung läuft — und die läuft endlos. Gemessen am 01.09., nachdem ein
+ * Telefon zum zweiten Mal heiß gemeldet wurde.
+ *
+ * Die sieben bleiben hell; das trägt die Farbe, nicht der Filter.
  */
 .neural-nodes circle:nth-child(7n) {
   fill: var(--accent);
-  filter: drop-shadow(0 0 1.4px color-mix(in oklab, var(--accent) 80%, transparent));
   animation-duration: 9s;
 }
 
@@ -1254,16 +1266,6 @@ body::before {
     opacity: 1;
     transform: none;
     text-shadow: var(--glow-text);
-  }
-}
-
-@keyframes button-breathe {
-  0%,
-  100% {
-    box-shadow: var(--shadow-lift), var(--glow-soft);
-  }
-  50% {
-    box-shadow: var(--shadow-lift), var(--glow-strong);
   }
 }
 
