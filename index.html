@@ -72,6 +72,30 @@
         document.documentElement.dataset.anitewFirstLaunch = 'true'
         document.documentElement.dataset.anitewLaunch = 'show'
       }
+
+      /*
+       * Nach dem Ritual verlässt der Splash das Dokument — wirklich.
+       *
+       * `anitew-launch-away` endet auf `visibility: hidden`, aber unsichtbar
+       * ist nicht abwesend: Feld, Aurora und Marke tragen Endlos-Animationen,
+       * und die liefen sonst die ganze Sitzung unsichtbar weiter (gemessen:
+       * 69 % eines Kerns nur dafür — Wärme und Akku auf jedem Telefon, bei
+       * jedem Öffnen). Der `skip`-Fall (App war schon offen, `display: none`)
+       * räumt beim Laden auf; der Wecker ist Rettungsanker, falls das
+       * Wegblenden nie feuert (fremde Browser-Einstellungen, die Animationen
+       * ganz abschalten) — sonst stünde der Splash für immer über der App.
+       */
+      const clearLaunch = () => document.getElementById('anitew-launch')?.remove()
+      document.addEventListener('animationend', (event) => {
+        if (event.animationName === 'anitew-launch-away') clearLaunch()
+      })
+      document.addEventListener('DOMContentLoaded', () => {
+        if (document.documentElement.dataset.anitewLaunch === 'skip') {
+          clearLaunch()
+          return
+        }
+        setTimeout(clearLaunch, 9000)
+      })
     </script>
     <style>
       /*
