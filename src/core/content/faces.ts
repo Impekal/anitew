@@ -79,7 +79,30 @@ export interface Face {
  * (D8). Ohne diese Verlässlichkeit wäre die Wiederholung sinnlos — man würde
  * jedes Mal ein neues Gesicht zum alten Namen lernen.
  */
+/*
+ * Dasselbe Wort ergibt dasselbe Gesicht — dann muss es auch nur einmal
+ * gerechnet werden.
+ *
+ * Gemessen: 50 000 Gesichter frisch zu wuerfeln kostet 23 ms, aus dem
+ * Speicher zu holen 2 ms. Gebraucht wird das an zwei Stellen oft — beim
+ * Zeichnen jedes Gesichts und seit dieser Aenderung in `spreadFaces`, das
+ * beim Planen jeden Namen mit jedem vergleicht. Rechenarbeit ist auf einem
+ * Telefon Waerme (BACKLOG P9), und diese hier ist vermeidbar.
+ *
+ * Der Speicher ist von Natur aus klein und begrenzt: Es gibt je Sprache rund
+ * fuenfzig Namen, und mehr Namen als im Vorrat kann niemand anfragen.
+ */
+const cache = new Map<string, Face>()
+
 export function faceFor(name: string): Face {
+  const known = cache.get(name)
+  if (known !== undefined) return known
+  const face = buildFace(name)
+  cache.set(name, face)
+  return face
+}
+
+function buildFace(name: string): Face {
   const rng = createRng(`face:${name}`)
   return {
     width: 0.88 + rng.next() * 0.24,
@@ -118,4 +141,30 @@ function beardOf(roll: number, name: string): 0 | 1 | 2 {
   if (roll < 0.1) return 1
   if (roll < 0.24) return 2
   return 0
+}
+
+/**
+ * Die Merkmale, an denen man zwei Menschen aus zwei Metern unterscheidet.
+ *
+ * Bewusst nur die kategorischen: Frisur, Haarfarbe, Hautton, Bart, Brille,
+ * Nase, Mund. Die feinen Maße (Kopfbreite, Kinn, Augenabstand, Ohren) machen
+ * ein Gesicht eigen, aber sie taugen nicht zum Auseinanderhalten — zwei
+ * Gesichter, die sich nur um drei Prozent Kopfbreite unterscheiden, sind für
+ * den Abruf dasselbe Gesicht.
+ */
+const STRONG_FEATURES = ['hairStyle', 'hair', 'skin', 'beard', 'glasses', 'nose', 'mouth'] as const
+
+/**
+ * Wie viele auffällige Merkmale trennen zwei Gesichter? (0 bis 7)
+ *
+ * Gerätemeldung 01.09.: „die Menschen sehen sich zu ähnlich aus. Im echten
+ * Leben ist es nicht so." Der Vorrat ist vielfältig — aber wer eine Runde
+ * sieht, sieht sechs Gesichter, und die wurden unabhängig voneinander
+ * gezogen. Greta und Zora etwa teilen alles außer dem Hautton. Diese Zahl
+ * macht „sieht ähnlich aus" prüfbar; wer sie nutzt, steht in `planBase.ts`.
+ */
+export function faceDistance(oneName: string, otherName: string): number {
+  const one = faceFor(oneName)
+  const other = faceFor(otherName)
+  return STRONG_FEATURES.filter((feature) => one[feature] !== other[feature]).length
 }

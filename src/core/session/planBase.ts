@@ -19,6 +19,7 @@
 import { MODES, type TrainingMode } from '../modes.ts'
 import { createRng } from '../rng.ts'
 import type { DayKey } from '../time.ts'
+import { faceDistance } from '../content/faces.ts'
 import { answerFor, factKindOf, missionFacts, personOf } from '../content/missions.ts'
 import { factAnswer, factPrompt } from '../content/own.ts'
 import {
@@ -754,9 +755,14 @@ export function planSession(input: PlanInput): SessionPlan {
     const dueSubjects = new Set(
       (input.due?.[moduleId] ?? []).map((entry) => subjectOf(moduleId, entry)),
     )
-    remaining.set(
-      moduleId,
-      rng.shuffle(
+    /*
+     * Nur die Gesichter bekommen nach dem Mischen eine zweite Ordnung: In
+     * einer Runde sollen keine zwei Menschen stehen, die man aus zwei Metern
+     * verwechselt (Geraetemeldung 01.09.). Begruendung und Messwerte bei
+     * `spreadFaces`. Alle anderen Module behalten das reine Mischen — bei
+     * Woertern oder Zahlen gibt es kein „sieht aehnlich aus".
+     */
+    const mixed = rng.shuffle(
         /*
          * Auch der Vorratseintrag über seinen **Anker**, nicht roh: Bei den
          * Zwillingen (D-027) heißt das fällige Paar `Kirche%Kirsche`, im
@@ -768,8 +774,8 @@ export function planSession(input: PlanInput): SessionPlan {
         (input.pools[moduleId] ?? []).filter(
           (entry) => !dueSubjects.has(subjectOf(moduleId, entry)),
         ),
-      ),
     )
+    remaining.set(moduleId, moduleId === 'faces' ? spreadFaces(mixed) : mixed)
     taken.set(moduleId, 0)
   }
 
@@ -973,4 +979,60 @@ export function reviewItemsOf(plan: SessionPlan, moduleId?: ModuleId): string[] 
 /** Welche Module kommen in dieser Einheit vor? */
 export function modulesOf(plan: SessionPlan): ModuleId[] {
   return [...new Set(plan.blocks.map((block) => block.moduleId))]
+}
+
+/**
+ * Gesichter einer Runde auseinanderhalten (Geraetemeldung 01.09.).
+ *
+ * Der Vorrat ist vielfaeltig, aber eine Runde ist ein zusammenhaengender
+ * Ausschnitt daraus — und in dem standen bisher regelmaessig Zwillinge.
+ * Gemessen vor dieser Behebung (300 Einheiten, 900 Runden): In 9,7 % der
+ * Runden unterschied sich das aehnlichste Paar in genau **einem** von sieben
+ * auffaelligen Merkmalen, in 48,6 % in zweien. Greta und Zora etwa teilen
+ * Frisur, Haarfarbe, Nase, Mund, Bartlosigkeit und Brillenlosigkeit.
+ *
+ * Behoben wird das **an der Reihenfolge**, nicht am Gesicht: `faceFor` bleibt
+ * unangetastet, sonst saehe „Elena" nach dem Update anders aus als beim
+ * Einpraegen vor drei Wochen (D8). Aus der gemischten Liste wird hier eine
+ * umsortierte, in der je zwei Namen innerhalb eines Rundenfensters weit genug
+ * auseinanderliegen. Dieselben Namen, dieselbe Anzahl, dieselbe Ziehung ohne
+ * Zuruecklegen — nur eine andere Ordnung.
+ *
+ * Genommen wird der **erste** Kandidat, der die Schwelle haelt, nicht der
+ * beste: Der beste zuerst verbraucht die auffaelligsten Gesichter frueh und
+ * laesst die aehnlichen fuer die spaeteren Runden uebrig. Haelt keiner die
+ * Schwelle (kleiner Vorrat, viele aehnliche Namen), kommt der mit dem
+ * groessten Abstand — nie eine Endlosschleife, nie ein Ausfall.
+ */
+const MIN_FACE_DISTANCE = 3
+
+function spreadFaces(names: readonly string[]): string[] {
+  const rest = [...names]
+  const ordered: string[] = []
+
+  while (rest.length > 0) {
+    // Nur das Fenster vergleichen, das eine Runde ueberhaupt zusammen zeigt.
+    const window = ordered.slice(-(MAX_ITEMS_PER_ROUND - 1))
+    let chosen = 0
+    let best = -1
+
+    for (let index = 0; index < rest.length; index++) {
+      const candidate = rest[index] as string
+      let closest = Number.POSITIVE_INFINITY
+      for (const seen of window) closest = Math.min(closest, faceDistance(seen, candidate))
+      if (closest >= MIN_FACE_DISTANCE) {
+        chosen = index
+        best = closest
+        break
+      }
+      if (closest > best) {
+        best = closest
+        chosen = index
+      }
+    }
+
+    ordered.push(rest.splice(chosen, 1)[0] as string)
+  }
+
+  return ordered
 }
