@@ -98,6 +98,19 @@ export const de = {
   sound: {
     on: 'Ton an',
     off: 'Ton aus',
+    /*
+     * Die Bereiche einzeln (Geraetewunsch 31.08.). `honest` ist die Zeile, die
+     * verhindert, dass aus einem angenehmen Klang ein Wirkungsversprechen wird
+     * (R-1): Die App misst keinen Konzentrationseffekt und behauptet keinen.
+     */
+    heading: 'Was klingt',
+    feedback: 'Rückmeldung',
+    feedbackNote: 'Die kurzen Töne beim Bedienen.',
+    arrival: 'Ankommen',
+    arrivalNote: 'Die Melodie der drei Sekunden vor der Einheit.',
+    focus: 'Klang während der Einheit',
+    focusNote: 'Ein sehr leiser Dauerklang beim Üben.',
+    honest: 'Ob ein Dauerklang beim Merken hilft, ist von Mensch zu Mensch verschieden — manche brauchen Stille. Gemessen haben wir das nicht, deshalb behaupten wir es auch nicht.',
   },
   session: {
     settle: 'Ankommen',

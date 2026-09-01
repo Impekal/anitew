@@ -65,7 +65,13 @@ export function SessionScreen(props: {
   const [settled, setSettled] = useState(false)
 
   if (!settled) {
-    return <Settle dictionary={props.dictionary} onDone={() => setSettled(true)} />
+    return (
+      <Settle
+        dictionary={props.dictionary}
+        platform={props.platform}
+        onDone={() => setSettled(true)}
+      />
+    )
   }
   return <RunningSession {...props} />
 }
@@ -79,11 +85,33 @@ export function SessionScreen(props: {
  * Die Uhr der Einheit läuft erst danach. Das Zeitbudget bleibt Trainingszeit
  * und wird nicht heimlich mit Ankommen gefüllt (B2).
  */
-function Settle({ dictionary, onDone }: { dictionary: Dictionary; onDone: () => void }) {
+function Settle({
+  dictionary,
+  platform,
+  onDone,
+}: {
+  dictionary: Dictionary
+  platform: Platform
+  onDone: () => void
+}) {
   useEffect(() => {
     const timer = setTimeout(onDone, SETTLE_MS)
     return () => clearTimeout(timer)
   }, [onDone])
+
+  /*
+   * Die Melodie des Ankommens (Geraetewunsch 31.08.). Sie steht genau hier
+   * und nirgends sonst: Der Startknopf hat die Tonausgabe schon
+   * freigeschaltet (iOS verlangt eine Geste), und diese drei Sekunden sind
+   * die einzige Stelle der App, an der Zeit fuer eine Melodie ist.
+   *
+   * Wer das Ankommen antippt und ueberspringt, hoert sie nicht zu Ende — das
+   * ist richtig so: Sie begleitet das Ankommen, sie haelt es nicht auf.
+   */
+  useEffect(() => {
+    platform.sound.play('arrival')
+    return () => platform.sound.stopAmbient()
+  }, [platform])
 
   return (
     <main className="app session">
@@ -146,6 +174,29 @@ function RunningSession({
       delete root.dataset.focus
     }
   }, [state.finished])
+
+  /*
+   * Der ruhige Klang waehrend der Einheit (Geraetewunsch 31.08.).
+   *
+   * Er beginnt mit dem ersten Block und endet mit der Einheit — nicht erst
+   * beim Verlassen des Bildschirms: Auf der Zusammenfassung ist die Arbeit
+   * getan, da soll es still sein. Ob er ueberhaupt klingt, entscheidet der
+   * Ton-Port anhand von Hauptschalter und Bereich; hier steht nur, **wann**
+   * er dran waere.
+   *
+   * Die Aufraeumfunktion haelt ihn in jedem Fall an — auch beim Abbrechen
+   * mitten in der Einheit oder wenn die Seite wechselt. Ein Klang, der nach
+   * dem Training weiterlaeuft, waere genau die Dauerlast, die P9 abgestellt
+   * hat.
+   */
+  useEffect(() => {
+    if (state.finished) {
+      platform.sound.stopAmbient()
+      return
+    }
+    platform.sound.startAmbient()
+    return () => platform.sound.stopAmbient()
+  }, [state.finished, platform])
 
   /*
    * Die Marken zerlegen genau so, wie die Einheit zählt (`useSessionRunner`):

@@ -1,0 +1,45 @@
+/* ── Ton-Bereiche (Gerätewunsch 31.08.) ────────────────────────────────────
+   Drei Schalter unter dem Hauptschalter: Rückmeldung, Ankommen, Klang
+   während der Einheit. Sie sind bewusst untereinander und nicht in einer
+   Reihe — jeder trägt eine Erklärzeile, und drei Erklärungen nebeneinander
+   sind auf einem Telefon unlesbar. */
+.sound-areas {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+}
+
+.sound-areas-label {
+  margin: 0;
+  color: var(--ink-soft);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.sound-area {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  padding: 0.6rem 1rem;
+  text-align: left;
+}
+
+.sound-area-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.sound-area-name {
+  color: var(--ink);
+}
+
+/* Abgeschaltet bleibt lesbar, wirkt aber zurückgenommen — kein Ausgrauen,
+   das die Schrift unter den Kontrastanspruch drückt (O4). */
+.sound-area[aria-pressed='false'] .sound-area-name {
+  color: var(--ink-soft);
+}

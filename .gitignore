@@ -18,3 +18,4 @@ facesheet*.png
 # Sie liegen in public/, damit Vite sie vor dem Precache nach dist/ kopiert.
 public/impressum.html
 public/datenschutz.html
+tsconfig.tsbuildinfo
