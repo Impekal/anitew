@@ -29,6 +29,7 @@ import {
   personOf,
   type Platform,
   splitEntries,
+  splitNumberEntries,
   stationOf,
   subjectOf,
   twinChoices,
@@ -147,11 +148,34 @@ function RunningSession({
   }, [state.finished])
 
   /*
+   * Die Marken zerlegen genau so, wie die Einheit zählt (`useSessionRunner`):
+   * Bei Zahlen ist das Leerzeichen Gruppierung — „12 345“ ist eine Zahl, und
+   * genau so zeigt die App sie beim Einprägen auch an. Bei Wörtern trennt es.
+   */
+  const numberRecall = state.block?.moduleId === 'numbers'
+  const recallChips = useMemo(
+    () => (numberRecall ? splitNumberEntries(state.entries) : splitEntries(state.entries)),
+    [numberRecall, state.entries],
+  )
+
+  /*
+   * Der Zeilenwechsel für den Ziffernblock, der keine Return-Taste hat.
+   * Zwei leere Zeilen hintereinander bringen nichts — der Knopf bleibt dann
+   * folgenlos und gibt nur den Fokus zurück.
+   */
+  const recallRef = useRef<HTMLTextAreaElement>(null)
+  const addRecallLine = () => {
+    const text = state.entries
+    if (text.trim() !== '' && !text.endsWith('\n')) setEntries(`${text}\n`)
+    recallRef.current?.focus()
+  }
+
+  /*
    * Jedes gelandete Wort klingt (D-011/G-9) — kurz, hoch, fast ein Tropfen.
    * Gezählt wird die Zahl der Marken, nicht jeder Tastendruck: Sonst klapperte
    * es beim Tippen wie eine Schreibmaschine.
    */
-  const chipCount = splitEntries(state.entries).length
+  const chipCount = recallChips.length
   const chipsRef = useRef(0)
   useEffect(() => {
     if (chipCount > chipsRef.current) platform.sound.play('type', chipCount)
@@ -510,6 +534,7 @@ function RunningSession({
               sucht man den Einprägeteil, den es nie gab. */}
           <p className="hint">{block.kind === 'review' ? t.reviewHint : t.recallHint}</p>
           <textarea
+            ref={recallRef}
             className="recall-input"
             value={state.entries}
             onChange={(event) => setEntries(event.target.value)}
@@ -529,12 +554,36 @@ function RunningSession({
             aria-label={t.recallHint}
           />
           {/*
+            Der Zeilenwechsel, den der Ziffernblock nicht hat (Gerätemeldung
+            31.08.: „auf der Tastatur wird keine Möglichkeit gegeben, auf die
+            nächste Zeile zu gehen"). `onMouseDown`/`onTouchStart` verhindern
+            den Fokuswechsel — sonst schlösse sich am Telefon bei jedem
+            Umbruch die Tastatur, und die nächste Zahl kostete zwei
+            zusätzliche Tipper.
+          */}
+          {block.moduleId === 'numbers' ? (
+            <button
+              type="button"
+              className="quiet recall-next"
+              onMouseDown={(event) => event.preventDefault()}
+              onTouchStart={(event) => event.preventDefault()}
+              onClick={addRecallLine}
+            >
+              {t.recallNextNumber}
+            </button>
+          ) : undefined}
+          {/*
             Das Getippte kommt als Marke zurück — sichtbar, greifbar, ohne
             jede Bewertung. Ein „richtig“ oder „falsch“ an dieser Stelle wäre
             ein Hinweis und würde den freien Abruf zerstören (C5).
+
+            Zerlegt wird **wie gezählt wird**: Bei Zahlen ist das Leerzeichen
+            Gruppierung („12 345“ ist eine Zahl, so zeigt die App sie auch an),
+            bei Wörtern trennt es. Die Marken lasen früher immer die
+            Wort-Regel und widersprachen damit sichtbar der Bewertung.
           */}
           <div className="chips" aria-hidden="true">
-            {splitEntries(state.entries).map((entry, index) => (
+            {recallChips.map((entry, index) => (
               <span className="chip" key={`${entry}-${index}`}>
                 {entry}
               </span>

@@ -1112,6 +1112,18 @@ body::before {
   box-shadow: var(--shadow), var(--glow);
 }
 
+/* Der Zeilenwechsel für den Ziffernblock (Gerätemeldung 31.08.: „auf der
+   Tastatur wird keine Möglichkeit gegeben, auf die nächste Zeile zu gehen").
+   Er steht direkt unter dem Feld und vor den Marken — dort sucht ihn die
+   Hand, die gerade die nächste Zahl tippen will. Rechtsbündig, damit der
+   Daumen ihn erreicht, ohne die Marken zu verdecken. Die 44-Pixel-Höhe
+   erbt er von `.quiet` (O5). */
+.recall-next {
+  align-self: flex-end;
+  padding-inline: 1rem;
+  font-size: 0.9rem;
+}
+
 /* Jedes getippte Wort landet sichtbar (D-011/G-7, Punkt 3). Es ist nur die
    eigene Eingabe zurückgespiegelt — keine Bewertung, kein Hinweis, ob es
    richtig war. Das wäre ein Hinweis und würde den freien Abruf zerstören. */

@@ -109,6 +109,7 @@ export const pt: Dictionary = {
     memoryPlaceholder: 'O que faz parte',
     recallPlaceholder: 'Uma palavra por linha',
     recallNumbersPlaceholder: 'Um número por linha',
+    recallNextNumber: 'Próximo número',
     doneWithBlock: 'Feito',
     abort: 'Cancelar',
   },

@@ -182,6 +182,12 @@ export const de = {
     memoryPlaceholder: 'Was dazugehört',
     recallPlaceholder: 'Ein Wort pro Zeile',
     recallNumbersPlaceholder: 'Eine Zahl pro Zeile',
+    /*
+     * Der Ziffernblock des Telefons hat keine Return-Taste (Gerätemeldung
+     * 31.08.). „Eine Zahl pro Zeile“ verlangte damit etwas, das das Gerät
+     * nicht hergibt — also gibt die App den Zeilenwechsel selbst.
+     */
+    recallNextNumber: 'Nächste Zahl',
     doneWithBlock: 'Fertig',
     abort: 'Abbrechen',
   },

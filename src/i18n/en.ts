@@ -99,6 +99,7 @@ export const en: Dictionary = {
     memoryPlaceholder: 'What belongs',
     recallPlaceholder: 'One word per line',
     recallNumbersPlaceholder: 'One number per line',
+    recallNextNumber: 'Next number',
     doneWithBlock: 'Done',
     abort: 'Stop',
   },
