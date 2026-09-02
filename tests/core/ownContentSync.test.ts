@@ -191,3 +191,43 @@ describe('Der Merkzettel wirkt beim Laden', () => {
     expect(activeOwnPalaces(store, undefined).palaces).toHaveLength(1)
   })
 })
+
+/**
+ * Eine berichtigte Antwort muss beim zweiten Gerät ankommen
+ * (Nutzerwunsch 02.09., zusammen mit der Frage vom 01.09.).
+ *
+ * Die Frage ist der Schlüssel eines Paares. Ändert jemand nur die **Antwort**
+ * — der gemeldete Fall, ein Tippfehler —, bleibt die Frage stehen, und beim
+ * Abgleich trafen zwei Karten mit derselben Frage aufeinander. Bis zum
+ * 02.09. gewann stur die lokale: Wer den Tippfehler auf dem Telefon
+ * berichtigte, fand ihn am Rechner für immer wieder. Der Kommentar an
+ * `mergeOwnFacts` begründete das mit „Es gibt keinen Weg, eine Antwort zu
+ * ändern“ — seit dem Berichtigen stimmt dieser Satz nicht mehr.
+ */
+describe('Eine berichtigte Antwort reist zum zweiten Gerät', () => {
+  const frage = 'Hauptstadt von Peru'
+
+  it('setzt die jüngere Berichtigung gegen die alte Antwort durch', () => {
+    const hier = [{ prompt: frage, answer: 'Limaa' }]
+    const dort = [{ prompt: frage, answer: 'Lima', editedAt: 1_700_000_000_000 }]
+
+    expect(
+      mergeDriveSettingValue('own.facts.de', hier, dort),
+      'die Berichtigung ist unterwegs verloren gegangen',
+    ).toEqual([{ prompt: frage, answer: 'Lima', editedAt: 1_700_000_000_000 }])
+  })
+
+  it('lässt die eigene, jüngere Berichtigung stehen', () => {
+    const hier = [{ prompt: frage, answer: 'Lima', editedAt: 1_700_000_100_000 }]
+    const dort = [{ prompt: frage, answer: 'Limaa', editedAt: 1_700_000_000_000 }]
+
+    expect(mergeDriveSettingValue('own.facts.de', hier, dort)).toEqual(hier)
+  })
+
+  it('lässt Karten ohne Marke beim Alten — lokal gewinnt wie bisher', () => {
+    const hier = [{ prompt: frage, answer: 'Limaa' }]
+    const dort = [{ prompt: frage, answer: 'Lima' }]
+
+    expect(mergeDriveSettingValue('own.facts.de', hier, dort)).toEqual(hier)
+  })
+})

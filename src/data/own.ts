@@ -8,7 +8,13 @@
  * Weg von hier ins Netz.
  */
 
-import { type OwnFact, activeOwnFacts, encodeFact, factPrompt } from '../core/index.ts'
+import {
+  type OwnFact,
+  activeOwnFacts,
+  editOwnFactList,
+  encodeFact,
+  factPrompt,
+} from '../core/index.ts'
 
 import { db } from './db.ts'
 import { itemIdOf, wordOf } from './items.ts'
@@ -79,6 +85,72 @@ export async function addOwnFacts(language: string, facts: readonly OwnFact[]): 
   }
 
   await db.settings.put({ key: keyFor(language), value: [...existing, ...fresh] })
+}
+
+/**
+ * Berichtigt ein Paar, ohne seinen Wiederholungsverlauf wegzuwerfen
+ * (Nutzerwunsch 02.09.).
+ *
+ * Die Kennung eines Paares ist `frage ⟂ antwort`. Jede Änderung — auch nur
+ * an der Antwort — ergibt also eine **andere** Kennung, und an der alten
+ * hängen Wiederholungen, Stabilität und Termin. Bisher gab es nur „löschen
+ * und neu eintippen", und damit war der Verlauf weg: Ein Tippfehler kostete
+ * die Wochen dahinter. Genau das war gemeldet.
+ *
+ * Deshalb ist Berichtigen hier ein **Umzug**: Der Termin wird unter der neuen
+ * Kennung abgelegt und unter der alten entfernt. Ändert sich die Frage,
+ * bekommt die alte einen Grabstein — sonst brächte das zweite Gerät sie beim
+ * nächsten Abgleich zurück (dieselbe Mechanik wie beim Wegwerfen) — und ein
+ * Grabstein auf der **neuen** Frage muss weichen, genau wie in `addOwnFacts`:
+ * Wer auf eine früher weggeworfene Frage berichtigt, will sie wiederhaben.
+ * Ohne das verschwände die Karte im selben Moment, in dem sie gespeichert
+ * wird — der Ausgang, der wie Datenverlust aussieht.
+ *
+ * Alle Schreibvorgänge liegen in **einer** Transaktion. Sie hängen
+ * voneinander ab: eine halb geschriebene Berichtigung — neue Liste ohne
+ * gelösten Grabstein, oder Grabstein ohne neue Liste — kostet die Karte.
+ *
+ * Meldet `false`, wenn die Änderung nicht trägt; was gültig ist, entscheidet
+ * `editOwnFactList` im browserfreien Kern.
+ */
+export async function editOwnFact(
+  language: string,
+  oldPrompt: string,
+  next: OwnFact,
+  now: number,
+): Promise<boolean> {
+  const existing = await loadOwnFacts(language)
+  const geaendert = editOwnFactList(existing, oldPrompt, next, now)
+  if (geaendert === undefined) return false
+
+  const alt = existing.find((fact) => fact.prompt === oldPrompt)
+  const neu = geaendert.find((fact) => fact.prompt === next.prompt.trim())
+  if (alt === undefined || neu === undefined) return false
+
+  const alteKennung = itemIdOf('facts', language, encodeFact(alt))
+  const neueKennung = itemIdOf('facts', language, encodeFact(neu))
+
+  await db.transaction('rw', db.settings, db.itemStates, async () => {
+    if (neu.prompt !== alt.prompt) {
+      const marks = { ...(await removedMarks(language)), [alt.prompt]: now }
+      delete marks[neu.prompt]
+      await db.settings.put({ key: removedKeyFor(language), value: marks })
+    }
+    await db.settings.put({ key: keyFor(language), value: [...geaendert] })
+
+    /*
+     * Der Umzug des Termins. Gibt es noch keinen — das Paar war nie dran —,
+     * gibt es auch nichts zu bewegen, und das ist kein Fehler.
+     */
+    if (alteKennung !== neueKennung) {
+      const termin = await db.itemStates.get(alteKennung)
+      if (termin !== undefined) {
+        await db.itemStates.put({ ...termin, itemId: neueKennung })
+        await db.itemStates.delete(alteKennung)
+      }
+    }
+  })
+  return true
 }
 
 /**

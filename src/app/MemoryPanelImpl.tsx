@@ -1,3 +1,5 @@
+import '../anitew-memory-edit.css'
+
 import { Suspense, lazy, useCallback, useEffect, useState } from 'react'
 
 import {
@@ -15,7 +17,16 @@ import {
 } from '../core/index.ts'
 import { loadDue } from '../data/items.ts'
 import { loadMemoryGraph, saveMemoryGraph, MEMORY_VISITED_KEY } from '../data/memoryStore.ts'
-import { removeMemoryNode } from '../core/index.ts'
+import {
+  type MemoryRelation,
+  disconnectMemoryNodes,
+  editMemoryEdge,
+  memoryNodeId,
+  removeMemoryNode,
+  renameMemoryNode,
+  setMemoryDetail,
+} from '../core/index.ts'
+import { editCopyFor } from '../i18n/editCopy.ts'
 import { memoryCountCopyFor, memoryForecastCopyFor, type Dictionary } from '../i18n/index.ts'
 
 import { MemoryConstellation } from './MemoryConstellation.tsx'
@@ -92,13 +103,32 @@ export function MemoryPanel({
     void platform.settings.write(MEMORY_VISITED_KEY, true).catch(() => undefined)
   }, [platform])
 
+  const e = editCopyFor(document.documentElement.lang)
+  const [editing, setEditing] = useState(false)
+  const [draftName, setDraftName] = useState('')
+  const [draftDetail, setDraftDetail] = useState('')
+  const [editFailed, setEditFailed] = useState<string | undefined>(undefined)
+
+  /*
+   * Jede Änderung geht denselben Weg: frisch laden, ändern, speichern,
+   * anzeigen, abgleichen. Frisch laden, weil zwischen zwei Fingertipps ein
+   * stiller Abgleich gelaufen sein kann — der Zustand im Bildschirm wäre dann
+   * älter als die Platte, und die Änderung schriebe ihn zurück.
+   */
+  const schreibe = useCallback(
+    (aendern: (graph: MemoryGraph, now: number) => MemoryGraph) =>
+      void (async () => {
+        const now = platform.clock.now()
+        const next = aendern(await loadMemoryGraph(), now)
+        await saveMemoryGraph(next)
+        setGraph(next)
+        scheduleDriveSync(platform)
+      })().catch(() => undefined),
+    [platform],
+  )
+
   const remove = (nodeId: string) => {
-    void (async () => {
-      const next = removeMemoryNode(await loadMemoryGraph(), nodeId, platform.clock.now())
-      await saveMemoryGraph(next)
-      setGraph(next)
-      scheduleDriveSync(platform)
-    })().catch(() => undefined)
+    schreibe((graph, now) => removeMemoryNode(graph, nodeId, now))
   }
 
   const byNeed = nodesByStrength(graph)
@@ -121,17 +151,30 @@ export function MemoryPanel({
   const latest = latestNodes(graph, 3)
   const selected = graph.nodes.find((node) => node.id === selectedId)
   const selectedForecast = selected === undefined ? undefined : forecastByNode.get(selected.id)
-  const connected =
+  /*
+   * Jede Verbindung einzeln, mit ihrer Art — nicht mehr nur die Namen der
+   * Gegenüber in einer Zeile.
+   *
+   * Vorher stand hier „Schlüssel · Tür · Auto". Die **Art** der Verbindung
+   * (Verknüpfung, Reihenfolge, Zusammenhang, Gegensatz, eigene) wurde gar
+   * nicht angezeigt — man konnte sie also nicht einmal sehen, geschweige denn
+   * berichtigen. Gemeldet am 02.09.: „Gilt auch für connections."
+   */
+  const links =
     selected === undefined
       ? []
       : graph.edges
           .filter((edge) => edge.from === selected.id || edge.to === selected.id)
-          .map((edge) =>
-            graph.nodes.find((node) =>
-              node.id === (edge.from === selected.id ? edge.to : edge.from),
+          .map((edge) => ({
+            edge,
+            other: graph.nodes.find(
+              (node) => node.id === (edge.from === selected.id ? edge.to : edge.from),
             ),
+          }))
+          .filter(
+            (link): link is { edge: (typeof graph.edges)[number]; other: NonNullable<typeof link.other> } =>
+              link.other !== undefined,
           )
-          .filter((node): node is NonNullable<typeof node> => node !== undefined)
   const dueSoon = selected !== undefined && dueNodeIds.has(selected.id)
   const reviewDay = selected === undefined ? undefined : reviewDayByNode.get(selected.id)
   const recalledNodeIds = new Set(
@@ -216,15 +259,139 @@ export function MemoryPanel({
           {selected !== undefined && (
             <section className="memory-detail" aria-live="polite">
               <p className="memory-detail-kicker">{texts.types[selected.type]}</p>
-              <h3>{selected.label}</h3>
-              {selected.detail !== undefined && <p>{selected.detail}</p>}
+              {editing ? (
+                /*
+                  Berichtigen statt wegwerfen (Nutzerwunsch 02.09.).
+
+                  Der Name eines Begriffs bildet seine Kennung, und an der
+                  hängt der Wiederholungsverlauf. Wer sich vertippt hatte,
+                  musste bisher wegwerfen und neu anlegen — und verlor die
+                  Wochen dahinter. Ändert sich nur die Schreibweise, bleibt
+                  die Kennung ohnehin gleich; sonst zieht alles mit um.
+                */
+                <form
+                  className="memory-edit"
+                  onSubmit={(event) => {
+                    event.preventDefault()
+                    const name = draftName.trim()
+                    if (name === '') return
+                    const kollision =
+                      memoryNodeId(selected.type, name) !== selected.id &&
+                      graph.nodes.some((node) => node.id === memoryNodeId(selected.type, name))
+                    if (kollision) {
+                      setEditFailed(e.taken)
+                      return
+                    }
+                    setEditFailed(undefined)
+                    setSelectedId(memoryNodeId(selected.type, name))
+                    schreibe((current, now) =>
+                      setMemoryDetail(
+                        renameMemoryNode(current, selected.id, name, now),
+                        memoryNodeId(selected.type, name),
+                        draftDetail,
+                        now,
+                      ),
+                    )
+                    setEditing(false)
+                  }}
+                >
+                  <label className="own-field">
+                    <span>{e.name}</span>
+                    <input value={draftName} onChange={(event) => setDraftName(event.target.value)} />
+                  </label>
+                  <label className="own-field">
+                    <span>{e.detail}</span>
+                    <input
+                      value={draftDetail}
+                      onChange={(event) => setDraftDetail(event.target.value)}
+                    />
+                  </label>
+                  {editFailed !== undefined && <p className="hint">{editFailed}</p>}
+                  <div className="note-actions">
+                    <button type="submit" className="quiet">
+                      {e.save}
+                    </button>
+                    <button
+                      type="button"
+                      className="quiet"
+                      onClick={() => {
+                        setEditing(false)
+                        setEditFailed(undefined)
+                      }}
+                    >
+                      {e.cancel}
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <>
+                  <h3>{selected.label}</h3>
+                  {selected.detail !== undefined && <p>{selected.detail}</p>}
+                  <button
+                    type="button"
+                    className="quiet memory-edit-open"
+                    onClick={() => {
+                      setDraftName(selected.label)
+                      setDraftDetail(selected.detail ?? '')
+                      setEditFailed(undefined)
+                      setEditing(true)
+                    }}
+                  >
+                    {e.edit}
+                  </button>
+                </>
+              )}
               <dl>
                 <div>
                   <dt>{texts.connected}</dt>
                   <dd>
-                    {connected.length === 0
-                      ? texts.none
-                      : connected.map((node) => node.label).join(' · ')}
+                    {links.length === 0 ? (
+                      texts.none
+                    ) : (
+                      <ul className="memory-links">
+                        {links.map(({ edge, other }) => (
+                          <li key={edge.id}>
+                            <span className="memory-link-name">{other.label}</span>
+                            <label className="memory-link-kind">
+                              <span className="visually-hidden">{e.relation}</span>
+                              <select
+                                value={edge.relation}
+                                onChange={(event) =>
+                                  schreibe((current, now) =>
+                                    editMemoryEdge(
+                                      current,
+                                      edge.id,
+                                      event.target.value as MemoryRelation,
+                                      now,
+                                    ),
+                                  )
+                                }
+                              >
+                                {(
+                                  ['association', 'sequence', 'context', 'contrast', 'custom'] as const
+                                ).map((art) => (
+                                  <option key={art} value={art}>
+                                    {e.relations[art]}
+                                  </option>
+                                ))}
+                              </select>
+                            </label>
+                            <button
+                              type="button"
+                              className="quiet"
+                              aria-label={`${e.disconnect}: ${other.label}`}
+                              onClick={() =>
+                                schreibe((current, now) =>
+                                  disconnectMemoryNodes(current, edge.id, now),
+                                )
+                              }
+                            >
+                              ×
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </dd>
                 </div>
                 <div>

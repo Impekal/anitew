@@ -34,7 +34,11 @@ test('macht aus eingefügtem Text Karten — und zeigt, was keine wurde', async 
   await openPage(page, 'Eigene Inhalte')
   await expect(page.locator('.own-list li')).toHaveCount(2)
 
-  await page.locator('.own-card', { hasText: 'Notruf' }).getByRole('button').click()
+  // Seit dem Berichtigen trägt jede Karte zwei Knöpfe — der Name sagt, welcher.
+  await page
+    .locator('.own-card', { hasText: 'Notruf' })
+    .getByRole('button', { name: 'Entfernen' })
+    .click()
   await expect(page.locator('.own-list li')).toHaveCount(1)
   await expect(page.locator('.own-list')).toContainText('Lissabon')
 

@@ -1,0 +1,73 @@
+/*
+  Berichtigen im Gedächtnis-Bildschirm (Nutzerwunsch 02.09.).
+
+  Eigenes Blatt am verzögerten Modul, nicht in `styles.css`: Diese Regeln
+  braucht nur, wer „Mein Gedächtnis" öffnet, und das Kaltstart-Budget stand
+  am 02.09. bei 12,0 von 12 KB. Dasselbe Muster wie `anitew-sound-areas.css`.
+*/
+
+/* Eine Zeile je Verbindung: Wer, welche Art, und weg damit.
+   Vorher stand hier eine einzige Zeile mit Namen — die Art war unsichtbar. */
+.memory-links {
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.memory-links li {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+.memory-link-name {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Die Auswahl der Art bleibt schmal — sie ist eine Angabe, keine Überschrift. */
+.memory-link-kind select {
+  padding: .3rem .45rem;
+  border: 1px solid var(--line);
+  border-radius: .5rem;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: .85rem;
+}
+
+/* Der Wegwerf-Knopf ist ein Zeichen, kein Wort — der Name daneben ist lang
+   genug. Was er tut, sagt sein `aria-label`. */
+.memory-links button {
+  padding: .25rem .6rem;
+  line-height: 1;
+}
+
+.memory-edit {
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+  margin: 0 0 .6rem;
+}
+
+.memory-edit-open {
+  align-self: flex-start;
+  margin: .2rem 0 .6rem;
+}
+
+/* Für Beschriftungen, die eine Vorlesehilfe braucht und das Auge nicht.
+   `clip-path` statt Verstecken: Verstecktes liest auch die Vorlesehilfe nicht. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
