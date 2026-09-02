@@ -368,39 +368,6 @@ export const de = {
       knee: 'Knie',
       foot: 'Fuß',
     },
-    /*
-      Mehrere Wege, und Wege dürfen wachsen (G3).
-
-      Der Hinweis nennt beides in einem Satz, weil es dieselbe Sache ist: Wer
-      die Technik benutzt, hat mehrere Wege und längere. Was er **nicht**
-      sagt: dass ein längerer Weg längere Einheiten bedeutet. Tut er nicht —
-      ein Gang bleibt bei fünf Stationen, ein langer Weg liefert stattdessen
-      mehr verschiedene Gänge.
-    */
-    ownIntro: 'Mindestens fünf Orte auf einem Weg, den du blind gehen kannst. Immer dieselbe Richtung. Du kannst Orte anhängen und weitere Wege anlegen — ein Gang geht davon immer fünf Stationen ab, nie den ganzen Weg auf einmal.',
-    ownName: 'Wie heißt der Weg?',
-    ownNamePlaceholder: 'Meine Wohnung',
-    ownStation: 'Station',
-    ownStationPlaceholder: 'Ort',
-    ownSave: 'Änderungen merken',
-    ownCreate: 'Weg anlegen',
-    ownCancel: 'Abbrechen',
-    ownAdd: 'Weiteren Weg anlegen',
-    ownAddStation: 'Ort anhängen',
-    /*
-      Jeder Ort lässt sich entfernen, nicht nur der letzte.
-
-      Das ging erst, seit ein Ort eine dauerhafte Nummer hat statt einer
-      Position: Wer den dritten von sechs herausnimmt, hinterlässt 1, 2, 4, 5,
-      6 — und die vier bleibt die vier. Vorher wäre aus dem vierten der dritte
-      geworden, und seine Termine hingen plötzlich am falschen Ort.
-    */
-    ownRemoveStation: 'Ort entfernen',
-    ownDiscard: 'Weg verwerfen',
-    ownSaved: 'Gemerkt. Er kommt ab jetzt im Training vor.',
-    ownFailed: 'Das hat nicht geklappt. Es wurde nichts verändert.',
-    ownFull: 'Acht Wege sind genug. Mehr, und man kommt in keinem mehr richtig an.',
-    ownRule: 'Mindestens fünf Orte, alle verschieden, keiner leer — und ein Name für den Weg.',
   },
   returns: {
     /*

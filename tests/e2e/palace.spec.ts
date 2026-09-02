@@ -140,7 +140,7 @@ test('legt fünf Dinge auf einen Weg und geht ihn danach ab', async ({ page }) =
   await expect(startButton(page)).toBeVisible()
 })
 
-test('lässt einen eigenen Weg anlegen und benutzt ihn (G3)', async ({ page }) => {
+test('lässt einen eigenen Palast anlegen und benutzt ihn (G3)', async ({ page }) => {
   test.setTimeout(360_000)
 
   /*
@@ -153,12 +153,12 @@ test('lässt einen eigenen Weg anlegen und benutzt ihn (G3)', async ({ page }) =
   await openPage(page, 'Der Gedächtnispalast')
 
   const own = ['Wohnungstür', 'Bad', 'Balkon', 'Bücherregal', 'Nachttisch']
-  await page.getByLabel('Wie heißt der Weg?').fill('Meine Bude')
+  await page.getByLabel('Wie heißt der Palast?').fill('Meine Bude')
   for (const [index, label] of own.entries()) {
     await page.getByLabel(`Station ${index + 1}`).fill(label)
   }
 
-  const save = page.getByRole('button', { name: 'Weg anlegen' })
+  const save = page.getByRole('button', { name: 'Palast anlegen' })
   await expect(save).toBeEnabled()
   await save.click()
   await expect(page.getByText(/Er kommt ab jetzt im Training vor/)).toBeVisible()
@@ -242,16 +242,16 @@ test('nimmt keinen halben Weg an', async ({ page }) => {
   await expect(startButton(page)).toBeVisible()
   await openPage(page, 'Der Gedächtnispalast')
 
-  await page.getByLabel('Wie heißt der Weg?').fill('Halb')
+  await page.getByLabel('Wie heißt der Palast?').fill('Halb')
   await page.getByLabel('Station 1').fill('Bad')
   // Zweimal derselbe Ort: „Was lag hier?“ hätte zwei Antworten.
   await page.getByLabel('Station 2').fill('Bad')
 
-  await expect(page.getByRole('button', { name: 'Weg anlegen' })).toBeDisabled()
+  await expect(page.getByRole('button', { name: 'Palast anlegen' })).toBeDisabled()
   await expect(page.getByText(/Mindestens fünf Orte, alle verschieden, keiner leer/)).toBeVisible()
 })
 
-test('hängt Orte an und legt einen zweiten Weg an (G3)', async ({ page }) => {
+test('hängt Orte an und legt einen zweiten Palast an (G3)', async ({ page }) => {
   test.setTimeout(120_000)
 
   await visit(page)
@@ -259,7 +259,7 @@ test('hängt Orte an und legt einen zweiten Weg an (G3)', async ({ page }) => {
   await openPage(page, 'Der Gedächtnispalast')
 
   // Erster Weg, sieben Orte statt fünf.
-  await page.getByLabel('Wie heißt der Weg?').fill('Meine Bude')
+  await page.getByLabel('Wie heißt der Palast?').fill('Meine Bude')
   const first = ['Wohnungstür', 'Bad', 'Balkon', 'Bücherregal', 'Nachttisch']
   for (const [index, label] of first.entries()) {
     await page.getByLabel(`Station ${index + 1}`).fill(label)
@@ -268,7 +268,7 @@ test('hängt Orte an und legt einen zweiten Weg an (G3)', async ({ page }) => {
   await page.getByLabel('Station 6').fill('Küchenfenster')
   await page.getByRole('button', { name: 'Ort anhängen' }).click()
   await page.getByLabel('Station 7').fill('Waschmaschine')
-  await page.getByRole('button', { name: 'Weg anlegen' }).click()
+  await page.getByRole('button', { name: 'Palast anlegen' }).click()
   await expect(page.getByText(/Er kommt ab jetzt im Training vor/)).toBeVisible()
 
   // Er bleibt liegen, mit allen sieben Orten.
@@ -277,24 +277,24 @@ test('hängt Orte an und legt einen zweiten Weg an (G3)', async ({ page }) => {
   await expect(page.getByLabel('Station 7')).toHaveValue('Waschmaschine')
 
   // Umbenennen: Der Ort bleibt derselbe, nur das Schild wechselt.
-  await page.getByLabel('Wie heißt der Weg?').fill('Meine Wohnung')
+  await page.getByLabel('Wie heißt der Palast?').fill('Meine Wohnung')
   await page.getByLabel('Station 3').fill('Balkontür')
   await page.getByRole('button', { name: 'Änderungen merken' }).click()
   await expect(page.getByText(/Er kommt ab jetzt im Training vor/)).toBeVisible()
   await page.reload()
   await openPage(page, 'Der Gedächtnispalast')
-  await expect(page.getByLabel('Wie heißt der Weg?')).toHaveValue('Meine Wohnung')
+  await expect(page.getByLabel('Wie heißt der Palast?')).toHaveValue('Meine Wohnung')
   await expect(page.getByLabel('Station 3')).toHaveValue('Balkontür')
 
   // Zweiter Weg daneben.
-  await page.getByRole('button', { name: 'Weiteren Weg anlegen' }).click()
+  await page.getByRole('button', { name: 'Weiteren Palast anlegen' }).click()
   const second = page.locator('.own-palace-entry').last()
-  await second.getByLabel('Wie heißt der Weg?').fill('Der Weg zur Arbeit')
+  await second.getByLabel('Wie heißt der Palast?').fill('Der Weg zur Arbeit')
   const stops = ['Haustür', 'Bushaltestelle', 'Bäckerei', 'Ampel', 'Büroeingang']
   for (const [index, label] of stops.entries()) {
     await second.getByLabel(`Station ${index + 1}`).fill(label)
   }
-  await second.getByRole('button', { name: 'Weg anlegen' }).click()
+  await second.getByRole('button', { name: 'Palast anlegen' }).click()
   // Erst die Bestätigung abwarten. Ein Neuladen mitten im Schreiben prüft
   // nicht die App, sondern das Wettrennen.
   await expect(page.getByText(/Er kommt ab jetzt im Training vor/)).toBeVisible()
@@ -305,11 +305,11 @@ test('hängt Orte an und legt einen zweiten Weg an (G3)', async ({ page }) => {
   // Zwei angelegte Wege — und das leere Formular für den nächsten erscheint
   // erst auf Knopfdruck, sobald es einen gibt.
   await expect(entries).toHaveCount(2)
-  await expect(entries.nth(0).getByLabel('Wie heißt der Weg?')).toHaveValue('Meine Wohnung')
-  await expect(entries.nth(1).getByLabel('Wie heißt der Weg?')).toHaveValue('Der Weg zur Arbeit')
+  await expect(entries.nth(0).getByLabel('Wie heißt der Palast?')).toHaveValue('Meine Wohnung')
+  await expect(entries.nth(1).getByLabel('Wie heißt der Palast?')).toHaveValue('Der Weg zur Arbeit')
 })
 
-test('übernimmt einen Weg aus der Zeit vor den mehreren Wegen', async ({ page }) => {
+test('übernimmt einen Palast aus der Zeit vor den mehreren Palästen', async ({ page }) => {
   /*
    * Die Regel lautet „keine riskanten Datenmigrationen", und dies ist die
    * Stelle, an der sie hätte brechen können.
@@ -344,7 +344,7 @@ test('übernimmt einen Weg aus der Zeit vor den mehreren Wegen', async ({ page }
 
   await page.reload()
   await openPage(page, 'Der Gedächtnispalast')
-  await expect(page.getByLabel('Wie heißt der Weg?')).toHaveValue('Alter Weg')
+  await expect(page.getByLabel('Wie heißt der Palast?')).toHaveValue('Alter Weg')
   await expect(page.getByLabel('Station 3')).toHaveValue('Balkon')
 
   // Und er behält seine Kennung, sonst wären seine Termine verwaist.
@@ -387,14 +387,14 @@ test('entfernt einen Ort aus der Mitte, ohne die Nummern dahinter zu verschieben
   await expect(startButton(page)).toBeVisible()
   await openPage(page, 'Der Gedächtnispalast')
 
-  await page.getByLabel('Wie heißt der Weg?').fill('Meine Bude')
+  await page.getByLabel('Wie heißt der Palast?').fill('Meine Bude')
   const orte = ['Tür', 'Bad', 'Balkon', 'Regal', 'Bett']
   for (const [index, label] of orte.entries()) {
     await page.getByLabel(`Station ${index + 1}`).fill(label)
   }
   await page.getByRole('button', { name: 'Ort anhängen' }).click()
   await page.getByLabel('Station 6').fill('Küchenfenster')
-  await page.getByRole('button', { name: 'Weg anlegen' }).click()
+  await page.getByRole('button', { name: 'Palast anlegen' }).click()
   await expect(page.getByText(/Er kommt ab jetzt im Training vor/)).toBeVisible()
 
   // Den dritten Ort entfernen — mitten aus dem Weg.
@@ -433,7 +433,7 @@ test('entfernt einen Ort aus der Mitte, ohne die Nummern dahinter zu verschieben
   expect(gespeichert.next).toBe(7)
 })
 
-test('legt einen zweiten Weg an, ohne den ersten anzufassen', async ({ page }) => {
+test('legt einen zweiten Palast an, ohne den ersten anzufassen', async ({ page }) => {
   test.setTimeout(120_000)
 
   await visit(page)
@@ -446,23 +446,23 @@ test('legt einen zweiten Weg an, ohne den ersten anzufassen', async ({ page }) =
    * ersten Eingabe. Wer den Bildschirm zum ersten Mal sah, fand eine Sackgasse.
    */
   await expect(page.getByText(/Mindestens fünf Orte, alle verschieden, keiner leer/)).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Weg anlegen' })).toBeDisabled()
+  await expect(page.getByRole('button', { name: 'Palast anlegen' })).toBeDisabled()
 
-  await page.getByLabel('Wie heißt der Weg?').fill('Meine Bude')
+  await page.getByLabel('Wie heißt der Palast?').fill('Meine Bude')
   for (const [index, label] of ['Tür', 'Bad', 'Balkon', 'Regal', 'Bett'].entries()) {
     await page.getByLabel(`Station ${index + 1}`).fill(label)
   }
-  await expect(page.getByRole('button', { name: 'Weg anlegen' })).toBeEnabled()
-  await page.getByRole('button', { name: 'Weg anlegen' }).click()
+  await expect(page.getByRole('button', { name: 'Palast anlegen' })).toBeEnabled()
+  await page.getByRole('button', { name: 'Palast anlegen' }).click()
   await expect(page.getByText(/Er kommt ab jetzt im Training vor/)).toBeVisible()
 
-  await page.getByRole('button', { name: 'Weiteren Weg anlegen' }).click()
+  await page.getByRole('button', { name: 'Weiteren Palast anlegen' }).click()
   const zweiter = page.locator('.own-palace-entry').last()
-  await zweiter.getByLabel('Wie heißt der Weg?').fill('Weg zur Arbeit')
+  await zweiter.getByLabel('Wie heißt der Palast?').fill('Weg zur Arbeit')
   for (const [index, label] of ['Haustür', 'Bushalt', 'Bäcker', 'Ampel', 'Büro'].entries()) {
     await zweiter.getByLabel(`Station ${index + 1}`).fill(label)
   }
-  await zweiter.getByRole('button', { name: 'Weg anlegen' }).click()
+  await zweiter.getByRole('button', { name: 'Palast anlegen' }).click()
 
   /*
    * Erst warten, bis der Schreibvorgang durch ist — dann neu laden.
@@ -472,15 +472,15 @@ test('legt einen zweiten Weg an, ohne den ersten anzufassen', async ({ page }) =
    * Weg anlegen" stehen bereits zwei da — der gespeicherte und das leere
    * Formular. Die Bedingung war erfüllt, bevor irgendetwas gespeichert war.
    *
-   * „Weiteren Weg anlegen" kommt dagegen erst zurück, wenn das Formular
+   * „Weiteren Palast anlegen" kommt dagegen erst zurück, wenn das Formular
    * abgeräumt ist, und das passiert erst nach dem Schreibversuch.
    */
-  await expect(page.getByRole('button', { name: 'Weiteren Weg anlegen' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Weiteren Palast anlegen' })).toBeVisible()
 
   await page.reload()
   await openPage(page, 'Der Gedächtnispalast')
   const eintraege = page.locator('.own-palace-entry')
   await expect(eintraege).toHaveCount(2)
-  await expect(eintraege.nth(0).getByLabel('Wie heißt der Weg?')).toHaveValue('Meine Bude')
-  await expect(eintraege.nth(1).getByLabel('Wie heißt der Weg?')).toHaveValue('Weg zur Arbeit')
+  await expect(eintraege.nth(0).getByLabel('Wie heißt der Palast?')).toHaveValue('Meine Bude')
+  await expect(eintraege.nth(1).getByLabel('Wie heißt der Palast?')).toHaveValue('Weg zur Arbeit')
 })

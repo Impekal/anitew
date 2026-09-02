@@ -12,7 +12,7 @@ import {
 } from '../core/index.ts'
 import { createOwnPalace, removeOwnPalace, saveOwnPalace } from '../data/palace.ts'
 import { scheduleDriveSync } from './driveSync.ts'
-import type { Dictionary } from '../i18n/index.ts'
+import { ownPalaceCopyFor } from '../i18n/ownPalaceCopy.ts'
 
 /**
  * Die eigenen Paläste (Backlog G3).
@@ -31,17 +31,21 @@ import type { Dictionary } from '../i18n/index.ts'
  * stattdessen mehr verschiedene Gänge (siehe `core/content/palace.ts`).
  */
 export function PalacePanel({
-  dictionary,
   own,
   onChange,
   platform,
 }: {
-  dictionary: Dictionary
   own: readonly OwnPalace[]
   onChange: () => void
   platform: Platform
 }) {
-  const t = dictionary.palace
+  /*
+   * Die Palast-Texte kommen aus dem verzögerten Modul, nicht aus dem
+   * Wörterbuch: Sie werden nur hier gebraucht, und `de`/`en` liegen sonst im
+   * Kaltstart-Bündel (P4). Die Oberflächensprache steht am Dokument — dieselbe
+   * Quelle, die `brainCareCopyFor` und `localPhotoCopyForCurrentUi` benutzen.
+   */
+  const o = ownPalaceCopyFor(document.documentElement.lang)
   const [adding, setAdding] = useState(false)
   /*
    * Anlegen, Umbenennen, Wegwerfen — alle drei gehen durch `onChange`, und
@@ -74,12 +78,11 @@ export function PalacePanel({
 
   return (
     <div className="own-palace">
-      <p className="hint">{t.ownIntro}</p>
+      <p className="hint">{o.ownIntro}</p>
 
       {own.map((palace) => (
         <PalaceEditor
           key={palace.id}
-          dictionary={dictionary}
           palace={palace}
           onChange={changed}
           onSaved={() => setSaved(true)}
@@ -90,7 +93,6 @@ export function PalacePanel({
 
       {showNew && (
         <PalaceEditor
-          dictionary={dictionary}
           palace={undefined}
           onChange={() => {
             setAdding(false)
@@ -115,14 +117,14 @@ export function PalacePanel({
                 setAdding(true)
               }}
             >
-              {t.ownAdd}
+              {o.ownAdd}
             </button>
           </div>
         ) : (
-          <p className="hint">{t.ownFull}</p>
+          <p className="hint">{o.ownFull}</p>
         ))}
 
-      {saved && <p className="hint">{t.ownSaved}</p>}
+      {saved && <p className="hint">{o.ownSaved}</p>}
     </div>
   )
 }
@@ -146,7 +148,6 @@ function nextFor(palace: OwnPalace | undefined): number {
  * und der Unterschied interessiert nur die Datenbank.
  */
 function PalaceEditor({
-  dictionary,
   palace,
   onChange,
   onSaved,
@@ -154,7 +155,6 @@ function PalaceEditor({
   onCancel,
   now,
 }: {
-  dictionary: Dictionary
   palace: OwnPalace | undefined
   onChange: () => void
   onSaved: () => void
@@ -163,7 +163,13 @@ function PalaceEditor({
   /** Die Uhr des Geräts — für den Merkzettel des Weggeworfenen. */
   now: () => number
 }) {
-  const t = dictionary.palace
+  /*
+   * Die Palast-Texte kommen aus dem verzögerten Modul, nicht aus dem
+   * Wörterbuch: Sie werden nur hier gebraucht, und `de`/`en` liegen sonst im
+   * Kaltstart-Bündel (P4). Die Oberflächensprache steht am Dokument — dieselbe
+   * Quelle, die `brainCareCopyFor` und `localPhotoCopyForCurrentUi` benutzen.
+   */
+  const o = ownPalaceCopyFor(document.documentElement.lang)
   const [name, setName] = useState(palace?.name ?? '')
   const [stations, setStations] = useState<OwnStation[]>(() => freshStations(palace))
   /*
@@ -232,12 +238,12 @@ function PalaceEditor({
   return (
     <section className="own-palace-entry">
       <label className="own-field">
-        <span>{t.ownName}</span>
+        <span>{o.ownName}</span>
         <input
           type="text"
           value={name}
           maxLength={LABEL_MAX}
-          placeholder={t.ownNamePlaceholder}
+          placeholder={o.ownNamePlaceholder}
           onChange={(event) => {
             setName(event.target.value)
             touch()
@@ -260,8 +266,8 @@ function PalaceEditor({
               type="text"
               value={station.label}
               maxLength={LABEL_MAX}
-              placeholder={t.ownStationPlaceholder}
-              aria-label={`${t.ownStation} ${index + 1}`}
+              placeholder={o.ownStationPlaceholder}
+              aria-label={`${o.ownStation} ${index + 1}`}
               onChange={(event) => {
                 const next = [...stations]
                 next[index] = { ...station, label: event.target.value }
@@ -280,7 +286,7 @@ function PalaceEditor({
               <button
                 type="button"
                 className="own-station-drop"
-                aria-label={`${t.ownRemoveStation}: ${station.label.trim() === '' ? index + 1 : station.label}`}
+                aria-label={`${o.ownRemoveStation}: ${station.label.trim() === '' ? index + 1 : station.label}`}
                 onClick={() => {
                   setStations(stations.filter((entry) => entry.id !== station.id))
                   touch()
@@ -304,14 +310,14 @@ function PalaceEditor({
               touch()
             }}
           >
-            {t.ownAddStation}
+            {o.ownAddStation}
           </button>
         </div>
       )}
 
       <div className="note-actions">
         <button type="button" className="quiet" disabled={!valid} onClick={save}>
-          {palace === undefined ? t.ownCreate : t.ownSave}
+          {palace === undefined ? o.ownCreate : o.ownSave}
         </button>
         {palace !== undefined && (
           <button
@@ -332,12 +338,12 @@ function PalaceEditor({
                 .finally(onChange)
             }}
           >
-            {t.ownDiscard}
+            {o.ownDiscard}
           </button>
         )}
         {palace === undefined && onCancel !== undefined && (
           <button type="button" className="quiet" onClick={onCancel}>
-            {t.ownCancel}
+            {o.ownCancel}
           </button>
         )}
       </div>
@@ -351,10 +357,10 @@ function PalaceEditor({
         zum ersten Mal sah, fand einen ausgegrauten „Weg anlegen"-Knopf ohne
         ein Wort dazu, warum er nicht geht.
       */}
-      {!valid && <p className="hint own-rule">{t.ownRule}</p>}
+      {!valid && <p className="hint own-rule">{o.ownRule}</p>}
       {failed && (
         <p className="hint" role="alert">
-          {t.ownFailed}
+          {o.ownFailed}
         </p>
       )}
     </section>

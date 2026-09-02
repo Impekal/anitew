@@ -139,8 +139,11 @@
   text-transform: uppercase !important;
 }
 .today-system {
-  color: rgb(140 207 192 / 70%) !important;
-  font-size: 9px !important;
+  /* 9 Pixel bei 70 % Deckkraft waren gemessen — und für eine Zeile, die den
+     ganzen Bereich benennt, zu wenig. Sie ist jetzt lesbar und trägt ihre
+     Farbe voll; die Sperrung bleibt, sie macht die Zeile ruhig, nicht klein. */
+  color: rgb(140 207 192 / 92%) !important;
+  font-size: 12px !important;
   text-align: center;
 }
 .today .constellation {

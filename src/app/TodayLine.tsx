@@ -99,8 +99,33 @@ export function TodayLine({
       : texts.numberRecord.replace('{digits}', String(numberRecord))
   return (
     <section className={refreshKey > 0 ? 'today today-resolved' : 'today'} aria-label={texts.heading}>
-      <p className="today-system">{texts.systemHeading}</p>
-      {graph.nodes.length > 0 && <MemoryConstellation graph={graph} />}
+      {/*
+        Überschrift und Konstellation sind zusammen ein Weg, kein Bild
+        (Gerätebefund 02.09.: „das sollte anklickbar sein, dann landet man in
+        Ma mémoire wie auch über Core").
+
+        Der Weg dorthin war längst verdrahtet — `onOpenMemories` öffnete
+        bisher nur den kleinen Einladungsknopf weiter unten, den es nur beim
+        ersten Mal gibt. Wer sein System schon hat, sah es an und kam nicht
+        hinein. Ein Knopf statt zweier Absätze; die Beschriftung sagt, wohin
+        er führt, damit auch eine Vorlesehilfe es ansagt.
+
+        Ohne eigenen Vorrat an Bewegung: Der Knopf ist ein Rahmen um das, was
+        ohnehin dasteht.
+      */}
+      {graph.nodes.length > 0 ? (
+        <button
+          type="button"
+          className="today-system-open"
+          onClick={onOpenMemories}
+          aria-label={`${texts.systemHeading} — ${texts.inviteOpen}`}
+        >
+          <span className="today-system">{texts.systemHeading}</span>
+          <MemoryConstellation graph={graph} />
+        </button>
+      ) : (
+        <p className="today-system">{texts.systemHeading}</p>
+      )}
       <div className="today-mission">
         <p className="today-mission-label">{texts.missionHeading}</p>
         <p className="today-duration">{texts.duration.replace('{duration}', duration)}</p>

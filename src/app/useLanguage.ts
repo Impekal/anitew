@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useState } from 'react'
 
 import { persistThenApply } from './persistThenApply.ts'
 
@@ -126,7 +126,30 @@ export function useLanguage(platform: Platform): LanguageState {
     }
   }, [platform])
 
-  useEffect(() => {
+  /*
+   * `useLayoutEffect`, nicht `useEffect` — und das ist hier kein Geschmack.
+   *
+   * `document.documentElement.lang` ist die **einzige** Sprachquelle für alles
+   * außerhalb von React: die beiden Schichten, die den Welcome-Screen
+   * imperativ ausbauen, und rund ein Dutzend ausgelagerter Textmodule
+   * (`…CopyFor(document.documentElement.lang)`). Die Schichten hängen an
+   * MutationObservern; deren Rückrufe laufen am Mikrotask-Checkpoint
+   * desselben Tasks, in dem React die DOM-Änderung committet.
+   *
+   * Ein *passiver* Effekt (`useEffect`) läuft erst danach, in einem eigenen
+   * Task. Beim Sprachwechsel remountet `.arrival` (key in OnboardingScreen);
+   * die Schichten bauten es dann mit dem **alten** `lang` aus, markierten es
+   * als erledigt und fassten es nie wieder an — halb übersetzt, dauerhaft.
+   *
+   * Gemessen am 02.09. unter CPU-Drosselung ×20: sechs von acht Wechseln
+   * blieben vollständig in der alten Sprache stehen. Auf schnellen Maschinen
+   * gewann meist der Effekt, deshalb sah es in CI wie Flackern aus.
+   *
+   * Ein Layout-Effekt läuft synchron in derselben Commit-Phase, direkt nach
+   * der DOM-Änderung und vor jedem Mikrotask. Damit ist die Reihenfolge kein
+   * Wettlauf mehr, sondern festgelegt.
+   */
+  useLayoutEffect(() => {
     document.documentElement.lang = language
     document.documentElement.dir = isRightToLeft(language) ? 'rtl' : 'ltr'
   }, [language])
