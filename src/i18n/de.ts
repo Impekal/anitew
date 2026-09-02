@@ -143,6 +143,7 @@ export const de = {
       gaze: 'Sieh das Bild an. Jedes Ding hat seine Farbe — merk dir beides zusammen.',
       facts: 'Deine Karte: Frage und Antwort. Bau eine Brücke — ein Bild, in dem beide vorkommen.',
       memory: 'Deine Erinnerung. Sieh alles zusammen — ein Bild, in dem alles am Anker hängt.',
+      people: 'Ein Mensch, den viele kennen. Jahr, Fach, Herkunft — häng die drei an den Namen.',
     },
     recallHint: 'Was ist geblieben? Reihenfolge egal.',
     reviewHint: 'Und jetzt von früher: Woran erinnerst du dich noch?',
@@ -193,6 +194,8 @@ export const de = {
     // gehört dazu?“ nach Tagen keine beantwortbare Frage.
     memoryAsk: '{subject} — was gehört dazu?',
     memoryPlaceholder: 'Was dazugehört',
+    peopleAsk: 'Welcher Jahrgang?',
+    peoplePlaceholder: 'Geburtsjahr',
     recallPlaceholder: 'Ein Wort pro Zeile',
     recallNumbersPlaceholder: 'Eine Zahl pro Zeile',
     /*
@@ -459,6 +462,7 @@ export const de = {
       gaze: 'Bilder',
       facts: 'Eigenes',
       memory: 'Erinnerungen',
+      people: 'Persönlichkeiten',
     },
     noWeakest: 'Kein Unterschied zwischen den Achsen, der über die Zählunsicherheit hinausgeht.',
     empty: 'Noch nichts zu zeigen. Das Profil entsteht aus dem Training — nicht aus einem Test am Anfang.',

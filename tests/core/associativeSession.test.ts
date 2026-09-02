@@ -25,7 +25,7 @@ function pools(): Pools {
     twins: [],
     gaze: [],
     facts: [],
-    memory: [],
+    memory: [], people: [],
     spatial: [],
   }
 }

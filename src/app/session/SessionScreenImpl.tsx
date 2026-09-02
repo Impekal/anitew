@@ -446,11 +446,17 @@ function RunningSession({
             Buchstaben stehen daneben und nicht darin, sonst läse jeder, der
             das Element ausliest, „4r7k“ statt „47“.
           */}
-          {block.moduleId === 'facts' ? (
+          {block.moduleId === 'facts' || block.moduleId === 'people' ? (
             /*
-              Ein eigenes Paar (D-032): Die Frage klein darüber, die Antwort
-              als das große Wort — eingeprägt wird die Brücke zwischen
-              beiden, nicht zwei Zeilen nacheinander.
+              Ein eigenes Paar (D-032) — und seit dem 02.09. auch eine
+              Persönlichkeit: Die Frage klein darüber, die Antwort als das
+              große Wort. Eingeprägt wird die Brücke zwischen beiden, nicht
+              zwei Zeilen nacheinander.
+
+              Bei den Persönlichkeiten steht oben der Name und unten
+              „1987 · Fußball · Argentinien“ — alle drei Angaben, obwohl
+              gleich nur nach dem Jahr gefragt wird. Fach und Herkunft sind
+              nicht Zierrat, sondern der Haken, an dem die Zahl hängt.
             */
             <div className="fact-pair" key={block.id + state.itemIndex} aria-live="polite">
               <p className="fact-prompt">{factPrompt(state.currentItem ?? '')}</p>
@@ -537,7 +543,7 @@ function RunningSession({
             steht groß da, wo sonst das Gesicht stünde.
           */
           question={
-            block.moduleId === 'facts'
+            block.moduleId === 'facts' || block.moduleId === 'people'
               ? factPrompt(block.items[state.promptIndex] ?? '')
               : block.moduleId === 'memory'
                 ? memorySubjectOf(block.items[state.promptIndex] ?? '')
@@ -1269,6 +1275,12 @@ function askFor(
     const ask = t.memoryAsk.replace('{subject}', memorySubjectOf(block.items[index] ?? ''))
     return block.kind === 'review' ? `${t.reviewLead} ${ask}` : ask
   }
+  if (block.moduleId === 'people') {
+    // Der Name steht daneben; gefragt ist die Zahl. Ohne diesen Satz wäre
+    // „Wer ist das?“ die Frage — und die Antwort stünde schon da.
+    const ask = t.peopleAsk
+    return block.kind === 'review' ? `${t.reviewLead} ${ask}` : ask
+  }
   if (block.moduleId !== 'missions') {
     return block.kind === 'review' ? t.reviewPromptHint : t.promptHint
   }
@@ -1283,6 +1295,7 @@ function placeholderFor(block: BlockPlan, index: number, dictionary: Dictionary)
   if (block.moduleId === 'gaze') return t.gazePlaceholder
   if (block.moduleId === 'palace') return dictionary.palace.placeholder
   if (block.moduleId === 'memory') return t.memoryPlaceholder
+  if (block.moduleId === 'people') return t.peoplePlaceholder
   if (block.moduleId !== 'missions') return t.promptPlaceholder
   const kind = factKindOf(block.items[index] ?? '')
   return kind === undefined ? t.promptPlaceholder : t.missionPlaceholders[kind]

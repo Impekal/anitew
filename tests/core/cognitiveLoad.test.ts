@@ -22,7 +22,7 @@ const pools: Pools = {
   twins,
   gaze: [],
   facts: [],
-  memory: [],
+  memory: [], people: [],
 }
 
 function learningRounds(modules: readonly ModuleId[]) {

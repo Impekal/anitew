@@ -105,7 +105,7 @@ describe('die Bilder im Bauplan', () => {
     reverse: [],
     twins: [],
     gaze: gazePool('plan', 30),
-    facts: [], memory: [],
+    facts: [], memory: [], people: [],
   }
   const base = { day: '2026-08-19', language: 'de', seed: 'plan', pools } as const
 
@@ -136,7 +136,7 @@ describe('die Bilder im Bauplan', () => {
     const plan = planSession({
       ...base,
       mode: 'daily',
-      due: { gaze: [dueItem], facts: [], memory: [] },
+      due: { gaze: [dueItem], facts: [], memory: [], people: [] },
       modules: ['gaze'],
     })
     for (const block of plan.blocks.filter((entry) => entry.kind !== 'review')) {

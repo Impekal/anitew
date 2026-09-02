@@ -54,6 +54,7 @@ import {
   spanLengthFor,
   TRAINING_MODULES,
   gazePool,
+  factPrompt,
   twinChoices,
   twinPairs,
   twinPool,
@@ -395,6 +396,20 @@ export function App() {
   }, [training, running])
 
   /*
+   * Persönlichkeiten (Nutzerwunsch 02.09.): derselbe endliche Vorrat wie bei
+   * den Zwillingen, dieselbe Regel. Wer schon einen Termin hat, kommt nie
+   * wieder als neu; ist der Rest aufgebraucht, fällt das Modul über den
+   * Vorratsfilter still aus der Lernrotation. Der Schlüssel ist der Name —
+   * die Antwortseite hängt an der Trainingssprache und wäre kein Schlüssel.
+   */
+  const [peopleDone, setPeopleDone] = useState<ReadonlySet<string>>(new Set())
+  useEffect(() => {
+    void loadTrackedWords('people', training)
+      .then((words) => setPeopleDone(new Set(words.map(factPrompt))))
+      .catch(() => undefined)
+  }, [training, running])
+
+  /*
    * Die letzten Antworten je Modul — Futter für die adaptive Schwierigkeit
    * (D2): gerechnet, nie fortgeschrieben, nach jeder Einheit neu gelesen.
    */
@@ -539,6 +554,16 @@ export function App() {
       const memoryGraph = await loadMemoryGraph().catch(() => createMemoryGraph())
       const ownPool = await loadOwnPool(training).catch(() => [])
       const memoryPool = composeMemoryPool(memoryGraph)
+      /*
+       * Die Personenliste wird erst hier geholt, nicht beim ersten Bild: Sie
+       * wiegt gut zwei Kilobyte und wird auf dem Startbildschirm nie
+       * gebraucht. Fällt das Nachladen aus — offline, Datei weg —, bleibt der
+       * Vorrat leer, und der Vorratsfilter nimmt das Modul still heraus. Die
+       * Einheit läuft ohne es weiter; das ist der bessere Tausch.
+       */
+      const peoplePool = await import('../core/content/people.ts')
+        .then((modul) => modul.peoplePool(training, seed))
+        .catch(() => [] as readonly string[])
       const memoryAnchors = new Set(memoryGraph.edges.map((edge) => edge.from))
       const mission = composeDailyMission({
         seconds,
@@ -634,6 +659,12 @@ export function App() {
            * Der Vorratsfilter nimmt das Modul dann still heraus.
            */
           memory: memoryPool,
+          /*
+           * Persönlichkeiten (Nutzerwunsch 02.09.): kuratiert und endlich,
+           * gefiltert um alles, was schon einen Termin hat. Ohne Bild — der
+           * Grund steht in `core/content/people.ts`.
+           */
+          people: peoplePool.filter((item) => !peopleDone.has(factPrompt(item))),
         },
         due,
         taught,
