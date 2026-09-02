@@ -103,7 +103,12 @@ function readFacts(value: unknown): readonly OwnFact[] | undefined {
     const answer = candidate['answer']
     if (typeof prompt !== 'string' || prompt === '') continue
     if (typeof answer !== 'string' || answer === '') continue
-    facts.push({ prompt, answer })
+    const editedAt = candidate['editedAt']
+    facts.push({
+      prompt,
+      answer,
+      ...(typeof editedAt === 'number' && Number.isFinite(editedAt) ? { editedAt } : {}),
+    })
   }
   return facts
 }
@@ -111,10 +116,22 @@ function readFacts(value: unknown): readonly OwnFact[] | undefined {
 /**
  * Vereinigt die eigenen Paare beider Geräte.
  *
- * Die Frage ist der Schlüssel — genau wie beim Einfügen (`data/own.ts`): Es
- * gibt keinen Weg, eine Antwort zu ändern, also bedeutet dieselbe Frage auf
- * beiden Geräten dieselbe Karte. Der lokale Eintrag bleibt stehen, damit an
- * ihm hängende Termine nicht auf eine neu geschriebene Kennung zeigen.
+ * Die Frage ist der Schlüssel — genau wie beim Einfügen (`data/own.ts`):
+ * Dieselbe Frage bedeutet auf beiden Geräten dieselbe Karte. Neue Karten des
+ * anderen Geräts kommen dazu.
+ *
+ * **Bei zwei Antworten auf dieselbe Frage** entscheidet die Berichtigungsmarke
+ * (`editedAt`): Seit dem 02.09. lässt sich eine Antwort ändern, also ist
+ * „lokal gewinnt immer“ nicht mehr richtig — wer den Tippfehler auf dem einen
+ * Gerät berichtigt, fände ihn sonst auf dem anderen für immer wieder. Die
+ * jüngste bewusste Änderung gewinnt; trägt keine Seite eine Marke (alle
+ * Karten von vor dem 02.09.), bleibt es beim lokalen Eintrag.
+ *
+ * Der Wiederholungsverlauf reist getrennt: Er hängt an der Kennung
+ * `frage ⟂ antwort` und liegt in der Tabelle `itemStates`, die derselbe
+ * Abgleich mitnimmt. Das berichtigende Gerät zieht ihn dort auf die neue
+ * Kennung um (`data/own.ts`), sodass er beim anderen Gerät unter der neuen
+ * Antwort ankommt.
  */
 export function mergeOwnFacts(local: unknown, remote: unknown): unknown {
   if (!Array.isArray(local) || !Array.isArray(remote)) return local
@@ -124,7 +141,14 @@ export function mergeOwnFacts(local: unknown, remote: unknown): unknown {
 
   const byPrompt = new Map<string, OwnFact>()
   for (const fact of mine) byPrompt.set(fact.prompt, fact)
-  for (const fact of theirs) if (!byPrompt.has(fact.prompt)) byPrompt.set(fact.prompt, fact)
+  for (const fact of theirs) {
+    const local = byPrompt.get(fact.prompt)
+    if (local === undefined) {
+      byPrompt.set(fact.prompt, fact)
+      continue
+    }
+    if ((fact.editedAt ?? 0) > (local.editedAt ?? 0)) byPrompt.set(fact.prompt, fact)
+  }
   return [...byPrompt.values()]
 }
 

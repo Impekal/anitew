@@ -1,3 +1,5 @@
+import '../anitew-memory-edit.css'
+
 import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react'
 
 import {
@@ -7,8 +9,9 @@ import {
   factPrompt,
   parseOwnText,
 } from '../core/index.ts'
-import { addOwnFacts, loadOwnFacts, loadOwnPool, removeOwnFact } from '../data/own.ts'
+import { addOwnFacts, editOwnFact, loadOwnFacts, loadOwnPool, removeOwnFact } from '../data/own.ts'
 import { scheduleDriveSync } from './driveSync.ts'
+import { editCopyFor } from '../i18n/editCopy.ts'
 import type { Dictionary } from '../i18n/index.ts'
 import { dictateLocally } from '../platform/web/localDictation.ts'
 import { localDictationCopyForCurrentUi } from './localDictationCopy.ts'
@@ -139,6 +142,36 @@ export function OwnPanel({
     void removeOwnFact(language, prompt, platform.clock.now())
       .then(changed)
       .catch(() => undefined)
+  }
+
+  /*
+   * Berichtigen statt wegwerfen (Nutzerwunsch 02.09.).
+   *
+   * Die Kennung einer Karte ist `frage ⟂ antwort` — jede Änderung ergibt eine
+   * andere, und an der alten hängt der Wiederholungsverlauf. „Löschen und neu
+   * eintippen" kostete deshalb die Wochen dahinter. `editOwnFact` zieht den
+   * Termin mit um; hier steht nur das Formular.
+   */
+  const e = editCopyFor(document.documentElement.lang)
+  const [editPrompt, setEditPrompt] = useState<string | undefined>(undefined)
+  const [draftPrompt, setDraftPrompt] = useState('')
+  const [draftAnswer, setDraftAnswer] = useState('')
+  const [editFailed, setEditFailed] = useState(false)
+
+  const applyEdit = (oldPrompt: string) => {
+    void editOwnFact(
+      language,
+      oldPrompt,
+      { prompt: draftPrompt, answer: draftAnswer },
+      platform.clock.now(),
+    )
+      .then((ok) => {
+        setEditFailed(!ok)
+        if (!ok) return
+        setEditPrompt(undefined)
+        changed()
+      })
+      .catch(() => setEditFailed(true))
   }
 
   const dictate = () => {
@@ -393,15 +426,70 @@ export function OwnPanel({
           <ul className="own-list">
             {stored.map((fact) => (
               <li key={fact.prompt} className="own-card">
-                <span className="own-card-text">
-                  {fact.prompt} · {fact.answer}
-                  <span className="own-card-state">
-                    {fresh.has(fact.prompt) ? texts.fresh : texts.scheduled}
-                  </span>
-                </span>
-                <button type="button" className="quiet" onClick={() => remove(fact.prompt)}>
-                  {texts.remove}
-                </button>
+                {editPrompt === fact.prompt ? (
+                  <form
+                    className="memory-edit"
+                    onSubmit={(event) => {
+                      event.preventDefault()
+                      applyEdit(fact.prompt)
+                    }}
+                  >
+                    <label className="own-field">
+                      <span>{e.question}</span>
+                      <input
+                        value={draftPrompt}
+                        onChange={(event) => setDraftPrompt(event.target.value)}
+                      />
+                    </label>
+                    <label className="own-field">
+                      <span>{e.answer}</span>
+                      <input
+                        value={draftAnswer}
+                        onChange={(event) => setDraftAnswer(event.target.value)}
+                      />
+                    </label>
+                    {editFailed && <p className="hint">{e.taken}</p>}
+                    <div className="note-actions">
+                      <button type="submit" className="quiet">
+                        {e.save}
+                      </button>
+                      <button
+                        type="button"
+                        className="quiet"
+                        onClick={() => {
+                          setEditPrompt(undefined)
+                          setEditFailed(false)
+                        }}
+                      >
+                        {e.cancel}
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <>
+                    <span className="own-card-text">
+                      {fact.prompt} · {fact.answer}
+                      <span className="own-card-state">
+                        {fresh.has(fact.prompt) ? texts.fresh : texts.scheduled}
+                      </span>
+                    </span>
+                    <button
+                      type="button"
+                      className="quiet"
+                      onClick={() => {
+                        setDraftPrompt(fact.prompt)
+                        setDraftAnswer(fact.answer)
+                        setEditFailed(false)
+                        setEditPrompt(fact.prompt)
+                      }}
+                    >
+                      {e.edit}
+                    </button>
+                    <button type="button" className="quiet" onClick={() => remove(fact.prompt)}>
+                      {texts.remove}
+                    </button>
+                  </>
+                )}
               </li>
             ))}
           </ul>
