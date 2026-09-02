@@ -177,6 +177,15 @@ intercambia el código de autorización de Google por tokens y mantiene la sesi�
 de tu navegador. La duración está fijada en un máximo de 180 días desde el inicio
 de sesión; el plazo **no** se prolonga con el uso.
 
+La pantalla de consentimiento de Google presenta el acceso a Drive en una
+casilla aparte que no viene marcada. Google le indica al worker, en su
+respuesta, si la marcaste; el worker guarda de ello **un sí o un no** en la
+misma sesión cifrada y transmite ese sí/no a la interfaz, nunca la lista de
+permisos de Google en sí. Solo así puede ANITEW decirte ya en el inicio de
+sesión que la casilla quedó vacía, en vez de dejar que lo descubras en el
+primer intento de guardado mediante un mensaje de error de Google. Sin esa
+marca todo permanece en tu dispositivo; no se pierde nada.
+
 Al tocar «Desconectar la cuenta de Google», la sincronización con Drive se apaga
 **de inmediato y de forma permanente** en el dispositivo y se retira la identidad
 de cuenta mostrada localmente. Si el worker es accesible, borra al mismo tiempo
