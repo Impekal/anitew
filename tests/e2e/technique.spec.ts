@@ -260,11 +260,38 @@ test('erklärt erst das Verfahren, dann die erste Ziffer (D5)', async ({ page })
   await startShort(page)
 
   await expect(page.locator('.lesson')).toBeVisible({ timeout: 30_000 })
-  await expect(page.getByText('Das Major-System')).toBeVisible()
-  // Das Beispiel muss in beide Richtungen dastehen: Wer nur 4–7 → „Rakete“
-  // liest, weiß immer noch nicht, wie er aus dem Bild die Ziffern zurückholt.
-  await expect(page.getByText(/Aus 4–7 wird r–k/)).toBeVisible()
-  await expect(page.getByText(/Rakete → r–k → 4–7/)).toBeVisible()
+  /*
+   * Der Name steht in seiner eigenen Zeile, nicht irgendwo auf dem Bildschirm.
+   *
+   * Vorher suchte der Test den Text frei; seit die Lektion auch erklärt, WAS
+   * das Major-System ist, kommt der Name zweimal vor — als Überschrift und im
+   * Erklärsatz. Frei gesucht ist das mehrdeutig. Gemeint war immer die
+   * Überschrift.
+   */
+  await expect(page.locator('.lesson .lesson-intro')).toHaveText('Das Major-System')
+  // Und die Erklärung selbst: was es ist, wozu es hilft — vor den Schritten.
+  await expect(page.locator('.lesson .lesson-what')).toHaveCount(2)
+  /*
+   * Das Beispiel muss in **beide Richtungen** dastehen: Wer nur 4–7 → „Rakete“
+   * liest, weiß immer noch nicht, wie er aus dem Bild die Ziffern zurückholt.
+   *
+   * Geprüft wird die Sache, nicht der Satz. Vorher standen hier zwei feste
+   * Wortlaute (`Aus 4–7 wird r–k`, `Rakete → r–k → 4–7`), und der Test wurde
+   * rot, als die Lektion auf Nutzerwunsch in einfachere Sprache umgeschrieben
+   * wurde — obwohl beide Richtungen weiterhin dastanden. Ein Test, der am
+   * Wortlaut hängt, verbietet das Umschreiben, statt den Anspruch zu sichern.
+   *
+   * Jetzt zählt die **Reihenfolge** innerhalb eines Schrittes: einmal Ziffern
+   * vor dem Wort, einmal das Wort vor den Ziffern. Wer eine der beiden
+   * Richtungen streicht, bekommt weiterhin Rot.
+   */
+  const schritte = await page.locator('.lesson-steps li').allTextContents()
+  const hinweg = schritte.some((schritt) => /4[\s\S]*7[\s\S]*Rakete/u.test(schritt))
+  const rueckweg = schritte.some((schritt) => /Rakete[\s\S]*4[\s\S]*7/u.test(schritt))
+  expect(hinweg, `keine Richtung Ziffern → Wort in:\n${schritte.join('\n')}`).toBe(true)
+  expect(rueckweg, `keine Richtung Wort → Ziffern in:\n${schritte.join('\n')}`).toBe(true)
+  // Und die Laute dazwischen — ohne sie ist „4–7 wird Rakete“ reine Behauptung.
+  expect(schritte.join(' ')).toMatch(/\br\b[\s\S]*\bk\b/u)
   // Und keine Ziffernkarte: Das Verfahren ist ein eigener Schritt.
   await expect(page.locator('.lesson-digit')).toHaveCount(0)
 

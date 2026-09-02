@@ -1093,6 +1093,30 @@ export function App() {
             onDemanding={() => {
               setMode('extended')
               closePage()
+              /*
+               * Den Blick mitnehmen (Gerätemeldung 01.09.).
+               *
+               * Gemeldet wurde: „‚lancer une séance exigeante‘ ramène au
+               * Core. Ça devrait plutôt conduire directement à l'écran où se
+               * trouvent les 15 Minutes afin qu'on clique sur commencer.“
+               *
+               * Der Knopf stellte die lange Einheit korrekt ein und schloss
+               * die Seite — nur landete man auf der Startseite, ohne dass
+               * etwas den Zusammenhang zeigte. In den Profilen, die hier
+               * fahrbar sind, stand der Startknopf im Bild; auf einem
+               * kleineren Fenster oder weiter unten gescrollt steht er es
+               * nicht. Statt zu raten, welches Gerät es war: Der Startknopf
+               * kommt jetzt immer ins Bild und bekommt den Fokus — dann sagt
+               * auch eine Vorlesehilfe, wo man gelandet ist.
+               *
+               * Nach dem Bild, nicht sofort: `closePage` räumt die Seite erst
+               * im nächsten Anstrich ab, vorher gibt es nichts zu scrollen.
+               */
+              requestAnimationFrame(() => {
+                const start = document.querySelector<HTMLButtonElement>('.challenge .start')
+                start?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+                start?.focus({ preventScroll: true })
+              })
             }}
           />
         ),

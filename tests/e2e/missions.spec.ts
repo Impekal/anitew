@@ -48,16 +48,30 @@ test('zeigt die Szene als Ganzes und fragt sie mit weltneutraler Semantik ab', a
   expect(person.length).toBeGreaterThan(1)
   const labels = await page.locator('.scene-facts dt').allTextContents()
   const values = await page.locator('.scene-facts dd').allTextContents()
-  expect(values).toHaveLength(4)
+  /*
+   * Fünf Zeilen, nicht vier.
+   *
+   * Bis zum Gerätebefund vom 01.09. standen Gegenstand und Position in
+   * **einer** Zeile unter „Dabei", durch „ · " getrennt — und die Position
+   * hatte keine eigene Beschriftung. Abgefragt wurden sie trotzdem einzeln:
+   * „Was hatte sie oder er dabei?" und „Wo lag der Gegenstand?". Wer die
+   * Szene ansieht, erfährt also nicht, dass die zweite Hälfte eine eigene
+   * Angabe ist, nach der gleich gefragt wird.
+   *
+   * Der Test erwartete das früher ausdrücklich so. Diese Erwartung war der
+   * Fehler, nicht der Anspruch: Der Anspruch ist unverändert, dass die Szene
+   * zeigt, was sie später abfragt.
+   */
+  expect(values).toHaveLength(5)
 
   const scene = new Map(
     labels.map((label, index) => [label.trim(), (values[index] ?? '').trim()]),
   )
   const number = scene.get('Nummer') as string
   const time = scene.get('Zeit') as string
-  const combinedObject = scene.get('Dabei') as string
+  const object = scene.get('Dabei') as string
+  const location = scene.get('Position') as string
   const place = scene.get('Ort') as string
-  const [object = '', location = ''] = combinedObject.split(' · ')
 
   // Hotel bleibt im Kern separat dreistellig regressionsgeprüft; zusätzliche
   // H4-Welten verwenden positive Nummern, die ein- bis dreistellig sein dürfen.
@@ -65,7 +79,9 @@ test('zeigt die Szene als Ganzes und fragt sie mit weltneutraler Semantik ab', a
   expect(time).toMatch(/^(0[6-9]|1[0-9]|2[0-3]):[0-5][05]$/)
   expect(object.split(' ')).toHaveLength(2)
   expect(location.length).toBeGreaterThan(5)
-  expect(combinedObject).toBe(`${object} · ${location}`)
+  // Der Gegenstand steht allein — die Position hat ihre eigene Zeile.
+  expect(object).not.toContain(' · ')
+  expect(location).not.toContain(' · ')
   expect(place.length).toBeGreaterThan(2)
 
   await expect(page.locator('.scene .face')).toBeVisible()

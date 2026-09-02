@@ -515,6 +515,16 @@ export const de = {
     denied: 'Benachrichtigungen sind für ANITEW abgelehnt. Das lässt sich nur in den Einstellungen des Browsers ändern — von hier aus geht es nicht.',
     ask: 'Benachrichtigungen erlauben',
     time: 'Uhrzeit',
+    /*
+      Wie die Uhrzeit einzugeben ist (Gerätemeldung 01.09.).
+
+      Gemeldet wurde: „on peut pas mettre ‚:‘ pour separer l'heure, seuls les
+      chiffres … et aucune indice“. Dass ein `input type="time"` nur Ziffern
+      annimmt und den Doppelpunkt selbst setzt, ist richtig — nur stand es
+      nirgends. Wer auf den Doppelpunkt wartet, bleibt bei einer halben
+      Eingabe stehen, und der Merken-Knopf ist dann stumm abgeschaltet.
+    */
+    timeHint: 'Nur Ziffern: erst die Stunde, dann die Minuten. Den Doppelpunkt setzt das Feld selbst — 07:15 tippst du als 0715.',
     save: 'Erinnerung merken',
     off: 'Keine Erinnerung',
     saved: 'Gemerkt.',
@@ -915,13 +925,15 @@ export const de = {
       Abruf.
     */
     method: {
+      what: 'Das Major-System ist eine Methode, um sich Zahlen zu merken — seit über zweihundert Jahren in Gebrauch. Der Gedanke dahinter: Ziffern sind schwer zu behalten, Bilder nicht.',
+      helps: 'Damit behältst du eine PIN, eine Telefonnummer, ein Datum, eine Hausnummer — alles, was aus Ziffern besteht.',
       steps: [
-        'Jede Ziffer bekommt einen festen Konsonanten: die Eins ein t, die Zwei ein n — zehn Ziffern, zehn Laute.',
-        'Vokale zählen nicht mit. Aus 4–7 wird r–k, daraus „Rakete“.',
-        'Das Bild bleibt. Beim Abruf liest du zurück: Rakete → r–k → 4–7.',
+        'Jede Ziffer steht für einen Laut. Die 1 ist ein t, die 2 ein n. Zehn Ziffern, zehn Laute — du lernst sie einzeln, nicht alle auf einmal.',
+        'Aus den Lauten machst du ein Wort. Vokale setzt du frei dazwischen: 4 und 7 sind r und k — daraus wird „Rakete“.',
+        'Das Wort ist ein Bild, und Bilder bleiben. Zum Erinnern liest du zurück: Rakete → r, k → 4, 7.',
       ],
-      build: 'Du lernst eine Ziffer nach der anderen. Die Wörter baust du selbst — vorgesetzte halten nicht.',
-      ready: 'Weiter zur Ziffer.',
+      build: 'Die Wörter baust du selbst. Ein Wort, das dir einfällt, sitzt fester als eines, das dir jemand vorsetzt.',
+      ready: 'Weiter zur ersten Ziffer.',
     },
     /*
       Steht über **jeder** Ziffernlektion.

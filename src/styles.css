@@ -1481,6 +1481,16 @@ body::before {
   color: var(--ink);
 }
 
+/* Was das Major-System ist und wozu es hilft — zwei ruhige Zeilen zwischen
+   dem Namen und den Schritten. Etwas kleiner als der Name und etwas größer
+   als die Schritte: Es ist die Antwort auf „worum geht es hier überhaupt",
+   und die liest man vor der Anleitung. */
+.lesson-what {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
 .lesson-steps {
   margin: 0;
   padding-left: 1.1rem;

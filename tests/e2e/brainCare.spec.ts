@@ -51,7 +51,24 @@ test('der Bereich fuehrt ins fordernde Training statt daneben ein zweites zu bau
   await page.getByRole('button', { name: 'Fordernde Einheit starten' }).click()
   await expect(page.locator('.page')).toBeHidden()
   await expect(page.locator('.mode-active')).toHaveText(/15 Minuten/)
-  await expect(startButton(page)).toBeVisible()
+
+  /*
+   * Im Bild, nicht bloß vorhanden (Gerätemeldung 01.09.).
+   *
+   * Gemeldet wurde: „‚lancer une séance exigeante‘ ramène au Core. Ça devrait
+   * plutôt conduire directement à l'écran où se trouvent les 15 Minutes afin
+   * qu'on clique sur commencer.“
+   *
+   * Der Knopf stellte die lange Einheit korrekt ein — nur landete man oben
+   * auf der Startseite, und der Startknopf stand darunter, außerhalb des
+   * Bildes. Auf dem Telefon sah das aus wie „nichts passiert".
+   *
+   * Dass der bisherige `toBeVisible()` das durchgehen ließ, ist kein Zufall:
+   * Bei Playwright heißt sichtbar „hat eine Fläche und ist nicht versteckt" —
+   * ein weggescrolltes Element erfüllt das. `toBeInViewport()` prüft, was der
+   * Mensch sieht. Der alte Anspruch war zu schwach, nicht falsch.
+   */
+  await expect(startButton(page)).toBeInViewport()
 })
 
 test('der Tipp des Tages kommt einmal, geht weg und blockiert nichts', async ({ page }) => {
