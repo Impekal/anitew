@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 
-import { memoryClusters, type MemoryGraph, type MemoryNodeType } from '../core/index.ts'
+import { createRng, memoryClusters, type MemoryGraph, type MemoryNodeType } from '../core/index.ts'
 
 /**
  * Die Memory-Constellation (D-036) — echte Daten, kein Dekor.
@@ -18,6 +18,95 @@ import { memoryClusters, type MemoryGraph, type MemoryNodeType } from '../core/i
  */
 
 const GOLDEN_ANGLE = 137.50776405003785
+
+/**
+ * Das neuronale Netz im Hintergrund (Nutzerwunsch 02.09.).
+ *
+ * Wörtlich: „Mit Verbindungslinien meinte ich vor allem Design (wie die
+ * neuronalen im Hintergrund), abgesehen von den tatsächlichen Verbindungen
+ * zwischen den Begriffen."
+ *
+ * Das ist die Unterscheidung, auf die es hier ankommt — und sie ist im Bild
+ * angelegt, nicht nur im Kommentar:
+ *
+ * - Diese Linien **berühren keinen einzigen Erinnerungspunkt.** Sie liegen
+ *   auf einem eigenen Raster, das nur von der Größe der Fläche abhängt und
+ *   von keiner Erinnerung. Sie können deshalb gar nicht als Verbindung
+ *   zwischen zwei Begriffen missverstanden werden.
+ * - Sie sind ein Vielfaches blasser als eine echte Verbindung und liegen
+ *   hinter allem, in derselben Gruppe wie die beiden Ringe.
+ * - Sie **bewegen sich nicht.** Das Bewegungsbudget der Startseite bleibt bei
+ *   22, davon 0 zeichnend. Ein Hintergrund, der blinkt, ist ein Hintergrund,
+ *   der stört — und auf einem Telefon ist er Wärme.
+ *
+ * Die Anordnung kommt aus einem festen Seed (A11, kein `Math.random()`):
+ * dasselbe Netz heute wie morgen.
+ */
+function Netz({ hoehe }: { hoehe: number }) {
+  const punkte = useMemo(() => {
+    const rng = createRng(`constellation-web:${hoehe}`)
+    return Array.from({ length: 16 }, () => ({
+      x: 3 + rng.next() * 94,
+      y: hoehe * (0.08 + rng.next() * 0.84),
+    }))
+  }, [hoehe])
+
+  const linien = useMemo(() => {
+    const wege: { x1: number; y1: number; x2: number; y2: number }[] = []
+    punkte.forEach((eins, i) => {
+      // Je Punkt die zwei nächsten Nachbarn — mehr wird ein Gitter, weniger
+      // eine Perlenkette.
+      const nachbarn = punkte
+        .map((zwei, j) => ({ zwei, j, weit: Math.hypot(eins.x - zwei.x, (eins.y - zwei.y) * 2) }))
+        .filter((eintrag) => eintrag.j !== i)
+        .sort((a, b) => a.weit - b.weit)
+        .slice(0, 2)
+      for (const { zwei, j } of nachbarn) {
+        if (j < i) continue
+        wege.push({ x1: eins.x, y1: eins.y, x2: zwei.x, y2: zwei.y })
+      }
+    })
+    return wege
+  }, [punkte])
+
+  return (
+    /*
+      Farbe und Strichstärke stehen an der Gruppe, nicht an jeder Linie: In
+      SVG erben Kinder diese Angaben, das sind einmal rund vierzig Zeichen
+      statt sechzehnmal. Und sie stehen hier statt im Stylesheet, weil das
+      CSS-Budget am 02.09. bei genau 12,0 von 12 KB stand — zwei neue Regeln
+      haben es gerissen.
+
+      Die Werte sind bewusst schwächer als eine echte Verbindung
+      (`.constellation-edge`) und schwächer als ein Erinnerungspunkt: Das Netz
+      soll zu spüren sein, nicht zu lesen.
+    */
+    <g
+      className="constellation-web"
+      stroke="rgba(140, 207, 192, .26)"
+      strokeWidth="0.22"
+      fill="rgba(216, 168, 90, .22)"
+    >
+      {linien.map((weg) => (
+        <line
+          key={`${weg.x1},${weg.y1},${weg.x2},${weg.y2}`}
+          x1={weg.x1}
+          y1={weg.y1}
+          x2={weg.x2}
+          y2={weg.y2}
+        />
+      ))}
+      {punkte.map((punkt) => (
+        <circle
+          key={`${punkt.x},${punkt.y}`}
+          cx={punkt.x}
+          cy={punkt.y}
+          r="0.55"
+        />
+      ))}
+    </g>
+  )
+}
 
 interface Placed {
   readonly id: string
@@ -42,6 +131,17 @@ export const MAX_VISIBLE_MEMORY_NODES = 72
  * raten und hinterher zu sehen, dass zwei sich überschreiben.
  */
 const EINHEITEN_JE_ZEICHEN = 2.1
+
+/**
+ * Luft zwischen dem äußersten Namen und dem Rand des Kastens, in
+ * Zeicheneinheiten.
+ *
+ * Ohne sie lag der erste Name gemessen bei x = 8 Pixeln, während der Kasten
+ * bei 12 beginnt — `overflow: hidden` schnitt „Ticket Ba" weg. Eine Rechnung,
+ * die auf den Millimeter aufgeht, geht beim ersten breiten Buchstaben nicht
+ * mehr auf.
+ */
+const BAND_LUFT = 2
 
 function kurz(label: string, maxZeichen: number): string {
   return label.length <= maxZeichen ? label : `${label.slice(0, maxZeichen - 1).trimEnd()}…`
@@ -136,12 +236,30 @@ function layout(graph: MemoryGraph, tappable: boolean, selectedId?: string): Pla
    *
    * Nur für das schmückende Band. Auf der Gedächtnis-Seite ist jeder Punkt
    * ein Knopf mit Trefferfläche; dort bleibt der Kranz.
+   *
+   * Mehr als vierundzwanzig Punkte nimmt das Band nicht: Ab da ist der
+   * Abstand kleiner als ein Punkt breit ist, und aus der Konstellation wird
+   * eine Perlenschnur. Der ganze Bestand steht in „Mein Gedächtnis".
    */
-  const alleEinzeln = !tappable && clusters.length > 2 && clusters.every((c) => c.nodes.length === 1)
-  if (alleEinzeln) {
+  if (!tappable && clusters.length > 2) {
+    /*
+     * Die Zeilen gelten für **jedes** Band, nicht nur für den unverbundenen
+     * Stand — und das war ein Fund im Bild, kein Vorsatz.
+     *
+     * Der erste Anlauf griff nur, solange gar nichts verbunden war. Kaum stand
+     * **eine** Verbindung, fiel die Anordnung auf den Cluster-Kranz zurück,
+     * und mit ihm kamen Überlappung und abgeschnittene Namen sofort wieder.
+     * Und Verbindungen entstehen jetzt laufend — das Verbinden von Hand kam
+     * im selben Zug dazu. Eine Behebung, die genau so lange hält, bis jemand
+     * die neue Funktion benutzt, ist keine.
+     *
+     * Die Reihenfolge folgt den Clustern: Was zusammengehört, steht
+     * nebeneinander, und die echten Verbindungslinien laufen dadurch kurze
+     * Wege statt quer über das Band.
+     */
     const einzeln = clusters
-      .map((cluster) => cluster.anchor)
-      .sort((a, b) => a.createdAt - b.createdAt || a.id.localeCompare(b.id))
+      .flatMap((cluster) => [...cluster.nodes].sort((a, b) => a.createdAt - b.createdAt))
+      .slice(0, 24)
     /*
      * Wie lang darf ein Name sein, damit nichts überschreibt und nichts
      * abgeschnitten wird? Das ist eine Gleichung, keine Schätzung.
@@ -151,12 +269,18 @@ function layout(graph: MemoryGraph, tappable: boolean, selectedId?: string): Pla
      * w/2 Platz, sonst ragt der äußerste aus dem Bild. Also:
      *
      *     Schritt = (100 − w) / (n − 1)     und    3 × Schritt ≥ w
-     *     ⟹  300 − 3w ≥ w·(n−1)  ⟹  w ≤ 300 / (n + 2)
+     *     ⟹  300 − 3w ≥ w·(n−1)  ⟹  w ≤ (300 − 6·L) / (n + 2)
+     *
+     * `L` ist die Luft am Rand. Sie steht hier, weil die erste Fassung ohne
+     * sie gemessen abgeschnitten wurde: Der äußerste Name lag bei x = 8
+     * Pixeln, der Kasten beginnt bei 12, und `overflow: hidden` nahm den Rest.
+     * Die 2,1 Einheiten je Zeichen sind ein Mittelwert — bei breiten
+     * Buchstaben reicht er nicht, und dann fehlt ein halbes Wort.
      *
      * Beim ersten Versuch stand hier eine geratene Zahl (14 Zeichen), und
      * gemessen überschrieben sich zwei Namen um 13 Pixel.
      */
-    const breite = 300 / (einzeln.length + 2)
+    const breite = (300 - 6 * BAND_LUFT) / (einzeln.length + 2)
     const nurJedeZweite = Math.floor(breite / EINHEITEN_JE_ZEICHEN) < 8
     const maxZeichen = Math.min(
       18,
@@ -168,8 +292,8 @@ function layout(graph: MemoryGraph, tappable: boolean, selectedId?: string): Pla
         ),
       ),
     )
-    // Derselbe Rand links wie rechts — die halbe Namensbreite.
-    const rand = Math.min(24, (maxZeichen * EINHEITEN_JE_ZEICHEN) / 2)
+    // Derselbe Rand links wie rechts — die halbe Namensbreite plus Luft.
+    const rand = Math.min(26, (maxZeichen * EINHEITEN_JE_ZEICHEN) / 2 + BAND_LUFT)
     const schritt = einzeln.length === 1 ? 0 : (100 - 2 * rand) / (einzeln.length - 1)
     /*
      * **Drei** Zeilen, reihum — und daraus folgt alles Weitere.
@@ -274,6 +398,7 @@ export function MemoryConstellation({
         aria-label={onSelect === undefined ? undefined : ariaLabel}
       >
         <g className="constellation-atmosphere" aria-hidden="true">
+          <Netz hoehe={raum.hoehe} />
           <ellipse cx="50" cy={raum.mitte} rx="46" ry={46 * raum.flach} className="constellation-orbit constellation-orbit-outer" />
           <ellipse cx="50" cy={raum.mitte} rx="33" ry={33 * raum.flach} className="constellation-orbit constellation-orbit-inner" />
         </g>
