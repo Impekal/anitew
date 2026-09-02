@@ -175,6 +175,15 @@ Google — cifrada num cookie `HttpOnly` do teu navegador. A duração está fix
 num máximo de 180 dias a contar do início de sessão; o prazo **não** é prolongado
 pelo uso.
 
+O ecrã de consentimento da Google apresenta o acesso ao Drive numa caixa
+separada, que não vem marcada. Se a marcaste, a Google di-lo ao worker na sua
+resposta; o worker guarda disso **um sim ou um não** na mesma sessão cifrada e
+transmite esse sim/não à interface — nunca a lista de autorizações da Google.
+Só assim a ANITEW te pode dizer logo no início de sessão que a caixa ficou
+vazia, em vez de te deixar descobrir isso na primeira tentativa de gravação
+através de uma mensagem de erro da Google. Sem essa marca tudo fica no teu
+aparelho; nada se perde.
+
 Ao tocares em «Desligar conta Google», a sincronização com o Drive é desligada
 **de imediato e de forma permanente** no aparelho e a identidade de conta
 mostrada localmente é removida. Se o worker estiver acessível, apaga ao mesmo

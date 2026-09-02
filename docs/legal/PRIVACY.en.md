@@ -169,6 +169,15 @@ keeps the session — including the Google refresh token — encrypted in an
 `HttpOnly` cookie of your browser. The lifetime is fixed at a maximum of 180 days
 from sign-in; the period is **not** extended by use.
 
+Google's consent screen lists Drive access as a separate box that is not
+ticked in advance. Whether you ticked it is something Google tells the worker
+in its reply; the worker keeps **a yes or no** about it in the same encrypted
+session and passes that yes/no on to the interface — never Google's list of
+permissions itself. Only this way can ANITEW tell you right at sign-in that
+the box stayed empty, instead of letting you find out at the first save
+attempt through an error message from Google. Without that tick everything
+stays on your device; nothing is lost.
+
 When you tap “Disconnect Google account”, the Drive sync is switched off
 **immediately and permanently** on the device and the locally shown account
 identity is removed. If the worker is reachable, it also deletes the HttpOnly

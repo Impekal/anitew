@@ -9,10 +9,17 @@ import { takeDriveRedirectNotice } from './driveRedirectNotice.ts'
 
 const platform = createWebPlatform()
 
+/** Die Kennung aus `requestDriveToken`, wenn Google die Drive-Freigabe nicht mitgab. */
+const SCOPE_MISSING = 'drive_scope_missing'
+
 /* Dieselbe Quelle wie der Drive-Bildschirm — sechs Sprachen, keine Insel. */
-function copy(): { connected: string; failed: string } {
+function copy(): { connected: string; failed: string; boxMissing: string } {
   const texts = driveCopyForCurrentUi()
-  return { connected: texts.redirectConnected, failed: texts.redirectFailed }
+  return {
+    connected: texts.redirectConnected,
+    failed: texts.redirectFailed,
+    boxMissing: texts.boxMissing,
+  }
 }
 
 let applying = false
@@ -29,7 +36,16 @@ async function applyFeedback(): Promise<void> {
     const notice = takeDriveRedirectNotice()
     if (notice?.kind === 'error') {
       status.dataset.error = 'true'
-      status.textContent = `${copy().failed} · ${notice.detail}`
+      /*
+       * Das leere Drive-Kästchen ist keine gescheiterte Anmeldung — sie hat
+       * geklappt. „Google-Anmeldung konnte nicht abgeschlossen werden ·
+       * drive_scope_missing" wäre hier gleich zweimal irreführend: falsch in
+       * der Sache und ein Kürzel statt einer Auskunft.
+       */
+      status.textContent =
+        notice.detail === SCOPE_MISSING
+          ? copy().boxMissing
+          : `${copy().failed} · ${notice.detail}`
       return
     }
 

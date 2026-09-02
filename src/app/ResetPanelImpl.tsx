@@ -29,6 +29,29 @@ function resetCopy(): ResetCopy {
   return resetCopyFor(document.documentElement.lang)
 }
 
+/**
+ * Wartet auf ein Versprechen — aber nicht ewig.
+ *
+ * `Promise.race` gegen einen Zeitgeber: Was zuerst fertig ist, gewinnt. Das
+ * hängende Versprechen läuft im Hintergrund weiter, es interessiert nur
+ * niemanden mehr. Ein `AbortController` wäre sauberer, aber `fetch` steckt
+ * hier zwei Schichten tiefer in `drive.ts`, und eine Frist an der richtigen
+ * Stelle ist besser als ein Umbau an der falschen.
+ */
+async function mitFrist<T>(arbeit: Promise<T>, ms: number): Promise<T> {
+  let zeitgeber: ReturnType<typeof setTimeout> | undefined
+  try {
+    return await Promise.race([
+      arbeit,
+      new Promise<never>((_, ablehnen) => {
+        zeitgeber = setTimeout(() => ablehnen(new Error('drive_timeout')), ms)
+      }),
+    ])
+  } finally {
+    if (zeitgeber !== undefined) clearTimeout(zeitgeber)
+  }
+}
+
 export function ResetPanelImpl({
   platform,
   dictionary,
@@ -42,6 +65,14 @@ export function ResetPanelImpl({
   const [wipeDrive, setWipeDrive] = useState(false)
   const [wipePhrase, setWipePhrase] = useState('')
   const [busy, setBusy] = useState(false)
+  /** Wurde gelöscht gedrückt, ohne dass das Wort dasteht? */
+  const [missingPhrase, setMissingPhrase] = useState(false)
+  /*
+   * Zählt die Löschversuche. Ein Abbruch erhöht ihn, und ein noch laufender
+   * Versuch erkennt daran, dass er nicht mehr gemeint ist: Er schreibt dann
+   * weder eine Fehlermeldung noch springt er auf die nackte App.
+   */
+  const laufenderVersuch = useRef(0)
   const [failed, setFailed] = useState<string | undefined>(undefined)
   const phraseField = useRef<HTMLInputElement>(null)
   const goButton = useRef<HTMLButtonElement>(null)
@@ -65,18 +96,27 @@ export function ResetPanelImpl({
    * Absicht (PRIVACY §8). Unbequem heißt aber „man muss etwas Bewusstes tun",
    * nicht „man muss erraten, dass es weiter unten weitergeht".
    *
-   * Der Fokus liegt danach im Feld, damit ohne Suchen klar ist, was jetzt
-   * dran ist.
+   * ── Warum hier **kein** Fokus mehr gesetzt wird (02.09.) ────────────────
+   *
+   * Bis zum 02.09. sprang der Fokus von selbst ins Feld. Gut gemeint: ohne
+   * Suchen ist klar, was dran ist. Auf einem Telefon fährt dadurch aber die
+   * Tastatur hoch — und der **erste** Tipp daneben schließt nur sie. Er
+   * erreicht keinen Knopf.
+   *
+   * Genau so wurde es gemeldet: „Ich drücke vergebens auf tout supprimer,
+   * passiert nichts, und auch auf annuler, nada!" Der Tipp kam an. Er schloss
+   * die Tastatur.
+   *
+   * Das Feld ins Bild zu holen bleibt — das war die Behebung von vorher und
+   * sie stimmt. Wer tippen will, tippt das Feld an; dann öffnet die Tastatur
+   * auf eine Absicht hin und nicht gegen eine.
    */
   useEffect(() => {
     if (!confirmWipe) return
-    const field = phraseField.current
-    if (field === null) return
-    field.scrollIntoView({
+    phraseField.current?.scrollIntoView({
       behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
       block: 'center',
     })
-    field.focus({ preventScroll: true })
   }, [confirmWipe])
 
   const phraseComplete = wipePhrase.trim().toUpperCase() === 'ANITEW'
@@ -101,15 +141,62 @@ export function ResetPanelImpl({
     })
   }, [confirmWipe, phraseComplete])
 
+  /**
+   * Wie lange auf Google gewartet wird, bevor die App etwas sagt.
+   *
+   * Vorher gab es **keine** Frist. Der Nutzerbefund vom 02.09. las sich
+   * zunächst wie zwei Fehler („Alles löschen tut nichts", „Abbrechen auch
+   * nicht") und war einer: `disabled={busy}` steht auf beiden Knöpfen. Wer
+   * „auch im Drive löschen" anhakt, schickt eine Anfrage los; antwortet
+   * Google nicht, bleibt `busy` für immer wahr — und der Bildschirm ist tot,
+   * ohne Spinner, ohne Satz, ohne Ausweg.
+   *
+   * Zwanzig Sekunden sind lang genug für eine müde Mobilverbindung und kurz
+   * genug, dass niemand sie für einen Absturz hält.
+   */
+  const DRIVE_FRIST_MS = 20_000
+
   const resetFromScratch = async () => {
     setBusy(true)
     setFailed(undefined)
+    const versuch = ++laufenderVersuch.current
     try {
       const drive = await import('../platform/web/drive.ts')
       if (wipeDrive) {
         const clientId = await resolveClientId(platform.settings)
-        const token = await drive.requestDriveToken(clientId, true)
-        await drive.deleteDriveBackup(token)
+        /*
+         * Der Netzteil bekommt eine Frist. Alles danach ist lokal und schnell.
+         *
+         * Wichtig ist die Reihenfolge: Erst Google, dann löschen. Wäre es
+         * umgekehrt, stünde man nach einer hängenden Anfrage ohne lokale Daten
+         * und ohne gelöschte Sicherung da — das Schlechteste von beidem.
+         */
+        await mitFrist(
+          (async () => {
+            let token: string
+            try {
+              token = await drive.requestDriveToken(clientId, true)
+            } catch (fehler) {
+              /*
+               * Ohne erteilte Drive-Freigabe liegt in Google Drive nichts von
+               * ANITEW — es gibt also nichts zu löschen. Hier einen Fehler zu
+               * zeigen hieße, jemandem eine gescheiterte Cloud-Löschung zu
+               * melden, der nie eine Cloud-Kopie hatte.
+               */
+              if (
+                typeof fehler === 'object' &&
+                fehler !== null &&
+                (fehler as { detail?: unknown }).detail === 'drive_scope_missing'
+              ) {
+                return
+              }
+              throw fehler
+            }
+            await drive.deleteDriveBackup(token)
+          })(),
+          DRIVE_FRIST_MS,
+        )
+        if (laufenderVersuch.current !== versuch) return
       }
       await wipeEverything()
       try {
@@ -126,9 +213,12 @@ export function ResetPanelImpl({
        * wird. Der Drive-Abgleich selbst ist durch die geleerte DB schon aus.
        */
       await disconnectGoogleAuthorization()
+      if (laufenderVersuch.current !== versuch) return
       // Neustart auf der nackten App — wie nach der ersten Installation.
       window.location.replace('/')
     } catch {
+      // Wer inzwischen abgebrochen hat, will keine Fehlermeldung mehr sehen.
+      if (laufenderVersuch.current !== versuch) return
       setFailed(wipeDrive ? reset.cloudFailed : t.failed)
       setBusy(false)
     }
@@ -162,28 +252,82 @@ export function ResetPanelImpl({
               value={wipePhrase}
               autoComplete="off"
               spellCheck={false}
-              onChange={(event) => setWipePhrase(event.target.value)}
+              onChange={(event) => {
+                setWipePhrase(event.target.value)
+                setMissingPhrase(false)
+              }}
               disabled={busy}
             />
           </label>
+          {missingPhrase && (
+            <p className="hint wipe-missing" role="alert">
+              {reset.type}
+            </p>
+          )}
+          {/*
+            Dass gearbeitet wird, muss man sehen. Vorher war der einzige
+            Unterschied, dass die Knöpfe nicht mehr reagierten — und das sieht
+            von außen genauso aus wie eine kaputte App.
+          */}
+          {busy && (
+            <p className="hint wipe-busy" role="status">
+              {reset.working}
+            </p>
+          )}
           <div className="backup-actions">
+            {/*
+              Nicht gesperrt, sondern auskunftsfähig (Gerätebefund 02.09.).
+
+              Vorher stand hier `disabled={busy || !phraseComplete}`. Am Gerät
+              hieß das: Der Knopf mit dem leuchtenden Rahmen sieht aus wie die
+              Hauptaktion, und wer ihn drückt, bekommt nichts — keinen
+              Hinweis, keine Bewegung, keine Auskunft, was fehlt. Ein
+              gesperrter Knopf ist eine Auskunft, die niemand hört.
+
+              Gelöscht wird weiterhin **nur** mit dem getippten Wort. Der
+              Unterschied ist, dass die Bedingung jetzt gesagt wird, statt
+              stumm zu gelten — und der Fokus springt dann ins Feld, weil ihn
+              diesmal jemand angefordert hat.
+            */}
             <button
               ref={goButton}
               type="button"
               className="quiet wipe-go"
-              disabled={busy || !phraseComplete}
-              onClick={() => void resetFromScratch()}
+              disabled={busy}
+              onClick={() => {
+                if (!phraseComplete) {
+                  setMissingPhrase(true)
+                  phraseField.current?.focus()
+                  return
+                }
+                void resetFromScratch()
+              }}
             >
               {t.wipe}
             </button>
+            {/*
+              Abbrechen ist **nie** gesperrt (Gerätebefund 02.09.).
+
+              Hier stand `disabled={busy}`. Zusammen mit derselben Sperre am
+              Löschknopf ergab das den gemeldeten Zustand: Wer „auch im Drive
+              löschen" angehakt hatte und auf ein stummes Google traf, saß vor
+              zwei toten Knöpfen. Abbrechen ist nichts Zerstörerisches — es
+              muss immer gehen, gerade dann.
+
+              Der Abbruch erhöht die Versuchsnummer; ein noch laufender
+              Versuch sieht daran, dass er nicht mehr gemeint ist.
+            */}
             <button
               type="button"
               className="quiet"
-              disabled={busy}
               onClick={() => {
+                laufenderVersuch.current += 1
+                setBusy(false)
                 setConfirmWipe(false)
                 setWipeDrive(false)
                 setWipePhrase('')
+                setMissingPhrase(false)
+                setFailed(undefined)
               }}
             >
               {t.wipeCancel}

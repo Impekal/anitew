@@ -176,6 +176,15 @@ aggiornamento Google — cifrata in un cookie `HttpOnly` del tuo browser. La dur
 è fissata a un massimo di 180 giorni dall'accesso; il termine **non** viene
 prolungato dall'uso.
 
+La schermata di consenso di Google presenta l'accesso a Drive in una casella
+separata, non selezionata di default. Se l'hai selezionata, Google lo comunica
+al worker nella sua risposta; il worker ne conserva **un sì o un no** nella
+stessa sessione cifrata e passa questo sì/no all'interfaccia — mai l'elenco
+delle autorizzazioni di Google. Solo così ANITEW può dirti già all'accesso che
+la casella è rimasta vuota, invece di lasciartelo scoprire al primo tentativo
+di salvataggio con un messaggio di errore di Google. Senza quella spunta tutto
+resta sul tuo dispositivo; non si perde nulla.
+
 Toccando «Scollega account Google», la sincronizzazione con Drive viene spenta
 **immediatamente e in modo permanente** sul dispositivo e l'identità dell'account
 mostrata localmente viene rimossa. Se il worker è raggiungibile, cancella

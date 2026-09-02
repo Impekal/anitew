@@ -21,6 +21,8 @@ export interface ResetCopy {
   keepCloud: string
   type: string
   cloudFailed: string
+  /** Steht sichtbar da, solange gelöscht wird — sonst sieht Warten wie Kaputt aus. */
+  working: string
 }
 
 export interface SupportCopy {
@@ -45,6 +47,7 @@ const RESET: Record<string, ResetCopy> = {
     keepCloud:
       'Ohne diesen Haken bleibt die Drive-Sicherung erhalten und kann bei einer späteren Anmeldung wieder eingelesen werden.',
     type: 'Zur endgültigen Bestätigung ANITEW eingeben.',
+    working: 'Wird gelöscht … Google kann einen Moment brauchen. Abbrechen geht jederzeit.',
     cloudFailed:
       'Die ANITEW-Sicherung in Google Drive konnte nicht gelöscht werden. Lokal wurde deshalb noch nichts gelöscht.',
   },
@@ -58,6 +61,7 @@ const RESET: Record<string, ResetCopy> = {
     keepCloud:
       'Without this tick the Drive backup stays and can be read back on a later sign-in.',
     type: 'Type ANITEW to confirm permanently.',
+    working: 'Deleting … Google may take a moment. You can cancel at any time.',
     cloudFailed:
       'The ANITEW backup in Google Drive could not be deleted. Nothing was deleted locally.',
   },
@@ -71,6 +75,7 @@ const RESET: Record<string, ResetCopy> = {
     keepCloud:
       'Sans cette case, la sauvegarde Drive reste et pourra être relue lors d’une prochaine connexion.',
     type: 'Saisis ANITEW pour confirmer définitivement.',
+    working: 'Suppression en cours … Google peut prendre un moment. Tu peux annuler à tout instant.',
     cloudFailed:
       'La sauvegarde ANITEW dans Google Drive n’a pas pu être supprimée. Rien n’a donc encore été supprimé en local.',
   },
@@ -84,6 +89,7 @@ const RESET: Record<string, ResetCopy> = {
     keepCloud:
       'Sin esta casilla, la copia en Drive se mantiene y podrá leerse de nuevo en un inicio de sesión posterior.',
     type: 'Escribe ANITEW para confirmar de forma definitiva.',
+    working: 'Borrando … Google puede tardar un momento. Puedes cancelar en cualquier momento.',
     cloudFailed:
       'No se pudo borrar la copia de ANITEW en Google Drive. Por eso todavía no se ha borrado nada en local.',
   },
@@ -97,6 +103,7 @@ const RESET: Record<string, ResetCopy> = {
     keepCloud:
       'Senza questa spunta il backup su Drive resta e potrà essere riletto a un accesso successivo.',
     type: 'Scrivi ANITEW per confermare in modo definitivo.',
+    working: 'Cancellazione in corso … Google può metterci un attimo. Puoi annullare quando vuoi.',
     cloudFailed:
       'Non è stato possibile cancellare il backup ANITEW in Google Drive. Per questo in locale non è stato ancora cancellato nulla.',
   },
@@ -110,6 +117,7 @@ const RESET: Record<string, ResetCopy> = {
     keepCloud:
       'Sem esta marca, a cópia no Drive mantém-se e pode ser lida de novo num início de sessão posterior.',
     type: 'Escreve ANITEW para confirmar definitivamente.',
+    working: 'A apagar … O Google pode demorar um momento. Podes cancelar a qualquer altura.',
     cloudFailed:
       'Não foi possível apagar a cópia da ANITEW no Google Drive. Por isso ainda não foi apagado nada em local.',
   },

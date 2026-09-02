@@ -107,10 +107,31 @@ export async function requestDriveToken(
   }
   if (!response.ok) throw new DriveError('drive', `oauth_worker_http_${response.status}`)
 
-  const body = (await response.json().catch(() => ({}))) as { access_token?: unknown }
+  const body = (await response.json().catch(() => ({}))) as {
+    access_token?: unknown
+    drive_granted?: unknown
+  }
   if (typeof body.access_token !== 'string' || body.access_token === '') {
     throw new DriveError('drive', 'oauth_access_token_missing')
   }
+  /*
+   * Das leere Kästchen, vor dem ersten Schreibversuch (Gerätebild 02.09.).
+   *
+   * Googles Zustimmungsbildschirm führt `drive.file` als eigenes, anfangs
+   * leeres Kästchen. Bleibt es leer, ist die Anmeldung gültig — nur ohne
+   * Drive. Vorher fiel das erst beim ersten Zugriff auf, als
+   * `drive_403_insufficientPermissions`: Googles Kürzel auf einem
+   * Bildschirm, der von Anmeldung sprach.
+   *
+   * `blocked`, nicht `denied`: `denied` heißt in `driveSyncImpl` „Sitzung
+   * weg" und schickt sofort und wortlos zu Google zurück. Die Sitzung ist
+   * hier aber gültig. Zurück muss man trotzdem — aber wissend, was fehlt.
+   *
+   * Nur ein ausdrückliches `false` hält an. Sitzungen aus der Zeit vor
+   * dieser Auskunft tragen das Feld nicht; ihnen die Freigabe abzusprechen
+   * wäre eine erfundene Auskunft.
+   */
+  if (body.drive_granted === false) throw new DriveError('blocked', 'drive_scope_missing')
   return body.access_token
 }
 

@@ -174,6 +174,15 @@ des Google-Refresh-Tokens — verschlüsselt in einem `HttpOnly`-Cookie deines
 Browsers. Die Laufzeit ist ab Anmeldung fest auf höchstens 180 Tage begrenzt;
 die Frist wird durch Nutzung **nicht** verlängert.
 
+Googles Zustimmungsbildschirm führt den Drive-Zugriff als eigenes, nicht
+vorausgewähltes Kästchen. Ob du es angehakt hast, sagt Google dem Worker in
+seiner Antwort; der Worker merkt sich davon **ein Ja oder Nein** in derselben
+verschlüsselten Sitzung und gibt dieses Ja/Nein an die Oberfläche weiter —
+nie Googles Freigabeliste selbst. Nur dadurch kann ANITEW dir gleich bei der
+Anmeldung sagen, dass das Kästchen leer geblieben ist, statt dich das beim
+ersten Speicherversuch an einer Fehlermeldung von Google merken zu lassen.
+Ohne dieses Häkchen bleibt alles auf deinem Gerät; verloren geht nichts.
+
 Beim Antippen von „Google-Konto trennen“ wird der Drive-Abgleich auf dem Gerät
 **sofort dauerhaft ausgeschaltet** und die lokal angezeigte Kontoidentität
 entfernt. Ist der Worker erreichbar, löscht er dabei zugleich den HttpOnly-

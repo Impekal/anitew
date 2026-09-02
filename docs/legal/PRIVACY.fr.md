@@ -177,6 +177,15 @@ jeton de rafraîchissement Google — chiffrée dans un cookie `HttpOnly` de ton
 navigateur. La durée est fixée à 180 jours au maximum à compter de la connexion ;
 elle n'est **pas** prolongée par l'usage.
 
+L'écran de consentement de Google présente l'accès à Drive dans une case
+distincte, non cochée par défaut. Google indique au worker, dans sa réponse,
+si tu l'as cochée ; le worker en retient **un oui ou un non** dans la même
+session chiffrée et transmet ce oui/non à l'interface — jamais la liste
+d'autorisations de Google elle-même. C'est ainsi seulement qu'ANITEW peut te
+dire dès la connexion que la case est restée vide, au lieu de te le laisser
+découvrir au premier enregistrement par un message d'erreur de Google. Sans
+cette coche, tout reste sur ton appareil ; rien n'est perdu.
+
 Lorsque tu touches « Déconnecter le compte Google », la synchronisation Drive
 est coupée **immédiatement et durablement** sur l'appareil et l'identité de
 compte affichée localement est retirée. Si le worker est joignable, il supprime
