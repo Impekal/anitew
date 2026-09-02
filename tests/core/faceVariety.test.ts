@@ -117,15 +117,41 @@ describe('Gesichter einer Runde (Gerätemeldung 01.09.)', () => {
       mouth: 'straight',
       glasses: false,
       ears: 1.0446224661311134,
+      /*
+       * Ab hier die Merkmale, die am 02.09. dazugekommen sind, weil die
+       * Gesichter sich zu ähnlich sahen (Kopfform, Augenform, Brauenschwung,
+       * Nasenlänge, Mundbreite, Alter, Lage der Züge).
+       *
+       * Entscheidend ist, was **darüber** steht: Kein einziger der alten
+       * Werte hat sich verschoben. Das ist kein Zufall, sondern der Grund,
+       * warum die neuen Merkmale aus einem eigenen Zufallsstrom kommen —
+       * hinge alles an einem Strom, sähe Elena nach dem Update anders aus als
+       * beim Einprägen vor drei Wochen, und genau das verhindert dieser Test
+       * seit PR #103.
+       */
+      headShape: 'round',
+      eyeShape: 'narrow',
+      browShape: 'arched',
+      noseLength: 0.8855215441156179,
+      mouthWidth: 1.102990689794533,
+      age: 0.3297314327210188,
+      featureY: 0.8638176480308175,
+      featureSpread: 0.9262521921191365,
     })
 
     /*
      * Und das Paar, an dem der Befund am deutlichsten hing: Greta und Zora
-     * teilen Frisur, Haarfarbe, Nase, Mund, Bartlosigkeit und Brillenlosigkeit
-     * — sie unterscheiden sich in genau **einem** Merkmal (Hautton). Solche
-     * Paare gibt es weiterhin im Vorrat; sie dürfen nur nicht mehr in
-     * derselben Runde nebeneinanderstehen.
+     * teilen Frisur, Haarfarbe, Nase, Mund, Bartlosigkeit und
+     * Brillenlosigkeit. Bis zum 02.09. unterschieden sie sich in genau
+     * **einem** Merkmal — dem Hautton —, und die Behebung von damals konnte
+     * nur dafür sorgen, dass sie nicht in derselben Runde nebeneinanderstehen.
+     *
+     * Seit die Zeichnung Kopfform, Augenform und Brauen wirklich verschieden
+     * macht, trennen sie **drei**: Greta ist lang mit runden Augen, Zora rund
+     * mit Mandelaugen. Die Zahl steht hier weiterhin fest — sie ist der Beleg
+     * dafür, dass der zweite Anlauf am schwächsten Paar des Vorrats wirklich
+     * etwas geändert hat, und nicht nur im Mittel.
      */
-    expect(faceDistance('Greta', 'Zora')).toBe(1)
+    expect(faceDistance('Greta', 'Zora')).toBe(3)
   })
 })
