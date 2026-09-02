@@ -157,10 +157,19 @@ test('„Neu anfangen" steht auch in den Einstellungen — und startet die App w
   const reset = page.locator('.wipe-reset')
   await expect(reset).toBeVisible()
 
-  // Ohne Bestätigung passiert nichts: Erst die Warnung, dann das Wort.
+  /*
+   * Ohne Bestätigung passiert nichts: Erst die Warnung, dann das Wort.
+   *
+   * Seit dem 02.09. ist der Löschknopf dabei nicht mehr gesperrt, sondern
+   * auskunftsfähig — ein gesperrter Knopf ist eine Auskunft, die niemand
+   * hört. Geprüft wird deshalb, was zählt: dass ein Druck ohne das Wort
+   * **nicht löscht** und sagt, was fehlt.
+   */
   await reset.getByRole('button').first().click()
   await expect(reset.locator('.wipe-warn')).toBeVisible()
-  await expect(reset.locator('.wipe-go')).toBeDisabled()
+  await reset.locator('.wipe-go').click()
+  await expect(reset.locator('.wipe-missing')).toBeVisible()
+  await expect(reset.locator('.wipe-confirm-input')).toBeVisible()
 
   await reset.locator('.wipe-confirm-input').fill('ANITEW')
   await expect(reset.locator('.wipe-go')).toBeEnabled()
@@ -307,6 +316,280 @@ test('nach dem Antippen steht der Bestätigungsschritt im Bild, nicht darunter',
   ).toBeLessThanOrEqual(lage.fenster)
   expect(lage.feld!.oben, 'Eingabefeld liegt über dem oberen Rand').toBeGreaterThanOrEqual(0)
 
-  // Und der Fokus steht im Feld, damit ohne Suchen klar ist, was dran ist.
-  expect(lage.fokusImFeld, 'der Fokus steht nicht im Bestätigungsfeld').toBe(true)
+  /*
+   * ── Umgekehrt am 02.09., und zwar bewusst ─────────────────────────────
+   *
+   * Hier stand: „Und der Fokus steht im Feld, damit ohne Suchen klar ist, was
+   * dran ist" — die Zusage aus der Behebung, zu der dieser Test gehört.
+   *
+   * Der nächste Gerätebefund hat sie widerlegt. Der Fokus öffnet auf einem
+   * Telefon die Tastatur, und dann schließt der **erste** Tipp daneben nur
+   * sie; er erreicht keinen Knopf. Gemeldet als: „Ich drücke vergebens auf
+   * tout supprimer, passiert nichts, und auch auf annuler, nada!"
+   *
+   * Der **Zweck** der alten Zusage bleibt und wird weiter geprüft: Feld und
+   * Löschknopf stehen im Bild (die vier Messungen darüber), und der Satz
+   * „ANITEW eingeben" steht sichtbar daneben. Nur der Weg dorthin war einer,
+   * der am Gerät mehr gekostet hat, als er einbrachte.
+   *
+   * Die Tastatur öffnet jetzt, wer sie öffnen will — oder wer den Löschknopf
+   * drückt, ohne das Wort getippt zu haben. Dann wird sie angefordert.
+   */
+  expect(lage.fokusImFeld, 'der Bildschirm holt sich den Tastaturfokus von selbst').toBe(false)
+})
+
+/**
+ * Der Bestätigungsschritt darf keine Sackgasse sein (Gerätebefund 02.09.).
+ *
+ * Wörtlich, mit Bild von einem iPhone:
+ *
+ *   „Ich drücke vergebens auf tout supprimer, passiert nichts, und auch auf
+ *    annuler, nada!"
+ *
+ * ── Was gemessen wurde ────────────────────────────────────────────────────
+ *
+ * Beide Knöpfe standen im Bild und waren anklickbar — `elementFromPoint` traf
+ * jeweils den Knopf selbst, kein Überlagerer. Aber „Alles löschen" war
+ * `disabled`, weil das Wort ANITEW noch nicht getippt war. Auf dem Bild trägt
+ * genau dieser Knopf den leuchtenden Rahmen und sieht wie die Hauptaktion
+ * aus. Wer ihn drückt, bekommt **nichts** — keinen Hinweis, keine Bewegung,
+ * keine Auskunft, was fehlt.
+ *
+ * Ein gesperrter Knopf ist eine Auskunft, die niemand hört.
+ *
+ * Und der Bildschirm holte sich beim Öffnen von selbst den Tastaturfokus.
+ * Auf einem Telefon fährt dann die Tastatur hoch, und der **erste** Tipp
+ * daneben schließt nur sie — er erreicht den Knopf nicht. Das ist die
+ * Erklärung für „auch auf Abbrechen nichts": Der Tipp kam an, aber er
+ * schloss die Tastatur.
+ */
+test('sagt beim Löschknopf, was noch fehlt, statt stumm zu bleiben', async ({ page }) => {
+  test.setTimeout(120_000)
+  await visit(page)
+  await openPage(page, 'Einstellungen')
+
+  await page.getByRole('button', { name: 'Alles löschen' }).click()
+  await expect(page.locator('.wipe-confirm-input')).toBeVisible({ timeout: 15_000 })
+
+  /*
+   * Kein Tastaturfokus von selbst — sonst schluckt der erste Tipp die
+   * Tastatur statt den Knopf.
+   *
+   * Bewusst **nach** einer Wartezeit und in einem Zug geprüft, nicht mit
+   * `expect.poll`: Ein `poll(...).not` ist schon zufrieden, sobald eine
+   * einzige Stichprobe passt — und die erste liegt vor jedem Fokus. Der
+   * Wächter wäre grün gewesen, ohne je etwas zu bewachen.
+   */
+  await page.waitForTimeout(1500)
+  expect(
+    await page.evaluate(() => document.activeElement?.className ?? ''),
+    'der Bildschirm holt sich den Tastaturfokus von selbst',
+  ).not.toContain('wipe-confirm-input')
+
+  const loeschen = page.locator('.wipe-reset .wipe-go')
+  await expect(loeschen, 'ein gesperrter Knopf sagt nichts').toBeEnabled()
+
+  await loeschen.click()
+  // Nichts gelöscht — und diesmal steht da, warum.
+  await expect(page.locator('.wipe-reset .wipe-missing')).toBeVisible()
+  await expect(page.locator('.wipe-confirm-input')).toBeVisible()
+})
+
+/**
+ * Ein Google, das nicht antwortet, darf den Bildschirm nicht totlegen.
+ *
+ * ── Die Korrektur, die alles erklärt ──────────────────────────────────────
+ *
+ * Zuerst hiess es hier, „Alles löschen" sei gesperrt gewesen, weil das Wort
+ * ANITEW fehlte. Der Nutzer hat widersprochen: **Er hatte es getippt.** Damit
+ * fällt diese Erklärung weg — und beide Hälften seines Befunds bekommen eine
+ * gemeinsame Ursache, die eine Zeile weiter oben stand:
+ *
+ *     disabled={busy}          ← auf BEIDEN Knöpfen
+ *
+ * Er hatte „auch im Drive löschen" angehakt. `resetFromScratch` setzt dann
+ * `busy` und ruft Google an — **ohne Frist**. Antwortet Google nicht, hängt
+ * der Aufruf, `busy` bleibt für immer wahr, und beide Knöpfe sind tot. Ohne
+ * Spinner, ohne Satz, ohne Ausweg. Genau das gemeldete „nada".
+ *
+ * Der Test hält Google absichtlich hin. Verlangt wird dreierlei: dass man
+ * **sieht**, dass gearbeitet wird; dass **Abbrechen** trotzdem geht; und dass
+ * die App nach einer Frist von selbst sagt, was los ist, statt zu warten,
+ * bis jemand die App schliesst.
+ */
+test('bleibt bedienbar, wenn Google nicht antwortet', async ({ page }) => {
+  test.setTimeout(180_000)
+
+  // Google hält still: Die Anfrage wird angenommen und nie beantwortet.
+  let angefragt = 0
+  await page.route('**/oauth/google/access-token', () => {
+    angefragt += 1
+  })
+
+  await visit(page)
+  await openPage(page, 'Einstellungen')
+
+  await page.getByRole('button', { name: 'Alles löschen' }).click()
+  const feld = page.locator('.wipe-confirm-input')
+  await expect(feld).toBeVisible({ timeout: 15_000 })
+
+  // Genau der Weg des Nutzers: Haken setzen, Wort tippen, löschen.
+  await page.locator('.wipe-reset input[type="checkbox"]').check()
+  await feld.fill('ANITEW')
+  await page.locator('.wipe-reset .wipe-go').click()
+
+  // Es läuft etwas, und man sieht es.
+  await expect(page.locator('.wipe-reset .wipe-busy')).toBeVisible({ timeout: 10_000 })
+  /*
+   * Gewartet, nicht gestichprobt: `.wipe-busy` steht schon da, während der
+   * Drive-Teil erst nachgeladen wird. Ein `expect(angefragt)` an dieser
+   * Stelle misst deshalb nicht die App, sondern wer schneller war.
+   */
+  await expect
+    .poll(() => angefragt, { message: 'Google wurde gar nicht erst gefragt' })
+    .toBeGreaterThan(0)
+
+  // Abbrechen geht — auch mitten im Warten.
+  await page.getByRole('button', { name: 'Abbrechen' }).click()
+  await expect(page.locator('.wipe-confirm-input')).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Alles löschen' })).toBeEnabled()
+})
+
+test('sagt nach einer Frist, dass Google nicht antwortet — und bietet den Ausweg', async ({
+  page,
+}) => {
+  test.setTimeout(180_000)
+  await page.route('**/oauth/google/access-token', () => {})
+
+  await visit(page)
+  await openPage(page, 'Einstellungen')
+  await page.getByRole('button', { name: 'Alles löschen' }).click()
+  await expect(page.locator('.wipe-confirm-input')).toBeVisible({ timeout: 15_000 })
+  await page.locator('.wipe-reset input[type="checkbox"]').check()
+  await page.locator('.wipe-confirm-input').fill('ANITEW')
+  await page.locator('.wipe-reset .wipe-go').click()
+
+  /*
+   * Die Frist ist bewusst kurz genug, dass niemand sie für einen Absturz
+   * hält, und lang genug für eine langsame Mobilverbindung. Geprüft wird der
+   * Endzustand, nicht die Zahl: Es steht ein Satz da, und die Knöpfe leben.
+   */
+  await expect(page.locator('.wipe-reset .coach-failure')).toBeVisible({ timeout: 45_000 })
+  await expect(page.locator('.wipe-reset .wipe-go')).toBeEnabled()
+  await expect(page.getByRole('button', { name: 'Abbrechen' })).toBeEnabled()
+})
+
+/**
+ * Abbrechen muss das Löschen **anhalten**, nicht nur den Bildschirm zumachen.
+ *
+ * Die erste Fassung dieses Tests prüfte nur, dass der Bestätigungsschritt
+ * nach „Abbrechen" verschwindet. Sie war ohne die Behebung grün — im
+ * Ruhezustand war „Abbrechen" nie gesperrt, es gab also nichts zu bewachen.
+ * Ein Wächter, der von Anfang an grün ist, bewacht nichts; er beruhigt nur.
+ *
+ * Bewacht wird deshalb die Lücke, die es wirklich gab: `resetFromScratch`
+ * läuft weiter, während man wartet. Antwortet Google **nach** dem Abbruch,
+ * lief die Fortsetzung ungebremst weiter — `wipeEverything()`,
+ * Google trennen, `location.replace('/')`. Man hätte abgebrochen und wäre
+ * trotzdem mit leerem Gerät auf der nackten App gelandet.
+ *
+ * Der Test hält Googles Antwort in der Hand: erst warten lassen, dann
+ * abbrechen, dann antworten. Danach muss alles noch da sein.
+ */
+test('bricht den Löschschritt wirklich ab — auch wenn Google danach doch antwortet', async ({
+  page,
+}) => {
+  test.setTimeout(180_000)
+
+  /*
+   * Googles Antwort liegt an der Leine: Die Anfrage wird angenommen und erst
+   * beantwortet, wenn der Test die Leine loslässt — also nach dem Abbruch.
+   */
+  let losbinden: (() => void) | undefined
+  const anDerLeine = new Promise<void>((weiter) => {
+    losbinden = weiter
+  })
+  let angefragt = 0
+  await page.route('**/oauth/google/access-token', async (route) => {
+    angefragt += 1
+    await anDerLeine
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({ access_token: 'test-token' }),
+    })
+  })
+  /*
+   * Der Rest des Drive-Wegs gelingt geräuschlos: kein Ordner, nichts zu
+   * löschen, kein Fehler. So endet der Weg ohne die Behebung zwingend im
+   * lokalen Löschen — und der Test misst genau das, nicht einen Netzfehler.
+   */
+  await page.route('https://www.googleapis.com/drive/v3/files**', (route) =>
+    route.fulfill({ contentType: 'application/json', body: JSON.stringify({ files: [] }) }),
+  )
+  await page.route('**/oauth/google/logout', (route) => route.fulfill({ status: 204, body: '' }))
+
+  await visit(page)
+
+  // Etwas Echtes hinterlegen, damit „nicht gelöscht" auch etwas heißt.
+  await page.evaluate(async () => {
+    const open = indexedDB.open('anitew')
+    const database: IDBDatabase = await new Promise((resolve, reject) => {
+      open.onsuccess = () => resolve(open.result)
+      open.onerror = () => reject(open.error)
+    })
+    await new Promise<void>((resolve, reject) => {
+      const tx = database.transaction('settings', 'readwrite')
+      tx.objectStore('settings').put({ key: 'test.abbruch.marker', value: 'present' })
+      tx.oncomplete = () => resolve()
+      tx.onerror = () => reject(tx.error)
+    })
+  })
+
+  await openPage(page, 'Einstellungen')
+  await page.getByRole('button', { name: 'Alles löschen' }).click()
+  await expect(page.locator('.wipe-confirm-input')).toBeVisible({ timeout: 15_000 })
+  await page.locator('.wipe-reset input[type="checkbox"]').check()
+  await page.locator('.wipe-confirm-input').fill('ANITEW')
+  await page.locator('.wipe-reset .wipe-go').click()
+
+  // Es läuft, Google ist gefragt — und hier wird abgebrochen.
+  await expect(page.locator('.wipe-reset .wipe-busy')).toBeVisible({ timeout: 10_000 })
+  /*
+   * Gewartet, nicht gestichprobt: `.wipe-busy` steht schon da, während der
+   * Drive-Teil erst nachgeladen wird. Ein `expect(angefragt)` an dieser
+   * Stelle misst deshalb nicht die App, sondern wer schneller war.
+   */
+  await expect
+    .poll(() => angefragt, { message: 'Google wurde gar nicht erst gefragt' })
+    .toBeGreaterThan(0)
+  await page.getByRole('button', { name: 'Abbrechen' }).click()
+  await expect(page.locator('.wipe-confirm-input')).toHaveCount(0)
+
+  // Und jetzt antwortet Google doch. Das darf nichts mehr auslösen.
+  losbinden?.()
+
+  /*
+   * Bewusst eine feste Wartezeit statt `poll`: Geprüft wird, dass **nichts**
+   * passiert. Eine einzelne frühe Stichprobe wäre auch dann zufrieden, wenn
+   * die Fortsetzung eine Sekunde später doch noch losläuft.
+   */
+  await page.waitForTimeout(5000)
+  await expect(page.locator('.arrival'), 'abgebrochen und trotzdem auf der nackten App').toHaveCount(
+    0,
+  )
+  await expect(page.getByRole('button', { name: 'Alles löschen' })).toBeEnabled()
+  const marke = await page.evaluate(async () => {
+    const open = indexedDB.open('anitew')
+    const database: IDBDatabase = await new Promise((resolve, reject) => {
+      open.onsuccess = () => resolve(open.result)
+      open.onerror = () => reject(open.error)
+    })
+    return await new Promise<unknown>((resolve, reject) => {
+      const tx = database.transaction('settings', 'readonly')
+      const anfrage = tx.objectStore('settings').get('test.abbruch.marker')
+      anfrage.onsuccess = () => resolve(anfrage.result)
+      anfrage.onerror = () => reject(anfrage.error)
+    })
+  })
+  expect(marke, 'abgebrochen und trotzdem gelöscht').toBeDefined()
 })
