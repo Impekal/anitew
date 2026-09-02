@@ -71,3 +71,31 @@
   clip-path: inset(50%);
   white-space: nowrap;
 }
+
+/* Zwei vorhandene Erinnerungen verbinden (Gerätebefund 02.09.).
+   Eine Zeile, die umbricht: Womit — welche Art — verbinden. */
+.memory-connect {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .5rem;
+  margin: .6rem 0 0;
+}
+
+.memory-connect select {
+  max-width: 11rem;
+  padding: .3rem .45rem;
+  border: 1px solid var(--line);
+  border-radius: .5rem;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: .85rem;
+}
+
+/* Der Satz erklärt, wozu Verbinden gut ist — er gehört unter die Zeile,
+   nicht dazwischen. */
+.memory-connect-hint {
+  flex-basis: 100%;
+  margin: .1rem 0 0;
+}

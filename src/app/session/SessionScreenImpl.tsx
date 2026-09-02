@@ -39,6 +39,7 @@ import {
   walkOf,
 } from '../../core/index.ts'
 import type { RoundResult, SessionProgress } from '../../data/sessions.ts'
+import { lessonCopyFor } from '../../i18n/lessonCopy.ts'
 import type { Dictionary } from '../../i18n/index.ts'
 import { Face } from '../Face.tsx'
 import { GazeScene } from '../GazeScene.tsx'
@@ -340,16 +341,15 @@ function RunningSession({
 
       {block.kind === 'teach' && (block.id === 'teach-story' || block.id === 'teach-link') ? (
         <EncodingLessonView
-          dictionary={dictionary}
           lesson={block.id === 'teach-story' ? 'story' : 'link'}
           onDone={() => advance()}
         />
       ) : block.kind === 'teach' && block.moduleId === 'palace' ? (
         <PalaceLesson dictionary={dictionary} onDone={() => advance()} />
       ) : block.id === 'teach-major-method' ? (
-        <MethodLesson dictionary={dictionary} onDone={() => advance()} />
+        <MethodLesson onDone={() => advance()} />
       ) : block.kind === 'teach' ? (
-        <Lesson dictionary={dictionary} digit={Number(block.items[0])} onDone={() => advance()} />
+        <Lesson digit={Number(block.items[0])} onDone={() => advance()} />
       ) : block.kind === 'encode' && block.moduleId === 'palace' ? (
         /*
           Ein Gang wird **als Ganzes** gezeigt, aus demselben Grund wie eine
@@ -478,7 +478,7 @@ function RunningSession({
                 : state.currentItem}
             </p>
           )}
-          {parts !== undefined && <p className="hint">{dictionary.technique.hint}</p>}
+          {parts !== undefined && <p className="hint">{lessonCopyFor(document.documentElement.lang).hint}</p>}
 
           <div
             className="encode-dots"
@@ -941,16 +941,8 @@ function formatSeconds(seconds: number): string {
  * selbst weitergetragen. Beides gilt als gehalten — die Lektion ist kein
  * Hindernis, das man nehmen muss.
  */
-function Lesson({
-  dictionary,
-  digit,
-  onDone,
-}: {
-  dictionary: Dictionary
-  digit: number
-  onDone: () => void
-}) {
-  const t = dictionary.technique
+function Lesson({ digit, onDone }: { digit: number; onDone: () => void }) {
+  const t = lessonCopyFor(document.documentElement.lang)
   // Die Schlüssel in `de.ts` sind Zahlen, keine Zeichenketten — ein Blick
   // durch `Record<number, string>` erspart die Wandlung und die Behauptung,
   // der Wert sei sicher da.
@@ -1063,15 +1055,14 @@ function Scene({
  * Beispiel-Merkbild von uns — selbst gebaute sitzen besser (D-013).
  */
 function EncodingLessonView({
-  dictionary,
   lesson,
   onDone,
 }: {
-  dictionary: Dictionary
   lesson: 'story' | 'link'
   onDone: () => void
 }) {
-  const t = lesson === 'story' ? dictionary.technique.story : dictionary.technique.link
+  const lektionen = lessonCopyFor(document.documentElement.lang)
+  const t = lesson === 'story' ? lektionen.story : lektionen.link
 
   return (
     <section className="lesson">
@@ -1098,8 +1089,8 @@ function EncodingLessonView({
  * erklärt. Sie kommt einmal, unmittelbar vor der ersten Ziffer, in derselben
  * Einheit.
  */
-function MethodLesson({ dictionary, onDone }: { dictionary: Dictionary; onDone: () => void }) {
-  const t = dictionary.technique
+function MethodLesson({ onDone }: { onDone: () => void }) {
+  const t = lessonCopyFor(document.documentElement.lang)
 
   return (
     <section className="lesson">

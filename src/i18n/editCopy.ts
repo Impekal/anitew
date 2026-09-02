@@ -33,6 +33,10 @@ export interface EditCopy {
   readonly relation: string
   readonly relations: RelationNames
   readonly disconnect: string
+  /** Zwei vorhandene Erinnerungen von Hand verbinden. */
+  readonly connect: string
+  readonly connectWith: string
+  readonly connectHint: string
   /** Wenn der neue Name schon vergeben ist. Sagt auch, warum das Nein gilt. */
   readonly taken: string
   readonly failed: string
@@ -56,6 +60,9 @@ const DE: EditCopy = {
     custom: 'Eigene',
   },
   disconnect: 'Verbindung entfernen',
+  connect: 'Verbinden',
+  connectWith: 'Womit?',
+  connectHint: 'Verbinde zwei Erinnerungen, die im Kopf zusammengehören. Verbundenes holt sich gegenseitig zurück — das ist der eigentliche Trick.',
   taken: 'Diesen Namen gibt es schon. Zwei zusammenzulegen ist etwas anderes, als einen Tippfehler zu berichtigen — und es würde einen der beiden Wiederholungsverläufe kosten.',
   failed: 'Das hat nicht geklappt. Es wurde nichts verändert.',
 }
@@ -78,6 +85,9 @@ const EN: EditCopy = {
     custom: 'Own',
   },
   disconnect: 'Remove connection',
+  connect: 'Connect',
+  connectWith: 'With what?',
+  connectHint: 'Connect two memories that belong together in your head. Connected things pull each other back — that is the real trick.',
   taken: 'That name is already taken. Merging two is something else than fixing a typo — and it would cost one of the two review histories.',
   failed: 'That did not work. Nothing was changed.',
 }
@@ -100,6 +110,9 @@ const FR: EditCopy = {
     custom: 'Propre',
   },
   disconnect: 'Retirer la connexion',
+  connect: 'Connecter',
+  connectWith: 'Avec quoi ?',
+  connectHint: 'Connecte deux souvenirs qui vont ensemble dans ta tête. Ce qui est relié se rappelle mutuellement — c’est là tout le truc.',
   taken: 'Ce nom existe déjà. Fusionner deux entrées est autre chose que corriger une faute — et cela coûterait l’un des deux historiques de révision.',
   failed: 'Cela n’a pas marché. Rien n’a été modifié.',
 }
@@ -122,6 +135,9 @@ const ES: EditCopy = {
     custom: 'Propia',
   },
   disconnect: 'Quitar la conexión',
+  connect: 'Conectar',
+  connectWith: '¿Con qué?',
+  connectHint: 'Conecta dos recuerdos que van juntos en tu cabeza. Lo conectado se recupera mutuamente — ese es el truco de verdad.',
   taken: 'Ese nombre ya existe. Fusionar dos no es lo mismo que corregir una errata — y costaría uno de los dos historiales de repaso.',
   failed: 'No ha funcionado. No se ha cambiado nada.',
 }
@@ -144,6 +160,9 @@ const IT: EditCopy = {
     custom: 'Proprio',
   },
   disconnect: 'Togliere il collegamento',
+  connect: 'Collegare',
+  connectWith: 'Con che cosa?',
+  connectHint: 'Collega due ricordi che nella tua testa stanno insieme. Ciò che è collegato si richiama a vicenda — è questo il vero trucco.',
   taken: 'Questo nome esiste già. Unire due voci è altro che correggere un refuso — e costerebbe uno dei due storici di ripasso.',
   failed: 'Non ha funzionato. Non è stato cambiato nulla.',
 }
@@ -166,6 +185,9 @@ const PT: EditCopy = {
     custom: 'Própria',
   },
   disconnect: 'Remover a ligação',
+  connect: 'Ligar',
+  connectWith: 'Com o quê?',
+  connectHint: 'Liga duas memórias que na tua cabeça andam juntas. O que está ligado chama-se de volta — é esse o verdadeiro truque.',
   taken: 'Esse nome já existe. Juntar duas é outra coisa do que corrigir uma gralha — e custaria um dos dois históricos de revisão.',
   failed: 'Não resultou. Nada foi alterado.',
 }

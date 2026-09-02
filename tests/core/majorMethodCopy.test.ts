@@ -23,13 +23,13 @@
 
 import { describe, expect, it } from 'vitest'
 
-import { TRANSLATED_LANGUAGES, dictionaryFor, ensureDictionary } from '../../src/i18n/index.ts'
+import { TRANSLATED_LANGUAGES } from '../../src/i18n/index.ts'
+import { lessonCopyFor } from '../../src/i18n/lessonCopy.ts'
 
 describe('Verfahrenslektion des Major-Systems', () => {
   it('sagt in jeder Sprache, was das Major-System ist und wozu es hilft', async () => {
     for (const tag of TRANSLATED_LANGUAGES) {
-      await ensureDictionary(tag)
-      const method = dictionaryFor(tag).technique.method
+      const method = lessonCopyFor(tag).method
 
       expect(method.what, `${tag}: keine Auskunft, was das Major-System ist`).toBeTruthy()
       expect(method.helps, `${tag}: keine Auskunft, wozu es hilft`).toBeTruthy()
@@ -37,21 +37,18 @@ describe('Verfahrenslektion des Major-Systems', () => {
   })
 
   it('übersetzt sie wirklich, statt die deutsche Fassung stehen zu lassen', async () => {
-    await ensureDictionary('de')
-    const deutsch = dictionaryFor('de').technique.method
+    const deutsch = lessonCopyFor('de').method
 
     for (const tag of TRANSLATED_LANGUAGES) {
       if (tag === 'de') continue
-      await ensureDictionary(tag)
-      const method = dictionaryFor(tag).technique.method
+      const method = lessonCopyFor(tag).method
       expect(method.what, `${tag}: „was" steht noch auf Deutsch`).not.toBe(deutsch.what)
       expect(method.helps, `${tag}: „wozu" steht noch auf Deutsch`).not.toBe(deutsch.helps)
     }
   })
 
   it('bleibt bei einer Lektion, die man in einem Atemzug liest', async () => {
-    await ensureDictionary('de')
-    const method = dictionaryFor('de').technique.method
+    const method = lessonCopyFor('de').method
     // Drei Schritte bleiben drei Schritte — dieselbe Form wie Palast,
     // Geschichte und Verknüpfung. Eine vierte Zeile wäre eine Seite.
     expect(method.steps).toHaveLength(3)
