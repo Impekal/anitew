@@ -123,3 +123,44 @@ export function majorParts(value: string, taught: readonly number[]): readonly M
 export function helpsWith(value: string, taught: readonly number[]): boolean {
   return majorParts(value, taught).some((part) => part.letters !== undefined)
 }
+
+/**
+ * Ordnet Zahlen so, dass die Technik zuerst trägt (D5, Gerätemeldung 01.09.).
+ *
+ * Gemeldet wurde: „Ich bekomme nur die Lektion zur 1 und soll dann sofort
+ * sechsstellige Zahlen mit lauter anderen Ziffern behalten.“ Gemessen war es
+ * genau so — nach der Lektion zur 1 enthielt knapp die Hälfte der Zahlen gar
+ * keine 1, und die erste oft auch nicht. Eine Lektion, die auf die nächste
+ * Aufgabe nicht anwendbar ist, ist am nächsten Tag wieder weg.
+ *
+ * Drei Gruppen, jede in sich in der gezogenen Reihenfolge:
+ *
+ * 1. Zahlen mit der **gerade gelehrten** Ziffer — an ihnen wird die frische
+ *    Lektion zum ersten Mal etwas wert.
+ * 2. Zahlen, in denen irgendeine **schon gelernte** Ziffer steckt.
+ * 3. Der Rest.
+ *
+ * Der Vorrat wird dabei **nicht** beschnitten: Es sind dieselben Zahlen, nur
+ * in einer anderen Reihenfolge. Wer alle zehn Ziffern kann, merkt von dieser
+ * Ordnung nichts mehr — dann ist jede Zahl in Gruppe eins oder zwei.
+ */
+export function applicableFirst(
+  values: readonly string[],
+  taught: readonly number[],
+  justTaught?: number,
+): readonly string[] {
+  if (taught.length === 0 && justTaught === undefined) return values
+
+  const frisch: string[] = []
+  const traegt: string[] = []
+  const rest: string[] = []
+  const neu = justTaught === undefined ? undefined : String(justTaught)
+
+  for (const value of values) {
+    if (neu !== undefined && value.includes(neu)) frisch.push(value)
+    else if (helpsWith(value, taught)) traegt.push(value)
+    else rest.push(value)
+  }
+
+  return [...frisch, ...traegt, ...rest]
+}

@@ -38,7 +38,7 @@ import {
   gazePlacements,
   gazeSceneOf,
 } from '../content/gaze.ts'
-import { nextToTeach } from '../technique/major.ts'
+import { applicableFirst, nextToTeach } from '../technique/major.ts'
 import {
   type EncodingLesson,
   encodingModuleOf,
@@ -822,7 +822,20 @@ export function planSession(input: PlanInput): SessionPlan {
           (entry) => !dueSubjects.has(subjectOf(moduleId, entry)),
         ),
     )
-    remaining.set(moduleId, moduleId === 'faces' ? spreadFaces(mixed) : mixed)
+    /*
+     * Zahlen bekommen nach dem Mischen eine zweite Ordnung, aus demselben
+     * Grund wie die Gesichter: Wo die gelernte Technik trägt, kommt zuerst.
+     * Ohne das folgte auf die Lektion zur 1 eine Zahl ohne jede 1 — gemeldet
+     * am 01.09., gemessen und bei `applicableFirst` begründet.
+     */
+    remaining.set(
+      moduleId,
+      moduleId === 'faces'
+        ? spreadFaces(mixed)
+        : moduleId === 'numbers'
+          ? [...applicableFirst(mixed, input.taught ?? [], nextToTeach(input.taught ?? []))]
+          : mixed,
+    )
     taken.set(moduleId, 0)
   }
 

@@ -16,6 +16,7 @@ import {
   type MajorPart,
   majorParts,
   missionFor,
+  missionObjectFor,
   type ModuleId,
   factAnswer,
   factPrompt,
@@ -1013,9 +1014,28 @@ function Scene({
           <dt>{t.departure}</dt>
           <dd>{value('time')}</dd>
         </div>
+        {/*
+          * Gegenstand und Position stehen getrennt — je eine Zeile mit eigener
+          * Beschriftung.
+          *
+          * Vorher klebten beide unter „Dabei" in einer Zeile aneinander, durch
+          * „ · " getrennt. Abgefragt wurden sie trotzdem einzeln: „Was hatte
+          * sie oder er dabei?" und „Wo lag der Gegenstand?". Wer die Szene
+          * ansah, konnte nicht wissen, dass die zweite Hälfte eine eigene
+          * Angabe ist — gemeldet vom Gerät am 01.09. Eine Szene muss zeigen,
+          * was sie später abfragt.
+          *
+          * Die Beschriftung der Position ist derselbe Text wie die
+          * Eingabehilfe beim Abruf. Absicht: Was beim Ansehen „Position"
+          * heißt, heißt beim Erinnern auch so.
+          */}
         <div>
           <dt>{t.carrying}</dt>
-          <dd>{value('object')}</dd>
+          <dd>{missionObjectFor(person, language as Language)}</dd>
+        </div>
+        <div>
+          <dt>{dictionary.session.missionPlaceholders.location}</dt>
+          <dd>{value('location')}</dd>
         </div>
         <div>
           <dt>{t.restaurant}</dt>
@@ -1086,6 +1106,17 @@ function MethodLesson({ dictionary, onDone }: { dictionary: Dictionary; onDone: 
       <p className="hint">{t.heading}</p>
       <button type="button" className="lesson-card lesson-wide" onClick={onDone}>
         <span className="lesson-intro">{t.majorName}</span>
+        {/*
+          * Was es ist und wozu es hilft — vor den Schritten.
+          *
+          * Zweite Gerätemeldung vom 01.09.: „C'est quoi le Major Système? Ça
+          * consiste à quoi exactement? Ça aide à faire quoi?" Die Lektion
+          * sagte bis dahin nur, **wie** es geht. Wer nicht weiß, wofür er
+          * etwas lernt, lernt es nicht — und drei Schritte ohne Zweck sind
+          * eine Anweisung, keine Erklärung.
+          */}
+        <span className="lesson-what">{t.method.what}</span>
+        <span className="lesson-what">{t.method.helps}</span>
         <ol className="lesson-steps">
           {t.method.steps.map((step) => (
             <li key={step}>{step}</li>

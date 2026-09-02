@@ -94,12 +94,23 @@ export function ReminderPanelImpl({
               type="time"
               value={time}
               disabled={busy}
+              aria-describedby="reminder-time-hint"
               onChange={(event) => {
                 setTime(event.target.value)
                 setSaid(undefined)
               }}
             />
           </label>
+          {/*
+            Der Hinweis steht **unter** dem Feld und nicht in einem
+            Platzhalter: Ein `input type="time"` hat keinen — er zeigt seine
+            eigenen Segmente. Und `aria-describedby` sorgt dafür, dass eine
+            Vorlesehilfe ihn beim Hineinspringen mitliest, nicht erst, wenn
+            jemand danach sucht.
+          */}
+          <p className="hint" id="reminder-time-hint">
+            {t.timeHint}
+          </p>
 
           <div className="note-actions">
             <button
