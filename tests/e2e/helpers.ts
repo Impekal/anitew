@@ -49,7 +49,16 @@ const MISSION_LABEL_OF_QUESTION = new Map([
   ['Welche Nummer?', 'Nummer'],
   ['Welche Zimmernummer?', 'Nummer'],
   ['Was hatte sie oder er dabei?', 'Dabei'],
-  ['Wo lag der Gegenstand?', 'Dabei'],
+  /*
+   * Die Position hat seit dem Gerätebefund vom 01.09. ihre eigene Zeile in
+   * der Szene. Vorher stand sie mit dem Gegenstand zusammen unter „Dabei“,
+   * durch „ · “ getrennt, und dieser Helfer trennte sie beim Antworten wieder
+   * auseinander. Zeigt die Szene beides getrennt, ist das Zerlegen nicht nur
+   * überflüssig, sondern falsch: Es lieferte auf die Positionsfrage eine
+   * leere Antwort — ein Punkt weniger, und nur dann, wenn überhaupt eine
+   * Mission gezogen wurde. Genau deshalb sah es aus wie ein würfelnder Test.
+   */
+  ['Wo lag der Gegenstand?', 'Position'],
   ['Wann war es?', 'Zeit'],
   ['Wann ging es los?', 'Zeit'],
   ['Wie hieß der Ort?', 'Ort'],
@@ -357,9 +366,6 @@ async function answerAt(page: Page, learned: Learned, index: number): Promise<st
   const label = MISSION_LABEL_OF_QUESTION.get(asked)
   expect(label, `unbekannte Frage: „${question}“`).toBeDefined()
   const value = learned.scene.get(label as string) ?? ''
-  if (label === 'Dabei') {
-    const [object = '', location = ''] = value.split(' · ')
-    return asked === 'Wo lag der Gegenstand?' ? location : object
-  }
+  expect(value, `keine Antwort für „${question}“ in der Szene`).not.toBe('')
   return value
 }
