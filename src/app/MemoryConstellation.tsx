@@ -33,6 +33,20 @@ interface Placed {
 
 export const MAX_VISIBLE_MEMORY_NODES = 72
 
+/**
+ * Wie breit ein Zeichen im Band ungefähr ist, in Zeicheneinheiten.
+ *
+ * Am Telefon gemessen (02.09.): ein Name aus 14 Zeichen war 114 Pixel breit,
+ * das Band 388 Pixel für 100 Einheiten. Macht 2,1 Einheiten je Zeichen. Damit
+ * lässt sich vorher ausrechnen, wie lang ein Name werden darf — statt es zu
+ * raten und hinterher zu sehen, dass zwei sich überschreiben.
+ */
+const EINHEITEN_JE_ZEICHEN = 2.1
+
+function kurz(label: string, maxZeichen: number): string {
+  return label.length <= maxZeichen ? label : `${label.slice(0, maxZeichen - 1).trimEnd()}…`
+}
+
 function visibleNodeIds(graph: MemoryGraph, selectedId?: string): Set<string> {
   if (graph.nodes.length <= MAX_VISIBLE_MEMORY_NODES) return new Set(graph.nodes.map((node) => node.id))
 
@@ -109,6 +123,88 @@ function layout(graph: MemoryGraph, tappable: boolean, selectedId?: string): Pla
     nodes: graph.nodes.filter((node) => visible.has(node.id)),
     edges: graph.edges.filter((edge) => visible.has(edge.from) && visible.has(edge.to)),
   })
+  /*
+   * Wenn **nichts** verbunden ist, ist jede Erinnerung ihr eigener Cluster.
+   * Der Kranz aus Clustern drängt sie dann in die Mitte, jede von ihnen ist
+   * Anker, jede trägt ihren Namen — und die Namen überschreiben einander
+   * (gemeldet 02.09. mit Bild: „Alassane anrufen" lag auf „Daniel Morrat").
+   *
+   * Für diesen Fall ist die ruhige Welle die ehrlichere Anordnung: gleicher
+   * Abstand über die ganze Breite, abwechselnd höher und tiefer. Immer noch
+   * deterministisch aus der Reihenfolge des Merkens — dieselben Erinnerungen
+   * stehen morgen am selben Ort.
+   *
+   * Nur für das schmückende Band. Auf der Gedächtnis-Seite ist jeder Punkt
+   * ein Knopf mit Trefferfläche; dort bleibt der Kranz.
+   */
+  const alleEinzeln = !tappable && clusters.length > 2 && clusters.every((c) => c.nodes.length === 1)
+  if (alleEinzeln) {
+    const einzeln = clusters
+      .map((cluster) => cluster.anchor)
+      .sort((a, b) => a.createdAt - b.createdAt || a.id.localeCompare(b.id))
+    /*
+     * Wie lang darf ein Name sein, damit nichts überschreibt und nichts
+     * abgeschnitten wird? Das ist eine Gleichung, keine Schätzung.
+     *
+     * Bei drei Zeilen stehen zwei Punkte derselben Zeile 3 × Schritt
+     * auseinander. Ein Name der Breite w braucht links und rechts vom Rand
+     * w/2 Platz, sonst ragt der äußerste aus dem Bild. Also:
+     *
+     *     Schritt = (100 − w) / (n − 1)     und    3 × Schritt ≥ w
+     *     ⟹  300 − 3w ≥ w·(n−1)  ⟹  w ≤ 300 / (n + 2)
+     *
+     * Beim ersten Versuch stand hier eine geratene Zahl (14 Zeichen), und
+     * gemessen überschrieben sich zwei Namen um 13 Pixel.
+     */
+    const breite = 300 / (einzeln.length + 2)
+    const nurJedeZweite = Math.floor(breite / EINHEITEN_JE_ZEICHEN) < 8
+    const maxZeichen = Math.min(
+      18,
+      Math.max(
+        6,
+        Math.floor(
+          (nurJedeZweite ? 300 / (Math.ceil(einzeln.length / 2) + 2) : breite) /
+            EINHEITEN_JE_ZEICHEN,
+        ),
+      ),
+    )
+    // Derselbe Rand links wie rechts — die halbe Namensbreite.
+    const rand = Math.min(24, (maxZeichen * EINHEITEN_JE_ZEICHEN) / 2)
+    const schritt = einzeln.length === 1 ? 0 : (100 - 2 * rand) / (einzeln.length - 1)
+    /*
+     * **Drei** Zeilen, reihum — und daraus folgt alles Weitere.
+     *
+     * Zwei Zeilen waren zu wenig: Gemessen lagen „Ticket Bayreu…" und
+     * „Alassane anru…" mit sechs Pixeln übereinander, und der erste Name ragte
+     * 13 Pixel links aus dem Bild. Der Grund ist Arithmetik: Zwei Punkte
+     * derselben Zeile stehen 2 × Schritt auseinander, ein gekürzter Name ist
+     * aber breiter als das.
+     *
+     * Drei Zeilen verdreifachen den Abstand innerhalb einer Zeile, ohne dass
+     * der Punkt seinen Platz wechselt. Und weil der Abstand jetzt bekannt ist,
+     * richtet sich die Namenslänge danach statt nach einer geratenen Zahl:
+     * 2,1 Einheiten je Zeichen sind am Telefon gemessen.
+     */
+    return einzeln.map((node, index) => ({
+      id: node.id,
+      // Das Band ist `aria-hidden`; der ganze Name steht in „Mein Gedächtnis".
+      label: kurz(node.label, maxZeichen),
+      x: einzeln.length === 1 ? 50 : rand + index * schritt,
+      y: BAND_MID + ((index % 3) - 1) * FLACH * 20,
+      strength: node.strength,
+      /*
+       * Wird es zu eng für jeden Namen, trägt nur jeder zweite Punkt einen —
+       * die übrigen bleiben stille Punkte. Ein Himmel mit ein paar benannten
+       * Sternen ist eine Konstellation; einer, in dem jeder Punkt beschriftet
+       * ist, ist eine Tabelle.
+       */
+      anchor: !nurJedeZweite || index % 2 === 0,
+      type: node.type,
+      degree: 0,
+      activityAt: node.lastRecalledAt ?? node.createdAt,
+    }))
+  }
+
   return clusters.flatMap((cluster, clusterIndex) => {
     const clusterAngle = ((clusterIndex * GOLDEN_ANGLE) % 360) * (Math.PI / 180)
     const clusterRadius = clusters.length === 1 ? 0 : 27 * Math.sqrt((clusterIndex + 1) / clusters.length)
@@ -255,7 +351,21 @@ export function MemoryConstellation({
                 }}
               />
               {node.anchor && (
-                <text x={node.x} y={node.y - 2.4} className="constellation-label" textAnchor="middle">
+                /*
+                 * Im Band wechseln die Namen zeilenweise die Seite und werden
+                 * bei Bedarf gekürzt. Beides aus demselben Grund: Ein Name
+                 * wie „Fils Le grand Senegal" ist bei dieser Schriftgröße
+                 * über ein Drittel der Breite lang — zwei davon nebeneinander
+                 * passen nicht, und übereinander gedruckt sind beide
+                 * unlesbar. Der ganze Name steht in „Mein Gedächtnis", einen
+                 * Fingertipp entfernt.
+                 */
+                <text
+                  x={node.x}
+                  y={node.y - 2.4}
+                  className="constellation-label"
+                  textAnchor="middle"
+                >
                   {node.label}
                 </text>
               )}

@@ -19,6 +19,7 @@ import { loadDue } from '../data/items.ts'
 import { loadMemoryGraph, saveMemoryGraph, MEMORY_VISITED_KEY } from '../data/memoryStore.ts'
 import {
   type MemoryRelation,
+  connectMemoryNodes,
   disconnectMemoryNodes,
   editMemoryEdge,
   memoryNodeId,
@@ -27,6 +28,9 @@ import {
   setMemoryDetail,
 } from '../core/index.ts'
 import { editCopyFor } from '../i18n/editCopy.ts'
+
+/** Die fünf Arten, in einer Reihenfolge — dieselbe Liste für beide Auswahlen. */
+const RELATIONS = ['association', 'sequence', 'context', 'contrast', 'custom'] as const
 import { memoryCountCopyFor, memoryForecastCopyFor, type Dictionary } from '../i18n/index.ts'
 
 import { MemoryConstellation } from './MemoryConstellation.tsx'
@@ -105,6 +109,8 @@ export function MemoryPanel({
 
   const e = editCopyFor(document.documentElement.lang)
   const [editing, setEditing] = useState(false)
+  const [connectTo, setConnectTo] = useState('')
+  const [connectRelation, setConnectRelation] = useState<MemoryRelation>('association')
   const [draftName, setDraftName] = useState('')
   const [draftDetail, setDraftDetail] = useState('')
   const [editFailed, setEditFailed] = useState<string | undefined>(undefined)
@@ -175,6 +181,22 @@ export function MemoryPanel({
             (link): link is { edge: (typeof graph.edges)[number]; other: NonNullable<typeof link.other> } =>
               link.other !== undefined,
           )
+  /*
+   * Womit lässt sich verbinden? Alles außer dem Begriff selbst und dem, was
+   * schon mit ihm verbunden ist — eine zweite Linie zwischen denselben beiden
+   * sagt nichts Neues. Nach dem Namen sortiert, damit die Liste auffindbar
+   * bleibt und nicht der Reihenfolge des Merkens folgt.
+   */
+  const verbindbar =
+    selected === undefined
+      ? []
+      : graph.nodes
+          .filter(
+            (node) =>
+              node.id !== selected.id && !links.some((link) => link.other.id === node.id),
+          )
+          .sort((a, b) => a.label.localeCompare(b.label))
+
   const dueSoon = selected !== undefined && dueNodeIds.has(selected.id)
   const reviewDay = selected === undefined ? undefined : reviewDayByNode.get(selected.id)
   const recalledNodeIds = new Set(
@@ -367,9 +389,7 @@ export function MemoryPanel({
                                   )
                                 }
                               >
-                                {(
-                                  ['association', 'sequence', 'context', 'contrast', 'custom'] as const
-                                ).map((art) => (
+                                {RELATIONS.map((art) => (
                                   <option key={art} value={art}>
                                     {e.relations[art]}
                                   </option>
@@ -391,6 +411,74 @@ export function MemoryPanel({
                           </li>
                         ))}
                       </ul>
+                    )}
+                    {/*
+                      Zwei vorhandene Erinnerungen von Hand verbinden
+                      (Gerätebefund 02.09.: „keine Verbindungslinien").
+
+                      Kanten entstanden bisher **nur** beim Merken eines
+                      ganzen Satzes: `rememberThis` zerlegt „Daniel aus Madrid
+                      spielt Gitarre" in Personen, Orte und die Kanten
+                      dazwischen. Wer einzelne Begriffe merkt, bekam lauter
+                      unverbundene Punkte — und damit einen Himmel ohne eine
+                      einzige Linie. Trennen und die Art ändern gab es seit
+                      dem Berichtigen; das Gegenstück fehlte.
+
+                      Die Linien in der Konstellation zeichnen echte
+                      Verbindungen. Deshalb wird hier verbunden, statt in der
+                      Zeichnung etwas anzudeuten, das es nicht gibt.
+                    */}
+                    {verbindbar.length > 0 && (
+                      <form
+                        className="memory-connect"
+                        onSubmit={(event) => {
+                          event.preventDefault()
+                          if (connectTo === '') return
+                          const ziel = connectTo
+                          setConnectTo('')
+                          schreibe((current, now) =>
+                            connectMemoryNodes(
+                              current,
+                              { from: selected.id, to: ziel, relation: connectRelation },
+                              now,
+                            ),
+                          )
+                        }}
+                      >
+                        <label className="memory-link-kind">
+                          <span className="visually-hidden">{e.connectWith}</span>
+                          <select
+                            value={connectTo}
+                            onChange={(event) => setConnectTo(event.target.value)}
+                          >
+                            <option value="">{e.connectWith}</option>
+                            {verbindbar.map((node) => (
+                              <option key={node.id} value={node.id}>
+                                {node.label}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                        <label className="memory-link-kind">
+                          <span className="visually-hidden">{e.relation}</span>
+                          <select
+                            value={connectRelation}
+                            onChange={(event) =>
+                              setConnectRelation(event.target.value as MemoryRelation)
+                            }
+                          >
+                            {RELATIONS.map((art) => (
+                              <option key={art} value={art}>
+                                {e.relations[art]}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                        <button type="submit" className="quiet" disabled={connectTo === ''}>
+                          {e.connect}
+                        </button>
+                        <p className="hint memory-connect-hint">{e.connectHint}</p>
+                      </form>
                     )}
                   </dd>
                 </div>
