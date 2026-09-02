@@ -1,6 +1,6 @@
 import { useId, useMemo } from 'react'
 
-import { type Face as FaceSpec, faceFor } from '../core/index.ts'
+import { type Face as FaceSpec, type HeadShape, faceFor } from '../core/index.ts'
 
 /**
  * Ein Gesicht, gezeichnet aus den Maßen, die der Kern liefert (D-005).
@@ -24,18 +24,42 @@ export function Face({ name, size = 132 }: { name: string; size?: number }) {
   const face = useMemo(() => faceFor(name), [name])
   const w = 50 * face.width
   const h = 58 * face.height
-  const head = headPath(w, h, face.jaw)
-  /* Wo das Kinn endet, hängt von der Kopfhöhe ab — Hals und Schultern müssen
-     mitwandern, sonst schwebt bei einem kurzen Kopf der Kragen. */
-  const chin = 64 + h * 0.66
+  const head = headPath(w, h, face.jaw, face.headShape)
+  /* Wo das Kinn endet, hängt von Kopfhöhe **und Form** ab — Hals und
+     Schultern müssen mitwandern, sonst schwebt bei einem kurzen Kopf der
+     Kragen und steht bei einem langen im Gesicht. */
+  const chin = 64 + h * chinDepth(face.headShape)
   // Doppelpunkte aus `useId` vertragen sich nicht mit `url(#…)`.
   const clipId = `face-${useId().replace(/:/g, '')}`
 
-  const browY = 58 - 6 * face.brow
-  const brows = [
-    `M ${60 - 20 * face.eyeSpacing} ${browY} q 7 ${-4 * face.brow} 14 0`,
-    `M ${60 + 6 * face.eyeSpacing} ${browY} q 7 ${-4 * face.brow} 14 0`,
-  ]
+  /*
+   * Brauen in drei Schwüngen (02.09.). Vorher hatte jedes Gesicht denselben
+   * flachen Bogen, nur unterschiedlich dick — und Dicke allein trennt zwei
+   * Gesichter nicht. Gerade, gerundet und geknickt trennen sie sofort.
+   *
+   * Mit dem Alter rücken sie näher an die Augen: Eine tiefer sitzende Braue
+   * ist eines der Merkmale, an denen man ein Alter schätzt, ohne es zu
+   * benennen.
+   */
+  /*
+   * Die Lage der Züge (02.09.).
+   *
+   * Bis hierher lagen die Augen bei **jedem** Gesicht auf y = 64 und der Mund
+   * auf y = 90. Das ist der stillste Grund dafür, dass sich alle ähnlich
+   * sahen: Man kann Kopfform, Haare und Nase wechseln — wenn die Züge immer
+   * am selben Fleck sitzen, bleibt der Eindruck derselbe.
+   */
+  const augenY = 64 + (face.featureY - 0.5) * 8
+  const spanne = 0.85 + face.featureSpread * 0.35
+  const mundY = augenY + 28 * spanne
+  const browY = augenY - 6 - 6 * face.brow + face.age * 3
+  const browBogen = (x: number): string =>
+    face.browShape === 'flat'
+      ? `M ${x} ${browY} q 7 0 14 0`
+      : face.browShape === 'angled'
+        ? `M ${x} ${browY + 1.6} l 7 -3.6 l 7 1.8`
+        : `M ${x} ${browY} q 7 ${-5 * face.brow} 14 0`
+  const brows = [browBogen(60 - 20 * face.eyeSpacing), browBogen(60 + 6 * face.eyeSpacing)]
 
   return (
     <svg
@@ -110,8 +134,8 @@ export function Face({ name, size = 132 }: { name: string; size?: number }) {
       />
 
       {/* Ohren — vor dem Kopf gezeichnet, also liegen sie dahinter. */}
-      <ellipse cx={60 - w} cy="66" rx={5 * face.ears} ry={8 * face.ears} fill={face.skin} />
-      <ellipse cx={60 + w} cy="66" rx={5 * face.ears} ry={8 * face.ears} fill={face.skin} />
+      <ellipse cx={60 - w * HEAD_METRICS[face.headShape].wange} cy="66" rx={5 * face.ears} ry={8 * face.ears} fill={face.skin} />
+      <ellipse cx={60 + w * HEAD_METRICS[face.headShape].wange} cy="66" rx={5 * face.ears} ry={8 * face.ears} fill={face.skin} />
 
       {/* Kopf: je kantiger der Kiefer, desto kleiner der untere Radius */}
       <path d={head} fill={face.skin} />
@@ -137,13 +161,16 @@ export function Face({ name, size = 132 }: { name: string; size?: number }) {
         </g>
       </g>
 
-      {/* Augen */}
-      <g>
-        <ellipse cx={60 - 13 * face.eyeSpacing} cy="64" rx={6 * face.eyeSize} ry={4.2 * face.eyeSize} fill="#fffdf8" />
-        <ellipse cx={60 + 13 * face.eyeSpacing} cy="64" rx={6 * face.eyeSize} ry={4.2 * face.eyeSize} fill="#fffdf8" />
-        <circle cx={60 - 13 * face.eyeSpacing} cy="64" r={2.6 * face.eyeSize} fill={face.eyes} />
-        <circle cx={60 + 13 * face.eyeSpacing} cy="64" r={2.6 * face.eyeSize} fill={face.eyes} />
-      </g>
+      {/*
+        Augen in vier Formen (02.09.).
+
+        Vorher trug **jedes** Gesicht dieselbe Mandel — 6 × 4,2 Einheiten,
+        nur um bis zu 14 Prozent skaliert. Zwei Augenpaare, die sich um 14
+        Prozent unterscheiden, sind für den Abruf dasselbe Augenpaar. Rund,
+        mandelförmig, mit schwerem Lid und schmal sind vier verschiedene
+        Gesichter, auch wenn sonst nichts anderes ist.
+      */}
+      <Eyes face={face} y={augenY} />
 
       {/*
         Reihenfolge von unten nach oben: Bart, Nase, Mund.
@@ -152,24 +179,139 @@ export function Face({ name, size = 132 }: { name: string; size?: number }) {
       */}
       {face.beard !== 0 && (
         <g clipPath={`url(#${clipId})`}>
-          <Beard face={face} w={w} />
+          <Beard face={face} w={w} y={mundY} />
         </g>
       )}
-      <Nose face={face} />
-      <Mouth face={face} />
-      {face.glasses && <Glasses face={face} />}
+      <Nose face={face} y={augenY} spanne={spanne} />
+      <Mouth face={face} y={mundY} />
+      <Age face={face} w={w} y={augenY} mundY={mundY} />
+      {face.glasses && <Glasses face={face} y={augenY} />}
     </svg>
   )
 }
 
+/**
+ * Die fünf Silhouetten (Gerätebefund 02.09.).
+ *
+ * Vorher gab es **eine** Kopfform, aus der Kopfbreite (0,88–1,12) und dem
+ * Kiefer leicht abgewandelt. Drei Prozent Breite sieht bei 130 Pixeln
+ * Kantenlänge niemand — deshalb sahen alle Gesichter gleich aus, obwohl die
+ * Zahlen dahinter verschieden waren.
+ *
+ * Diese fünf trennt man dagegen aus zwei Metern. Jede Zahl ist ein Anteil der
+ * Grundbreite: `krone` am Schädel, `wange` am Jochbein, `kiefer` am
+ * Unterkiefer, `kinn` als Tiefe. Das Herz ist oben breit und unten spitz, das
+ * Kantige läuft gerade herunter, das Lange ist schmal und tief.
+ *
+ * Die erste Fassung dieser Tabelle war zu zaghaft: Auf dem Bogen sah man die
+ * fünf Formen kaum, weil sie sich nur um wenige Prozent unterschieden — genau
+ * der Fehler, den sie beheben sollte, eine Ebene höher wiederholt. Ein runder
+ * Kopf ist jetzt 1,2 mal so breit wie die Grundbreite, ein langer 0,82 — das
+ * ist knapp die Hälfte Unterschied und **das** sieht man.
+ *
+ * Die Oberkante bleibt bei allen `64 − h`: Darauf setzt die Haarhaube auf,
+ * und eine Frisur, die je nach Kopfform schwebt oder einsinkt, wäre ein
+ * schlechterer Tausch als eine Form weniger.
+ */
+const HEAD_METRICS: Record<HeadShape, { krone: number; wange: number; kiefer: number; kinn: number }> = {
+  oval: { krone: 0.9, wange: 0.98, kiefer: 0.68, kinn: 0.68 },
+  round: { krone: 1.1, wange: 1.2, kiefer: 1.02, kinn: 0.52 },
+  square: { krone: 1.02, wange: 1.06, kiefer: 1.1, kinn: 0.58 },
+  long: { krone: 0.78, wange: 0.82, kiefer: 0.6, kinn: 0.88 },
+  heart: { krone: 1.12, wange: 1.02, kiefer: 0.44, kinn: 0.76 },
+}
+
+/** Wie tief das Kinn sitzt — Hals und Schultern müssen mitwandern. */
+function chinDepth(shape: HeadShape): number {
+  return HEAD_METRICS[shape].kinn
+}
+
+/**
+ * Die vier Augenformen (02.09.).
+ *
+ * Gezeichnet wird jeweils Weiß, Iris und Pupille — und bei `hooded` ein Lid
+ * in Hautfarbe darüber, das das obere Drittel verdeckt. Das ist derselbe
+ * Trick wie im Gesicht selbst: Ein schweres Lid ist keine andere Augenfarbe,
+ * sondern ein Stück Haut mehr.
+ */
+function Eyes({ face, y }: { face: FaceSpec; y: number }) {
+  const links = 60 - 13 * face.eyeSpacing
+  const rechts = 60 + 13 * face.eyeSpacing
+  const s = face.eyeSize
+  const masse =
+    face.eyeShape === 'round'
+      ? { rx: 5.4 * s, ry: 5.2 * s, pupille: 2.8 * s }
+      : face.eyeShape === 'narrow'
+        ? { rx: 6.8 * s, ry: 2.6 * s, pupille: 2.2 * s }
+        : face.eyeShape === 'hooded'
+          ? { rx: 6.2 * s, ry: 4.4 * s, pupille: 2.5 * s }
+          : { rx: 6.6 * s, ry: 3.8 * s, pupille: 2.6 * s }
+
+  return (
+    <g>
+      {[links, rechts].map((cx) => (
+        <g key={cx}>
+          <ellipse cx={cx} cy={y} rx={masse.rx} ry={masse.ry} fill="#fffdf8" />
+          <circle cx={cx} cy={y} r={masse.pupille} fill={face.eyes} />
+          <circle cx={cx} cy={y} r={masse.pupille * 0.45} fill="#1a1410" />
+          {face.eyeShape === 'hooded' && (
+            <path
+              d={`M ${cx - masse.rx - 0.6} ${y - masse.ry * 0.2} a ${masse.rx + 0.6} ${masse.ry + 1.4} 0 0 1 ${2 * masse.rx + 1.2} 0 z`}
+              fill={face.skin}
+            />
+          )}
+          {/* Die Lidkante gibt dem Auge eine Oberkante — ohne sie schwimmt
+              das Weiß im Gesicht. */}
+          <path
+            d={`M ${cx - masse.rx} ${y - masse.ry * 0.55} a ${masse.rx} ${masse.ry} 0 0 1 ${2 * masse.rx} 0`}
+            stroke="#00000055"
+            strokeWidth="1.1"
+            fill="none"
+            strokeLinecap="round"
+          />
+        </g>
+      ))}
+    </g>
+  )
+}
+
+/**
+ * Was ein Alter sichtbar macht (02.09.).
+ *
+ * Keine Zahl im Bild und keine Behauptung — nur die zwei Linien, an denen ein
+ * Mensch im Alltag ein Alter schätzt: die Falte von der Nase zum Mundwinkel
+ * und eine über der Stirn. Sie erscheinen erst ab der Hälfte und werden
+ * kräftiger, nie hart.
+ */
+function Age({ face, w, y, mundY }: { face: FaceSpec; w: number; y: number; mundY: number }) {
+  if (face.age < 0.5) return null
+  const staerke = (face.age - 0.5) * 2
+  return (
+    <g stroke="#00000030" fill="none" strokeLinecap="round" opacity={0.35 + staerke * 0.5}>
+      <path d={`M ${60 - w * 0.42} ${mundY - 8} q -2 6 1 11`} strokeWidth="1.6" />
+      <path d={`M ${60 + w * 0.42} ${mundY - 8} q 2 6 -1 11`} strokeWidth="1.6" />
+      {face.age > 0.78 && <path d={`M ${60 - w * 0.34} ${y - 17} q ${w * 0.34} -3 ${w * 0.68} 0`} strokeWidth="1.4" />}
+    </g>
+  )
+}
+
 /** Der Umriss des Kopfes — einmal beschrieben, zweimal gebraucht: als Fläche und als Maske. */
-function headPath(w: number, h: number, jaw: number): string {
-  return `M 60 ${64 - h}
-          q ${w} 0 ${w} ${h}
-          q 0 ${h * (0.62 - jaw * 0.34)} ${-w * (0.55 + jaw * 0.4)} ${h * 0.52}
-          q ${-w * (0.45 - jaw * 0.4)} ${h * 0.14} ${-w * (0.9 - jaw * 0.8)} 0
-          q ${-w * (0.55 + jaw * 0.4)} ${-h * 0.38} ${-w * (0.55 + jaw * 0.4)} ${-h * 0.52}
-          q 0 ${-h} ${w} ${-h} z`
+function headPath(w: number, h: number, jaw: number, shape: HeadShape): string {
+  const m = HEAD_METRICS[shape]
+  const top = 64 - h
+  const wKrone = w * m.krone
+  // Der Kiefer folgt zusätzlich dem feinen Maß: kantig heißt breiter unten.
+  const wKiefer = w * m.kiefer * (0.9 + jaw * 0.24)
+  const wWange = w * m.wange
+  const yWange = 64 + h * 0.12
+  const yKinn = 64 + h * m.kinn
+  const rund = 1 - jaw * 0.55
+
+  return `M 60 ${top}
+          C ${60 + wKrone} ${top} ${60 + wWange} ${top + h * 0.42} ${60 + wWange} ${yWange}
+          C ${60 + wWange} ${yKinn - h * 0.30} ${60 + wKiefer} ${yKinn - h * 0.10 * rund} 60 ${yKinn}
+          C ${60 - wKiefer} ${yKinn - h * 0.10 * rund} ${60 - wWange} ${yKinn - h * 0.30} ${60 - wWange} ${yWange}
+          C ${60 - wWange} ${top + h * 0.42} ${60 - wKrone} ${top} 60 ${top} Z`
 }
 
 /**
@@ -184,9 +326,20 @@ function headPath(w: number, h: number, jaw: number): string {
  * Die Haube ist um vier Prozent breiter und drei Einheiten höher als der
  * Schädel: Sonst blitzt an der Rundung eine helle Linie Kopfhaut durch.
  */
-function cap(w: number, h: number, drop: number, dip: number): string {
+function cap(w: number, h: number, drop: number, dip: number, shape: HeadShape): string {
   const top = 64 - h - 3
-  const hw = w * 1.04
+  /*
+   * Die Haube folgt seit dem 02.09. der **Kopfform**.
+   *
+   * Vorher war sie immer gleich breit (`w * 1.04`), egal ob darunter ein
+   * runder oder ein kantiger Schädel saß. Damit war die neue Silhouette auf
+   * dem Bogen praktisch unsichtbar: Bei allen außer den Glatzen verdeckte die
+   * immer gleiche Haube genau den Teil, an dem man eine Kopfform erkennt.
+   * Ein breiterer Schädel braucht eine breitere Haube — sonst blitzt seitlich
+   * Kopfhaut durch, und die Form bleibt trotzdem verborgen.
+   */
+  const m = HEAD_METRICS[shape]
+  const hw = w * Math.max(m.krone, m.wange) * 1.04
   return `M ${60 - hw} ${drop}
           q 0 ${top - drop + 2} ${hw} ${top - drop}
           q ${hw} 2 ${hw} ${drop - top}
@@ -202,13 +355,13 @@ function Hair({ face, w, h }: { face: FaceSpec; w: number; h: number }) {
     case 'fringe':
       // Der Pony ist die eine Frisur, die die Stirn **verdecken darf** — ein
       // negativer `dip` zieht den Ansatz in der Mitte nach unten.
-      return <path d={cap(w, h, 48, -16)} fill={face.hair} />
+      return <path d={cap(w, h, 48, -16, face.headShape)} fill={face.hair} />
 
     case 'bun':
       return (
         <g fill={face.hair}>
           <circle cx="60" cy={top - 2} r={w * 0.32} />
-          <path d={cap(w, h, 48, 14)} />
+          <path d={cap(w, h, 48, 14, face.headShape)} />
         </g>
       )
 
@@ -218,7 +371,7 @@ function Hair({ face, w, h }: { face: FaceSpec; w: number; h: number }) {
           {[-0.86, -0.44, 0, 0.44, 0.86].map((offset, index) => (
             <circle key={index} cx={60 + offset * w} cy={top + 5 + Math.abs(offset) * 11} r={w * 0.3} />
           ))}
-          <path d={cap(w, h, 48, 12)} />
+          <path d={cap(w, h, 48, 12, face.headShape)} />
         </g>
       )
 
@@ -238,7 +391,7 @@ function Hair({ face, w, h }: { face: FaceSpec; w: number; h: number }) {
         <g fill={face.hair}>
           <path d={strand} />
           <path d={strand} transform="matrix(-1 0 0 1 120 0)" />
-          <path d={cap(w, h, 48, 14)} />
+          <path d={cap(w, h, 48, 14, face.headShape)} />
         </g>
       )
     }
@@ -261,40 +414,103 @@ function Hair({ face, w, h }: { face: FaceSpec; w: number; h: number }) {
     }
 
     default:
-      return <path d={cap(w, h, 48, 14)} fill={face.hair} />
+      return <path d={cap(w, h, 48, 14, face.headShape)} fill={face.hair} />
   }
 }
 
-function Nose({ face }: { face: FaceSpec }) {
+/**
+ * Die Nase — jetzt sichtbar (02.09.).
+ *
+ * Auf dem Bogen vom 02.09. war sie auf den meisten Gesichtern gar nicht zu
+ * finden: 18 bis 30 Prozent Schwarz auf hautfarbenem Grund verschwinden. Sie
+ * war damit einer von sieben „auffälligen" Kanälen, der nichts beitrug.
+ * Kräftiger gezeichnet und in der Länge veränderlich trägt sie wirklich.
+ */
+function Nose({ face, y, spanne }: { face: FaceSpec; y: number; spanne: number }) {
+  const laenge = 10 * face.noseLength * spanne
+  const oben = y + 5
   if (face.nose === 'round') {
-    return <circle cx="60" cy="78" r="4" fill="#00000018" />
+    return (
+      <g>
+        <path
+          d={`M 60 ${oben + 1} l 0 ${laenge}`}
+          stroke="#00000026"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+        <circle cx="60" cy={oben + laenge + 2} r={3.4 + face.noseLength} fill="#00000026" />
+      </g>
+    )
   }
   if (face.nose === 'wide') {
-    return <path d="M 54 80 q 6 5 12 0" stroke="#00000030" strokeWidth="2.4" fill="none" strokeLinecap="round" />
+    return (
+      <path
+        d={`M ${60 - 4 - 3 * face.noseLength} ${oben + laenge + 1} q ${4 + 3 * face.noseLength} ${5} ${8 + 6 * face.noseLength} 0`}
+        stroke="#00000042"
+        strokeWidth="2.8"
+        fill="none"
+        strokeLinecap="round"
+      />
+    )
   }
-  return <path d="M 60 68 l 0 12 l -4 2" stroke="#00000028" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+  return (
+    <path
+      d={`M 60 ${oben - 2} l 0 ${laenge + 2} l ${-4} 2`}
+      stroke="#0000003a"
+      strokeWidth="2.4"
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  )
 }
 
-function Mouth({ face }: { face: FaceSpec }) {
+/** Der Mund — vier Formen wie bisher, jetzt zusätzlich in der Breite veränderlich. */
+function Mouth({ face, y }: { face: FaceSpec; y: number }) {
+  const halb = 8 * face.mouthWidth
+  const dick = 2.6 + face.mouthWidth * 0.8
   switch (face.mouth) {
     case 'open':
-      return <ellipse cx="60" cy="92" rx="7" ry="5" fill="#7d3b3b" />
+      return <ellipse cx="60" cy={y + 2} rx={halb * 0.9} ry={4 + face.mouthWidth} fill="#7d3b3b" />
     case 'straight':
-      return <path d="M 52 92 l 16 0" stroke="#8c4a45" strokeWidth="2.8" strokeLinecap="round" />
+      return (
+        <path
+          d={`M ${60 - halb} ${y + 2} l ${2 * halb} 0`}
+          stroke="#8c4a45"
+          strokeWidth={dick}
+          strokeLinecap="round"
+        />
+      )
     case 'smirk':
-      return <path d="M 52 91 q 8 6 16 -2" stroke="#8c4a45" strokeWidth="2.8" fill="none" strokeLinecap="round" />
+      return (
+        <path
+          d={`M ${60 - halb} ${y + 1} q ${halb} 6 ${2 * halb} -2`}
+          stroke="#8c4a45"
+          strokeWidth={dick}
+          fill="none"
+          strokeLinecap="round"
+        />
+      )
     default:
-      return <path d="M 51 89 q 9 8 18 0" stroke="#8c4a45" strokeWidth="2.8" fill="none" strokeLinecap="round" />
+      return (
+        <path
+          d={`M ${60 - halb} ${y - 1} q ${halb} 8 ${2 * halb} 0`}
+          stroke="#8c4a45"
+          strokeWidth={dick}
+          fill="none"
+          strokeLinecap="round"
+        />
+      )
   }
 }
 
-function Beard({ face, w }: { face: FaceSpec; w: number }) {
+function Beard({ face, w, y }: { face: FaceSpec; w: number; y: number }) {
   if (face.beard === 1) {
     // Schnurrbart, als Fläche und nicht als Strich: Ein Strich in Haarfarbe
     // sieht neben einem Vollbart aus wie ein vergessener Bleistiftstrich.
     return (
       <path
-        d="M 47 85 q 7 -6 13 -1 q 6 -5 13 1 q -6 6 -13 4 q -7 2 -13 -4 z"
+        d={`M 47 ${y - 5} q 7 -6 13 -1 q 6 -5 13 1 q -6 6 -13 4 q -7 2 -13 -4 z`}
         fill={face.hair}
         opacity="0.94"
         stroke="#00000030"
@@ -315,8 +531,8 @@ function Beard({ face, w }: { face: FaceSpec; w: number }) {
    */
   return (
     <path
-      d={`M ${60 - w * 1.2} 70
-          Q 60 98 ${60 + w * 1.2} 70
+      d={`M ${60 - w * 1.2} ${y - 20}
+          Q 60 ${y + 8} ${60 + w * 1.2} ${y - 20}
           L ${60 + w * 1.2} 130
           L ${60 - w * 1.2} 130 Z`}
       fill={face.hair}
@@ -336,13 +552,13 @@ function Beard({ face, w }: { face: FaceSpec; w: number }) {
   )
 }
 
-function Glasses({ face }: { face: FaceSpec }) {
+function Glasses({ face, y }: { face: FaceSpec; y: number }) {
   const dx = 13 * face.eyeSpacing
   return (
     <g stroke="#3a332b" strokeWidth="2" fill="none" opacity="0.85">
-      <circle cx={60 - dx} cy="64" r={9 * face.eyeSize} />
-      <circle cx={60 + dx} cy="64" r={9 * face.eyeSize} />
-      <path d={`M ${60 - dx + 9 * face.eyeSize} 64 l ${2 * dx - 18 * face.eyeSize} 0`} />
+      <circle cx={60 - dx} cy={y} r={9 * face.eyeSize} />
+      <circle cx={60 + dx} cy={y} r={9 * face.eyeSize} />
+      <path d={`M ${60 - dx + 9 * face.eyeSize} ${y} l ${2 * dx - 18 * face.eyeSize} 0`} />
     </g>
   )
 }

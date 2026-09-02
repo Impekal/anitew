@@ -48,6 +48,35 @@ export type NoseShape = (typeof NOSE_SHAPES)[number]
 export const MOUTH_SHAPES = ['smile', 'straight', 'open', 'smirk'] as const
 export type MouthShape = (typeof MOUTH_SHAPES)[number]
 
+/*
+ * ── Die zweite Garnitur (Gerätebefund 02.09.) ─────────────────────────────
+ *
+ * „Sie sehen sich alle einfach zu ähnlich aus. Liegt wohl am
+ *  Zeichentricksding."
+ *
+ * Gemessen, bevor etwas geändert wurde: Die **Daten** sind vielfältig —
+ * mittlerer Abstand 4,47 von 7 auffälligen Merkmalen über 48 Namen, nur vier
+ * Paare liegen bei 1. Sichtbar waren davon aber nur vier Kanäle: Haare,
+ * Hautton, Brille, Bart. Kopfbreite schwankte um 3 Prozent, Augenabstand und
+ * -größe um 14 — bei 130 Pixeln Kantenlänge sieht das niemand. Jedes Gesicht
+ * hatte dieselbe Silhouette und dieselben Augen.
+ *
+ * Diese Merkmale sind deshalb **kategorisch** statt fein: Eine runde und eine
+ * kantige Kopfform trennt man aus zwei Metern, drei Prozent Breite nicht.
+ */
+
+/** Die Silhouette — das Erste, was man aus der Entfernung sieht. */
+export const HEAD_SHAPES = ['oval', 'round', 'square', 'long', 'heart'] as const
+export type HeadShape = (typeof HEAD_SHAPES)[number]
+
+/** Die Augenform. Bisher hatte jedes Gesicht dieselbe Mandel. */
+export const EYE_SHAPES = ['round', 'almond', 'hooded', 'narrow'] as const
+export type EyeShape = (typeof EYE_SHAPES)[number]
+
+/** Der Schwung der Braue. */
+export const BROW_SHAPES = ['flat', 'arched', 'angled'] as const
+export type BrowShape = (typeof BROW_SHAPES)[number]
+
 export interface Face {
   /** Breite des Kopfes, 1 ist der Normalwert. */
   width: number
@@ -69,6 +98,31 @@ export interface Face {
   mouth: MouthShape
   glasses: boolean
   ears: number
+  headShape: HeadShape
+  eyeShape: EyeShape
+  browShape: BrowShape
+  /** Wie lang die Nase ist, 1 ist der Normalwert. */
+  noseLength: number
+  /** Wie breit der Mund ist, 1 ist der Normalwert. */
+  mouthWidth: number
+  /**
+   * Alter, 0 = jung, 1 = alt. Sichtbar an Nasolabialfalte, Stirnfalte und
+   * einem tieferen Haaransatz — die Merkmale, an denen man im Alltag ein
+   * Alter schätzt, ohne es zu benennen.
+   */
+  age: number
+  /**
+   * Wo die Augenlinie sitzt, 0 = hoch, 1 = tief.
+   *
+   * Das war lange die stillste Ursache dafür, dass alle Gesichter gleich
+   * aussahen: Augen, Nase und Mund lagen bei **jedem** Gesicht auf genau
+   * derselben Höhe. Zwei Menschen unterscheiden sich aber gerade darin — ein
+   * hoher Haaransatz mit tiefliegenden Augen ist ein anderes Gesicht als eine
+   * kurze Stirn mit Augen weit oben, auch bei gleicher Kopfform.
+   */
+  featureY: number
+  /** Wie weit Augenlinie und Mund auseinanderliegen, 0 = gedrängt, 1 = lang. */
+  featureSpread: number
 }
 
 /**
@@ -104,6 +158,20 @@ export function faceFor(name: string): Face {
 
 function buildFace(name: string): Face {
   const rng = createRng(`face:${name}`)
+  /*
+   * Ein **zweiter** Strom für die neuen Merkmale — und das ist kein Zufall.
+   *
+   * Wer „Elena" schon gelernt hat, erkennt sie an Haarfarbe, Frisur, Hautton,
+   * Bart und Brille wieder. Zöge man die neuen Merkmale aus demselben Strom,
+   * verschöbe sich jeder folgende Wurf, und **jedes** Gesicht sähe von einem
+   * Tag auf den anderen völlig anders aus — bei laufenden Wiederholungen
+   * hieße das: gelernte Paare wären wertlos, und der Wiederholungsplan
+   * behauptete Wissen, das es nicht mehr gibt.
+   *
+   * Aus einem eigenen Strom bleiben die alten Werte Wort für Wort dieselben.
+   * Elena bleibt Elena — sie bekommt nur ein eigenes Gesicht.
+   */
+  const form = createRng(`face-shape:${name}`)
   return {
     width: 0.88 + rng.next() * 0.24,
     height: 0.9 + rng.next() * 0.22,
@@ -120,6 +188,14 @@ function buildFace(name: string): Face {
     mouth: rng.pick(MOUTH_SHAPES),
     glasses: rng.next() < 0.27,
     ears: 0.85 + rng.next() * 0.3,
+    headShape: form.pick(HEAD_SHAPES),
+    eyeShape: form.pick(EYE_SHAPES),
+    browShape: form.pick(BROW_SHAPES),
+    noseLength: 0.78 + form.next() * 0.5,
+    mouthWidth: 0.76 + form.next() * 0.5,
+    age: form.next(),
+    featureY: form.next(),
+    featureSpread: form.next(),
   }
 }
 
@@ -152,10 +228,23 @@ function beardOf(roll: number, name: string): 0 | 1 | 2 {
  * Gesichter, die sich nur um drei Prozent Kopfbreite unterscheiden, sind für
  * den Abruf dasselbe Gesicht.
  */
-const STRONG_FEATURES = ['hairStyle', 'hair', 'skin', 'beard', 'glasses', 'nose', 'mouth'] as const
+const STRONG_FEATURES = [
+  'hairStyle',
+  'hair',
+  'skin',
+  'beard',
+  'glasses',
+  'nose',
+  'mouth',
+  // Seit dem 02.09. dazu: Diese drei sieht man wirklich, anders als die
+  // feinen Maße daneben.
+  'headShape',
+  'eyeShape',
+  'browShape',
+] as const
 
 /**
- * Wie viele auffällige Merkmale trennen zwei Gesichter? (0 bis 7)
+ * Wie viele auffällige Merkmale trennen zwei Gesichter? (0 bis 10)
  *
  * Gerätemeldung 01.09.: „die Menschen sehen sich zu ähnlich aus. Im echten
  * Leben ist es nicht so." Der Vorrat ist vielfältig — aber wer eine Runde
