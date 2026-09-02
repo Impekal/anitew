@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 
 import {
   LABEL_MAX,
@@ -7,9 +7,11 @@ import {
   OWN_MIN_STATIONS,
   type OwnPalace,
   type OwnStation,
+  type Platform,
   isOwnPalace,
 } from '../core/index.ts'
 import { createOwnPalace, removeOwnPalace, saveOwnPalace } from '../data/palace.ts'
+import { scheduleDriveSync } from './driveSync.ts'
 import type { Dictionary } from '../i18n/index.ts'
 
 /**
@@ -32,13 +34,26 @@ export function PalacePanel({
   dictionary,
   own,
   onChange,
+  platform,
 }: {
   dictionary: Dictionary
   own: readonly OwnPalace[]
   onChange: () => void
+  platform: Platform
 }) {
   const t = dictionary.palace
   const [adding, setAdding] = useState(false)
+  /*
+   * Anlegen, Umbenennen, Wegwerfen — alle drei gehen durch `onChange`, und
+   * alle drei sind Inhalt: selbst überlegte Orte der eigenen Wohnung. Sie
+   * sollen das zweite Gerät erreichen, ohne auf den nächsten App-Start zu
+   * warten (D-038), so wie es „Das merke ich mir“ und „Mein Gedächtnis“
+   * längst tun. Ein Anstoß an einer Stelle statt drei an dreien.
+   */
+  const changed = useCallback(() => {
+    onChange()
+    scheduleDriveSync(platform)
+  }, [onChange, platform])
   /*
    * Die Bestätigung gehört dem Bildschirm, nicht dem Formular.
    *
@@ -66,9 +81,10 @@ export function PalacePanel({
           key={palace.id}
           dictionary={dictionary}
           palace={palace}
-          onChange={onChange}
+          onChange={changed}
           onSaved={() => setSaved(true)}
           onDirty={() => setSaved(false)}
+          now={() => platform.clock.now()}
         />
       ))}
 
@@ -78,10 +94,11 @@ export function PalacePanel({
           palace={undefined}
           onChange={() => {
             setAdding(false)
-            onChange()
+            changed()
           }}
           onSaved={() => setSaved(true)}
           onDirty={() => setSaved(false)}
+          now={() => platform.clock.now()}
           // Abbrechen gibt es nur, wenn es etwas gibt, wozu man zurückkehrt.
           onCancel={own.length === 0 ? undefined : () => setAdding(false)}
         />
@@ -135,6 +152,7 @@ function PalaceEditor({
   onSaved,
   onDirty,
   onCancel,
+  now,
 }: {
   dictionary: Dictionary
   palace: OwnPalace | undefined
@@ -142,6 +160,8 @@ function PalaceEditor({
   onSaved: () => void
   onDirty: () => void
   onCancel?: () => void
+  /** Die Uhr des Geräts — für den Merkzettel des Weggeworfenen. */
+  now: () => number
 }) {
   const t = dictionary.palace
   const [name, setName] = useState(palace?.name ?? '')
@@ -307,7 +327,7 @@ function PalaceEditor({
                * man ihn neu anlegt: Der neue bekommt eine neue Kennung, damit
                * er nicht die Termine des alten erbt.
                */
-              void removeOwnPalace(palace.id)
+              void removeOwnPalace(palace.id, now())
                 .catch(() => undefined)
                 .finally(onChange)
             }}

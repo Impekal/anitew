@@ -1,4 +1,5 @@
 import { DIMENSIONS } from '../profile/dimensions.ts'
+import { mergeOwnFacts, mergeOwnPalaces, mergeRemovedMarks } from './ownContent.ts'
 import {
   PROFILE_HISTORY_LIMIT,
   readProfileHistory,
@@ -63,6 +64,18 @@ function mergeMajorDigits(local: unknown, remote: unknown): unknown {
  */
 export function mergeDriveSettingValue(key: string, local: unknown, remote: unknown): unknown {
   if (key === 'memory.graph') return remote
+
+  /*
+   * Eigene Inhalte sind keine Vorlieben (G3 · I). Sie werden vereinigt, und
+   * ihre Merkzettel des Weggeworfenen gleich mit — sonst käme jedes gelöschte
+   * Paar beim nächsten Abgleich vom anderen Gerät zurück. Die Merkzettel
+   * stehen zuerst, weil `own.facts.removed.de` sonst als Paarliste gelesen
+   * würde.
+   */
+  if (key === 'palace.own.removed') return mergeRemovedMarks(local, remote)
+  if (key.startsWith('own.facts.removed.')) return mergeRemovedMarks(local, remote)
+  if (key === 'palace.own.v2') return mergeOwnPalaces(local, remote)
+  if (key.startsWith('own.facts.')) return mergeOwnFacts(local, remote)
 
   if (key === 'technique.major.taught') return mergeMajorDigits(local, remote)
   if (/^technique\..+\.taught$/u.test(key)) {

@@ -1,5 +1,6 @@
 import { Suspense, lazy } from 'react'
 
+import type { Platform } from '../core/index.ts'
 import type { Dictionary } from '../i18n/index.ts'
 
 /*
@@ -16,7 +17,11 @@ const OwnPanelImpl = lazy(() =>
   import('./OwnPanelImpl.tsx').then((module) => ({ default: module.OwnPanel })),
 )
 
-export function OwnPanel(props: { language: string; dictionary: Dictionary }) {
+export function OwnPanel(props: {
+  language: string
+  dictionary: Dictionary
+  platform: Platform
+}) {
   return (
     <Suspense fallback={null}>
       <OwnPanelImpl {...props} />

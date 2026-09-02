@@ -2,11 +2,13 @@ import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react'
 
 import {
   type OwnFact,
+  type Platform,
   type RememberSuggestions,
   factPrompt,
   parseOwnText,
 } from '../core/index.ts'
 import { addOwnFacts, loadOwnFacts, loadOwnPool, removeOwnFact } from '../data/own.ts'
+import { scheduleDriveSync } from './driveSync.ts'
 import type { Dictionary } from '../i18n/index.ts'
 import { dictateLocally } from '../platform/web/localDictation.ts'
 import { localDictationCopyForCurrentUi } from './localDictationCopy.ts'
@@ -64,7 +66,15 @@ interface LocalPhoto {
  * BYOK-Anbieter. Dessen Antwort ist nur `RememberSuggestions`: Sie landet in
  * derselben Memory-Mode-Vorschau wie Text-KI und schreibt niemals direkt.
  */
-export function OwnPanel({ language, dictionary }: { language: string; dictionary: Dictionary }) {
+export function OwnPanel({
+  language,
+  dictionary,
+  platform,
+}: {
+  language: string
+  dictionary: Dictionary
+  platform: Platform
+}) {
   const texts = dictionary.own
   const dictationTexts = localDictationCopyForCurrentUi()
   const photoTexts = localPhotoCopyForCurrentUi()
@@ -104,20 +114,30 @@ export function OwnPanel({ language, dictionary }: { language: string; dictionar
 
   const parsed = parseOwnText(draft)
 
+  /*
+   * Eigene Paare sind Inhalt, keine Vorliebe: Sie sollen das zweite Gerät
+   * erreichen, ohne auf den nächsten App-Start zu warten (D-038) — so wie es
+   * „Das merke ich mir“ und „Mein Gedächtnis“ längst tun.
+   */
+  const changed = () => {
+    reload()
+    scheduleDriveSync(platform)
+  }
+
   const save = () => {
     if (parsed.facts.length === 0) return
     void addOwnFacts(language, parsed.facts)
       .then(() => {
         setDraft('')
         setMemoryModeOpen(false)
-        reload()
+        changed()
       })
       .catch(() => undefined)
   }
 
   const remove = (prompt: string) => {
-    void removeOwnFact(language, prompt)
-      .then(reload)
+    void removeOwnFact(language, prompt, platform.clock.now())
+      .then(changed)
       .catch(() => undefined)
   }
 
