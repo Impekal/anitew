@@ -49,7 +49,7 @@ const POOLS: Pools = (() => {
     twins: [],
     gaze: [],
     facts: [],
-    memory: [],
+    memory: [], people: [],
   }
 })()
 

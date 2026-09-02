@@ -16,6 +16,14 @@ export * from './backup.ts'
 export * from './backupSettings.ts'
 export * from './content/associations.ts'
 export * from './content/faces.ts'
+/*
+  `content/people.ts` steht hier bewusst NICHT: Die Personenliste wird erst
+  beim Bau einer Einheit gebraucht und beim ersten Bild nicht. Über diesen
+  Sammelexport käme sie in den Kaltstart (gemessen: +2,3 KB). Die Oberfläche
+  lädt sie mit `await import(...)`; die Form der Karte steht in
+  `content/peopleCard.ts` und darf hier stehen.
+*/
+export * from './content/peopleCard.ts'
 export * from './content/interference.ts'
 export * from './content/names.ts'
 export * from './content/missions.ts'

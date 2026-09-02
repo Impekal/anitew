@@ -253,7 +253,7 @@ describe('die Memory-Szene im Bauplan (D-036)', () => {
     twins: [],
     gaze: [],
     facts: [],
-    memory: [],
+    memory: [], people: [],
   }
   const base = { day: '2026-08-19', language: 'de', seed: 'memory', mode: 'daily' } as const
 

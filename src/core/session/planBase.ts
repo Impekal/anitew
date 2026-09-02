@@ -22,6 +22,7 @@ import type { DayKey } from '../time.ts'
 import { faceDistance } from '../content/faces.ts'
 import { answerFor, factKindOf, missionFacts, personOf } from '../content/missions.ts'
 import { factAnswer, factPrompt } from '../content/own.ts'
+import { personYearOf } from '../content/peopleCard.ts'
 import {
   memoryLabelsOf,
   memorySceneItems,
@@ -144,6 +145,14 @@ export const TRAINING_MODULES = [
    * überall: still aus der Lernrotation, Wiedersehen unberührt.
    */
   'memory',
+  /*
+   * Bekannte Persönlichkeiten als Fakten, ohne jedes Bild (Nutzerwunsch
+   * 02.09.): Name → Geburtsjahr, Fach, Herkunft. Endlicher, kuratierter
+   * Vorrat wie die Zwillinge — ist alles terminiert, nimmt der
+   * Vorratsfilter das Modul still heraus. Warum ohne Bild, steht in
+   * `content/people.ts`.
+   */
+  'people',
 ] as const
 export type ModuleId = (typeof TRAINING_MODULES)[number]
 
@@ -184,7 +193,13 @@ export function isPrompted(moduleId: ModuleId): boolean {
     // Gesicht ist das die Aufgabe, die im Alltag vorkommt (D-032).
     moduleId === 'facts' ||
     // Memory-Szenen fragen am Anker: „Daniel — was gehört dazu?“ (D-036).
-    moduleId === 'memory'
+    moduleId === 'memory' ||
+    /*
+     * Persönlichkeiten: Der Name steht da, gesucht sind Jahr, Fach und
+     * Herkunft. „Nenne alle Persönlichkeiten“ wäre keine Frage — genau wie
+     * beim Gesicht ist der Name der Anker und nicht das Gesuchte.
+     */
+    moduleId === 'people'
   )
 }
 
@@ -320,6 +335,12 @@ export function targetOf(moduleId: ModuleId, item: string, language: string): st
   if (moduleId === 'gaze') return gazeAnswer(item, language as Language) ?? item
   // Eigenes Paar: Die Kennung trägt beide Seiten, gesucht ist die Antwort.
   if (moduleId === 'facts') return factAnswer(item)
+  /*
+   * Persönlichkeiten: Eingeprägt wird die ganze Karte, gefragt ist das Jahr.
+   * Der Grund steht bei `personYearOf` — kurz: Drei Angaben in ein Feld wäre
+   * eine Tastaturübung, und eine Zahl lässt sich genau bewerten.
+   */
+  if (moduleId === 'people') return personYearOf(item)
   // Memory: gesucht ist das Ding am Anker (D-036).
   if (moduleId === 'memory') return memoryTargetOf(item)
   if (moduleId !== 'missions') return item
@@ -358,6 +379,9 @@ export function displayOf(moduleId: ModuleId, item: string, language: string): s
   // Eigenes Paar: „Frage · Antwort“ — lesbar, nicht die Kennung mit dem
   // unsichtbaren Trennzeichen.
   if (moduleId === 'facts') return `${factPrompt(item)} · ${factAnswer(item)}`
+  // Persönlichkeit: „Lionel Messi · 1987 · Fußball · Argentinien“ — die ganze
+  // Karte, denn in der Zusammenfassung steht, was dastand.
+  if (moduleId === 'people') return `${factPrompt(item)} · ${factAnswer(item)}`
   // Memory: „Daniel · Madrid“ — woran man sich erinnert hat (D-036).
   if (moduleId === 'memory') {
     const labels = memoryLabelsOf(item)
@@ -398,6 +422,12 @@ export function leniencyFor(moduleId: ModuleId, item?: string): Leniency {
   if (moduleId === 'facts') {
     return /^\d+$/.test(factAnswer(item ?? '')) ? 'exact' : 'typos'
   }
+  /*
+   * Persönlichkeiten: Gefragt ist ein Geburtsjahr, also genau. 1984 und 1948
+   * sind nicht derselbe Jahrgang — nachsichtig zu sein hieße hier, die
+   * Aufgabe abzuschaffen und trotzdem einen Punkt zu geben (D-012).
+   */
+  if (moduleId === 'people') return 'exact'
   // Memory (D-036): dieselbe Regel — eine Zahl als Antwort ist exakt.
   if (moduleId === 'memory') {
     return /^\d+$/.test(memoryTargetOf(item ?? '')) ? 'exact' : 'typos'

@@ -37,7 +37,7 @@ function pools(seed: string): Pools {
     twins: [],
     gaze: [],
     facts: [],
-    memory: [],
+    memory: [], people: [],
   }
 }
 

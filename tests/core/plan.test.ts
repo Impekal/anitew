@@ -23,7 +23,7 @@ const plan = (mode: (typeof TRAINING_MODES)[number], seed = 'test', due: string[
     day: '2026-08-17',
     language: 'de',
     seed,
-    pools: { words: pool, faces: [], numbers: [], missions: [], palace: [], reverse: [], twins: [], gaze: [], facts: [], memory: [] },
+    pools: { words: pool, faces: [], numbers: [], missions: [], palace: [], reverse: [], twins: [], gaze: [], facts: [], memory: [], people: [] },
     due: { words: due },
     modules: ['words'],
   })
@@ -136,7 +136,7 @@ describe('die Wortauswahl', () => {
         day: '2026-08-17',
         language: 'de',
         seed: 'x',
-        pools: { words: ['eins', 'zwei'], faces: [], numbers: [], missions: [], palace: [], reverse: [], twins: [], gaze: [], facts: [], memory: [] },
+        pools: { words: ['eins', 'zwei'], faces: [], numbers: [], missions: [], palace: [], reverse: [], twins: [], gaze: [], facts: [], memory: [], people: [] },
         modules: ['words'],
       }),
     ).toThrow(RangeError)
