@@ -8,6 +8,32 @@ const STATE_COOKIE = 'anitew_google_oauth_state'
 const PUSH_STATE_KEY = 'push-state-v1'
 
 /**
+ * Der Scope, ohne den ANITEW nichts in Google Drive schreiben kann.
+ *
+ * Er steht hier noch einmal wörtlich statt als Import: Der Worker ist
+ * bewusst schlichtes, abhängigkeitsfreies JavaScript. Die App führt dieselbe
+ * Zeichenkette in `src/core/sync/drive.ts`; ein Test hält beide zusammen.
+ */
+const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file'
+
+/**
+ * Hat Google die Drive-Freigabe wirklich mitgegeben?
+ *
+ * Googles Zustimmungsbildschirm zeigt `drive.file` als **eigenes, anfangs
+ * leeres Kästchen**. Bleibt es leer, ist die Anmeldung trotzdem gültig — nur
+ * ohne Drive. Google sagt das im Feld `scope` der Token-Antwort. Ohne diese
+ * Prüfung hielt sich die App für verbunden und erfuhr die Wahrheit erst beim
+ * ersten Schreibversuch, als `drive_403_insufficientPermissions`.
+ *
+ * Verglichen wird auf ganze Einträge, nicht mit `includes`: Ein Scope, der
+ * zufällig auf denselben Text endet, ist ein anderer Scope.
+ */
+function grantsDrive(scope) {
+  if (typeof scope !== 'string') return false
+  return scope.split(/\s+/u).includes(DRIVE_SCOPE)
+}
+
+/**
  * Absolute Obergrenze einer Google-Sitzung (D-049). PRIVACY verspricht
  * „läuft nach spätestens 180 Tagen ab“ — deshalb wird der Ablauf beim
  * ersten Login mit versiegelt und bei jedem Refresh nur **übernommen**,
@@ -225,6 +251,8 @@ async function handleCallback(request, env) {
       refreshToken: typeof token.refresh_token === 'string' ? token.refresh_token : undefined,
       // Der absolute Sitzungsablauf entsteht genau einmal: beim Login.
       sessionExpiresAt: Date.now() + SESSION_MAX_AGE_MS,
+      // Und genauso das Ja/Nein zur Drive-Freigabe — direkt aus Googles Antwort.
+      driveGranted: grantsDrive(token.scope),
     }
     const sealed = await seal(credential, env.GOOGLE_CLIENT_SECRET)
     const maxAge = credential.refreshToken
@@ -268,6 +296,18 @@ async function handleAccessToken(request, env) {
    * Altbestand ohne absoluten Ablauf bekommt die kurze Übergangsfrist, nicht
    * ein frisches 180-Tage-Fenster (R3-02).
    */
+  /*
+   * Ein Ja/Nein, nie Googles Scope-Zeile. Der Browser braucht die Auskunft
+   * „Drive ist frei", nicht die Liste, aus der sie stammt (PRIVACY §5:
+   * nach außen nur, was gebraucht wird).
+   *
+   * Sitzungen aus der Zeit vor dieser Prüfung tragen das Feld nicht. Sie
+   * gelten als freigegeben: Sie synchronisieren seit Wochen erfolgreich, und
+   * ihnen jetzt die Freigabe abzusprechen wäre eine erfundene Auskunft — sie
+   * würde funktionierende Abgleiche grundlos anhalten.
+   */
+  const driveGranted = credential.driveGranted !== false
+
   const legacy = typeof credential.sessionExpiresAt !== 'number'
   const sessionExpiresAt = legacy
     ? Date.now() + LEGACY_SESSION_GRACE_MS
@@ -285,7 +325,7 @@ async function handleAccessToken(request, env) {
      * nach vier Wochen wiederkam, bekam die Frist erst dann versiegelt und
      * lebte damit deutlich länger als die in PRIVACY §9 zugesagten 30 Tage.
      */
-    if (!legacy) return json({ access_token: credential.accessToken })
+    if (!legacy) return json({ access_token: credential.accessToken, drive_granted: driveGranted })
 
     const sealedNow = await seal(
       { ...credential, sessionExpiresAt },
@@ -293,7 +333,7 @@ async function handleAccessToken(request, env) {
     )
     const remainingNow = Math.max(60, Math.floor((sessionExpiresAt - Date.now()) / 1000))
     return json(
-      { access_token: credential.accessToken },
+      { access_token: credential.accessToken, drive_granted: driveGranted },
       200,
       credentialCookie(sealedNow, remainingNow),
     )
@@ -312,11 +352,23 @@ async function handleAccessToken(request, env) {
     expiresAt: Date.now() + Math.max(60, expiresIn - 60) * 1000,
     refreshToken: credential.refreshToken,
     sessionExpiresAt,
+    /*
+     * Google schickt `scope` beim Erneuern nicht immer mit. Fehlt es, bleibt
+     * die bisherige Auskunft stehen — sie neu zu erfinden hieße, entweder
+     * einem Verbundenen grundlos den Abgleich zu nehmen oder eine Freigabe
+     * zu behaupten, die niemand erteilt hat.
+     */
+    driveGranted:
+      typeof refreshed.scope === 'string' ? grantsDrive(refreshed.scope) : driveGranted,
   }
   const nextSealed = await seal(next, env.GOOGLE_CLIENT_SECRET)
   // Das Cookie lebt nur noch die **Rest**laufzeit — kein rollierendes Fenster.
   const remaining = Math.max(60, Math.floor((sessionExpiresAt - Date.now()) / 1000))
-  return json({ access_token: next.accessToken }, 200, credentialCookie(nextSealed, remaining))
+  return json(
+    { access_token: next.accessToken, drive_granted: next.driveGranted },
+    200,
+    credentialCookie(nextSealed, remaining),
+  )
 }
 
 async function handleLogout(request, env) {

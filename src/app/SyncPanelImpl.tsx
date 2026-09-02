@@ -18,6 +18,9 @@ import { takeDriveRedirectNotice } from './driveRedirectNotice.ts'
 
 type SyncFailureText = DriveFailure | 'remote-invalid' | 'storage'
 
+/** Die Kennung aus `requestDriveToken`, wenn Google die Drive-Freigabe nicht mitgab. */
+const SCOPE_MISSING = 'drive_scope_missing'
+
 /*
   Die Texte stehen in `i18n/driveCopy.ts`, in allen sechs App-Sprachen.
 
@@ -29,10 +32,22 @@ type SyncFailureText = DriveFailure | 'remote-invalid' | 'storage'
   Muster jetzt aus dem Quelltext heraus.
 */
 
+/*
+  `blocked` gehört in diese Liste — es fehlte, und das machte einen ganzen
+  Satz unerreichbar.
+
+  Am 01.09. bekam der abgelehnte Drive-Zugriff seinen eigenen Text
+  (`sync.errors.blocked`), damit ein 403 nicht mehr der Anmeldung angelastet
+  wird. Diese Prüfung hier kannte `blocked` aber nicht und gab `undefined`
+  zurück; der Aufrufer nahm dann ersatzweise `drive`. Der neue Satz stand im
+  Wörterbuch und kam nie auf einen Bildschirm.
+*/
 function driveFailure(error: unknown): DriveFailure | undefined {
   if (typeof error !== 'object' || error === null || !('reason' in error)) return undefined
   const reason = (error as { reason?: unknown }).reason
-  return reason === 'denied' || reason === 'offline' || reason === 'drive' ? reason : undefined
+  return reason === 'denied' || reason === 'offline' || reason === 'drive' || reason === 'blocked'
+    ? reason
+    : undefined
 }
 
 function driveFailureDetail(error: unknown): string | undefined {
@@ -277,12 +292,23 @@ export function SyncPanelImpl({ platform, dictionary }: { platform: Platform; di
       )}
       {failure !== undefined && (
         <p className="sync-failure">
-          {failure === 'remote-invalid'
-            ? drive.remoteInvalid
-            : failure === 'storage'
-              ? drive.storage
-              : texts.errors[failure]}
-          {failureDetail === undefined ? '' : ` · ${failureDetail}`}
+          {/*
+            Das leere Drive-Kästchen bekommt einen eigenen Satz statt eines
+            Kürzels: Es ist der einzige Fehlerfall, bei dem die Anmeldung
+            gelungen ist und der Mensch trotzdem noch einmal zu Google muss.
+            Googles Kennung stünde hier nur im Weg — der Satz sagt alles,
+            was sie sagt, und dazu, was zu tun ist.
+          */}
+          {failureDetail === SCOPE_MISSING
+            ? drive.boxMissing
+            : failure === 'remote-invalid'
+              ? drive.remoteInvalid
+              : failure === 'storage'
+                ? drive.storage
+                : texts.errors[failure]}
+          {failureDetail === undefined || failureDetail === SCOPE_MISSING
+            ? ''
+            : ` · ${failureDetail}`}
         </p>
       )}
 

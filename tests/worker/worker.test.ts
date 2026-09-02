@@ -1,7 +1,10 @@
+import { readFile } from 'node:fs/promises'
+
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 // @ts-expect-error — der Worker ist bewusst schlichtes JavaScript ohne Typen.
 import workerModule, { PushReminder, seal } from '../../worker/index.js'
+import { DRIVE_SCOPE } from '../../src/core/sync/drive.ts'
 
 /**
  * Der Cloudflare-Worker ist die sicherheitskritischste Datei des Projekts:
@@ -148,12 +151,13 @@ describe('der OAuth-Callback', () => {
 })
 
 describe('der Access-Token-Endpunkt', () => {
-  async function signIn(env: StubEnv): Promise<string> {
+  async function signIn(env: StubEnv, scope = `${DRIVE_SCOPE} openid email profile`): Promise<string> {
     globalThis.fetch = (async () =>
       Response.json({
         access_token: 'zugriff',
         refresh_token: 'erneuerung',
         expires_in: 3600,
+        scope,
       })) as typeof fetch
     const request = new Request(`${ORIGIN}/oauth/google/callback?state=s1&code=c1`, {
       headers: { cookie: 'anitew_google_oauth_state=s1' },
@@ -193,7 +197,83 @@ describe('der Access-Token-Endpunkt', () => {
     })
     const response: Response = await workerModule.fetch(request, env)
     expect(response.status).toBe(200)
-    expect(await response.json()).toEqual({ access_token: 'zugriff' })
+    expect(await response.json()).toEqual({ access_token: 'zugriff', drive_granted: true })
+  })
+
+  /**
+   * Googles Zustimmungsbildschirm hat für `drive.file` ein **eigenes,
+   * anfangs leeres Kästchen.** Wer es übersieht, meldet sich vollständig
+   * gültig an — nur ohne Drive. Google sagt das in der Antwort: Im Feld
+   * `scope` steht dann nur noch `openid email profile`.
+   *
+   * Bis hierher hat der Worker dieses Feld **nie gelesen**. Die App bekam ein
+   * Token, hielt sich für verbunden und erfuhr erst beim ersten Drive-Zugriff
+   * die Wahrheit — als `drive_403_insufficientPermissions`, in Googles
+   * Kürzeln, auf einem Bildschirm, der von Anmeldung sprach. Genau so wurde
+   * es am 02.09. gemeldet.
+   *
+   * Nach außen geht **nur ein Ja/Nein**, nie die Scope-Zeile selbst: Der
+   * Browser braucht die Auskunft „Drive ist frei", nicht Googles Liste.
+   */
+  it('führt denselben Drive-Scope wie die App', async () => {
+    /*
+      Der Worker ist bewusst abhängigkeitsfrei und trägt die Scope-Zeile
+      deshalb ein zweites Mal. Zwei Kopien laufen auseinander, sobald eine
+      angefasst wird — und die Folge wäre still: Der Worker meldete „keine
+      Freigabe“ für eine Freigabe, die die App gerade erst geholt hat.
+    */
+    const quelle = await readFile(new URL('../../worker/index.js', import.meta.url), 'utf8')
+    expect(quelle).toContain(`const DRIVE_SCOPE = '${DRIVE_SCOPE}'`)
+  })
+
+  it('sagt, ob die Drive-Freigabe wirklich erteilt wurde — ohne die Scope-Zeile herauszugeben', async () => {
+    const env = stubEnv()
+    // Angemeldet, aber das Drive-Kästchen blieb leer.
+    const cookie = await signIn(env, 'openid email profile')
+    const response: Response = await workerModule.fetch(
+      new Request(`${ORIGIN}/oauth/google/access-token`, {
+        method: 'POST',
+        headers: { 'x-anitew-request': '1', origin: ORIGIN, cookie },
+      }),
+      env,
+    )
+    expect(response.status).toBe(200)
+    const body = (await response.clone().json()) as Record<string, unknown>
+    expect(body.drive_granted, 'die fehlende Drive-Freigabe wird verschwiegen').toBe(false)
+    // Das Token gibt es weiterhin — die Anmeldung selbst ist ja gültig.
+    expect(body.access_token).toBe('zugriff')
+    // Googles Scope-Zeile bleibt beim Worker.
+    expect(await response.text()).not.toContain('openid')
+  })
+
+  it('merkt sich die Drive-Freigabe über den Refresh hinweg', async () => {
+    /*
+      Google schickt `scope` beim Erneuern nicht immer mit. Die Freigabe darf
+      dabei weder verschwinden (dann verlöre ein verbundener Mensch grundlos
+      seinen Abgleich) noch aus dem Nichts entstehen.
+    */
+    const env = stubEnv()
+    const cookie = await signIn(env, 'openid email profile')
+    globalThis.fetch = (async () =>
+      Response.json({ access_token: 'frisch', expires_in: 3600 })) as typeof fetch
+    vi.useFakeTimers()
+    try {
+      vi.setSystemTime(Date.now() + 2 * 3600_000)
+      const refreshed: Response = await workerModule.fetch(
+        new Request(`${ORIGIN}/oauth/google/access-token`, {
+          method: 'POST',
+          headers: { 'x-anitew-request': '1', origin: ORIGIN, cookie },
+        }),
+        env,
+      )
+      expect(refreshed.status).toBe(200)
+      expect((await refreshed.json()) as Record<string, unknown>).toMatchObject({
+        access_token: 'frisch',
+        drive_granted: false,
+      })
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it('verlängert die Sitzung beim Refresh nicht — nach 180 Tagen ab Anmeldung ist Schluss (F-04)', async () => {

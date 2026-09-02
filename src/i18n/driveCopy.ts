@@ -35,6 +35,15 @@ export interface DriveCopy {
   /** Nach der Rückkehr von Google, im Erstlauf-Blatt. */
   redirectConnected: string
   redirectFailed: string
+  /**
+   * Die Anmeldung gelang, das Drive-Kästchen blieb leer (Gerätebild 02.09.).
+   *
+   * Der Satz muss dreierlei leisten: die Anmeldung **nicht** beschuldigen —
+   * sie hat funktioniert; sagen, was fehlt; und sagen, wie man es nachholt.
+   * Googles eigene Beschriftung wird bewusst nicht zitiert: Sie ändert sich,
+   * und ein falsch zitiertes Kästchen sucht man vergebens.
+   */
+  boxMissing: string
 }
 
 const COPY: Record<string, DriveCopy> = {
@@ -59,6 +68,8 @@ const COPY: Record<string, DriveCopy> = {
     connected: 'Google-Anmeldung abgeschlossen. Dein Konto ist jetzt verbunden.',
     redirectConnected: 'Angemeldet. Daten im eigenen Google Drive gespeichert',
     redirectFailed: 'Google-Anmeldung konnte nicht abgeschlossen werden.',
+    boxMissing:
+      'Die Anmeldung hat geklappt — aber die Freigabe für Google Drive wurde nicht erteilt. Google zeigt sie als eigenes Kästchen, das nicht vorausgewählt ist. Melde dich noch einmal an und setze dort den Haken. Bis dahin bleibt alles auf diesem Gerät; verloren geht nichts.',
   },
   en: {
     intro:
@@ -80,6 +91,8 @@ const COPY: Record<string, DriveCopy> = {
     connected: 'Google sign-in completed. Your account is now connected.',
     redirectConnected: 'Signed in. Data saved in your own Google Drive',
     redirectFailed: 'Google sign-in could not be completed.',
+    boxMissing:
+      'Signing in worked — but permission for Google Drive was not granted. Google shows it as a separate box that is not ticked in advance. Sign in again and tick it. Until then everything stays on this device; nothing is lost.',
   },
   fr: {
     intro:
@@ -102,6 +115,8 @@ const COPY: Record<string, DriveCopy> = {
     connected: 'Connexion Google terminée. Ton compte est maintenant relié.',
     redirectConnected: 'Connecté. Données enregistrées dans ton propre Google Drive',
     redirectFailed: 'La connexion Google n’a pas pu être terminée.',
+    boxMissing:
+      'La connexion a réussi — mais l’autorisation pour Google Drive n’a pas été accordée. Google l’affiche dans une case distincte, non cochée par défaut. Reconnecte-toi et coche-la. En attendant, tout reste sur cet appareil ; rien n’est perdu.',
   },
   es: {
     intro:
@@ -123,6 +138,8 @@ const COPY: Record<string, DriveCopy> = {
     connected: 'Inicio de sesión con Google completado. Tu cuenta ya está conectada.',
     redirectConnected: 'Sesión iniciada. Datos guardados en tu propio Google Drive',
     redirectFailed: 'No se pudo completar el inicio de sesión con Google.',
+    boxMissing:
+      'El inicio de sesión funcionó, pero no se concedió el permiso para Google Drive. Google lo muestra en una casilla aparte que no viene marcada. Inicia sesión de nuevo y márcala. Hasta entonces todo permanece en este dispositivo; no se pierde nada.',
   },
   it: {
     intro:
@@ -144,6 +161,8 @@ const COPY: Record<string, DriveCopy> = {
     connected: 'Accesso con Google completato. Il tuo account ora è collegato.',
     redirectConnected: 'Accesso eseguito. Dati salvati nel tuo Google Drive',
     redirectFailed: 'Non è stato possibile completare l’accesso con Google.',
+    boxMissing:
+      'L’accesso è riuscito, ma l’autorizzazione per Google Drive non è stata concessa. Google la mostra in una casella separata che non è selezionata di default. Accedi di nuovo e selezionala. Fino ad allora tutto resta su questo dispositivo; non si perde nulla.',
   },
   pt: {
     intro:
@@ -165,6 +184,8 @@ const COPY: Record<string, DriveCopy> = {
     connected: 'Início de sessão com o Google concluído. A tua conta está agora ligada.',
     redirectConnected: 'Sessão iniciada. Dados guardados no teu próprio Google Drive',
     redirectFailed: 'Não foi possível concluir o início de sessão com o Google.',
+    boxMissing:
+      'O início de sessão funcionou, mas a autorização para o Google Drive não foi concedida. O Google mostra-a numa caixa separada que não vem marcada. Inicia sessão outra vez e marca-a. Até lá tudo fica neste dispositivo; nada se perde.',
   },
 }
 
