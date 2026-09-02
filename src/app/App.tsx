@@ -1054,7 +1054,6 @@ export function App() {
         title: dictionary.palace.heading,
         body: (
           <PalacePanel
-            dictionary={dictionary}
             own={own}
             onChange={reloadOwn}
             platform={platform}

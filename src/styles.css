@@ -2387,3 +2387,30 @@ body::before {
   gap: 1rem;
 }
 
+
+/* Überschrift und Konstellation als ein Weg (Gerätebefund 02.09.).
+
+   Ein Knopf, der nicht wie einer aussieht: Er umschließt, was ohnehin dasteht,
+   und gibt ihm nur eine Fläche zum Antippen. Bewusst ohne `.quiet` — dessen
+   Pille, Polster und Mindesthöhe müsste hier alles wieder zurückgenommen
+   werden, und ein Kasten um eine Zeichnung wäre das Möbel, das G-2 weglässt.
+   Den Tastatur-Fokus zeigt der Browser selbst; ihn nachzubauen kostet Zeilen
+   und bringt nichts. */
+.today-system-open {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.today-system-open .today-system {
+  display: block;
+}
+
+/* Die Rückmeldung sitzt auf der Zeichnung — sie ist das Große, das man
+   trifft. Nur `opacity`: kein Neuzeichnen. */
+.today-system-open:active .constellation {
+  opacity: .82;
+}

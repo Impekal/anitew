@@ -1,7 +1,6 @@
 import { Suspense, lazy } from 'react'
 
 import type { OwnPalace, Platform } from '../core/index.ts'
-import type { Dictionary } from '../i18n/index.ts'
 
 /*
  * Der Gedächtnispalast ist eine tiefe Arbeitsseite und gehört nicht in den
@@ -19,7 +18,6 @@ const PalacePanelImpl = lazy(() =>
 )
 
 export function PalacePanel(props: {
-  dictionary: Dictionary
   own: readonly OwnPalace[]
   onChange: () => void
   platform: Platform

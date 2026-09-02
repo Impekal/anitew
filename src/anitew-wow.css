@@ -172,7 +172,11 @@ body::after {
   stroke: rgb(158 230 210 / 7%);
   stroke-width: .18;
   stroke-dasharray: .8 2.2;
-  transform-origin: 50px 50px;
+  /* In Prozent statt in Einheiten: Die Ringe drehen sich um die Mitte ihrer
+     Zeichenfläche — und die ist auf der Startseite eine andere als auf der
+     Gedächtnis-Seite. Feste 50px 50px ließen sie im Band um einen Punkt
+     unter sich eiern. */
+  transform-origin: 50% 50%;
   animation: wow-orbit 44s linear infinite;
 }
 .constellation-orbit-inner {
@@ -219,7 +223,10 @@ body::after {
 }
 .constellation-label {
   fill: #e8eee8;
-  font-size: 2.2px;
+  /* 3,2 statt 2,2 Einheiten: Mit dem Band-Maßstab (3,88) sind das 12,4 statt
+     8,5 Pixel. Zusammen mit der Geometrie bringt das die gemeldeten „kaum
+     leserlichen" 3,9 Pixel auf eine Größe, die man am Telefon lesen kann. */
+  font-size: 3.2px;
   paint-order: stroke;
   stroke: rgb(5 9 8 / 82%);
   stroke-width: .65px;

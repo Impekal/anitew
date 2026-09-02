@@ -468,10 +468,37 @@ body::before {
   animation: recall-signal 1.8s var(--ease) both;
 }
 
+/*
+   Die Punkte atmen an ihrem Platz und treiben leicht — statt auf ihrem Radius
+   nach außen und zurück zu fahren (Nutzerwunsch 02.09.: „die bewegenden Punkte
+   gehen nur in eine Richtung und zurück. Kann das eleganter sein?").
+
+   Die Ursache war ein fehlender Drehpunkt: Ohne `transform-box: fill-box`
+   skaliert ein SVG-Element um den Ursprung der **Zeichenfläche**, nicht um
+   sich selbst. Ein `scale(1.25)` verschob deshalb jeden Punkt vom Mittelpunkt
+   weg und wieder hin — alle gleichzeitig, alle auf einer Geraden. Das sah
+   nicht nach einem Netz aus, sondern nach einem Kolben.
+
+   Mit eigenem Drehpunkt wird aus derselben einen Bewegung ein Atmen an Ort
+   und Stelle, und die kleine geschlossene Schleife darüber macht daraus ein
+   Treiben. Den Gleichschritt bricht der gestaffelte Beginn, den die Komponente
+   ohnehin je Punkt setzt — dafür braucht es keine zweite Regel. **Es bleibt bei einer Bewegung je Punkt**, weiterhin nur
+   `transform` — kein Neuzeichnen, keine zusätzliche Last (D-038, PR #107).
+*/
 .constellation-node {
   fill: var(--an-text);
-  animation: node-glimmer calc(var(--motion-breathe) * 0.85) ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
 }
+
+/* Nur die schmückende Konstellation treibt. Auf der Gedächtnis-Seite ist jeder
+   Punkt ein Knopf, und ein Knopf, der wandert, ist für eine unruhige Hand
+   schwerer zu treffen — bei dieser Zielgruppe kein Detail. Nebenbei laufen auf
+   der Seite dadurch weniger Bewegungen, nicht mehr. */
+.constellation:not(.constellation-tappable) .constellation-node {
+  animation: node-drift calc(var(--motion-breathe) * 1.6) ease-in-out infinite;
+}
+
 
 .constellation-node-anchor {
   fill: var(--an-gold);
@@ -518,9 +545,15 @@ body::before {
   50% { opacity: 0.5; }
 }
 
-@keyframes node-glimmer {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.25); }
+/*
+   Eine geschlossene Schleife: Der Punkt kommt dort an, wo er losgelaufen ist.
+   Die Wege sind winzig — 0,6 Nutzereinheiten sind auf dem Telefon gut zwei
+   Pixel. Mehr wäre Zappeln; das hier ist das Flimmern eines Sternenfelds.
+*/
+@keyframes node-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  35% { transform: translate(.5px, -.28px) scale(1.14); }
+  70% { transform: translate(-.28px, .38px) scale(1.06); }
 }
 
 @keyframes memory-born {
