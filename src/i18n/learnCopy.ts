@@ -46,6 +46,22 @@ export interface LearnCopy {
   nextDigit: string
   /** Die gelernten Ziffern-Laut-Paare, als Überschrift über der Tabelle. */
   hooksHeading: string
+  /**
+   * Warum die Ziffern nicht bei 0 anfangen (Nutzerfrage 04.09.).
+   *
+   * Die Reihenfolge war von Anfang an didaktisch gewählt — nur stand der
+   * Grund im Quelltext und nirgends auf dem Bildschirm. Wer eine Ordnung
+   * sieht, die er nicht versteht, hält sie für einen Fehler. Zu Recht.
+   */
+  orderWhy: string
+  /** Der Übungsraum zu einer Methode. */
+  practiseHeading: string
+  /** Was diese Runde enthält — je Methode eine Zeile. */
+  practiseWhat: Readonly<Record<'story' | 'link' | 'major' | 'palace', string>>
+  /** Die Längenwahl. */
+  lengthHeading: string
+  startRound: string
+  back: string
 }
 
 const COPY: Record<string, LearnCopy> = {
@@ -84,6 +100,18 @@ const COPY: Record<string, LearnCopy> = {
     cancel: 'Abbrechen',
     nextDigit: 'Als Nächstes: die {digit}',
     hooksHeading: 'Ziffer und Laut',
+    orderWhy:
+      'Warum nicht 0, 1, 2 …? Weil zuerst die Ziffern kommen, deren Brücke man sieht: 1, 2 und 3 hängen an der Zahl der Abstriche, 4 und 5 an einem Wort und einer Zahl, 9 und 8 an der Form. Die 0 und die 6 stehen hinten — ihre Brücke ist die schwächste, und wer dort anfängt, hält die ganze Technik für willkürlich.',
+    practiseHeading: 'Üben',
+    practiseWhat: {
+      story: 'Eine Reihe Wörter zum Einprägen und Abrufen — nichts anderes.',
+      link: 'Gesichter mit Namen zum Einprägen und Abrufen — nichts anderes.',
+      major: 'Zahlen zum Einprägen und Abrufen — nichts anderes.',
+      palace: 'Gänge durch einen Palast, Ort für Ort — nichts anderes.',
+    },
+    lengthHeading: 'Wie lange?',
+    startRound: 'Runde starten',
+    back: 'Zurück',
   },
   en: {
     heading: 'Learn',
@@ -120,6 +148,18 @@ const COPY: Record<string, LearnCopy> = {
     cancel: 'Cancel',
     nextDigit: 'Next: the {digit}',
     hooksHeading: 'Digit and sound',
+    orderWhy:
+      'Why not 0, 1, 2 …? Because the digits whose bridge you can see come first: 1, 2 and 3 hang on the number of downstrokes, 4 and 5 on a word and a number, 9 and 8 on the shape. The 0 and the 6 come last — their bridge is the weakest, and starting there makes the whole technique look arbitrary.',
+    practiseHeading: 'Practise',
+    practiseWhat: {
+      story: 'A row of words to memorise and recall — nothing else.',
+      link: 'Faces with names to memorise and recall — nothing else.',
+      major: 'Numbers to memorise and recall — nothing else.',
+      palace: 'Walks through a palace, place by place — nothing else.',
+    },
+    lengthHeading: 'How long?',
+    startRound: 'Start a round',
+    back: 'Back',
   },
   fr: {
     heading: 'Apprendre',
@@ -156,6 +196,18 @@ const COPY: Record<string, LearnCopy> = {
     cancel: 'Annuler',
     nextDigit: 'Ensuite : le {digit}',
     hooksHeading: 'Chiffre et son',
+    orderWhy:
+      'Pourquoi pas 0, 1, 2 … ? Parce que viennent d’abord les chiffres dont on voit le pont : 1, 2 et 3 tiennent au nombre de jambages, 4 et 5 à un mot et à un nombre, 9 et 8 à la forme. Le 0 et le 6 arrivent en dernier — leur pont est le plus faible, et commencer par là fait passer toute la technique pour arbitraire.',
+    practiseHeading: 'S’entraîner',
+    practiseWhat: {
+      story: 'Une série de mots à mémoriser et à restituer — rien d’autre.',
+      link: 'Des visages avec des noms à mémoriser et à restituer — rien d’autre.',
+      major: 'Des nombres à mémoriser et à restituer — rien d’autre.',
+      palace: 'Des parcours dans un palais, lieu après lieu — rien d’autre.',
+    },
+    lengthHeading: 'Combien de temps ?',
+    startRound: 'Lancer une manche',
+    back: 'Retour',
   },
   es: {
     heading: 'Aprender',
@@ -192,6 +244,18 @@ const COPY: Record<string, LearnCopy> = {
     cancel: 'Cancelar',
     nextDigit: 'A continuación: el {digit}',
     hooksHeading: 'Cifra y sonido',
+    orderWhy:
+      '¿Por qué no 0, 1, 2…? Porque primero vienen las cifras cuyo puente se ve: 1, 2 y 3 dependen del número de trazos, 4 y 5 de una palabra y de un número, 9 y 8 de la forma. El 0 y el 6 van al final: su puente es el más débil, y empezar por ahí hace que toda la técnica parezca arbitraria.',
+    practiseHeading: 'Practicar',
+    practiseWhat: {
+      story: 'Una serie de palabras para memorizar y recordar, nada más.',
+      link: 'Caras con nombres para memorizar y recordar, nada más.',
+      major: 'Números para memorizar y recordar, nada más.',
+      palace: 'Recorridos por un palacio, lugar a lugar, nada más.',
+    },
+    lengthHeading: '¿Cuánto tiempo?',
+    startRound: 'Empezar una ronda',
+    back: 'Volver',
   },
   it: {
     heading: 'Imparare',
@@ -228,6 +292,18 @@ const COPY: Record<string, LearnCopy> = {
     cancel: 'Annullare',
     nextDigit: 'Poi: il {digit}',
     hooksHeading: 'Cifra e suono',
+    orderWhy:
+      'Perché non 0, 1, 2…? Perché vengono prima le cifre di cui si vede il ponte: 1, 2 e 3 dipendono dal numero delle aste, 4 e 5 da una parola e da un numero, 9 e 8 dalla forma. Lo 0 e il 6 stanno in fondo: il loro ponte è il più debole, e cominciare da lì fa sembrare arbitraria tutta la tecnica.',
+    practiseHeading: 'Esercitarsi',
+    practiseWhat: {
+      story: 'Una serie di parole da memorizzare e richiamare — nient’altro.',
+      link: 'Volti con nomi da memorizzare e richiamare — nient’altro.',
+      major: 'Numeri da memorizzare e richiamare — nient’altro.',
+      palace: 'Percorsi in un palazzo, luogo dopo luogo — nient’altro.',
+    },
+    lengthHeading: 'Quanto a lungo?',
+    startRound: 'Iniziare un turno',
+    back: 'Indietro',
   },
   pt: {
     heading: 'Aprender',
@@ -264,6 +340,18 @@ const COPY: Record<string, LearnCopy> = {
     cancel: 'Cancelar',
     nextDigit: 'A seguir: o {digit}',
     hooksHeading: 'Algarismo e som',
+    orderWhy:
+      'Porquê não 0, 1, 2…? Porque vêm primeiro os algarismos cuja ponte se vê: 1, 2 e 3 dependem do número de hastes, 4 e 5 de uma palavra e de um número, 9 e 8 da forma. O 0 e o 6 ficam no fim — a sua ponte é a mais fraca, e começar por aí faz toda a técnica parecer arbitrária.',
+    practiseHeading: 'Praticar',
+    practiseWhat: {
+      story: 'Uma série de palavras para memorizar e recordar — nada mais.',
+      link: 'Rostos com nomes para memorizar e recordar — nada mais.',
+      major: 'Números para memorizar e recordar — nada mais.',
+      palace: 'Percursos por um palácio, lugar a lugar — nada mais.',
+    },
+    lengthHeading: 'Quanto tempo?',
+    startRound: 'Começar uma ronda',
+    back: 'Voltar',
   },
 }
 

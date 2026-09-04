@@ -150,3 +150,29 @@
 .learn-ask p { margin: 0 0 .4rem; }
 
 .learn-practise-note { margin-top: 1rem; }
+
+/*
+  Der Übungsraum (Nutzerbefund 04.09.): nur diese Methode, eine Länge, ein
+  Startknopf. Er ersetzt die Liste, statt sich darunter zu öffnen — sonst
+  müsste man an vier anderen Methoden vorbeiscrollen, um zu starten.
+*/
+.learn-practising .learn-title { margin-bottom: .35rem; }
+
+.learn-lengths {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-bottom: .3rem;
+}
+
+/* Die gewählte Länge trägt die Farbe — sonst rät man, welche gilt. */
+.learn-length-on {
+  border-color: var(--an-cyan);
+  color: var(--an-text);
+}
+
+.learn-order-why {
+  margin: .5rem 0;
+  color: var(--an-dim);
+  font-size: .85rem;
+}

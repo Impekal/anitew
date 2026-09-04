@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react'
 
-import type { ModuleId } from '../core/index.ts'
+import type { ModuleId, TrainingMode } from '../core/index.ts'
 import type { Dictionary } from '../i18n/index.ts'
 
 /*
@@ -16,7 +16,7 @@ const LearnPanelImpl = lazy(async () => {
 export function LearnPanel(props: {
   dictionary: Dictionary
   language: string
-  onPractise: (module: ModuleId) => void
+  onPractise: (module: ModuleId, mode: TrainingMode) => void
 }) {
   return (
     <Suspense fallback={null}>
