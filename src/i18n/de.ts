@@ -754,6 +754,13 @@ export const de = {
     },
     notConfigured: 'Der Abgleich ist in dieser Installation noch nicht eingerichtet — es fehlt ihre Google-Kennung. Sicherung und Training sind davon unberührt.',
   },
+  /*
+    Nur die Überschrift steht hier — die Sätze des Lernbereichs liegen in
+    `learnCopy.ts` und werden erst geladen, wenn jemand ihn öffnet. Diese
+    eine Zeile braucht die Schublade, und die gehört zum Kaltstart.
+  */
+  learn: { heading: 'Lernen' },
+
   coach: {
     /*
       Der Coach (M · D-031). Zwei Hälften, eine Haltung: Der obere Teil

@@ -12,6 +12,7 @@ export type MenuIconKind =
   | 'benchmark'
   | 'coach'
   | 'contents'
+  | 'learn'
   | 'memories'
   | 'about'
   | 'palace'
@@ -35,6 +36,12 @@ function Glyph({ kind }: { kind: MenuIconKind }) {
       return <path d="M4.5 5.5h15v10h-8.5L7 19v-3.5H4.5zM8 9.5h8M8 12.5h5" />
     case 'contents':
       return <path d="M7.5 4.5h12v11h-12zM7.5 7.5h12M4.5 8.5v11h12" />
+    /*
+      Lernen: ein aufgeschlagenes Buch. Bewusst kein Doktorhut — der gehört
+      zu Prüfungen, und hier wird nicht geprüft.
+    */
+    case 'learn':
+      return <path d="M12 7.5v12M12 7.5C10 6 7.5 5.5 4.5 5.5v12c3 0 5.5.5 7.5 2M12 7.5c2-1.5 4.5-2 7.5-2v12c-3 0-5.5.5-7.5 2" />
     case 'memories':
       return <path d="M6 8.5l6.5-3 5.5 5-4.5 8-6-2.5zM6 8.5l7.5 9.5M12.5 5.5l-1 9.5" />
     case 'about':

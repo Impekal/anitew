@@ -110,6 +110,7 @@ export {
 } from './session/plan.ts'
 export { planSession } from './session/adaptivePlan.ts'
 export * from './technique/encodings.ts'
+export * from './technique/learn.ts'
 export * from './technique/major.ts'
 export * from './time.ts'
 export * from './training.ts'

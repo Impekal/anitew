@@ -1,0 +1,152 @@
+/*
+  Der Lernbereich (Nutzerwunsch 03.09.).
+
+  Eigene Datei und kein Zusatz im Hauptstylesheet: Vite schneidet sie mit dem
+  Panel zusammen ab, und beides wird erst geladen, wenn jemand den Bereich
+  öffnet. Das Kaltstart-CSS steht bei 12,0 von 12 KB — dort ist kein Platz,
+  und hier wird auch keiner gebraucht.
+
+  Die Gestaltung folgt bewusst den vorhandenen Bausteinen (`.quiet`, `.hint`,
+  dieselben Linien und Abstände wie bei den eigenen Inhalten): Ein Bereich,
+  der aussieht wie eine fremde App, fühlt sich auch so an.
+*/
+
+.learn-intro {
+  margin: 0 0 .35rem;
+  color: var(--an-muted);
+}
+
+.learn-progress {
+  margin: 0 0 1rem;
+  color: var(--an-dim);
+  font: .7rem var(--mono);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.learn-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: .9rem;
+}
+
+.learn-card {
+  padding: .9rem 0 .9rem 1.1rem;
+  border-left: 1px solid var(--an-line);
+}
+
+/* Durchgearbeitet: die Linie wird warm, mehr braucht es nicht. */
+.learn-card-done { border-left-color: var(--an-cyan); }
+
+.learn-title {
+  margin: 0 0 .2rem;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.learn-purpose {
+  margin: 0;
+  color: var(--an-muted);
+  font-size: .9rem;
+}
+
+.learn-steps,
+.learn-done {
+  margin: .35rem 0 0;
+  color: var(--an-dim);
+  font: .7rem var(--mono);
+  letter-spacing: .06em;
+}
+
+.learn-done { color: var(--an-cyan); }
+.learn-next { color: var(--an-muted); }
+
+.learn-lesson {
+  margin: .7rem 0 .2rem;
+  padding: .1rem 0 .1rem .9rem;
+  border-left: 1px solid var(--an-cyan);
+}
+
+.learn-lesson p { margin: 0 0 .5rem; }
+.learn-lesson-lead { color: var(--an-text); }
+
+.learn-lesson-steps {
+  margin: 0 0 .5rem;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: .4rem;
+  color: var(--an-muted);
+}
+
+.learn-lesson-build {
+  color: var(--an-dim);
+  font-style: italic;
+}
+
+.learn-hooks-heading {
+  margin: .6rem 0 .3rem;
+  font: .7rem var(--mono);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--an-dim);
+  font-weight: 400;
+}
+
+.learn-hooks {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: .4rem;
+}
+
+.learn-hooks li {
+  display: grid;
+  /* Ziffer, Laute, Begründung — die Spalten stehen untereinander bündig. */
+  grid-template-columns: 1.2rem 3.5rem 1fr;
+  align-items: baseline;
+  gap: .5rem;
+  font-size: .85rem;
+  color: var(--an-muted);
+}
+
+.learn-hooks b { color: var(--an-text); font-size: 1rem; }
+.learn-hook-letters { font: .8rem var(--mono); color: var(--an-cyan); }
+
+.learn-actions {
+  margin-top: .6rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+
+/*
+  Der Hauptknopf trägt die Farbe, „Üben" bleibt ruhig. Wer die Seite öffnet,
+  will zuerst lesen — üben kann er danach.
+*/
+.learn-go {
+  border-color: var(--an-cyan);
+  color: var(--an-text);
+}
+
+.learn-restart,
+.learn-restart-all {
+  margin-top: .5rem;
+  font-size: .8rem;
+  color: var(--an-dim);
+}
+
+.learn-restart-all { margin-top: 1.2rem; }
+
+.learn-ask {
+  margin-top: .6rem;
+  padding: .7rem .9rem;
+  border: 1px solid var(--an-line);
+  border-radius: 12px;
+}
+
+.learn-ask p { margin: 0 0 .4rem; }
+
+.learn-practise-note { margin-top: 1rem; }

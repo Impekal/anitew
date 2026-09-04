@@ -496,6 +496,13 @@ export const fr: Dictionary = {
     },
     notConfigured: 'La synchronisation n’est pas encore configurée dans cette installation — son identifiant Google manque. Sauvegarde et entraînement n’en sont pas affectés.',
   },
+  /*
+    Nur die Überschrift steht hier — die Sätze des Lernbereichs liegen in
+    `learnCopy.ts` und werden erst geladen, wenn jemand ihn öffnet. Diese
+    eine Zeile braucht die Schublade, und die gehört zum Kaltstart.
+  */
+  learn: { heading: 'Apprendre' },
+
   coach: {
     heading: 'Coach',
     adviceHeading: 'De tes chiffres',

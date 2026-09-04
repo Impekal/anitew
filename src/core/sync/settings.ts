@@ -54,6 +54,84 @@ function mergeMajorDigits(local: unknown, remote: unknown): unknown {
 }
 
 /**
+ * Ein Lernstand mit Zeitpunkt (Nutzerwunsch 03.09.).
+ *
+ * `at` ist der Zeitpunkt der letzten Änderung, `clearedAt` der eines
+ * bewussten „neu anfangen". Altbestand hat beides nicht und wird weiterhin
+ * einfach vereinigt.
+ */
+interface Gelernt {
+  readonly at?: number
+  readonly clearedAt?: number
+  readonly digits?: unknown
+  readonly taught?: unknown
+}
+
+function alsGelernt(value: unknown): Gelernt | undefined {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return undefined
+  const eintrag = value as Gelernt
+  return typeof eintrag.at === 'number' ? eintrag : undefined
+}
+
+/** Der Inhalt eines Lernstands — die Liste, das Ja/Nein oder der nackte Altwert. */
+function inhalt(value: unknown): unknown {
+  const eintrag = alsGelernt(value)
+  if (eintrag === undefined) return value
+  return eintrag.digits ?? eintrag.taught
+}
+
+/**
+ * Lernstand zusammenführen: vereinigen — außer, jemand hat bewusst
+ * zurückgesetzt.
+ *
+ * ── Warum es die Ausnahme braucht ─────────────────────────────────────────
+ *
+ * Vereinigen ist für **Lernen** richtig: Wer auf dem Telefon die Vier lernt
+ * und auf dem Rechner die Sieben, soll beide behalten, und keine ältere
+ * Drive-Datei darf Gelerntes wegnehmen.
+ *
+ * Dieselbe Regel machte „neu anfangen" unmöglich: Das andere Gerät kennt die
+ * Ziffern noch, der nächste Abgleich holt sie zurück. Auf dem Gerät, an dem
+ * man gedrückt hat, sähe es nach Erfolg aus — bis zum nächsten Abgleich.
+ *
+ * Die Auflösung ist dieselbe wie beim Berichtigen eigener Karten: Ein
+ * bewusster Eingriff bekommt einen Zeitpunkt, und der jüngere gewinnt. Ein
+ * Zurücksetzen schlägt alles, was **davor** gelernt wurde — und verliert
+ * gegen alles, was **danach** gelernt wurde. Sonst könnte man nach einem
+ * Zurücksetzen nie wieder etwas lernen.
+ */
+function mergeLearned(
+  local: unknown,
+  remote: unknown,
+  vereinige: (mine: unknown, theirs: unknown) => unknown,
+): unknown {
+  const meins = alsGelernt(local)
+  const ihres = alsGelernt(remote)
+
+  /*
+   * Ein Zeitpunkt schlägt keinen Zeitpunkt. Während der Übergangszeit
+   * schreibt ein noch nicht aktualisiertes Gerät die nackte Form; ein
+   * Zurücksetzen mit Zeitpunkt ist eine bewusste Handlung mit bekannter
+   * Zeit, ein nacktes `true` ist es nicht.
+   */
+  const seitAnderswo = (eintrag: Gelernt | undefined): number => eintrag?.at ?? 0
+  if (meins?.clearedAt !== undefined && meins.clearedAt > seitAnderswo(ihres)) return local
+  if (ihres?.clearedAt !== undefined && ihres.clearedAt > seitAnderswo(meins)) return remote
+
+  const vereinigt = vereinige(inhalt(local), inhalt(remote))
+  if (meins === undefined && ihres === undefined) return vereinigt
+
+  // Der jüngere Zeitpunkt und das ältere Zurücksetzen bleiben stehen: Beides
+  // ist Wissen über die Vergangenheit und darf nicht verlorengehen.
+  const at = Math.max(seitAnderswo(meins), seitAnderswo(ihres))
+  const clearedAt = Math.max(meins?.clearedAt ?? 0, ihres?.clearedAt ?? 0)
+  const schluessel = meins?.digits !== undefined || ihres?.digits !== undefined ? 'digits' : 'taught'
+  return clearedAt > 0
+    ? { [schluessel]: vereinigt, at, clearedAt }
+    : { [schluessel]: vereinigt, at }
+}
+
+/**
  * Konfliktregel ausschließlich für den automatischen Drive-Abgleich.
  *
  * Eine manuell importierte Sicherung darf weiterhin bewusst Einstellungen
@@ -77,10 +155,11 @@ export function mergeDriveSettingValue(key: string, local: unknown, remote: unkn
   if (key === 'palace.own.v2') return mergeOwnPalaces(local, remote)
   if (key.startsWith('own.facts.')) return mergeOwnFacts(local, remote)
 
-  if (key === 'technique.major.taught') return mergeMajorDigits(local, remote)
+  if (key === 'technique.major.taught') return mergeLearned(local, remote, mergeMajorDigits)
   if (/^technique\..+\.taught$/u.test(key)) {
-    if (typeof local === 'boolean' && typeof remote === 'boolean') return local || remote
-    return local
+    return mergeLearned(local, remote, (mine, theirs) =>
+      typeof mine === 'boolean' && typeof theirs === 'boolean' ? mine || theirs : mine,
+    )
   }
 
   if (key.startsWith('profile.history.')) return mergeProfileHistory(local, remote)
