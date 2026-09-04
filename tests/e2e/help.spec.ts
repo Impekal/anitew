@@ -60,13 +60,20 @@ test('hält die Antworten zu, bis jemand fragt — und öffnet dann wirklich', a
   await expect(page.locator('.faq-answer')).toHaveCount(0)
 })
 
-test('beantwortet die Namensfrage wirklich — Herkunft und wörtlicher Sinn', async ({ page }) => {
+test('beantwortet die Namensfrage wirklich — Sprache und Belegstelle', async ({ page }) => {
   /*
    * Die Frage stand ausdrücklich im Wunsch. Eine Überschrift „Was bedeutet
    * ANITEW?" mit einer ausweichenden Antwort darunter hätte sie nicht
-   * beantwortet — geprüft wird deshalb, dass die beiden Auskünfte dastehen,
-   * die die Frage ausmachen: aus welcher Sprache das Wort kommt und was es
-   * wörtlich heißt.
+   * beantwortet.
+   *
+   * Geprüft werden deshalb die beiden Angaben, die aus der Antwort eine
+   * Auskunft machen: aus welcher Sprache das Wort kommt und **wo** es steht.
+   * Die Belegstelle ist der Unterschied zwischen „man sagt" und „hier steht
+   * es": Daniel 1,17 der Akan-Bibel führt „anitew" neben „nimdeɛ".
+   *
+   * Bewusst **nicht** geprüft wird die wörtliche Lesart „das Auge ist offen".
+   * Sie ließ sich nicht belegen und steht in der App deshalb als Lesart — ein
+   * Test, der sie einforderte, machte aus einer Vermutung eine Zusage.
    */
   await visit(page)
   await openPage(page, 'Fragen & Antworten')
@@ -74,7 +81,7 @@ test('beantwortet die Namensfrage wirklich — Herkunft und wörtlicher Sinn', a
   await page.locator('.faq-question', { hasText: 'ANITEW' }).first().click()
   const antwort = page.locator('.faq-answer').first()
   await expect(antwort).toContainText('Twi')
-  await expect(antwort).toContainText('Auge')
+  await expect(antwort).toContainText('Daniel')
 })
 
 test('spricht die Sprache der App, nicht Deutsch', async ({ page }) => {

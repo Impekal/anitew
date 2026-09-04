@@ -14,9 +14,11 @@
  * **Zur Namensfrage.** Was unter „Was bedeutet ANITEW?" steht, folgt D-001 und
  * `docs/TRADEMARK.md`: Der Name wurde ausdrücklich gewählt, **weil** er nichts
  * bedeutete, und die Vorprüfung fand später, dass er im Twi ein echtes Wort
- * ist. Seine Bedeutung steht seit dem 04.09. in TRADEMARK.md: wörtlich „das
- * Auge hat sich geöffnet", im übertragenen Sinn Klugheit, Scharfsinn und
- * Weisheit, je nach Zusammenhang auch Listigkeit.
+ * ist. Sein Beleg steht seit dem 04.09. in TRADEMARK.md: Daniel 1,17 in der
+ * Akan-Bibel, wo „anitew" neben „nimdeɛ" (Kenntnis) steht — Klugheit,
+ * Scharfsinn, Einsicht. Die wörtliche Lesart „das Auge ist offen" ist als
+ * Lesart benannt und nicht als Tatsache: In den Bibelstellen, an denen Augen
+ * aufgetan werden (1. Mose 3,5 und 3,7), steht nicht „tew", sondern „bue".
  *
  * Zwei Dinge sagt der Text deshalb ausdrücklich: dass der Name **nicht**
  * dafür gewählt wurde, und dass die App nichts davon verspricht. Klugheit
@@ -184,7 +186,7 @@ const COPY: Record<string, HelpCopy> = {
         entries: [
           {
             q: 'Was bedeutet der Name ANITEW?',
-            a: 'Gewählt wurde er, weil er nichts bedeutete — anders als MEMORA, MNEMO oder RECALL, die sofort verständlich und deshalb hundertfach belegt sind. Die Bedeutung sollte der Untertitel tragen: „Train your memory. Measure your progress. Remember more." Erst die Namensrecherche brachte heraus, dass „anitew" ein echtes Wort ist: im Twi, der Akan-Sprache Ghanas, wo es in Kirchenliedern und Bibeltexten vorkommt. Wörtlich heißt es „das Auge hat sich geöffnet"; im übertragenen Sinn steht es für Klugheit und Scharfsinn, für Weisheit, je nach Zusammenhang auch für Listigkeit. Gewählt haben wir es nicht deswegen, und versprechen tun wir davon nichts: Klugheit verteilt keine App. Dass ein absichtlich leeres Wort ausgerechnet dort gelandet ist, gefällt uns trotzdem.',
+            a: 'Gewählt wurde er, weil er nichts bedeutete — anders als MEMORA, MNEMO oder RECALL, die sofort verständlich und deshalb hundertfach belegt sind. Die Bedeutung sollte der Untertitel tragen: „Train your memory. Measure your progress. Remember more." Erst die Namensrecherche brachte heraus, dass „anitew" ein echtes Wort ist: im Twi, der Akan-Sprache Ghanas, In der Akan-Bibel steht es in Daniel 1,17 neben „nimdeɛ" (Kenntnis) — an der Stelle, die englische Übersetzungen mit „knowledge and skill" wiedergeben. Es benennt also Klugheit, Scharfsinn, Einsicht. „ani" heißt Auge, und der Name lässt sich als „das Auge ist offen" lesen; belegen konnten wir diese Lesart nicht. Gewählt haben wir es nicht deswegen, und versprechen tun wir davon nichts: Klugheit verteilt keine App. Dass ein absichtlich leeres Wort ausgerechnet dort gelandet ist, gefällt uns trotzdem.',
           },
           {
             q: 'Worauf steht die App?',
@@ -384,7 +386,7 @@ const COPY: Record<string, HelpCopy> = {
         entries: [
           {
             q: 'What does the name ANITEW mean?',
-            a: 'It was chosen because it meant nothing — unlike MEMORA, MNEMO or RECALL, which are instantly understood and therefore taken a hundred times over. The meaning was meant to sit in the subtitle: “Train your memory. Measure your progress. Remember more.” Only the name search turned up that “anitew” is a real word: in Twi, the Akan language of Ghana, where it appears in hymns and Bible texts. Literally it means “the eye has opened”; figuratively it stands for cleverness and acumen, for wisdom, and depending on context for cunning. We did not pick it for that, and we promise none of it: no app hands out cleverness. That a deliberately empty word landed there of all places is something we like all the same.',
+            a: 'It was chosen because it meant nothing — unlike MEMORA, MNEMO or RECALL, which are instantly understood and therefore taken a hundred times over. The meaning was meant to sit in the subtitle: “Train your memory. Measure your progress. Remember more.” Only the name search turned up that “anitew” is a real word: in Twi, the Akan language of Ghana, In the Akan Bible it stands at Daniel 1:17 beside “nimdeɛ” (knowledge), where English versions have “knowledge and skill”. So it names cleverness, acumen, insight. “ani” is the eye, and the name can be read as “the eye is open” — but that reading we could not verify. We did not pick it for that, and we promise none of it: no app hands out cleverness. That a deliberately empty word landed there of all places is something we like all the same.',
           },
           {
             q: 'What does the app rest on?',
@@ -584,7 +586,7 @@ const COPY: Record<string, HelpCopy> = {
         entries: [
           {
             q: 'Que signifie le nom ANITEW ?',
-            a: 'Il a été choisi parce qu’il ne signifiait rien — contrairement à MEMORA, MNEMO ou RECALL, immédiatement compréhensibles et donc pris cent fois. Le sens devait être porté par le sous-titre : « Train your memory. Measure your progress. Remember more. » C’est la recherche de nom qui a révélé qu’« anitew » est un vrai mot : en twi, la langue akan du Ghana, où il apparaît dans des cantiques et des textes bibliques. Littéralement, il signifie « l’œil s’est ouvert » ; au figuré, il désigne l’intelligence et la perspicacité, la sagesse et, selon le contexte, la ruse. Nous ne l’avons pas choisi pour cela et nous n’en promettons rien : aucune application ne distribue l’intelligence. Qu’un mot voulu vide soit tombé précisément là nous plaît tout de même.',
+            a: 'Il a été choisi parce qu’il ne signifiait rien — contrairement à MEMORA, MNEMO ou RECALL, immédiatement compréhensibles et donc pris cent fois. Le sens devait être porté par le sous-titre : « Train your memory. Measure your progress. Remember more. » C’est la recherche de nom qui a révélé qu’« anitew » est un vrai mot : en twi, la langue akan du Ghana, Dans la Bible akan, il figure en Daniel 1.17 à côté de « nimdeɛ » (connaissance), là où les versions anglaises portent « knowledge and skill ». Il désigne donc l’intelligence, la perspicacité, le discernement. « ani » veut dire œil, et le nom peut se lire « l’œil est ouvert » ; cette lecture, nous n’avons pas pu l’établir. Nous ne l’avons pas choisi pour cela et nous n’en promettons rien : aucune application ne distribue l’intelligence. Qu’un mot voulu vide soit tombé précisément là nous plaît tout de même.',
           },
           {
             q: 'Sur quoi repose l’application ?',
@@ -784,7 +786,7 @@ const COPY: Record<string, HelpCopy> = {
         entries: [
           {
             q: '¿Qué significa el nombre ANITEW?',
-            a: 'Se eligió porque no significaba nada — a diferencia de MEMORA, MNEMO o RECALL, que se entienden al instante y por eso están tomados cien veces. El sentido debía llevarlo el subtítulo: «Train your memory. Measure your progress. Remember more.» Fue la búsqueda del nombre la que reveló que «anitew» es una palabra real: en twi, la lengua akan de Ghana, donde aparece en himnos y textos bíblicos. Literalmente significa «el ojo se ha abierto»; en sentido figurado designa la inteligencia y la agudeza, la sabiduría y, según el contexto, la astucia. No lo elegimos por eso y no prometemos nada de ello: ninguna aplicación reparte inteligencia. Que una palabra querida vacía fuera a caer justo ahí nos gusta de todos modos.',
+            a: 'Se eligió porque no significaba nada — a diferencia de MEMORA, MNEMO o RECALL, que se entienden al instante y por eso están tomados cien veces. El sentido debía llevarlo el subtítulo: «Train your memory. Measure your progress. Remember more.» Fue la búsqueda del nombre la que reveló que «anitew» es una palabra real: en twi, la lengua akan de Ghana, En la Biblia acán aparece en Daniel 1:17 junto a «nimdeɛ» (conocimiento), donde las versiones inglesas dicen «knowledge and skill». Designa, pues, la inteligencia, la agudeza, el discernimiento. «ani» significa ojo, y el nombre puede leerse como «el ojo está abierto»; esa lectura no hemos podido comprobarla. No lo elegimos por eso y no prometemos nada de ello: ninguna aplicación reparte inteligencia. Que una palabra querida vacía fuera a caer justo ahí nos gusta de todos modos.',
           },
           {
             q: '¿Sobre qué se apoya la aplicación?',
@@ -984,7 +986,7 @@ const COPY: Record<string, HelpCopy> = {
         entries: [
           {
             q: 'Che cosa significa il nome ANITEW?',
-            a: 'È stato scelto perché non significava nulla — a differenza di MEMORA, MNEMO o RECALL, subito comprensibili e perciò già presi cento volte. Il senso doveva portarlo il sottotitolo: «Train your memory. Measure your progress. Remember more.» È stata la ricerca sul nome a rivelare che «anitew» è una parola vera: in twi, la lingua akan del Ghana, dove compare in canti di chiesa e testi biblici. Alla lettera significa «l’occhio si è aperto»; in senso figurato indica l’intelligenza e l’acume, la saggezza e, a seconda del contesto, l’astuzia. Non l’abbiamo scelto per questo e non ne promettiamo nulla: nessuna app distribuisce intelligenza. Che una parola voluta vuota sia finita proprio lì ci piace comunque.',
+            a: 'È stato scelto perché non significava nulla — a differenza di MEMORA, MNEMO o RECALL, subito comprensibili e perciò già presi cento volte. Il senso doveva portarlo il sottotitolo: «Train your memory. Measure your progress. Remember more.» È stata la ricerca sul nome a rivelare che «anitew» è una parola vera: in twi, la lingua akan del Ghana, Nella Bibbia akan compare in Daniele 1:17 accanto a «nimdeɛ» (conoscenza), dove le versioni inglesi hanno «knowledge and skill». Indica dunque l’intelligenza, l’acume, il discernimento. «ani» significa occhio, e il nome si può leggere come «l’occhio è aperto»; questa lettura non siamo riusciti a documentarla. Non l’abbiamo scelto per questo e non ne promettiamo nulla: nessuna app distribuisce intelligenza. Che una parola voluta vuota sia finita proprio lì ci piace comunque.',
           },
           {
             q: 'Su che cosa si regge l’app?',
@@ -1184,7 +1186,7 @@ const COPY: Record<string, HelpCopy> = {
         entries: [
           {
             q: 'O que significa o nome ANITEW?',
-            a: 'Foi escolhido porque não significava nada — ao contrário de MEMORA, MNEMO ou RECALL, que se entendem de imediato e por isso estão tomados cem vezes. O sentido devia ser levado pelo subtítulo: «Train your memory. Measure your progress. Remember more.» Foi a pesquisa do nome que revelou que «anitew» é uma palavra real: em twi, a língua akan do Gana, onde aparece em cânticos e textos bíblicos. Literalmente significa «o olho abriu-se»; em sentido figurado designa a inteligência e a perspicácia, a sabedoria e, conforme o contexto, a astúcia. Não o escolhemos por isso e não prometemos nada disso: nenhuma aplicação distribui inteligência. Que uma palavra pensada vazia tenha ido cair justamente aí agrada-nos, ainda assim.',
+            a: 'Foi escolhido porque não significava nada — ao contrário de MEMORA, MNEMO ou RECALL, que se entendem de imediato e por isso estão tomados cem vezes. O sentido devia ser levado pelo subtítulo: «Train your memory. Measure your progress. Remember more.» Foi a pesquisa do nome que revelou que «anitew» é uma palavra real: em twi, a língua akan do Gana, Na Bíblia acã surge em Daniel 1:17 ao lado de «nimdeɛ» (conhecimento), onde as versões inglesas trazem «knowledge and skill». Designa, portanto, a inteligência, a perspicácia, o discernimento. «ani» quer dizer olho, e o nome pode ler-se como «o olho está aberto»; essa leitura não a conseguimos comprovar. Não o escolhemos por isso e não prometemos nada disso: nenhuma aplicação distribui inteligência. Que uma palavra pensada vazia tenha ido cair justamente aí agrada-nos, ainda assim.',
           },
           {
             q: 'Em que assenta a aplicação?',
