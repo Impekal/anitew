@@ -99,7 +99,21 @@ export function isTooEasy(value: string): boolean {
  * als er sein sollte, weil man nur noch die Ziffern und nicht mehr die Länge
  * behalten muss.
  */
-export function numberPool(seed: string, count: number): readonly string[] {
+export function numberPool(
+  seed: string,
+  count: number,
+  /**
+   * Die längste Folge, die dieser Vorrat enthalten darf (Nutzerbefund
+   * 04.09.). Ohne Angabe bleibt alles wie bisher — der Vorgabewert ist
+   * `MAX_DIGITS`, damit kein Aufrufer und kein alter Test sich ändern muss.
+   * Wer die Decke setzt, bekommt weiter eine Streuung von `MIN_DIGITS` bis
+   * dorthin, nur eben eine kürzere.
+   */
+  maxDigits: number = MAX_DIGITS,
+): readonly string[] {
+  // Gegen Unfug von außen: eine Decke unter dem Boden ergäbe eine leere
+  // Spanne und damit eine Endlosschleife bis zur Schranke unten.
+  const decke = Math.max(MIN_DIGITS, Math.min(MAX_DIGITS, Math.floor(maxDigits)))
   const rng = createRng(`numbers:${seed}`)
   const pool = new Set<string>()
 
@@ -109,7 +123,7 @@ export function numberPool(seed: string, count: number): readonly string[] {
    * Schleife für immer — und zwar auf dem Telefon eines Nutzers, nicht hier.
    */
   for (let attempt = 0; pool.size < count && attempt < count * 40; attempt++) {
-    const digits = MIN_DIGITS + rng.int(MAX_DIGITS - MIN_DIGITS + 1)
+    const digits = MIN_DIGITS + rng.int(decke - MIN_DIGITS + 1)
     // Die erste Ziffer nie null (siehe oben), die übrigen frei.
     let value = String(1 + rng.int(9))
     for (let index = 1; index < digits; index++) value += String(rng.int(10))

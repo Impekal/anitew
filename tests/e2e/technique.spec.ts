@@ -167,6 +167,53 @@ test('unterrichtet die Technik und lässt sie sofort anwenden', async ({ page })
   expect(shown).toMatch(/^\d+(?:\s+\d+)*$/)
 })
 
+test('verlangt nach der ersten Lektion keine sechsstellige Zahl', async ({ page }) => {
+  test.setTimeout(120_000)
+
+  /*
+   * Nutzerbefund 04.09., wörtlich: „Ich lerne (erstmal nur) t und d für 1 und
+   * … soll gleich mehrere 6-stellige Ziffern anmerken können. Wie soll das
+   * gehen, wenn ich noch nicht viele Wörter im Katalog für 1 habe?"
+   *
+   * Der Befund stimmte. Gemessen vor dem Eingriff: 24 Zahlen in einer
+   * Fünf-Minuten-Einheit, sieben davon sechsstellig — bei einer gelehrten
+   * Ziffer genau so viele wie bei allen zehn.
+   *
+   * Warum das nicht bloß unangenehm war: Das Major-System fasst zwei Ziffern
+   * zu einem Wort. Mit einer gelernten Ziffer ist ein zufälliges Paar in
+   * einem von hundert Fällen brauchbar; vier Sekunden für sechs Ziffern sind
+   * dann kein Anwenden der Technik.
+   *
+   * Geprüft wird **jede** Zahl, die der Einprägen-Block zeigt, nicht die
+   * erste: Der Befund lautete „mehrere".
+   */
+  await seedTaught(page, [1])
+  await startShort(page)
+
+  await expect(page.locator('.lesson')).toBeVisible({ timeout: 30_000 })
+  await continueLesson(page)
+  await expect(page.locator('.encode-word')).toBeVisible({ timeout: 30_000 })
+
+  const gesehen = new Set<string>()
+  while ((await page.locator('.recall-input').count()) === 0) {
+    const roh = (await page.locator('.encode-word').textContent())?.trim() ?? ''
+    const nochmal = (await page.locator('.encode-word').textContent())?.trim() ?? ''
+    // Zweimal lesen und nur nehmen, was stehen geblieben ist: Der Block
+    // schaltet weiter, und ein Wechsel mitten im Lesen ergäbe ein Bruchstück.
+    if (roh !== '' && roh === nochmal) gesehen.add(roh)
+    await page.waitForTimeout(150)
+  }
+
+  expect(gesehen.size, 'die Runde zeigte gar keine Zahl').toBeGreaterThan(0)
+  for (const zahl of gesehen) {
+    // Ohne die Gruppierungs-Zwischenräume, die `displayNumber` ab fünf
+    // Ziffern setzt — gezählt werden Ziffern, nicht Zeichen.
+    const ziffern = zahl.replace(/\s/gu, '')
+    expect(ziffern, `„${zahl}" ist keine Ziffernfolge`).toMatch(/^\d+$/u)
+    expect(ziffern.length, `„${zahl}" hat ${ziffern.length} Ziffern`).toBeLessThanOrEqual(3)
+  }
+})
+
 test('schreibt den Konsonanten unter seine Ziffer — auch den frisch gelernten', async ({
   page,
 }) => {
