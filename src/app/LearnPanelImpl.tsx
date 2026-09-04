@@ -6,8 +6,10 @@ import {
   type LearnCard,
   type LearnState,
   type LearnTopic,
+  MODES,
   type ModuleId,
   TEACH_ORDER,
+  type TrainingMode,
   learnCards,
   learnProgress,
   lettersFor,
@@ -55,9 +57,24 @@ import {
 interface Props {
   dictionary: Dictionary
   language: string
-  /** Startet eine Einheit mit dieser Methode als Schwerpunkt. */
-  onPractise: (module: ModuleId) => void
+  /**
+   * Startet eine Übungsrunde, die **nur** diese Methode enthält.
+   *
+   * Vorher hieß das hier „Schwerpunkt setzen und Seite schließen". Am Gerät
+   * sah das aus, als lande man grundlos wieder im Core (Nutzerbefund 04.09.).
+   * Der Wunsch war deutlich: „wo nur Dinge zur ausgewählten Methode
+   * angeboten werden."
+   */
+  onPractise: (module: ModuleId, mode: TrainingMode) => void
 }
+
+/**
+ * Die Längen, die im Übungsraum angeboten werden.
+ *
+ * Ohne die fünfzehn Minuten: Wer eine Methode übt, will eine Runde und
+ * keinen Abend. Wer mehr will, nimmt die Einheit auf dem Startbildschirm.
+ */
+const LAENGEN: readonly TrainingMode[] = ['emergency', 'short', 'daily']
 
 /** Der Lernstand, wie ihn das Gerät kennt — einmal geladen, danach gepflegt. */
 async function ladeStand(): Promise<LearnState> {
@@ -78,6 +95,9 @@ export function LearnPanelImpl({ dictionary, language, onPractise }: Props) {
   const [offen, setOffen] = useState<LearnTopic | undefined>(undefined)
   /** Welche Rückfrage gerade offen ist — je Lektion oder für alles. */
   const [fragt, setFragt] = useState<LearnTopic | 'alle' | undefined>(undefined)
+  /** Welcher Übungsraum offen ist — und mit welcher Länge. */
+  const [uebt, setUebt] = useState<LearnTopic | undefined>(undefined)
+  const [laenge, setLaenge] = useState<TrainingMode>('short')
   const lebt = useRef(true)
 
   useEffect(() => {
@@ -124,6 +144,51 @@ export function LearnPanelImpl({ dictionary, language, onPractise }: Props) {
     setFragt(undefined)
     setOffen(undefined)
     await neuLaden()
+  }
+
+  const geuebt = uebt === undefined ? undefined : karten.find((karte) => karte.topic === uebt)
+  if (geuebt !== undefined) {
+    /*
+      Der Übungsraum: nur diese Methode, sonst nichts. Er ersetzt die Liste
+      und öffnet sich nicht darunter — sonst müsste man an vier anderen
+      Methoden vorbeiscrollen, um den Startknopf zu finden.
+    */
+    return (
+      <div className="learn learn-practising">
+        <h3 className="learn-title">{texte.titles[geuebt.topic]}</h3>
+        <p className="learn-purpose">{texte.practiseWhat[geuebt.topic]}</p>
+
+        <h4 className="learn-hooks-heading">{texte.lengthHeading}</h4>
+        <div className="learn-lengths">
+          {LAENGEN.map((wahl) => (
+            <button
+              key={wahl}
+              type="button"
+              className={`quiet learn-length${wahl === laenge ? ' learn-length-on' : ''}`}
+              aria-pressed={wahl === laenge}
+              onClick={() => setLaenge(wahl)}
+            >
+              {Math.round(MODES[wahl].seconds / 60)} min
+            </button>
+          ))}
+        </div>
+
+        <div className="learn-actions">
+          <button
+            type="button"
+            className="learn-go"
+            onClick={() => onPractise(geuebt.module, laenge)}
+          >
+            {texte.startRound}
+          </button>
+          <button type="button" className="quiet" onClick={() => setUebt(undefined)}>
+            {texte.back}
+          </button>
+        </div>
+
+        <p className="hint learn-practise-note">{texte.practiseNote}</p>
+      </div>
+    )
   }
 
   return (
@@ -185,7 +250,11 @@ export function LearnPanelImpl({ dictionary, language, onPractise }: Props) {
                         ? texte.begin
                         : texte.resume}
                 </button>
-                <button type="button" className="quiet learn-practise" onClick={() => onPractise(karte.module)}>
+                <button
+                  type="button"
+                  className="quiet learn-practise"
+                  onClick={() => setUebt(karte.topic)}
+                >
                   {texte.practise}
                 </button>
               </div>
@@ -308,6 +377,17 @@ function Lektion({
         ))}
       </ol>
       <p className="learn-lesson-build">{lektionen.method.build}</p>
+      {/*
+        Warum nicht 0 bis 9 (Nutzerfrage 04.09.). Die Reihenfolge war von
+        Anfang an didaktisch gewählt — nur stand der Grund im Quelltext und
+        nirgends auf dem Bildschirm. Wer eine Ordnung sieht, die er nicht
+        versteht, hält sie für einen Fehler. Zu Recht.
+
+        Der Satz steht **außerhalb** der Tabelle: Die Frage stellt sich beim
+        ersten Aufschlagen, wenn dort „Als Nächstes: die 1" steht und später
+        die 9 kommt — also lange bevor eine Tabelle da ist.
+      */}
+      <p className="learn-order-why">{texte.orderWhy}</p>
       {gelernt.length > 0 && (
         <>
           <h4 className="learn-hooks-heading">{texte.hooksHeading}</h4>

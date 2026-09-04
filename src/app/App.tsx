@@ -403,18 +403,6 @@ export function App() {
    * Vorratsfilter still aus der Lernrotation. Der Schlüssel ist der Name —
    * die Antwortseite hängt an der Trainingssprache und wäre kein Schlüssel.
    */
-  /*
-   * Der Schwerpunkt, den der Lernbereich gesetzt hat (Nutzerwunsch 03.09.).
-   *
-   * „Üben" heißt hier: Die nächste Einheit gibt dieser Methode den meisten
-   * Raum. Bewusst ein **Schwerpunkt** und keine Einheit aus nur einem Modul —
-   * die würde bei leerem Vorrat scheitern (der Palast braucht erst einen
-   * Weg), und ein Übungsknopf, der manchmal in einen Fehler läuft, ist
-   * schlimmer als keiner. Der Schwerpunkt ist dieselbe Mechanik, die das
-   * Profil ohnehin benutzt.
-   */
-  const [practiceFocus, setPracticeFocus] = useState<ModuleId | undefined>(undefined)
-
   const [peopleDone, setPeopleDone] = useState<ReadonlySet<string>>(new Set())
   useEffect(() => {
     void loadTrackedWords('people', training)
@@ -520,17 +508,31 @@ export function App() {
     })().catch(() => setMissionPreview(undefined))
   }, [dimensionCounts, mode, platform, recentByModule, training, systemPulse])
 
-  const start = useCallback(() => {
+  /**
+   * Eine Einheit starten — normal, oder als Übungsrunde zu einer Methode.
+   *
+   * Die Übungsrunde (Nutzerwunsch 04.09.) kommt über `uebung` herein und
+   * enthält **nur** dieses Modul. Vorher setzte „Üben" bloß einen
+   * Schwerpunkt und schloss die Seite; auf dem Gerät sah das aus, als
+   * lande man grundlos wieder im Core. Der Wunsch war deutlich: „wo nur
+   * Dinge zur ausgewählten Methode angeboten werden."
+   *
+   * Länge und Modul kommen als Argument und nicht aus dem Zustand: Ein
+   * `setMode(...)` unmittelbar vor dem Start würde beim selben Durchlauf
+   * noch den alten Wert lesen.
+   */
+  const start = useCallback((uebung?: { onlyModule: ModuleId; mode: TrainingMode }) => {
     // Der erste Ton der Einheit, ausgelöst vom Fingertipp — genau die Geste,
     // die iOS verlangt, bevor eine Seite überhaupt klingen darf.
     platform.sound.play('start')
+    const laufMode = uebung?.mode ?? mode
     const now = platform.clock.now()
     const day = dayKeyOf(now, { offsetMinutes: platform.clock.offsetMinutes(now) })
     // Der Seed macht die Einheit reproduzierbar (A11): Aus Tag, Modus und
     // Startzeit folgen genau diese Wörter in genau dieser Reihenfolge.
-    const seed = `${day}:${mode}:${now}`
+    const seed = `${day}:${laufMode}:${now}`
     const sessionId = `s-${now.toString(36)}-${createRng(seed).int(1_000_000).toString(36)}`
-    const seconds = MODES[mode].seconds
+    const seconds = MODES[laufMode].seconds
 
     void (async () => {
       /*
@@ -594,7 +596,7 @@ export function App() {
       })
 
       const plan = planSession({
-        mode,
+        mode: laufMode,
         day,
         language: training,
         seed,
@@ -698,8 +700,15 @@ export function App() {
         ),
         // Was der Mensch im Lernbereich geübt haben will, geht vor: Er hat es
         // gerade eben ausgesucht, die Zählung spricht über die letzten Wochen.
-        focus: practiceFocus ?? mission.focus ?? focus?.moduleId,
-        modules: mission.modules,
+        focus: uebung?.onlyModule ?? mission.focus ?? focus?.moduleId,
+        /*
+         * Eine Übungsrunde enthält genau ein Modul. Der Planer lässt ein
+         * erzwungenes Einzelmodul bewusst nicht still herausfallen — und das
+         * ist hier richtig: Wer „Zahlen üben" antippt, will Zahlen und nicht
+         * einen Ersatz. Keiner der vier Vorräte kann leer sein; die Paläste
+         * fallen notfalls auf die drei eingebauten zurück.
+         */
+        modules: uebung === undefined ? mission.modules : [uebung.onlyModule],
       })
       const progress: SessionProgress = {
         sessionId,
@@ -710,13 +719,10 @@ export function App() {
       }
 
       setResumable(undefined)
-      // Einmal geübt ist einmal geübt: Der Wunsch gilt für diese Einheit und
-      // nicht für alle folgenden.
-      setPracticeFocus(undefined)
       setRunning(progress)
       void beginSession(progress, day, now).catch(() => undefined)
     })()
-  }, [training, mode, platform, taught, palaceTaught, storyTaught, linkTaught, majorMethodTaught, own, focus, practiceFocus, peopleDone, recentByModule, dimensionCounts])
+  }, [training, mode, platform, taught, palaceTaught, storyTaught, linkTaught, majorMethodTaught, own, focus, peopleDone, recentByModule, dimensionCounts])
 
   const leave = useCallback(() => {
     setRunning(undefined)
@@ -1144,22 +1150,15 @@ export function App() {
           <LearnPanel
             dictionary={dictionary}
             language={language}
-            onPractise={(moduleId) => {
-              setPracticeFocus(moduleId)
-              closePage()
+            onPractise={(moduleId, laenge) => {
               /*
-               * Den Blick mitnehmen — dieselbe Bewegung wie bei „Anspruchs-
-               * volle Einheit starten" (Gerätemeldung 01.09.): Wer auf Üben
-               * tippt, will den Startknopf sehen und nicht nach ihm suchen.
+               * Die Übungsrunde beginnt sofort und enthält nur diese Methode
+               * (Nutzerbefund 04.09.). Vorher wurde hier bloß ein Schwerpunkt
+               * gesetzt und die Seite geschlossen — auf dem Gerät sah das
+               * aus, als lande man grundlos wieder im Core.
                */
-              window.requestAnimationFrame(() => {
-                document.querySelector('.challenge')?.scrollIntoView({
-                  behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
-                    ? 'auto'
-                    : 'smooth',
-                  block: 'center',
-                })
-              })
+              closePage()
+              start({ onlyModule: moduleId, mode: laenge })
             }}
           />
         ),
@@ -1489,7 +1488,12 @@ export function App() {
       <section className="challenge">
         {/* Kein Titel über dem Knopf — „5:00 Beginnen“ erklärt sich, und ein
             Etikett darüber wäre genau das Möbel, das G-2 weglässt. */}
-        <button type="button" className="start" onClick={start}>
+        {/*
+          `() => start()` und nicht `start`: Sonst reicht React das
+          Klick-Ereignis als Argument durch, und `start` läse darin eine
+          Übungsrunde, die es nicht gibt.
+        */}
+        <button type="button" className="start" onClick={() => start()}>
           <span className="start-time">{label}</span>
           <span className="start-label">{dictionary.start.start}</span>
         </button>

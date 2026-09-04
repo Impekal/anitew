@@ -127,16 +127,79 @@ test('setzt auf Wunsch alles zurück — und hält den Stand über das Neuladen'
     .toContainText('0 von 4')
 })
 
-test('„Üben" führt zum Startknopf, statt still etwas zu tun', async ({ page }) => {
+test('„Üben" öffnet den Übungsraum zu dieser Methode — und schickt nicht zurück', async ({
+  page,
+}) => {
   /*
-   * Derselbe Befund wie am 01.09. bei „Anspruchsvolle Einheit starten": Ein
-   * Knopf, der die Seite schließt und den Menschen dann suchen lässt, fühlt
-   * sich an, als sei nichts passiert.
+   * Nutzerbefund 04.09.: „Wenn man bei den Methoden auf üben drückt, kommt
+   * man zurück auf Core."
+   *
+   * Vorher setzte der Knopf nur einen Schwerpunkt und schloss die Seite. Auf
+   * dem Gerät sah das aus, als sei nichts passiert — man stand wieder da, wo
+   * man hergekommen war. Gefordert war: „die Übungseite öffnen (wo nur Dinge
+   * zur ausgewählten Methode angeboten werden)."
    */
   await visit(page)
   await openPage(page, 'Lernen')
 
-  await page.locator('.learn-card').first().locator('.learn-practise').click()
+  await page.locator('.learn-card', { hasText: 'Das Major-System' }).locator('.learn-practise').click()
+
+  // Der Raum ist offen, und er zeigt nur diese eine Methode.
+  const raum = page.locator('.learn-practising')
+  await expect(raum).toBeVisible()
+  await expect(raum.locator('.learn-title')).toHaveText('Das Major-System')
+  await expect(page.locator('.learn-card'), 'die anderen Methoden stehen noch daneben')
+    .toHaveCount(0)
+  await expect(raum.locator('.learn-length')).toHaveCount(3)
+
+  // Und zurück geht es auch — ohne dass etwas gestartet wäre.
+  await raum.locator('button', { hasText: 'Zurück' }).click()
+  await expect(page.locator('.learn-card')).toHaveCount(4)
+})
+
+test('die Übungsrunde enthält wirklich nur die gewählte Methode', async ({ page }) => {
+  /*
+   * Der eigentliche Beweis. „Nur Dinge zur ausgewählten Methode" ist eine
+   * Zusage über den Inhalt der Runde, nicht über die Beschriftung eines
+   * Knopfes — und sie wäre still gebrochen, wenn der Planer wie sonst
+   * mischte.
+   *
+   * Gewählt werden die Zahlen, weil man ihnen ansieht, was sie sind: Der
+   * Abruf zeigt einen Nummernblock. Stünde dort ein Textfeld, käme die
+   * Aufgabe aus einem anderen Modul.
+   */
+  await visit(page)
+  await openPage(page, 'Lernen')
+
+  await page.locator('.learn-card', { hasText: 'Das Major-System' }).locator('.learn-practise').click()
+  await page.locator('.learn-length', { hasText: '1 min' }).click()
+  await page.locator('.learn-go', { hasText: 'Runde starten' }).click()
+
+  // Die Einheit läuft — und der Lernbereich ist zu.
   await expect(page.locator('.learn')).toHaveCount(0)
-  await expect(page.locator('.challenge .start')).toBeVisible()
+  await expect(page.locator('.session')).toBeVisible({ timeout: 15_000 })
+  // Eingeprägt werden Ziffern, nichts sonst.
+  const wort = page.locator('.encode-word').first()
+  await expect(wort).toBeVisible({ timeout: 15_000 })
+  await expect(wort, 'da steht kein Zahlenstück').toHaveText(/^\d+$/u)
+})
+
+test('sagt beim Major-System, warum es nicht bei 0 anfängt', async ({ page }) => {
+  /*
+   * Nutzerfrage 04.09.: „warum ist es nicht chronologisch 0 bis 9?"
+   *
+   * Die Reihenfolge war von Anfang an didaktisch gewählt (TEACH_ORDER) — nur
+   * stand der Grund im Quelltext und nirgends auf dem Bildschirm. Wer eine
+   * Ordnung sieht, die er nicht versteht, hält sie für einen Fehler.
+   *
+   * Der Satz muss beim **ersten** Aufschlagen dastehen: Da steht schon „Als
+   * Nächstes: die 1", und die Frage kommt spätestens bei der 9.
+   */
+  await visit(page)
+  await openPage(page, 'Lernen')
+
+  const major = page.locator('.learn-card', { hasText: 'Das Major-System' })
+  await major.locator('.learn-go').click()
+  await expect(major.locator('.learn-order-why')).toBeVisible()
+  await expect(major.locator('.learn-order-why')).toContainText('Abstriche')
 })
