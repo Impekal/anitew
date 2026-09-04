@@ -38,6 +38,14 @@ die Begründung wird hiermit korrigiert, damit eine falsche Annahme nicht
 unbemerkt weiterlebt. Die eigentliche Freigabe (Register-Recherche) steht
 weiter aus.
 
+**Nachtrag 2026-09-04:** Die Bedeutung ist inzwischen bekannt — wörtlich
+**„das Auge hat sich geöffnet"**, übertragen Klugheit, Scharfsinn und Weisheit,
+je nach Zusammenhang auch Listigkeit (`docs/TRADEMARK.md`, Nachtrag vom selben
+Tag). Das ändert an D-001 wieder
+nichts, und die App macht daraus ausdrücklich kein Versprechen: Ein Name, der
+eine Eigenschaft nennt, ist kein Beleg, dass die Anwendung sie liefert (R-1).
+Der Bereich „Fragen & Antworten" sagt genau das.
+
 ## D-002 · 2026-08-17 · Kostenlos, mit Spende. Pro bleibt möglich, aber gebunden
 
 Die App ist kostenlos. Wer will, kann spenden. Ein späteres Pro-Angebot wird

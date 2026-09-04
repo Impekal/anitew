@@ -40,7 +40,7 @@ schon.
 | Handelsmarke „ANITEW“ | Websuche | Kein exakter Treffer. Nächstliegend: **ANIKEW** (US, Seriennr. 97012991, Klasse 21 Haushaltswaren) — **andere Schreibweise, andere Warenklasse**, kein Bezug zu Software |
 | Domain `anitew.com` | DNS-Auflösung | Löst nicht auf — kein aktiver Auftritt |
 | Domain `anitew.app` | DNS-Auflösung | Löst nicht auf — kein aktiver Auftritt |
-| Bedeutung des Wortes | Websuche | Twi/Akan (Ghana); tritt in religiösen Texten auf. Genaue Bedeutung nicht sicher belegt |
+| Bedeutung des Wortes | Websuche (2026-08-18), ergänzt durch Auskunft (2026-09-04) | Twi/Akan (Ghana); tritt in religiösen Texten auf. **Wörtlich „das Auge hat sich geöffnet"; übertragen: Klugheit, Scharfsinn, Weisheit — je nach Zusammenhang auch Listigkeit.** Siehe Nachtrag unten |
 
 **Was diese Prüfungen wert sind:** Sie schließen die **groben** Fälle aus —
 einen bekannten Namensvetter, eine gleichnamige App, einen offensichtlich
@@ -74,6 +74,48 @@ Was daraus folgt:
   auffindbar und unbesetzt — aber die Behauptung „sagt zunächst nichts“ gilt
   nur für Menschen ohne Twi. Diese Datei hält das fest, damit die Annahme nicht
   unbemerkt falsch weiterlebt.
+
+---
+
+## Nachtrag 2026-09-04 — die Bedeutung, und was sie nicht ist
+
+Die Zeile „genaue Bedeutung nicht sicher belegt" ist überholt. Für die Bereiche
+**Hilfe** und **Fragen & Antworten** wurde die Frage neu gestellt. Die Auskunft:
+
+> **Wörtlich:** „anitew" heißt „das Auge hat sich geöffnet".
+> **Übertragen:** Klugheit, Scharfsinn, Weisheit — je nach Zusammenhang auch
+> Listigkeit.
+
+Drei Anmerkungen, damit das nicht falsch weiterlebt:
+
+1. **Die Quelle ist eine Auskunft, kein Wörterbuch.** Sie ist besser als die
+   Websuche vom 18.08., die nur Fundstellen und keine Übersetzung lieferte —
+   aber sie ist nicht dasselbe wie ein Lexikoneintrag. Wer je ein
+   Akan-Wörterbuch zur Hand hat, möge das hier bestätigen oder berichtigen.
+
+2. **Die Auskunft kam in drei Anläufen**, und das gehört dazu: zuerst
+   „Aufmerksamkeit, Achtsamkeit, Aufpassen", dann die übertragene Reihe
+   (Weisheit, Klugheit, Listigkeit, Scharfsinn), zuletzt das Wörtliche. Erst
+   der letzte Schritt macht die ersten beiden verständlich — ein geöffnetes
+   Auge ist das Bild, aus dem sowohl Aufmerksamkeit als auch Scharfsinn
+   hervorgehen. In der App steht deshalb beides: das Wörtliche und, davon
+   getrennt, das Übertragene.
+
+   *(In der Reihe stand einmal auch „Schlaffheit". Das ist weder in die App
+   noch hierher übernommen worden: Es widerspricht allen übrigen Angaben und
+   sieht nach einem Fehler der Quelle aus. Wenn es doch stimmt, gehört es
+   nachgetragen — dann aber mit Erklärung, nicht als fünftes Wort in einer
+   Reihe, die sonst das Gegenteil sagt.)*
+
+3. **Der Name wurde nicht deswegen gewählt.** D-001 wählte ihn ausdrücklich,
+   *weil* er nichts zu bedeuten schien. Dass er nun ausgerechnet ein geöffnetes
+   Auge und Klugheit benennt, ist ein Fund und keine Absicht — und die App
+   verspricht nichts davon. Ein Name, der eine Eigenschaft nennt, ist kein Beleg, dass die
+   Anwendung sie liefert (R-1). Der Text unter „Fragen & Antworten" sagt beides
+   ausdrücklich.
+
+**Unberührt bleibt, was offen ist:** Die Register-Recherche unten ist damit
+nicht erledigt. Eine Bedeutung zu kennen ist keine Markenfreiheit.
 
 ---
 

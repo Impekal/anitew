@@ -19,6 +19,8 @@ export type MenuIconKind =
   | 'reminder'
   | 'science'
   | 'brainCare'
+  | 'help'
+  | 'faq'
   | 'install'
   | 'privacy'
   | 'backup'
@@ -36,6 +38,26 @@ function Glyph({ kind }: { kind: MenuIconKind }) {
       return <path d="M4.5 5.5h15v10h-8.5L7 19v-3.5H4.5zM8 9.5h8M8 12.5h5" />
     case 'contents':
       return <path d="M7.5 4.5h12v11h-12zM7.5 7.5h12M4.5 8.5v11h12" />
+    /*
+      Hilfe: ein Rettungsring. Kein Fragezeichen — das trägt schon die
+      Nachbarseite, und zwei Fragezeichen nebeneinander sind keine Ordnung.
+    */
+    case 'help':
+      return (
+        <>
+          <circle cx="12" cy="12" r="8.2" />
+          <circle cx="12" cy="12" r="3.4" />
+          <path d="M6.2 6.2l3.4 3.4M17.8 6.2l-3.4 3.4M17.8 17.8l-3.4-3.4M6.2 17.8l3.4-3.4" />
+        </>
+      )
+    /* Fragen & Antworten: zwei Sprechblasen — gefragt und geantwortet. */
+    case 'faq':
+      return (
+        <>
+          <path d="M4 5.5h11v7.5H8.5L5.5 16v-3H4z" />
+          <path d="M18 9.5h2v7.5h-1.5v3l-3-3H10.5" />
+        </>
+      )
     /*
       Lernen: ein aufgeschlagenes Buch. Bewusst kein Doktorhut — der gehört
       zu Prüfungen, und hier wird nicht geprüft.
