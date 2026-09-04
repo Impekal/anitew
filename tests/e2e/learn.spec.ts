@@ -178,10 +178,30 @@ test('die Übungsrunde enthält wirklich nur die gewählte Methode', async ({ pa
   // Die Einheit läuft — und der Lernbereich ist zu.
   await expect(page.locator('.learn')).toHaveCount(0)
   await expect(page.locator('.session')).toBeVisible({ timeout: 15_000 })
-  // Eingeprägt werden Ziffern, nichts sonst.
+  /*
+   * Eingeprägt werden Ziffern, nichts sonst.
+   *
+   * Geprüft wird die Ziffernfolge ohne ihre Zwischenräume, und das ist kein
+   * Aufweichen: Der Vorrat würfelt drei bis sechs Ziffern, und `displayNumber`
+   * setzt erst ab fünf einen Gruppierungs-Zwischenraum. Ein Muster, das nur
+   * reine Ziffern zulässt, hinge damit an der gewürfelten Länge — es war
+   * genau einmal in zwei CI-Läufen rot, bei gleichem Stand. Beide Anzeigen
+   * sind richtig; die Behauptung war falsch.
+   *
+   * Was die Zusage trägt, bleibt unangetastet: Ein Wort, ein Name oder ein
+   * Gang durch einen Palast besteht nicht aus drei bis sechs Ziffern. Käme
+   * die Aufgabe aus einem anderen Modul, fiele das hier auf.
+   *
+   * `expect.poll` statt eines einzelnen Lesens, weil der Einprägen-Block
+   * weiterschaltet: Ein Lesen ohne Wiederholung könnte den Wechsel treffen.
+   */
   const wort = page.locator('.encode-word').first()
   await expect(wort).toBeVisible({ timeout: 15_000 })
-  await expect(wort, 'da steht kein Zahlenstück').toHaveText(/^\d+$/u)
+  await expect
+    .poll(async () => ((await wort.textContent()) ?? '').replace(/\s/gu, ''), {
+      message: 'da steht kein Zahlenstück',
+    })
+    .toMatch(/^\d{3,6}$/u)
 })
 
 test('sagt beim Major-System, warum es nicht bei 0 anfängt', async ({ page }) => {
