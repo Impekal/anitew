@@ -51,6 +51,7 @@ import {
   spanPool,
   DIFFICULTY_WINDOW,
   itemsDeltaFor,
+  numberLengthFor,
   spanLengthFor,
   TRAINING_MODULES,
   gazePool,
@@ -612,7 +613,16 @@ export function App() {
         pools: {
           words: wordPool(training),
           faces: namePool(training),
-          numbers: numberPool(seed, 60),
+          /*
+           * Die Decke wächst mit dem Lernstand (Nutzerbefund 04.09.): Wer
+           * erst die 1 kennt, bekommt keine sechsstellige Zahl vorgesetzt.
+           * Begründung und Messung stehen bei `numberLengthFor`.
+           */
+          numbers: numberPool(
+            seed,
+            60,
+            numberLengthFor({ taught, recent: recentByModule['numbers'] ?? [] }),
+          ),
           /*
            * Missionen ziehen aus demselben Namensvorrat wie die Gesichter
            * (H1): Aus dem Namen entsteht die ganze Szene, so wie aus ihm das
