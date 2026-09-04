@@ -93,6 +93,7 @@ import {
 import { type Dictionary, isTranslated } from '../i18n/index.ts'
 import { AboutPanel } from './AboutPanel.tsx'
 import { BackupPanel } from './BackupPanel.tsx'
+import { LearnPanel } from './LearnPanel.tsx'
 import { MenuIcon, type MenuIconKind } from './MenuIcon.tsx'
 import { OnboardingScreen } from './onboarding/OnboardingScreen.tsx'
 import { PalacePanel } from './PalacePanel.tsx'
@@ -402,6 +403,18 @@ export function App() {
    * Vorratsfilter still aus der Lernrotation. Der Schlüssel ist der Name —
    * die Antwortseite hängt an der Trainingssprache und wäre kein Schlüssel.
    */
+  /*
+   * Der Schwerpunkt, den der Lernbereich gesetzt hat (Nutzerwunsch 03.09.).
+   *
+   * „Üben" heißt hier: Die nächste Einheit gibt dieser Methode den meisten
+   * Raum. Bewusst ein **Schwerpunkt** und keine Einheit aus nur einem Modul —
+   * die würde bei leerem Vorrat scheitern (der Palast braucht erst einen
+   * Weg), und ein Übungsknopf, der manchmal in einen Fehler läuft, ist
+   * schlimmer als keiner. Der Schwerpunkt ist dieselbe Mechanik, die das
+   * Profil ohnehin benutzt.
+   */
+  const [practiceFocus, setPracticeFocus] = useState<ModuleId | undefined>(undefined)
+
   const [peopleDone, setPeopleDone] = useState<ReadonlySet<string>>(new Set())
   useEffect(() => {
     void loadTrackedWords('people', training)
@@ -683,7 +696,9 @@ export function App() {
             itemsDeltaFor({ recent: recentByModule[moduleId] ?? [] }),
           ]),
         ),
-        focus: mission.focus ?? focus?.moduleId,
+        // Was der Mensch im Lernbereich geübt haben will, geht vor: Er hat es
+        // gerade eben ausgesucht, die Zählung spricht über die letzten Wochen.
+        focus: practiceFocus ?? mission.focus ?? focus?.moduleId,
         modules: mission.modules,
       })
       const progress: SessionProgress = {
@@ -695,10 +710,13 @@ export function App() {
       }
 
       setResumable(undefined)
+      // Einmal geübt ist einmal geübt: Der Wunsch gilt für diese Einheit und
+      // nicht für alle folgenden.
+      setPracticeFocus(undefined)
       setRunning(progress)
       void beginSession(progress, day, now).catch(() => undefined)
     })()
-  }, [training, mode, platform, taught, palaceTaught, storyTaught, linkTaught, majorMethodTaught, own, focus, recentByModule, dimensionCounts])
+  }, [training, mode, platform, taught, palaceTaught, storyTaught, linkTaught, majorMethodTaught, own, focus, practiceFocus, peopleDone, recentByModule, dimensionCounts])
 
   const leave = useCallback(() => {
     setRunning(undefined)
@@ -1115,6 +1133,37 @@ export function App() {
         Belegstand, dort die Grundlagen der App mit ihrem. Wer den einen Ton
         kennt, erkennt den anderen wieder (Geraetewunsch 31.08.).
       */
+      /*
+        Der Lernbereich (Nutzerwunsch 03.09.): alle vier Methoden an einem
+        Ort, ohne Uhr. Er steht in der Schublade weit oben, weil er zum
+        Anfangen gehört und nicht zur Verwaltung.
+      */
+      learn: {
+        title: dictionary.learn.heading,
+        body: (
+          <LearnPanel
+            dictionary={dictionary}
+            language={language}
+            onPractise={(moduleId) => {
+              setPracticeFocus(moduleId)
+              closePage()
+              /*
+               * Den Blick mitnehmen — dieselbe Bewegung wie bei „Anspruchs-
+               * volle Einheit starten" (Gerätemeldung 01.09.): Wer auf Üben
+               * tippt, will den Startknopf sehen und nicht nach ihm suchen.
+               */
+              window.requestAnimationFrame(() => {
+                document.querySelector('.challenge')?.scrollIntoView({
+                  behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+                    ? 'auto'
+                    : 'smooth',
+                  block: 'center',
+                })
+              })
+            }}
+          />
+        ),
+      },
       brainCare: {
         title: brainCareHeading(language),
         body: (
@@ -1623,6 +1672,10 @@ export function App() {
               <button type="button" className="drawer-item" onClick={() => openPage('coach')}>
                 <MenuIcon kind="coach" />
                 <span>{dictionary.coach.heading}</span>
+              </button>
+              <button type="button" className="drawer-item" onClick={() => openPage('learn')}>
+                <MenuIcon kind="learn" />
+                <span>{dictionary.learn.heading}</span>
               </button>
               <button type="button" className="drawer-item" onClick={() => openPage('memories')}>
                 <MenuIcon kind="memories" />

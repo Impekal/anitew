@@ -488,6 +488,13 @@ export const en: Dictionary = {
     },
     notConfigured: 'Sync is not set up in this installation yet — its Google identifier is missing. Backup and training are unaffected.',
   },
+  /*
+    Nur die Überschrift steht hier — die Sätze des Lernbereichs liegen in
+    `learnCopy.ts` und werden erst geladen, wenn jemand ihn öffnet. Diese
+    eine Zeile braucht die Schublade, und die gehört zum Kaltstart.
+  */
+  learn: { heading: 'Learn' },
+
   coach: {
     heading: 'Coach',
     adviceHeading: 'From your numbers',
