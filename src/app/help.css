@@ -1,0 +1,100 @@
+/*
+  Hilfe und Fragen & Antworten (Nutzerwunsch 04.09.).
+
+  Eigene Datei und kein Zusatz im Hauptstylesheet: Vite schneidet sie mit dem
+  Panel zusammen ab, und beides wird erst geladen, wenn jemand eine der beiden
+  Seiten öffnet. Das Kaltstart-CSS steht bei 12,0 von 12 KB — dort ist kein
+  Platz, und hier wird auch keiner gebraucht.
+
+  Gestaltet mit den vorhandenen Bausteinen (`.hint`, dieselben Linien und
+  Abstände wie im Lernbereich): Eine Seite, die aussieht wie eine fremde App,
+  fühlt sich auch so an.
+*/
+
+.help-intro {
+  margin: 0 0 1.4rem;
+  color: var(--an-muted);
+}
+
+.help-section {
+  margin-bottom: 1.8rem;
+}
+
+.help-section-title {
+  margin: 0 0 .8rem;
+  font: .7rem var(--mono);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--an-dim);
+  font-weight: 400;
+}
+
+.help-item {
+  padding: 0 0 .9rem 1.1rem;
+  border-left: 1px solid var(--an-line);
+}
+
+.help-item:last-child { padding-bottom: 0; }
+
+.help-item-title {
+  margin: 0 0 .25rem;
+  font-size: .95rem;
+  font-weight: 500;
+}
+
+.help-item-body {
+  margin: 0;
+  color: var(--an-muted);
+  font-size: .9rem;
+  line-height: 1.55;
+}
+
+/*
+  Die Fragen: Der ganze Kopf ist der Schalter, nicht nur ein Pfeil daneben.
+  Auf einem Telefon ist ein Zeichen von 12 Pixeln kein Ziel — die Zeile ist
+  eines.
+*/
+.faq-item {
+  border-bottom: 1px solid var(--an-line);
+}
+
+.faq-item:first-of-type {
+  border-top: 1px solid var(--an-line);
+}
+
+.faq-question {
+  display: flex;
+  align-items: baseline;
+  gap: .7rem;
+  width: 100%;
+  padding: .85rem 0;
+  border: 0;
+  background: none;
+  color: var(--an-text);
+  font: inherit;
+  font-size: .95rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.faq-mark {
+  flex: none;
+  width: 1rem;
+  color: var(--an-cyan);
+  font: 1rem var(--mono);
+  line-height: 1;
+}
+
+.faq-open .faq-question { color: var(--an-cyan); }
+
+.faq-answer {
+  /* Bündig unter dem Fragetext, nicht unter dem Zeichen davor. */
+  margin: 0 0 .95rem 1.7rem;
+  color: var(--an-muted);
+  font-size: .9rem;
+  line-height: 1.6;
+}
+
+.help-evidence {
+  margin-top: 1.6rem;
+}

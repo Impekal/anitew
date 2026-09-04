@@ -38,6 +38,15 @@ die Begründung wird hiermit korrigiert, damit eine falsche Annahme nicht
 unbemerkt weiterlebt. Die eigentliche Freigabe (Register-Recherche) steht
 weiter aus.
 
+**Nachtrag 2026-09-04:** Die Bedeutung ist inzwischen belegt — **Daniel 1,17**
+der Akan-Bibel führt „nimdeɛ ne anitew" dort, wo die King-James-Übersetzung
+„knowledge and skill" hat: Klugheit, Scharfsinn, Einsicht (`docs/TRADEMARK.md`,
+Nachtrag vom selben Tag). Die wörtliche Lesart „das Auge ist offen" blieb
+unbelegt und steht in der App ausdrücklich als Lesart. Das ändert an D-001 wieder
+nichts, und die App macht daraus ausdrücklich kein Versprechen: Ein Name, der
+eine Eigenschaft nennt, ist kein Beleg, dass die Anwendung sie liefert (R-1).
+Der Bereich „Fragen & Antworten" sagt genau das.
+
 ## D-002 · 2026-08-17 · Kostenlos, mit Spende. Pro bleibt möglich, aber gebunden
 
 Die App ist kostenlos. Wer will, kann spenden. Ein späteres Pro-Angebot wird

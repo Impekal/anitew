@@ -40,7 +40,7 @@ schon.
 | Handelsmarke „ANITEW“ | Websuche | Kein exakter Treffer. Nächstliegend: **ANIKEW** (US, Seriennr. 97012991, Klasse 21 Haushaltswaren) — **andere Schreibweise, andere Warenklasse**, kein Bezug zu Software |
 | Domain `anitew.com` | DNS-Auflösung | Löst nicht auf — kein aktiver Auftritt |
 | Domain `anitew.app` | DNS-Auflösung | Löst nicht auf — kein aktiver Auftritt |
-| Bedeutung des Wortes | Websuche | Twi/Akan (Ghana); tritt in religiösen Texten auf. Genaue Bedeutung nicht sicher belegt |
+| Bedeutung des Wortes | Websuche 18.08., Auskunft 04.09., **Belegstelle 04.09.** | Twi/Akan (Ghana). **Belegt in Daniel 1,17 der Akan-Bibel: „nimdeɛ ne anitew" — Kenntnis und Können/Verstand.** Also Klugheit, Scharfsinn, Einsicht. Die wörtliche Lesart „das Auge ist offen" ließ sich nicht belegen. Siehe Nachtrag unten |
 
 **Was diese Prüfungen wert sind:** Sie schließen die **groben** Fälle aus —
 einen bekannten Namensvetter, eine gleichnamige App, einen offensichtlich
@@ -74,6 +74,60 @@ Was daraus folgt:
   auffindbar und unbesetzt — aber die Behauptung „sagt zunächst nichts“ gilt
   nur für Menschen ohne Twi. Diese Datei hält das fest, damit die Annahme nicht
   unbemerkt falsch weiterlebt.
+
+---
+
+## Nachtrag 2026-09-04 — die Bedeutung, und was sie nicht ist
+
+Die Zeile „genaue Bedeutung nicht sicher belegt" ist überholt. Für die Bereiche
+**Hilfe** und **Fragen & Antworten** wurde die Frage neu gestellt — erst als
+Auskunft, dann mit einer Suche nach einer Belegstelle. Beides zusammen ergibt:
+
+> **Belegt:** „anitew" steht in der Akan-Bibel in **Daniel 1,17** (Revised
+> Akuapem Twi): „Na mmerantewa baanan yi, Onyankopɔn maa wɔn nhoma ne nyansa
+> nyinaa mu nimdeɛ ne **anitew**, na Daniel nyaa anisoadehu ne adae nyinaa mu
+> nhumu." Dieselbe Stelle lautet in der King-James-Übersetzung „God gave them
+> **knowledge and skill** in all learning and wisdom". „anitew" steht dort also
+> neben „nimdeɛ" (Kenntnis) und benennt **Klugheit, Scharfsinn, Einsicht**.
+>
+> **Nicht belegt:** die wörtliche Lesart „das Auge hat sich geöffnet". Dass
+> „ani" Auge heißt, ist gesichert. Aber an den Stellen, an denen die Akan-Bibel
+> Augen auftut — **1. Mose 3,5** („mo ani bebue") und **3,7** („wɔn ani
+> buebuee") —, steht nicht *tew*, sondern *bue*. Die Lesart bleibt plausibel
+> und ist keine Bibelwendung; ein Wörterbucheintrag für *tew* war aus dieser
+> Umgebung nicht erreichbar (Egress-Sperre auf bible.com, wiktionary.org,
+> akandictionary.com und learnakandictionary.com).
+
+Drei Anmerkungen, damit das nicht falsch weiterlebt:
+
+1. **Eine Belegstelle ist kein Wörterbuch.** Daniel 1,17 zeigt, *wofür* das
+   Wort dort steht, und das ist erheblich mehr als die Websuche vom 18.08.
+   hergab. Es ist aber kein Lexikoneintrag mit Wortbildung und Bedeutungsfeld.
+   Wer je ein Akan-Wörterbuch zur Hand hat, möge das hier bestätigen oder
+   berichtigen — besonders die Lesart mit *tew*.
+
+2. **Die Auskunft kam in drei Anläufen**, und das gehört dazu: zuerst
+   „Aufmerksamkeit, Achtsamkeit, Aufpassen", dann die übertragene Reihe
+   (Weisheit, Klugheit, Listigkeit, Scharfsinn), zuletzt das Wörtliche. Die
+   Suche stützt den **zweiten** Anlauf und lässt den dritten offen. In der App
+   steht deshalb der Beleg voran und die Lesart dahinter, ausdrücklich als
+   Lesart.
+
+   *(In der Reihe stand einmal auch „Schlaffheit". Das ist weder in die App
+   noch hierher übernommen worden: Es widerspricht allen übrigen Angaben und
+   sieht nach einem Fehler der Quelle aus. Wenn es doch stimmt, gehört es
+   nachgetragen — dann aber mit Erklärung, nicht als fünftes Wort in einer
+   Reihe, die sonst das Gegenteil sagt.)*
+
+3. **Der Name wurde nicht deswegen gewählt.** D-001 wählte ihn ausdrücklich,
+   *weil* er nichts zu bedeuten schien. Dass er nun ausgerechnet Klugheit und
+   Einsicht benennt, ist ein Fund und keine Absicht — und die App verspricht
+   nichts davon. Ein Name, der eine Eigenschaft nennt, ist kein Beleg, dass die
+   Anwendung sie liefert (R-1). Der Text unter „Fragen & Antworten" sagt beides
+   ausdrücklich.
+
+**Unberührt bleibt, was offen ist:** Die Register-Recherche unten ist damit
+nicht erledigt. Eine Bedeutung zu kennen ist keine Markenfreiheit.
 
 ---
 

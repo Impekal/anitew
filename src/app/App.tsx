@@ -106,6 +106,8 @@ import { BrainCarePanel } from './BrainCarePanel.tsx'
  * also im Kaltstart. Die Texte selbst liegen im verzoegerten Chunk (P4).
  */
 import { brainCareHeading } from './brainCareHeading.ts'
+import { HelpPanel } from './HelpPanel.tsx'
+import { faqHeading, helpHeading, understandLabel } from './helpHeadings.ts'
 import { DailyTipMount } from './DailyTipMount.tsx'
 import { SciencePanel } from './SciencePanel.tsx'
 import { FoundationPanel } from './FoundationPanel.tsx'
@@ -1163,6 +1165,20 @@ export function App() {
           />
         ),
       },
+      /*
+        Hilfe und Fragen & Antworten (Nutzerwunsch 04.09.). Zwei Seiten, eine
+        Textdatei, ein Panel: Die Hilfe liest man der Reihe nach, die Fragen
+        schlägt man nach — derselbe Stoff wäre zweimal geführt der sichere Weg,
+        dass eine Hälfte veraltet.
+      */
+      help: {
+        title: helpHeading(language),
+        body: <HelpPanel language={language} view="help" />,
+      },
+      faq: {
+        title: faqHeading(language),
+        body: <HelpPanel language={language} view="faq" />,
+      },
       brainCare: {
         title: brainCareHeading(language),
         body: (
@@ -1696,6 +1712,23 @@ export function App() {
               <button type="button" className="drawer-item" onClick={() => openPage('palace')}>
                 <MenuIcon kind="palace" />
                 <span>{dictionary.palace.heading}</span>
+              </button>
+            </section>
+            {/*
+              Eine eigene Gruppe für die beiden Auskunftsseiten: Unter „Dein
+              Stand" stünde eine Hilfe falsch — sie sagt nichts über den
+              Menschen —, und unter „App & Gerät" ginge sie zwischen Sicherung
+              und Einstellungen unter. Wer Hilfe sucht, sucht sie oben.
+            */}
+            <section className="menu-group">
+              <h2 className="menu-label">{understandLabel(language)}</h2>
+              <button type="button" className="drawer-item" onClick={() => openPage('help')}>
+                <MenuIcon kind="help" />
+                <span>{helpHeading(language)}</span>
+              </button>
+              <button type="button" className="drawer-item" onClick={() => openPage('faq')}>
+                <MenuIcon kind="faq" />
+                <span>{faqHeading(language)}</span>
               </button>
             </section>
             <section className="menu-group menu-group-device">
