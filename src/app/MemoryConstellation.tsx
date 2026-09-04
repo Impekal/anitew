@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 
-import { createRng, memoryClusters, type MemoryGraph, type MemoryNodeType } from '../core/index.ts'
+import { bandLabel, createRng, memoryClusters, type MemoryGraph, type MemoryNodeType } from '../core/index.ts'
 
 /**
  * Die Memory-Constellation (D-036) — echte Daten, kein Dekor.
@@ -143,9 +143,11 @@ const EINHEITEN_JE_ZEICHEN = 2.1
  */
 const BAND_LUFT = 2
 
-function kurz(label: string, maxZeichen: number): string {
-  return label.length <= maxZeichen ? label : `${label.slice(0, maxZeichen - 1).trimEnd()}…`
-}
+/*
+  Gekürzt wird im Kern (`memory/label.ts`) — hier stand vorher eine eigene,
+  ungeputzte Fassung, und die hat am 03.09. auf dem Telefon einen Namen zu
+  „.…" zusammenfallen lassen. Der Grund und die Messung stehen dort.
+*/
 
 function visibleNodeIds(graph: MemoryGraph, selectedId?: string): Set<string> {
   if (graph.nodes.length <= MAX_VISIBLE_MEMORY_NODES) return new Set(graph.nodes.map((node) => node.id))
@@ -312,7 +314,7 @@ function layout(graph: MemoryGraph, tappable: boolean, selectedId?: string): Pla
     return einzeln.map((node, index) => ({
       id: node.id,
       // Das Band ist `aria-hidden`; der ganze Name steht in „Mein Gedächtnis".
-      label: kurz(node.label, maxZeichen),
+      label: bandLabel(node.label, maxZeichen),
       x: einzeln.length === 1 ? 50 : rand + index * schritt,
       y: BAND_MID + ((index % 3) - 1) * FLACH * 20,
       strength: node.strength,
@@ -475,7 +477,12 @@ export function MemoryConstellation({
                       : ((node.activityAt - oldestActivity) / (newestActivity - oldestActivity)) * 0.25),
                 }}
               />
-              {node.anchor && (
+              {/*
+                `node.label !== ''` gehört dazu: Bleibt nach dem Putzen nichts
+                Lesbares übrig, bekommt der Punkt keinen Namen statt eines
+                nackten „…". Ein Rest mit Pünktchen ist keine Auskunft.
+              */}
+              {node.anchor && node.label !== '' && (
                 /*
                  * Im Band wechseln die Namen zeilenweise die Seite und werden
                  * bei Bedarf gekürzt. Beides aus demselben Grund: Ein Name
