@@ -105,6 +105,31 @@ export async function visit(page: Page) {
     await page.locator('.challenge').waitFor()
   }
 
+  await closeFirstRunGuide(page)
+}
+
+/**
+ * Die Erst-Orientierung wegräumen, **bevor** sie im Weg steht.
+ *
+ * Sie ist ein modaler Vorhang (`role="dialog" aria-modal="true"`), und sie
+ * kommt **nach** dem Startbildschirm: Gemessen am 07.09. steht `.challenge`
+ * bereits, die Führung erscheint 0,5 bis 0,75 Sekunden später (fünf von fünf
+ * Läufen). Wer `.challenge` als Startsignal nimmt und sofort weiterklickt,
+ * wettet also darauf, schneller zu sein als der Vorhang.
+ *
+ * Am Menschen ist daran nichts falsch: Wer während der Führung etwas anderes
+ * antippt, schließt sie damit, und der Klick läuft normal weiter
+ * (`firstRunExperience.ts`). Playwright dagegen **sendet den Klick gar nicht**,
+ * solange ein anderes Element die Zeigereignisse abfängt — es wartet, bis der
+ * Test in die Zeitschranke läuft. Genau so ist der portugiesische
+ * Drive-Test in CI gefallen: 160 Versuche, jedes Mal
+ * „`.first-run-guide-card` … intercepts pointer events".
+ *
+ * Deshalb wird hier nicht geschaut, ob die Führung **gerade** steht, sondern
+ * an den Marken abgelesen, ob sie **noch kommt** — und dann auf sie gewartet.
+ * Ein `count() > 0` an dieser Stelle hätte dieselbe Wette nur verschoben.
+ */
+export async function closeFirstRunGuide(page: Page): Promise<void> {
   const guideExpected = await page.evaluate(() => {
     try {
       return (
@@ -115,13 +140,12 @@ export async function visit(page: Page) {
       return false
     }
   })
+  if (!guideExpected) return
 
-  if (guideExpected) {
-    const guide = page.locator('.first-run-guide')
-    await guide.waitFor({ state: 'visible', timeout: 8_000 })
-    await page.locator('.first-run-guide-skip').click()
-    await expect(guide).toBeHidden()
-  }
+  const guide = page.locator('.first-run-guide')
+  await guide.waitFor({ state: 'visible', timeout: 8_000 })
+  await page.locator('.first-run-guide-skip').click()
+  await expect(guide).toBeHidden()
 }
 
 /**
