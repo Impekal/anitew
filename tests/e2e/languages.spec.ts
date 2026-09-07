@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-import { openPage } from './helpers.ts'
+import { closeFirstRunGuide, openPage } from './helpers.ts'
 
 /**
  * Der Smoke-Pfad je Interface-Sprache (TRANSLATION_WORKFLOW §6):
@@ -145,6 +145,13 @@ for (const lang of DRIVE_SMOKE) {
     await expect(page.locator('html')).toHaveAttribute('lang', lang.tag)
     await page.getByRole('button', { name: lang.skip }).click()
     await expect(page.locator('.challenge')).toBeVisible({ timeout: 15_000 })
+    /*
+     * Die Führung kommt erst nach dem Startbildschirm — und sie fängt jeden
+     * Klick ab. Ohne diese Zeile wettet der Test darauf, schneller im
+     * Menü zu sein als der Vorhang; auf einem ausgelasteten CI-Rechner
+     * verliert er die Wette (Begründung in `closeFirstRunGuide`).
+     */
+    await closeFirstRunGuide(page)
     await openPage(page, lang.page)
 
     // Der Satz, der auf dem Foto englisch war.

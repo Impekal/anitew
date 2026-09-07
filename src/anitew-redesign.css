@@ -457,14 +457,13 @@ body::before {
   animation: connection-draw 1.2s var(--ease) forwards;
 }
 
+/* Drehpunkt siehe `.constellation-node` weiter unten — er gilt für jeden
+   Punkt und stand hier doppelt. Vier tote Angaben, die nichts bewirkt haben:
+   Sie setzten genau die Werte, die ohnehin schon anlagen. */
 .constellation-memory-new .constellation-node {
-  transform-box: fill-box;
-  transform-origin: center;
   animation: memory-born 1.1s var(--ease) both;
 }
 .constellation-memory-recalled .constellation-node {
-  transform-box: fill-box;
-  transform-origin: center;
   animation: recall-signal 1.8s var(--ease) both;
 }
 
@@ -494,9 +493,22 @@ body::before {
 /* Nur die schmückende Konstellation treibt. Auf der Gedächtnis-Seite ist jeder
    Punkt ein Knopf, und ein Knopf, der wandert, ist für eine unruhige Hand
    schwerer zu treffen — bei dieser Zielgruppe kein Detail. Nebenbei laufen auf
-   der Seite dadurch weniger Bewegungen, nicht mehr. */
-.constellation:not(.constellation-tappable) .constellation-node {
-  animation: node-drift calc(var(--motion-breathe) * 1.6) ease-in-out infinite;
+   der Seite dadurch weniger Bewegungen, nicht mehr.
+
+   Die Bewegung sitzt an der **Gruppe**, nicht am Punkt (Nutzerbefund 07.09.:
+   „sollten sich konstant bewegen wie in einem Billard oder bei den Galaxys").
+   Vorher trieb nur der Kreis, und zwar um ±1,6 Einheiten — der Name stand
+   still daneben. Damit sah die Konstellation aus, als bewege sich nichts.
+   An der Gruppe wandern Punkt und Name zusammen.
+
+   **Es ist dieselbe Anzahl Animationen wie vorher, nämlich eine je Punkt.**
+   Das ist hier keine Nebensache: Auf der Startseite laufen 23 Dauerbewegungen
+   und die Schranke steht bei 24 (`performance.spec.ts`, Gerätemeldung 01.09.
+   „Le téléphone chauffe toujours"). Eine zweite Animation je Punkt wären
+   fünfunddreißig gewesen. Bewegt wird ausschließlich `transform` — das
+   schiebt die Grafikkarte, ohne neu zu zeichnen. */
+.constellation:not(.constellation-tappable) .constellation-memory {
+  animation: node-drift var(--drift) ease-in-out infinite;
 }
 
 
@@ -557,11 +569,29 @@ body::before {
    mehr" (gemeldet 02.09.). 1,6 Einheiten sind rund 6 Pixel — sichtbar, ohne
    dass ein Punkt seinen Platz verlässt. Es bleibt dieselbe eine Animation je
    Punkt, nur mit größeren Zahlen: kein Deut mehr Rechenarbeit. */
+/* Ein Weg, kein Puls (Nutzerbefund 07.09.).
+
+   Die Amplitude ist nicht frei gewählt: Die Anordnung rechnet mit genau drei
+   Einheiten Drift je Punkt und hält jeden Kasten um so viel größer frei
+   (`DRIFT` in `MemoryConstellation.tsx`). Wer sie hier erhöht, muss sie dort
+   erhöhen — sonst berühren sich zwei Namen wieder.
+
+   Vier Stützstellen mit ungleichen Abständen und ungleichen Richtungen: Eine
+   Bahn, die auf halber Strecke umkehrt, sieht nach Pendel aus. Diese hier
+   kommt an keiner Stelle zweimal vorbei und wirkt deshalb wie Trift, nicht
+   wie Takt.
+
+   **Nur Verschiebung, keine Skalierung.** Zwei Gründe, und beide zählen: An
+   der Gruppe hängt jetzt auch der Name, und ein Name, der atmet, liest sich
+   unruhig. Und eine Verschiebung braucht keinen Drehpunkt — damit entfallen
+   `transform-box` und `transform-origin` an dieser Regel, und das ist der
+   Unterschied zwischen 12,0 KB Kaltstart-CSS und darüber. */
 @keyframes node-drift {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  30% { transform: translate(1.6px, -.9px) scale(1.18); }
-  62% { transform: translate(-1.1px, 1.3px) scale(1.04); }
-  82% { transform: translate(.7px, .9px) scale(1.12); }
+  0%, 100% { transform: translate(0, 0); }
+  27% { transform: translate(2.6px, -1.9px); }
+  53% { transform: translate(-2.2px, 1.4px); }
+  74% { transform: translate(1.1px, 2.4px); }
+  89% { transform: translate(-1.4px, -1.1px); }
 }
 
 @keyframes memory-born {
