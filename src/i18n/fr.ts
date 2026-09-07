@@ -164,53 +164,8 @@ export const fr: Dictionary = {
     noneYet: 'Aucune mesure terminée pour l’instant.',
   },
   science: {
+    /* Nur die Überschrift — der Rest steht in `scienceCopy.ts`. */
     heading: 'Ce qui est établi',
-    note: 'ANITEW repose sur quelques résultats qui tiennent depuis des décennies — et laisse de côté ce qui sonne seulement bien. Les deux sont ici, avec les sources.',
-    standings: {
-      established: 'Bien établi',
-      narrow: 'Établi, mais seulement pour cela',
-      unsupported: 'Non établi',
-      unmeasured: 'Non mesuré',
-    },
-    standingNotes: {
-      established: 'Répliqué de nombreuses fois, par des travaux indépendants. L’app est construite dessus.',
-      narrow: 'L’effet existe — mais il vaut pour ce qui a été exercé, pas au-delà.',
-      unsupported: 'Régulièrement affirmé par les apps de mémoire, et cela ne résiste pas à l’examen. ANITEW ne l’affirme donc pas.',
-      unmeasured: 'Personne ne l’a mesuré. Nous non plus.',
-    },
-    claims: {
-      spacing: {
-        title: 'La pratique espacée bat la pratique massée',
-        body: 'Le même effort, réparti sur des jours, apporte nettement plus qu’en une seule fois. C’est pourquoi ANITEW planifie des révisions au lieu de te faire réviser longtemps.',
-      },
-      retrieval: {
-        title: 'Le rappel apprend, la relecture non',
-        body: 'Sortir quelque chose de sa tête est l’acte d’apprentissage lui-même — relire donne une meilleure sensation et apporte moins. C’est pourquoi l’app interroge au lieu de montrer.',
-      },
-      forgetting: {
-        title: 'L’oubli suit une courbe prévisible',
-        body: 'La courbe est ancienne et a été proprement répliquée en 2015. Oublier n’est pas un défaut ; c’est la raison pour laquelle une échéance peut être planifiée.',
-      },
-      mnemonics: {
-        title: 'Les techniques de mémorisation élèvent la performance — dans la tâche exercée',
-        body: 'Six semaines d’entraînement des loci changent de façon mesurable combien de mots d’une liste quelqu’un retient. Ce qui en découle pour les noms, les rendez-vous ou ton quotidien n’est **pas** démontré par là. ANITEW t’apprend la technique et n’affirme rien sur le reste.',
-      },
-      brainTraining: {
-        title: 'La gym cérébrale ne rend pas globalement plus intelligent',
-        body: 'Les grandes études trouvent la même chose : on devient meilleur dans les exercices et nulle part ailleurs. Un entraînement de la mémoire de travail n’élève ni l’intelligence ni la performance au quotidien. ANITEW ne le promet donc pas — et c’est exactement pour cela que le slogan dit « une technique, pas un don ».',
-      },
-      rewards: {
-        title: 'Les récompenses peuvent évincer la motivation propre',
-        body: 'C’est pourquoi il n’y a ici ni points, ni niveaux, ni rien à débloquer. Le résultat est bien étudié — mais sur des tâches de laboratoire, pas sur des apps : qu’une app **sans** points fonctionne mieux n’a été montré nulle part, et ANITEW ne l’affirme pas. La décision est une posture, pas une déduction : revenir doit valoir la peine parce que quelque chose reste — pas parce qu’un chiffre se casserait sinon. Ce qui existe à la place vient de tes vrais chiffres : la série avec ses jours de protection, la Memory World qui grandit et la mesure.',
-      },
-      everyday: {
-        title: 'Si ANITEW aide ton quotidien',
-        body: 'Il n’y a pas d’étude là-dessus, parce qu’il n’y a pas encore d’étude de cette app. Ce que nous pouvons mesurer, la mesure le mesure : combien de vingt mots sont encore là le lendemain. Tout au-delà serait deviné — et ici, on ne devine pas.',
-      },
-    },
-    sources: 'Sources',
-    restsOn: 'Ce qui en dépend dans l’app :',
-    nothingRests: 'Rien dans l’app n’est construit dessus.',
   },
   palace: {
     heading: 'Le palais de mémoire',

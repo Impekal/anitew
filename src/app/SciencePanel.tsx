@@ -1,7 +1,5 @@
 import { lazy, Suspense } from 'react'
 
-import type { Dictionary } from '../i18n/index.ts'
-
 /*
  * Die Wissenschaftsseite ist wichtig, aber kein Kaltstart-Bestandteil. Ihre
  * Quellen, Claim-Matrix und Darstellung werden erst geladen, wenn der Mensch
@@ -14,10 +12,10 @@ const SciencePanelImpl = lazy(async () => {
   return { default: module.SciencePanelImpl }
 })
 
-export function SciencePanel({ dictionary }: { dictionary: Dictionary }) {
+export function SciencePanel({ language }: { language: string }) {
   return (
     <Suspense fallback={null}>
-      <SciencePanelImpl dictionary={dictionary} />
+      <SciencePanelImpl language={language} />
     </Suspense>
   )
 }

@@ -36,8 +36,26 @@ test('sagt, was Gehirnjogging nicht kann (F4, R-2)', async ({ page }) => {
   await expect(block.getByText('Nicht belegt')).toBeVisible()
   await expect(block.getByText('Gehirnjogging macht nicht allgemein klüger')).toBeVisible()
 
-  // Der entscheidende Satz: Auf einer unbelegten Annahme steht hier nichts.
-  await expect(block.getByText('Darauf ist in der App nichts gebaut.')).toBeVisible()
+  /*
+   * Seit dem 05.09. steht hier eine zweite Aussage: die Schlagzeile, dass
+   * Gehirntraining das Demenzrisiko senke. Sie gehört hierher, weil man ihr
+   * begegnet — zwei Auswertungen derselben Studie fanden etwas, eine
+   * veröffentlichte Gegenanalyse hebt es nach Korrektur für mehrfaches Testen
+   * wieder auf, und die Autoren widersprechen. Der Streit läuft.
+   */
+  await expect(block.getByText('Demenzrisiko')).toBeVisible()
+
+  /*
+   * Der entscheidende Satz: Auf einer unbelegten Annahme steht hier nichts.
+   *
+   * Geprüft wird er jetzt für **jede** Aussage im Block und nicht mehr für
+   * „irgendeine" — vorher war der Selektor eindeutig, weil es nur eine gab.
+   * Genau daran ist der Test beim Hinzufügen der zweiten rot geworden.
+   */
+  const aussagen = block.locator('.claim')
+  await expect(aussagen).toHaveCount(2)
+  await expect(block.locator('.rests')).toHaveCount(2)
+  await expect(block.getByText('Darauf ist in der App nichts gebaut.')).toHaveCount(2)
 })
 
 test('gibt zu, was niemand gemessen hat — auch nicht wir', async ({ page }) => {

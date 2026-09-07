@@ -60,6 +60,7 @@ export const SCIENCE_CLAIMS = [
   'forgetting',
   'mnemonics',
   'brainTraining',
+  'dementiaPrevention',
   'rewards',
   'everyday',
 ] as const
@@ -164,6 +165,87 @@ export const SCIENCE: readonly ScienceClaim[] = [
         year: 2016,
         title: 'Do "brain-training" programs work?',
         where: 'Psychological Science in the Public Interest, 17(3), 103–186',
+      },
+    ],
+  },
+  /*
+   * ── Vorgemerkt, aber noch nicht eingetragen: das Geschwindigkeitstraining ──
+   *
+   * Die Recherche vom 05.09. ist gemacht und fiele auf `narrow` aus: Die
+   * ACTIVE-Studie fand nach zehn Jahren, dass die trainierte Fähigkeit hält;
+   * die UFOV-Metaanalyse zeigt kleinen nahen Übertrag (Geschwindigkeit 0,22,
+   * Aufmerksamkeit 0,14) und keinen auf Gedächtnis oder exekutive Funktionen;
+   * die Metaanalyse zweiter Ordnung findet beim Fernübertrag mit aktiver
+   * Kontrollgruppe 0,01 — also null.
+   *
+   * Warum sie trotzdem nicht dasteht: **Regel 1 dieser Datei.** Eine Aussage
+   * mit Stand `narrow` muss etwas tragen, und ANITEW hat noch keine Übung,
+   * die auf ihr stünde. Eine belegte Aussage ohne Funktion darunter wäre
+   * Wissenschaft als Zierrat — genau das, was diese Seite anprangert.
+   *
+   * Sie kommt mit der Übung, nicht davor. Die Quellen stehen im PR, der diese
+   * Zeilen einträgt.
+   */
+  {
+    /*
+     * Die Schlagzeile, der man begegnet — und warum sie hier unter
+     * „nicht belegt" steht.
+     *
+     * Das ist **nicht** „niemand hat etwas gefunden". Zwei Auswertungen der
+     * ACTIVE-Daten fanden ein geringeres Demenzrisiko nach
+     * Geschwindigkeitstraining: 2017 über zehn Jahre (−29 %, p = 0,049,
+     * Konfidenzintervall 0,50–0,998) und 2026 über zwanzig Jahre in
+     * Medicare-Daten (Hazard Ratio 0,75).
+     *
+     * Vier Dinge sprechen dagegen, darauf etwas zu bauen:
+     *
+     * 1. Demenz war **nicht** der Endpunkt, für den die Studie gebaut wurde —
+     *    die Auswertung ist sekundär und explorativ.
+     * 2. Das erste Ergebnis lag mit p = 0,049 knapp unter der Schwelle, und
+     *    das Konfidenzintervall reicht bis fast an 1 heran.
+     * 3. Kein unabhängiger zweiter Versuch hat es wiederholt; beide Befunde
+     *    stammen aus derselben Studie.
+     * 4. Eine veröffentlichte Gegenanalyse zeigt, dass nach Korrektur für
+     *    mehrfaches Testen **alle** Konfidenzintervalle die 1 einschließen.
+     *
+     * Fairerweise: Die Gegenanalyse ist eine Einzelautor-Arbeit, und die
+     * Autoren der Studie haben geantwortet — sie halten eine Korrektur für
+     * mehrfaches Testen nicht für nötig. Der Streit läuft also, und genau
+     * deshalb steht hier nichts als das.
+     *
+     * `restsOn` ist leer, und das ist die Regel dieser Datei: Auf einer
+     * umstrittenen Aussage darf in ANITEW nichts stehen.
+     */
+    id: 'dementiaPrevention',
+    standing: 'unsupported',
+    restsOn: [],
+    sources: [
+      {
+        authors: 'Edwards, J. D., Xu, H., Clark, D. O. et al.',
+        year: 2017,
+        title: 'Speed of processing training results in lower risk of dementia',
+        where: "Alzheimer's & Dementia: Translational Research & Clinical Interventions, 3(4)",
+      },
+      {
+        authors: 'Coe, N. B., Miller, K. E., Sun, C. et al.',
+        year: 2026,
+        title:
+          'Impact of cognitive training on claims-based diagnosed dementia over 20 years: evidence from the ACTIVE study',
+        where: "Alzheimer's & Dementia: Translational Research & Clinical Interventions, 12(1), e70197",
+      },
+      {
+        authors: 'Dickels, W. T.',
+        year: 2026,
+        title:
+          'Reanalyzing the impact of cognitive training over 20 years in the ACTIVE study: Losing the forest in the trees',
+        where: "Alzheimer's & Dementia: Translational Research & Clinical Interventions, 12(2), e70280",
+      },
+      {
+        authors: 'Albert, M. S. et al.',
+        year: 2026,
+        title:
+          'Response to "Reanalyzing the impact of cognitive training over 20 years in the ACTIVE study: Losing the forest in the trees"',
+        where: "Alzheimer's & Dementia: Translational Research & Clinical Interventions",
       },
     ],
   },

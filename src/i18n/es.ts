@@ -164,53 +164,8 @@ export const es: Dictionary = {
     noneYet: 'Aún ninguna medición terminada.',
   },
   science: {
+    /* Nur die Überschrift — der Rest steht in `scienceCopy.ts`. */
     heading: 'Lo que está demostrado',
-    note: 'ANITEW se apoya en unos pocos hallazgos que aguantan desde hace décadas — y deja fuera lo que solo suena bien. Ambos están aquí, con fuentes.',
-    standings: {
-      established: 'Bien demostrado',
-      narrow: 'Demostrado, pero solo para eso',
-      unsupported: 'No demostrado',
-      unmeasured: 'No medido',
-    },
-    standingNotes: {
-      established: 'Replicado muchas veces, en trabajos independientes. Sobre esto está construida la app.',
-      narrow: 'El efecto existe — pero vale para lo que se practicó, y no más allá.',
-      unsupported: 'Las apps de memoria lo afirman con regularidad y no resiste el examen. Por eso ANITEW no lo afirma.',
-      unmeasured: 'Nadie lo ha medido. Nosotros tampoco.',
-    },
-    claims: {
-      spacing: {
-        title: 'Practicar espaciado gana a practicar de golpe',
-        body: 'El mismo esfuerzo, repartido en días, rinde claramente más que de una sentada. Por eso ANITEW planifica repasos en vez de dejarte practicar largo rato.',
-      },
-      retrieval: {
-        title: 'Recuperar enseña, mirar no',
-        body: 'Sacar algo de la cabeza es el propio acto de aprender — releer sienta mejor y rinde menos. Por eso la app pregunta en vez de enseñar.',
-      },
-      forgetting: {
-        title: 'El olvido sigue una curva previsible',
-        body: 'La curva es antigua y fue replicada limpiamente en 2015. Olvidar no es un defecto, sino la razón de que una fecha de repaso se pueda planificar.',
-      },
-      mnemonics: {
-        title: 'Las mnemotecnias elevan el rendimiento — en la tarea practicada',
-        body: 'Seis semanas de entrenamiento de loci cambian de forma medible cuántas palabras de una lista alguien conserva. Lo que de ahí se siga para nombres, citas o tu día a día **no** queda demostrado con eso. ANITEW te enseña la técnica y no afirma nada sobre el resto.',
-      },
-      brainTraining: {
-        title: 'La gimnasia cerebral no te hace más listo en general',
-        body: 'Los grandes estudios encuentran lo mismo: mejoras en los ejercicios y en ningún otro sitio. Un entrenamiento de memoria de trabajo no eleva ni la inteligencia ni el rendimiento diario. Por eso ANITEW no lo promete — y justo por eso el lema dice «una técnica, no un talento».',
-      },
-      rewards: {
-        title: 'Las recompensas pueden desplazar la motivación propia',
-        body: 'Por eso aquí no hay puntos, ni niveles, ni nada que desbloquear. El hallazgo está bien estudiado — aunque en tareas de laboratorio, no en apps: que una app **sin** puntos funcione mejor no se ha demostrado en ningún sitio, y ANITEW no lo afirma. La decisión es una postura, no una deducción: volver debe valer la pena porque algo se queda — no porque si no se rompa un número. Lo que hay en su lugar sale de tus números reales: la racha con días de protección, la Memory World que crece y la medición.',
-      },
-      everyday: {
-        title: 'Si ANITEW ayuda a tu día a día',
-        body: 'No hay estudio sobre eso, porque todavía no hay estudio de esta app. Lo que podemos medir, lo mide la medición: cuántas de veinte palabras siguen ahí al día siguiente. Todo lo demás sería adivinar — y aquí no se adivina.',
-      },
-    },
-    sources: 'Fuentes',
-    restsOn: 'Lo que depende de ello en la app:',
-    nothingRests: 'Sobre esto no está construido nada en la app.',
   },
   palace: {
     heading: 'El palacio de la memoria',
