@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 import { openPage, startButton, visit } from './helpers.ts'
+import { TRAINING_MODULES } from '../../src/core/session/plan.ts'
 
 /**
  * „Geistig aktiv bleiben" und der Tipp des Tages (Gerätewunsch 31.08.).
@@ -38,37 +39,85 @@ test('die Seite zeigt Tipps mit ihrem Belegstand und nennt die Grenze', async ({
 test('der Bereich fuehrt ins fordernde Training statt daneben ein zweites zu bauen', async ({
   page,
 }) => {
+  test.setTimeout(120_000)
   await visit(page)
   await expect(startButton(page)).toBeVisible()
   await openPage(page, 'Geistig aktiv bleiben')
 
   /*
    * Der Wunsch war „eventuell auch mit schwierigen Aufgaben". Die Antwort
-   * ist ein Weg, kein zweiter Aufgabenvorrat: Der Knopf schliesst die Seite
-   * und stellt die lange Einheit ein — Anspruch kommt aus dem Training, das
-   * es schon gibt.
+   * ist ein Weg, kein zweiter Aufgabenvorrat: Anspruch kommt aus dem
+   * Training, das es schon gibt — nur in seiner langen Form.
+   *
+   * ── Und der Weg endet jetzt wirklich dort (06.09.) ──────────────────────
+   *
+   * Zweimal gemeldet, wörtlich: „‚lancer une séance exigeante‘ ramène au
+   * Core" (01.09.) und „fordernde Einheit starten führt zurück ins Core"
+   * (06.09.). Der erste Eingriff holte nur den Startknopf ins Bild und gab
+   * ihm den Fokus. Das war eine Verbesserung am **Landeplatz** — der Knopf
+   * stellte die Einheit weiter bloß ein, statt sie zu beginnen. Ein Etikett
+   * mit einem Verb, das nichts tut, wird beim zweiten Mal genauso gemeldet
+   * wie beim ersten.
+   *
+   * Dieser Test prüfte bis dahin genau die alte Mechanik: Seite zu,
+   * „15 Minuten" gewählt, Startknopf im Bild. Alle drei Aussagen waren wahr
+   * und trotzdem war der Befund berechtigt — sie beschrieben eine
+   * Vorbereitung, keinen Start. Geprüft wird deshalb ab jetzt die Wirkung.
    */
   await page.getByRole('button', { name: 'Fordernde Einheit starten' }).click()
+
+  // Eine Einheit läuft: Ankommen (D-011/G-1), danach der Abbruch-Knopf.
+  await page.locator('.settle').click({ timeout: 15_000 })
+  await expect(page.locator('.session-abort')).toBeVisible({ timeout: 15_000 })
   await expect(page.locator('.page')).toBeHidden()
-  await expect(page.locator('.mode-active')).toHaveText(/15 Minuten/)
+
+  const plan = await page.evaluate(() => {
+    return new Promise<{ sekunden?: number; module?: string[] } | undefined>((resolve) => {
+      const open = indexedDB.open('anitew')
+      open.onsuccess = () => {
+        const request = open.result
+          .transaction('settings')
+          .objectStore('settings')
+          .get('activeSession')
+        request.onsuccess = () => {
+          const value = request.result?.value as
+            | { plan?: { totalSeconds?: number; blocks?: { moduleId?: string }[] } }
+            | undefined
+          resolve({
+            ...(value?.plan?.totalSeconds === undefined
+              ? {}
+              : { sekunden: value.plan.totalSeconds }),
+            module: [...new Set((value?.plan?.blocks ?? []).map((b) => b.moduleId ?? '?'))],
+          })
+        }
+        request.onerror = () => resolve(undefined)
+      }
+      open.onerror = () => resolve(undefined)
+    })
+  })
+
+  // Die lange Länge, nicht die Voreinstellung.
+  expect(plan?.sekunden, 'die Einheit ist nicht die fordernde').toBe(900)
 
   /*
-   * Im Bild, nicht bloß vorhanden (Gerätemeldung 01.09.).
-   *
-   * Gemeldet wurde: „‚lancer une séance exigeante‘ ramène au Core. Ça devrait
-   * plutôt conduire directement à l'écran où se trouvent les 15 Minutes afin
-   * qu'on clique sur commencer.“
-   *
-   * Der Knopf stellte die lange Einheit korrekt ein — nur landete man oben
-   * auf der Startseite, und der Startknopf stand darunter, außerhalb des
-   * Bildes. Auf dem Telefon sah das aus wie „nichts passiert".
-   *
-   * Dass der bisherige `toBeVisible()` das durchgehen ließ, ist kein Zufall:
-   * Bei Playwright heißt sichtbar „hat eine Fläche und ist nicht versteckt" —
-   * ein weggescrolltes Element erfüllt das. `toBeInViewport()` prüft, was der
-   * Mensch sieht. Der alte Anspruch war zu schwach, nicht falsch.
+   * Und kein zweiter Aufgabenvorrat — das ist die eigentliche Aussage dieses
+   * Tests. Was läuft, sind die gewöhnlichen Trainingsmodule; „schwierig"
+   * heißt hier länger und breiter, nicht anderswoher.
    */
-  await expect(startButton(page)).toBeInViewport()
+  expect(plan?.module?.length, 'die Einheit hat gar keine Module').toBeGreaterThan(0)
+  for (const modul of plan?.module ?? []) {
+    expect(TRAINING_MODULES as readonly string[], `„${modul}" ist kein Trainingsmodul`).toContain(
+      modul,
+    )
+  }
+
+  /*
+   * Zuletzt: Wer die Einheit verwirft, findet auf dem Startbildschirm die
+   * fordernde Länge vorgewählt. Der Knopf hinterlässt also einen Zustand,
+   * der zu dem passt, was gerade lief.
+   */
+  await page.locator('.session-abort').click()
+  await expect(page.locator('.mode-active:not(.language-pace)')).toHaveText(/15 Minuten/)
 })
 
 test('der Tipp des Tages kommt einmal, geht weg und blockiert nichts', async ({ page }) => {

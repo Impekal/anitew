@@ -560,8 +560,14 @@ export function App() {
    * Länge und Modul kommen als Argument und nicht aus dem Zustand: Ein
    * `setMode(...)` unmittelbar vor dem Start würde beim selben Durchlauf
    * noch den alten Wert lesen.
+   *
+   * `onlyModule` ist optional, und das ist seit dem 06.09. der Unterschied
+   * zwischen zwei Aufrufern: Die Übungsrunde schränkt auf **ein** Modul ein,
+   * „Fordernde Einheit starten" will die **volle** Bandbreite — nur eben
+   * fünfzehn Minuten lang. Ohne diese Unterscheidung konnte der zweite Knopf
+   * gar nicht starten und musste sich auf `setMode` beschränken.
    */
-  const start = useCallback((uebung?: { onlyModule: ModuleId; mode: TrainingMode }) => {
+  const start = useCallback((uebung?: { onlyModule?: ModuleId; mode: TrainingMode }) => {
     // Der erste Ton der Einheit, ausgelöst vom Fingertipp — genau die Geste,
     // die iOS verlangt, bevor eine Seite überhaupt klingen darf.
     platform.sound.play('start')
@@ -793,7 +799,7 @@ export function App() {
          * einen Ersatz. Keiner der vier Vorräte kann leer sein; die Paläste
          * fallen notfalls auf die drei eingebauten zurück.
          */
-        modules: uebung === undefined ? mission.modules : [uebung.onlyModule],
+        modules: uebung?.onlyModule === undefined ? mission.modules : [uebung.onlyModule],
       })
       const progress: SessionProgress = {
         sessionId,
@@ -1268,32 +1274,32 @@ export function App() {
         body: (
           <BrainCarePanel
             onDemanding={() => {
+              /*
+               * Der Knopf heißt „Fordernde Einheit starten" — also startet er
+               * (Gerätemeldung 01.09., erneut am 06.09.).
+               *
+               * Zweimal gemeldet, wörtlich: „‚lancer une séance exigeante‘
+               * ramène au Core" und „fordernde Einheit starten führt zurück
+               * ins Core". Der erste Eingriff holte nur den Startknopf ins
+               * Bild und gab ihm den Fokus — das war eine Verbesserung am
+               * Landeplatz, aber es blieb dabei, dass der Knopf die Einheit
+               * bloß **einstellte** statt sie zu beginnen. Ein Etikett mit
+               * einem Verb, das nichts tut, wird beim zweiten Mal genauso
+               * gemeldet wie beim ersten.
+               *
+               * Dieselbe Lehre steht seit dem 04.09. eine Ebene höher bei
+               * `start`: „Vorher setzte ‚Üben' bloß einen Schwerpunkt und
+               * schloss die Seite; auf dem Gerät sah das aus, als lande man
+               * grundlos wieder im Core." Genau dieselbe Form, nur am anderen
+               * Knopf — und dort war sie längst behoben.
+               *
+               * Die Länge geht als Argument mit, nicht über den Zustand:
+               * `setMode` wirkt erst im nächsten Durchlauf. Es steht trotzdem
+               * dabei, damit der Startbildschirm hinterher zeigt, was lief.
+               */
               setMode('extended')
               closePage()
-              /*
-               * Den Blick mitnehmen (Gerätemeldung 01.09.).
-               *
-               * Gemeldet wurde: „‚lancer une séance exigeante‘ ramène au
-               * Core. Ça devrait plutôt conduire directement à l'écran où se
-               * trouvent les 15 Minutes afin qu'on clique sur commencer.“
-               *
-               * Der Knopf stellte die lange Einheit korrekt ein und schloss
-               * die Seite — nur landete man auf der Startseite, ohne dass
-               * etwas den Zusammenhang zeigte. In den Profilen, die hier
-               * fahrbar sind, stand der Startknopf im Bild; auf einem
-               * kleineren Fenster oder weiter unten gescrollt steht er es
-               * nicht. Statt zu raten, welches Gerät es war: Der Startknopf
-               * kommt jetzt immer ins Bild und bekommt den Fokus — dann sagt
-               * auch eine Vorlesehilfe, wo man gelandet ist.
-               *
-               * Nach dem Bild, nicht sofort: `closePage` räumt die Seite erst
-               * im nächsten Anstrich ab, vorher gibt es nichts zu scrollen.
-               */
-              requestAnimationFrame(() => {
-                const start = document.querySelector<HTMLButtonElement>('.challenge .start')
-                start?.scrollIntoView({ block: 'center', behavior: 'smooth' })
-                start?.focus({ preventScroll: true })
-              })
+              start({ mode: 'extended' })
             }}
           />
         ),
@@ -1798,6 +1804,21 @@ export function App() {
                 <MenuIcon kind="palace" />
                 <span>{dictionary.palace.heading}</span>
               </button>
+              {/*
+                „Geistig aktiv bleiben" gehört hierher (Nutzerentscheidung
+                06.09.: „der Punkt sollte her unter ‚Dein Stand' sein und
+                nicht ‚App & Gerät'").
+
+                Ich hatte es zuerst zu „Verstehen" gelegt, weil die Seite
+                etwas erklärt. Der Einwand ist besser: Sie erklärt nicht nur,
+                sie **handelt** — sie hat den Tipp des Tages und den Knopf in
+                die fordernde Einheit. Damit steht sie bei dem, was der Mensch
+                mit sich vorhat, und nicht bei den Auskunftsseiten.
+              */}
+              <button type="button" className="drawer-item" onClick={() => openPage('brainCare')}>
+                <MenuIcon kind="brainCare" />
+                <span>{brainCareHeading(language)}</span>
+              </button>
             </section>
             {/*
               Die Gruppe für alles, was **erklärt** statt zu messen oder
@@ -1833,10 +1854,6 @@ export function App() {
               <button type="button" className="drawer-item" onClick={() => openPage('science')}>
                 <MenuIcon kind="science" />
                 <span>{dictionary.science.heading}</span>
-              </button>
-              <button type="button" className="drawer-item" onClick={() => openPage('brainCare')}>
-                <MenuIcon kind="brainCare" />
-                <span>{brainCareHeading(language)}</span>
               </button>
             </section>
             <section className="menu-group menu-group-device">

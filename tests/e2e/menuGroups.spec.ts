@@ -41,9 +41,27 @@ test('die erklärenden Seiten stehen unter „Verstehen“', async ({ page }) =>
   await openMenu(page)
   const verstehen = await itemsOfGroup(page, 'Verstehen')
   expect(verstehen, 'die Gruppe „Verstehen" fehlt').not.toHaveLength(0)
-  for (const seite of ['Hilfe', 'Fragen & Antworten', 'Was belegt ist', 'Geistig aktiv bleiben']) {
+  for (const seite of ['Hilfe', 'Fragen & Antworten', 'Was belegt ist']) {
     expect(verstehen, `„${seite}" steht nicht unter „Verstehen"`).toContain(seite)
   }
+})
+
+test('„Geistig aktiv bleiben“ steht unter „Dein Stand“', async ({ page }) => {
+  /*
+   * Nutzerentscheidung 06.09.: „der Punkt sollte her unter ‚Dein Stand' sein
+   * und nicht ‚App & Gerät'."
+   *
+   * Ich hatte die Seite zuerst zu „Verstehen" gelegt, weil sie etwas erklärt.
+   * Der Einwand ist besser: Sie **handelt** auch — Tipp des Tages und der
+   * Knopf in die fordernde Einheit. Damit gehört sie zu dem, was der Mensch
+   * mit sich vorhat.
+   */
+  await openMenu(page)
+  const stand = await itemsOfGroup(page, 'Dein Stand')
+  expect(stand, 'die Gruppe „Dein Stand" fehlt').not.toHaveLength(0)
+  expect(stand, '„Geistig aktiv bleiben" steht nicht unter „Dein Stand"').toContain(
+    'Geistig aktiv bleiben',
+  )
 })
 
 test('„App & Gerät“ enthält nur noch Geräte-Dinge', async ({ page }) => {
