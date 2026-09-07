@@ -88,7 +88,7 @@ describe('das Modul Eigenes', () => {
       reverse: [],
       twins: [],
       gaze: [],
-      facts: [], memory: [], people: [],
+      facts: [], memory: [], people: [], math: [],
     }
     const base = { day: '2026-08-19', language: 'de', seed: 'own', mode: 'daily' } as const
 

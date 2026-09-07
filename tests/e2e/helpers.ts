@@ -167,15 +167,28 @@ export async function leavePage(page: Page) {
 }
 
 /**
- * Startet den Notfallmodus und überspringt das Ankommen.
+ * Module, deren Antwort der gemeinsame Helfer nicht ablesen kann.
  *
- * Rückwärts und D12-Spatial haben eigene Antwortformen. Die vielen älteren
- * E2E-Helfer, die anschließend `collectItems`/`answerRecall` verwenden,
- * lesen dagegen bewusst nur Wort-/Prompt-/Szenenrunden. Deshalb werden diese
- * beiden spezialisierten Module hier neu gezogen; ihre Semantik wird in ihren
- * eigenen E2E- und Kerntests geprüft. So rät der gemeinsame Helfer nicht über
- * eine Antwortform, die er gar nicht lesen kann.
+ * `answerAt` nimmt bei einem Nicht-Szenenmodul den eingeprägten Text als die
+ * Antwort. Das stimmt für Wörter, Namen, Zahlen, Zwillinge und seit dem
+ * 06.09. auch fürs Kopfrechnen — dort steht das Ergebnis groß da und ist
+ * genau das Gesuchte. Für vier Module stimmt es nicht:
+ *
+ *   `reverse`      dreht die Folge um (D7)
+ *   `spatial`      antwortet auf einem Raster (D12)
+ *   `people`       zeigt „1987 · Fußball · Argentinien“, gefragt ist „1987“
+ *   `associative`  zeigt die Tatsache, gefragt ist der Mensch (D13)
+ *
+ * Sie werden hier neu gezogen; ihre Semantik prüfen ihre **eigenen** E2E- und
+ * Kerntests. So rät der gemeinsame Helfer nicht über eine Antwortform, die er
+ * gar nicht lesen kann.
+ *
+ * Die beiden letzten kamen am 06.09. dazu, und nicht aus Vorsicht: Bis dahin
+ * bot die App sie gar nicht an (siehe `memory/dailyMission.ts`).
  */
+const FREMDE_ANTWORTFORM = ['reverse', 'spatial', 'people', 'associative']
+
+/** Startet den Notfallmodus und überspringt das Ankommen. */
 export async function startEmergency(page: Page) {
   for (let attempt = 0; attempt < 25; attempt++) {
     await page.getByRole('button', { name: '60 Sekunden' }).click()
@@ -185,7 +198,7 @@ export async function startEmergency(page: Page) {
     await page.locator('.settle').click()
 
     const moduleId = await pollFirstModule(page)
-    if (moduleId !== 'reverse' && moduleId !== 'spatial') {
+    if (!FREMDE_ANTWORTFORM.includes(moduleId)) {
       await expect(page.locator('.encode-word, .scene').first()).toBeVisible({
         timeout: 15_000,
       })
@@ -196,6 +209,31 @@ export async function startEmergency(page: Page) {
     await expect(page.locator('.challenge')).toBeVisible()
   }
   throw new Error('in 25 Anläufen kam keine kompatible Runde mit Terminen')
+}
+
+/**
+ * Startet Notfall-Einheiten, bis die Runde eines **bestimmten** Moduls steht.
+ *
+ * Welches Modul kommt, entscheidet der Seed (siehe `reverse.spec.ts`) — also
+ * derselbe Knopf, den auch ein Mensch hat, so oft wie nötig. Gebraucht von
+ * den Prüfungen der Module, die der gemeinsame Abruf-Helfer nicht lesen kann
+ * und die deshalb ihre eigene Datei haben.
+ */
+export async function reachModuleRound(page: Page, wanted: string, attempts = 40) {
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    await page.getByRole('button', { name: '60 Sekunden' }).click()
+    await startButton(page).click()
+    await page.locator('.settle').click()
+
+    if ((await pollFirstModule(page)) === wanted) {
+      await expect(page.locator('.encode-word, .scene').first()).toBeVisible({ timeout: 15_000 })
+      return
+    }
+
+    await page.locator('.session-abort').click()
+    await expect(page.locator('.challenge')).toBeVisible()
+  }
+  throw new Error(`in ${attempts} Anläufen kam keine Runde „${wanted}“`)
 }
 
 /** Das Modul des ersten Blocks, aus dem persistierten Plan gelesen. */

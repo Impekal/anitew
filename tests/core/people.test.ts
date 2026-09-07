@@ -41,6 +41,22 @@ import type { Language } from '../../src/core/language.ts'
 
 const SPRACHEN: readonly Language[] = ['de', 'en', 'fr', 'es', 'it', 'pt']
 
+/**
+ * Die Antwort ist immer eine Zahl — und darauf beruht die Zifferntastatur.
+ *
+ * Nachgetragen am 06.09. zusammen mit dem Fund, dass dieses Modul seit dem
+ * 02.09. gar nicht zu sehen war: Die Oberfläche schaltete für einen Jahrgang
+ * auf die Buchstabentastatur. Aufgefallen ist es niemandem, weil niemand je
+ * einen Jahrgang eintippen konnte.
+ */
+describe('der Jahrgang als Eingabe', () => {
+  it('ist im ganzen Vorrat eine reine Ziffernfolge', () => {
+    for (const item of peoplePool('de', 'probe')) {
+      expect(targetOf('people', item, 'de'), item).toMatch(/^\d{3,4}$/u)
+    }
+  })
+})
+
 describe('die Persönlichkeiten selbst', () => {
   it('nennen ein Geburtsjahr, nie ein Alter', () => {
     /*
@@ -246,14 +262,14 @@ describe('das Modul in der Einheit', () => {
     }
     const mit = planSession({
       mode: 'daily', day: '2026-09-02', language: 'de', seed: 's',
-      pools: { ...grund, people: peoplePool('de', 's') },
+      pools: { ...grund, people: peoplePool('de', 's'), math: [] },
       due: {}, modules: ['words', 'people'],
     })
     expect(mit.blocks.some((block) => block.moduleId === 'people')).toBe(true)
 
     const ohne = planSession({
       mode: 'daily', day: '2026-09-02', language: 'de', seed: 's',
-      pools: { ...grund, people: [] },
+      pools: { ...grund, people: [], math: [] },
       due: {}, modules: ['words', 'people'],
     })
     expect(ohne.blocks.some((block) => block.moduleId === 'people')).toBe(false)

@@ -153,6 +153,13 @@ export const TRAINING_MODULES = [
    * `content/people.ts`.
    */
   'people',
+  /*
+   * Kopfrechnen (Nutzerwunsch 05.09.). Frage-Antwort-Paare wie die eigenen
+   * Karten und die Persönlichkeiten — und aus demselben Grund hier und nicht
+   * als Denksport: Das Einmaleins ist Stoff mit Termin.
+   * Die Begründung steht in `content/arithmetic.ts`.
+   */
+  'math',
 ] as const
 export type ModuleId = (typeof TRAINING_MODULES)[number]
 
@@ -199,7 +206,9 @@ export function isPrompted(moduleId: ModuleId): boolean {
      * Herkunft. „Nenne alle Persönlichkeiten“ wäre keine Frage — genau wie
      * beim Gesicht ist der Name der Anker und nicht das Gesuchte.
      */
-    moduleId === 'people'
+    moduleId === 'people' ||
+    // Kopfrechnen: die Aufgabe steht da, gesucht ist die Zahl.
+    moduleId === 'math'
   )
 }
 
@@ -331,7 +340,16 @@ export function secondsPerItemFor(moduleId: ModuleId, input: PaceInput = {}): nu
   const grund =
     moduleId === 'palace' || moduleId === 'memory'
       ? 8
-      : moduleId === 'missions' || moduleId === 'gaze' || moduleId === 'facts'
+      : moduleId === 'missions' ||
+          moduleId === 'gaze' ||
+          moduleId === 'facts' ||
+          /*
+           * Kopfrechnen genauso: „7 × 8 → 56“ ist dieselbe Bauform wie ein
+           * eigenes Paar, und dieselbe Arbeit — eine Brücke erfinden, nicht
+           * zwei Zahlen lesen. Wer stattdessen ausrechnet, braucht die Zeit
+           * erst recht.
+           */
+          moduleId === 'math'
         ? 7
         : /*
            * Sechs statt vier für Wörter, Namen und Zahlen (Nutzerbefund
@@ -421,6 +439,8 @@ export function targetOf(moduleId: ModuleId, item: string, language: string): st
    * eine Tastaturübung, und eine Zahl lässt sich genau bewerten.
    */
   if (moduleId === 'people') return personYearOf(item)
+  // Kopfrechnen: gefragt ist das Ergebnis.
+  if (moduleId === 'math') return factAnswer(item)
   // Memory: gesucht ist das Ding am Anker (D-036).
   if (moduleId === 'memory') return memoryTargetOf(item)
   if (moduleId !== 'missions') return item
@@ -462,6 +482,8 @@ export function displayOf(moduleId: ModuleId, item: string, language: string): s
   // Persönlichkeit: „Lionel Messi · 1987 · Fußball · Argentinien“ — die ganze
   // Karte, denn in der Zusammenfassung steht, was dastand.
   if (moduleId === 'people') return `${factPrompt(item)} · ${factAnswer(item)}`
+  // Kopfrechnen: die ganze Tatsache, so wie sie dastand.
+  if (moduleId === 'math') return `${factPrompt(item)} · ${factAnswer(item)}`
   // Memory: „Daniel · Madrid“ — woran man sich erinnert hat (D-036).
   if (moduleId === 'memory') {
     const labels = memoryLabelsOf(item)
@@ -508,6 +530,8 @@ export function leniencyFor(moduleId: ModuleId, item?: string): Leniency {
    * Aufgabe abzuschaffen und trotzdem einen Punkt zu geben (D-012).
    */
   if (moduleId === 'people') return 'exact'
+  // Kopfrechnen: 56 und 54 sind nicht dasselbe Ergebnis (D-012).
+  if (moduleId === 'math') return 'exact'
   // Memory (D-036): dieselbe Regel — eine Zahl als Antwort ist exakt.
   if (moduleId === 'memory') {
     return /^\d+$/.test(memoryTargetOf(item ?? '')) ? 'exact' : 'typos'

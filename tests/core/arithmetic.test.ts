@@ -2,6 +2,17 @@ import { describe, expect, it } from 'vitest'
 
 import { ARITHMETIC_STAGES, arithmeticPool, arithmeticSize } from '../../src/core/content/arithmetic.ts'
 import { OWN_SEPARATOR } from '../../src/core/content/own.ts'
+import type { ModuleId } from '../../src/core/index.ts'
+import {
+  TRAINING_MODULES,
+  displayOf,
+  entersReview,
+  isPrompted,
+  leniencyFor,
+  planSession,
+  secondsPerItemFor,
+  targetOf,
+} from '../../src/core/index.ts'
 
 /**
  * Kopfrechnen (Nutzerwunsch 05.09.).
@@ -26,9 +37,10 @@ function rechne(text: string): number | undefined {
   return undefined
 }
 
-describe('der Rechenvorrat', () => {
-  const alle = arithmeticPool('probe', ARITHMETIC_STAGES)
+/** Der ganze Vorrat, alle Stufen — beide Blöcke prüfen daran. */
+const alle = arithmeticPool('probe', ARITHMETIC_STAGES)
 
+describe('der Rechenvorrat', () => {
   it('trägt jede Aufgabe als Frage-Antwort-Paar', () => {
     for (const item of alle) {
       expect(item.split(OWN_SEPARATOR), item).toHaveLength(2)
@@ -84,5 +96,90 @@ describe('der Rechenvorrat', () => {
     // Das kleine Einmaleins ohne Spiegelungen und ohne die Reihen 1 und 10:
     // die Dreiecksmatrix von 2×2 bis 9×9.
     expect(nurEinmaleins).toBe(36)
+  })
+})
+
+/**
+ * Und hier das, was das Modul zum Modul macht.
+ *
+ * Der Vorrat oben ist nur eine Liste. Ob daraus eine Übung wird, entscheiden
+ * fünf Weichen im Planer — und jede einzelne war schon einmal die, die
+ * vergessen wurde. Deshalb steht jede hier mit ihrer Folge dabei, nicht nur
+ * mit ihrem Namen.
+ */
+describe('Kopfrechnen als Modul', () => {
+  const pools = Object.fromEntries(
+    TRAINING_MODULES.map((moduleId) => [
+      moduleId,
+      moduleId === 'math' ? arithmeticPool('rechnen', ['times']) : [],
+    ]),
+  ) as Record<ModuleId, readonly string[]>
+
+  it('plant eine Runde, die wirklich Aufgaben enthält', () => {
+    const plan = planSession({
+      seed: 'rechnen',
+      day: '2026-09-06',
+      mode: 'daily',
+      language: 'de',
+      modules: ['math'],
+      pools,
+      taught: [],
+      palaceTaught: false,
+      storyTaught: false,
+      linkTaught: false,
+      majorMethodTaught: false,
+    })
+    const stuecke = plan.blocks.flatMap((block) => block.items)
+    expect(stuecke.length).toBeGreaterThan(0)
+    for (const item of stuecke) expect(rechne(frage(item)), item).toBeDefined()
+  })
+
+  it('fragt gestützt — die Aufgabe steht da, gesucht ist das Ergebnis', () => {
+    /*
+     * Ohne diese Weiche wäre die Frage „schreib auf, was geblieben ist“ —
+     * und die Antwort auf „7 × 8“ hinge davon ab, ob man die Aufgabe noch
+     * weiß. Beim Kopfrechnen ist die Aufgabe der Anker, nicht das Gesuchte.
+     */
+    expect(isPrompted('math')).toBe(true)
+  })
+
+  it('bewertet exakt — 54 ist nicht 56', () => {
+    /*
+     * Die Tippfehler-Nachsicht („typos“) ist für Wörter gebaut: „Ankre“
+     * statt „Anker“ ist dieselbe Erinnerung. Bei einer Zahl ist eine
+     * abweichende Ziffer eine andere Zahl (D-012).
+     */
+    expect(leniencyFor('math', alle[0] as string)).toBe('exact')
+  })
+
+  it('gibt als Ziel immer eine Zahl — darauf beruht die Zifferntastatur', () => {
+    /*
+     * Die Oberfläche schaltet für dieses Modul ohne weitere Prüfung auf
+     * `inputMode="numeric"`. Diese Zeile ist die Begründung dafür: Es gibt
+     * im ganzen Vorrat kein Stück, dessen Antwort keine Zahl ist. Käme je
+     * eine Stufe mit einer Wortantwort dazu, wird dieser Test rot — und
+     * nicht erst der Nutzer am Telefon.
+     */
+    for (const item of alle) expect(targetOf('math', item, 'de'), item).toMatch(/^\d+$/u)
+  })
+
+  it('zeigt in der Zusammenfassung beide Seiten', () => {
+    // Sonst stünde am Ende „56“ da, und niemand wüsste, wozu.
+    const item = alle[0] as string
+    expect(displayOf('math', item, 'de')).toBe(`${frage(item)} · ${antwort(item)}`)
+  })
+
+  it('kommt wieder — es ist Stoff mit Termin, das ist der ganze Punkt', () => {
+    expect(entersReview('math')).toBe(true)
+  })
+
+  it('bekommt die Zeit eines eigenen Paars, nicht die eines Wortes', () => {
+    /*
+     * Eine Brücke zwischen „7 × 8“ und „56“ zu erfinden ist dieselbe Arbeit
+     * wie bei einer eigenen Karte — und mehr als ein Wort anzusehen. Wer
+     * stattdessen ausrechnet, braucht die Zeit erst recht.
+     */
+    expect(secondsPerItemFor('math')).toBe(secondsPerItemFor('facts'))
+    expect(secondsPerItemFor('math')).toBeGreaterThan(secondsPerItemFor('words'))
   })
 })

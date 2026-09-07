@@ -105,7 +105,7 @@ describe('die Bilder im Bauplan', () => {
     reverse: [],
     twins: [],
     gaze: gazePool('plan', 30),
-    facts: [], memory: [], people: [],
+    facts: [], memory: [], people: [], math: [],
   }
   const base = { day: '2026-08-19', language: 'de', seed: 'plan', pools } as const
 

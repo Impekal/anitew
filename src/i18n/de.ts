@@ -144,10 +144,15 @@ export const de = {
       facts: 'Deine Karte: Frage und Antwort. Bau eine Brücke — ein Bild, in dem beide vorkommen.',
       memory: 'Deine Erinnerung. Sieh alles zusammen — ein Bild, in dem alles am Anker hängt.',
       people: 'Ein Mensch, den viele kennen. Jahr, Fach, Herkunft — häng die drei an den Namen.',
+      math: 'Eine Aufgabe und ihr Ergebnis. Nicht rechnen — merken: 7 × 8 ist 56, so wie „Paris ist die Hauptstadt“.',
+      // Querabruf (D13): Bis zum 06.09. stand hier nichts — das Modul war
+      // nie zu sehen, also fiel die leere Zeile niemandem auf.
+      associative: 'Zwei, die zusammengehören. Gleich wird von der anderen Seite gefragt.',
     },
     recallHint: 'Was ist geblieben? Reihenfolge egal.',
     reviewHint: 'Und jetzt von früher: Woran erinnerst du dich noch?',
     promptHint: 'Wer ist das?',
+    associativeAsk: 'Wer gehört dazu?',
     reviewPromptHint: 'Und von früher: Wer ist das?',
     promptPlaceholder: 'Name',
     /*
@@ -196,6 +201,8 @@ export const de = {
     memoryPlaceholder: 'Was dazugehört',
     peopleAsk: 'Welcher Jahrgang?',
     peoplePlaceholder: 'Geburtsjahr',
+    mathAsk: 'Wie viel ist das?',
+    mathPlaceholder: 'Ergebnis',
     recallPlaceholder: 'Ein Wort pro Zeile',
     recallNumbersPlaceholder: 'Eine Zahl pro Zeile',
     /*
@@ -406,6 +413,15 @@ export const de = {
       facts: 'Eigenes',
       memory: 'Erinnerungen',
       people: 'Persönlichkeiten',
+      math: 'Kopfrechnen',
+      /*
+       * Die beiden Module ohne eigenen Vorrat: Räume erzeugt der Planer,
+       * der Querabruf dreht eine gelernte Mission um. Ihre Namen fehlten
+       * hier bis zum 06.09. — der Startbildschirm hätte einen leeren
+       * Schwerpunkt angekündigt, sobald einer von beiden vorrückt.
+       */
+      spatial: 'Räume',
+      associative: 'Zusammenhänge',
     },
     noWeakest: 'Kein Unterschied zwischen den Achsen, der über die Zählunsicherheit hinausgeht.',
     empty: 'Noch nichts zu zeigen. Das Profil entsteht aus dem Training — nicht aus einem Test am Anfang.',

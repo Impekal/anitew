@@ -24,7 +24,7 @@ const pools: Pools = {
   twins: Array.from({ length: 20 }, (_, index) => `paar${index}a%paar${index}b`),
   gaze: [],
   facts: [],
-  memory: [], people: [],
+  memory: [], people: [], math: [],
 }
 
 function memory(reviews: number, dueDay: string): Memory {

@@ -93,10 +93,15 @@ export const fr: Dictionary = {
       facts: 'Ta carte : question et réponse. Construis un pont — une image qui contient les deux.',
       memory: 'Ton souvenir. Vois tout ensemble — une image où tout tient à l’ancre.',
       people: 'Quelqu’un que beaucoup connaissent. Année, domaine, origine — accroche les trois au nom.',
+      math: 'Une opération et son résultat. Ne calculez pas — retenez : 7 × 8 fait 56, comme « Paris est la capitale ».',
+      // Querabruf (D13): Bis zum 06.09. stand hier nichts — das Modul war
+      // nie zu sehen, also fiel die leere Zeile niemandem auf.
+      associative: 'Deux choses qui vont ensemble. Dans un instant, la question viendra de l’autre côté.',
     },
     recallHint: 'Qu’est-ce qui est resté ? L’ordre n’a pas d’importance.',
     reviewHint: 'Et maintenant, d’avant : de quoi te souviens-tu encore ?',
     promptHint: 'Qui est-ce ?',
+    associativeAsk: 'À qui cela appartient-il ?',
     reviewPromptHint: 'Et d’avant : qui est-ce ?',
     promptPlaceholder: 'Nom',
     reverseAsk: 'Retiens les chiffres — saisis-les à l’envers.',
@@ -121,6 +126,8 @@ export const fr: Dictionary = {
     memoryPlaceholder: 'Ce qui va avec',
     peopleAsk: 'Quelle année de naissance ?',
     peoplePlaceholder: 'Année de naissance',
+    mathAsk: 'Combien cela fait-il ?',
+    mathPlaceholder: 'Résultat',
     recallPlaceholder: 'Un mot par ligne',
     recallNumbersPlaceholder: 'Un nombre par ligne',
     recallNextNumber: 'Nombre suivant',
@@ -262,6 +269,15 @@ export const fr: Dictionary = {
       facts: 'Tes contenus',
       memory: 'Souvenirs',
       people: 'Personnalités',
+      math: 'Calcul mental',
+      /*
+       * Die beiden Module ohne eigenen Vorrat: Räume erzeugt der Planer,
+       * der Querabruf dreht eine gelernte Mission um. Ihre Namen fehlten
+       * hier bis zum 06.09. — der Startbildschirm hätte einen leeren
+       * Schwerpunkt angekündigt, sobald einer von beiden vorrückt.
+       */
+      spatial: 'Lieux',
+      associative: 'Liens',
     },
     noWeakest: 'Aucune différence entre les axes au-delà de l’incertitude de comptage.',
     empty: 'Rien à montrer pour l’instant. Le profil naît de l’entraînement — pas d’un test au départ.',

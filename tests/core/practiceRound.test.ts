@@ -43,6 +43,7 @@ const pools = {
   facts: [],
   memory: [],
   people: [],
+  math: [],
 }
 
 // Fällig ist etwas aus drei anderen Modulen — genau das, was sich in eine
