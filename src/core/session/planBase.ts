@@ -269,24 +269,104 @@ export function sceneItemsOf(moduleId: ModuleId, anchor: string): readonly strin
  * Dass die Betrachtungszeit später mit der Schwierigkeit wandert, steht als
  * H6 im Backlog. Hier ist sie erst einmal eine Eigenschaft des Moduls.
  */
-export function secondsPerItemFor(moduleId: ModuleId): number {
-  /*
-   * Der Palast bekommt am meisten Zeit, und das ist der Kern der Technik:
-   * An dieser Stelle soll der Nutzer nicht lesen, sondern **ein Bild bauen**
-   * — den Toaster im Flur, groß, im Weg, unübersehbar. Das dauert länger als
-   * ein Wort anzusehen, und wer es nicht tut, hat nur eine Liste gelesen.
+/**
+ * Wie viel Zeit sich der Mensch zum Einprägen nehmen will (Nutzerbefund
+ * 05.09.: „Man hat kaum Zeit, sich was auszudenken").
+ *
+ * Eine Einstellung und keine Messung, und das mit Absicht: Wie schnell jemand
+ * sich ein Bild ausdenkt, weiß keine Trefferquote. Die App kann sehen, ob
+ * etwas behalten wurde — nicht, ob dafür genug Zeit war.
+ */
+export type Pace = 'much' | 'normal' | 'little'
+
+/** Kürzeste und längste Zeit, die ein Stück je bekommen kann. */
+export const SECONDS_MIN = 3
+export const SECONDS_MAX = 14
+
+export interface PaceInput {
+  /**
+   * Steht die Technik dieses Moduls schon vollständig?
+   *
+   * Nicht „kann er sie gut" — das kann die App nicht wissen und behauptet es
+   * auch nicht (R-1). Nur: Ist der Unterricht durch? Solange er läuft, muss
+   * man beim Einprägen zwei Dinge zugleich tun — die Technik anwenden und sie
+   * sich dabei erst zurechtlegen.
    */
-  if (moduleId === 'palace') return 6
-  // Eine echte Erinnerung (D-036) bekommt dieselbe Zeit wie ein Palastort:
-  // Hier soll ein Bild entstehen, das Daniel und Madrid zusammenhält.
-  if (moduleId === 'memory') return 6
-  // Ein Bild (gaze) wie eine Mission: Vier Dinge und ihre Farben sollen
-  // **zusammen** gesehen werden, nicht nacheinander gelesen.
-  // Ein eigenes Paar (facts) ebenso: Frage und Antwort sollen zu einer
-  // Brücke werden, nicht zwei gelesene Wörter bleiben (D-032).
-  return moduleId === 'missions' || moduleId === 'gaze' || moduleId === 'facts'
-    ? 5
-    : SECONDS_PER_ITEM
+  readonly practised?: boolean
+  readonly pace?: Pace
+}
+
+/**
+ * Steht die Technik dieses Moduls schon vollständig?
+ *
+ * Beim Major-System sind das zehn Lektionen, bei Geschichte, Verknüpfung und
+ * Palast je eine. Module ohne eigene Technik (Rückwärts, Zwillinge, eigene
+ * Inhalte) haben nichts zu lernen und bekommen deshalb auch keinen Zuschlag.
+ *
+ * Fehlt die Angabe, gilt die Technik als **nicht** fertig — dieselbe Vorsicht
+ * wie beim Unterricht selbst: Lieber einmal zu viel Zeit als einem Anfänger
+ * zu wenig.
+ */
+function techniqueDone(moduleId: ModuleId, input: PlanInput): boolean {
+  if (moduleId === 'numbers') return new Set(input.taught ?? []).size >= 10
+  if (moduleId === 'words') return input.storyTaught === true
+  if (moduleId === 'faces') return input.linkTaught === true
+  if (moduleId === 'palace') return input.palaceTaught === true
+  return true
+}
+
+export function secondsPerItemFor(moduleId: ModuleId, input: PaceInput = {}): number {
+  /*
+   * Der Palast und die echte Erinnerung (D-036) bekommen am meisten Zeit, und
+   * das ist der Kern der Technik: An dieser Stelle soll der Nutzer nicht
+   * lesen, sondern **ein Bild bauen** — den Toaster im Flur, groß, im Weg,
+   * unübersehbar. Das dauert länger als ein Wort anzusehen, und wer es nicht
+   * tut, hat nur eine Liste gelesen.
+   *
+   * Ein Bild (gaze) wie eine Mission: Vier Dinge und ihre Farben sollen
+   * **zusammen** gesehen werden, nicht nacheinander gelesen. Ein eigenes Paar
+   * (facts) ebenso: Frage und Antwort sollen zu einer Brücke werden, nicht
+   * zwei gelesene Wörter bleiben (D-032).
+   */
+  const grund =
+    moduleId === 'palace' || moduleId === 'memory'
+      ? 8
+      : moduleId === 'missions' || moduleId === 'gaze' || moduleId === 'facts'
+        ? 7
+        : /*
+           * Sechs statt vier für Wörter, Namen und Zahlen (Nutzerbefund
+           * 05.09.).
+           *
+           * Gemessen: Vier Sekunden galten für jedes Stück in jedem Modus —
+           * die Viertelstunde gab genau so viel Zeit je Wort wie die
+           * Notfall-Minute, nur mehr Runden. Es gab keinen Zustand, in dem man
+           * sich Zeit nehmen konnte. Dabei ist genau das die Arbeit: Aus
+           * „Anker" ein Bild machen, aus 41 „Reiter", aus einem Namen ein
+           * Gesicht.
+           *
+           * Sechs ist keine neue Zahl, sondern die, die der Palast bisher
+           * hatte — und seine Begründung gilt hier wörtlich: „An dieser Stelle
+           * soll der Nutzer nicht lesen, sondern ein Bild bauen." Dass Wörter
+           * und Zahlen weniger bekamen, war keine Entscheidung, sondern eine
+           * Konstante für alles, was keine Szene ist.
+           *
+           * Die ganze Leiter steigt deshalb mit, damit ihre Ordnung bleibt:
+           * Ein Wort (6) ist weniger Arbeit als eine Tatsache in einer Szene,
+           * die mit vier anderen zusammengebunden werden muss (7), und die
+           * wiederum weniger als ein Bild, das an einen Ort gestellt wird (8).
+           * Ein Kerntest hält genau diese Reihenfolge fest — er war rot, als
+           * hier nur die Wörter stiegen, und hatte recht.
+           */
+          6
+
+  /*
+   * Während der Unterricht läuft, drei Sekunden mehr. Wer die 4 gerade erst
+   * gelernt hat, muss beim Einprägen erst nachschlagen, was sie war — das ist
+   * die eigentliche Arbeit dieser Wochen und nicht die Zahl selbst.
+   */
+  const unterricht = input.practised === false ? 3 : 0
+  const wunsch = input.pace === 'much' ? 2 : input.pace === 'little' ? -2 : 0
+  return Math.max(SECONDS_MIN, Math.min(SECONDS_MAX, grund + unterricht + wunsch))
 }
 
 /**
@@ -521,6 +601,11 @@ export interface PlanInput {
    * Angabe soll deshalb nicht plötzlich ganz ohne Unterricht dastehen.
    */
   majorMethodTaught?: boolean
+  /**
+   * Wie viel Zeit sich der Mensch zum Einprägen nehmen will (Nutzerbefund
+   * 05.09.). Fehlt der Wert, bleibt es beim mittleren Takt.
+   */
+  pace?: Pace
   /**
    * Die adaptive Verschiebung je Modul (D2): ein Stück mehr, eines
    * weniger, oder nichts — gerechnet aus den letzten Antworten
@@ -936,6 +1021,15 @@ export function planSession(input: PlanInput): SessionPlan {
       throw new RangeError(`Der Vorrat reicht nicht für eine Szene (${moduleId})`)
     }
     const delta = input.difficulty?.[moduleId] ?? 0
+    /*
+     * Der Takt dieses Moduls — einmal gerechnet und dann für beides benutzt:
+     * für die Stückzahl und für die Sekunden des Blocks. Zwei getrennte
+     * Rechnungen wären zwei Wahrheiten über dieselbe Runde.
+     */
+    const takt = secondsPerItemFor(moduleId, {
+      practised: techniqueDone(moduleId, input),
+      ...(input.pace === undefined ? {} : { pace: input.pace }),
+    })
     const items = scene
       ? sceneItemsOf(moduleId, pool[used] as string)
       : pool.slice(
@@ -943,7 +1037,7 @@ export function planSession(input: PlanInput): SessionPlan {
           used +
             (asksOnSight(moduleId)
               ? promptsForRound(roundSeconds, pool.length - used, delta)
-              : itemsForRound(roundSeconds, pool.length - used, delta)),
+              : itemsForRound(roundSeconds, pool.length - used, delta, takt)),
         )
     taken.set(moduleId, used + (scene ? 1 : items.length))
     /*
@@ -951,7 +1045,7 @@ export function planSession(input: PlanInput): SessionPlan {
      * und Fragen geschehen im Abruf selbst, Frage für Frage. Das ganze
      * Rundenbudget gehört dem Abruf — die Summe bleibt exakt.
      */
-    const encodeSeconds = asksOnSight(moduleId) ? 0 : items.length * secondsPerItemFor(moduleId)
+    const encodeSeconds = asksOnSight(moduleId) ? 0 : items.length * takt
 
     if (encodeSeconds > 0) {
       blocks.push({
@@ -1022,8 +1116,21 @@ function promptsForRound(roundSeconds: number, available: number, delta = 0): nu
   return Math.min(wanted, available)
 }
 
-function itemsForRound(roundSeconds: number, available: number, delta = 0): number {
-  const byTime = Math.floor((roundSeconds * ENCODE_SHARE) / SECONDS_PER_ITEM)
+function itemsForRound(
+  roundSeconds: number,
+  available: number,
+  delta = 0,
+  /*
+   * Der Takt des Moduls, nicht die alte Konstante (Nutzerbefund 05.09.).
+   *
+   * Das ist die Stelle, an der „weniger, dafür in Ruhe" von selbst entsteht:
+   * Die Stückzahl wird aus der Zeit gerechnet. Wer neun Sekunden je Wort
+   * bekommt, bekommt in derselben Runde eben vier Wörter statt acht — das
+   * Zeitbudget der Einheit bleibt auf die Sekunde gleich.
+   */
+  perItem: number = SECONDS_PER_ITEM,
+): number {
+  const byTime = Math.floor((roundSeconds * ENCODE_SHARE) / perItem)
   // Wie bei den Rückwärts-Runden: erst stutzen, dann verschieben (D2).
   const base = Math.min(MAX_ITEMS_PER_ROUND, Math.max(MIN_ITEMS_PER_ROUND, byTime))
   const wanted = Math.min(MAX_ITEMS_PER_ROUND, Math.max(MIN_ITEMS_PER_ROUND, base + delta))

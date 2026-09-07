@@ -51,7 +51,10 @@ export const sceneItemsOf = base.sceneItemsOf as (
   moduleId: ModuleId,
   anchor: string,
 ) => readonly string[]
-export const secondsPerItemFor = base.secondsPerItemFor as (moduleId: ModuleId) => number
+export const secondsPerItemFor = base.secondsPerItemFor as (
+  moduleId: ModuleId,
+  input?: base.PaceInput,
+) => number
 export const subjectOf = base.subjectOf as (moduleId: ModuleId, item: string) => string
 
 export function displayOf(moduleId: ModuleId, item: string, language: string): string {

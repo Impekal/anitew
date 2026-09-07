@@ -671,5 +671,12 @@ export const en: Dictionary = {
     note: 'The same controls are also at the bottom of the start screen.',
     saveFailed: 'This setting could not be saved on the device. The previous one still applies.',
     resetNote: 'If you want to start completely over: the way there is below. A backup under “Backup” is worth it first — afterwards nothing is left.',
+    pace: {
+      heading: 'Time to memorise',
+      note: 'How long a word, a name or a number stays before the next one. The session keeps its length — with more time you get fewer items, but in peace.',
+      much: 'much',
+      normal: 'normal',
+      little: 'little',
+    },
   },
 }

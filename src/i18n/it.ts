@@ -679,6 +679,13 @@ export const it: Dictionary = {
     note: 'Gli stessi comandi stanno anche in basso nella schermata iniziale.',
     saveFailed: 'Questa impostazione non si è potuta salvare sul dispositivo. Vale ancora la precedente.',
     resetNote: 'Se vuoi ripartire proprio da zero: la strada sta in basso. Prima conviene un backup sotto «Backup» — dopo non resta nulla.',
+    pace: {
+      heading: 'Tempo per memorizzare',
+      note: 'Quanto resta una parola, un nome o un numero prima del successivo. La sessione mantiene la sua durata: con più tempo arrivano meno esercizi, ma con calma.',
+      much: 'molto',
+      normal: 'normale',
+      little: 'poco',
+    },
   },
 }
 

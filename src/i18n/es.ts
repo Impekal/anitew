@@ -679,6 +679,13 @@ export const es: Dictionary = {
     note: 'Los mismos controles están también abajo, en la pantalla de inicio.',
     saveFailed: 'Este ajuste no se pudo guardar en el dispositivo. Sigue valiendo el anterior.',
     resetNote: 'Si quieres empezar de cero del todo: el camino está abajo. Antes conviene una copia en «Copia de seguridad» — después no queda nada.',
+    pace: {
+      heading: 'Tiempo para memorizar',
+      note: 'Cuánto se queda una palabra, un nombre o un número antes del siguiente. La sesión mantiene su duración: con más tiempo hay menos ejercicios, pero con calma.',
+      much: 'mucho',
+      normal: 'normal',
+      little: 'poco',
+    },
   },
 }
 

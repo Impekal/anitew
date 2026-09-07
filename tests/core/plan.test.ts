@@ -4,8 +4,8 @@ import { TRAINING_MODES, MODES } from '../../src/core/modes.ts'
 import { wordPool } from '../../src/core/content/words.ts'
 import {
   MAX_ITEMS_PER_ROUND,
+  secondsPerItemFor,
   MIN_ITEMS_PER_ROUND,
-  SECONDS_PER_ITEM,
   itemsOf,
   planSession,
   reviewItemsOf,
@@ -77,12 +77,60 @@ describe('der Aufbau einer Runde', () => {
   })
 
   it('gibt jedem Wort seine Zeit beim Einprägen', () => {
+    /*
+     * Geprüft wird der Zusammenhang, nicht mehr eine feste Zahl: Die Sekunden
+     * eines Blocks sind genau die Stückzahl mal den Takt des Moduls.
+     *
+     * Vorher stand hier `SECONDS_PER_ITEM` — solange der Takt eine Konstante
+     * für alles war, hieß das dasselbe. Seit er vom Lernstand und vom
+     * eingestellten Tempo abhängt (Nutzerbefund 05.09.), wäre die Konstante
+     * nur noch der Boden und nicht die Wahrheit über diesen Block.
+     *
+     * Der Test wird dadurch nicht schwächer, sondern schärfer: Er fängt jetzt
+     * auch den Fall, in dem der Planer die Stückzahl mit einem Takt rechnet
+     * und die Sekunden mit einem anderen — genau die Art Bruch, an dem die
+     * Anzeige aus dem Plan liefe.
+     */
+    const takt = secondsPerItemFor('words', { practised: false })
     for (const mode of TRAINING_MODES) {
       for (const block of plan(mode).blocks) {
         if (block.kind !== 'encode') continue
-        expect(block.seconds).toBe(block.items.length * SECONDS_PER_ITEM)
+        expect(block.seconds).toBe(block.items.length * takt)
       }
     }
+  })
+
+  it('nimmt sich beim Einprägen mehr Zeit, solange die Technik noch gelehrt wird', () => {
+    /*
+     * Nutzerbefund 05.09.: „Man hat kaum Zeit, sich was auszudenken … da man
+     * die Methoden lernen muss. Wenn das so schnell geht, schafft man es
+     * nicht, was zu lernen."
+     *
+     * Gemessen war es vorher genau eine Zahl: vier Sekunden je Stück, in
+     * jedem Modul außer den Szenen und in jedem Modus — die Viertelstunde gab
+     * je Wort so viel Zeit wie die Notfall-Minute.
+     */
+    expect(secondsPerItemFor('words', { practised: false })).toBeGreaterThan(
+      secondsPerItemFor('words', { practised: true }),
+    )
+    // Und der Wunsch des Menschen zählt auch: Wie schnell jemand sich ein
+    // Bild ausdenkt, weiß keine Trefferquote.
+    expect(secondsPerItemFor('words', { pace: 'much' })).toBeGreaterThan(
+      secondsPerItemFor('words', { pace: 'little' }),
+    )
+  })
+
+  it('gibt in einer längeren Einheit nicht mehr Stücke, sondern mehr Runden', () => {
+    /*
+     * Der Grund, warum „mehr Zeit" nicht heißt „länger üben": Die Stückzahl
+     * wird aus der Zeit gerechnet. Wer neun Sekunden je Wort bekommt, bekommt
+     * weniger Wörter in derselben Runde — das Zeitbudget der Einheit bleibt
+     * auf die Sekunde gleich, und das prüft der Abschnitt oben.
+     */
+    const langsam = plan('daily')
+    const ersteRunde = langsam.blocks.find((block) => block.kind === 'encode')
+    expect(ersteRunde).toBeDefined()
+    expect(ersteRunde!.items.length).toBeLessThan(MAX_ITEMS_PER_ROUND)
   })
 
   it('bleibt zwischen 3 und 8 Wörtern je Runde', () => {
