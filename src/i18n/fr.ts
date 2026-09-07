@@ -351,6 +351,8 @@ export const fr: Dictionary = {
       toldApart: 'Distingué vingt-cinq fois du semblable après des jours.',
       sawDetails: 'Ramené vingt-cinq détails d’images après des jours.',
       namesHeld: 'Encore su vingt-cinq noms après des jours.',
+      heldTwelve: 'Retenu un nombre de douze chiffres.',
+      heldThirty: 'Retenu un nombre de trente chiffres.',
     },
   },
   today: {

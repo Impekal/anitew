@@ -889,8 +889,9 @@ export function App() {
       toldApartTotal: heldOf('attention'),
       detailsHeldTotal: heldOf('visual'),
       namesHeldTotal: heldOf('faces'),
+      longestNumberDigits: longestNumber,
     }
-  }, [returns, streak.best, taught.length, runs, own, dimensionCounts])
+  }, [returns, streak.best, taught.length, runs, own, dimensionCounts, longestNumber])
 
 
   /*

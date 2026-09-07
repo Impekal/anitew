@@ -353,6 +353,8 @@ export const pt: Dictionary = {
       toldApart: 'Vinte e cinco vezes distinguiste o parecido passados dias.',
       sawDetails: 'Vinte e cinco detalhes de imagens trazidos de volta passados dias.',
       namesHeld: 'Vinte e cinco nomes ainda sabidos passados dias.',
+      heldTwelve: 'Guardou um número de doze algarismos.',
+      heldThirty: 'Guardou um número de trinta algarismos.',
     },
   },
   today: {

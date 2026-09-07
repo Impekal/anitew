@@ -34,6 +34,19 @@ export const ACHIEVEMENTS = [
   'toldApart',
   'sawDetails',
   'namesHeld',
+  /*
+   * Die lange Ziffernfolge (Nutzerwunsch 04.09./05.09.).
+   *
+   * Zwölf Ziffern sind das Doppelte der Merkspanne und sechs Wörter im
+   * Major-System — die Stelle, an der die Technik anfängt, etwas zu können,
+   * was ohne sie nicht geht. Dreißig ist die oberste Stufe der Leiter.
+   *
+   * Beides bleibt eine **Tatsache und kein Ziel**: Was noch nicht erreicht
+   * ist, steht nirgends, auch nicht ausgegraut (K7). Wer wissen will, wie es
+   * weitergeht, merkt es an den Zahlen selbst — sie werden länger.
+   */
+  'heldTwelve',
+  'heldThirty',
 ] as const
 export type AchievementId = (typeof ACHIEVEMENTS)[number]
 
@@ -59,6 +72,13 @@ export interface AchievementInput {
   detailsHeldTotal: number
   /** Gesichter-Wiedersehen ohne Verlust — der Name saß noch. */
   namesHeldTotal: number
+  /**
+   * Die längste Ziffernfolge, die je richtig abgerufen wurde.
+   *
+   * Dieselbe Zahl, die auch die Decke hebt (`numberLengthFor`) — gerechnet
+   * aus den Rohereignissen, nicht gespeichert.
+   */
+  longestNumberDigits: number
 }
 
 /**
@@ -81,5 +101,7 @@ export function achievementsOf(input: AchievementInput): readonly AchievementId[
   if (input.toldApartTotal >= 25) reached.push('toldApart')
   if (input.detailsHeldTotal >= 25) reached.push('sawDetails')
   if (input.namesHeldTotal >= 25) reached.push('namesHeld')
+  if (input.longestNumberDigits >= 12) reached.push('heldTwelve')
+  if (input.longestNumberDigits >= 30) reached.push('heldThirty')
   return reached
 }
