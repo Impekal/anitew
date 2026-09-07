@@ -32,12 +32,29 @@ import { pollFirstModule, startButton, visit } from './helpers.ts'
  * Ändert der Planer sein Verhalten, fällt das hier auf — und die Meldung
  * unten sagt, was zu tun ist. Das ist der Unterschied zu einem Würfel:
  * Dieser Test wird nicht launisch, er wird eindeutig.
+ *
+ * ── Und genau das ist am 06.09. passiert ──────────────────────────────────
+ *
+ * Die App bot bis dahin nur elf ihrer vierzehn Module an (siehe
+ * `memory/dailyMission.ts`). Mit den drei zurückgeholten verschiebt sich die
+ * ganze Zuordnung: **Sekunde 17 und 21 ziehen jetzt `people`** — wörtlich das,
+ * was die Meldung unten in CI ausgegeben hat.
+ *
+ * Neu gemessen, dieselbe Methode, sechzig Sekunden durchgezählt:
+ *
+ *   reverse   6, 11, 30, 38
+ *   people    17, 21, 26, 29, 34, 37
+ *   math      4, 8, 9
+ *   numbers   1, 3, 7, 15, 16, 27
+ *
+ * Der Test hat damit getan, wozu er gebaut wurde: Er ist nicht launisch
+ * geworden, sondern eindeutig — und die Meldung sagte, was zu tun ist.
  */
 
 /** Startzeiten, die auf einem frischen Stand eine Rückwärts-Runde ziehen. */
 const RUECKWAERTS_ZEITEN = [
-  Date.UTC(2026, 0, 15, 9, 0, 17),
-  Date.UTC(2026, 0, 15, 9, 0, 21),
+  Date.UTC(2026, 0, 15, 9, 0, 6),
+  Date.UTC(2026, 0, 15, 9, 0, 11),
 ]
 
 test('zeigt die Ziffern kurz, sperrt das Feld und zählt die Umkehr ehrlich', async ({ page }) => {
