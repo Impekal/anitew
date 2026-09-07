@@ -64,6 +64,35 @@ export function spanLengthFor(input: DifficultyInput): number {
 }
 
 /**
+ * Die Stufen oberhalb des Lernstands (Nutzerwunsch 04.09.).
+ *
+ * Wörtlich: „Das kann ruhig bis zu dreißig, 60 Zeichen gehen je nachdem. Aber
+ * das muss halt stufenweise sein und wenn ich weiterkomme, darf das mehr."
+ *
+ * Bis sechs geht es Ziffer für Ziffer, denn dort entscheidet der Lernstand.
+ * Darüber in **Zweierschritten**, und das ist keine Bequemlichkeit: Das
+ * Major-System fasst zwei Ziffern zu einem Wort. Eine ungerade Länge ließe am
+ * Ende eine halbe Silbe stehen — sieben Ziffern sind drei Wörter und ein
+ * Rest, acht sind vier Wörter.
+ *
+ * Bei dreißig ist Schluss, obwohl der Wunsch bis sechzig ging. Der Grund ist
+ * die Uhr, nicht die Vorsicht: Bei einer Sekunde je Ziffer (siehe
+ * `secondsPerItemFor`) braucht eine sechzigstellige Folge eine ganze Minute
+ * allein zum Einprägen — mehr als eine Notfall-Einheit im Ganzen hat. Wer
+ * dreißig wirklich erreicht, hat den Beleg dafür geliefert, dass die nächste
+ * Stufe gebaut werden sollte.
+ */
+const LADDER = [3, 4, 5, 6, 8, 10, 12, 14, 16, 20, 24, 30] as const
+
+/** Die höchste Stufe der Leiter — auch für den Vorrat und die Uhr. */
+export const MAX_LADDER_DIGITS = 30
+
+/** Die nächste Stufe über einer Länge — oder die oberste, wenn keine mehr kommt. */
+function nextStep(digits: number): number {
+  return LADDER.find((step) => step > digits) ?? MAX_LADDER_DIGITS
+}
+
+/**
  * Wie lang eine **neue** Zahl höchstens sein darf (Nutzerbefund 04.09.).
  *
  * Der Befund: „Ich lerne (erstmal nur) t und d für 1 und … soll gleich
@@ -103,13 +132,56 @@ export function spanLengthFor(input: DifficultyInput): number {
  * Ziffer von selbst (`teach-major`, gespeichert in `useSessionRunner`); der
  * Lernstand wächst also auch ohne den Lernbereich, rund eine Ziffer je
  * Einheit. Nach etwa zehn Einheiten steht die Decke ohnehin bei sechs.
+ *
+ * **Und über sechs gilt etwas anderes** (Wunsch vom 04.09., gebaut am 06.09.):
+ * Dort hebt nicht mehr der Lernstand und auch nicht die Quote, sondern allein
+ * der Beleg — siehe `LADDER` oben.
  */
 export function numberLengthFor(
-  input: DifficultyInput & { readonly taught: readonly number[] },
+  input: DifficultyInput & {
+    readonly taught: readonly number[]
+    /**
+     * Die längste Folge, die dieser Mensch **je richtig** hatte (in Ziffern).
+     *
+     * Der Motor für alles oberhalb von sechs. Nicht die Trefferquote, denn
+     * die sagt nur, wie es bei der zuletzt gestellten Länge lief — und wer
+     * bei drei Ziffern glänzt, hat damit nichts über dreißig gesagt.
+     * Gerechnet aus den Rohereignissen, nie gespeichert (`loadLongestRecalled`).
+     */
+    readonly longestRecalled?: number
+  },
 ): number {
   const gelehrt = new Set(input.taught).size
   const ausLernstand = gelehrt >= 8 ? 6 : gelehrt >= 5 ? 5 : gelehrt >= 2 ? 4 : 3
-  return Math.max(3, Math.min(6, ausLernstand + itemsDeltaFor(input)))
+
+  /*
+   * **Oberhalb von sechs hebt nur der Beleg** — eine Stufe über dem Längsten,
+   * das wirklich gelungen ist.
+   *
+   * Nicht mehr: Sonst stünde nach einer guten Woche eine dreißigstellige Zahl
+   * da, die nie jemand geübt hat. Und die Trefferquote darf dort senken, aber
+   * nicht heben — wer noch nie eine sechsstellige Folge richtig hatte,
+   * bekommt auch mit zwanzig richtigen Dreistelligen keine achte Ziffer.
+   * Sonst hinge die anspruchsvollste Übung der App an einer Quote, die über
+   * ganz andere Längen gesammelt wurde.
+   */
+  const belegt = input.longestRecalled ?? 0
+  const obergrenze = belegt >= 6 ? nextStep(belegt) : 6
+  const decke = belegt >= 6 ? obergrenze : ausLernstand
+
+  /*
+   * Die eigene Quote verschiebt wie überall um ein Stück (D2) — aber in
+   * **Stufen**, nicht in Ziffern: Über sechs wäre „eine Ziffer weniger" eine
+   * ungerade Länge und damit ein halbes Wort.
+   */
+  const versatz = itemsDeltaFor(input)
+  const stelle = LADDER.indexOf(decke as (typeof LADDER)[number])
+  const verschoben =
+    stelle < 0
+      ? decke
+      : (LADDER[Math.max(0, Math.min(LADDER.length - 1, stelle + versatz))] as number)
+
+  return Math.max(3, Math.min(obergrenze, verschoben))
 }
 
 /**

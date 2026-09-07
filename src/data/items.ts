@@ -233,6 +233,36 @@ export async function loadRecentOutcomes(moduleId: string, limit: number): Promi
     .map((row) => row.correct === true)
 }
 
+/**
+ * Die längste Ziffernfolge, die dieser Mensch je richtig abgerufen hat.
+ *
+ * Die Grundlage für die Decke oberhalb von sechs Ziffern (Nutzerwunsch
+ * 04.09.: „Das kann ruhig bis zu dreißig, 60 Zeichen gehen je nachdem. Aber
+ * das muss halt stufenweise sein und wenn ich weiterkomme, darf das mehr.").
+ *
+ * **Gerechnet, nicht gespeichert** — dieselbe Haltung wie bei Serie,
+ * Wiedersehen und Erreichtem (D-015, D-019). Es gibt keinen „Rang", der
+ * hochgezählt wird; es gibt nur die Rohereignisse, und daraus folgt die
+ * Decke. Wer die App zurücksetzt, fängt ehrlich wieder unten an.
+ *
+ * Alte Zeilen ohne `module` fallen heraus (D-026) — sie würden sonst Wörter
+ * als Ziffernfolgen zählen. Und gezählt wird nur, was wirklich eine
+ * Ziffernfolge ist: Die Kennung einer Zahl **ist** die Zahl.
+ */
+export async function loadLongestRecalled(moduleId: string): Promise<number> {
+  const rows = await db.events
+    .filter(
+      (event) =>
+        event.kind === 'answered' &&
+        event.module === moduleId &&
+        event.correct === true &&
+        typeof event.itemId === 'string' &&
+        /^\d+$/.test(event.itemId),
+    )
+    .toArray()
+  return rows.reduce((longest, row) => Math.max(longest, (row.itemId as string).length), 0)
+}
+
 /** Wie viele Informationen warten insgesamt auf ihren nächsten Termin? */
 export async function countTracked(language: string): Promise<number> {
   return db.itemStates.where('language').equals(language).count()

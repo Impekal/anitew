@@ -23,6 +23,7 @@ import { faceDistance } from '../content/faces.ts'
 import { answerFor, factKindOf, missionFacts, personOf } from '../content/missions.ts'
 import { factAnswer, factPrompt } from '../content/own.ts'
 import { personYearOf } from '../content/peopleCard.ts'
+import { MAX_DIGITS, MAX_LONG_DIGITS } from '../content/numbers.ts'
 import {
   memoryLabelsOf,
   memorySceneItems,
@@ -293,16 +294,18 @@ export const SECONDS_MIN = 3
 export const SECONDS_MAX = 14
 
 export interface PaceInput {
-  /**
-   * Steht die Technik dieses Moduls schon vollständig?
-   *
-   * Nicht „kann er sie gut" — das kann die App nicht wissen und behauptet es
-   * auch nicht (R-1). Nur: Ist der Unterricht durch? Solange er läuft, muss
-   * man beim Einprägen zwei Dinge zugleich tun — die Technik anwenden und sie
-   * sich dabei erst zurechtlegen.
-   */
   readonly practised?: boolean
   readonly pace?: Pace
+  /**
+   * Wie lang die Ziffernfolgen dieser Runde sind (Nutzerwunsch 04.09.).
+   *
+   * Nur die Zahlen kennen das, und nur oberhalb von sechs Ziffern ändert es
+   * etwas. Der Takt einer Runde gilt für alle ihre Stücke; genommen wird
+   * deshalb die **Decke** der Runde, nicht die Länge des einzelnen Stücks —
+   * die kürzere Folge bekommt damit etwas mehr Zeit, als sie bräuchte, und
+   * das ist die richtige Richtung.
+   */
+  readonly digits?: number
 }
 
 /**
@@ -384,7 +387,26 @@ export function secondsPerItemFor(moduleId: ModuleId, input: PaceInput = {}): nu
    */
   const unterricht = input.practised === false ? 3 : 0
   const wunsch = input.pace === 'much' ? 2 : input.pace === 'little' ? -2 : 0
-  return Math.max(SECONDS_MIN, Math.min(SECONDS_MAX, grund + unterricht + wunsch))
+  const modulTakt = Math.max(SECONDS_MIN, Math.min(SECONDS_MAX, grund + unterricht + wunsch))
+
+  /*
+   * Lange Ziffernfolgen: **eine Sekunde je Ziffer** (Nutzerwunsch 04.09.).
+   *
+   * Die Zahl ist nicht erfunden, sondern die vorhandene: Sechs Sekunden für
+   * sechs Ziffern ist der Takt, den dieses Modul seit dem Tempo-Eingriff hat.
+   * Fortgeschrieben heißt das zwölf Sekunden für zwölf Ziffern und dreißig
+   * für dreißig — und genau das ist der Grund, warum die Decke bei dreißig
+   * endet und nicht bei den gewünschten sechzig: Eine Minute nur zum
+   * Einprägen ist mehr, als eine ganze Notfall-Einheit hat.
+   *
+   * Die Deckelung auf vierzehn Sekunden gilt hier bewusst **nicht**. Sie ist
+   * für Module gedacht, deren Stück immer gleich groß ist; eine
+   * zwanzigstellige Folge in vierzehn Sekunden wäre keine schwere Aufgabe,
+   * sondern eine unmögliche — und eine unmögliche Aufgabe misst nichts (R-1).
+   */
+  const lang = Math.floor(input.digits ?? 0)
+  if (moduleId !== 'numbers' || lang <= MAX_DIGITS) return modulTakt
+  return Math.max(modulTakt, Math.min(MAX_LONG_DIGITS, lang) + wunsch)
 }
 
 /**
@@ -630,6 +652,16 @@ export interface PlanInput {
    * 05.09.). Fehlt der Wert, bleibt es beim mittleren Takt.
    */
   pace?: Pace
+  /**
+   * Wie lang die Ziffernfolgen dieser Einheit sind (Nutzerwunsch 04.09.).
+   *
+   * Derselbe Wert, mit dem der Aufrufer den Zahlenvorrat gezogen hat
+   * (`numberLengthFor`). Der Planer braucht ihn für zweierlei: für die
+   * **Uhr** — eine Sekunde je Ziffer — und für die **Rundengröße**, denn
+   * über sechs Ziffern ist eine Folge eine Runde für sich. Fehlt der Wert,
+   * bleibt alles so, wie es vor diesem Eingriff war.
+   */
+  numberDigits?: number
   /**
    * Die adaptive Verschiebung je Modul (D2): ein Stück mehr, eines
    * weniger, oder nichts — gerechnet aus den letzten Antworten
@@ -1053,7 +1085,15 @@ export function planSession(input: PlanInput): SessionPlan {
     const takt = secondsPerItemFor(moduleId, {
       practised: techniqueDone(moduleId, input),
       ...(input.pace === undefined ? {} : { pace: input.pace }),
+      ...(input.numberDigits === undefined ? {} : { digits: input.numberDigits }),
     })
+    /*
+     * Eine lange Ziffernfolge ist eine Runde für sich (Wunsch 04.09.) —
+     * dieselbe Überlegung wie bei einer Szene: Sie zerfiele, wenn der Planer
+     * drei halbe davon abzählte.
+     */
+    const bodenStuecke =
+      moduleId === 'numbers' && (input.numberDigits ?? 0) > MAX_DIGITS ? 1 : MIN_ITEMS_PER_ROUND
     const items = scene
       ? sceneItemsOf(moduleId, pool[used] as string)
       : pool.slice(
@@ -1061,7 +1101,7 @@ export function planSession(input: PlanInput): SessionPlan {
           used +
             (asksOnSight(moduleId)
               ? promptsForRound(roundSeconds, pool.length - used, delta)
-              : itemsForRound(roundSeconds, pool.length - used, delta, takt)),
+              : itemsForRound(roundSeconds, pool.length - used, delta, takt, bodenStuecke)),
         )
     taken.set(moduleId, used + (scene ? 1 : items.length))
     /*
@@ -1153,12 +1193,22 @@ function itemsForRound(
    * Zeitbudget der Einheit bleibt auf die Sekunde gleich.
    */
   perItem: number = SECONDS_PER_ITEM,
+  /*
+   * Wie wenige Stücke eine Runde mindestens hat.
+   *
+   * Drei ist der Normalfall: Ein einzelnes Wort wäre keine Runde, sondern
+   * eine Karteikarte. Bei **langen Ziffernfolgen** ist es umgekehrt (Wunsch
+   * 04.09.) — eine zwanzigstellige Folge braucht zwanzig Sekunden zum
+   * Einprägen, und drei davon fräßen die ganze Runde samt Abruf. Dort ist
+   * ein Stück die Runde, so wie eine Szene eine Runde ist.
+   */
+  minimum: number = MIN_ITEMS_PER_ROUND,
 ): number {
   const byTime = Math.floor((roundSeconds * ENCODE_SHARE) / perItem)
   // Wie bei den Rückwärts-Runden: erst stutzen, dann verschieben (D2).
-  const base = Math.min(MAX_ITEMS_PER_ROUND, Math.max(MIN_ITEMS_PER_ROUND, byTime))
-  const wanted = Math.min(MAX_ITEMS_PER_ROUND, Math.max(MIN_ITEMS_PER_ROUND, base + delta))
-  if (available < MIN_ITEMS_PER_ROUND) {
+  const base = Math.min(MAX_ITEMS_PER_ROUND, Math.max(minimum, byTime))
+  const wanted = Math.min(MAX_ITEMS_PER_ROUND, Math.max(minimum, base + delta))
+  if (available < minimum) {
     throw new RangeError(`Der Wortvorrat reicht nicht für eine Runde (${available} übrig)`)
   }
   return Math.min(wanted, available)
