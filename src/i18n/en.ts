@@ -85,10 +85,15 @@ export const en: Dictionary = {
       facts: 'Your card: question and answer. Build a bridge — one image holding both.',
       memory: 'Your memory. See it all together — one image hanging off the anchor.',
       people: 'Someone many people know. Year, field, origin — hang all three on the name.',
+      math: 'A task and its result. Do not work it out — remember it: 7 × 8 is 56, the way “Paris is the capital” is.',
+      // Querabruf (D13): Bis zum 06.09. stand hier nichts — das Modul war
+      // nie zu sehen, also fiel die leere Zeile niemandem auf.
+      associative: 'Two that belong together. In a moment the question comes from the other side.',
     },
     recallHint: 'What stayed with you? Order does not matter.',
     reviewHint: 'And now from earlier days: what do you still remember?',
     promptHint: 'Who is this?',
+    associativeAsk: 'Who belongs to this?',
     reviewPromptHint: 'And from earlier: who is this?',
     promptPlaceholder: 'Name',
     reverseAsk: 'Memorise the digits — enter them backwards.',
@@ -113,6 +118,8 @@ export const en: Dictionary = {
     memoryPlaceholder: 'What belongs',
     peopleAsk: 'Which birth year?',
     peoplePlaceholder: 'Year of birth',
+    mathAsk: 'How much is that?',
+    mathPlaceholder: 'Result',
     recallPlaceholder: 'One word per line',
     recallNumbersPlaceholder: 'One number per line',
     recallNextNumber: 'Next number',
@@ -254,6 +261,15 @@ export const en: Dictionary = {
       facts: 'Your material',
       memory: 'Memories',
       people: 'Public figures',
+      math: 'Mental arithmetic',
+      /*
+       * Die beiden Module ohne eigenen Vorrat: Räume erzeugt der Planer,
+       * der Querabruf dreht eine gelernte Mission um. Ihre Namen fehlten
+       * hier bis zum 06.09. — der Startbildschirm hätte einen leeren
+       * Schwerpunkt angekündigt, sobald einer von beiden vorrückt.
+       */
+      spatial: 'Places',
+      associative: 'Connections',
     },
     noWeakest: 'No difference between the axes beyond the counting uncertainty.',
     empty: 'Nothing to show yet. The profile grows out of the training — not out of a test at the start.',

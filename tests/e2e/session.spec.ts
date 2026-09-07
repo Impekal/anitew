@@ -3,12 +3,14 @@ import { expect, test, type Page } from '@playwright/test'
 import {
   answerRecall,
   collectItems,
+  pollFirstModule,
   recallKind,
   sceneOf,
   startButton,
   startEmergency as startGuardedEmergency,
   visit,
 } from './helpers.ts'
+import { de } from '../../src/i18n/de.ts'
 
 /**
  * Eine Trainingseinheit von vorn bis hinten (Backlog B1–B3, B5, D4, D6).
@@ -57,25 +59,20 @@ test('führt durch Einprägen und Abrufen und zählt ehrlich', async ({ page }) 
    */
   const scene = await sceneOf(page)
 
-  if (scene === undefined) {
-    // Der Einprägetext gehört zum Modul: Wörter kommen einzeln, beim Gesicht
-    // gehören Bild und Name zusammen, Zahlen spricht man innerlich mit.
-    await expect(
-      page.getByText(
-        /Ein Wort nach dem anderen\.|Gesicht und Name gehören zusammen\.|Eine Zahl nach der anderen\.|gleich steht ein Zwilling daneben\./,
-      ),
-    ).toBeVisible()
-  } else {
-    /*
-      Zwei Module bauen eine Szene, und sie sagen Verschiedenes an: Die
-      Mission fragt nach der Bindung zwischen den Stücken, der Gang verlangt,
-      dass man sie hinlegt. Der Test liest ab, welche dasteht — vorherzusagen
-      welche, war schon zweimal der Fehler.
-    */
-    await expect(
-      page.getByText(/Eine Szene\. Was gehört zu wem\?|Geh den Weg ab\.|Sieh das Bild an\./),
-    ).toBeVisible()
-  }
+  /*
+   * Der Einprägetext gehört zum Modul — und zwar genau der, den das
+   * Wörterbuch für dieses Modul führt.
+   *
+   * Hier stand bis zum 06.09. eine Aufzählung von sieben Sätzen in zwei
+   * Zweigen. Sie hatte zwei Schwächen, und beide sind an einem Tag
+   * eingetreten: Sie wurde unvollständig, sobald ein Modul dazukam — und
+   * einen **leeren** Hinweis hätte sie nie bemerkt. Genau den hatte der
+   * Querabruf, seit es ihn gibt.
+   */
+  const moduleId = await pollFirstModule(page)
+  const erwartet = de.session.encodeHints[moduleId as keyof typeof de.session.encodeHints]
+  expect(erwartet, `kein Einprägetext für „${moduleId}“`).toBeTruthy()
+  await expect(page.locator('.hint').first()).toHaveText(erwartet)
 
   /*
    * Die Punktreihe wird **während** des Einprägens gezählt, nicht danach.

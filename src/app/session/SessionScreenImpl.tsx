@@ -446,7 +446,12 @@ function RunningSession({
             Buchstaben stehen daneben und nicht darin, sonst läse jeder, der
             das Element ausliest, „4r7k“ statt „47“.
           */}
-          {block.moduleId === 'facts' || block.moduleId === 'people' ? (
+          {block.moduleId === 'facts' ||
+          block.moduleId === 'people' ||
+          /* Kopfrechnen: „7 × 8“ klein darüber, „56“ als das große Wort — dieselbe
+             Form wie eine eigene Karte, denn es ist dieselbe Sache: eine Brücke
+             zwischen Frage und Antwort. */
+          block.moduleId === 'math' ? (
             /*
               Ein eigenes Paar (D-032) — und seit dem 02.09. auch eine
               Persönlichkeit: Die Frage klein darüber, die Antwort als das
@@ -543,7 +548,9 @@ function RunningSession({
             steht groß da, wo sonst das Gesicht stünde.
           */
           question={
-            block.moduleId === 'facts' || block.moduleId === 'people'
+            block.moduleId === 'facts' ||
+            block.moduleId === 'people' ||
+            block.moduleId === 'math'
               ? factPrompt(block.items[state.promptIndex] ?? '')
               : block.moduleId === 'memory'
                 ? memorySubjectOf(block.items[state.promptIndex] ?? '')
@@ -1281,6 +1288,22 @@ function askFor(
     const ask = t.peopleAsk
     return block.kind === 'review' ? `${t.reviewLead} ${ask}` : ask
   }
+  if (block.moduleId === 'associative') {
+    /*
+     * Querabruf (D13): Gezeigt wird die Tatsache, gesucht ist der Mensch.
+     * Bis zum 06.09. fiel dieses Modul auf `promptHint` zurück — und das ist
+     * die Gesichterfrage „Wer ist das?“, gestellt über einem Hotelnamen.
+     * Gemessen am Bildschirm, nicht vermutet.
+     */
+    const ask = t.associativeAsk
+    return block.kind === 'review' ? `${t.reviewLead} ${ask}` : ask
+  }
+  if (block.moduleId === 'math') {
+    // Die Aufgabe steht daneben; gefragt ist das Ergebnis — wie bei den
+    // Persönlichkeiten, wo der Name daneben steht und das Jahr gesucht ist.
+    const ask = t.mathAsk
+    return block.kind === 'review' ? `${t.reviewLead} ${ask}` : ask
+  }
   if (block.moduleId !== 'missions') {
     return block.kind === 'review' ? t.reviewPromptHint : t.promptHint
   }
@@ -1296,6 +1319,7 @@ function placeholderFor(block: BlockPlan, index: number, dictionary: Dictionary)
   if (block.moduleId === 'palace') return dictionary.palace.placeholder
   if (block.moduleId === 'memory') return t.memoryPlaceholder
   if (block.moduleId === 'people') return t.peoplePlaceholder
+  if (block.moduleId === 'math') return t.mathPlaceholder
   if (block.moduleId !== 'missions') return t.promptPlaceholder
   const kind = factKindOf(block.items[index] ?? '')
   return kind === undefined ? t.promptPlaceholder : t.missionPlaceholders[kind]
@@ -1304,6 +1328,18 @@ function placeholderFor(block: BlockPlan, index: number, dictionary: Dictionary)
 /** Zimmernummer und Uhrzeit sind Zahlen — dann die Zifferntastatur. */
 function numericFor(block: BlockPlan, index: number): boolean {
   if (block.moduleId === 'reverse') return true
+  /*
+   * Kopfrechnen und Persönlichkeiten: Die Antwort ist immer eine Zahl — ein
+   * Ergebnis oder ein Jahrgang, und für beide hält ein Kerntest fest, dass
+   * es im ganzen Vorrat keine Ausnahme gibt. Ohne diese Zeile bekäme man am
+   * Telefon die Buchstabentastatur für „56“ oder „1987“ (Gerätebefund vom
+   * 31.08. zu den Ziffern).
+   *
+   * Bei den Persönlichkeiten war das seit dem 02.09. falsch und ist erst am
+   * 06.09. aufgefallen: Das Modul war nie zu sehen (siehe `dailyMission.ts`),
+   * also hat es auch niemand getippt.
+   */
+  if (block.moduleId === 'math' || block.moduleId === 'people') return true
   // Memory (D-036): Ist die gesuchte Antwort eine Zahl, kommt die Zifferntastatur.
   if (block.moduleId === 'memory') return /^\d+$/.test(memoryTargetOf(block.items[index] ?? ''))
   if (block.moduleId !== 'missions') return false

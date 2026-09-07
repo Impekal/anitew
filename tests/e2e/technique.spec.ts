@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { startButton, visit } from './helpers.ts'
+import { pollFirstModule, startButton, visit } from './helpers.ts'
 
 /**
  * Die Merktechnik, im Browser nachgeprüft (Backlog D5).
@@ -192,12 +192,43 @@ test('verlangt nach der ersten Lektion keine sechsstellige Zahl', async ({ page 
 
   await expect(page.locator('.lesson')).toBeVisible({ timeout: 30_000 })
   await continueLesson(page)
+
+  /*
+   * Die Annahme dieses Tests, ausgesprochen: Nach der Ziffernlektion ist die
+   * **erste Runde die der Zahlen** — Unterricht ohne Anwendung wäre am
+   * nächsten Tag wieder weg (D5). Nur deshalb darf gleich alles gelesen
+   * werden, was `.encode-word` zeigt.
+   */
+  expect(await pollFirstModule(page)).toBe('numbers')
   await expect(page.locator('.encode-word')).toBeVisible({ timeout: 30_000 })
 
+  /*
+   * Lesen mit kurzer Frist — und das ist eine Berichtigung vom 06.09.
+   *
+   * Hier stand `textContent()` ohne Grenze. Endete der Einprägeblock
+   * zwischen der Abfrage von `.recall-input` und dem Lesen, wartete
+   * Playwright auf ein Element, das nie wiederkommt: bis zur Zeitgrenze des
+   * **Tests**. Die Schleife kam nie wieder zum Ausstieg, die Einheit lief
+   * derweil in die nächste Runde, und der Test starb an seiner Uhr statt an
+   * seiner Aussage — die Fehlermeldung lautete „Test timeout“, nicht
+   * „sechsstellige Zahl“.
+   *
+   * Aufgefallen ist es, als der neue Takt (Tempo-Regler) die Blockgrenzen
+   * verschob und aus dem seltenen Zufall ein häufiger wurde.
+   */
+  const liesWort = async () =>
+    (
+      (await page
+        .locator('.encode-word')
+        .textContent({ timeout: 500 })
+        .catch(() => '')) ?? ''
+    ).trim()
+
   const gesehen = new Set<string>()
-  while ((await page.locator('.recall-input').count()) === 0) {
-    const roh = (await page.locator('.encode-word').textContent())?.trim() ?? ''
-    const nochmal = (await page.locator('.encode-word').textContent())?.trim() ?? ''
+  const frist = Date.now() + 90_000
+  while ((await page.locator('.recall-input').count()) === 0 && Date.now() < frist) {
+    const roh = await liesWort()
+    const nochmal = await liesWort()
     // Zweimal lesen und nur nehmen, was stehen geblieben ist: Der Block
     // schaltet weiter, und ein Wechsel mitten im Lesen ergäbe ein Bruchstück.
     if (roh !== '' && roh === nochmal) gesehen.add(roh)

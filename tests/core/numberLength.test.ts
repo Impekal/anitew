@@ -101,6 +101,7 @@ describe('eine Einheit nach der ersten Lektion', () => {
           facts: [],
           memory: [],
           people: [],
+          math: [],
         },
         due: {},
         taught,

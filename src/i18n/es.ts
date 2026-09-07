@@ -93,10 +93,15 @@ export const es: Dictionary = {
       facts: 'Tu tarjeta: pregunta y respuesta. Construye un puente — una imagen donde salgan las dos.',
       memory: 'Tu recuerdo. Míralo todo junto — una imagen donde todo cuelga del ancla.',
       people: 'Alguien a quien mucha gente conoce. Año, campo, origen: cuelga los tres del nombre.',
+      math: 'Una operación y su resultado. No calcule: recuerde. 7 × 8 es 56, igual que «París es la capital».',
+      // Querabruf (D13): Bis zum 06.09. stand hier nichts — das Modul war
+      // nie zu sehen, also fiel die leere Zeile niemandem auf.
+      associative: 'Dos cosas que van juntas. En un momento se pregunta desde el otro lado.',
     },
     recallHint: '¿Qué se ha quedado? El orden da igual.',
     reviewHint: 'Y ahora de antes: ¿de qué te acuerdas todavía?',
     promptHint: '¿Quién es?',
+    associativeAsk: '¿A quién pertenece?',
     reviewPromptHint: 'Y de antes: ¿quién es?',
     promptPlaceholder: 'Nombre',
     reverseAsk: 'Memoriza las cifras — escríbelas al revés.',
@@ -121,6 +126,8 @@ export const es: Dictionary = {
     memoryPlaceholder: 'Lo que va con ello',
     peopleAsk: '¿De qué año de nacimiento?',
     peoplePlaceholder: 'Año de nacimiento',
+    mathAsk: '¿Cuánto es?',
+    mathPlaceholder: 'Resultado',
     recallPlaceholder: 'Una palabra por línea',
     recallNumbersPlaceholder: 'Un número por línea',
     recallNextNumber: 'Siguiente número',
@@ -262,6 +269,15 @@ export const es: Dictionary = {
       facts: 'Lo tuyo',
       memory: 'Recuerdos',
       people: 'Personalidades',
+      math: 'Cálculo mental',
+      /*
+       * Die beiden Module ohne eigenen Vorrat: Räume erzeugt der Planer,
+       * der Querabruf dreht eine gelernte Mission um. Ihre Namen fehlten
+       * hier bis zum 06.09. — der Startbildschirm hätte einen leeren
+       * Schwerpunkt angekündigt, sobald einer von beiden vorrückt.
+       */
+      spatial: 'Lugares',
+      associative: 'Conexiones',
     },
     noWeakest: 'Ninguna diferencia entre los ejes más allá de la incertidumbre de recuento.',
     empty: 'Aún nada que mostrar. El perfil nace del entrenamiento — no de un test al principio.',

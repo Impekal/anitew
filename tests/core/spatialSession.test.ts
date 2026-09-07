@@ -24,7 +24,7 @@ function pools(seed: string): Pools {
     twins: [],
     gaze: [],
     facts: [],
-    memory: [], people: [],
+    memory: [], people: [], math: [],
     spatial: spatialPool(seed, 20),
   }
 }

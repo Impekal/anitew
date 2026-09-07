@@ -109,7 +109,7 @@ const COPY: Record<string, HelpCopy> = {
         items: [
           {
             title: 'Aus der App',
-            body: 'Wörter, Namen und Gesichter, Zahlen, Szenen mit Personen, Gänge durch einen Gedächtnispalast, Rückwärts-Folgen, Zwillingspaare, Bilder — und bekannte Persönlichkeiten, dort als Fakten ohne Bild.',
+            body: 'Wörter, Namen und Gesichter, Zahlen, Szenen mit Personen, Gänge durch einen Gedächtnispalast, Rückwärts-Folgen, Zwillingspaare, Bilder — bekannte Persönlichkeiten, dort als Fakten ohne Bild — und Kopfrechnen: das Einmaleins, Quadratzahlen, Zweierpotenzen und die gängigen Prozentwerte.',
           },
           {
             title: 'Von dir',
@@ -309,7 +309,7 @@ const COPY: Record<string, HelpCopy> = {
         items: [
           {
             title: 'From the app',
-            body: 'Words, names and faces, numbers, scenes with people, walks through a memory palace, backward sequences, twin pairs, images — and well-known people, there as facts without a picture.',
+            body: 'Words, names and faces, numbers, scenes with people, walks through a memory palace, backward sequences, twin pairs, images — well-known people, there as facts without a picture — and mental arithmetic: the times tables, squares, powers of two and the common percentages.',
           },
           {
             title: 'From you',
@@ -509,7 +509,7 @@ const COPY: Record<string, HelpCopy> = {
         items: [
           {
             title: 'Depuis l’application',
-            body: 'Des mots, des noms et des visages, des nombres, des scènes avec des personnes, des parcours dans un palais de mémoire, des suites à l’envers, des paires jumelles, des images — et des personnalités connues, là sous forme de faits sans image.',
+            body: 'Des mots, des noms et des visages, des nombres, des scènes avec des personnes, des parcours dans un palais de mémoire, des suites à l’envers, des paires jumelles, des images — des personnalités connues, là sous forme de faits sans image — et le calcul mental : les tables de multiplication, les carrés, les puissances de deux et les pourcentages courants.',
           },
           {
             title: 'De vous',
@@ -709,7 +709,7 @@ const COPY: Record<string, HelpCopy> = {
         items: [
           {
             title: 'De la aplicación',
-            body: 'Palabras, nombres y caras, números, escenas con personas, recorridos por un palacio de la memoria, secuencias al revés, pares gemelos, imágenes — y personalidades conocidas, ahí como datos sin imagen.',
+            body: 'Palabras, nombres y caras, números, escenas con personas, recorridos por un palacio de la memoria, secuencias al revés, pares gemelos, imágenes — personalidades conocidas, ahí como datos sin imagen — y cálculo mental: las tablas de multiplicar, los cuadrados, las potencias de dos y los porcentajes habituales.',
           },
           {
             title: 'Tuyo',
@@ -909,7 +909,7 @@ const COPY: Record<string, HelpCopy> = {
         items: [
           {
             title: 'Dall’app',
-            body: 'Parole, nomi e volti, numeri, scene con persone, percorsi in un palazzo della memoria, sequenze all’indietro, coppie gemelle, immagini — e personalità note, lì come fatti senza immagine.',
+            body: 'Parole, nomi e volti, numeri, scene con persone, percorsi in un palazzo della memoria, sequenze all’indietro, coppie gemelle, immagini — personalità note, lì come fatti senza immagine — e calcolo mentale: le tabelline, i quadrati, le potenze di due e le percentuali più comuni.',
           },
           {
             title: 'Da te',
@@ -1109,7 +1109,7 @@ const COPY: Record<string, HelpCopy> = {
         items: [
           {
             title: 'Da aplicação',
-            body: 'Palavras, nomes e rostos, números, cenas com pessoas, percursos por um palácio da memória, sequências ao contrário, pares gémeos, imagens — e personalidades conhecidas, aí como factos sem imagem.',
+            body: 'Palavras, nomes e rostos, números, cenas com pessoas, percursos por um palácio da memória, sequências ao contrário, pares gémeos, imagens — personalidades conhecidas, aí como factos sem imagem — e cálculo mental: a tabuada, os quadrados, as potências de dois e as percentagens habituais.',
           },
           {
             title: 'De si',

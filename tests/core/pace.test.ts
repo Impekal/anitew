@@ -28,7 +28,7 @@ const plane = (extra: Record<string, unknown> = {}) =>
     seed: 'tempo',
     pools: {
       words: pool, faces: [], numbers: [], missions: [], palace: [],
-      reverse: [], twins: [], gaze: [], facts: [], memory: [], people: [],
+      reverse: [], twins: [], gaze: [], facts: [], memory: [], people: [], math: [],
     },
     due: {},
     modules: ['words'],

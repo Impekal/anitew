@@ -51,6 +51,8 @@ import {
   spanPool,
   DIFFICULTY_WINDOW,
   itemsDeltaFor,
+  arithmeticPool,
+  type ArithmeticStage,
   numberLengthFor,
   type Pace,
   spanLengthFor,
@@ -419,6 +421,20 @@ export function App() {
   }, [training, running])
 
   /*
+   * Kopfrechnen (Nutzerwunsch 05.09.): Was schon einen Termin hat, kommt
+   * nicht noch einmal als neuer Stoff — dieselbe Regel wie bei den
+   * Persönlichkeiten. Anders als dort ist das Erschöpfen hier aber das
+   * **Ziel**: Das Einmaleins ist endlich, und es zu können heißt, es
+   * gesehen zu haben.
+   */
+  const [mathDone, setMathDone] = useState<ReadonlySet<string>>(new Set())
+  useEffect(() => {
+    void loadTrackedWords('math', training)
+      .then((words) => setMathDone(new Set(words.map(factPrompt))))
+      .catch(() => undefined)
+  }, [training, running])
+
+  /*
    * Die letzten Antworten je Modul — Futter für die adaptive Schwierigkeit
    * (D2): gerechnet, nie fortgeschrieben, nach jeder Einheit neu gelesen.
    */
@@ -541,6 +557,21 @@ export function App() {
     const seed = `${day}:${laufMode}:${now}`
     const sessionId = `s-${now.toString(36)}-${createRng(seed).int(1_000_000).toString(36)}`
     const seconds = MODES[laufMode].seconds
+
+    /*
+     * Welche Rechenstufen offen sind — gerechnet aus dem, was schon einen
+     * Termin hat, nie gespeichert (dieselbe Haltung wie bei Serie und
+     * Wiedersehen, D-019).
+     *
+     * Stufenweise, wie bei der Zahllänge: Wer das kleine Einmaleins fast
+     * durchhat, bekommt die Quadratzahlen dazu — nicht vorher. Die Schwellen
+     * liegen knapp unter der vollen Stufe, damit die letzte Aufgabe nicht die
+     * Tür blockiert; die übrigen kommen als Wiedersehen ohnehin.
+     */
+    const mathStages: ArithmeticStage[] = ['times']
+    if (mathDone.size >= 30) mathStages.push('squares')
+    if (mathDone.size >= 44) mathStages.push('powers')
+    if (mathDone.size >= 50) mathStages.push('percent')
 
     void (async () => {
       /*
@@ -697,6 +728,13 @@ export function App() {
            * Grund steht in `core/content/people.ts`.
            */
           people: peoplePool.filter((item) => !peopleDone.has(factPrompt(item))),
+          /*
+           * Kopfrechnen: der Vorrat der offenen Stufen, ohne alles, was schon
+           * einen Termin hat.
+           */
+          math: arithmeticPool(seed, mathStages).filter(
+            (item) => !mathDone.has(factPrompt(item)),
+          ),
         },
         due,
         taught,
@@ -745,7 +783,7 @@ export function App() {
       setRunning(progress)
       void beginSession(progress, day, now).catch(() => undefined)
     })()
-  }, [training, mode, platform, taught, palaceTaught, storyTaught, linkTaught, majorMethodTaught, own, focus, peopleDone, recentByModule, dimensionCounts, tempo.pace])
+  }, [training, mode, platform, taught, palaceTaught, storyTaught, linkTaught, majorMethodTaught, own, focus, peopleDone, mathDone, recentByModule, dimensionCounts, tempo.pace])
 
   const leave = useCallback(() => {
     setRunning(undefined)

@@ -95,10 +95,15 @@ export const pt: Dictionary = {
       facts: 'O teu cartão: pergunta e resposta. Constrói uma ponte — uma imagem onde entram as duas.',
       memory: 'A tua memória. Vê tudo junto — uma imagem em que tudo está pendurado na âncora.',
       people: 'Alguém que muita gente conhece. Ano, área, origem — pendura os três no nome.',
+      math: 'Uma operação e o seu resultado. Não calcule — memorize: 7 × 8 é 56, tal como «Paris é a capital».',
+      // Querabruf (D13): Bis zum 06.09. stand hier nichts — das Modul war
+      // nie zu sehen, also fiel die leere Zeile niemandem auf.
+      associative: 'Duas coisas que andam juntas. Daqui a pouco a pergunta vem do outro lado.',
     },
     recallHint: 'O que ficou? A ordem não importa.',
     reviewHint: 'E agora de antes: de que ainda te lembras?',
     promptHint: 'Quem é?',
+    associativeAsk: 'A quem pertence?',
     reviewPromptHint: 'E de antes: quem é?',
     promptPlaceholder: 'Nome',
     reverseAsk: 'Memoriza os algarismos — escreve-os ao contrário.',
@@ -123,6 +128,8 @@ export const pt: Dictionary = {
     memoryPlaceholder: 'O que faz parte',
     peopleAsk: 'De que ano de nascimento?',
     peoplePlaceholder: 'Ano de nascimento',
+    mathAsk: 'Quanto é?',
+    mathPlaceholder: 'Resultado',
     recallPlaceholder: 'Uma palavra por linha',
     recallNumbersPlaceholder: 'Um número por linha',
     recallNextNumber: 'Próximo número',
@@ -264,6 +271,15 @@ export const pt: Dictionary = {
       facts: 'O teu material',
       memory: 'Memórias',
       people: 'Personalidades',
+      math: 'Cálculo mental',
+      /*
+       * Die beiden Module ohne eigenen Vorrat: Räume erzeugt der Planer,
+       * der Querabruf dreht eine gelernte Mission um. Ihre Namen fehlten
+       * hier bis zum 06.09. — der Startbildschirm hätte einen leeren
+       * Schwerpunkt angekündigt, sobald einer von beiden vorrückt.
+       */
+      spatial: 'Lugares',
+      associative: 'Ligações',
     },
     noWeakest: 'Nenhuma diferença entre os eixos para lá da incerteza de contagem.',
     empty: 'Ainda nada para mostrar. O perfil nasce do treino — não de um teste no início.',

@@ -93,10 +93,15 @@ export const it: Dictionary = {
       facts: 'La tua carta: domanda e risposta. Costruisci un ponte — un’immagine che le contiene entrambe.',
       memory: 'Il tuo ricordo. Guarda tutto insieme — un’immagine in cui tutto è appeso all’àncora.',
       people: 'Qualcuno che molti conoscono. Anno, ambito, origine — appendi i tre al nome.',
+      math: 'Un’operazione e il suo risultato. Non calcolare — ricordare: 7 × 8 fa 56, come «Parigi è la capitale».',
+      // Querabruf (D13): Bis zum 06.09. stand hier nichts — das Modul war
+      // nie zu sehen, also fiel die leere Zeile niemandem auf.
+      associative: 'Due cose che stanno insieme. Tra poco la domanda arriva dall’altro lato.',
     },
     recallHint: 'Cosa è rimasto? L’ordine non conta.',
     reviewHint: 'E ora da prima: cosa ricordi ancora?',
     promptHint: 'Chi è?',
+    associativeAsk: 'A chi appartiene?',
     reviewPromptHint: 'E da prima: chi è?',
     promptPlaceholder: 'Nome',
     reverseAsk: 'Memorizza le cifre — inseriscile al contrario.',
@@ -121,6 +126,8 @@ export const it: Dictionary = {
     memoryPlaceholder: 'Ciò che ne fa parte',
     peopleAsk: 'Di che anno di nascita?',
     peoplePlaceholder: 'Anno di nascita',
+    mathAsk: 'Quanto fa?',
+    mathPlaceholder: 'Risultato',
     recallPlaceholder: 'Una parola per riga',
     recallNumbersPlaceholder: 'Un numero per riga',
     recallNextNumber: 'Numero successivo',
@@ -262,6 +269,15 @@ export const it: Dictionary = {
       facts: 'Il tuo materiale',
       memory: 'Ricordi',
       people: 'Personalità',
+      math: 'Calcolo mentale',
+      /*
+       * Die beiden Module ohne eigenen Vorrat: Räume erzeugt der Planer,
+       * der Querabruf dreht eine gelernte Mission um. Ihre Namen fehlten
+       * hier bis zum 06.09. — der Startbildschirm hätte einen leeren
+       * Schwerpunkt angekündigt, sobald einer von beiden vorrückt.
+       */
+      spatial: 'Luoghi',
+      associative: 'Collegamenti',
     },
     noWeakest: 'Nessuna differenza tra gli assi oltre l’incertezza di conteggio.',
     empty: 'Ancora nulla da mostrare. Il profilo nasce dall’allenamento — non da un test all’inizio.',
