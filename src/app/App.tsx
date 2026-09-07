@@ -70,6 +70,7 @@ import {
   loadRecentOutcomes,
   loadDue,
   loadReviewed,
+  loadLongestRecalled,
   loadTrackedWords,
   moduleOf,
   wordOf,
@@ -435,6 +436,21 @@ export function App() {
   }, [training, running])
 
   /*
+   * Die längste Ziffernfolge, die je richtig war (Nutzerwunsch 04.09.).
+   *
+   * Der Motor für alles oberhalb von sechs Ziffern. Gerechnet aus den
+   * Rohereignissen, nie gespeichert — wie Serie und Wiedersehen (D-015,
+   * D-019). Nach jeder Einheit neu gelesen, damit die Decke am selben Abend
+   * steigt, an dem der Beleg entstanden ist.
+   */
+  const [longestNumber, setLongestNumber] = useState(0)
+  useEffect(() => {
+    void loadLongestRecalled('numbers')
+      .then(setLongestNumber)
+      .catch(() => undefined)
+  }, [training, running])
+
+  /*
    * Die letzten Antworten je Modul — Futter für die adaptive Schwierigkeit
    * (D2): gerechnet, nie fortgeschrieben, nach jeder Einheit neu gelesen.
    */
@@ -568,6 +584,17 @@ export function App() {
      * liegen knapp unter der vollen Stufe, damit die letzte Aufgabe nicht die
      * Tür blockiert; die übrigen kommen als Wiedersehen ohnehin.
      */
+    /*
+     * Die Zahllänge dieser Einheit — einmal gerechnet und dreimal gebraucht:
+     * für den Vorrat, für die Uhr und für die Rundengröße. Dreimal gerechnet
+     * wären drei Wahrheiten über dieselbe Einheit.
+     */
+    const zahlLaenge = numberLengthFor({
+      taught,
+      recent: recentByModule['numbers'] ?? [],
+      longestRecalled: longestNumber,
+    })
+
     const mathStages: ArithmeticStage[] = ['times']
     if (mathDone.size >= 30) mathStages.push('squares')
     if (mathDone.size >= 44) mathStages.push('powers')
@@ -654,11 +681,7 @@ export function App() {
            * erst die 1 kennt, bekommt keine sechsstellige Zahl vorgesetzt.
            * Begründung und Messung stehen bei `numberLengthFor`.
            */
-          numbers: numberPool(
-            seed,
-            60,
-            numberLengthFor({ taught, recent: recentByModule['numbers'] ?? [] }),
-          ),
+          numbers: numberPool(seed, 60, zahlLaenge),
           /*
            * Missionen ziehen aus demselben Namensvorrat wie die Gesichter
            * (H1): Aus dem Namen entsteht die ganze Szene, so wie aus ihm das
@@ -736,6 +759,7 @@ export function App() {
             (item) => !mathDone.has(factPrompt(item)),
           ),
         },
+        numberDigits: zahlLaenge,
         due,
         taught,
         palaceTaught,
@@ -783,7 +807,7 @@ export function App() {
       setRunning(progress)
       void beginSession(progress, day, now).catch(() => undefined)
     })()
-  }, [training, mode, platform, taught, palaceTaught, storyTaught, linkTaught, majorMethodTaught, own, focus, peopleDone, mathDone, recentByModule, dimensionCounts, tempo.pace])
+  }, [training, mode, platform, taught, palaceTaught, storyTaught, linkTaught, majorMethodTaught, own, focus, peopleDone, mathDone, longestNumber, recentByModule, dimensionCounts, tempo.pace])
 
   const leave = useCallback(() => {
     setRunning(undefined)
@@ -865,8 +889,9 @@ export function App() {
       toldApartTotal: heldOf('attention'),
       detailsHeldTotal: heldOf('visual'),
       namesHeldTotal: heldOf('faces'),
+      longestNumberDigits: longestNumber,
     }
-  }, [returns, streak.best, taught.length, runs, own, dimensionCounts])
+  }, [returns, streak.best, taught.length, runs, own, dimensionCounts, longestNumber])
 
 
   /*

@@ -22,6 +22,7 @@ const NONE: AchievementInput = {
   toldApartTotal: 0,
   detailsHeldTotal: 0,
   namesHeldTotal: 0,
+  longestNumberDigits: 0,
 }
 
 describe('Erreichtes', () => {
@@ -73,8 +74,28 @@ describe('Erreichtes', () => {
       toldApartTotal: 25,
       detailsHeldTotal: 25,
       namesHeldTotal: 25,
+      longestNumberDigits: 30,
     }
     expect(achievementsOf(all)).toEqual([...ACHIEVEMENTS])
+  })
+
+  it('nennt die lange Ziffernfolge erst, wenn sie wirklich saß', () => {
+    /*
+     * Die Tatsache zur Zahlenleiter (Nutzerwunsch 04.09./05.09.). Zwölf
+     * Ziffern sind das Doppelte der Merkspanne und sechs Wörter im
+     * Major-System; dreißig ist die oberste Stufe.
+     *
+     * Wichtig ist hier vor allem, was **nicht** passiert: Bei elf Ziffern
+     * steht nichts da — kein „noch eine Ziffer bis zur nächsten Stufe“. Das
+     * wäre die Aufforderung, die K7 ausschließt.
+     */
+    expect(achievementsOf({ ...NONE, longestNumberDigits: 11 })).toEqual([])
+    expect(achievementsOf({ ...NONE, longestNumberDigits: 12 })).toEqual(['heldTwelve'])
+    expect(achievementsOf({ ...NONE, longestNumberDigits: 29 })).toEqual(['heldTwelve'])
+    expect(achievementsOf({ ...NONE, longestNumberDigits: 30 })).toEqual([
+      'heldTwelve',
+      'heldThirty',
+    ])
   })
 
   it('hat für jede Tatsache einen Text in beiden Sprachen', () => {

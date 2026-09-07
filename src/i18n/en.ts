@@ -343,6 +343,8 @@ export const en: Dictionary = {
       toldApart: 'Told similar things apart twenty-five times after days.',
       sawDetails: 'Brought back twenty-five picture details after days.',
       namesHeld: 'Still knew twenty-five names after days.',
+      heldTwelve: 'Held a twelve-digit number.',
+      heldThirty: 'Held a thirty-digit number.',
     },
   },
   today: {

@@ -552,6 +552,8 @@ export const de = {
       toldApart: 'Fünfundzwanzigmal Ähnliches nach Tagen auseinandergehalten.',
       sawDetails: 'Fünfundzwanzig Einzelheiten aus Bildern nach Tagen zurückgeholt.',
       namesHeld: 'Fünfundzwanzig Namen nach Tagen noch gewusst.',
+      heldTwelve: 'Eine zwölfstellige Zahl behalten.',
+      heldThirty: 'Eine dreißigstellige Zahl behalten.',
     },
   },
   today: {

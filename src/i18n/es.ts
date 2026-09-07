@@ -351,6 +351,8 @@ export const es: Dictionary = {
       toldApart: 'Veinticinco veces distinguiste lo parecido después de días.',
       sawDetails: 'Veinticinco detalles de imágenes recuperados después de días.',
       namesHeld: 'Veinticinco nombres aún sabidos después de días.',
+      heldTwelve: 'Retenido un número de doce cifras.',
+      heldThirty: 'Retenido un número de treinta cifras.',
     },
   },
   today: {

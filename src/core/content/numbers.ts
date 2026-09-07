@@ -34,6 +34,18 @@ export const MIN_DIGITS = 3
 export const MAX_DIGITS = 6
 
 /**
+ * Die Decke für den **langen** Bereich (Nutzerwunsch 04.09.: „Das kann ruhig
+ * bis zu dreißig, 60 Zeichen gehen je nachdem").
+ *
+ * Sechs bleibt die Grenze der Merkspanne und damit das, was ohne Technik
+ * geht. Alles darüber ist gekonnte Anwendung des Major-Systems, und dorthin
+ * kommt nur, wer es belegt hat (`numberLengthFor`). Die Zahl selbst steht in
+ * `session/difficulty.ts`; hier steht sie noch einmal, weil der Vorrat sie
+ * als Schranke braucht und `content` nichts aus `session` importieren soll.
+ */
+export const MAX_LONG_DIGITS = 30
+
+/**
  * Gruppiert eine Ziffernfolge nur für die Anzeige.
  *
  * Von rechts in Dreiergruppen, weil dadurch die zugrunde liegende ID nie
@@ -43,10 +55,25 @@ export const MAX_DIGITS = 6
  */
 export function displayNumber(value: string): string {
   if (!/^\d+$/.test(value) || value.length <= 4) return value
-  const first = value.length % 3 || 3
+  /*
+   * Über sechs Ziffern in **Zweiergruppen** (Nutzerwunsch 04.09.).
+   *
+   * Bis sechs bleibt es bei Dreiergruppen: So sieht eine Telefonnummer aus,
+   * und so liest man sie im Alltag. Darüber ist die Folge kein Alltagsobjekt
+   * mehr, sondern eine Übung im Major-System — und das fasst **zwei** Ziffern
+   * zu einem Wort. Dreiergruppen liefen dort quer zur Technik: „123 456" muss
+   * man erst wieder zu 12|34|56 umbauen, bevor man die Wörter findet. Das ist
+   * Arbeit, die nichts mit Gedächtnis zu tun hat.
+   *
+   * Die Kennung bleibt in jedem Fall die reine Ziffernfolge; das hier ist
+   * ausschließlich Anzeige, und eine gruppiert eingegebene Antwort wird
+   * ohnehin wieder darauf reduziert (`splitNumberEntries`).
+   */
+  const size = value.length > MAX_DIGITS ? 2 : 3
+  const first = value.length % size || size
   const groups = [value.slice(0, first)]
-  for (let index = first; index < value.length; index += 3) {
-    groups.push(value.slice(index, index + 3))
+  for (let index = first; index < value.length; index += size) {
+    groups.push(value.slice(index, index + size))
   }
   return groups.join(' ')
 }
@@ -106,14 +133,30 @@ export function numberPool(
    * Die längste Folge, die dieser Vorrat enthalten darf (Nutzerbefund
    * 04.09.). Ohne Angabe bleibt alles wie bisher — der Vorgabewert ist
    * `MAX_DIGITS`, damit kein Aufrufer und kein alter Test sich ändern muss.
-   * Wer die Decke setzt, bekommt weiter eine Streuung von `MIN_DIGITS` bis
-   * dorthin, nur eben eine kürzere.
+   * Wer eine Decke bis sechs setzt, bekommt weiter eine Streuung von
+   * `MIN_DIGITS` bis dorthin. Wer darüber geht, bekommt zwei Längen — die
+   * Decke und die Stufe darunter (siehe `boden` unten).
    */
   maxDigits: number = MAX_DIGITS,
 ): readonly string[] {
   // Gegen Unfug von außen: eine Decke unter dem Boden ergäbe eine leere
   // Spanne und damit eine Endlosschleife bis zur Schranke unten.
-  const decke = Math.max(MIN_DIGITS, Math.min(MAX_DIGITS, Math.floor(maxDigits)))
+  const decke = Math.max(MIN_DIGITS, Math.min(MAX_LONG_DIGITS, Math.floor(maxDigits)))
+
+  /*
+   * Der Boden der Streuung — und über sechs ein anderer als darunter.
+   *
+   * **Bis sechs** wird von drei an gestreut, wie bisher: Eine Runde aus lauter
+   * gleich langen Folgen wäre leichter, als sie sein soll, weil man dann nur
+   * noch die Ziffern und nicht mehr die Länge behalten muss.
+   *
+   * **Über sechs** wäre dieselbe Streuung das Gegenteil einer Übung: Wer die
+   * zwölfstellige Decke erreicht hat, bekäme überwiegend drei- bis
+   * sechsstellige Folgen und träfe die zwölf fast nie. Dort sind es deshalb
+   * genau zwei Längen — die Decke und die Stufe darunter. Streuung bleibt,
+   * die Aufgabe auch.
+   */
+  const boden = decke > MAX_DIGITS ? decke - 2 : MIN_DIGITS
   const rng = createRng(`numbers:${seed}`)
   const pool = new Set<string>()
 
@@ -123,7 +166,11 @@ export function numberPool(
    * Schleife für immer — und zwar auf dem Telefon eines Nutzers, nicht hier.
    */
   for (let attempt = 0; pool.size < count && attempt < count * 40; attempt++) {
-    const digits = MIN_DIGITS + rng.int(decke - MIN_DIGITS + 1)
+    const digits =
+      decke > MAX_DIGITS
+        ? // Zwei Längen, nicht eine Spanne: Boden oder Decke.
+          (rng.int(2) === 0 ? boden : decke)
+        : boden + rng.int(decke - boden + 1)
     // Die erste Ziffer nie null (siehe oben), die übrigen frei.
     let value = String(1 + rng.int(9))
     for (let index = 1; index < digits; index++) value += String(rng.int(10))

@@ -214,6 +214,10 @@ const COPY: Record<string, HelpCopy> = {
             a: 'Der Trainingsscore entsteht nebenbei in jeder Einheit und sagt, wie es heute lief. Die Messung ist ein eigener, kurzer Test alle zwei Wochen, immer gleich aufgebaut — mit Inhalten, die es sonst nirgends in der App gibt und die nie in den Wiederholungsplan wandern. Was dort gefragt wird, hast du nie geübt. Nur deshalb sagt das Ergebnis überhaupt etwas.',
           },
           {
+            q: 'Warum werden die Zahlen manchmal länger?',
+            a: 'Weil du weitergekommen bist. Bis sechs Ziffern folgt die Länge dem Lernstand: Zwei Ziffern sind im Major-System ein Wort, und ein Paar ist erst brauchbar, wenn du beide Ziffern kennst. Über sechs zählt nur noch, was du wirklich geschafft hast — die Decke steht eine Stufe über der längsten Folge, die du je richtig hattest, und sie fällt von selbst wieder zurück, wenn es gerade nicht läuft. Es gibt dabei kein Level und keinen Rang; es ist nur eine Zahl, die es schon gab.',
+          },
+          {
             q: 'Warum sehen die Gesichter gezeichnet aus?',
             a: 'Weil sie im Code entstehen statt aus einer Sammlung zu kommen. Eine feste Bildersammlung ist nach zwei Wochen durchgesehen und misst danach Wiedererkennen statt Gedächtnis. Fotos lebender Personen kommen aus rechtlichen Gründen nicht in Frage — deshalb gibt es bei den bekannten Persönlichkeiten gar kein Bild, sondern nur Name, Jahr, Fach und Herkunft.',
           },
@@ -412,6 +416,10 @@ const COPY: Record<string, HelpCopy> = {
           {
             q: 'What is the difference between the training score and the measurement?',
             a: 'The training score comes out of every session as a by-product and says how today went. The measurement is a separate short test every two weeks, always built the same way — using material that exists nowhere else in the app and never enters the review plan. What it asks about, you have never practised. That is the only reason the result says anything.',
+          },
+          {
+            q: 'Why do the numbers sometimes get longer?',
+            a: 'Because you have got further. Up to six digits the length follows what you have been taught: two digits make one word in the major system, and a pair is only usable once you know both digits. Above six, only what you have actually managed counts — the ceiling sits one step above the longest sequence you ever recalled correctly, and it drops back by itself when things are not going well. There is no level and no rank in this; it is simply a number that already existed.',
           },
           {
             q: 'Why do the faces look drawn?',
@@ -614,6 +622,10 @@ const COPY: Record<string, HelpCopy> = {
             a: 'Le score d’entraînement naît en passant dans chaque séance et dit comment s’est passée la journée. La mesure est un test court et distinct, toutes les deux semaines, toujours construit de la même façon — avec des contenus qui n’existent nulle part ailleurs dans l’application et n’entrent jamais dans le plan de révision. Ce qui y est demandé, vous ne l’avez jamais exercé. C’est la seule raison pour laquelle le résultat dit quelque chose.',
           },
           {
+            q: 'Pourquoi les nombres deviennent-ils parfois plus longs ?',
+            a: 'Parce que vous avez progressé. Jusqu’à six chiffres, la longueur suit ce que vous avez appris : dans le système majeur, deux chiffres forment un mot, et une paire n’est utilisable que si vous connaissez les deux chiffres. Au-delà de six, seul compte ce que vous avez réellement réussi — le plafond se situe une marche au-dessus de la plus longue suite que vous ayez jamais restituée correctement, et il redescend tout seul quand cela ne marche pas. Il n’y a là ni niveau ni rang ; c’est simplement un nombre qui existait déjà.',
+          },
+          {
             q: 'Pourquoi les visages ont-ils l’air dessinés ?',
             a: 'Parce qu’ils naissent dans le code au lieu de venir d’une collection. Un jeu d’images figé est épuisé en quinze jours et mesure ensuite la reconnaissance, pas la mémoire. Les photos de personnes vivantes sont exclues pour des raisons juridiques — c’est pourquoi les personnalités connues n’ont aucune image, seulement un nom, une année, un domaine et une origine.',
           },
@@ -812,6 +824,10 @@ const COPY: Record<string, HelpCopy> = {
           {
             q: '¿Qué diferencia hay entre la puntuación de entrenamiento y la medición?',
             a: 'La puntuación de entrenamiento sale de paso en cada sesión y dice cómo ha ido el día. La medición es una prueba corta aparte, cada dos semanas, siempre con la misma estructura — con contenidos que no existen en ningún otro sitio de la aplicación y que nunca entran en el plan de repaso. Lo que allí se pregunta no lo has practicado nunca. Solo por eso el resultado dice algo.',
+          },
+          {
+            q: '¿Por qué a veces los números se alargan?',
+            a: 'Porque has avanzado. Hasta seis cifras la longitud sigue lo aprendido: en el sistema mayor dos cifras forman una palabra, y un par solo sirve cuando conoces las dos cifras. Por encima de seis solo cuenta lo que realmente has conseguido: el techo queda un escalón por encima de la secuencia más larga que hayas recordado bien alguna vez, y baja solo cuando la cosa no va. Aquí no hay nivel ni rango; es simplemente un número que ya existía.',
           },
           {
             q: '¿Por qué las caras parecen dibujadas?',
@@ -1014,6 +1030,10 @@ const COPY: Record<string, HelpCopy> = {
             a: 'Il punteggio di allenamento nasce di passaggio in ogni sessione e dice com’è andata oggi. La misurazione è un test breve e separato, ogni due settimane, sempre costruito allo stesso modo — con contenuti che non esistono da nessun’altra parte nell’app e non entrano mai nel piano di ripasso. Ciò che vi si chiede non l’hai mai esercitato. Solo per questo il risultato dice qualcosa.',
           },
           {
+            q: 'Perché a volte i numeri diventano più lunghi?',
+            a: 'Perché sei andato avanti. Fino a sei cifre la lunghezza segue quello che hai imparato: nel sistema maggiore due cifre formano una parola, e una coppia è utilizzabile solo quando conosci entrambe le cifre. Oltre le sei conta solo ciò che hai davvero fatto: il tetto sta un gradino sopra la sequenza più lunga che tu abbia mai richiamato correttamente, e scende da solo quando le cose non vanno. Non c’è nessun livello e nessun grado; è soltanto un numero che esisteva già.',
+          },
+          {
             q: 'Perché i volti sembrano disegnati?',
             a: 'Perché nascono nel codice invece di venire da una raccolta. Un insieme fisso di immagini si esaurisce in due settimane e da lì misura il riconoscimento, non la memoria. Le fotografie di persone viventi sono escluse per motivi giuridici — per questo le personalità note non hanno alcuna immagine, ma solo nome, anno, campo e origine.',
           },
@@ -1212,6 +1232,10 @@ const COPY: Record<string, HelpCopy> = {
           {
             q: 'Qual é a diferença entre a pontuação de treino e a medição?',
             a: 'A pontuação de treino nasce de passagem em cada sessão e diz como correu hoje. A medição é um teste curto e separado, de duas em duas semanas, sempre com a mesma estrutura — com conteúdos que não existem em mais lado nenhum da aplicação e que nunca entram no plano de revisão. O que aí se pergunta nunca o praticou. Só por isso o resultado diz alguma coisa.',
+          },
+          {
+            q: 'Porque é que os números às vezes ficam mais longos?',
+            a: 'Porque avançou. Até seis algarismos o comprimento segue o que aprendeu: no sistema maior dois algarismos formam uma palavra, e um par só serve quando conhece os dois algarismos. Acima de seis só conta o que conseguiu mesmo — o tecto fica um degrau acima da sequência mais longa que alguma vez recordou corretamente, e desce sozinho quando as coisas não correm. Não há aqui nível nem posto; é apenas um número que já existia.',
           },
           {
             q: 'Porque é que os rostos parecem desenhados?',
