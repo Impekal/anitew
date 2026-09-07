@@ -107,6 +107,7 @@ export {
   type SessionPlan,
   type PlanInput,
   type Pools,
+  type Pace,
 } from './session/plan.ts'
 export { planSession } from './session/adaptivePlan.ts'
 export * from './technique/encodings.ts'

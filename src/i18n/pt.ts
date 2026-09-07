@@ -681,6 +681,13 @@ export const pt: Dictionary = {
     note: 'Os mesmos controlos estão também em baixo, no ecrã inicial.',
     saveFailed: 'Esta definição não se pôde guardar no aparelho. Continua a valer a anterior.',
     resetNote: 'Se quiseres começar mesmo do zero: o caminho está em baixo. Antes vale a pena uma cópia em «Cópia de segurança» — depois não fica nada.',
+    pace: {
+      heading: 'Tempo para memorizar',
+      note: 'Quanto tempo fica uma palavra, um nome ou um número antes do seguinte. A sessão mantém a duração — com mais tempo vêm menos exercícios, mas com calma.',
+      much: 'muito',
+      normal: 'normal',
+      little: 'pouco',
+    },
   },
 }
 

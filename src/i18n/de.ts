@@ -997,5 +997,18 @@ export const de = {
     // R3-06: Was sich nicht speichern ließ, wird gesagt statt angezeigt.
     saveFailed: 'Diese Einstellung ließ sich auf dem Gerät nicht speichern. Es gilt weiterhin die vorherige.',
     resetNote: 'Wenn du ganz von vorn anfangen willst: Der Weg dorthin steht unten. Vorher lohnt sich eine Sicherung unter „Sicherung“ — danach ist nichts mehr da.',
+    /*
+      Der Regler fürs Tempo (Nutzerbefund 05.09.): „Man hat kaum Zeit, sich
+      was auszudenken." Gemessen waren es vier Sekunden je Stück — in jedem
+      Modus dieselben. Wie schnell jemand sich ein Bild ausdenkt, weiß keine
+      Trefferquote; deshalb eine Einstellung und keine Automatik.
+    */
+    pace: {
+      heading: 'Zeit zum Einprägen',
+      note: 'Wie lange ein Wort, ein Name oder eine Zahl stehen bleibt, ehe die nächste kommt. Die Einheit bleibt gleich lang — bei mehr Zeit kommen weniger Aufgaben, dafür in Ruhe.',
+      much: 'viel',
+      normal: 'normal',
+      little: 'wenig',
+    },
   },
 } as const

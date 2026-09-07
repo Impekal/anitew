@@ -130,9 +130,26 @@ export const MISSION_SECONDS_MIN = 4
 export const MISSION_SECONDS_BASE = 5
 export const MISSION_SECONDS_MAX = 6
 
-export function missionSecondsPerFact(delta: -1 | 0 | 1): number {
-  return Math.max(
-    MISSION_SECONDS_MIN,
-    Math.min(MISSION_SECONDS_MAX, MISSION_SECONDS_BASE - delta),
-  )
+/**
+ * Die Sekunden je Tatsache, gemessen an dem, was für diese Runde geplant war.
+ *
+ * `base` ist neu (Nutzerbefund 05.09.). Vorher stand die Fünf hier fest, und
+ * das ging gut, solange eine Mission immer fünf Sekunden je Tatsache bekam.
+ * Seit der Takt vom Lernstand und vom eingestellten Tempo abhängt, wäre die
+ * feste Fünf eine zweite Wahrheit: Bei `delta = 0` ließ H6 den Plan in Ruhe
+ * (sieben Sekunden), bei ±1 schrieb es ihn auf sechs oder vier um — ein
+ * Sprung nach unten, obwohl „leichter" gemeint war. Zwei Kerntests haben
+ * genau das gefangen.
+ *
+ * Der Vorgabewert hält die alte Bedeutung für jeden Aufrufer, der keinen
+ * eigenen Takt kennt.
+ */
+export function missionSecondsPerFact(
+  delta: -1 | 0 | 1,
+  base: number = MISSION_SECONDS_BASE,
+): number {
+  // Ein Stück mehr oder weniger als geplant, nie ein Sprung — dieselbe
+  // ±1-Regel wie überall (D2). Mit dem Vorgabewert kommen genau die alten
+  // vier, fünf und sechs Sekunden heraus.
+  return Math.max(1, base - delta)
 }

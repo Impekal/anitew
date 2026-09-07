@@ -126,6 +126,11 @@ test('sagt, warum nur vollständig trainierbare Sprachen zur Auswahl stehen', as
     Die Genau-Gleichheit bleibt der Wächter: eine siebte, nur halb
     übersetzte Sprache dürfte hier wieder nicht auftauchen.
   */
-  const ui = await page.locator('.language:not(.language-training) select').locator('option').allTextContents()
+  // Wie in `foundation.spec.ts`: Drei Zeilen tragen `.language`, gemeint ist
+  // die App-Sprache.
+  const ui = await page
+    .locator('.language:not(.language-training):not(.language-pace) select')
+    .locator('option')
+    .allTextContents()
   expect(ui).toEqual(['Deutsch', 'English', 'Français', 'Español', 'Italiano', 'Português'])
 })

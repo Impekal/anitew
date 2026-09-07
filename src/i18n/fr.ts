@@ -679,6 +679,13 @@ export const fr: Dictionary = {
     note: 'Les mêmes commandes sont aussi en bas de l’écran d’accueil.',
     saveFailed: 'Ce réglage n’a pas pu être enregistré sur l’appareil. Le précédent s’applique toujours.',
     resetNote: 'Si tu veux repartir de zéro : le chemin est en bas. Une sauvegarde sous « Sauvegarde » vaut la peine avant — après, il ne reste rien.',
+    pace: {
+      heading: 'Temps pour mémoriser',
+      note: 'Combien de temps un mot, un nom ou un nombre reste avant le suivant. La séance garde sa durée — avec plus de temps, moins d’exercices, mais tranquillement.',
+      much: 'beaucoup',
+      normal: 'normal',
+      little: 'peu',
+    },
   },
 }
 

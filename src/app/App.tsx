@@ -52,6 +52,7 @@ import {
   DIFFICULTY_WINDOW,
   itemsDeltaFor,
   numberLengthFor,
+  type Pace,
   spanLengthFor,
   TRAINING_MODULES,
   gazePool,
@@ -130,6 +131,7 @@ import { useProfile } from './useProfile.ts'
 import { useStoragePersists } from './useStoragePersists.ts'
 import { useTrainingLanguage } from './useTrainingLanguage.ts'
 import { SoundAreas } from './SoundAreas.tsx'
+import { usePaceSetting } from './usePaceSetting.ts'
 import { useSoundSetting } from './useSoundSetting.ts'
 
 const MODE_ORDER: readonly TrainingMode[] = ['emergency', 'short', 'daily', 'extended']
@@ -170,6 +172,9 @@ export function App() {
     ),
   )
   const sound = useSoundSetting(platform)
+  // Zeit zum Einprägen (Nutzerbefund 05.09.) — wirkt beim Planen der
+  // nächsten Einheit, nicht in der laufenden.
+  const tempo = usePaceSetting(platform)
   /*
    * Das Ankommens-Profil (Onboarding).
    *
@@ -712,6 +717,12 @@ export function App() {
         ),
         // Was der Mensch im Lernbereich geübt haben will, geht vor: Er hat es
         // gerade eben ausgesucht, die Zählung spricht über die letzten Wochen.
+        /*
+         * Der eingestellte Takt (Nutzerbefund 05.09.). Er verschiebt keine
+         * Sekunde des Zeitbudgets — er entscheidet nur, wie viele Stücke in
+         * dieselbe Zeit passen.
+         */
+        pace: tempo.pace,
         focus: uebung?.onlyModule ?? mission.focus ?? focus?.moduleId,
         /*
          * Eine Übungsrunde enthält genau ein Modul. Der Planer lässt ein
@@ -734,7 +745,7 @@ export function App() {
       setRunning(progress)
       void beginSession(progress, day, now).catch(() => undefined)
     })()
-  }, [training, mode, platform, taught, palaceTaught, storyTaught, linkTaught, majorMethodTaught, own, focus, peopleDone, recentByModule, dimensionCounts])
+  }, [training, mode, platform, taught, palaceTaught, storyTaught, linkTaught, majorMethodTaught, own, focus, peopleDone, recentByModule, dimensionCounts, tempo.pace])
 
   const leave = useCallback(() => {
     setRunning(undefined)
@@ -1282,7 +1293,8 @@ export function App() {
               trainable={trainable}
               translated={translated}
               sound={sound}
-              saveFailed={languageSaveFailed || trainingSaveFailed || sound.saveFailed}
+              tempo={tempo}
+              saveFailed={languageSaveFailed || trainingSaveFailed || sound.saveFailed || tempo.saveFailed}
             />
             <p className="hint">{dictionary.settings.note}</p>
             {/*
@@ -1604,7 +1616,8 @@ export function App() {
           trainable={trainable}
           translated={translated}
           sound={sound}
-          saveFailed={languageSaveFailed || trainingSaveFailed || sound.saveFailed}
+          tempo={tempo}
+          saveFailed={languageSaveFailed || trainingSaveFailed || sound.saveFailed || tempo.saveFailed}
         />
 
         {/*
@@ -1805,6 +1818,7 @@ function LanguageSoundControls({
   trainable,
   translated,
   sound,
+  tempo,
   saveFailed,
 }: {
   dictionary: Dictionary
@@ -1815,6 +1829,7 @@ function LanguageSoundControls({
   trainable: readonly Language[]
   translated: boolean
   sound: ReturnType<typeof useSoundSetting>
+  tempo: ReturnType<typeof usePaceSetting>
   /** R3-06: Eine der drei Einstellungen ließ sich nicht speichern. */
   saveFailed: boolean
 }) {
@@ -1901,6 +1916,49 @@ function LanguageSoundControls({
           )}
         </>
       )}
+
+      {/*
+        Zeit zum Einprägen (Nutzerbefund 05.09.): „Man hat kaum Zeit, sich was
+        auszudenken."
+
+        Ein Auswahlfeld und keine drei Knöpfe — und zwar aus zwei Gründen, die
+        beide erst ein Fehlschlag gezeigt hat.
+
+        Der erste Entwurf benutzte `.mode`/`.mode-active`, die Pillen der
+        Längenwahl. Das kostete zwar kein Byte Kaltstart-CSS, machte aber
+        `.mode-active` doppeldeutig: Die Klasse bedeutete „die gewählte Länge",
+        wird in sechs Stylesheets beschrieben, und ein Kommentar nennt sie „den
+        einzigen anderen Schalter". Zwei Bildschirmprüfungen fanden auf einmal
+        zwei gewählte Pillen statt einer — zu Recht.
+
+        Ein eigener Zustandsstil hätte das Kaltstart-CSS von 12 288 auf 12 294
+        Byte gehoben. Das Auswahlfeld löst beides: Es ist dieselbe Bauform wie
+        die Sprach- und Trainingssprachwahl unmittelbar darüber, erbt deren
+        Stil vollständig und braucht weder eine neue Klasse noch eine neue
+        Regel.
+      */}
+      {/*
+        `language-pace` ist eine Marke und kein Stil: Sie trägt keine einzige
+        CSS-Regel. Ohne sie hieß der Selektor für die App-Sprache
+        `.language:not(.language-training) select` — und traf mit dieser Zeile
+        plötzlich zwei Felder. Dieselbe Sorte Fehler wie bei `.mode-active`
+        einen Schritt vorher: Ein vorhandener Stil ist geliehen, seine
+        Bedeutung nicht.
+      */}
+      <label className="language language-pace">
+        <span>{dictionary.settings.pace.heading}</span>
+        <select
+          value={tempo.pace}
+          onChange={(event) => tempo.choose(event.target.value as Pace)}
+        >
+          {(['much', 'normal', 'little'] as const).map((wahl) => (
+            <option key={wahl} value={wahl}>
+              {dictionary.settings.pace[wahl]}
+            </option>
+          ))}
+        </select>
+      </label>
+      <p className="hint">{dictionary.settings.pace.note}</p>
 
       {/* R3-06: Nicht gespeichert heißt: gesagt, nicht angezeigt. */}
       {saveFailed && (

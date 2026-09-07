@@ -11,7 +11,6 @@ import {
   type Platform,
   promptedHits,
   promptedSetHits,
-  secondsPerItemFor,
   subjectOf,
   type SessionPlan,
   splitEntries,
@@ -296,12 +295,20 @@ export function useSessionRunner(
       setRemaining(Math.ceil(left))
 
       if (block.kind === 'encode') {
-        // Der Takt des Moduls, nicht die Wort-Konstante: Eine Szene gibt
-        // ihren Stücken mehr Sekunden, und die Anzeige soll dem Plan folgen.
-        const index = Math.min(
-          block.items.length - 1,
-          Math.floor(elapsed / secondsPerItemFor(block.moduleId)),
-        )
+        /*
+         * Der Takt kommt aus dem Block selbst, nicht aus einer zweiten
+         * Rechnung (Nutzerbefund 05.09.).
+         *
+         * Vorher stand hier `secondsPerItemFor(block.moduleId)` — dieselbe
+         * Funktion, die auch der Planer benutzt. Solange sie eine Konstante je
+         * Modul war, kam dasselbe heraus. Seit der Takt vom Lernstand und vom
+         * eingestellten Tempo abhängt, hätte die Anzeige den Plan verlassen:
+         * neun Sekunden geplant, alle sechs weitergeschaltet. Der Block trägt
+         * seine Sekunden und seine Stücke — daraus folgt der Takt eindeutig,
+         * und eine zweite Wahrheit kann gar nicht erst entstehen.
+         */
+        const takt = block.seconds / Math.max(1, block.items.length)
+        const index = Math.min(block.items.length - 1, Math.floor(elapsed / takt))
         setItemIndex(index)
       }
       if (left <= 0) advance()
