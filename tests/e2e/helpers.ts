@@ -243,21 +243,116 @@ export async function startEmergency(page: Page) {
  * den Prüfungen der Module, die der gemeinsame Abruf-Helfer nicht lesen kann
  * und die deshalb ihre eigene Datei haben.
  */
-export async function reachModuleRound(page: Page, wanted: string, attempts = 40) {
-  for (let attempt = 0; attempt < attempts; attempt++) {
+/** Der angehaltene Startzeitpunkt, auf den sich die Tabelle darunter bezieht. */
+const MESSPUNKT = { jahr: 2026, monat: 0, tag: 15, stunde: 9, minute: 0 }
+
+/**
+ * Welche Startsekunde welches Modul zieht — im **frischen** Stand, wie ihn
+ * `visit()` hinterlässt.
+ *
+ * Gemessen am 07.09., sechzig Sekunden durchgezählt:
+ *
+ *   missions     0, 2, 23, 49, 56        words   10, 12, 20, 28, 31, 32, 33, 40, 43, 46
+ *   numbers      1, 3, 7, 15, 16, 27,    twins   13, 19, 22
+ *                45, 47, 51, 57, 58      people  17, 21, 26, 29, 34, 37, 53
+ *   math         4, 8, 9, 52             spatial 24, 36
+ *   faces        5, 14, 18, 25, 35,      gaze    39, 41, 42, 55
+ *                48, 59                  associative 50, 54
+ *   reverse      6, 11, 30, 38, 44
+ *
+ * `palace` und `facts` stehen nicht dabei: Der eine braucht seine Lektion,
+ * der andere eigenen Stoff — im frischen Stand fallen beide still aus der
+ * Lernrotation. Das ist kein Fehler der Tabelle.
+ */
+const MODUL_SEKUNDEN: Record<string, number[]> = {
+  missions: [0, 2, 23, 49, 56],
+  numbers: [1, 3, 7, 15, 16, 27, 45, 47, 51, 57, 58],
+  math: [4, 8, 9, 52],
+  faces: [5, 14, 18, 25, 35, 48, 59],
+  reverse: [6, 11, 30, 38, 44],
+  words: [10, 12, 20, 28, 31, 32, 33, 40, 43, 46],
+  twins: [13, 19, 22],
+  people: [17, 21, 26, 29, 34, 37, 53],
+  spatial: [24, 36],
+  gaze: [39, 41, 42, 55],
+  associative: [50, 54],
+}
+
+/**
+ * Eine Einheit erreichen, deren erste Runde ein bestimmtes Modul hat.
+ *
+ * ── Warum das hier nicht mehr würfelt (CI-Befund 07.09.) ──────────────────
+ *
+ * Vorher startete dieser Helfer bis zu vierzig Einheiten und verwarf jede,
+ * die nicht zufällig das gewünschte Modul zog. Wie oft das schiefgeht, sagt
+ * die Tabelle darüber:
+ *
+ *   math          4 von 60 Sekunden → (1 − 4/60)^40 ≈  6 % der Läufe rot
+ *   people        7 von 60          → (1 − 7/60)^40 ≈  1 %
+ *   associative   2 von 60          → (1 − 2/60)^40 ≈ 26 %
+ *
+ * Zusammen fällt einer der drei in rund einem Drittel der Läufe, und CI
+ * fährt jeden Push zweimal — also etwa jeder zweite Push. Mit
+ * `failOnFlakyTests` ist das kein Flackern, sondern ein hartes Nein.
+ *
+ * Statt mehr Anläufe (der Würfel bliebe, er würde nur seltener sichtbar)
+ * wird die Uhr angehalten und die **gemessene** Sekunde angesprungen —
+ * dieselbe Lösung wie in `reverse.spec.ts` und `longNumbers.spec.ts`.
+ * `setFixedTime` hält nur `Date.now()` an; Zeitgeber und `performance.now()`
+ * laufen weiter, die Einheit misst ihre Sekunden also unverändert.
+ *
+ * Veraltet die Tabelle, weil der Planer seine Zuordnung ändert, wird der
+ * Test **nicht launisch, sondern langsamer**: Nach den bekannten Sekunden
+ * geht er alle übrigen durch und findet das Modul trotzdem. Erst wenn es in
+ * keiner einzigen Sekunde vorkommt, ist es wirklich aus der Rotation
+ * gefallen — und genau das hat am 06.09. die doppelte Modulliste
+ * aufgedeckt. Diese Aussagekraft bleibt erhalten.
+ */
+export async function reachModuleRound(page: Page, wanted: string) {
+  const bekannt = MODUL_SEKUNDEN[wanted] ?? []
+  const reihenfolge = [
+    ...bekannt,
+    ...Array.from({ length: 60 }, (_, i) => i).filter((s) => !bekannt.includes(s)),
+  ]
+
+  const gezogen = new Set<string>()
+  /*
+   * Eine eigene Frist, damit ein fehlendes Modul seine **Meldung** abliefert
+   * statt einer nackten Zeitüberschreitung des Tests (die sagt nichts). Sie
+   * greift nur, wenn die Tabelle veraltet ist; im Normalfall ist der erste
+   * Anlauf der richtige.
+   */
+  const frist = Date.now() + 200_000
+
+  for (const sekunde of reihenfolge) {
+    await page.clock.setFixedTime(
+      new Date(
+        Date.UTC(MESSPUNKT.jahr, MESSPUNKT.monat, MESSPUNKT.tag, MESSPUNKT.stunde, MESSPUNKT.minute, sekunde),
+      ),
+    )
+    await page.reload()
+    await expect(startButton(page)).toBeVisible({ timeout: 30_000 })
     await page.getByRole('button', { name: '60 Sekunden' }).click()
     await startButton(page).click()
     await page.locator('.settle').click()
 
-    if ((await pollFirstModule(page)) === wanted) {
+    const modul = await pollFirstModule(page)
+    if (modul === wanted) {
       await expect(page.locator('.encode-word, .scene').first()).toBeVisible({ timeout: 15_000 })
       return
     }
+    gezogen.add(modul)
 
     await page.locator('.session-abort').click()
     await expect(page.locator('.challenge')).toBeVisible()
+    if (Date.now() > frist) break
   }
-  throw new Error(`in ${attempts} Anläufen kam keine Runde „${wanted}“`)
+
+  throw new Error(
+    `keine Startsekunde zog „${wanted}“ — gezogen wurden ${[...gezogen].sort().join(', ')}. ` +
+      'Entweder ist das Modul aus der Lernrotation gefallen (dann liegt der Fehler in der App), ' +
+      'oder der Planer hat seine Zuordnung geändert (dann MODUL_SEKUNDEN oben neu durchzählen).',
+  )
 }
 
 /** Das Modul des ersten Blocks, aus dem persistierten Plan gelesen. */
