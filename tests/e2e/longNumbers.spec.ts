@@ -78,16 +78,66 @@ async function collectNumbers(page: Page): Promise<string[]> {
   return [...gesehen]
 }
 
+/**
+ * Startzeiten, die im belegten Stand eine **Zahlenrunde** ziehen.
+ *
+ * Vorher stand hier ein Würfel: vierzig Anläufe, und wenn keiner davon
+ * `numbers` zog, ein „in vierzig Anläufen kam keine Zahlenrunde". Genau so
+ * ist dieser Test am 07.09. in CI gefallen — nicht, weil an der App etwas
+ * falsch war, sondern weil die Würfel schlecht fielen.
+ *
+ * Gemessen, vierzig aufeinanderfolgende Startsekunden in genau dem Stand,
+ * den `seedProof` herstellt:
+ *
+ *   numbers      3, 29
+ *   associative  0, 1, 5, 22, 35        spatial   6, 15, 21, 27
+ *   twins        2, 10                  missions  7, 17, 23, 26, 38
+ *   people       4, 13, 25              palace    8, 9, 24, 34
+ *   words        11, 14, 16, 18, 32     gaze      12, 20, 31, 39
+ *   reverse      19, 30                 math      28, 33, 36
+ *   faces        37
+ *
+ * Zwei von vierzig — **fünf Prozent je Anlauf**. Vierzig blinde Anläufe
+ * verfehlen die Runde damit in 0,95^40 ≈ **13 %** der Läufe, und CI fährt
+ * jeden Push zweimal. Das ist kein seltenes Flackern, das ist ein Viertel
+ * aller Pushes. Die Anlaufzahl zu erhöhen wäre die falsche Antwort: Der
+ * Würfel bliebe, er würde nur seltener sichtbar.
+ *
+ * Deshalb dieselbe Lösung wie in `reverse.spec.ts`: die Uhr anhalten und die
+ * gemessene Sekunde anspringen. `setFixedTime` hält nur `Date.now()` an;
+ * Zeitgeber und `performance.now()` laufen weiter, die Einheit misst ihre
+ * Sekunden also unverändert.
+ *
+ * Ändert der Planer sein Verhalten, wird dieser Test nicht launisch, sondern
+ * eindeutig — und die Meldung unten sagt, was zu tun ist.
+ */
+const ZAHLEN_ZEITEN = [
+  Date.UTC(2026, 0, 15, 9, 0, 3),
+  Date.UTC(2026, 0, 15, 9, 0, 29),
+]
+
 test('ein Beleg über sechs Ziffern kommt am Bildschirm an', async ({ page }) => {
   test.setTimeout(300_000)
+  /*
+   * Die Uhr **vor** dem Belegen anhalten: `seedProof` schreibt das Ereignis
+   * auf `Date.now() - 86_400_000`. Erst danach anzuhalten legte den Beleg in
+   * die Zukunft der App-Uhr — und ein Beleg von morgen ist keiner.
+   */
+  await page.clock.setFixedTime(new Date(ZAHLEN_ZEITEN[0] as number))
   await seedProof(page, '482913')
 
-  for (let attempt = 0; attempt < 40; attempt++) {
+  const gezogen: string[] = []
+  for (const zeit of ZAHLEN_ZEITEN) {
+    await page.clock.setFixedTime(new Date(zeit))
+    await page.reload()
+    await expect(startButton(page)).toBeVisible()
     await page.getByRole('button', { name: '3 Minuten' }).click()
     await startButton(page).click()
     await page.locator('.settle').click()
 
-    if ((await pollFirstModule(page)) !== 'numbers') {
+    const modul = await pollFirstModule(page)
+    gezogen.push(modul)
+    if (modul !== 'numbers') {
       await page.locator('.session-abort').click()
       await expect(page.locator('.challenge')).toBeVisible()
       continue
@@ -114,5 +164,9 @@ test('ein Beleg über sechs Ziffern kommt am Bildschirm an', async ({ page }) =>
     }
     return
   }
-  throw new Error('in vierzig Anläufen kam keine Zahlenrunde')
+  throw new Error(
+    `keine der gemessenen Startsekunden zog eine Zahlenrunde, gezogen wurde ${gezogen.join(', ')} — ` +
+      'der Planer hat seine Zuordnung geändert. Sekunden neu durchzählen und ' +
+      'ZAHLEN_ZEITEN oben ersetzen (die Tabelle im Kommentar mit).',
+  )
 })
