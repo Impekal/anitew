@@ -1154,7 +1154,7 @@ export function App() {
       },
       science: {
         title: dictionary.science.heading,
-        body: <SciencePanel dictionary={dictionary} />,
+        body: <SciencePanel language={language} />,
       },
       /*
         „Geistig aktiv bleiben" steht direkt neben „Was belegt ist" — die
@@ -1204,7 +1204,6 @@ export function App() {
         title: brainCareHeading(language),
         body: (
           <BrainCarePanel
-            dictionary={dictionary}
             onDemanding={() => {
               setMode('extended')
               closePage()

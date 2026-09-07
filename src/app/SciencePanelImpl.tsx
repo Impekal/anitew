@@ -1,5 +1,5 @@
 import { STANDING_ORDER, citationOf, claimsWithStanding } from '../core/index.ts'
-import type { Dictionary } from '../i18n/index.ts'
+import { scienceCopyFor } from '../i18n/scienceCopy.ts'
 
 import { Emphasis } from './Emphasis.tsx'
 
@@ -18,8 +18,15 @@ import { Emphasis } from './Emphasis.tsx'
  * Aussage dazukommt, für die noch kein Text existiert (Übersetzungsfehler
  * statt leerer Absatz).
  */
-export function SciencePanelImpl({ dictionary }: { dictionary: Dictionary }) {
-  const t = dictionary.science
+export function SciencePanelImpl({ language }: { language: string }) {
+  /*
+   * Die Texte kommen aus einer eigenen, verzögert geladenen Datei und nicht
+   * mehr aus dem Wörterbuch (Kaltstart 05.09.): Der Bildschirm war längst
+   * verzögert, seine Prosa aber nicht — rund 3,8 KB Deutsch und 3,3 KB
+   * Englisch lagen auf dem Startpfad für eine Seite, die die meisten nie
+   * öffnen.
+   */
+  const t = scienceCopyFor(language)
 
   return (
     <div className="science">

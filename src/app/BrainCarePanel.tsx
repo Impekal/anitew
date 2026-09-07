@@ -1,6 +1,5 @@
 import { lazy, Suspense } from 'react'
 
-import type { Dictionary } from '../i18n/index.ts'
 
 /*
  * Wie die Wissenschaftsseite: wichtig, aber kein Kaltstart-Bestandteil (P4).
@@ -13,15 +12,13 @@ const BrainCarePanelImpl = lazy(async () => {
 })
 
 export function BrainCarePanel({
-  dictionary,
   onDemanding,
 }: {
-  dictionary: Dictionary
   onDemanding?: () => void
 }) {
   return (
     <Suspense fallback={null}>
-      <BrainCarePanelImpl dictionary={dictionary} onDemanding={onDemanding} />
+      <BrainCarePanelImpl onDemanding={onDemanding} />
     </Suspense>
   )
 }

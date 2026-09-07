@@ -8,7 +8,8 @@ import { citationOf, STANDING_ORDER } from '../core/science.ts'
 import '../anitew-brain-care.css'
 
 import { brainCareCopyFor } from '../i18n/brainCareCopy.ts'
-import type { Dictionary } from '../i18n/index.ts'
+
+import { scienceCopyFor } from '../i18n/scienceCopy.ts'
 
 import { Emphasis } from './Emphasis.tsx'
 
@@ -26,13 +27,18 @@ import { Emphasis } from './Emphasis.tsx'
  * steht in `core/brainCare.ts` und wird dort geprüft.
  */
 export function BrainCarePanelImpl({
-  dictionary,
   onDemanding,
 }: {
-  dictionary: Dictionary
   /** Startet eine lange Einheit und schliesst die Seite. */
   onDemanding?: () => void
 }) {
+  /*
+   * Die Standes-Wörter („Gut belegt“, „Belegt, aber nur dafür“ …) kommen aus
+   * der Wissenschaftsseite und stehen seit dem 05.09. in `scienceCopy` statt
+   * im Kaltstart-Wörterbuch. Geliehen bleiben sie trotzdem: Zwei Fassungen
+   * derselben vier Wörter wären zwei Wahrheiten.
+   */
+  const wissenschaft = scienceCopyFor(document.documentElement.lang)
   const t = brainCareCopyFor(document.documentElement.lang)
 
   return (
@@ -63,8 +69,8 @@ export function BrainCarePanelImpl({
         if (tips.length === 0) return null
         return (
           <section key={standing} className={`standing standing-${standing}`}>
-            <h2>{dictionary.science.standings[standing]}</h2>
-            <p className="hint">{dictionary.science.standingNotes[standing]}</p>
+            <h2>{wissenschaft.standings[standing]}</h2>
+            <p className="hint">{wissenschaft.standingNotes[standing]}</p>
 
             {tips.map((tip) => (
               <article key={tip.id} className="claim">
@@ -75,7 +81,7 @@ export function BrainCarePanelImpl({
 
                 {tip.sources.length > 0 && (
                   <details className="details">
-                    <summary>{dictionary.science.sources}</summary>
+                    <summary>{wissenschaft.sources}</summary>
                     <ul className="citations">
                       {tip.sources.map((source) => (
                         <li key={citationOf(source)}>{citationOf(source)}</li>

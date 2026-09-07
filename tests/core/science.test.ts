@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
+import { scienceCopyFor } from '../../src/i18n/scienceCopy.ts'
+
 import {
   EVIDENCE_STANDINGS,
   SCIENCE,
@@ -8,8 +10,6 @@ import {
   citationOf,
   claimsWithStanding,
 } from '../../src/core/index.ts'
-import { de } from '../../src/i18n/de.ts'
-import { en } from '../../src/i18n/en.ts'
 
 /**
  * Die Wissenschaftsseite, geprüft wie eine Rechenregel (Backlog F6, R-2).
@@ -81,15 +81,22 @@ describe('Wissenschaftsseite', () => {
      * den Fall, dass ein Schlüssel zwar existiert, aber leer bleibt, weil
      * jemand ihn nur schnell anlegen wollte.
      */
-    for (const dictionary of [de, en]) {
+    /*
+     * Geprüft werden jetzt **alle sechs** Sprachen und nicht mehr nur Deutsch
+     * und Englisch: Seit die Texte in `scienceCopy.ts` stehen (Kaltstart
+     * 05.09.) liegen sie alle in einer Datei, und eine Sprache, die eine
+     * Aussage vergisst, fiele sonst erst dem Menschen auf.
+     */
+    for (const sprache of ['de', 'en', 'fr', 'es', 'it', 'pt']) {
+      const copy = scienceCopyFor(sprache)
       for (const id of SCIENCE_CLAIMS) {
-        const text = dictionary.science.claims[id]
-        expect(text.title.length, `${id} ohne Überschrift`).toBeGreaterThan(0)
-        expect(text.body.length, `${id} ohne Text`).toBeGreaterThan(40)
+        const text = copy.claims[id]
+        expect(text.title.length, `${id} ohne Überschrift (${sprache})`).toBeGreaterThan(0)
+        expect(text.body.length, `${id} ohne Text (${sprache})`).toBeGreaterThan(40)
       }
       for (const standing of EVIDENCE_STANDINGS) {
-        expect(dictionary.science.standings[standing].length).toBeGreaterThan(0)
-        expect(dictionary.science.standingNotes[standing].length).toBeGreaterThan(0)
+        expect(copy.standings[standing].length, `${standing} (${sprache})`).toBeGreaterThan(0)
+        expect(copy.standingNotes[standing].length, `${standing} (${sprache})`).toBeGreaterThan(0)
       }
     }
   })
