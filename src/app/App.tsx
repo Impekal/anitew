@@ -1800,10 +1800,25 @@ export function App() {
               </button>
             </section>
             {/*
-              Eine eigene Gruppe für die beiden Auskunftsseiten: Unter „Dein
-              Stand" stünde eine Hilfe falsch — sie sagt nichts über den
-              Menschen —, und unter „App & Gerät" ginge sie zwischen Sicherung
-              und Einstellungen unter. Wer Hilfe sucht, sucht sie oben.
+              Die Gruppe für alles, was **erklärt** statt zu messen oder
+              einzustellen: Unter „Dein Stand" stünde eine Hilfe falsch — sie
+              sagt nichts über den Menschen —, und unter „App & Gerät" ginge
+              sie zwischen Sicherung und Einstellungen unter. Wer Hilfe sucht,
+              sucht sie oben.
+
+              Nutzerbefund 06.09., wörtlich: „wo bleibt jetzt aktiv bleiben.
+              Das finde ich nicht mehr im Core." Gemessen am Telefon
+              (390 × 844): Das Menü ist 1328 Pixel hoch, sichtbar sind 633 —
+              und „Geistig aktiv bleiben" saß bei 1027, als dritter Eintrag
+              unter „App & Gerät". Es war nie weg, aber es stand zwischen
+              Datenschutz und Sicherung, während direkt darüber eine Gruppe
+              namens „Verstehen" aufmachte, in der es nicht vorkam.
+
+              Beide Seiten erklären etwas und stellen nichts ein. Sie stehen
+              deshalb jetzt hier. „App & Gerät" wird dadurch um zwei Einträge
+              kürzer, und das zählt am Telefon doppelt: Diese Gruppe ist dort
+              als einzige **einspaltig** (`anitew-core-mobile.css`), acht
+              Einträge waren allein 656 Pixel.
             */}
             <section className="menu-group">
               <h2 className="menu-label">{understandLabel(language)}</h2>
@@ -1815,13 +1830,6 @@ export function App() {
                 <MenuIcon kind="faq" />
                 <span>{faqHeading(language)}</span>
               </button>
-            </section>
-            <section className="menu-group menu-group-device">
-              <h2 className="menu-label">{dictionary.menu.device}</h2>
-              <button type="button" className="drawer-item" onClick={() => openPage('reminder')}>
-                <MenuIcon kind="reminder" />
-                <span>{dictionary.reminder.heading}</span>
-              </button>
               <button type="button" className="drawer-item" onClick={() => openPage('science')}>
                 <MenuIcon kind="science" />
                 <span>{dictionary.science.heading}</span>
@@ -1829,6 +1837,13 @@ export function App() {
               <button type="button" className="drawer-item" onClick={() => openPage('brainCare')}>
                 <MenuIcon kind="brainCare" />
                 <span>{brainCareHeading(language)}</span>
+              </button>
+            </section>
+            <section className="menu-group menu-group-device">
+              <h2 className="menu-label">{dictionary.menu.device}</h2>
+              <button type="button" className="drawer-item" onClick={() => openPage('reminder')}>
+                <MenuIcon kind="reminder" />
+                <span>{dictionary.reminder.heading}</span>
               </button>
               {advice.kind === 'ios' && (
                 <button type="button" className="drawer-item" onClick={() => openPage('install')}>
