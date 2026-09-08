@@ -29,7 +29,7 @@
 
 import { expect, test, type Page } from '@playwright/test'
 
-import { openPage, visit } from './helpers.ts'
+import { openPage, visit, warteAufBandform } from './helpers.ts'
 
 const NAMEN = [
   'Eva',
@@ -618,92 +618,109 @@ async function saeeViele(page: Page, anzahl: number): Promise<void> {
   await page.reload()
 }
 
-test('laesst keinen Punkt ohne Namen — und sagt, wenn nicht alle passen', async ({ page }) => {
+/*
+ * ── Der Ausschnitt ist rund, die Zeichnung war ein Streifen (08.09.) ──────
+ *
+ * Am Telefon liegt auf dem Band eine Kreismaske (`anitew-living.css`, erst
+ * **nachgeladen**):
+ *
+ *     border-radius: 50%;
+ *     mask-image: radial-gradient(circle, black 0 64%, transparent 92%);
+ *
+ * Gezeichnet wurde ein flacher Streifen bei 16:7. Gemessen, zwanzig
+ * Erinnerungen: **sieben von siebzehn Namen überhaupt sichtbar, vier standen
+ * frei** — der Rest lag bei 100 bis 133 Prozent des Radius, also dort, wo die
+ * Maske nichts mehr durchlässt. Der Zähler „17 / 20" lag bei 133 Prozent: Er
+ * war ausgeliefert und unsichtbar.
+ *
+ * Drei Anläufe sind daran vorbeigegangen, weil sie **vor** der nachgeladenen
+ * Stilvorlage gemessen haben. Deshalb wartet jeder Wächter hier zuerst auf
+ * sie (`warteAufBandform`) — und rechnet dann so, wie die Maske rechnet:
+ * kreisförmig, bis zur entferntesten Ecke.
+ */
+
+/** Der Anteil des Maskenradius, bis zu dem alles voll sichtbar bleibt. */
+const MASKE_FREI = 0.64
+
+test('haelt jeden Namen im sichtbaren Ausschnitt — auch unterwegs', async ({ page }) => {
   test.setTimeout(120_000)
   await page.setViewportSize({ width: 412, height: 915 })
   await visit(page)
   await saeeViele(page, 20)
   await expect(page.locator('.constellation-label').first()).toBeVisible({ timeout: 30_000 })
+  await warteAufBandform(page)
 
-  /*
-   * Die Zusage ist **nicht** „alle zwanzig stehen im Bild" — das ginge nur
-   * mit einem Band von 310 Pixeln (gemessen, siehe `bandMass`). Die Zusage
-   * ist: **kein stummer Punkt.** Wer dasteht, trägt seinen Namen; und passen
-   * nicht alle, dann sagt der Zähler unten rechts, wie viele von wie vielen
-   * zu sehen sind, statt es zu verschweigen.
-   */
-  const befund = await page.evaluate(() => {
-    const gruppen = [...document.querySelectorAll('.constellation .constellation-memory')]
-    const stumm = gruppen
-      .filter((g) => {
-        const name = g.querySelector('.constellation-label')
-        return name === null || (name.textContent ?? '').trim() === ''
-      })
-      .map((g) => g.getAttribute('aria-label') ?? '?')
-    const zaehler = document.querySelector('.constellation-window')
-    return { punkte: gruppen.length, stumm, zaehler: (zaehler?.textContent ?? '').trim() }
-  })
+  const befund = await page.evaluate((frei) => {
+    const div = document.querySelector('.constellation') as HTMLElement
+    const r = div.getBoundingClientRect()
+    const cx = r.left + r.width / 2
+    const cy = r.top + r.height / 2
+    /*
+     * `radial-gradient(circle, …)` misst kreisförmig und ohne weitere Angabe
+     * bis zur **entferntesten Ecke**. Getrennt nach Breite und Höhe zu
+     * normieren ergäbe eine Ellipse und damit falsche Zahlen — dieser Fehler
+     * ist mir beim Messen selbst unterlaufen.
+     */
+    const maskenRadius = Math.hypot(r.width / 2, r.height / 2)
+    const anteil = (el: Element): number => {
+      const b = el.getBoundingClientRect()
+      const ecken: [number, number][] = [
+        [b.left, b.top], [b.right, b.top], [b.left, b.bottom], [b.right, b.bottom],
+      ]
+      return Math.max(...ecken.map(([x, y]) => Math.hypot(x - cx, y - cy))) / maskenRadius
+    }
 
-  expect(
-    befund.stumm,
-    `${befund.stumm.length} von ${befund.punkte} Punkten stehen ohne Namen da`,
-  ).toEqual([])
-  expect(befund.punkte, 'der Himmel ist leer').toBeGreaterThanOrEqual(6)
-
-  if (befund.punkte < 20) {
-    expect(
-      befund.zaehler,
-      `nur ${befund.punkte} von 20 Punkten stehen da, und nichts sagt es`,
-    ).toBe(`${befund.punkte} / 20`)
-  }
-})
-
-test('haelt die Namen auch bei zwanzig Erinnerungen im Bild — gemessen am schneidenden Kasten', async ({ page }) => {
-  test.setTimeout(120_000)
-  await page.setViewportSize({ width: 412, height: 915 })
-  await visit(page)
-  await saeeViele(page, 20)
-  await expect(page.locator('.constellation-label').first()).toBeVisible({ timeout: 30_000 })
-
-  /*
-   * **Gemessen wird gegen das SVG, nicht gegen `.constellation`.**
-   *
-   * Das ist der Fehler, an dem der Wächter vom 07.09. vorbeisah: `.constellation`
-   * ist das umgebende DIV, und es war gemessen 224 Pixel hoch, während die
-   * Zeichenfläche darin 170 Pixel hoch ist und `overflow: hidden` trägt. Der
-   * Test verglich also mit einem Kasten, der 54 Pixel höher ist als der, der
-   * wirklich schneidet — unten konnte er gar nichts finden.
-   */
-  const befund = await page.evaluate(() => {
-    const svg = document.querySelector('.constellation svg')
-    if (svg === null) return { draussen: ['kein SVG gefunden'], ueber: [] as string[], zahl: 0 }
-    const feld = svg.getBoundingClientRect()
-    const kaesten = [...document.querySelectorAll('.constellation .constellation-label')].map(
-      (n) => ({ text: n.textContent ?? '', r: n.getBoundingClientRect() }),
-    )
-    const draussen = kaesten
-      .filter(
-        ({ r }) =>
-          r.left < feld.left + 2 ||
-          r.right > feld.right - 2 ||
-          r.top < feld.top + 2 ||
-          r.bottom > feld.bottom - 2,
-      )
-      .map(({ text, r }) => `${text} y[${r.top.toFixed(0)}..${r.bottom.toFixed(0)}] x[${r.left.toFixed(0)}..${r.right.toFixed(0)}] gegen y[${feld.top.toFixed(0)}..${feld.bottom.toFixed(0)}] x[${feld.left.toFixed(0)}..${feld.right.toFixed(0)}]`)
-    const ueber: string[] = []
-    for (let i = 0; i < kaesten.length; i += 1) {
-      for (let j = i + 1; j < kaesten.length; j += 1) {
-        const a = kaesten[i]!.r
-        const b = kaesten[j]!.r
-        if (a.right - 1 > b.left && b.right - 1 > a.left && a.bottom - 1 > b.top && b.bottom - 1 > a.top) {
-          ueber.push(`${kaesten[i]!.text} × ${kaesten[j]!.text}`)
+    const ebenen = [...document.querySelectorAll('.constellation .constellation-layer')] as SVGGElement[]
+    const namen = [...document.querySelectorAll('.constellation .constellation-label')]
+    const schlimmst = namen.map(() => 0)
+    const ueber = new Set<string>()
+    // Acht Auslenkungen der Ebenen — der schlimmste Fall, nicht der Moment.
+    for (let k = 0; k < 8; k++) {
+      const w = (k / 8) * 2 * Math.PI
+      for (const e of ebenen) {
+        e.style.setProperty('transform', `translate(${2.6 * Math.cos(w)}px, ${2.6 * Math.sin(w)}px)`, 'important')
+      }
+      const kaesten = namen.map((n) => ({ t: n.textContent ?? '', r: n.getBoundingClientRect() }))
+      namen.forEach((n, i) => { schlimmst[i] = Math.max(schlimmst[i] as number, anteil(n)) })
+      for (let i = 0; i < kaesten.length; i += 1) {
+        for (let j = i + 1; j < kaesten.length; j += 1) {
+          const a = kaesten[i]!.r
+          const b = kaesten[j]!.r
+          if (a.right - 1 > b.left && b.right - 1 > a.left && a.bottom - 1 > b.top && b.bottom - 1 > a.top) {
+            ueber.add(`${kaesten[i]!.t} × ${kaesten[j]!.t}`)
+          }
         }
       }
     }
-    return { draussen, ueber, zahl: kaesten.length }
-  })
+    for (const e of ebenen) e.style.removeProperty('transform')
 
-  expect(befund.zahl, 'es gab keine Namen zu prüfen').toBeGreaterThanOrEqual(6)
-  expect(befund.draussen, `Namen ohne Luft am Rand: ${befund.draussen.join('; ')}`).toEqual([])
+    const zaehler = document.querySelector('.constellation-window')
+    return {
+      namen: namen.length,
+      verblasst: namen
+        .map((n, i) => ({ t: n.textContent ?? '', a: Math.round(100 * (schlimmst[i] as number)) }))
+        .filter(({ a }) => a > frei * 100)
+        .map(({ t, a }) => `${t} bei ${a} %`),
+      ueber: [...ueber],
+      zaehler: zaehler === null ? -1 : Math.round(100 * anteil(zaehler)),
+      zaehlerText: (zaehler?.textContent ?? '').trim(),
+    }
+  }, MASKE_FREI)
+
+  expect(befund.namen, 'es standen keine Namen zum Prüfen da').toBeGreaterThanOrEqual(6)
+  expect(
+    befund.verblasst,
+    `diese Namen geraten unter die Maske (frei ist bis ${MASKE_FREI * 100} % des Radius): ${befund.verblasst.join('; ')}`,
+  ).toEqual([])
   expect(befund.ueber, `Namen liegen übereinander: ${befund.ueber.join(', ')}`).toEqual([])
+
+  /*
+   * Und der Zähler muss dort stehen, wo man ihn sieht. Er sagt „so viele von
+   * so vielen" — eine Angabe, die unter der Maske liegt, ist keine Angabe.
+   */
+  expect(befund.zaehler, `der Zähler „${befund.zaehlerText}" fehlt ganz`).toBeGreaterThan(-1)
+  expect(
+    befund.zaehler,
+    `der Zähler „${befund.zaehlerText}" steht bei ${befund.zaehler} % des Radius und ist damit weggeblendet`,
+  ).toBeLessThanOrEqual(MASKE_FREI * 100)
 })

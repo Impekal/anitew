@@ -109,6 +109,29 @@ export async function visit(page: Page) {
 }
 
 /**
+ * Warten, bis die **nachgeladene** Stilvorlage am Band angekommen ist.
+ *
+ * `anitew-living.css` wird erst nach dem ersten Bild geholt (`main.tsx`), und
+ * sie ändert das Band grundlegend: runder Ausschnitt, Kreismaske, andere
+ * Höhe. Wer vorher misst, misst einen Zustand, den kein Telefon je zeigt.
+ *
+ * Genau daran sind drei Anläufe am 07. und 08.09. vorbeigegangen: Die
+ * Prüfungen meldeten „nichts abgeschnitten, nichts überlappt", während auf
+ * dem Gerät sieben von siebzehn Namen unter der Maske verschwanden. Der
+ * Fehler war nicht die App — es war die Messung.
+ */
+export async function warteAufBandform(page: Page): Promise<void> {
+  await page.waitForFunction(
+    () => {
+      const el = document.querySelector('.constellation')
+      return el !== null && getComputedStyle(el).maskImage !== 'none'
+    },
+    undefined,
+    { timeout: 15_000 },
+  )
+}
+
+/**
  * Die Erst-Orientierung wegräumen, **bevor** sie im Weg steht.
  *
  * Sie ist ein modaler Vorhang (`role="dialog" aria-modal="true"`), und sie
