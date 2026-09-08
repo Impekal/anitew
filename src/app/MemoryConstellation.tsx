@@ -205,13 +205,203 @@ const BAND_HOEHE = 44
  * Die Fläche dort ist ohnehin nicht 16:7 — das Seitenverhältnis der Karte
  * gilt nur unter `.today`. Beide Formen sind also richtig, jede an ihrem Ort.
  */
-function feld(tappable: boolean): { hoehe: number; mitte: number; flach: number } {
+function feld(tappable: boolean, hoehe = BAND_HOEHE): { hoehe: number; mitte: number; flach: number } {
   return tappable
     ? { hoehe: 100, mitte: 50, flach: 1 }
-    : { hoehe: BAND_HOEHE, mitte: BAND_HOEHE / 2, flach: BAND_HOEHE / 100 }
+    : { hoehe, mitte: hoehe / 2, flach: hoehe / 100 }
 }
 
-function layout(graph: MemoryGraph, tappable: boolean, selectedId?: string): Placed[] {
+/** Ein Kasten in der Streuung: Mitte und halbe Breite, in Bandeinheiten. */
+interface Kasten {
+  x: number
+  y: number
+  w: number
+}
+
+/*
+ * Der Kasten eines Punktes ist **nicht symmetrisch**, und das war ein Fehler
+ * (Gerätebefund 08.09.): Der Name steht über dem Punkt, der Punkt darunter.
+ * Gemessen reicht ein Name 5,6 Einheiten über die Mitte hinauf und der Punkt
+ * 3,3 hinunter. Gerechnet wurde mit vier nach jeder Seite — deshalb stand
+ * „Darbo" zwei Pixel über der Oberkante und wurde abgeschnitten.
+ */
+const UEBER = 6
+const UNTER = 4
+/** Der senkrechte Abstand, den zwei Punkte brauchen. */
+const KASTEN_HOEHE = UEBER + UNTER
+/**
+ * Die Drift-Reserve. Die größte Auslenkung beträgt 2,6 Einheiten; drei
+ * ließen nur 0,4 Einheiten übrig — 1,5 Pixel, weniger als die zwei Pixel
+ * Luft, die der Wächter am Rand verlangt. Seit die Punkte ebenenweise
+ * wandern, trifft eine ganze Ebene diesen Ausschlag gleichzeitig, und aus
+ * dem seltenen Fall wurde der Regelfall.
+ */
+const DRIFT = 3.5
+/**
+ * Die Höhen, unter denen das Band gewählt wird — und warum es überhaupt
+ * wächst (Gerätebefund 08.09., mit Bild: drei Punkte eingekringelt, „Nicht
+ * ganz").
+ *
+ * Bis dahin war das Band immer 44 Einheiten hoch, und wurde es eng, trug nur
+ * **jeder zweite Punkt** einen Namen. Am Gerät hieß das: zwanzig
+ * Erinnerungen, zehn Namen, zehn stumme Punkte — und niemand erfuhr, warum.
+ * Genau das war der ursprüngliche Befund „Man sieht nicht alles", und er war
+ * nach dem Umbau der Anordnung noch da.
+ *
+ * Nachgemessen, wie viele Zeichen bei welcher Höhe überlappungsfrei
+ * unterzubringen sind:
+ *
+ *          H=44        H=56        H=68
+ *   n=12   8 Zeichen   12          12
+ *   n=16   passt nicht  8           8
+ *   n=20   passt nicht  4           8
+ *   n=24   passt nicht  3           7
+ *
+ * Bei 44 Einheiten passt ab sechzehn Erinnerungen **keine einzige**
+ * Namenslänge, auch keine dreistellige. Das Verstecken war also keine
+ * Bequemlichkeit, sondern die einzige Möglichkeit bei dieser Höhe. Der Hebel
+ * ist die Höhe, nicht die Beschriftung.
+ */
+const BAND_HOEHEN = [BAND_HOEHE, 56, 68] as const
+/** Kürzer als sechs Zeichen ist kein Name mehr, sondern ein Rest. */
+const MINDEST_ZEICHEN = 6
+/** Länger lohnt nicht: `bandLabel` deckelt ohnehin bei achtzehn. */
+const HOECHST_ZEICHEN = 12
+
+/**
+ * Streuen (R2-Folge) und danach so lange auseinanderschieben, bis nichts
+ * mehr kollidiert. Steht als eigene Funktion da, weil die Anordnung sie
+ * einmal für das fertige Bild braucht — und vorher mehrmals als **Probe**,
+ * um Höhe und Namenslänge zu finden.
+ */
+function streueUndEntzerre(breiten: number[], hoehe: number): Kasten[] {
+  const a1 = 0.7548776662466927
+  const a2 = 0.5698402909980532
+  const kaesten: Kasten[] = breiten.map((w, i) => ({
+    w,
+    x: w + ((0.5 + a1 * (i + 1)) % 1) * (100 - 2 * w),
+    y: UEBER + ((0.5 + a2 * (i + 1)) % 1) * (hoehe - KASTEN_HOEHE),
+  }))
+
+  for (let runde = 0; runde < 20; runde++) {
+    for (let i = 0; i < kaesten.length; i++) {
+      for (let j = i + 1; j < kaesten.length; j++) {
+        const eins = kaesten[i] as Kasten
+        const zwei = kaesten[j] as Kasten
+        const dx = zwei.x - eins.x
+        const dy = zwei.y - eins.y
+        // Nötiger Abstand: halbe Breiten plus die Drift beider Punkte.
+        const noetigX = eins.w + zwei.w + 2 * DRIFT
+        const noetigY = KASTEN_HOEHE + 2 * DRIFT
+        const fehltX = noetigX - Math.abs(dx)
+        const fehltY = noetigY - Math.abs(dy)
+        if (fehltX <= 0 || fehltY <= 0) continue
+        /*
+         * Auseinander in der Achse, in der weniger fehlt — das ist der
+         * kürzere Weg aus der Überlappung und hält die Streuung dicht.
+         * Die Achsen sind verschieden lang, deshalb wird die senkrechte
+         * Strecke auf dieselbe Skala gebracht, bevor verglichen wird.
+         */
+        if (fehltX / noetigX < fehltY / noetigY) {
+          const schub = ((fehltX + 0.01) / 2) * (dx < 0 ? -1 : 1)
+          eins.x -= schub
+          zwei.x += schub
+        } else {
+          const schub = ((fehltY + 0.01) / 2) * (dy < 0 ? -1 : 1)
+          eins.y -= schub
+          zwei.y += schub
+        }
+      }
+    }
+    // Nach jedem Durchgang zurück ins Bild — sonst schiebt die Entzerrung
+    // den äußersten Punkt hinaus, und genau das war der Befund „man sieht
+    // nicht alles".
+    for (const eintrag of kaesten) {
+      eintrag.x = Math.max(eintrag.w + DRIFT, Math.min(100 - eintrag.w - DRIFT, eintrag.x))
+      eintrag.y = Math.max(UEBER + DRIFT, Math.min(hoehe - UNTER - DRIFT, eintrag.y))
+    }
+  }
+  return kaesten
+}
+
+/** Steht am Ende noch etwas übereinander? Ohne Drift-Reserve — das ist das Bild. */
+function stossenAn(kaesten: Kasten[]): boolean {
+  for (let i = 0; i < kaesten.length; i++) {
+    for (let j = i + 1; j < kaesten.length; j++) {
+      const eins = kaesten[i] as Kasten
+      const zwei = kaesten[j] as Kasten
+      if (Math.abs(zwei.x - eins.x) < eins.w + zwei.w && Math.abs(zwei.y - eins.y) < KASTEN_HOEHE) {
+        return true
+      }
+    }
+  }
+  return false
+}
+
+/**
+ * Höhe und Namenslänge für so viele Punkte — **probiert, nicht gerechnet.**
+ *
+ * Vorher stand hier eine Formel, die aus der Zeit der drei Zeilen stammte
+ * („zwei Punkte derselben Zeile stehen 3 × Schritt auseinander"). Diese
+ * Zeilen gibt es nicht mehr; die Formel schätzte also eine Geometrie, die
+ * niemand mehr zeichnet — und sie schätzte zu streng, weshalb die Hälfte der
+ * Namen verschwand.
+ *
+ * Jetzt wird die Anordnung mit Kandidatenwerten **durchgerechnet** und
+ * geprüft, ob am Ende etwas übereinandersteht. Die Probe kostet einmal beim
+ * Bauen der Anordnung ein paar tausend Rechenschritte und nie wieder ein
+ * Bild. Der niedrigste Kasten und der längste Name, die zusammen aufgehen,
+ * gewinnen: So bleibt das Band für die meisten Menschen genau so hoch wie
+ * bisher und wächst nur dort, wo sonst Namen verschwänden.
+ */
+function bandMass(anzahl: number): { hoehe: number; zeichen: number; punkte: number } {
+  const passt = (zahl: number, zeichen: number, hoehe: number): boolean => {
+    const w = (zeichen * EINHEITEN_JE_ZEICHEN) / 2 + BAND_LUFT
+    return !stossenAn(streueUndEntzerre(Array.from({ length: zahl }, () => w), hoehe))
+  }
+
+  for (const hoehe of BAND_HOEHEN) {
+    for (let zeichen = HOECHST_ZEICHEN; zeichen >= MINDEST_ZEICHEN; zeichen--) {
+      if (passt(anzahl, zeichen, hoehe)) return { hoehe, zeichen, punkte: anzahl }
+    }
+  }
+
+  /*
+   * Es passt nicht mehr — und dann wird **nicht heimlich beschriftet**.
+   *
+   * Vorher trug in diesem Fall nur jeder zweite Punkt einen Namen; am Gerät
+   * standen zwanzig Punkte und zehn Namen, ohne ein Wort dazu. Genau das war
+   * der Befund „Man sieht nicht alles".
+   *
+   * Jetzt stehen weniger Punkte da, dafür trägt **jeder** seinen Namen — und
+   * der Zähler unten rechts sagt, wie viele von wie vielen zu sehen sind.
+   * Gezeigt werden die stärksten; der ganze Bestand ist einen Fingertipp
+   * entfernt in „Mein Gedächtnis".
+   *
+   * Warum nicht einfach ein höheres Band? Weil der Platz teuer ist: Zwanzig
+   * Namen zu sieben Zeichen brauchen gemessen H = 80, also 310 Pixel am
+   * Telefon. Das ist kein Band mehr, das ist die halbe Startseite.
+   */
+  const hoehe = BAND_HOEHEN[BAND_HOEHEN.length - 1] as number
+  for (let punkte = anzahl - 1; punkte >= 6; punkte--) {
+    for (let zeichen = HOECHST_ZEICHEN; zeichen >= MINDEST_ZEICHEN; zeichen--) {
+      if (passt(punkte, zeichen, hoehe)) return { hoehe, zeichen, punkte }
+    }
+  }
+  return { hoehe, zeichen: MINDEST_ZEICHEN, punkte: 6 }
+}
+
+/**
+ * Die Anordnung **und die Höhe des Bandes** — beides gehört zusammen, seit
+ * das Band mit der Anzahl wächst. Käme die Höhe aus einer zweiten Quelle,
+ * liefen Zeichenfläche und Anordnung auseinander, sobald eine der beiden
+ * angefasst wird. Genau so ist die doppelte Modulliste entstanden.
+ */
+function layout(
+  graph: MemoryGraph,
+  tappable: boolean,
+  selectedId?: string,
+): { punkte: Placed[]; hoehe: number } {
   const { mitte: BAND_MID, flach: FLACH } = feld(tappable)
   const anchors = new Set(graph.edges.map((edge) => edge.from))
   const degree = new Map<string, number>()
@@ -282,145 +472,49 @@ function layout(graph: MemoryGraph, tappable: boolean, selectedId?: string): Pla
      * Beim ersten Versuch stand hier eine geratene Zahl (14 Zeichen), und
      * gemessen überschrieben sich zwei Namen um 13 Pixel.
      */
-    const breite = (300 - 6 * BAND_LUFT) / (einzeln.length + 2)
-    const nurJedeZweite = Math.floor(breite / EINHEITEN_JE_ZEICHEN) < 8
-    const maxZeichen = Math.min(
-      18,
-      Math.max(
-        6,
-        Math.floor(
-          (nurJedeZweite ? 300 / (Math.ceil(einzeln.length / 2) + 2) : breite) /
-            EINHEITEN_JE_ZEICHEN,
-        ),
-      ),
-    )
     /*
-     * **Gestreut statt gereiht** (Nutzerbefund 07.09.).
-     *
-     * Wörtlich: „insgesamt ist es zu alligniert. Die Wörter/Begriffe sollten
-     * gemischt werden … und sich konstant bewegen wie in einem Billard oder
-     * bei den Galaxys."
-     *
-     * Vorher standen die Punkte auf **drei** Zeilen mit konstantem Schritt.
-     * Gemessen am Telefon: y = 281 / 315 / 348 Pixel, x in gleichen Abständen
-     * — ein Raster, und als Raster hat er es auch gelesen. Die drei Zeilen
-     * waren kein Zufall, sondern die Antwort auf ein echtes Problem: Zwei
-     * Namen derselben Zeile stehen 3 × Schritt auseinander, und weniger als
-     * das überschreibt sich (gemessen 13 Pixel Überlappung bei zwei Zeilen).
-     *
-     * Diese Fassung löst dasselbe Problem anders herum. Statt die Freiheit
-     * wegzunehmen, bis nichts mehr kollidieren **kann**, werden die Punkte
-     * frei gestreut und danach so lange auseinandergeschoben, bis nichts mehr
-     * kollidiert. Das ist dieselbe Zusage, nur ohne Gitter — und es nutzt die
-     * Fläche, die vorher brachlag: Das Band belegte 67 von 167 Pixeln Höhe.
-     *
-     * Drei Dinge bleiben, wie sie waren:
-     *
-     * - **Deterministisch.** Kein `Math.random()` (A11): Die Mischung kommt
-     *   aus einem gesetzten Startwert, die Streuung aus einer festen Folge.
-     *   Derselbe Stand ergibt dasselbe Bild — heute, morgen, auf jedem
-     *   Gerät. Eine Konstellation, die bei jedem Öffnen anders stünde, wäre
-     *   keine.
-     *
-     *   Genau gesagt: Was gleich bleibt, ist das **Bild zu einem Stand**.
-     *   Kommt eine Erinnerung dazu, wird neu gemischt und alle rücken. Das
-     *   war bei den drei Zeilen nicht anders — auch dort hing jede
-     *   x-Stelle an der Anzahl —, und ein Himmel, in dem der neue Stern die
-     *   alten nicht berührt, ließe sich nur mit festen Plätzen bauen. Feste
-     *   Plätze sind aber das Raster, das hier gerade abgeschafft wird.
-     * - **Nichts überschreibt sich**, und **nichts ragt aus dem Bild.** Beides
-     *   hält die Entzerrung unten, und beide Zusagen prüft ein Test.
-     * - **Die Bewegung ist eingerechnet.** Jeder Kasten ist um die volle
-     *   Drift-Amplitude größer, als er aussieht; deshalb kann auch ein Punkt
-     *   in Bewegung weder den Nachbarn noch den Rand erreichen.
+     * Wie hoch das Band wird und wie lang die Namen sein dürfen, sagt die
+     * Probe (`bandMass`) — beides hängt allein an der Anzahl. Vorher stand
+     * hier eine Formel aus der Zeit der drei Zeilen; sie schätzte zu streng
+     * und ließ ab sechzehn Erinnerungen die Hälfte der Namen verschwinden.
      */
-    const gemischt = createRng(`constellation-scatter:${einzeln.length}`).shuffle(
-      einzeln.map((node, index) => ({ node, index })),
+    const mass = bandMass(einzeln.length)
+    const maxZeichen = Math.min(18, mass.zeichen)
+    /*
+     * Passen nicht alle, kommen die **stärksten** ins Bild — vorher
+     * entschied der Listenplatz (`index % 2`), eine Münze, die nichts über
+     * die Erinnerung aussagt. Und die übrigen verschwinden ganz, statt als
+     * namenlose Punkte dazustehen: Der Zähler unten rechts nennt sie.
+     */
+    const gezeigt =
+      mass.punkte >= einzeln.length
+        ? einzeln
+        : [...einzeln].sort((a, b) => b.strength - a.strength).slice(0, mass.punkte)
+    const gemischt = createRng(`constellation-scatter:${gezeigt.length}`).shuffle(
+      gezeigt.map((node, index) => ({ node, index })),
     )
     const halbBreite = (text: string) => (text.length * EINHEITEN_JE_ZEICHEN) / 2 + BAND_LUFT
-    /*
-     * Der Kasten eines Punktes: Name darüber, Punkt darunter. Gemessen sind
-     * die Namen am Telefon 14 Pixel hoch, das Feld 167 Pixel für 44 Einheiten
-     * — also 3,7 Einheiten. Mit dem Punkt und etwas Luft sind es acht.
-     */
-    const KASTEN_HOEHE = 8
-    const DRIFT = 3
+    const beschriftet = gemischt.map(({ node, index }) => ({
+      node,
+      index,
+      label: bandLabel(node.label, maxZeichen),
+    }))
+    const plaetze = streueUndEntzerre(
+      beschriftet.map(({ label }) => halbBreite(label)),
+      mass.hoehe,
+    )
+    const gestreut = beschriftet.map((eintrag, i) => ({
+      ...eintrag,
+      x: (plaetze[i] as Kasten).x,
+      y: (plaetze[i] as Kasten).y,
+    }))
 
-    const gestreut = gemischt.map(({ node, index }, i) => {
-      /*
-       * Der Ausgangspunkt kommt aus der **R2-Folge** (goldenes Verhältnis in
-       * zwei Achsen). Sie streut gleichmäßig, ohne je ein Gitter zu bilden —
-       * anders als `Math.random()`, das Klumpen und Löcher macht, und anders
-       * als ein Raster, das genau das Problem von heute ist.
-       */
-      const a1 = 0.7548776662466927
-      const a2 = 0.5698402909980532
-      const label = bandLabel(node.label, maxZeichen)
-      const w = halbBreite(label)
-      return {
-        node,
-        index,
-        label,
-        w,
-        x: w + ((0.5 + a1 * (i + 1)) % 1) * (100 - 2 * w),
-        y: KASTEN_HOEHE / 2 + ((0.5 + a2 * (i + 1)) % 1) * (BAND_HOEHE - KASTEN_HOEHE),
-      }
-    })
-
-    /*
-     * Entzerren: Wer sich überlappt, schiebt sich gegenseitig weg — und der
-     * Rand hält jeden im Bild. Zwanzig Durchgänge reichen für vierundzwanzig
-     * Punkte; die Rechnung läuft einmal beim Bauen der Anordnung und nie
-     * wieder, sie kostet also kein Bild.
-     */
-    for (let runde = 0; runde < 20; runde++) {
-      for (let i = 0; i < gestreut.length; i++) {
-        for (let j = i + 1; j < gestreut.length; j++) {
-          const eins = gestreut[i] as (typeof gestreut)[number]
-          const zwei = gestreut[j] as (typeof gestreut)[number]
-          const dx = zwei.x - eins.x
-          const dy = zwei.y - eins.y
-          // Nötiger Abstand: halbe Breiten plus die Drift beider Punkte.
-          const noetigX = eins.w + zwei.w + 2 * DRIFT
-          const noetigY = KASTEN_HOEHE + 2 * DRIFT
-          const fehltX = noetigX - Math.abs(dx)
-          const fehltY = noetigY - Math.abs(dy)
-          if (fehltX <= 0 || fehltY <= 0) continue
-          /*
-           * Auseinander in der Achse, in der weniger fehlt — das ist der
-           * kürzere Weg aus der Überlappung und hält die Streuung dicht.
-           * Die Achsen sind verschieden lang, deshalb wird die senkrechte
-           * Strecke auf dieselbe Skala gebracht, bevor verglichen wird.
-           */
-          if (fehltX / noetigX < fehltY / noetigY) {
-            const schub = ((fehltX + 0.01) / 2) * (dx < 0 ? -1 : 1)
-            eins.x -= schub
-            zwei.x += schub
-          } else {
-            const schub = ((fehltY + 0.01) / 2) * (dy < 0 ? -1 : 1)
-            eins.y -= schub
-            zwei.y += schub
-          }
-        }
-      }
-      // Nach jedem Durchgang zurück ins Bild — sonst schiebt die Entzerrung
-      // den äußersten Punkt hinaus, und genau das war der Befund „man sieht
-      // nicht alles".
-      for (const eintrag of gestreut) {
-        eintrag.x = Math.max(eintrag.w + DRIFT, Math.min(100 - eintrag.w - DRIFT, eintrag.x))
-        eintrag.y = Math.max(
-          KASTEN_HOEHE / 2 + DRIFT,
-          Math.min(BAND_HOEHE - KASTEN_HOEHE / 2 - DRIFT, eintrag.y),
-        )
-      }
-    }
-
-    return gestreut.map(({ node, index, label, x, y }) => ({
+    return { hoehe: mass.hoehe, punkte: gestreut.map(({ node, label, x, y }) => ({
       id: node.id,
       // Das Band ist `aria-hidden`; der ganze Name steht in „Mein Gedächtnis".
       label,
       x: einzeln.length === 1 ? 50 : x,
-      y: einzeln.length === 1 ? BAND_MID : y,
+      y: einzeln.length === 1 ? mass.hoehe / 2 : y,
       strength: node.strength,
       /*
        * Wird es zu eng für jeden Namen, trägt nur jeder zweite Punkt einen —
@@ -428,14 +522,14 @@ function layout(graph: MemoryGraph, tappable: boolean, selectedId?: string): Pla
        * Sternen ist eine Konstellation; einer, in dem jeder Punkt beschriftet
        * ist, ist eine Tabelle.
        */
-      anchor: !nurJedeZweite || index % 2 === 0,
+      anchor: true,
       type: node.type,
       degree: 0,
       activityAt: node.lastRecalledAt ?? node.createdAt,
-    }))
+    })) }
   }
 
-  return clusters.flatMap((cluster, clusterIndex) => {
+  return { hoehe: BAND_HOEHE, punkte: clusters.flatMap((cluster, clusterIndex) => {
     const clusterAngle = ((clusterIndex * GOLDEN_ANGLE) % 360) * (Math.PI / 180)
     const clusterRadius = clusters.length === 1 ? 0 : 27 * Math.sqrt((clusterIndex + 1) / clusters.length)
     const centerX = 50 + clusterRadius * Math.cos(clusterAngle)
@@ -456,7 +550,7 @@ function layout(graph: MemoryGraph, tappable: boolean, selectedId?: string): Pla
         activityAt: node.lastRecalledAt ?? node.createdAt,
       }
     })
-  })
+  }) }
 }
 
 export function MemoryConstellation({
@@ -482,8 +576,26 @@ export function MemoryConstellation({
   dueNodeIds?: ReadonlySet<string>
 }) {
   const tappable = onSelect !== undefined
-  const raum = feld(tappable)
-  const placed = useMemo(() => layout(graph, tappable, selectedId), [graph, tappable, selectedId])
+  const anordnung = useMemo(
+    () => layout(graph, tappable, selectedId),
+    [graph, tappable, selectedId],
+  )
+  const raum = feld(tappable, anordnung.hoehe)
+  const placed = anordnung.punkte
+  /*
+   * Höchstens sechs Ebenen, und bei wenigen Punkten nur so viele wie Punkte
+   * — eine leere Ebene würde eine Bewegung kosten und nichts bewegen.
+   * Reihum verteilt, damit Nachbarn in der Anordnung auf verschiedenen
+   * Ebenen landen und nicht im Gleichschritt wandern.
+   */
+  const ebenen = useMemo(() => {
+    const zahl = Math.max(1, Math.min(6, placed.length))
+    const listen: { node: Placed }[][] = Array.from({ length: zahl }, () => [])
+    placed.forEach((node, index) => {
+      ;(listen[index % zahl] as { node: Placed }[]).push({ node })
+    })
+    return listen
+  }, [placed])
   const byId = useMemo(() => new Map(placed.map((node) => [node.id, node])), [placed])
   const activity = placed.map((node) => node.activityAt)
   const oldestActivity = Math.min(...activity)
@@ -500,6 +612,20 @@ export function MemoryConstellation({
     >
       <svg
         viewBox={`0 0 100 ${raum.hoehe}`}
+        /*
+         * Das Seitenverhältnis muss der Zeichenfläche folgen, sobald das Band
+         * wächst (Gerätebefund 08.09.). Die Stilvorlage nagelt es auf 16:7
+         * fest; mit einer höheren Zeichenfläche im selben Kasten skaliert der
+         * Browser die ganze Zeichnung **kleiner**, statt sie höher zu
+         * zeichnen — gemessen schrumpfte sie von 388 auf 250 Pixel Breite und
+         * stand mit Rändern in der Mitte. Gesetzt wird nur im Ausnahmefall:
+         * Bleibt das Band bei seiner gewohnten Höhe, entscheidet weiter die
+         * Stilvorlage, und für alle mit wenigen Erinnerungen ändert sich
+         * nichts.
+         */
+        style={
+          raum.hoehe === BAND_HOEHE ? undefined : { aspectRatio: `100 / ${raum.hoehe}` }
+        }
         aria-hidden={onSelect === undefined ? true : undefined}
         aria-label={onSelect === undefined ? undefined : ariaLabel}
       >
@@ -528,7 +654,41 @@ export function MemoryConstellation({
             />
           )
         })}
-        {placed.map((node, index) => {
+        {/*
+          * **Die Bewegung sitzt auf Ebenen, nicht auf jedem Punkt**
+          * (Gerätebefund 08.09.).
+          *
+          * Vorher trieb jeder Punkt für sich. Das sah richtig aus und war
+          * teuer: Die Zahl der Dauerbewegungen wuchs mit der Zahl der
+          * Erinnerungen. Gemessen am Telefon, Startseite:
+          *
+          *   ohne Erinnerungen    7    zwölf Erinnerungen   23
+          *   zwanzig Erinnerungen 31   ← Schranke ist 24
+          *
+          * Elf davon sind fest (Kopfzeile, Knöpfe, Bahnen); alles darüber
+          * waren die Punkte. Wer zwanzig Dinge gemerkt hat, hatte damit ein
+          * wärmeres Telefon als wer zwölf gemerkt hat — die Belohnung fürs
+          * Üben war Hitze (Gerätemeldung 01.09.: „Le téléphone chauffe
+          * toujours").
+          *
+          * Auf höchstens sechs Ebenen ist die Zahl **konstant**: siebzehn,
+          * bei zwölf Erinnerungen wie bei zweihundert. Jede Ebene hat ihre
+          * eigene Dauer und ihren eigenen Vorlauf, drei bis vier Punkte
+          * teilen sich eine Bahn — nah genug an eigenen Körpern, und weit
+          * weg vom einen Atemzug des ganzen Bildes.
+          */}
+        {ebenen.map((ebene, ebeneIndex) => (
+          <g
+            key={ebeneIndex}
+            className="constellation-layer"
+            style={
+              {
+                '--drift': `${19 + ((ebeneIndex * 7) % 13)}s`,
+                animationDelay: `-${(ebeneIndex * 2300) % 19000}ms`,
+              } as React.CSSProperties
+            }
+          >
+        {ebene.map(({ node }) => {
           const isDue = dueNodeIds.has(node.id)
           const isRecalled = recalledNodeIds.has(node.id)
           return (
@@ -545,22 +705,6 @@ export function MemoryConstellation({
                   onSelect?.(node.id)
                 }
               }}
-              /*
-               * Jeder Punkt hat seine eigene Dauer und seinen eigenen
-               * Vorlauf (Nutzerbefund 07.09.). Ohne das laufen zwölf Punkte
-               * im Gleichtakt, und ein Gleichtakt sieht aus wie ein Atemzug
-               * des ganzen Bildes — nicht wie zwölf Körper, die ihre eigene
-               * Bahn ziehen. Die Werte kommen aus dem Index und nicht aus dem
-               * Zufall: dieselbe Bahn heute wie morgen (A11).
-               *
-               * Ohne Rückfallwert in der CSS-Regel: Jeder Punkt bekommt die
-               * Dauer hier gesetzt, und fünf gesparte Zeichen waren der
-               * Unterschied zum gerissenen Kaltstart-Budget (12 288 Byte).
-               */
-              style={{
-                '--drift': `${19 + ((index * 7) % 13)}s`,
-                animationDelay: `-${(index * 2300) % 19000}ms`,
-              } as React.CSSProperties}
             >
               {onSelect !== undefined && (
                 <rect
@@ -623,6 +767,8 @@ export function MemoryConstellation({
             </g>
           )
         })}
+          </g>
+        ))}
       </svg>
       {graph.nodes.length > placed.length && (
         <span className="constellation-window" aria-live="polite">

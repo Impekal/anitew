@@ -93,12 +93,20 @@ test('bewegt die Punkte sichtbar, nicht nur messbar', async ({ page }) => {
     if (punkt === null || gruppe === null || gruppe === undefined) return -1
     /*
      * Die Bahn hängt seit dem Befund vom 07.09. an der **Gruppe**, nicht am
-     * Kreis — nur so wandert der Name mit. Gesucht wird sie an beiden Orten:
-     * Zugesagt ist, dass der Punkt sich sichtbar bewegt, nicht, an welchem
-     * Element das notiert steht. Gemessen wird in jedem Fall der Kreis; das
+     * Kreis, und seit dem 08.09. an der **Ebene** darüber (sechs Ebenen
+     * statt einer Bahn je Punkt — das hält die Hitze konstant). Gesucht wird
+     * sie deshalb von unten nach oben: Zugesagt ist, dass der Punkt sich
+     * sichtbar bewegt, nicht, an welchem Element das notiert steht. Gemessen wird in jedem Fall der Kreis; das
      * ist der Punkt, um den es in der Meldung vom 02.09. ging.
      */
-    const lauf = punkt.getAnimations()[0] ?? gruppe.getAnimations()[0]
+    const bahnVon = (el: Element | null): Animation | undefined => {
+      for (let k: Element | null = el; k !== null; k = k.parentElement) {
+        const lauf = k.getAnimations()[0]
+        if (lauf !== undefined) return lauf
+      }
+      return undefined
+    }
+    const lauf = bahnVon(punkt)
     if (lauf === undefined) return -2
     const dauer = Number((lauf.effect as KeyframeEffect).getTiming().duration ?? 0)
     if (dauer === 0) return -3
@@ -377,7 +385,11 @@ test('bewegt die Namen mit, nicht nur die Punkte', async ({ page }) => {
     const gruppen = [...document.querySelectorAll('.constellation .constellation-memory')]
     return gruppen.map((gruppe) => {
       const name = gruppe.querySelector('.constellation-label')
-      const lauf = gruppe.getAnimations()[0]
+      let lauf: Animation | undefined
+      for (let k: Element | null = gruppe; k !== null; k = k.parentElement) {
+        lauf = k.getAnimations()[0]
+        if (lauf !== undefined) break
+      }
       /*
        * Statt Kennzahlen wie „-2" ein Satz: Der Gegenprobe-Lauf ohne die
        * Behebung meldet damit „trägt keine Bahn" statt „-2,00 px", und wer
@@ -427,8 +439,9 @@ test('bewegt die Namen mit, nicht nur die Punkte', async ({ page }) => {
    * Und jeder auf seiner eigenen Bahn. Punkte mit derselben Dauer und
    * demselben Vorlauf atmen im Gleichtakt — das liest sich als ein einziges
    * Bild, das sich hebt und senkt, nicht als „Billard". Vorher war es eine
-   * einzige Dauer für alle (9,6 s), jetzt zieht jeder Punkt seine Zahl aus
-   * seinem Index.
+   * einzige Dauer für alle (9,6 s), jetzt zieht jede Ebene ihre Zahl aus
+   * ihrem Index — sechs verschiedene Bahnen, auf die sich die Punkte
+   * verteilen.
    */
   const dauern = new Set(wege.map(({ dauer }) => Math.round(dauer)))
   expect(
@@ -462,7 +475,14 @@ test('haelt die Namen auf jedem Punkt ihrer Bahn auseinander', async ({ page }) 
       return { ueber: ['keine Konstellation gefunden'], draussen: [] as string[], bahnen: 0 }
     }
     const gruppen = [...document.querySelectorAll('.constellation .constellation-memory')]
-      .map((g) => ({ lauf: g.getAnimations()[0], name: g.querySelector('.constellation-label') }))
+      .map((g) => {
+        let lauf: Animation | undefined
+        for (let k: Element | null = g; k !== null; k = k.parentElement) {
+          lauf = k.getAnimations()[0]
+          if (lauf !== undefined) break
+        }
+        return { lauf, name: g.querySelector('.constellation-label') }
+      })
       .filter((g): g is { lauf: Animation; name: Element } => g.lauf !== undefined && g.name !== null)
     for (const { lauf } of gruppen) lauf.pause()
 
@@ -531,4 +551,159 @@ test('haelt die Namen auf jedem Punkt ihrer Bahn auseinander', async ({ page }) 
     schlimmstes.draussen,
     `Namen laufen im Lauf ihrer Bahn aus dem Bild: ${schlimmstes.draussen.join(', ')}`,
   ).toEqual([])
+})
+
+/*
+ * ── Der Befund vom 08.09.: „Nicht ganz" ──────────────────────────────────
+ *
+ * Mit Bild, drei Punkte grün eingekringelt. Der ursprüngliche Satz vom 07.09.
+ * lautete „Man sieht nicht alles", und nach dem Umbau der Anordnung war das
+ * immer noch wahr — nur aus einem anderen Grund als vermutet.
+ *
+ * Gemessen am Telefon (412 × 915), zwanzig Erinnerungen: **zehn Punkte
+ * trugen einen Namen, zehn keinen.** Die Anordnung versteckte jeden zweiten,
+ * sobald es eng wurde, und sagte niemandem warum. Die Schwelle lag bei
+ * sechzehn Erinnerungen.
+ *
+ * Der Grund war die Bandhöhe. Nachgemessen, wie viele Zeichen bei welcher
+ * Höhe überlappungsfrei unterzubringen sind:
+ *
+ *          H=44        H=56        H=68
+ *   n=12   8 Zeichen   12          12
+ *   n=16   passt nicht  8           8
+ *   n=20   passt nicht  4           8
+ *
+ * Bei 44 Einheiten passt ab sechzehn Erinnerungen keine einzige Namenslänge
+ * — auch keine dreistellige. Das Verstecken war die einzige Möglichkeit bei
+ * dieser Höhe.
+ */
+
+/** So viele Erinnerungen, alle unverbunden, mit Namen von echter Länge. */
+async function saeeViele(page: Page, anzahl: number): Promise<void> {
+  const vorrat = [
+    'Ecobank Konto', 'Darbo', 'Research', 'Vic', 'Fahrschule', 'Moise',
+    'Darbo Termin', 'Lois Macdonald', 'Prüfen', 'Barmer', 'Alassane anrufen',
+    'Ticket Bayreuth', 'Zahnarzt', 'Kita Anmeldung', 'Steuer', 'Miete',
+    'Oma Geburtstag', 'Impftermin', 'Passwort Bank', 'Autoschlüssel',
+  ]
+  await page.evaluate(
+    ({ namen }) =>
+      new Promise<void>((resolve, reject) => {
+        const now = Date.now()
+        const open = indexedDB.open('anitew')
+        open.onerror = () => reject(open.error)
+        open.onsuccess = () => {
+          const tx = open.result.transaction(['settings'], 'readwrite')
+          tx.objectStore('settings').put({
+            key: 'memory.graph',
+            value: {
+              nodes: namen.map((label, i) => ({
+                id: `fact:${i}`,
+                type: 'fact',
+                label,
+                createdAt: now - i * 3_600_000,
+                strength: 0.2 + i * 0.03,
+              })),
+              edges: [],
+              removed: {},
+            },
+          })
+          tx.objectStore('settings').put({ key: 'memory.visited', value: true })
+          tx.oncomplete = () => resolve()
+          tx.onerror = () => reject(tx.error)
+        }
+      }),
+    { namen: vorrat.slice(0, anzahl) },
+  )
+  await page.reload()
+}
+
+test('laesst keinen Punkt ohne Namen — und sagt, wenn nicht alle passen', async ({ page }) => {
+  test.setTimeout(120_000)
+  await page.setViewportSize({ width: 412, height: 915 })
+  await visit(page)
+  await saeeViele(page, 20)
+  await expect(page.locator('.constellation-label').first()).toBeVisible({ timeout: 30_000 })
+
+  /*
+   * Die Zusage ist **nicht** „alle zwanzig stehen im Bild" — das ginge nur
+   * mit einem Band von 310 Pixeln (gemessen, siehe `bandMass`). Die Zusage
+   * ist: **kein stummer Punkt.** Wer dasteht, trägt seinen Namen; und passen
+   * nicht alle, dann sagt der Zähler unten rechts, wie viele von wie vielen
+   * zu sehen sind, statt es zu verschweigen.
+   */
+  const befund = await page.evaluate(() => {
+    const gruppen = [...document.querySelectorAll('.constellation .constellation-memory')]
+    const stumm = gruppen
+      .filter((g) => {
+        const name = g.querySelector('.constellation-label')
+        return name === null || (name.textContent ?? '').trim() === ''
+      })
+      .map((g) => g.getAttribute('aria-label') ?? '?')
+    const zaehler = document.querySelector('.constellation-window')
+    return { punkte: gruppen.length, stumm, zaehler: (zaehler?.textContent ?? '').trim() }
+  })
+
+  expect(
+    befund.stumm,
+    `${befund.stumm.length} von ${befund.punkte} Punkten stehen ohne Namen da`,
+  ).toEqual([])
+  expect(befund.punkte, 'der Himmel ist leer').toBeGreaterThanOrEqual(6)
+
+  if (befund.punkte < 20) {
+    expect(
+      befund.zaehler,
+      `nur ${befund.punkte} von 20 Punkten stehen da, und nichts sagt es`,
+    ).toBe(`${befund.punkte} / 20`)
+  }
+})
+
+test('haelt die Namen auch bei zwanzig Erinnerungen im Bild — gemessen am schneidenden Kasten', async ({ page }) => {
+  test.setTimeout(120_000)
+  await page.setViewportSize({ width: 412, height: 915 })
+  await visit(page)
+  await saeeViele(page, 20)
+  await expect(page.locator('.constellation-label').first()).toBeVisible({ timeout: 30_000 })
+
+  /*
+   * **Gemessen wird gegen das SVG, nicht gegen `.constellation`.**
+   *
+   * Das ist der Fehler, an dem der Wächter vom 07.09. vorbeisah: `.constellation`
+   * ist das umgebende DIV, und es war gemessen 224 Pixel hoch, während die
+   * Zeichenfläche darin 170 Pixel hoch ist und `overflow: hidden` trägt. Der
+   * Test verglich also mit einem Kasten, der 54 Pixel höher ist als der, der
+   * wirklich schneidet — unten konnte er gar nichts finden.
+   */
+  const befund = await page.evaluate(() => {
+    const svg = document.querySelector('.constellation svg')
+    if (svg === null) return { draussen: ['kein SVG gefunden'], ueber: [] as string[], zahl: 0 }
+    const feld = svg.getBoundingClientRect()
+    const kaesten = [...document.querySelectorAll('.constellation .constellation-label')].map(
+      (n) => ({ text: n.textContent ?? '', r: n.getBoundingClientRect() }),
+    )
+    const draussen = kaesten
+      .filter(
+        ({ r }) =>
+          r.left < feld.left + 2 ||
+          r.right > feld.right - 2 ||
+          r.top < feld.top + 2 ||
+          r.bottom > feld.bottom - 2,
+      )
+      .map(({ text, r }) => `${text} y[${r.top.toFixed(0)}..${r.bottom.toFixed(0)}] x[${r.left.toFixed(0)}..${r.right.toFixed(0)}] gegen y[${feld.top.toFixed(0)}..${feld.bottom.toFixed(0)}] x[${feld.left.toFixed(0)}..${feld.right.toFixed(0)}]`)
+    const ueber: string[] = []
+    for (let i = 0; i < kaesten.length; i += 1) {
+      for (let j = i + 1; j < kaesten.length; j += 1) {
+        const a = kaesten[i]!.r
+        const b = kaesten[j]!.r
+        if (a.right - 1 > b.left && b.right - 1 > a.left && a.bottom - 1 > b.top && b.bottom - 1 > a.top) {
+          ueber.push(`${kaesten[i]!.text} × ${kaesten[j]!.text}`)
+        }
+      }
+    }
+    return { draussen, ueber, zahl: kaesten.length }
+  })
+
+  expect(befund.zahl, 'es gab keine Namen zu prüfen').toBeGreaterThanOrEqual(6)
+  expect(befund.draussen, `Namen ohne Luft am Rand: ${befund.draussen.join('; ')}`).toEqual([])
+  expect(befund.ueber, `Namen liegen übereinander: ${befund.ueber.join(', ')}`).toEqual([])
 })

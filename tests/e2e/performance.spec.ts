@@ -351,3 +351,66 @@ test('höchstens 24 Bewegungen laufen gleichzeitig', async ({ page }) => {
   const laufend = await running(page)
   expect(laufend.length, laufend.map((a) => a.where).slice(0, 10).join(' | ')).toBeLessThanOrEqual(24)
 })
+
+test('bleibt unter der Schranke, auch wenn zwanzig Dinge gemerkt sind', async ({ page }) => {
+  test.setTimeout(120_000)
+
+  /*
+   * Der Wächter darüber prüft die Startseite eines **leeren** Standes — und
+   * genau dort lag die Lücke (Gerätebefund 08.09.).
+   *
+   * Gemessen am Telefon, ehe das behoben war:
+   *
+   *   ohne Erinnerungen     7 Bewegungen
+   *   zwölf Erinnerungen   23
+   *   zwanzig Erinnerungen 31   ← Schranke ist 24
+   *
+   * Jeder Punkt trug seine eigene Bahn, also wuchs die Wärme mit dem, was
+   * jemand gemerkt hat: Wer fleißig war, bekam ein heißeres Telefon. Das ist
+   * die Umkehrung dessen, wofür die Schranke da ist (Gerätemeldung 01.09.:
+   * „Le téléphone chauffe toujours").
+   *
+   * Ein Wächter, der nur den leeren Stand misst, sieht davon nichts — er ist
+   * bei sieben von vierundzwanzig und bleibt es. Deshalb steht dieser hier
+   * daneben und misst den Stand eines Menschen, der die App benutzt.
+   */
+  await visit(page)
+  await page.evaluate(
+    (n) =>
+      new Promise<void>((resolve, reject) => {
+        const now = Date.now()
+        const open = indexedDB.open('anitew')
+        open.onerror = () => reject(open.error)
+        open.onsuccess = () => {
+          const tx = open.result.transaction(['settings'], 'readwrite')
+          tx.objectStore('settings').put({
+            key: 'memory.graph',
+            value: {
+              nodes: Array.from({ length: n }, (_, i) => ({
+                id: `fact:${i}`,
+                type: 'fact',
+                label: `Erinnerung ${i}`,
+                createdAt: now - i * 3_600_000,
+                strength: 0.2 + i * 0.03,
+              })),
+              edges: [],
+              removed: {},
+            },
+          })
+          tx.objectStore('settings').put({ key: 'memory.visited', value: true })
+          tx.oncomplete = () => resolve()
+          tx.onerror = () => reject(tx.error)
+        }
+      }),
+    20,
+  )
+  await page.reload()
+  await expect(page.locator('.constellation-label').first()).toBeVisible({ timeout: 30_000 })
+  await page.waitForTimeout(1500)
+
+  const laufend = await running(page)
+  expect(
+    laufend.length,
+    `${laufend.length} Bewegungen bei zwanzig Erinnerungen: ${laufend.map((a) => a.where).slice(0, 12).join(' | ')}`,
+  ).toBeLessThanOrEqual(24)
+})
