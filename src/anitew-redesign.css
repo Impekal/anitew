@@ -417,10 +417,15 @@ body::before {
   stroke-width: .7;
   filter: drop-shadow(0 0 3px var(--an-cyan));
 }
+/* Unten **mittig**, nicht in der Ecke (Nutzerfrage 08.09.: „Wo genau soll
+   17/20 stehen?"). Am Telefon liegt auf dem Band eine Kreismaske; die untere
+   rechte Ecke lag gemessen bei 133 % des Radius, und ab 92 % lässt die Maske
+   nichts mehr durch. Der Zähler war ausgeliefert und unsichtbar. */
 .constellation-window {
   position: absolute;
-  right: .75rem;
-  bottom: .55rem;
+  left: 50%;
+  translate: -50% 0;
+  bottom: 9%;
   color: var(--an-dim);
   font: .65rem var(--mono);
   letter-spacing: .08em;
@@ -438,10 +443,14 @@ body::before {
 .memory-detail dt { color: var(--an-dim); font: .7rem var(--mono); text-transform: uppercase; }
 .memory-detail dd { margin: 0; color: var(--an-muted); }
 
+/* Das Seitenverhältnis kommt aus der Zeichenfläche und wird vom Bauteil
+   gesetzt — nicht hier geraten. Genau dieses Raten war der Fehler vom
+   08.09.: Die Stilvorlage sagte 16:7, gezeichnet wurden 100 × 44, und der
+   sichtbare Ausschnitt war ein Kreis. Drei Formen, keine passte zur
+   anderen. */
 .constellation svg {
   display: block;
   width: 100%;
-  aspect-ratio: 16 / 10;
 }
 
 .constellation-edge {
@@ -509,6 +518,25 @@ body::before {
    schiebt die Grafikkarte, ohne neu zu zeichnen. */
 .constellation:not(.constellation-tappable) .constellation-layer {
   animation: node-drift var(--drift) ease-in-out infinite;
+}
+
+/* Die Reise des ganzen Feldes (Nutzerwunsch 08.09.: „mehr aleatoire Bewegung
+   in unterschiedlichen Richtungen … was oben versteckt ist kann bald unten
+   sichtbar sein").
+
+   Dieselbe Bahn wie die Ebenen, nur **viel langsamer** — eine eigene Kurve
+   hätte 60 Byte gekostet, und das Kaltstart-Budget ist auf drei Byte genau
+   ausgereizt. Ein Bewegungsvokabular in zwei Zeitmaßstäben liest sich
+   ohnehin ruhiger als zwei verschiedene.
+
+   Sie liegt auf **einer** Gruppe, kostet also genau eine Dauerbewegung — und
+   weil sich alle Punkte gemeinsam bewegen, ändert sie keinen einzigen
+   Abstand: Was nicht überlappt, überlappt auch unterwegs nicht. Zusammen mit
+   den sechs Ebenen darunter, die je eigene Dauer und eigenen Vorlauf haben,
+   mischt sich die Nachbarschaft ständig neu. */
+.constellation:not(.constellation-tappable) .constellation-reise {
+  animation: node-drift 97s ease-in-out infinite;
+}
 }
 
 
@@ -807,7 +835,11 @@ body::before {
   letter-spacing: .24em;
 }
 .today .constellation { border: 0; border-radius: 50% 50% 18px 18px; background: radial-gradient(circle, rgba(140,207,192,.1), transparent 64%); }
-.today .constellation svg { aspect-ratio: 16 / 7; }
+/* Kein Seitenverhältnis mehr für das Band: Das Bauteil setzt es aus der
+   Zeichenfläche (100 × 75 — die Form des sichtbaren Kreises), und eine
+   Regel, die eine eigene Angabe am Element nie schlagen kann, ist tote
+   Fracht. Vorher stand hier 16:7 — ein flacher Streifen in einem runden
+   Ausschnitt, dessen Enden niemand je sah. */
 .today-mission { display: flex; justify-content: space-between; gap: 1rem; align-items: baseline; margin: 1rem 0 .65rem; }
 .today-mission-label { margin: 0; color: var(--an-text); font: clamp(1.45rem, 5vw, 2.2rem) var(--serif); }
 .today-duration { margin: 0; color: var(--an-dim); font: .68rem var(--mono); text-align: right; }

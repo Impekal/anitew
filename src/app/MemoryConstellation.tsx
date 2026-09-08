@@ -190,7 +190,40 @@ function visibleNodeIds(graph: MemoryGraph, selectedId?: string): Set<string> {
  * einzige zusätzliche Bewegung — es ist dieselbe Zeichnung, nur nicht mehr
  * in einen Streifen in der Mitte gesperrt.
  */
-const BAND_HOEHE = 44
+/**
+ * Die Höhe des Bandes — und sie folgt seit dem 08.09. dem **sichtbaren
+ * Ausschnitt**, nicht mehr dem Seitenverhältnis einer Karte.
+ *
+ * Der Befund, mit Bild und zwei roten Kringeln: „Nicht ganz."
+ *
+ * Am Telefon liegt auf dem Band eine Kreismaske (`anitew-living.css`):
+ *
+ *     border-radius: 50%;
+ *     mask-image: radial-gradient(circle, black 0 64%, transparent 92%);
+ *
+ * Gezeichnet wurde aber ein **breiter flacher Streifen** — 404 × 177 Pixel
+ * bei 16:7 — und der lag in einem **Kreis** von 388 × 290 Pixeln. Der
+ * Streifen ragte links und rechts hinaus, während oben und unten im Kreis
+ * Platz leer stand. Gemessen bei zwanzig Erinnerungen: **sieben von
+ * siebzehn Namen überhaupt sichtbar, vier standen frei.** Die übrigen lagen
+ * bei 100 bis 133 Prozent des Radius — dort, wo die Maske nichts mehr
+ * durchlässt.
+ *
+ * Beides stammt aus verschiedenen Zeiten und wurde nie zusammengeführt. Die
+ * Zeichenfläche trägt jetzt die Form des Ausschnitts: 100 × 75 ergibt bei
+ * 388 Pixeln Breite ein Feld von 291 Pixeln Höhe — dieselbe Größe, die die
+ * Maske ohnehin freihält, nur zeichnet die App jetzt hinein statt daneben.
+ */
+const BAND_HOEHE = 75
+
+/**
+ * Der Anteil des Radius, bis zu dem die Maske **voll** durchlässt (64 %),
+ * und der, ab dem gar nichts mehr durchkommt (92 %). Beide Zahlen stehen so
+ * in `anitew-living.css`; sie stehen hier, weil die Anordnung sie kennen
+ * muss — eine Anordnung, die den Ausschnitt nicht kennt, parkt Namen dort,
+ * wo niemand sie je sieht. Genau das war der Fehler.
+ */
+const MASKE_FREI = 0.64
 
 /**
  * Das Band gilt nur für die **schmückende** Konstellation der Startseite.
@@ -262,8 +295,6 @@ const DRIFT = 3.5
  * Bequemlichkeit, sondern die einzige Möglichkeit bei dieser Höhe. Der Hebel
  * ist die Höhe, nicht die Beschriftung.
  */
-const BAND_HOEHEN = [BAND_HOEHE, 56, 68] as const
-/** Kürzer als sechs Zeichen ist kein Name mehr, sondern ein Rest. */
 const MINDEST_ZEICHEN = 6
 /** Länger lohnt nicht: `bandLabel` deckelt ohnehin bei achtzehn. */
 const HOECHST_ZEICHEN = 12
@@ -275,13 +306,42 @@ const HOECHST_ZEICHEN = 12
  * um Höhe und Namenslänge zu finden.
  */
 function streueUndEntzerre(breiten: number[], hoehe: number): Kasten[] {
+  const mx = 50
+  const my = hoehe / 2
+  /*
+   * Der Radius, den die Maske **voll** durchlässt. `radial-gradient(circle,
+   * …)` misst ohne weitere Angabe bis zur entferntesten Ecke — bei 100 × 75
+   * sind das 62,5 Einheiten, und 64 Prozent davon sind 40.
+   */
+  const frei = MASKE_FREI * Math.hypot(mx, my)
+  /** Wie weit ein Kasten von seiner Mitte aus reicht (Name oben, Punkt unten). */
+  const reichweite = (w: number) => Math.hypot(w, UEBER)
+
+  /*
+   * Gestreut wird in der **Scheibe**, nicht im Rechteck: `sqrt` auf dem
+   * Radius, sonst drängt sich alles in der Mitte. Die beiden Zahlen sind
+   * die R2-Folge (goldenes Verhältnis in zwei Achsen) — sie streut
+   * gleichmäßig, ohne je ein Gitter zu bilden, und sie ist deterministisch
+   * (A11: kein `Math.random()`).
+   */
   const a1 = 0.7548776662466927
   const a2 = 0.5698402909980532
-  const kaesten: Kasten[] = breiten.map((w, i) => ({
-    w,
-    x: w + ((0.5 + a1 * (i + 1)) % 1) * (100 - 2 * w),
-    y: UEBER + ((0.5 + a2 * (i + 1)) % 1) * (hoehe - KASTEN_HOEHE),
-  }))
+  const kaesten: Kasten[] = breiten.map((w, i) => {
+    const platz = Math.max(0, frei - reichweite(w) - DRIFT)
+    const r = platz * Math.sqrt((0.5 + a1 * (i + 1)) % 1)
+    const winkel = 2 * Math.PI * ((0.5 + a2 * (i + 1)) % 1)
+    return { w, x: mx + r * Math.cos(winkel), y: my + r * Math.sin(winkel) }
+  })
+
+  const zurueckInDenKreis = (eintrag: Kasten): void => {
+    const platz = Math.max(0, frei - reichweite(eintrag.w) - DRIFT)
+    const dx = eintrag.x - mx
+    const dy = eintrag.y - my
+    const weit = Math.hypot(dx, dy)
+    if (weit <= platz || weit === 0) return
+    eintrag.x = mx + (dx / weit) * platz
+    eintrag.y = my + (dy / weit) * platz
+  }
 
   for (let runde = 0; runde < 20; runde++) {
     for (let i = 0; i < kaesten.length; i++) {
@@ -297,10 +357,9 @@ function streueUndEntzerre(breiten: number[], hoehe: number): Kasten[] {
         const fehltY = noetigY - Math.abs(dy)
         if (fehltX <= 0 || fehltY <= 0) continue
         /*
-         * Auseinander in der Achse, in der weniger fehlt — das ist der
-         * kürzere Weg aus der Überlappung und hält die Streuung dicht.
-         * Die Achsen sind verschieden lang, deshalb wird die senkrechte
-         * Strecke auf dieselbe Skala gebracht, bevor verglichen wird.
+         * Auseinander in der Achse, in der weniger fehlt — der kürzere Weg
+         * aus der Überlappung. Die Achsen sind verschieden lang, deshalb
+         * wird auf dieselbe Skala gebracht, bevor verglichen wird.
          */
         if (fehltX / noetigX < fehltY / noetigY) {
           const schub = ((fehltX + 0.01) / 2) * (dx < 0 ? -1 : 1)
@@ -313,13 +372,12 @@ function streueUndEntzerre(breiten: number[], hoehe: number): Kasten[] {
         }
       }
     }
-    // Nach jedem Durchgang zurück ins Bild — sonst schiebt die Entzerrung
-    // den äußersten Punkt hinaus, und genau das war der Befund „man sieht
-    // nicht alles".
-    for (const eintrag of kaesten) {
-      eintrag.x = Math.max(eintrag.w + DRIFT, Math.min(100 - eintrag.w - DRIFT, eintrag.x))
-      eintrag.y = Math.max(UEBER + DRIFT, Math.min(hoehe - UNTER - DRIFT, eintrag.y))
-    }
+    /*
+     * Nach jedem Durchgang zurück in den Kreis. Vorher stand hier das
+     * Rechteck — und genau deshalb landeten Namen dort, wo die Maske sie
+     * wegblendet.
+     */
+    for (const eintrag of kaesten) zurueckInDenKreis(eintrag)
   }
   return kaesten
 }
@@ -336,59 +394,6 @@ function stossenAn(kaesten: Kasten[]): boolean {
     }
   }
   return false
-}
-
-/**
- * Höhe und Namenslänge für so viele Punkte — **probiert, nicht gerechnet.**
- *
- * Vorher stand hier eine Formel, die aus der Zeit der drei Zeilen stammte
- * („zwei Punkte derselben Zeile stehen 3 × Schritt auseinander"). Diese
- * Zeilen gibt es nicht mehr; die Formel schätzte also eine Geometrie, die
- * niemand mehr zeichnet — und sie schätzte zu streng, weshalb die Hälfte der
- * Namen verschwand.
- *
- * Jetzt wird die Anordnung mit Kandidatenwerten **durchgerechnet** und
- * geprüft, ob am Ende etwas übereinandersteht. Die Probe kostet einmal beim
- * Bauen der Anordnung ein paar tausend Rechenschritte und nie wieder ein
- * Bild. Der niedrigste Kasten und der längste Name, die zusammen aufgehen,
- * gewinnen: So bleibt das Band für die meisten Menschen genau so hoch wie
- * bisher und wächst nur dort, wo sonst Namen verschwänden.
- */
-function bandMass(anzahl: number): { hoehe: number; zeichen: number; punkte: number } {
-  const passt = (zahl: number, zeichen: number, hoehe: number): boolean => {
-    const w = (zeichen * EINHEITEN_JE_ZEICHEN) / 2 + BAND_LUFT
-    return !stossenAn(streueUndEntzerre(Array.from({ length: zahl }, () => w), hoehe))
-  }
-
-  for (const hoehe of BAND_HOEHEN) {
-    for (let zeichen = HOECHST_ZEICHEN; zeichen >= MINDEST_ZEICHEN; zeichen--) {
-      if (passt(anzahl, zeichen, hoehe)) return { hoehe, zeichen, punkte: anzahl }
-    }
-  }
-
-  /*
-   * Es passt nicht mehr — und dann wird **nicht heimlich beschriftet**.
-   *
-   * Vorher trug in diesem Fall nur jeder zweite Punkt einen Namen; am Gerät
-   * standen zwanzig Punkte und zehn Namen, ohne ein Wort dazu. Genau das war
-   * der Befund „Man sieht nicht alles".
-   *
-   * Jetzt stehen weniger Punkte da, dafür trägt **jeder** seinen Namen — und
-   * der Zähler unten rechts sagt, wie viele von wie vielen zu sehen sind.
-   * Gezeigt werden die stärksten; der ganze Bestand ist einen Fingertipp
-   * entfernt in „Mein Gedächtnis".
-   *
-   * Warum nicht einfach ein höheres Band? Weil der Platz teuer ist: Zwanzig
-   * Namen zu sieben Zeichen brauchen gemessen H = 80, also 310 Pixel am
-   * Telefon. Das ist kein Band mehr, das ist die halbe Startseite.
-   */
-  const hoehe = BAND_HOEHEN[BAND_HOEHEN.length - 1] as number
-  for (let punkte = anzahl - 1; punkte >= 6; punkte--) {
-    for (let zeichen = HOECHST_ZEICHEN; zeichen >= MINDEST_ZEICHEN; zeichen--) {
-      if (passt(punkte, zeichen, hoehe)) return { hoehe, zeichen, punkte }
-    }
-  }
-  return { hoehe, zeichen: MINDEST_ZEICHEN, punkte: 6 }
 }
 
 /**
@@ -478,43 +483,79 @@ function layout(
      * hier eine Formel aus der Zeit der drei Zeilen; sie schätzte zu streng
      * und ließ ab sechzehn Erinnerungen die Hälfte der Namen verschwinden.
      */
-    const mass = bandMass(einzeln.length)
-    const maxZeichen = Math.min(18, mass.zeichen)
+    const halbBreite = (text: string) => (text.length * EINHEITEN_JE_ZEICHEN) / 2 + BAND_LUFT
+
+    /*
+     * **Die Probe rechnet mit denselben Namen, die nachher dastehen.**
+     *
+     * Vorher lief sie mit lauter gleich breiten Kästen — der Höchstlänge für
+     * alle. Das ist bei der Breite die vorsichtigere Annahme, aber es ist
+     * eine **andere Rechnung**: Andere Breiten ergeben andere Schübe und
+     * damit ganz andere Plätze. „Passt" in der Probe hieß deshalb nicht
+     * „passt auf dem Glas". Gemessen bei einer Bandhöhe von 85 Einheiten:
+     * Die Probe meldete frei, die Zeichnung hatte Überlappungen.
+     *
+     * Jetzt wird für jede Kandidatenlänge wirklich gekürzt, wirklich
+     * gestreut, wirklich entzerrt — und geprüft. Das kostet ein paar tausend
+     * Rechenschritte einmal beim Bauen der Anordnung und nie wieder ein Bild.
+     */
+    const hoehe = BAND_HOEHE
+    type Knoten = (typeof einzeln)[number]
+    const versuch = (
+      auswahl: readonly Knoten[],
+      zeichen: number,
+    ): { plaetze: Kasten[]; labels: string[] } | undefined => {
+      const labels = auswahl.map((node) => bandLabel(node.label, Math.min(18, zeichen)))
+      const plaetze = streueUndEntzerre(labels.map(halbBreite), hoehe)
+      return stossenAn(plaetze) ? undefined : { plaetze, labels }
+    }
+
     /*
      * Passen nicht alle, kommen die **stärksten** ins Bild — vorher
      * entschied der Listenplatz (`index % 2`), eine Münze, die nichts über
      * die Erinnerung aussagt. Und die übrigen verschwinden ganz, statt als
-     * namenlose Punkte dazustehen: Der Zähler unten rechts nennt sie.
+     * namenlose Punkte dazustehen: Der Zähler nennt sie.
      */
-    const gezeigt =
-      mass.punkte >= einzeln.length
-        ? einzeln
-        : [...einzeln].sort((a, b) => b.strength - a.strength).slice(0, mass.punkte)
-    const gemischt = createRng(`constellation-scatter:${gezeigt.length}`).shuffle(
-      gezeigt.map((node, index) => ({ node, index })),
-    )
-    const halbBreite = (text: string) => (text.length * EINHEITEN_JE_ZEICHEN) / 2 + BAND_LUFT
-    const beschriftet = gemischt.map(({ node, index }) => ({
+    const nachStaerke = [...einzeln].sort((a, b) => b.strength - a.strength)
+    let gewaehlt: { plaetze: Kasten[]; labels: string[] } | undefined
+    let gemischt: { node: Knoten; index: number }[] = []
+    for (let punkte = einzeln.length; punkte >= 1 && gewaehlt === undefined; punkte--) {
+      const auswahl = punkte >= einzeln.length ? einzeln : nachStaerke.slice(0, punkte)
+      // Erst mischen, dann probieren: Die Reihenfolge entscheidet die Plätze.
+      const misch = createRng(`constellation-scatter:${punkte}`).shuffle(
+        auswahl.map((node, index) => ({ node, index })),
+      )
+      for (let zeichen = HOECHST_ZEICHEN; zeichen >= MINDEST_ZEICHEN; zeichen--) {
+        const ergebnis = versuch(
+          misch.map(({ node }) => node),
+          zeichen,
+        )
+        if (ergebnis !== undefined) {
+          gewaehlt = ergebnis
+          gemischt = misch
+          break
+        }
+      }
+    }
+    const treffer = gewaehlt ?? { plaetze: [] as Kasten[], labels: [] as string[] }
+    const beschriftet = gemischt.map(({ node, index }, i) => ({
       node,
       index,
-      label: bandLabel(node.label, maxZeichen),
+      label: treffer.labels[i] as string,
     }))
-    const plaetze = streueUndEntzerre(
-      beschriftet.map(({ label }) => halbBreite(label)),
-      mass.hoehe,
-    )
+    const plaetze = treffer.plaetze
     const gestreut = beschriftet.map((eintrag, i) => ({
       ...eintrag,
       x: (plaetze[i] as Kasten).x,
       y: (plaetze[i] as Kasten).y,
     }))
 
-    return { hoehe: mass.hoehe, punkte: gestreut.map(({ node, label, x, y }) => ({
+    return { hoehe, punkte: gestreut.map(({ node, label, x, y }) => ({
       id: node.id,
       // Das Band ist `aria-hidden`; der ganze Name steht in „Mein Gedächtnis".
       label,
       x: einzeln.length === 1 ? 50 : x,
-      y: einzeln.length === 1 ? mass.hoehe / 2 : y,
+      y: einzeln.length === 1 ? hoehe / 2 : y,
       strength: node.strength,
       /*
        * Wird es zu eng für jeden Namen, trägt nur jeder zweite Punkt einen —
@@ -623,9 +664,7 @@ export function MemoryConstellation({
          * Stilvorlage, und für alle mit wenigen Erinnerungen ändert sich
          * nichts.
          */
-        style={
-          raum.hoehe === BAND_HOEHE ? undefined : { aspectRatio: `100 / ${raum.hoehe}` }
-        }
+        style={{ aspectRatio: `100 / ${raum.hoehe}` }}
         aria-hidden={onSelect === undefined ? true : undefined}
         aria-label={onSelect === undefined ? undefined : ariaLabel}
       >
@@ -677,6 +716,7 @@ export function MemoryConstellation({
           * teilen sich eine Bahn — nah genug an eigenen Körpern, und weit
           * weg vom einen Atemzug des ganzen Bildes.
           */}
+        <g className="constellation-reise">
         {ebenen.map((ebene, ebeneIndex) => (
           <g
             key={ebeneIndex}
@@ -769,6 +809,7 @@ export function MemoryConstellation({
         })}
           </g>
         ))}
+        </g>
       </svg>
       {graph.nodes.length > placed.length && (
         <span className="constellation-window" aria-live="polite">
