@@ -507,7 +507,7 @@ body::before {
    „Le téléphone chauffe toujours"). Eine zweite Animation je Punkt wären
    fünfunddreißig gewesen. Bewegt wird ausschließlich `transform` — das
    schiebt die Grafikkarte, ohne neu zu zeichnen. */
-.constellation:not(.constellation-tappable) .constellation-memory {
+.constellation:not(.constellation-tappable) .constellation-layer {
   animation: node-drift var(--drift) ease-in-out infinite;
 }
 
