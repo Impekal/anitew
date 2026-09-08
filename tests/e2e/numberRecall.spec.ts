@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { pollFirstModule, startButton, visit } from './helpers.ts'
+import { reachModuleRound, startButton, visit } from './helpers.ts'
 
 /**
  * Zahlen abrufen — mit der Tastatur, die das Telefon wirklich zeigt.
@@ -17,27 +17,24 @@ import { pollFirstModule, startButton, visit } from './helpers.ts'
  * das das Gerät nicht hergibt.
  *
  * Welches Modul eine Einheit zieht, entscheidet der Seed (siehe
- * `reverse.spec.ts`): Der Test startet Notfall-Einheiten und verwirft sie,
- * bis eine Zahlenrunde kommt — derselbe Knopf, den auch ein Mensch hat.
+ * `reverse.spec.ts`). Bis zum 08.09. startete dieser Test dafür bis zu
+ * vierzig Einheiten und verwarf sie, bis zufällig eine Zahlenrunde kam —
+ * die dritte Kopie desselben Würfels, nach `reachModuleRound` und
+ * `longNumbers.spec.ts`. Er ist im Produktzweig gefallen, mit der eigenen
+ * Meldung „in vierzig Anläufen kam keine Zahlenrunde“, und hat den Deploy
+ * aufgehalten. Jetzt läuft er über denselben Helfer wie alle anderen: Uhr
+ * anhalten, gemessene Sekunde anspringen.
  */
 
-/** Startet Notfall-Einheiten, bis eine Zahlenrunde bis zum freien Abruf steht. */
+/**
+ * Eine Zahlenrunde bis zum **freien Abruf** — über den gemeinsamen Helfer.
+ *
+ * `reachModuleRound` bringt die Runde ins Einprägen; das Einprägen läuft
+ * über echte Sekunden, der freie Abruf kommt danach von selbst.
+ */
 async function reachNumberRecall(page: Page): Promise<void> {
-  for (let attempt = 0; attempt < 40; attempt++) {
-    await page.getByRole('button', { name: '60 Sekunden' }).click()
-    await startButton(page).click()
-    await page.locator('.settle').click()
-
-    if ((await pollFirstModule(page)) === 'numbers') {
-      // Das Einprägen läuft über echte Sekunden; der freie Abruf kommt danach.
-      await page.locator('.recall-input').waitFor({ timeout: 90_000 })
-      return
-    }
-
-    await page.locator('.session-abort').click()
-    await expect(page.locator('.challenge')).toBeVisible()
-  }
-  throw new Error('in vierzig Anläufen kam keine Zahlenrunde')
+  await reachModuleRound(page, 'numbers')
+  await page.locator('.recall-input').waitFor({ timeout: 90_000 })
 }
 
 test('mehrere Zahlen gehen auch mit dem Ziffernblock — die App gibt den Umbruch', async ({
