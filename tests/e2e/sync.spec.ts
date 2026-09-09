@@ -309,6 +309,85 @@ test('sagt bei fehlender Drive-Freigabe, welches Kästchen leer blieb', async ({
 })
 
 /**
+ * Der Satz stimmt — der Knopf hielt sich nicht daran (Gerätebild 09.09.).
+ *
+ * `boxMissing` sagt: „Melde dich noch einmal an und setze dort den Haken."
+ * Genau das ging nicht. Nach der leer gebliebenen Freigabe liegt eine
+ * **gültige** Google-Sitzung im Browser — 180 Tage lang. Der Knopf lief
+ * gegen sie, bekam vom Worker wieder `drive_granted: false` und warf.
+ * `needsInteractiveAuthorization` kannte nur `denied`; die fehlende
+ * Freigabe ist aber `blocked`. Also kein Rücksprung zu Google, sondern
+ * gemessen:
+ *
+ *   Weiterleitungen zu accounts.google.com   0
+ *   Meldung danach   „Anmeldung nicht abgeschlossen … · drive_scope_missing"
+ *
+ * Beides falsch: Die Anmeldung *war* abgeschlossen, und Googles Kürzel
+ * stand wieder da, wo ein Satz hingehört. Wer der Meldung folgte, drehte
+ * sich im Kreis — und auf dem Erstbildschirm gibt es nicht einmal einen
+ * Trennen-Knopf, mit dem man herauskäme.
+ */
+test('führt nach dem leeren Kästchen wirklich zu Google zurück', async ({ page }) => {
+  let zuGoogle = 0
+  await installGoogleStub(page, { driveGranted: false })
+  await page.route('https://accounts.google.com/**', (route) => {
+    zuGoogle += 1
+    return route.fulfill({ contentType: 'text/html', body: '<p>Google</p>' })
+  })
+
+  await visit(page)
+  await seedClientId(page)
+  await openPage(page, 'Synchronisieren / Abmelden')
+  await page.locator('.sync-run').click()
+  await expect(page.locator('.sync-failure')).toContainText('Kästchen')
+
+  // Das zweite Tippen — genau das, was die Meldung verlangt.
+  await page.locator('.sync-run').click()
+  await expect
+    .poll(() => zuGoogle, { message: 'der Knopf springt nicht zu Google zurück', timeout: 15_000 })
+    .toBeGreaterThan(0)
+})
+
+/**
+ * Derselbe Weg auf dem **Erstbildschirm** — dort kam das Gerätebild her.
+ *
+ * Die Karte „Deine Daten. Deine Kontrolle." hatte bis zum 09.09. keine
+ * einzige Prüfung ihrer Statuszeile: nicht für „verbunden", nicht für einen
+ * Fehler, nicht für das leere Kästchen. Und sie ist der einzige Ort, an dem
+ * jemand die Freigabe gibt, bevor die App überhaupt aufgeht — ohne
+ * Trennen-Knopf, also ohne zweiten Ausweg.
+ */
+test('die Erstkarte erklärt das leere Kästchen und führt dann zu Google', async ({ page }) => {
+  let zuGoogle = 0
+  await installGoogleStub(page, { driveGranted: false })
+  await page.route('https://accounts.google.com/**', (route) => {
+    zuGoogle += 1
+    return route.fulfill({ contentType: 'text/html', body: '<p>Google</p>' })
+  })
+
+  // Nicht über `visit`: Der Erstbildschirm ist genau der zu prüfende Ort.
+  await page.goto('/')
+  await page.locator('.arrival').waitFor({ timeout: 30_000 })
+  await seedClientId(page)
+  // Die Rückkehr von Googles Zustimmung, ohne dass dort der Haken gesetzt wurde.
+  await page.goto('/?googleOAuth=complete')
+
+  const status = page.locator('.first-run-drive-status')
+  const knopf = page.locator('.first-run-drive-connect')
+  await expect(status).toContainText('Kästchen', { timeout: 30_000 })
+  // Kein „nicht abgeschlossen": Sie war abgeschlossen, nur ohne Drive.
+  await expect(status).not.toContainText('nicht abgeschlossen')
+  await expect(status).not.toContainText('drive_scope_missing')
+  // Und die Karte behauptet nichts: Ohne Freigabe ist nichts verbunden.
+  await expect(knopf).toBeEnabled()
+
+  await knopf.click()
+  await expect
+    .poll(() => zuGoogle, { message: 'die Erstkarte ist eine Sackgasse', timeout: 15_000 })
+    .toBeGreaterThan(0)
+})
+
+/**
  * Der abgelehnte Zugriff bekommt seinen eigenen Satz — er stand schon im
  * Wörterbuch, kam aber nie an.
  *
