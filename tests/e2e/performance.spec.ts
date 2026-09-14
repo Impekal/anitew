@@ -259,22 +259,36 @@ async function running(page: import('@playwright/test').Page): Promise<RunningAn
           den ganzen Teilbaum in eine eigene Ebene, und die wird neu
           gerechnet, sobald sich darin etwas ruehrt. Genau so war das Netz
           gebaut — ein `drop-shadow` ueber achtzig bewegten Elementen.
+
+          **Und die bewegte Flaeche selbst kann ein Pseudo-Element sein.**
+          Genau daran ist diese Pruefung bis zum 13.09. vorbeigesehen: Bei
+          `body::after` ist `effect.target` schlicht `body`, und `body` hat
+          keinen Filter — der liegt auf dem Pseudo. `getComputedStyle(node)`
+          ohne zweites Argument fragte also den falschen Kasten und meldete
+          die teuerste Flaeche der App als sauber. Der erste Schritt prueft
+          deshalb das Pseudo-Element selbst, erst danach die Vorfahren.
         */
+        const pseudo = (effect as unknown as { pseudoElement?: string | null })?.pseudoElement ?? null
         let blur = ''
+        const pruefe = (style: CSSStyleDeclaration) => {
+          const backdrop = style.backdropFilter
+          const filter = style.filter
+          if (backdrop !== 'none' && backdrop !== '') return `backdrop-filter: ${backdrop}`
+          if (filter !== 'none' && (filter.includes('blur') || filter.includes('drop-shadow'))) {
+            return `filter: ${filter}`
+          }
+          return ''
+        }
+        if (target !== undefined) blur = pruefe(getComputedStyle(target, pseudo))
         for (
           let node: Element | null | undefined = target;
           node !== null && node !== undefined && blur === '';
           node = node.parentElement
         ) {
-          const near = getComputedStyle(node)
-          const backdrop = near.backdropFilter
-          const filter = near.filter
-          if (backdrop !== 'none' && backdrop !== '') blur = `backdrop-filter: ${backdrop}`
-          else if (filter !== 'none' && (filter.includes('blur') || filter.includes('drop-shadow'))) {
-            blur = `filter: ${filter}`
-          }
+          blur = pruefe(getComputedStyle(node))
         }
-        const name = target === undefined ? '?' : (target.getAttribute('class') ?? target.tagName)
+        const eigenName = target === undefined ? '?' : (target.getAttribute('class') ?? target.tagName)
+        const name = `${eigenName}${pseudo ?? ''}`
         const timing = effect?.getComputedTiming()
         return {
           where: `${name}`.slice(0, 60),
@@ -314,7 +328,25 @@ test('keine dauerhafte Bewegung zeichnet pro Bild neu', async ({ page }) => {
 test('keine Bewegung sitzt auf einer Weichzeichner-Fläche', async ({ page }) => {
   test.setTimeout(120_000)
 
-  // Erst der Startbildschirm — dort steht der Knopf mit dem Weichzeichner.
+  /*
+   * Zuerst der **Startvorhang** — bis zum 13.09. hat diese Prüfung ihn gar
+   * nicht gesehen. Er liegt als Inline-Stil im `index.html`, steht fünf
+   * Sekunden lang und trug mit `blur(42px)` den stärksten Weichzeichner der
+   * ganzen App, endlos bewegt. Ausgerechnet im Kaltstart, wo das Gerät
+   * ohnehin am meisten zu tun hat.
+   */
+  await page.goto('/')
+  await page.locator('#anitew-launch').waitFor({ timeout: 20_000 })
+  await page.waitForTimeout(600)
+  const amVorhang = (await running(page)).filter(
+    (animation) => animation.dauerhaft && animation.blur !== '',
+  )
+  expect(
+    amVorhang.map((a) => `${a.where} · ${a.blur}`).slice(0, 6).join(' | '),
+    'bewegte Weichzeichner am Startvorhang',
+  ).toBe('')
+
+  // Dann der Startbildschirm — dort steht der Knopf mit dem Weichzeichner.
   await visit(page)
   await expect(startButton(page)).toBeVisible()
   await page.waitForTimeout(1200)

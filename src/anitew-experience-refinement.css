@@ -119,7 +119,7 @@ body::after {
   opacity: .78 !important;
   background:
     conic-gradient(from 18deg at 50% 38%, transparent 0 17%, color-mix(in oklab, var(--v4-mint) 7%, transparent) 24%, transparent 31% 62%, color-mix(in oklab, var(--v4-gold) 6%, transparent) 70%, transparent 78%) !important;
-  filter: blur(25px) !important;
+  filter: none !important;
 }
 .note,
 .constellation,
