@@ -36,7 +36,6 @@
   left: 13%;
   top: -18%;
   background: radial-gradient(circle, rgba(140, 207, 192, .09), rgba(140, 207, 192, .025) 40%, transparent 68%);
-  filter: blur(18px);
   animation: world-breathe calc(var(--motion-breathe) * 1.4) ease-in-out infinite;
 }
 
@@ -46,7 +45,6 @@
   right: -10%;
   bottom: -24%;
   background: radial-gradient(circle, rgba(216, 168, 90, .09), transparent 68%);
-  filter: blur(22px);
   animation: world-drift 18s ease-in-out infinite alternate;
 }
 
@@ -244,7 +242,6 @@
   z-index: -1;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(140, 207, 192, .055), transparent 66%);
-  filter: blur(16px);
   animation: session-aura 7.5s ease-in-out infinite;
 }
 

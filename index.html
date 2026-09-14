@@ -188,7 +188,13 @@
             rgb(240 184 100 / 6%) 68%,
             transparent 76%
           );
-        filter: blur(42px);
+        /*
+         * Kein Weichzeichner mehr (Gerätemeldung 13.09., „sehr heiß").
+         * Ein Verlauf ist schon weich; 42 Pixel Unschärfe darüber ändern
+         * gemessen höchstens 5 von 255 Helligkeitsstufen — dafür muss die
+         * Fläche in jedem Bild neu gerastert werden, solange sie sich
+         * bewegt. Die Bewegung bleibt, sie kostet ohne Filter nichts.
+         */
         animation: anitew-launch-aurora 14s ease-in-out infinite alternate;
       }
       /*
