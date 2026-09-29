@@ -118,7 +118,9 @@ describe('die Bilder im Bauplan', () => {
         expect(new Set(block.items.map((item) => gazeSceneOf(item))).size).toBe(1)
       }
       const total = plan.blocks.reduce((sum, block) => sum + block.seconds, 0)
-      expect(total).toBe(MODES[mode].seconds)
+      expect(total).toBe(plan.totalSeconds)
+      expect(total).toBeGreaterThan(MODES[mode].seconds)
+      expect(total).toBeLessThanOrEqual(MODES[mode].seconds * 1.25)
     }
   })
 

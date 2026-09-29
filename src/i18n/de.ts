@@ -83,6 +83,7 @@ export const de = {
     'Vergessen ist kein Defekt. Es ist planbar.',
   ],
   start: {
+    answerTime: 'Die Modusnamen nennen die Basisdauer. Dazu kommen 25 % mehr Antwortzeit; oben steht die Obergrenze. Beim Start siehst du die genaue geplante Dauer.',
     // Die Frage steht über den Knöpfen, nicht auf jedem einzelnen: „Ich habe
     // 15 Minuten“ bricht auf einem Telefon um, und vier umbrechende Knöpfe
     // sind vier Unruheherde (D-011/G-2).
@@ -99,7 +100,30 @@ export const de = {
     on: 'Ton an',
     off: 'Ton aus',
   },
+  journey: {
+    heading: 'Dein Trainingsweg',
+    level: 'Level',
+    names: [
+      'Entdecken',
+      'Verknüpfen',
+      'Wiederfinden',
+      'Dranbleiben',
+      'Vertiefen',
+      'Ausbauen',
+      'Navigieren',
+      'Festigen',
+      'Weiterdenken',
+      'Erfahrung'
+    ],
+    next: 'Noch {xp} XP bis Level {level}',
+    complete: 'Alle Etappen erreicht',
+    progress: 'Fortschritt zum nächsten Trainingslevel',
+    path: 'Level und Spielregeln',
+    rules: '10 XP pro abgeschlossenem Trainingstag, 2 XP pro Wiedersehen nach dem ersten Tag. Mehrere Einheiten am selben Tag zählen einmal.',
+    note: 'XP zeigen deine Trainingsaktivität, keine gemessene Gedächtnisleistung. Pausen kosten keine XP. Alle Methoden bleiben jederzeit verfügbar.'
+  },
   session: {
+    plannedTime: 'Geplante Trainingszeit: {time} inklusive Antwortreserve',
     settle: 'Ankommen',
     settleHint: 'Antippen, wenn du bereit bist',
     round: 'Runde',
@@ -119,9 +143,9 @@ export const de = {
     */
     encodeHints: {
       words: 'Sieh hin. Ein Wort nach dem anderen.',
-      faces: 'Gesicht und Name gehören zusammen. Merke dir beides.',
+      faces: 'Gesicht und Name gehören zusammen. Merke dir beides. Die Übungsnamen sind erfunden.',
       numbers: 'Eine Zahl nach der anderen. Sprich sie innerlich mit.',
-      missions: 'Eine Szene. Was gehört zu wem?',
+      missions: 'Eine Szene. Was gehört zu wem? Namen und Angaben sind erfunden.',
       palace: 'Geh den Weg ab. Leg jedes Ding an seinen Platz — groß, im Weg, unübersehbar.',
       // Wird nie gezeigt — Rückwärts fragt ohne Einprägephase (D7). Der
       // Schlüssel existiert, weil das Wörterbuch je Modul vollständig ist.
@@ -479,6 +503,7 @@ export const de = {
     benchmarkTitle: 'Die Messung wartet',
     benchmarkBody: 'Zwanzig Minuten sind um. Was ist geblieben?',
   },
+  portraitCredits: 'Portraits und Bildnachweise',
   privacy: {
     /*
       Datenschutz in der App (R4).
@@ -620,7 +645,7 @@ export const de = {
       geht (R-3) — und die Quelle der Vorschläge wird beim Prüfen genannt.
     */
     aiSuggest: 'Mit KI vorschlagen',
-    aiNote: 'Dafür geht dein Text mit deinem Schlüssel direkt an {provider} — sonst nirgendwohin.',
+    aiNote: 'Dein Text geht bei Bedarf der Reihe nach an diese Anbieter: {provider}. Jeder Schlüssel geht nur an seinen Anbieter.',
     aiBusy: 'Die KI liest …',
     aiSource: 'Diese Vorschläge kommen von der KI. Prüfe sie — gespeichert wird nur, was du bestätigst.',
     suggestionsNodes: 'Das würden Erinnerungen — abwählen, was nicht stimmt:',
@@ -705,6 +730,14 @@ export const de = {
     notConfigured: 'Der Abgleich ist in dieser Installation noch nicht eingerichtet — es fehlt ihre Google-Kennung. Sicherung und Training sind davon unberührt.',
   },
   coach: {
+    keyOrder: 'Reihenfolge der KI-Schlüssel: zuerst der oberste, bei einem Fehler automatisch der nächste. Bis zu 20 Schlüssel.',
+    keyLabel: 'Bezeichnung (optional)',
+    preferred: 'Bevorzugt',
+    reserve: 'Reserve',
+    moveUp: 'Nach oben',
+    moveDown: 'Nach unten',
+    activeKey: 'Anfrage an {name}',
+
     /*
       Der Coach (M · D-031). Zwei Hälften, eine Haltung: Der obere Teil
       sagt nur, was die eigenen Zahlen hergeben (R-1), der untere braucht
@@ -727,7 +760,7 @@ export const de = {
       D-034 stehen fünf Anbieter zur Wahl — je mit dem Direktlink zur
       Schlüssel-Seite und dem ehrlichen Satz zu Kosten oder Grenzen.
     */
-    keyNote: 'Mit einem eigenen Schlüssel eines KI-Anbieters kannst du dem Coach freie Fragen stellen. Der Schlüssel bleibt auf diesem Gerät und geht mit jeder Frage nur an den gewählten Anbieter — einen Server dazwischen gibt es nicht. Kosten oder Grenzen regelt dein Konto dort.',
+    keyNote: 'Mit einem eigenen Schlüssel eines KI-Anbieters kannst du dem Coach freie Fragen stellen. Die Schlüssel bleiben auf diesem Gerät. Fragen und Kontext gehen bei Ausfällen der Reihe nach an die von dir eingetragenen Anbieter; jeder Schlüssel nur an seinen Anbieter. Es gibt keinen Zwischenserver. Kosten oder Grenzen regelt dein Konto dort.',
     providerLabel: 'Anbieter',
     providers: {
       gemini: 'Google Gemini — empfohlen',

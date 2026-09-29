@@ -35,6 +35,7 @@ export const en: Dictionary = {
     'Forgetting is not a defect. It is predictable.',
   ],
   start: {
+    answerTime: 'Mode names show the base duration. An extra 25% answer time is added; the maximum is shown above. The exact planned duration appears when you start.',
     heading: 'How much time do you have?',
     start: 'Begin',
     modes: {
@@ -48,7 +49,30 @@ export const en: Dictionary = {
     on: 'Sound on',
     off: 'Sound off',
   },
+  journey: {
+    heading: 'Your training journey',
+    level: 'Level',
+    names: [
+      'Explore',
+      'Connect',
+      'Recall',
+      'Keep going',
+      'Deepen',
+      'Build',
+      'Navigate',
+      'Consolidate',
+      'Discover more',
+      'Experience'
+    ],
+    next: '{xp} XP to level {level}',
+    complete: 'All milestones reached',
+    progress: 'Progress to the next training level',
+    path: 'Levels and game rules',
+    rules: '10 XP per completed training day, 2 XP per review after the first day. Multiple sessions on one day count once.',
+    note: 'XP reflect training activity, not measured memory ability. Breaks cost no XP. All methods remain available.'
+  },
   session: {
+    plannedTime: 'Planned training time: {time}, including answer reserve',
     settle: 'Arriving',
     settleHint: 'Tap when you are ready',
     round: 'Round',
@@ -62,9 +86,9 @@ export const en: Dictionary = {
     },
     encodeHints: {
       words: 'Look. One word at a time.',
-      faces: 'Face and name belong together. Remember both.',
+      faces: 'Face and name belong together. Remember both. Training names are fictional.',
       numbers: 'One number at a time. Say it to yourself.',
-      missions: 'One scene. What belongs to whom?',
+      missions: 'One scene. What belongs to whom? Names and details are fictional.',
       palace: 'Walk the route. Put each thing in its place — huge, in the way, impossible to miss.',
       reverse: 'Asked backwards in a moment.',
       twins: 'Look closely — a twin will stand next to it.',
@@ -311,6 +335,7 @@ export const en: Dictionary = {
     benchmarkTitle: 'The measurement is waiting',
     benchmarkBody: 'Twenty minutes are up. What stayed?',
   },
+  portraitCredits: 'Portraits and photo credits',
   privacy: {
     heading: 'Privacy',
     lead: 'ANITEW has no server.',
@@ -399,7 +424,7 @@ export const en: Dictionary = {
     rememberPlaceholder: 'Daniel works at the museum, comes from Madrid and plays guitar.',
     suggest: 'See suggestions',
     aiSuggest: 'Suggest with AI',
-    aiNote: 'Your text goes straight to {provider} with your key — nowhere else.',
+    aiNote: 'If needed, your text goes to these providers in order: {provider}. Each key goes only to its own provider.',
     aiBusy: 'The AI is reading …',
     aiSource: 'These suggestions come from the AI. Check them — only what you confirm is saved.',
     suggestionsNodes: 'These would become memories — deselect what is wrong:',
@@ -472,6 +497,14 @@ export const en: Dictionary = {
     notConfigured: 'Sync is not set up in this installation yet — its Google identifier is missing. Backup and training are unaffected.',
   },
   coach: {
+    keyOrder: 'AI key order: first the top entry, then the next one automatically on failure. Up to 20 keys.',
+    keyLabel: 'Label (optional)',
+    preferred: 'Preferred',
+    reserve: 'Backup',
+    moveUp: 'Move up',
+    moveDown: 'Move down',
+    activeKey: 'Request to {name}',
+
     heading: 'Coach',
     adviceHeading: 'From your numbers',
     advice: {
@@ -482,7 +515,7 @@ export const en: Dictionary = {
       firstSteps: 'Your numbers do not support advice yet. A few sessions, and this space will say what can be read from them — no more, no less.',
     },
     askHeading: 'Free questions',
-    keyNote: 'With your own key from an AI provider you can ask the coach free questions. The key stays on this device and travels only to the chosen provider with each question — there is no server in between. Costs or limits are governed by your account there.',
+    keyNote: 'With your own key from an AI provider you can ask the coach free questions. Keys stay on this device. If a request fails, your question and context go to the providers in your list in order; each key goes only to its own provider. There is no intermediary server. Costs or limits are governed by your account there.',
     providerLabel: 'Provider',
     providers: {
       gemini: 'Google Gemini — recommended',

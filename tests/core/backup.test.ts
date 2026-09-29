@@ -176,3 +176,17 @@ describe('zusammenführen statt überschreiben (N9)', () => {
     expect(keepItemState(one, { ...one })).toEqual(one)
   })
 })
+
+it('keeps all AI credentials out of exports and ignores credentials from old backups', () => {
+  const settings = [
+    { key: 'coach.keys', value: [{ key: 'secret' }] },
+    { key: 'coach.key', value: 'legacy-secret' },
+    { key: 'coach.key.groq', value: 'provider-secret' },
+    { key: 'language', value: 'de' },
+  ]
+  const file = makeBackup({ ...empty, settings }, 1, 'test')
+  expect(file.tables.settings).toEqual([{ key: 'language', value: 'de' }])
+  const restored = readBackup({ ...file, tables: { ...file.tables, settings } })
+  expect(restored.ok).toBe(true)
+  if (restored.ok) expect(restored.file.tables.settings).toEqual([{ key: 'language', value: 'de' }])
+})

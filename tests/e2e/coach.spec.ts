@@ -114,3 +114,38 @@ test('OpenAI bleibt BYOK und spricht direkt über die Responses API', async ({ p
   await expect(page.locator('.coach-answer')).toContainText('sofort eine Verbindung')
   expect(requestSeen).toBe(true)
 })
+
+test('speichert mehrere Schlüssel, ändert die Priorität und wechselt automatisch', async ({ page }) => {
+  const used: string[] = []
+  await page.route('https://api.groq.com/**', async route => {
+    used.push(route.request().headers().authorization!)
+    await route.fulfill({ status: 429, headers: { 'retry-after': '60' }, body: '{}' })
+  })
+  await page.route('https://generativelanguage.googleapis.com/**', async route => {
+    const key = route.request().headers()['x-goog-api-key']!
+    used.push(key)
+    await route.fulfill({ status: key === 'first' ? 503 : 200, contentType: 'application/json',
+      body: JSON.stringify({ candidates: [{ content: { parts: [{ text: 'Die Reserve antwortet.' }] } }] }) })
+  })
+  await visit(page)
+  await openPage(page, 'Coach')
+  for (const [provider, key, label] of [['gemini', 'first', 'Erster'], ['gemini', 'second', 'Zweiter'], ['groq', 'third', 'Dritter']]) {
+    await page.locator('.coach-provider select').selectOption(provider!)
+    await page.locator('.coach-key-label input').fill(label!)
+    await page.locator('.coach-key-input').fill(key!)
+    await page.getByRole('button', { name: 'Schlüssel speichern' }).click()
+    await expect(page.locator('.coach-keys')).toContainText(label!)
+  }
+  await page.getByRole('button', { name: 'Nach oben 3', exact: true }).click()
+  await expect(page.locator('.coach-keys li strong')).toHaveText(['Erster', 'Dritter', 'Zweiter'])
+  await page.reload()
+  await openPage(page, 'Coach')
+  await expect(page.locator('.coach-keys li strong')).toHaveText(['Erster', 'Dritter', 'Zweiter'])
+  await page.locator('.coach-question').fill('Eine Methode bitte')
+  await page.getByRole('button', { name: 'Fragen', exact: true }).click()
+  await expect(page.locator('.coach-answer')).toHaveText('Die Reserve antwortet.')
+  expect(used).toEqual(['first', 'Bearer third', 'second'])
+  await expect(page.locator('.coach-attempt')).toContainText('3. Zweiter')
+  await expect(page.locator('.coach-keys')).not.toContainText('first')
+  await expect(page.locator('.coach-key-input')).toHaveValue('')
+})

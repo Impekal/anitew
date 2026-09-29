@@ -83,3 +83,10 @@ Nicht vorgesehen und ausdrücklich nicht vorhanden: Fotos oder Gesichter
 Dritter. Gesichter erzeugt ANITEW selbst (D-005) — das umgeht neben dem
 Urheberrecht auch die Persönlichkeitsrechte, die ein „lizenzfreies“ Foto eines
 echten Menschen nicht mit abdeckt.
+
+## Portrait photographs
+
+The files in `public/portraits/*.webp` are by their credited photographers,
+under the [Pexels License](https://www.pexels.com/license/), not the code license.
+See `docs/PORTRAITS.md` and `public/portraits/manifest.json` for per-file sources,
+credits, modifications and restrictions.

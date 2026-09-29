@@ -1,4 +1,4 @@
-import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { type ReactNode, lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import {
   MODES,
@@ -97,6 +97,7 @@ import { ProfilePanel } from './ProfilePanel.tsx'
 import { ReminderPanel } from './ReminderPanel.tsx'
 import { SciencePanel } from './SciencePanel.tsx'
 import { FoundationPanel } from './FoundationPanel.tsx'
+import { TrainingJourney } from './TrainingJourney.tsx'
 import { AchievementsLine } from './AchievementsLine.tsx'
 import { CoachPanel } from './CoachPanel.tsx'
 import { MemoryPanel } from './MemoryPanel.tsx'
@@ -109,7 +110,7 @@ import { TodayLine } from './TodayLine.tsx'
 import { StreakLine } from './StreakLine.tsx'
 import { BenchmarkPanel } from './benchmark/BenchmarkPanel.tsx'
 import { BenchmarkScreen } from './benchmark/BenchmarkScreen.tsx'
-import { SessionScreen } from './session/SessionScreen.tsx'
+const SessionScreen = lazy(() => import('./session/SessionScreen.tsx').then(module => ({ default: module.SessionScreen })))
 import { useLanguage } from './useLanguage.ts'
 import { useProfile } from './useProfile.ts'
 import { useStoragePersists } from './useStoragePersists.ts'
@@ -798,7 +799,7 @@ export function App() {
 
   if (running !== undefined) {
     return (
-      <SessionScreen
+      <Suspense fallback={<main className="app" role="status">…</main>}><SessionScreen
         /*
           Der Schlüssel ist die sessionId: „Noch eine Runde“ (B7) setzt eine
           neue Einheit, und der Runner baut seinen Zustand nur beim Einhängen
@@ -813,7 +814,7 @@ export function App() {
         onLeave={leave}
         onComplete={() => setSystemPulse((value) => value + 1)}
         onAgain={start}
-      />
+      /></Suspense>
     )
   }
 
@@ -952,6 +953,7 @@ export function App() {
               ))}
             </ul>
             <p className="hint">{dictionary.privacy.honest}</p>
+            <a href="/portraits/credits.html">{dictionary.portraitCredits}</a>
           </div>
         ),
       },
@@ -985,7 +987,7 @@ export function App() {
     setPageId(undefined)
   }
 
-  const seconds = MODES[mode].seconds
+  const seconds = Math.ceil(MODES[mode].seconds * 1.25)
   const label = `${Math.floor(seconds / 60)}:${(seconds % 60).toString().padStart(2, '0')}`
 
   return (
@@ -1185,7 +1187,7 @@ export function App() {
         {/* Kein Titel über dem Knopf — „5:00 Beginnen“ erklärt sich, und ein
             Etikett darüber wäre genau das Möbel, das G-2 weglässt. */}
         <button type="button" className="start" onClick={start}>
-          <span className="start-time">{label}</span>
+          <span className="start-time">≤ {label}</span>
           <span className="start-label">{dictionary.start.start}</span>
         </button>
 
@@ -1225,6 +1227,7 @@ export function App() {
           </>
         )}
 
+        <p className="hint response-time-note">{dictionary.start.answerTime}</p>
         <h2 id="challenge-heading">{dictionary.start.heading}</h2>
         <div className="modes" role="group" aria-labelledby="challenge-heading">
           {MODE_ORDER.map((id) => (
@@ -1240,6 +1243,8 @@ export function App() {
           ))}
         </div>
       </section>
+
+      <TrainingJourney days={trainingDays} today={today} returns={returns.total} dictionary={dictionary} />
 
       <div className="today-history" aria-label={dictionary.today.heading}>
         <StreakLine streak={streak} dictionary={dictionary} />

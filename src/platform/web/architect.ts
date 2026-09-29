@@ -9,7 +9,7 @@
  * Extraktion.
  */
 
-import type { CoachPort } from '../../core/coach/prompt.ts'
+import type { CoachPort, CoachRequest } from '../../core/coach/prompt.ts'
 import {
   type MemoryArchitect,
   architectSystem,
@@ -17,10 +17,13 @@ import {
 } from '../../core/memory/memoryArchitect.ts'
 import { CoachError } from './coach.ts'
 
-export function createWebArchitect(coach: CoachPort): MemoryArchitect {
+export function createWebArchitect(coach: CoachPort, onAttempt?: CoachRequest['onAttempt']): MemoryArchitect {
   return {
     async suggest(text) {
-      const answer = await coach.ask({ system: architectSystem(), question: text })
+      const answer = await coach.ask({
+        system: architectSystem(), question: text, onAttempt,
+        accepts: answer => parseArchitectAnswer(answer) !== undefined,
+      })
       const suggestions = parseArchitectAnswer(answer)
       // Kein lesbares JSON ist ein Fehler des Anbieters, kein leeres Ergebnis.
       if (suggestions === undefined) throw new CoachError('failed')

@@ -12,27 +12,14 @@
  * 3. **Gemischt.** Geschlechter und Herkünfte über die Liste verteilt — wer
  *    nur eine Sorte Namen übt, übt nur eine Sorte Namen.
  *
- * Die Gesichter dazu entstehen aus dem Namen (siehe `faces.ts`): Derselbe Name
+ * Die Portraits sind fest zugeordnet (siehe `portraitAssignments.ts`): Derselbe Name
  * ergibt immer dasselbe Gesicht, heute wie in drei Wochen.
  */
 
 import { FALLBACK_LANGUAGE, type Language } from '../language.ts'
 
-/*
- * Warum die Listen zweigeteilt sind.
- *
- * Der Gesichtsgenerator würfelt den Bart aus dem Namen. Vorher stand deshalb
- * mit einer Wahrscheinlichkeit von rund einem Viertel eine Margarethe mit
- * Vollbart auf dem Bildschirm — und das liest sich nicht als Vielfalt,
- * sondern als Fehler. Wer einen Fehler sieht, schaut auf den Fehler und nicht
- * auf das Gesicht, das er sich merken soll.
- *
- * Die Trennung ist ausdrücklich **keine Aussage darüber, wie Menschen
- * aussehen** — es gibt bärtige Frauen, und Regel 3 oben bleibt. Sie ist eine
- * Aussage über eine Zeichnung aus fünf Strichen: Die kann Zwischentöne nicht
- * transportieren, also zeichnet sie das Naheliegende und behauptet nicht mehr,
- * als sie zeigen kann. Kahlköpfigkeit bleibt bewusst für alle möglich — die
- * fällt nicht als Fehler auf, der Vollbart schon.
+/* Existing name groups remain stable for saved sessions and spaced review.
+ * The names are fictional labels, not identities of the photographed people.
  */
 const deFeminine = [
   'Beata', 'Dilara', 'Farida', 'Hedwig', 'Jolanda', 'Ludmilla', 'Nadja', 'Pia',
@@ -116,14 +103,7 @@ export function hasNamePool(language: Language): boolean {
   return POOLS[language] !== undefined
 }
 
-/**
- * Darf zu diesem Namen ein Bart gezeichnet werden?
- *
- * Ein unbekannter Name — später etwa aus einer eigenen Liste — ergibt `true`.
- * Das ist die harmlosere Richtung: Ein Bart, der nicht passt, ist ein schiefes
- * Bild; eine Regel, die stillschweigend alle Bärte abschaltet, wäre ein
- * verschwundenes Merkmal.
- */
+/** Legacy name-group lookup, retained for data compatibility. */
 export function beardFits(name: string): boolean {
   return !FEMININE.has(name)
 }

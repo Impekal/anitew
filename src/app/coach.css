@@ -1,0 +1,113 @@
+/* ── Der Coach (M · D-031) ────────────────────────────────────────────── */
+
+/* Zwei ruhige Abschnitte: Hinweise aus den Zahlen, dann die freien Fragen.
+   Dieselben leisen Etiketten wie im Fähigkeitsbaum — der Coach ist Auskunft,
+   kein eigenes Möbelstück. */
+.coach {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+.coach-source {
+  margin: 0 0 0.4rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.coach-advice {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+/* Die Anbieterwahl (D-034): ein leises Auswahlfeld, kein Markenlogo-Zoo. */
+.coach-provider {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+  width: 100%;
+}
+
+.coach-provider select {
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.92rem;
+}
+
+/* Die Schlüssel-Anleitung samt Direktlink — vor dem Feld (D-015). */
+.coach-key-help {
+  margin: 0.5rem 0 0;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.coach-key,
+.coach-ask {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+  margin-top: 0.6rem;
+}
+
+.coach-key-input,
+.coach-question {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.92rem;
+}
+
+.coach-question {
+  resize: vertical;
+}
+
+.coach-key-present {
+  margin: 0.6rem 0 0;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+}
+
+.coach-key-remove {
+  padding: 0;
+}
+
+.coach-answer {
+  margin: 0.4rem 0 0;
+  padding: 0.7rem 0.85rem;
+  border-left: 2px solid var(--line);
+  font-size: 0.95rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.coach-keys { padding-left: 1.5rem; }
+.coach-keys li { padding: .75rem 0; border-bottom: 1px solid var(--line, #8884); overflow-wrap: anywhere; }
+.coach-keys li > span { display: block; font-size: .85rem; opacity: .75; }
+.coach-key-actions { display: flex; gap: .5rem; flex-wrap: wrap; }
+.coach-key-actions button { min-width: 44px; min-height: 44px; }
+.coach-key-label { display: grid; gap: .4rem; margin-block: 1rem; }
+.coach-key-label input { min-width: 0; width: 100%; box-sizing: border-box; }
+.coach-attempt { font-size: .85rem; overflow-wrap: anywhere; }
+

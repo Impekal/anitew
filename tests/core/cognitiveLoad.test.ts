@@ -67,6 +67,8 @@ describe('O7 — kognitive Last zwischen Runden', () => {
 
     expect(roundModules.length).toBeGreaterThan(0)
     expect(roundModules.every(isCognitivelyHeavy)).toBe(true)
-    expect(session.blocks.reduce((sum, block) => sum + block.seconds, 0)).toBe(MODES.extended.seconds)
+    expect(session.blocks.reduce((sum, block) => sum + block.seconds, 0)).toBe(session.totalSeconds)
+    expect(session.totalSeconds).toBeGreaterThan(MODES.extended.seconds)
+    expect(session.totalSeconds).toBeLessThanOrEqual(MODES.extended.seconds * 1.25)
   })
 })

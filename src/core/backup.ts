@@ -173,9 +173,13 @@ export type BackupReading =
     }
   | { ok: false; problem: BackupProblem; version?: number }
 
+export function isPrivateSetting(key: string): boolean {
+  return key === 'coach.key' || key === 'coach.keys' || key.startsWith('coach.key.')
+}
+
 /** Baut die Datei aus den Tabellen. */
 export function makeBackup(tables: BackupTables, now: number, app: string): BackupFile {
-  return { format: BACKUP_FORMAT, version: BACKUP_VERSION, createdAt: now, app, tables }
+  return { format: BACKUP_FORMAT, version: BACKUP_VERSION, createdAt: now, app, tables: { ...tables, settings: tables.settings.filter(row => !isPrivateSetting(row.key)) } }
 }
 
 /**
@@ -214,7 +218,7 @@ export function readBackup(raw: unknown): BackupReading {
    * Bericht.
    */
   const events = rows.events.filter((event) => isBackupEventKind(event.kind))
-  const tables: BackupTables = { ...rows, events }
+  const tables: BackupTables = { ...rows, events, settings: rows.settings.filter(row => row !== null && typeof row === 'object' && typeof row.key === 'string' && !isPrivateSetting(row.key)) }
 
   return {
     ok: true,

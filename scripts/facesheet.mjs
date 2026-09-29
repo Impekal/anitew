@@ -1,20 +1,6 @@
-/**
- * Ein Bogen voller Gesichter — Werkzeug, kein Teil der App.
- *
- * Gesichter lassen sich nicht durch Lesen prüfen. Ob ein Bart über dem Mund
- * liegt, ob eine Frisur die Brauen verschluckt, ob sich acht Gesichter
- * wirklich unterscheiden: Das sieht man erst, wenn man viele nebeneinander
- * legt. Einzelne Bildschirmfotos aus der laufenden App zeigen jeweils ein
- * Gesicht und kosten jedes Mal eine Minute — bei sieben Frisuren, drei Nasen
- * und vier Mündern findet man so einen Fehler erst, wenn ein Nutzer ihn
- * meldet.
- *
- * Deshalb rendert dieses Skript `app/Face.tsx` ohne Browser nach SVG und legt
- * die Gesichter in ein Raster. Es benutzt esbuild (kommt mit Vite) nur zum
- * Übersetzen von TSX und react-dom/server zum Zeichnen — keine zusätzliche
- * Abhängigkeit, kein Teil des Auslieferungspakets.
- *
- *   node scripts/facesheet.mjs [ziel.html] [anzahl]
+/** Offline portrait contact sheet for visual review.
+ * Renders the production Face component with local bundled images.
+ * Usage: node scripts/facesheet.mjs [target.html] [count]
  */
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -43,7 +29,7 @@ await build({
   stdin: {
     contents: `
       export { Face } from ${JSON.stringify(join(root, 'src/app/Face.tsx'))}
-      export { faceFor, namePool } from ${JSON.stringify(join(root, 'src/core/index.ts'))}
+      export { namePool } from ${JSON.stringify(join(root, 'src/core/index.ts'))}
     `,
     resolveDir: root,
     loader: 'ts',
@@ -57,35 +43,18 @@ await build({
   logLevel: 'warning',
 })
 
-const { Face, faceFor, namePool } = await import(bundle)
+const { Face, namePool } = await import(bundle)
 const { renderToStaticMarkup } = await import('react-dom/server')
 const { createElement } = await import('react')
 
-/*
- * `--nur=merkmal` zeigt nur Gesichter mit einer bestimmten Eigenschaft.
- * Seltene Merkmale — der Vollbart trifft rund jedes siebte Gesicht — sind auf
- * einem gemischten Bogen sonst kaum zu beurteilen: Man sieht drei Stück und
- * hält für Zufall, was in Wahrheit die Form ist.
- */
-const filters = {
-  bart: (face) => face.beard === 2,
-  schnurrbart: (face) => face.beard === 1,
-  brille: (face) => face.glasses,
-}
-const wanted = process.argv.find((arg) => arg.startsWith('--nur='))?.slice(6)
-if (wanted !== undefined && filters[wanted] === undefined) {
-  throw new Error(`--nur= kennt nur: ${Object.keys(filters).join(', ')}`)
-}
 
-const names = namePool('de')
-  .filter((name) => wanted === undefined || filters[wanted](faceFor(name)))
-  .slice(0, count)
+const names = [...new Set(['de', 'en', 'fr', 'es'].flatMap(namePool))].slice(0, count)
 const cells = names
   .map(
     (name) =>
       `<figure><div class="frame">${renderToStaticMarkup(
         createElement(Face, { name, size: 132 }),
-      )}</div><figcaption>${name}</figcaption></figure>`,
+      ).replaceAll('src="/portraits/', `src="file://${root}/public/portraits/`)}</div><figcaption>${name}</figcaption></figure>`,
   )
   .join('\n')
 
@@ -108,7 +77,7 @@ writeFileSync(
   figure { margin: 0; text-align: center; }
   .frame { display: flex; justify-content: center; }
   figcaption { margin-top: 4px; opacity: 0.75; font-size: 13px; }
-  svg { width: 108px; height: auto; }
+  img { width: 108px; height: 135px; object-fit: cover; border-radius: 10px; }
 </style>
 <section class="light"><div class="grid">${cells}</div></section>
 <section class="dark"><div class="grid">${cells}</div></section>

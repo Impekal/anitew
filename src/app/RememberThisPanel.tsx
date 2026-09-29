@@ -12,15 +12,12 @@ import { applyRememberedSuggestions } from '../core/index.ts'
 import { createWebArchitect } from '../platform/web/architect.ts'
 import { scheduleDriveSync } from './driveSync.ts'
 import {
-  COACH_PROVIDERS,
   COACH_PROVIDER_NAMES,
-  COACH_PROVIDER_SETTING,
   CoachError,
   type CoachFailure,
   type CoachProvider,
-  LEGACY_COACH_KEY_SETTING,
-  coachKeySettingFor,
 } from '../platform/web/coach.ts'
+import { loadCoachKeys } from '../platform/web/coachKeys.ts'
 import type { Dictionary } from '../i18n/index.ts'
 
 /**
@@ -52,21 +49,17 @@ export function RememberThisPanel({
   // Der KI-Weg (D-037) ist ein Angebot, kein Pflichtpfad (M2): Er erscheint
   // nur, wenn beim gewählten Coach-Anbieter ein eigener Schlüssel liegt.
   const [aiProvider, setAiProvider] = useState<CoachProvider | undefined>(undefined)
+  const [aiOrder, setAiOrder] = useState('')
+  const [aiAttempt, setAiAttempt] = useState('')
   const [aiBusy, setAiBusy] = useState(false)
   const [aiFailure, setAiFailure] = useState<CoachFailure | undefined>(undefined)
   const [fromAi, setFromAi] = useState(false)
 
   useEffect(() => {
     void (async () => {
-      const stored = await platform.settings.read<CoachProvider>(COACH_PROVIDER_SETTING)
-      const provider =
-        stored !== undefined && COACH_PROVIDERS.includes(stored) ? stored : COACH_PROVIDERS[0]
-      const key =
-        (await platform.settings.read<string>(coachKeySettingFor(provider))) ??
-        (provider === 'anthropic'
-          ? await platform.settings.read<string>(LEGACY_COACH_KEY_SETTING)
-          : undefined)
-      setAiProvider(key !== undefined && key.trim() !== '' ? provider : undefined)
+      const keys = await loadCoachKeys(platform.settings)
+      setAiProvider(keys[0]?.provider)
+      setAiOrder(keys.map(key => COACH_PROVIDER_NAMES[key.provider]).join(' → '))
     })().catch(() => undefined)
   }, [platform])
 
@@ -81,10 +74,11 @@ export function RememberThisPanel({
 
   const proposeWithAi = () => {
     setAiBusy(true)
+    setAiAttempt('')
     setAiFailure(undefined)
     void (async () => {
       try {
-        const next = await createWebArchitect(platform.coach).suggest(draft.trim())
+        const next = await createWebArchitect(platform.coach, entry => setAiAttempt(dictionary.coach.activeKey.replace('{name}', `${entry.position}. ${entry.label || COACH_PROVIDER_NAMES[entry.provider as CoachProvider]}`))).suggest(draft.trim())
         setSuggestions(next)
         setDropped(new Set())
         setSaved(false)
@@ -205,9 +199,10 @@ export function RememberThisPanel({
           </button>
         )}
       </div>
+      {aiAttempt && <p role="status">{aiAttempt}</p>}
       {aiProvider !== undefined && (
         <p className="hint remember-ainote">
-          {texts.aiNote.replace('{provider}', COACH_PROVIDER_NAMES[aiProvider])}
+          {dictionary.coach.keyOrder} {texts.aiNote.replace('{provider}', aiOrder)}
         </p>
       )}
       {aiBusy && <p className="hint remember-aibusy">{texts.aiBusy}</p>}

@@ -38,3 +38,17 @@ Vor dem Produktionsdeploy bleiben deshalb als **USER ACTIONS AT END** auf einem 
 V4.2 gilt erst dann als automatischer Release Candidate, wenn alle oben genannten CI-Gates auf `anitew-v4-2-living-memory` grün sind. Während des Hardening wird **nicht** auf `anitew-redesign-v2` gemergt und **nicht** aus ChatGPT in Produktion deployt.
 
 Der Produktionsdeploy erfolgt ausschließlich lokal durch den Nutzer nach dem echten iPhone-Endcheck. Die Hosting-Konfiguration und Produktions-URL werden durch dieses Hardening nicht verändert.
+
+## Ergänzung 2026-09-30
+
+- Portraits: 186 unterschiedliche lokal gebündelte Fotos samt Herkunft und
+  Lizenzregister; alle müssen vor dem ersten Anzeigen offline verfügbar sein.
+- Neue Trainingseinheiten haben auf Nutzerwunsch zusätzliche Antwortzeit.
+  Summe aller Blöcke = angezeigte geplante Dauer; Einprägen wird nicht gekürzt.
+  Kein pauschaler Test auf die alte Basisdauer. Benchmarks bleiben unverändert.
+- Trainingslevel werden aus vorhandener Aktivität abgeleitet und als Spiel
+  ausgewiesen. Restore und Reset benötigen keinen neuen XP-Speicher.
+- KI: Reihenfolge, mehrere Schlüssel eines Anbieters, automatische Ausweichfolge,
+  Zeitüberschreitungen und Ausschluss der Schlüssel aus Sicherungen sind geprüft.
+- Die neuen Browserprüfungen laufen früh auf Desktop und Mobile. Die übrigen
+  strengen Gates, Budgets und das Verbot von Merge/Deploy bleiben bestehen.

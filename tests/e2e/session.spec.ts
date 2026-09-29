@@ -152,7 +152,7 @@ test('führt durch Einprägen und Abrufen und zählt ehrlich', async ({ page }) 
 })
 
 test('hält das Zeitbudget ein, auch wenn niemand etwas tut', async ({ page }) => {
-  // Der Notfallmodus dauert 60 Sekunden — der Test muss ihn abwarten dürfen.
+  // Der Notfallmodus enthält die zusätzliche Antwortreserve.
   test.setTimeout(150_000)
 
   await startEmergency(page)
@@ -161,6 +161,9 @@ test('hält das Zeitbudget ein, auch wenn niemand etwas tut', async ({ page }) =
   // Eine Mission zeigt statt einzelner Stücke ihre Szene — beides ist der
   // Anfang der Trainingszeit.
   await expect(page.locator('.encode-word, .scene').first()).toBeVisible({ timeout: 15_000 })
+  const plannedSeconds = Number(await page.locator('main.session').getAttribute('data-planned-seconds'))
+  expect(plannedSeconds).toBeGreaterThan(60)
+  expect(plannedSeconds).toBeLessThanOrEqual(75)
   const started = Date.now()
   // Der Abruf beginnt mit einem Feld — oder mit den zwei Knöpfen der
   // Zwillinge (D-027). Beides heißt: Die Uhr der Runde läuft.
@@ -172,15 +175,17 @@ test('hält das Zeitbudget ein, auch wenn niemand etwas tut', async ({ page }) =
   await expect(page.getByRole('heading', { name: 'Geblieben' })).toBeVisible({ timeout: 90_000 })
   await expect(page.locator('.summary-score strong')).toHaveText('0')
 
-  // Die Zusage aus B2: 60 Sekunden sind 60 Sekunden. Der Spielraum nach oben
+  // Die angezeigte geplante Zeit gilt einschließlich Reserve. Der Spielraum nach oben
   // deckt Anlauf und Testmaschine ab, nach unten wäre jede Abkürzung ein
   // Fehler — dann hätte ein Block seine Zeit nicht bekommen.
   const seconds = (Date.now() - started) / 1000
-  expect(seconds).toBeGreaterThan(57)
-  expect(seconds).toBeLessThan(72)
+  expect(seconds).toBeGreaterThan(plannedSeconds - 3)
+  expect(seconds).toBeLessThan(plannedSeconds + 12)
 })
 
 test('überlebt eine Unterbrechung mitten in der Einheit (B5)', async ({ page }) => {
+  // Erststart, ggf. Modulneuwahl und zweiter Splash gehören zum Ablauf.
+  test.setTimeout(60_000)
   await startEmergency(page)
   await expect(page.locator('.encode-word, .scene').first()).toBeVisible()
   await page.waitForTimeout(1500)
@@ -189,11 +194,14 @@ test('überlebt eine Unterbrechung mitten in der Einheit (B5)', async ({ page })
   await page.reload()
 
   await expect(page.getByRole('heading', { name: 'Eine Einheit läuft noch' })).toBeVisible()
-  await page.getByRole('button', { name: 'Fortsetzen' }).click()
+  await expect(page.locator('#anitew-launch')).toBeHidden({ timeout: 10_000 })
+  await page.getByRole('button', { name: 'Fortsetzen' }).click({ timeout: 5_000 })
   await expect(page.locator('.encode-word, .scene, .recall-input').first()).toBeVisible()
 })
 
 test('lässt sich verwerfen und beginnt dann neu', async ({ page }) => {
+  // Drei Seitenstarts; die einzelne Bedienaktion bleibt zeitlich begrenzt.
+  test.setTimeout(60_000)
   await startEmergency(page)
   await expect(page.locator('.encode-word, .scene').first()).toBeVisible()
   await page.reload()

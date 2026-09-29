@@ -62,7 +62,7 @@ export function SessionScreen(props: {
   const [settled, setSettled] = useState(false)
 
   if (!settled) {
-    return <Settle dictionary={props.dictionary} onDone={() => setSettled(true)} />
+    return <Settle seconds={props.progress.plan.totalSeconds} dictionary={props.dictionary} onDone={() => setSettled(true)} />
   }
   return <RunningSession {...props} />
 }
@@ -76,7 +76,7 @@ export function SessionScreen(props: {
  * Die Uhr der Einheit läuft erst danach. Das Zeitbudget bleibt Trainingszeit
  * und wird nicht heimlich mit Ankommen gefüllt (B2).
  */
-function Settle({ dictionary, onDone }: { dictionary: Dictionary; onDone: () => void }) {
+function Settle({ dictionary, seconds, onDone }: { dictionary: Dictionary; seconds: number; onDone: () => void }) {
   useEffect(() => {
     const timer = setTimeout(onDone, SETTLE_MS)
     return () => clearTimeout(timer)
@@ -88,6 +88,7 @@ function Settle({ dictionary, onDone }: { dictionary: Dictionary; onDone: () => 
         <span className="settle-breath" aria-hidden="true" />
         <p className="settle-word">{dictionary.session.settle}</p>
         <p className="hint">{dictionary.session.settleHint}</p>
+        <p className="session-duration" data-seconds={seconds}>{dictionary.session.plannedTime.replace('{time}', formatSeconds(seconds))}</p>
       </button>
     </main>
   )
@@ -238,13 +239,14 @@ function RunningSession({
       : undefined
 
   return (
-    <main className={`app session${state.landingPulse ? ' session-memory-landing' : ''}`}>
+    <main data-planned-seconds={progress.plan.totalSeconds} className={`app session${state.landingPulse ? ' session-memory-landing' : ''}`}>
       <header className="session-head">
         <span>
           {t.round} {block.round}/{rounds}
         </span>
         <span className="session-clock">{formatSeconds(state.remaining)}</span>
       </header>
+      <p className="hint session-duration">{t.plannedTime.replace('{time}', formatSeconds(progress.plan.totalSeconds))}</p>
       <div className={`session-phase session-phase-${phase}`} aria-live="polite">
         <span aria-hidden="true" />
         {t.phases[phase]}

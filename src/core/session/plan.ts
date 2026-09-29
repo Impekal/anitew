@@ -93,11 +93,23 @@ export function planSession(input: PlanInput): SessionPlan {
     spatial: input.pools.spatial ?? spatialPool(input.seed, 40),
     associative,
   }
-  return base.planSession({
+  const planned = base.planSession({
     ...input,
     pools,
     modules: input.modules ?? TRAINING_MODULES,
   } as unknown as base.PlanInput) as unknown as SessionPlan
+  // User-requested 25% answer reserve; encoding and task difficulty stay intact.
+  // Round cumulative extra time so the total never exceeds 125% of the base mode.
+  let answers = 0
+  let granted = 0
+  const blocks = planned.blocks.map(block => {
+    if (block.kind !== 'recall' && block.kind !== 'review') return block
+    answers += block.seconds
+    const extra = Math.round(answers * 0.25) - granted
+    granted += extra
+    return { ...block, seconds: block.seconds + extra }
+  })
+  return { ...planned, blocks, totalSeconds: planned.totalSeconds + granted }
 }
 
 export const itemsOf = base.itemsOf as (

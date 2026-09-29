@@ -1035,6 +1035,9 @@ body::before {
 
 .face {
   display: block;
+  object-fit: cover;
+  border-radius: 12px;
+  max-width: 100%;
   filter: drop-shadow(0 6px 18px rgb(0 0 0 / 12%));
 }
 
@@ -1709,110 +1712,6 @@ body::before {
   color: var(--ink-faint);
 }
 
-/* ── Der Coach (M · D-031) ────────────────────────────────────────────── */
-
-/* Zwei ruhige Abschnitte: Hinweise aus den Zahlen, dann die freien Fragen.
-   Dieselben leisen Etiketten wie im Fähigkeitsbaum — der Coach ist Auskunft,
-   kein eigenes Möbelstück. */
-.coach {
-  display: flex;
-  flex-direction: column;
-  gap: 1.4rem;
-}
-
-.coach-source {
-  margin: 0 0 0.4rem;
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-}
-
-.coach-advice {
-  margin: 0;
-  padding-left: 1.1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.55rem;
-  font-size: 0.92rem;
-  line-height: 1.5;
-  color: var(--ink-soft);
-}
-
-/* Die Anbieterwahl (D-034): ein leises Auswahlfeld, kein Markenlogo-Zoo. */
-.coach-provider {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  font-size: 0.92rem;
-  color: var(--ink-soft);
-  width: 100%;
-}
-
-.coach-provider select {
-  padding: 0.5rem 0.6rem;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--paper);
-  color: var(--ink);
-  font: inherit;
-  font-size: 0.92rem;
-}
-
-/* Die Schlüssel-Anleitung samt Direktlink — vor dem Feld (D-015). */
-.coach-key-help {
-  margin: 0.5rem 0 0;
-  font-size: 0.92rem;
-  line-height: 1.5;
-  color: var(--ink-soft);
-}
-
-.coach-key,
-.coach-ask {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  align-items: flex-start;
-  margin-top: 0.6rem;
-}
-
-.coach-key-input,
-.coach-question {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 0.55rem 0.7rem;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--paper);
-  color: var(--ink);
-  font: inherit;
-  font-size: 0.92rem;
-}
-
-.coach-question {
-  resize: vertical;
-}
-
-.coach-key-present {
-  margin: 0.6rem 0 0;
-  font-size: 0.92rem;
-  color: var(--ink-soft);
-}
-
-.coach-key-remove {
-  padding: 0;
-}
-
-.coach-answer {
-  margin: 0.4rem 0 0;
-  padding: 0.7rem 0.85rem;
-  border-left: 2px solid var(--line);
-  font-size: 0.95rem;
-  line-height: 1.55;
-  white-space: pre-wrap;
-}
-
 .coach-failure {
   margin: 0.4rem 0 0;
   font-size: 0.92rem;
@@ -2304,3 +2203,17 @@ body::before {
   color: var(--ink);
   border: 2px solid var(--accent);
 }
+
+.training-journey { display: flex; gap: 1rem; padding: 1.1rem; margin: 1.5rem 0; border: 1px solid #a98a5140; border-radius: 18px; background: linear-gradient(120deg, #ad8a4512, transparent); }
+.journey-level { width: 3rem; height: 3rem; flex: 0 0 3rem; display: grid; place-items: center; border: 1px solid #a98a5170; border-radius: 50%; font-size: 1.4rem; font-weight: 700; }
+.journey-content { min-width: 0; flex: 1; }
+.journey-eyebrow { font-size: .75rem; letter-spacing: .08em; margin: 0 0 .3rem; opacity: .7; }
+.journey-content h2 { font-size: 1rem; margin: 0; }
+.journey-xp { font-size: .82rem; margin: .4rem 0; }
+.journey-content progress { display: block; width: 100%; height: .5rem; accent-color: #ae8c4f; margin: .8rem 0; }
+.journey-content summary { cursor: pointer; font-size: .8rem; padding-block: .4rem; }
+.journey-path { list-style: none; padding: 0; display: grid; gap: .5rem; font-size: .8rem; }
+.journey-path li { display: flex; flex-wrap: wrap; gap: .4rem; opacity: .65; }
+.journey-path .journey-reached { opacity: 1; }
+.journey-path small { margin-left: auto; }
+.response-time-note { max-width: 34rem; }

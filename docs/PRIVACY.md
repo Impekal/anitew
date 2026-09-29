@@ -1,6 +1,6 @@
 # Datenschutzerklärung
 
-**Stand: 2026-08-24** · Backlog R4
+**Stand: 2026-09-30** · Backlog R4
 
 > Der kurze Teil zuerst: **ANITEW bleibt local-first.** Es gibt **kein Konto**
 > bei ANITEW, keine Werbung, keine Analyse-Dienste und keine Tracker.
@@ -118,13 +118,27 @@ Für Google gelten zusätzlich Googles Datenschutzbedingungen.
 
 ## 9. Coach mit eigenem API-Schlüssel
 
-Der Coach ist aus, bis du einen eigenen Schlüssel hinterlegst und eine Frage
-stellst. Unterstützt werden **Gemini, Anthropic, Groq, OpenRouter und Mistral**.
-Dann gehen Frage und der dafür beschriebene Zahlenkontext direkt an den von dir
-gewählten KI-Anbieter. Eigene Erinnerungstexte werden nur bei einer von dir
-ausgelösten KI-Vorschlagsfunktion übertragen. Der API-Schlüssel bleibt auf
-deinem Gerät. Für die Verarbeitung beim jeweiligen Anbieter gilt dessen
-Datenschutzerklärung.
+Der Coach überträgt erst etwas, wenn du eigene Schlüssel hinterlegst und eine
+Frage stellst. Unterstützt werden **Gemini, Anthropic, OpenAI, Groq, OpenRouter
+und Mistral**. Du kannst mehrere Schlüssel je Anbieter speichern und ihre
+Reihenfolge ändern. Bei Fehlern, ausgeschöpften Kontingenten, leeren Antworten
+oder Zeitüberschreitungen versucht die App den nächsten verfügbaren Eintrag.
+Frage und Zahlenkontext können dadurch an mehrere konfigurierte Anbieter gehen.
+Die Oberfläche zeigt den aktuell verwendeten Eintrag. Ein Schlüssel wird nur
+an seinen jeweiligen Anbieter übertragen, niemals an einen anderen Anbieter.
+
+Eigene Erinnerungstexte werden nur bei einer von dir ausgelösten
+KI-Vorschlagsfunktion übertragen; dafür gilt dieselbe Ausweichfolge. Die
+Schlüssel werden lokal gespeichert und aus Dateisicherungen sowie dem
+Google-Drive-Abgleich ausgeschlossen. Beim Import alter Sicherungen werden
+darin enthaltene KI-Schlüssel ignoriert. Für die Verarbeitung beim jeweiligen
+Anbieter gilt dessen Datenschutzerklärung; Kosten und Kontingente regelt dein
+Konto dort.
+
+Die Portraitfotos sind Bestandteil der App und werden für Offline-Nutzung
+lokal zwischengespeichert. Beim Training werden keine Bilder von Pexels oder
+anderen Bilddiensten angefordert. Namen und Szenendetails sind fiktive
+Übungsdaten; Bildquellen stehen unter „Portraits und Bildnachweise“.
 
 ## 10. Kinder
 

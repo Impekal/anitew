@@ -61,7 +61,9 @@ describe('H6 — adaptive Missionsschwierigkeit', () => {
   it('verschiebt nur Zeit innerhalb der Runde — das Sessionbudget bleibt exakt', () => {
     for (const delta of [-1, 0, 1] as const) {
       const plan = adaptivePlanSession({ ...input, difficulty: { missions: delta } })
-      expect(plan.blocks.reduce((sum, block) => sum + block.seconds, 0)).toBe(MODES.daily.seconds)
+      expect(plan.blocks.reduce((sum, block) => sum + block.seconds, 0)).toBe(plan.totalSeconds)
+    expect(plan.totalSeconds).toBeGreaterThan(MODES.daily.seconds)
+    expect(plan.totalSeconds).toBeLessThanOrEqual(MODES.daily.seconds * 1.25)
       for (const block of plan.blocks.filter(
         (entry) => entry.kind === 'recall' && entry.moduleId === 'missions',
       )) {

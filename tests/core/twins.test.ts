@@ -174,6 +174,8 @@ describe('die Zwillinge im Bauplan (D-027)', () => {
     ])
     // Die Zusage bleibt exakt.
     const total = plan.blocks.reduce((sum, block) => sum + block.seconds, 0)
-    expect(total).toBe(MODES.daily.seconds)
+    expect(total).toBe(plan.totalSeconds)
+      expect(total).toBeGreaterThan(MODES.daily.seconds)
+      expect(total).toBeLessThanOrEqual(MODES.daily.seconds * 1.25)
   })
 })

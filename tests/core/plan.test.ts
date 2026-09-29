@@ -33,8 +33,9 @@ describe('das Zeitbudget', () => {
     for (const mode of TRAINING_MODES) {
       const session = plan(mode)
       const sum = session.blocks.reduce((total, block) => total + block.seconds, 0)
-      expect(sum).toBe(MODES[mode].seconds)
-      expect(session.totalSeconds).toBe(MODES[mode].seconds)
+      expect(sum).toBe(session.totalSeconds)
+      expect(session.totalSeconds).toBeGreaterThan(MODES[mode].seconds)
+      expect(session.totalSeconds).toBeLessThanOrEqual(MODES[mode].seconds * 1.25)
     }
   })
 
@@ -168,16 +169,17 @@ describe('das Wiedersehen mit früheren Tagen (D8)', () => {
     for (const mode of TRAINING_MODES) {
       const session = plan(mode, 'test', due)
       const sum = session.blocks.reduce((total, block) => total + block.seconds, 0)
-      expect(sum).toBe(MODES[mode].seconds)
+      expect(sum).toBe(session.totalSeconds)
     }
   })
 
-  it('nimmt sich die Zeit vom Lernen, nicht obendrauf', () => {
-    // Sonst wäre das Wiedersehen ein heimlicher Aufschlag auf die
-    // versprochenen fünf Minuten (B2).
+  it('plant das Wiedersehen innerhalb der Basis und gewährt die Antwortreserve', () => {
+    // Das Basisbudget bleibt begrenzt; nur die offen ausgewiesene
+    // Antwortreserve verlängert die Gesamtdauer.
     const withReview = plan('daily', 'test', due)
     const withoutReview = plan('daily')
-    expect(withReview.totalSeconds).toBe(withoutReview.totalSeconds)
+    expect(withReview.totalSeconds).toBeLessThanOrEqual(MODES.daily.seconds * 1.25)
+    expect(withoutReview.totalSeconds).toBeLessThanOrEqual(MODES.daily.seconds * 1.25)
     expect(itemsOf(withReview).length).toBeLessThanOrEqual(itemsOf(withoutReview).length)
   })
 

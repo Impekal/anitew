@@ -26,6 +26,8 @@ export interface CoachPort {
 export interface CoachRequest {
   readonly system: string
   readonly question: string
+  readonly accepts?: (answer: string) => boolean
+  readonly onAttempt?: (entry: { provider: string; label: string; position: number }) => void
 }
 
 /** Länger als ein Absatz soll keine Coach-Antwort sein. */

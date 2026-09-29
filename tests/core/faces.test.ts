@@ -1,83 +1,46 @@
+import { readFileSync } from 'node:fs'
+import { createHash } from 'node:crypto'
 import { describe, expect, it } from 'vitest'
 
 import { faceFor } from '../../src/core/content/faces.ts'
 import { beardFits, namePool } from '../../src/core/content/names.ts'
 import { gradePrompted } from '../../src/core/session/grading.ts'
 
-describe('der Gesichtsgenerator (D-005)', () => {
-  it('gibt demselben Namen immer dasselbe Gesicht', () => {
-    // Darauf beruht das Wiedersehen (D8): „Elena“ sieht in drei Wochen aus
-    // wie heute. Ohne diese Verlässlichkeit lernte man jedes Mal ein neues
-    // Gesicht zum alten Namen.
-    expect(faceFor('Elena')).toEqual(faceFor('Elena'))
+describe('lokale Portraitfotos', () => {
+  const names = [...new Set(['de', 'en', 'fr', 'es'].flatMap(language => namePool(language as 'de')))]
+  it('ordnet jedem vorhandenen Namen ein eigenes stabiles Foto zu', () => {
+    const faces = names.map(faceFor)
+    expect(faces.every(Boolean)).toBe(true)
+    expect(new Set(faces.map(face => face?.src)).size).toBe(names.length)
+    for (const name of names) expect(faceFor(name)).toEqual(faceFor(name))
   })
-
-  it('gibt verschiedenen Namen verschiedene Gesichter', () => {
-    expect(faceFor('Elena')).not.toEqual(faceFor('Elenb'))
-  })
-
-  it('erzeugt aus dem Namensvorrat sichtbar verschiedene Gesichter', () => {
-    // Der Sinn des Generators ist Unterscheidbarkeit. Gemessen an der Zahl
-    // verschiedener Kombinationen aus den auffälligsten Merkmalen.
-    const faces = namePool('de').map(faceFor)
-    const marks = new Set(
-      faces.map((face) => `${face.hairStyle}|${face.skin}|${face.hair}|${face.glasses}|${face.beard}`),
-    )
-    expect(marks.size).toBeGreaterThan(faces.length * 0.75)
-  })
-
-  it('nutzt die ganze Spanne der Hauttöne', () => {
-    // Eine Gedächtnis-App, in der alle Gesichter gleich aussehen, übt nicht
-    // das, worauf es ankommt: Menschen auseinanderzuhalten.
-    const tones = new Set(namePool('de').map((name) => faceFor(name).skin))
-    expect(tones.size).toBeGreaterThanOrEqual(6)
-  })
-
-  it('bleibt in sinnvollen Maßen', () => {
-    for (const name of namePool('de')) {
-      const face = faceFor(name)
-      expect(face.width).toBeGreaterThan(0.8)
-      expect(face.width).toBeLessThan(1.2)
-      expect(face.eyeSpacing).toBeGreaterThan(0.8)
-      expect(face.eyeSpacing).toBeLessThan(1.2)
-      expect([0, 1, 2]).toContain(face.beard)
+  it('behandelt fremde Namen sicher, ohne fremde Bilder oder Antwort im Ersatzbild', () => {
+    for (const name of ['unknown', '__proto__', 'constructor', 'https://example.com/a.jpg']) {
+      expect(faceFor(name)).toBeUndefined()
     }
   })
-
-  it('zeichnet keinen Bart, wo keiner hingehört', () => {
-    // Eine Margarethe mit Vollbart liest sich nicht als Vielfalt, sondern als
-    // Fehler — und wer einen Fehler sieht, schaut auf den Fehler statt auf
-    // das Gesicht, das er sich merken soll. Die Begründung steht in names.ts.
-    for (const language of ['de', 'en'] as const) {
-      for (const name of namePool(language)) {
-        if (!beardFits(name)) expect(faceFor(name).beard).toBe(0)
-      }
+  it('liefert vorhandene, verschiedene WebP-Dateien mit Quellen und Lizenzen', () => {
+    const manifest = JSON.parse(readFileSync('public/portraits/manifest.json', 'utf8'))
+    expect(manifest).toHaveLength(names.length)
+    const hashes = new Set<string>()
+    let bytes = 0
+    for (const name of names) {
+      const face = faceFor(name)!
+      expect(face.src).toMatch(/^\/portraits\/pexels-\d+\.webp$/)
+      const file = readFileSync(`public${face.src}`)
+      expect(file.subarray(8, 12).toString()).toBe('WEBP')
+      const hash = createHash('sha256').update(file).digest('hex')
+      hashes.add(hash)
+      bytes += file.length
+      const credit = manifest.find((entry: { name: string }) => entry.name === name)
+      expect(credit.sha256).toBe(hash)
+      expect(credit.source).toMatch(/^https:\/\/www\.pexels\.com\/photo\//)
+      expect(credit.photographer.length).toBeGreaterThan(1)
+      expect(credit.license).toBe('Pexels License')
     }
+    expect(hashes.size).toBe(names.length)
+    expect(bytes).toBeLessThan(3 * 1024 * 1024)
   })
-
-  it('behält den Bart als Merkmal — er verschwindet nicht insgesamt', () => {
-    // Die Gegenprobe zur vorigen Regel: Eine Bedingung, die versehentlich
-    // *alle* Bärte abschaltet, würde dort nicht auffallen.
-    const bearded = namePool('de').filter((name) => faceFor(name).beard !== 0)
-    expect(bearded.length).toBeGreaterThanOrEqual(4)
-  })
-
-  /*
-   * Hier stand ein Test dazu, dass der Bart genau **einen** Wurf verbraucht
-   * (siehe `beardOf` in faces.ts). Er ist wieder heraus, und zwar bewusst:
-   *
-   * Von außen ist an `faceFor` nicht zu sehen, wie oft der Zufall gefragt
-   * wurde — sichtbar sind nur die Merkmale, und die sehen in beiden Fällen
-   * zufällig aus. Mein Versuch, es über die Streuung der übrigen Merkmale zu
-   * messen, ist prompt an sich selbst gescheitert: Bei sieben bärtigen Namen
-   * und 48 möglichen Kombinationen aus Augen, Nase und Mund fallen zwei
-   * zusammen, wie es die Wahrscheinlichkeit vorsieht — der Test war falsch,
-   * nicht der Code.
-   *
-   * Ein Test, der nur so lange grün ist, wie der Zufall mitspielt, ist
-   * schlimmer als keiner. Die Begründung steht deshalb als Kommentar an der
-   * Stelle, wo sie gebraucht wird, und nicht als Scheinprüfung hier.
-   */
 })
 
 describe('der Namensvorrat (L6)', () => {

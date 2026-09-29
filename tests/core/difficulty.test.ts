@@ -109,7 +109,9 @@ describe('die Verschiebung im Bauplan (D2)', () => {
         expect(block.items.length).toBeLessThanOrEqual(8)
       }
       const total = plan.blocks.reduce((sum, block) => sum + block.seconds, 0)
-      expect(total).toBe(MODES.daily.seconds)
+      expect(total).toBe(plan.totalSeconds)
+      expect(total).toBeGreaterThan(MODES.daily.seconds)
+      expect(total).toBeLessThanOrEqual(MODES.daily.seconds * 1.25)
     }
   })
 

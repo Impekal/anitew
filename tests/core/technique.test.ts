@@ -260,7 +260,9 @@ describe('Geschichte und Verknüpfung im Bauplan (D5 · D-013)', () => {
   it('hält das Budget exakt, Lektion einbegriffen', () => {
     const plan = planSession({ ...encBase, mode: 'daily', storyTaught: false, linkTaught: false })
     const total = plan.blocks.reduce((sum, block) => sum + block.seconds, 0)
-    expect(total).toBe(MODES.daily.seconds)
+    expect(total).toBe(plan.totalSeconds)
+      expect(total).toBeGreaterThan(MODES.daily.seconds)
+      expect(total).toBeLessThanOrEqual(MODES.daily.seconds * 1.25)
   })
 })
 

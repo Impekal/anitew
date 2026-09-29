@@ -53,8 +53,9 @@ describe('D12 spatial session wiring', () => {
       modules: ['spatial'],
     })
 
-    expect(plan.totalSeconds).toBe(180)
-    expect(plan.blocks.reduce((sum, block) => sum + block.seconds, 0)).toBe(180)
+    expect(plan.totalSeconds).toBeGreaterThan(180)
+    expect(plan.totalSeconds).toBeLessThanOrEqual(225)
+    expect(plan.blocks.reduce((sum, block) => sum + block.seconds, 0)).toBe(plan.totalSeconds)
     expect(plan.blocks.every((block) => block.moduleId === 'spatial')).toBe(true)
 
     const encoded = plan.blocks.filter((block) => block.kind === 'encode').flatMap((block) => block.items)

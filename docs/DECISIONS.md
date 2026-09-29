@@ -1507,3 +1507,38 @@ Ihr Anker ist deterministisch der am stärksten verbundene, dann älteste
 Knoten. Diese Welten steuern räumliche Nähe und Navigation, nicht Leistung.
 Bei großen Graphen bleibt die bestehende Sichtgrenze bestehen; ein Fokus zeigt
 eine Welt statt hunderter gleichzeitiger Punkte.
+
+## 2026-09-29 · Reale Portraits (ersetzt den Gesichterteil von D-005)
+
+Auf ausdrücklichen Nutzerwunsch ersetzen 186 lokal gebündelte, lizenzierte
+Portraitfotos die SVG-Gesichter. Namen bleiben stabile, fiktive Übungslabels.
+Kein Bilddienst wird zur Laufzeit angesprochen. Quellen und Rechte: PORTRAITS.md.
+Die übrigen D-005-Regeln für Symbole und Szenen bleiben bestehen.
+
+## 2026-09-30 · Antwortreserve, Trainingslevel und KI-Reihenfolge
+
+Auf Nutzerwunsch erhalten alle neu geplanten Trainingseinheiten in allen
+Schwierigkeitsstufen rund 25 % mehr Abruf- und Wiedersehzeit. Die Rundung
+beträgt je Block weniger als eine Sekunde. Einprägen, Inhalte, Lektionen und
+Schwierigkeit bleiben gleich; die Einheit wird entsprechend länger. Der
+Startknopf zeigt die Obergrenze, die Einheit ihre konkrete geplante Dauer.
+Gespeicherte laufende Einheiten behalten ihren ursprünglichen Plan.
+Standardisierte Benchmarks bleiben unverändert, damit Vergleiche gültig bleiben.
+
+Der ebenfalls gewünschte Spielanteil ergänzt D-019: zehn Trainingslevel,
+10 XP je abgeschlossenem Trainingstag und 2 XP je Wiedersehen nach dem ersten
+Tag. Berechnet aus vorhandenen Daten, ohne zweiten Zähler, Tagesdruck,
+XP-Verlust oder gesperrte Methoden. XP sind Aktivität, kein Leistungsbefund.
+
+Bis zu 20 eigene KI-Schlüssel sind in frei änderbarer Reihenfolge möglich,
+auch mehrere je Anbieter. Inspiration: Impekal/rreader, AKIYES aiTeam.ts
+(06424f90b6379c81e4988296ad511afb28e82fb7).
+ANITEW hält die konfigurierte Reihenfolge strikt ein, auch über Anbietergrenzen.
+Jeder Versuch hat 15 Sekunden Zeit; 429 respektiert Retry-After (mindestens
+30 Sekunden, ohne Angabe 5 Minuten), 401/403 pausieren den Eintrag 5 Minuten.
+Die Pause liegt nur im Arbeitsspeicher. Keine Live-Kontostandsabfrage, keine
+Umgehung von Anbietergrenzen, kein Erfolgsversprechen bei leeren Kontingenten.
+Alte Schlüssel werden beim Lesen übernommen und beim ersten Speichern in die
+neue Liste migriert. Schlüssel sind von Backup, Import und Drive ausgeschlossen.
+Coach und Memory-Architekt verwenden denselben Weg; ungültige strukturierte
+Antworten lösen ebenfalls den nächsten Versuch aus.

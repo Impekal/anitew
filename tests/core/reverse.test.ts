@@ -66,7 +66,9 @@ describe('das Rückwärts-Modul', () => {
       expect(encodes).toHaveLength(0)
       // Die Zusage bleibt exakt: Die Summe der Blöcke ist die Länge des Modus.
       const total = plan.blocks.reduce((sum, block) => sum + block.seconds, 0)
-      expect(total).toBe(MODES[mode].seconds)
+      expect(total).toBe(plan.totalSeconds)
+      expect(total).toBeGreaterThan(MODES[mode].seconds)
+      expect(total).toBeLessThanOrEqual(MODES[mode].seconds * 1.25)
     }
   })
 

@@ -180,32 +180,76 @@ function callFor(provider: CoachProvider, key: string, request: CoachRequest) {
 export interface CoachConfig {
   provider: CoachProvider
   key: string | undefined
+  label?: string
 }
 
-export function createWebCoach(readConfig: () => Promise<CoachConfig>): CoachPort {
+export const COACH_ATTEMPT_TIMEOUT_MS = 15_000
+
+/** Each key is tried once, in the configured order. Cooldowns are memory-only. */
+export function createWebCoach(readConfig: () => Promise<CoachConfig | readonly CoachConfig[]>): CoachPort {
+  const unavailable = new Map<string, { until: number; reason: CoachFailure }>()
   return {
     async ask(request: CoachRequest): Promise<string> {
-      const { provider, key } = await readConfig()
-      if (key === undefined || key.trim() === '') throw new CoachError('no-key')
-
-      const call = await callFor(provider, key.trim(), request)
-      let response: Response
-      try {
-        response = await fetch(call.url, {
-          method: 'POST',
-          headers: { 'content-type': 'application/json', ...call.headers },
-          body: JSON.stringify(call.body),
-        })
-      } catch {
-        throw new CoachError('offline')
+      const loaded = await readConfig()
+      const entries: readonly CoachConfig[] = Array.isArray(loaded) ? loaded : [loaded as CoachConfig]
+      let last = new CoachError('no-key')
+      const tried = new Set<string>()
+      for (const [index, entry] of entries.entries()) {
+        const { provider, key } = entry
+        if (typeof key !== 'string' || !key.trim() || !COACH_PROVIDERS.includes(provider)) continue
+        const identity = `${provider}:${key.trim()}`
+        if (tried.has(identity)) continue
+        tried.add(identity)
+        const cooldown = unavailable.get(identity)
+        if (cooldown !== undefined && cooldown.until > Date.now()) {
+          last = new CoachError(cooldown.reason)
+          continue
+        }
+        request.onAttempt?.({ provider, label: entry.label ?? '', position: index + 1 })
+        const controller = new AbortController()
+        let timeout: ReturnType<typeof setTimeout> | undefined
+        try {
+          const attempt = async () => {
+            const call = await callFor(provider, key.trim(), request)
+            let response: Response
+            try {
+              response = await fetch(call.url, {
+                method: 'POST', redirect: 'error', signal: controller.signal,
+                headers: { 'content-type': 'application/json', ...call.headers },
+                body: JSON.stringify(call.body),
+              })
+            } catch { throw new CoachError('offline') }
+            if (response.status === 429) {
+              const retry = response.headers.get('retry-after')
+              const seconds = retry === null ? NaN : Number(retry)
+              const date = retry === null ? NaN : Date.parse(retry)
+              const until = Number.isFinite(seconds) ? Date.now() + seconds * 1000 : date
+              unavailable.set(identity, { until: Math.max(Date.now() + 30_000,
+                Number.isFinite(until) ? until : Date.now() + 300_000), reason: 'failed' })
+            }
+            if (response.status === 401 || response.status === 403) {
+              unavailable.set(identity, { until: Date.now() + 300_000, reason: 'bad-key' })
+              throw new CoachError('bad-key')
+            }
+            if (!response.ok) throw new CoachError('failed')
+            const text = call.parse(await response.json()).trim()
+            if (text === '' || (request.accepts !== undefined && !request.accepts(text))) throw new CoachError('failed')
+            return text
+          }
+          const deadline = new Promise<never>((_, reject) => {
+            timeout = setTimeout(() => { controller.abort(); reject(new CoachError('failed')) }, COACH_ATTEMPT_TIMEOUT_MS)
+          })
+          const answer = await Promise.race([attempt(), deadline])
+          unavailable.delete(identity)
+          return answer
+        } catch (error) {
+          last = error instanceof CoachError ? error : new CoachError('failed')
+        } finally {
+          clearTimeout(timeout)
+          controller.abort()
+        }
       }
-
-      if (response.status === 401 || response.status === 403) throw new CoachError('bad-key')
-      if (!response.ok) throw new CoachError('failed')
-
-      const text = call.parse((await response.json()) as unknown).trim()
-      if (text === '') throw new CoachError('failed')
-      return text
+      throw last
     },
   }
 }
