@@ -6,6 +6,9 @@ test('zeigt nachvollziehbare Level und berechnet den Fortschritt nach Neustart a
   const journey = page.locator('.training-journey')
   await expect(journey).toContainText('Level 1')
   await expect(journey).toContainText('0 XP')
+  const challenge = await page.locator('.challenge').boundingBox()
+  const levelCard = await journey.boundingBox()
+  expect(levelCard!.y).toBeGreaterThan(challenge!.y + challenge!.height - 1)
   await journey.locator('summary').click()
   await expect(journey.locator('li')).toHaveCount(10)
   await page.evaluate(async () => {

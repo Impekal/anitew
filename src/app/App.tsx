@@ -1244,9 +1244,8 @@ export function App() {
         </div>
       </section>
 
-      <TrainingJourney days={trainingDays} today={today} returns={returns.total} dictionary={dictionary} />
-
       <div className="today-history" aria-label={dictionary.today.heading}>
+        <TrainingJourney days={trainingDays} today={today} returns={returns.total} dictionary={dictionary} />
         <StreakLine streak={streak} dictionary={dictionary} />
         <ReturnsLine returns={returns} dictionary={dictionary} />
       </div>
