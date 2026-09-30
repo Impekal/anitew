@@ -1,10 +1,10 @@
 import { LEVEL_THRESHOLDS, trainingLevel } from '../core/progress/levels.ts'
 import type { Dictionary } from '../i18n/index.ts'
 
-export function TrainingJourney({ days, today, returns, dictionary }: {
-  days: readonly string[]; today: string; returns: number; dictionary: Dictionary
+export function TrainingJourney({ days, today, returns, dictionary, courses }: {
+  days: readonly string[]; today: string; returns: number; dictionary: Dictionary; courses?: readonly string[]
 }) {
-  const state = trainingLevel(days, today, returns)
+  const state = trainingLevel(days, today, returns, courses)
   const t = dictionary.journey
   return (
     <section className="training-journey" aria-label={t.heading}>

@@ -40,3 +40,13 @@
 .courses button.primary,.courses button[aria-pressed="true"] { background:var(--an-gold-wash,rgba(194,165,100,.16)); border-color:var(--an-gold,#c2a564); }
 .courses button:disabled { opacity:.5; cursor:default; }
 .courses button:focus-visible,.course-media select:focus-visible { outline:2px solid var(--an-gold,#c2a564); outline-offset:3px; }
+
+#course-stage { width:100%; min-height:44px; padding:.6rem; font:inherit; color:var(--ink); background:var(--bg,#101914); border:1px solid var(--an-line,currentColor); border-radius:.65rem; }
+
+.course-illustration { margin:1rem 0; padding:.8rem; border:1px solid var(--an-line,currentColor); border-radius:.8rem; }
+.course-illustration figcaption { font-size:.85em; margin-bottom:.7rem; }
+.course-illustration svg { display:block; width:100%; max-width:24rem; margin:auto; }
+.course-illustration ol { display:flex; flex-wrap:wrap; gap:.5rem; list-style:none; padding:0; }
+.course-illustration li { flex:1 1 5rem; padding:.6rem; border:1px solid var(--an-line,currentColor); border-radius:.5rem; margin:0; }
+.illustration-number { display:block; font-size:.75em; margin-bottom:.3rem; color:var(--an-gold,#c2a564); }
+.illustration-long-words li,.illustration-number-images li { font-family:monospace; }

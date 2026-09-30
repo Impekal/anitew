@@ -1,0 +1,337 @@
+[
+  {
+    "course": "active-recall",
+    "language": "de",
+    "model": "thorsten",
+    "textSha256": "606cd0096d23d0c2d40d8643a4637cd077bdd6c3ed52bd3499eef8057e41a9ef",
+    "duration": 92.15873015873017,
+    "bytes": 1099763,
+    "sha256": "3048a972a2252dc25d884659787d18b25289c62ac5274e39e2230450efcab511",
+    "src": "/course-media/library/active-recall-de-3048a972a225.m4a"
+  },
+  {
+    "nameReference": "approved-v14",
+    "course": "active-recall",
+    "language": "en",
+    "model": "joe",
+    "textSha256": "6ed730d63ef9eb6d27acf45a0fd30d8d4d0f0850c8e6d330e656312f1bde83a6",
+    "duration": 84.03124716553289,
+    "bytes": 980656,
+    "sha256": "4af1d5f6d569009f04f6822cbe7527209ed23fe5ddacd75ef80bb8fe92ea8382",
+    "src": "/course-media/library/active-recall-en-4af1d5f6d569.m4a"
+  },
+  {
+    "nameReference": "approved-v14",
+    "course": "active-recall",
+    "language": "fr",
+    "model": "tom",
+    "textSha256": "ecfb40b6dc07185e232770fdd30bf324db9d6213b38dcabda1b85b726cc5df44",
+    "duration": 96.67451247165535,
+    "bytes": 1216043,
+    "sha256": "626ef676416a64e5d1009aed3e5843f8568858f928e78c0dc87ddbfced9f1d81",
+    "src": "/course-media/library/active-recall-fr-626ef676416a.m4a"
+  },
+  {
+    "course": "interleaved-practice",
+    "language": "de",
+    "model": "thorsten",
+    "textSha256": "00db244fa6f6130723b3813e1c5bb3a1e6fed8d47158d8b4da23426af29a5bbc",
+    "duration": 92.40888888888888,
+    "bytes": 1117918,
+    "sha256": "2b2e4524356cf36c82f805da618e1dafa8081590df07ce68d5311c4bb4919b64",
+    "src": "/course-media/library/interleaved-practice-de-2b2e4524356c.m4a"
+  },
+  {
+    "course": "interleaved-practice",
+    "language": "en",
+    "model": "joe",
+    "textSha256": "f8119e0f208f6b9b18b75d84af130941cd74336f69fbda6867db806178c46639",
+    "duration": 84.95528344671202,
+    "bytes": 1000273,
+    "sha256": "7e40012866166aa442071c9c888defda45ff2a240948de376affde0b77d9060a",
+    "src": "/course-media/library/interleaved-practice-en-7e4001286616.m4a"
+  },
+  {
+    "course": "interleaved-practice",
+    "language": "fr",
+    "model": "tom",
+    "textSha256": "016c1237e8efd195add136be289d44e3bf59a80e04b4ef89f7c61940de8af386",
+    "duration": 101.68526077097505,
+    "bytes": 1291868,
+    "sha256": "b95057c75d35cb6d3ddae23c951ba34e7ffc468dcc375730030a9ef1056267cf",
+    "src": "/course-media/library/interleaved-practice-fr-b95057c75d35.m4a"
+  },
+  {
+    "course": "keyword-method",
+    "language": "de",
+    "model": "thorsten",
+    "textSha256": "d75e5d4b7a8a0a6bcca1a9bead9d6a3218e4f6015a4aa41e443cd15fea0c320d",
+    "duration": 78.1750566893424,
+    "bytes": 932837,
+    "sha256": "5d63988f2e5ae6120e9c33931abd3a0edc50a10f4bf996fe2c523b798cd367f4",
+    "src": "/course-media/library/keyword-method-de-5d63988f2e5a.m4a"
+  },
+  {
+    "course": "keyword-method",
+    "language": "en",
+    "model": "joe",
+    "textSha256": "7461b72d048fc794591c1321ed9ee460575b1581863a8034bb1d2dfe9eeeb6af",
+    "duration": 73.78648526077097,
+    "bytes": 843509,
+    "sha256": "a45a43def2b60dd9606a7edd5896f497e7f04e4ad73476f6851aba4f989302a3",
+    "src": "/course-media/library/keyword-method-en-a45a43def2b6.m4a"
+  },
+  {
+    "course": "keyword-method",
+    "language": "fr",
+    "model": "tom",
+    "textSha256": "5e57cb21c73a25a23b87916c6668871e2a8a8a009ea403a6ea6b6e059b8338a5",
+    "duration": 77.76290249433109,
+    "bytes": 971098,
+    "sha256": "a4338419786640106002c6cff4d9619a70c1cf677b541d3e4d8a8181889d5f33",
+    "src": "/course-media/library/keyword-method-fr-a43384197866.m4a"
+  },
+  {
+    "course": "long-words",
+    "language": "de",
+    "model": "thorsten",
+    "textSha256": "cfe5f86a744fd63ee91fc3ca1df50850848d3161e5cae58a3219c88b9748da6a",
+    "duration": 76.9148299319728,
+    "bytes": 937249,
+    "sha256": "8b6e43c26383fcc91fd6a5c87dff29bf03f4a27d44008403310dc8891078bbf0",
+    "src": "/course-media/library/long-words-de-8b6e43c26383.m4a"
+  },
+  {
+    "course": "long-words",
+    "language": "en",
+    "model": "joe",
+    "textSha256": "b18153002b522cdfaf930cf389a6781a5e8a0b8841c9e1c6db4453a0aac7b777",
+    "duration": 70.85442176870748,
+    "bytes": 800064,
+    "sha256": "5b09eb57893833762dba0d1882040d255ea58bd707f994dbefe2d76fa4bf1a9a",
+    "src": "/course-media/library/long-words-en-5b09eb578938.m4a"
+  },
+  {
+    "course": "long-words",
+    "language": "fr",
+    "model": "tom",
+    "textSha256": "814332feabf3e67b714e16cb1d682f6fb08499c4335e7014da6cdc764932615f",
+    "duration": 83.6195918367347,
+    "bytes": 1042342,
+    "sha256": "a52c213553a5dfddc89d56ee1efc8efbb8b42fe9049e2b00995c5372f0e5a288",
+    "src": "/course-media/library/long-words-fr-a52c213553a5.m4a"
+  },
+  {
+    "course": "meaningful-groups",
+    "language": "de",
+    "model": "thorsten",
+    "textSha256": "78dc00daca1b0c26e5adc9ddf426e0e7fd6c0096057664753849a76f801a4146",
+    "duration": 89.8831746031746,
+    "bytes": 1051358,
+    "sha256": "26af5d52c5963ab180e6a15246275d41c4047c4e95fab094eca6b24bfccff611",
+    "src": "/course-media/library/meaningful-groups-de-26af5d52c596.m4a"
+  },
+  {
+    "course": "meaningful-groups",
+    "language": "en",
+    "model": "joe",
+    "textSha256": "978fe08c51cdd1866c1ccf8803c7fbf31cf09b52b27d001dbac7ea0e532b9560",
+    "duration": 83.36997732426303,
+    "bytes": 956345,
+    "sha256": "a25f0cad614ca9d372429fd36def84f519680f8b8992185af6451871a4911761",
+    "src": "/course-media/library/meaningful-groups-en-a25f0cad614c.m4a"
+  },
+  {
+    "course": "meaningful-groups",
+    "language": "fr",
+    "model": "tom",
+    "textSha256": "67113a09ddef124dd679e9661f9ebb2969798cb6e47f0a249dd860a61d094734",
+    "duration": 90.42303854875284,
+    "bytes": 1147896,
+    "sha256": "baae09f56af2dcbf4f2aaa05e6ace98f2680f80e49a140e389b03312ddf4a47f",
+    "src": "/course-media/library/meaningful-groups-fr-baae09f56af2.m4a"
+  },
+  {
+    "course": "method-of-loci",
+    "language": "de",
+    "model": "thorsten",
+    "textSha256": "bb7fe31ec3ab25c1bccdbba1bddb858369d86632c0d1046e56e6f8a81c3b4ecd",
+    "duration": 79.83528344671203,
+    "bytes": 954970,
+    "sha256": "63afd3dc1922fb8295bdae3f58103e2f199d191b632204e6975ee8d277fa49b2",
+    "src": "/course-media/library/method-of-loci-de-63afd3dc1922.m4a"
+  },
+  {
+    "course": "method-of-loci",
+    "language": "en",
+    "model": "joe",
+    "textSha256": "d51445aabcb168581aa96c11fb10a76e5bf5041fe103e3e1e7a96fa9531a808a",
+    "duration": 72.62548752834468,
+    "bytes": 844967,
+    "sha256": "fdf7ea5d6d511d51b7899991f345d92f83af60491d9b09f2eb8be080e9cd0339",
+    "src": "/course-media/library/method-of-loci-en-fdf7ea5d6d51.m4a"
+  },
+  {
+    "course": "method-of-loci",
+    "language": "fr",
+    "model": "tom",
+    "textSha256": "c5c3e1f06f2b12abcc7a4b2c3af93cd39690a1a917f8d2c176aad7c7a97b93f9",
+    "duration": 83.78267573696147,
+    "bytes": 1054183,
+    "sha256": "3232205a3398a3cae3e34ec6231655a9e55f60e9643dc53380665b5d03aa370a",
+    "src": "/course-media/library/method-of-loci-fr-3232205a3398.m4a"
+  },
+  {
+    "course": "number-images",
+    "language": "de",
+    "model": "thorsten",
+    "textSha256": "bc90a149364d37f82b5ab29da5ce7a80bb22a39a7d357cf1c8150314371b0d49",
+    "duration": 75.56281179138323,
+    "bytes": 893241,
+    "sha256": "1f0e6a51c04cea59e2a625f3e9c6bba97b90fcda7f56fde32d8182ec8b5b8a51",
+    "src": "/course-media/library/number-images-de-1f0e6a51c04c.m4a"
+  },
+  {
+    "course": "number-images",
+    "language": "en",
+    "model": "joe",
+    "textSha256": "6b56af1f9f8998777435d63f28be4f841af26aa255c1a236137189910594c6b8",
+    "duration": 72.54421768707482,
+    "bytes": 856843,
+    "sha256": "d3fb8429463fab14252e7ff48956b879d61331d3e7509f6c0803b72e5d0066d5",
+    "src": "/course-media/library/number-images-en-d3fb8429463f.m4a"
+  },
+  {
+    "course": "number-images",
+    "language": "fr",
+    "model": "tom",
+    "textSha256": "542e4383eee0cfc5d742e8d48a1da8bcfe179a2755100becc379dcbff2c08bf2",
+    "duration": 86.50521541950111,
+    "bytes": 1088761,
+    "sha256": "73a1dd6ac4ae903bc4d99a58b6230950f5a4be4b9dbd5a5821ce7abea40d4497",
+    "src": "/course-media/library/number-images-fr-73a1dd6ac4ae.m4a"
+  },
+  {
+    "course": "self-explanation",
+    "language": "de",
+    "model": "thorsten",
+    "textSha256": "c24ceca1bafdf65d97a2cb92b93cb02231f47533dae1976b353ecc470e9da7ef",
+    "duration": 98.98539682539683,
+    "bytes": 1193572,
+    "sha256": "c567121e4e5eb4bb864f1cb7a47257ba9a58136ef95c4aceed816779dd2a8dbd",
+    "src": "/course-media/library/self-explanation-de-c567121e4e5e.m4a"
+  },
+  {
+    "course": "self-explanation",
+    "language": "en",
+    "model": "joe",
+    "textSha256": "38a3fb4a49795acc0f3bcb3609b033f422acdc4e8bb97f3f4c902a611b8c4ddf",
+    "duration": 95.72299319727891,
+    "bytes": 1148750,
+    "sha256": "542f9984cdaae61aa87df4758e21ae608f876bfd241a7623e775f2c5eb797809",
+    "src": "/course-media/library/self-explanation-en-542f9984cdaa.m4a"
+  },
+  {
+    "course": "self-explanation",
+    "language": "fr",
+    "model": "tom",
+    "textSha256": "7ac3caa4bbd609688bf4252c94c3d8ec23d3b8cabd2c25f179debe9628842ba7",
+    "duration": 104.55238095238093,
+    "bytes": 1330614,
+    "sha256": "1d8821f173b7a6e8b142ef7c03ca32b0a0730ae3926418876b81fd83a27e6c1e",
+    "src": "/course-media/library/self-explanation-fr-1d8821f173b7.m4a"
+  },
+  {
+    "nameReference": "approved-v14",
+    "course": "spaced-practice",
+    "language": "de",
+    "model": "thorsten",
+    "textSha256": "a25b3afdc1c2f1ab954bfbc3f748f1bcbe4af31631f0a834b2f869bb557368c2",
+    "duration": 106.93773242630385,
+    "bytes": 1287431,
+    "sha256": "5b2bfa6c1bb8b7efc81522daa618f89b2784e6fd7fe5e7afb18e099e6f7365bf",
+    "src": "/course-media/library/spaced-practice-de-5b2bfa6c1bb8.m4a"
+  },
+  {
+    "nameReference": "approved-v14",
+    "course": "spaced-practice",
+    "language": "en",
+    "model": "joe",
+    "textSha256": "8cddae1a34db847a1a8c4ee174b912cb361beb357d38b0dcb490c20e1f25fc05",
+    "duration": 98.83396825396825,
+    "bytes": 1168903,
+    "sha256": "5e5d876faa78b0e13fb4c2e42cf31d0a89cd1358446ebf25c677719fe36a55b6",
+    "src": "/course-media/library/spaced-practice-en-5e5d876faa78.m4a"
+  },
+  {
+    "nameReference": "approved-v14",
+    "course": "spaced-practice",
+    "language": "fr",
+    "model": "tom",
+    "textSha256": "850ccfe46902f09069a191eb51964bd1979a926ad75d48c406933bbad43b2194",
+    "duration": 111.535283446712,
+    "bytes": 1414416,
+    "sha256": "9fca22af5ace26d03865f02bdc25d7e84906a0629a90492377048870d0c39bad",
+    "src": "/course-media/library/spaced-practice-fr-9fca22af5ace.m4a"
+  },
+  {
+    "course": "text-meaning",
+    "language": "de",
+    "model": "thorsten",
+    "textSha256": "41633f6305fd41d7192b1b24e380420447827d25f704760995f2773bd2aa4502",
+    "duration": 89.0356462585034,
+    "bytes": 1056754,
+    "sha256": "52fee689e21ab513e80cac515a575ce8e4b6f86315cf9f1988af14b4fafee27d",
+    "src": "/course-media/library/text-meaning-de-52fee689e21a.m4a"
+  },
+  {
+    "course": "text-meaning",
+    "language": "en",
+    "model": "joe",
+    "textSha256": "f7a9ad5385bf766967dad42451ac89ca3609faabe7f9f788be13d3fb720f0d37",
+    "duration": 81.12925170068026,
+    "bytes": 926759,
+    "sha256": "6c87a0d5131192f3970f3890e94daed6ffd1210f6de7918ece3133c97cea55c4",
+    "src": "/course-media/library/text-meaning-en-6c87a0d51311.m4a"
+  },
+  {
+    "course": "text-meaning",
+    "language": "fr",
+    "model": "tom",
+    "textSha256": "5a8b2f445d5c9b2c593dd307d94edec989205b2c19d9b1725ff3b51d1568e426",
+    "duration": 93.66802721088436,
+    "bytes": 1185468,
+    "sha256": "f613bad2cf54d5894d217cbfc4b94aa74e7e3f810cfedc2ad622764d8c532dad",
+    "src": "/course-media/library/text-meaning-fr-f613bad2cf54.m4a"
+  },
+  {
+    "course": "text-verbatim",
+    "language": "de",
+    "model": "thorsten",
+    "textSha256": "fef35ce6c3ab379a2bfc774406edb91c26ac4b44891af9fb214def8164b6c70f",
+    "duration": 75.12689342403628,
+    "bytes": 895851,
+    "sha256": "e44718c5f7f34c9c92d92f684f5e92606781af17ca1214c82537c7635f089d10",
+    "src": "/course-media/library/text-verbatim-de-e44718c5f7f3.m4a"
+  },
+  {
+    "course": "text-verbatim",
+    "language": "en",
+    "model": "joe",
+    "textSha256": "9266a503cb38ded4c2007ec09089db966f15a7d1bc2efbc4f364bde623901ee0",
+    "duration": 69.7166439909297,
+    "bytes": 807570,
+    "sha256": "153d0627f9225b2c7283cbb75db2333ada2e4af319853e3305c9db205d3ab259",
+    "src": "/course-media/library/text-verbatim-en-153d0627f922.m4a"
+  },
+  {
+    "course": "text-verbatim",
+    "language": "fr",
+    "model": "tom",
+    "textSha256": "657e94492632c26b14a3de53ff74d1824e41bd008e48eea1f8ed452c9a735a2e",
+    "duration": 82.22639455782313,
+    "bytes": 1029992,
+    "sha256": "73636e755e9e4ef064b38428b244932ed605f0d2a7b93ff672e9a5eb07b4547c",
+    "src": "/course-media/library/text-verbatim-fr-73636e755e9e.m4a"
+  }
+]

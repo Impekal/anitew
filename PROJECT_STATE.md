@@ -2709,3 +2709,14 @@ machten die französische Tonspur nicht suchbar. Vollständiges Laden in einen
 versionierten Mediencache plus Workbox RangeRequests und CORS-Modus beheben
 das. Vier gezielte Browserprüfungen jetzt grün, inklusive Offline-206-Antwort
 mit korrektem Content-Range und exakt 100 angeforderten Bytes.
+
+
+## Kursausbau · 2026-09-30 · laufender Arbeitsstand
+
+- Zwölf Kurse mit drei Übungsstufen: geführtes Beispiel, neues Beispiel und eigenes Material; die alten Trainingslektionen bleiben erhalten. Zehn XP einmal je Kurs, unabhängig von Wiederholungen oder Darstellungsmodus.
+- Wortlautvergleich berücksichtigt Wörter, Reihenfolge, Groß-/Kleinschreibung und Satzzeichen; kein semantischer Leistungsscore.
+- 36 lokale DE/EN/FR-Tonspuren insgesamt; die 33 zusätzlichen Spuren werden ausdrücklich geladen, nach SHA-256 geprüft und können fortgesetzt/entfernt werden.
+- Sprachwechsel erhält das tatsächlich gehörte Beispiel. Für sprachabhängige Merkwörter gibt es eigene Untertitelanpassungen.
+- Durchgehende Geschichten-Wiedergabe in vollständigem Chromium mit Software-Grafik bestanden; der separate Headless-Shell-Medientakt ist lokal ungeeignet. Kein Test übersprungen, keine Zeit simuliert.
+- 598 Kernprüfungen bestanden. Vollständige Kursregression und finaler strenger CI-Gate werden weiter geprüft.
+- Natürlich sprechende Coaches, abschließende Hör-/Sprachprüfung und echte Mobilgeräte bleiben offene Qualitätsaufgaben. Kein Produktionsdeploy und kein Merge.

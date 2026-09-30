@@ -1,6 +1,18 @@
 # Was noch offen ist — und wer es tun muss
 
-**Stand: 2026-08-19** (nach dem großen Ausbau: acht Trainingsmodule plus
+## Aktueller Ausbau · 2026-09-30
+
+Der aktuelle Kursausbau auf `anitew-v4-2-living-memory` wird in
+[BACKLOG.md](BACKLOG.md#1-lernmethoden-und-neue-kurse) geführt. Zwölf
+zusätzliche DE/EN/FR-Lesekurse, Kursstufen, Coach-Auswahl und lokale
+Audiokurse sind integriert. Sprechvideos, vollständige Untertitelabnahme,
+Hörprüfung und finale Geräte-/CI-Abnahme bleiben dort nachvollziehbar offen.
+Dieser Branch wurde nicht in Produktion deployt; PR #57 bleibt ungemergt.
+
+Die folgenden Aussagen betreffen ausschließlich den historischen Stand.
+Sie bestätigen weder die Veröffentlichung noch die Abnahme des neuen Kursausbaus.
+
+## Historischer Stand: 2026-08-19 (nach dem großen Ausbau: acht Trainingsmodule plus
 Eigene Inhalte, vier gelehrte Techniken, adaptive Schwierigkeit,
 Fähigkeitsbaum, Coach mit eigenem Schlüssel)
 

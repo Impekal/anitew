@@ -68,7 +68,7 @@ export const en: Dictionary = {
     complete: 'All milestones reached',
     progress: 'Progress to the next training level',
     path: 'Levels and game rules',
-    rules: '10 XP per completed training day, 2 XP per review after the first day. Multiple sessions on one day count once.',
+    rules: '10 XP per completed training day, 2 XP per review after the first day. Multiple sessions on one day count once. Each course exercise earns 10 XP on its first completion; repeating it does not count twice.',
     note: 'XP reflect training activity, not measured memory ability. Breaks cost no XP. All methods remain available.'
   },
   session: {

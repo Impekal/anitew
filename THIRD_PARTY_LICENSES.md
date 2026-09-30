@@ -99,9 +99,10 @@ No third-party photo licence or CC0 claim is made for these generated assets.
 `public/coaches/manifest.json` records source filenames, provenance, checksums
 and the lossless WebP conversion. Decoded pixels match the source PNG files.
 
-## Synthetic story-course narration
+## Synthetic course narration
 
-The three generated audio files in `public/course-media/story/` use Piper
+The three generated audio files in `public/course-media/story/` and the 33
+files in `public/course-media/library/` use Piper
 voices Thorsten, Joe and Tom. Model/dataset provenance, licence references,
 pronunciation handling and review limitations are documented in
 [STORY_MEDIA.md](docs/STORY_MEDIA.md). Only generated narration is bundled;

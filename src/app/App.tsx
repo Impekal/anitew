@@ -1,3 +1,4 @@
+import { COURSE_PROGRESS_KEY, courseProgress, type CourseId } from '../core/courses/progress.ts'
 import { type ReactNode, lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import {
@@ -235,6 +236,14 @@ export function App() {
    * Einheit ist ein Tag mehr, und der soll sofort dastehen und nicht erst
    * beim nächsten Öffnen.
    */
+  const [practisedCourses, setPractisedCourses] = useState<CourseId[]>([])
+  useEffect(() => {
+    let active = true
+    void platform.settings.read(COURSE_PROGRESS_KEY).then(value => {
+      if (active) setPractisedCourses(courseProgress(value))
+    }).catch(() => undefined)
+    return () => { active = false }
+  }, [platform, pageId])
   const [trainingDays, setTrainingDays] = useState<readonly string[]>([])
   useEffect(() => {
     void loadTrainingDays()
@@ -1253,7 +1262,7 @@ export function App() {
       </section>
 
       <div className="today-history" aria-label={dictionary.today.heading}>
-        <TrainingJourney days={trainingDays} today={today} returns={returns.total} dictionary={dictionary} />
+        <TrainingJourney courses={practisedCourses} days={trainingDays} today={today} returns={returns.total} dictionary={dictionary} />
         <StreakLine streak={streak} dictionary={dictionary} />
         <ReturnsLine returns={returns} dictionary={dictionary} />
       </div>

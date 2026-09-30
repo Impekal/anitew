@@ -50,3 +50,30 @@ https://developer.chrome.com/docs/workbox/serving-cached-audio-and-video .
 Große Videos werden weiterhin nicht automatisch geladen. Die Darstellung ist
 eine illustrierte Audiollektion mit statischem Coach, kein natürlich animiertes
 Sprechvideo. Automatisierte Medien-/Steuerungstests ersetzen keine Hörprüfung.
+
+## Erweiterung: elf weitere Kurse
+
+`public/course-media/library/manifest.json` dokumentiert 33 weitere Tonspuren
+(DE/EN/FR, zusammen 34,53 MB). Gleiche lokale Synthese und Stimmen wie oben;
+keine Modelle oder privaten Aufnahmen werden ausgeliefert. Der akzeptierte
+Namensausschnitt aus Probe 14 wird auch in den beiden weiteren Kursen mit
+ANITEW-Nennung eingesetzt. `nameReference: approved-v14` kennzeichnet sie.
+Andere Passagen enthalten keine Nennung des App-Namens.
+
+Diese Dateien werden bewusst einzeln geladen. Dateinamen enthalten den
+SHA-256-Präfix, der vollständige Hash wird vor der Offline-Freigabe geprüft.
+Fortschritt, Abbruch, Fortsetzung über HTTP Range, Speicherfehler und Entfernen
+sind abgedeckt. Normales Streaming lädt kein dauerhaftes Paket. Workbox liefert
+Teilantworten aus dem ausdrücklich gefüllten Mediencache. Alle URLs bleiben
+auf der eigenen Origin; die Wiedergabe benötigt weder API-Schlüssel noch KI.
+
+Die drei Hauptsprachen erhalten Untertitel zum tatsächlich gesprochenen
+Beispiel. Wort-, Schlüsselwort- und Major-Beispiele unterscheiden sich je
+Tonspur; ihre Lernwörter werden beim Sprachwechsel erhalten. Fehlende weitere
+Übersetzungen werden ausdrücklich angezeigt. Ein erster lokaler M2M100-Versuch
+wurde wegen falscher Fachbegriffe und übersetzter Lernwörter verworfen.
+
+Die Lesefassung bleibt verfügbar. Medienwahl, Sprache und Geschwindigkeit
+werden gespeichert; sie starten keine automatische Wiedergabe. Die Übung
+verwendet das zuvor gehörte Beispiel. Die höheren Kursstufen haben neue
+Leseübungen und eigenes Material, keine irreführend wiederverwendete Beispieltonspur.

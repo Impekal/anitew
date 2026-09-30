@@ -24,7 +24,7 @@ Die Geschichten-Methode bietet jetzt drei lokale Tonspuren, elf synchronisierte
 Untertitelentwürfe, vollständigen Sprechtext, Tempo und Kapitelsprünge.
 Tonwahl und Tempo werden gespeichert. Vor der gesprochenen Lösung geht es
 in dieselbe Abrufübung wie beim Lesen; beide Wege teilen den Kursabschluss.
-Die übrigen elf Kurse bleiben vorerst Lesekurse. Quellen, Dateinachweise und
+Die übrigen elf Kurse bieten ebenfalls je drei lokale Tonspuren mit bewusstem Offline-Download. Alle zwölf Kurse haben drei Übungsstufen und einen gemeinsamen Lernfortschritt. Quellen, Dateinachweise und
 Prüfgrenzen stehen in [STORY_MEDIA.md](STORY_MEDIA.md).
 
 ## Separate lokale Medienvorschau

@@ -13,8 +13,8 @@ it('defaults primary languages to their narration and all others to English',()=
   }
 })
 it('rejects invalid saved media preferences',()=>{
-  for(const value of [null,[],false,{}, {audio:'https://external.test',speed:100}])expect(mediaPreferences(value)).toEqual({audio:'auto',speed:1})
-  for(const speed of MEDIA_SPEEDS)expect(mediaPreferences({audio:'fr',speed})).toEqual({audio:'fr',speed})
+  for(const value of [null,[],false,{}, {audio:'https://external.test',speed:100}])expect(mediaPreferences(value)).toEqual({audio:'auto',speed:1,view:'read'})
+  for(const speed of MEDIA_SPEEDS)expect(mediaPreferences({audio:'fr',speed})).toEqual({audio:'fr',speed,view:'read'})
 })
 it('keeps local media, cue order and subtitles consistent',()=>{
   for(const pack of Object.values(storyMedia.packs)){

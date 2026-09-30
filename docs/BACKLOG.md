@@ -377,7 +377,7 @@ Zwei Dinge nebenher, unabhängig vom Meilenstein:
 
 ## Aktueller Ausbau: Methodenkurse und Coaches — 2026-09-30
 
-Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte. Die ältere Aufgabenliste bleibt als Historie erhalten; ihre Datierungen und Statusangaben sind nicht automatisch der heutige Stand. Die neuen Kursfunktionen liegen bislang überwiegend in einer separaten lokalen Vorschau, nicht in der App. Reihenfolge: Lernziele und priorisierte Text-/Wortkurse, Coach-/Sprachqualität, App-Integration, Offline-Nutzung, vollständige Abnahme.
+Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte. Die ältere Aufgabenliste bleibt als Historie erhalten; ihre Datierungen und Statusangaben sind nicht automatisch der heutige Stand. Die Kursbibliothek, Kursstufen, Coach-Auswahl und Audiomedien sind inzwischen in der App integriert. Natürliche Sprechvideos und die abschließende Medienabnahme sind weiterhin offen. Reihenfolge: Lernziele und priorisierte Text-/Wortkurse, Coach-/Sprachqualität, App-Integration, Offline-Nutzung, vollständige Abnahme.
 
 **Fest vereinbart:** ausschließlich Branch `anitew-v4-2-living-memory`; keine Produktion deployen; PR #57 nicht mergen; fremde Dateien und Stashes nicht anfassen. Diese Liste beauftragt keine Store-Veröffentlichung, Käufe oder neuen Dienste.
 
@@ -386,17 +386,17 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 ### 1. Lernmethoden und neue Kurse
 
 - [x] **K01 · Kursangebot mit den vorhandenen App-Lektionen abgleichen.** Die zehn Techniken der Übersicht auf vorhandene Inhalte abbilden, Doppelungen vermeiden und Lernziele, Voraussetzungen und Grenzen pro Kurs festhalten.
-- [ ] **K02 · Lange Texte inhaltlich behalten.** Vollständigen Kurs bauen: Sinnabschnitte, Leitfragen, eigene Erklärung, Abruf ohne Vorlage, Vergleich und Wiederholung. Mit kurzem Einstieg und längeren Texten für Fortgeschrittene.
-- [ ] **K03 · Texte wortgetreu lernen.** Kurs mit kleinen Passagen, genauer Fehlerkorrektur, Übergängen zwischen Abschnitten und Abruf von verschiedenen Startpunkten erstellen. Inhaltliche Richtigkeit und exakter Wortlaut getrennt bewerten.
-- [ ] **K04 · Lange Wörter sicher behalten.** Bedeutungsbausteine und Sprechsilben unterscheiden; Bedeutung, Aussprache und Schreibweise erklären und am vollständigen Wort prüfen. Sprachspezifische Beispiele statt deutscher Trennregeln für alle Sprachen.
-- [ ] **K05 · Aktives Abrufen als eigenen Kurs ausarbeiten.** Fragen, freies Wiedergeben, Rückmeldung und erneuten Versuch didaktisch vermitteln; an die vorhandenen Trainingsfunktionen anbinden.
-- [ ] **K06 · Verteiltes Wiederholen als eigenen Kurs ausarbeiten.** Zeitlich verteiltes Üben erklären und mit dem vorhandenen Wiederholungssystem verbinden. Keine zweite konkurrierende Terminplanung einführen.
-- [ ] **K07 · Sinnabschnitte und Selbsterklärung ausarbeiten.** Zwei klar abgegrenzte Lektionen: Inhalte sinnvoll gruppieren und Zusammenhänge mit eigenen Worten begründen.
-- [ ] **K08 · Geschichten- und Loci-Kurse vervollständigen.** Geschichten-Prototyp fertigstellen; bestehende Loci-Inhalte um Coach, Illustration, angeleitete und freie Übung erweitern. Grenzen beim wortgetreuen Lernen erklären.
-- [ ] **K09 · Schlüsselworttechnik und Zahl-Bild-Systeme ausarbeiten.** Vokabelkurs mit Lautform, Bedeutung und Schreibweise; vorhandene Major-Inhalte zu vollständigem Kurs erweitern, nötige Zuordnungen zuerst üben.
-- [ ] **K10 · Abwechselnde Aufgabentypen vermitteln.** Kurs zum gezielten Mischen ähnlicher Aufgaben nach einer Einführung erstellen; Auswahl der passenden Methode üben.
-- [ ] **K11 · Einheitlichen didaktischen Ablauf umsetzen.** Jeder Kurs: Was ist es? Wozu dient es? Wann hilft es und wann nicht? Erklärung → illustriertes Beispiel → eigener Abruf → Rückmeldung → Transfer auf eigenes Material.
-- [ ] **K12 · Kursstufen und Lernfortschritt anbinden.** Vom angeleiteten Beispiel zum freien Anwenden steigern; längere und komplexere Inhalte ergänzen. Vorhandene XP/Levels nutzen, Abschluss an Lernhandlungen knüpfen, Trainingspunkte nicht als gemessene Gedächtnisleistung ausgeben.
+- [x] **K02 · Lange Texte inhaltlich behalten.** Vollständigen Kurs bauen: Sinnabschnitte, Leitfragen, eigene Erklärung, Abruf ohne Vorlage, Vergleich und Wiederholung. Mit kurzem Einstieg und längeren Texten für Fortgeschrittene.
+- [x] **K03 · Texte wortgetreu lernen.** Kurs mit kleinen Passagen, genauer Fehlerkorrektur, Übergängen zwischen Abschnitten und Abruf von verschiedenen Startpunkten erstellen. Inhaltliche Richtigkeit und exakter Wortlaut getrennt bewerten.
+- [x] **K04 · Lange Wörter sicher behalten.** Bedeutungsbausteine und Sprechsilben unterscheiden; Bedeutung, Aussprache und Schreibweise erklären und am vollständigen Wort prüfen. Sprachspezifische Beispiele statt deutscher Trennregeln für alle Sprachen.
+- [x] **K05 · Aktives Abrufen als eigenen Kurs ausarbeiten.** Fragen, freies Wiedergeben, Rückmeldung und erneuten Versuch didaktisch vermitteln; an die vorhandenen Trainingsfunktionen anbinden.
+- [x] **K06 · Verteiltes Wiederholen als eigenen Kurs ausarbeiten.** Zeitlich verteiltes Üben erklären und mit dem vorhandenen Wiederholungssystem verbinden. Keine zweite konkurrierende Terminplanung einführen.
+- [x] **K07 · Sinnabschnitte und Selbsterklärung ausarbeiten.** Zwei klar abgegrenzte Lektionen: Inhalte sinnvoll gruppieren und Zusammenhänge mit eigenen Worten begründen.
+- [x] **K08 · Geschichten- und Loci-Kurse vervollständigen.** Geschichten-Prototyp fertigstellen; bestehende Loci-Inhalte um Coach, Illustration, angeleitete und freie Übung erweitern. Grenzen beim wortgetreuen Lernen erklären.
+- [x] **K09 · Schlüsselworttechnik und Zahl-Bild-Systeme ausarbeiten.** Vokabelkurs mit Lautform, Bedeutung und Schreibweise; vorhandene Major-Inhalte zu vollständigem Kurs erweitern, nötige Zuordnungen zuerst üben.
+- [x] **K10 · Abwechselnde Aufgabentypen vermitteln.** Kurs zum gezielten Mischen ähnlicher Aufgaben nach einer Einführung erstellen; Auswahl der passenden Methode üben.
+- [x] **K11 · Einheitlichen didaktischen Ablauf umsetzen.** Jeder Kurs: Was ist es? Wozu dient es? Wann hilft es und wann nicht? Erklärung → illustriertes Beispiel → eigener Abruf → Rückmeldung → Transfer auf eigenes Material.
+- [x] **K12 · Kursstufen und Lernfortschritt anbinden.** Vom angeleiteten Beispiel zum freien Anwenden steigern; längere und komplexere Inhalte ergänzen. Vorhandene XP/Levels nutzen, Abschluss an Lernhandlungen knüpfen, Trainingspunkte nicht als gemessene Gedächtnisleistung ausgeben.
 
 ### 2. Coaches, Stimme und Kursdarstellung
 
@@ -405,27 +405,27 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 - [ ] **C03 · Tonqualität und Sprachfassungen prüfen.** Bestätigte deutsche Männerstimme erhalten; englische und französische Fassungen auf Natürlichkeit, flüssige Aussprache, korrekte Wörter und Akzente prüfen und nötigenfalls verbessern. Nutzer-Hörprüfung der neuen Fassungen bleibt offen.
 - [x] **C04 · Coach-Auswahl in die App übernehmen.** Jüngerer Coach, Lin und Rafael als gekennzeichnete fiktive Standbilder integriert: Standard je Kurs, global oder individuell; dauerhaft und sprachübergreifend gespeichert. Alte Einstellungen derselben Origin werden übernommen. Die separate Vorschau auf einem anderen Port kann nicht automatisch ausgelesen werden. Sprechvideos bleiben C01–C03.
 - [ ] **C05 · Illustrationen und Animationen je Methode erstellen.** Bilder schrittweise passend zur Erklärung aufbauen; Beispiele vor dem Abruf ausblenden. Bewegungen müssen Lerninhalte erklären und die reduzierte Bewegungseinstellung respektieren.
-- [ ] **C06 · Lesen und Ansehen gleichwertig integrieren.** Vollständigen Text, Übungen und denselben Fortschritt anbieten; Tempo, Pause, Kapitel, tatsächliche Dauer und gespeicherte Auswahl übernehmen. App-Schrift, Farben und Button-Stile verwenden. Im Prototyp teilweise vorhanden.
+- [x] **C06 · Lesen und Ansehen gleichwertig integrieren.** Vollständigen Text, Übungen und denselben Fortschritt anbieten; Tempo, Pause, Kapitel, tatsächliche Dauer und gespeicherte Auswahl übernehmen. App-Schrift, Farben und Button-Stile verwenden. Als illustrierter Audiokurs integriert; natürliche Coach-Bewegung bleibt C01.
 
 ### 3. Sprachen und Zugänglichkeit
 
 - [x] **S01 · Sprachregel in die echte App integrieren.** Für die integrierte Geschichten-Audioprobe umgesetzt: DE/FR/EN automatisch, andere App-Sprachen Englisch; ausdrückliche Tonwahl unabhängig von den Untertiteln in der App-Sprache. Weitere Kursmedien bleiben S03.
 - [ ] **S02 · Übersetzungen und Untertitel prüfen.** Derzeit elf Untertitelsprachen als Entwürfe: DE, FR, EN, ES, IT, PT, NL, TR, AR, ZH, JA. Inhalt, Fachbegriffe, Lesbarkeit und Zeitabgleich für jede Tonspur prüfen; weitere tatsächlich unterstützte App-Sprachen ergänzen oder fehlende Übersetzung ehrlich anzeigen.
-- [ ] **S03 · Alle fertigen Kurse in drei Tonsprachen bereitstellen.** Bisher existiert nur die Geschichten-Kursprobe. Für jede neue Lektion geprüfte DE/FR/EN-Tonspuren, Transkripte und passende Untertitel erzeugen; heruntergeladene Medien eindeutig beschriften.
+- [ ] **S03 · Alle fertigen Kurse in drei Tonsprachen bereitstellen.** 36 Tonspuren für zwölf Kurse integriert, 33 davon bewusst herunterladbar. Vollständige Untertitelabdeckung und abschließende Hörprüfung bleiben offen.
 - [ ] **S04 · Barrierefreiheit und Geräteverhalten prüfen.** Tastatur, Fokus, Screenreader, Kontrast, Textvergrößerung, RTL und schmale Displays prüfen; Untertitel, Tempo und Pausen auf echten Mobilgeräten testen.
 
 ### 4. Integration, Offline-Nutzung und Rechte
 
-- [ ] **I01 · Prototyp in die App auf dem erlaubten Branch übertragen.** Kursdaten, Player, Methodenübersicht und Coach-Einstellungen modular integrieren. Bestehende Nutzerdaten, Navigation, Reset-Schutz und V4.2-Hardening erhalten.
-- [ ] **I02 · Offline-Medienpakete und PWA-Caching bauen.** Medien lokal bündeln oder bewusst herunterladbar machen; große Videos nicht ungefragt precachen. Größe, Downloadfortschritt, Versionen, Speicherfehler, Abbruch, Wiederaufnahme und Entfernen eines Pakets behandeln.
+- [x] **I01 · Prototyp in die App auf dem erlaubten Branch übertragen.** Kursdaten, Player, Methodenübersicht und Coach-Einstellungen modular integrieren. Bestehende Nutzerdaten, Navigation, Reset-Schutz und V4.2-Hardening erhalten.
+- [x] **I02 · Offline-Medienpakete und PWA-Caching bauen.** Medien lokal bündeln oder bewusst herunterladbar machen; große Videos nicht ungefragt precachen. Größe, Downloadfortschritt, Versionen, Speicherfehler, Abbruch, Wiederaufnahme und Entfernen eines Pakets behandeln.
 - [ ] **I03 · Offline-Nutzung vollständig prüfen.** Installierte App ohne Netz starten, heruntergeladenen Kurs abspielen, Tonspur wechseln, Untertitel und Lesemodus nutzen. Keine externen Bild-/Medienrequests oder Live-KI für die Wiedergabe benötigen.
 - [ ] **I04 · Quellen und Nutzungsrechte für die finale Auswahl dokumentieren.** Bild-, Stimm-, Modell- und Medienrechte pro ausgeliefertem Asset nachvollziehbar prüfen; Quellen und KI-Kennzeichnung in der App ergänzen. Namensausschnitt und entstehende Clips einschließen. Keine bezahlten APIs voraussetzen.
-- [ ] **I05 · Projektunterlagen auf den aktuellen Stand bringen.** Ältere Statusangaben in BACKLOG/OFFEN und Kursmedienvorschlag mit Code und neuen Ergebnissen abgleichen; historische Entscheidungen bewahren, aber veraltete Aussagen nicht als aktuellen Stand präsentieren.
+- [x] **I05 · Projektunterlagen auf den aktuellen Stand bringen.** Ältere Statusangaben in BACKLOG/OFFEN und Kursmedienvorschlag mit Code und neuen Ergebnissen abgleichen; historische Entscheidungen bewahren, aber veraltete Aussagen nicht als aktuellen Stand präsentieren.
 
 ### 5. Abnahme und strenger CI-Gate
 
-- [ ] **Q01 · Regressionstests für Kursfunktionen ergänzen.** Sprachvorgaben und Auswahl, Coach-Zuordnung, Persistenz/Migration, identischen Fortschritt im Lese-/Videomodus, Tempo/Dauer, Abrufsperre vor der Lösung und Offline-Verfügbarkeit prüfen.
-- [ ] **Q02 · Durchgehende Wiedergabe und Medienqualität nachweisen.** Der bisherige Testbrowser blieb auch bei unverändertem Audio im Wiedergabetakt stehen. Die tatsächliche Wiedergabe, Sprünge, Audio-/Bild-/Untertitelsynchronität und Unterbrechungen in einer funktionierenden Umgebung und auf Mobilgeräten prüfen.
+- [x] **Q01 · Regressionstests für Kursfunktionen ergänzen.** Sprachvorgaben und Auswahl, Coach-Zuordnung, Persistenz/Migration, identischen Fortschritt im Lese-/Videomodus, Tempo/Dauer, Abrufsperre vor der Lösung und Offline-Verfügbarkeit prüfen.
+- [ ] **Q02 · Durchgehende Wiedergabe und Medienqualität nachweisen.** Durchgehende Geschichten-Wiedergabe im vollständigen Chromium mit Software-Grafik sowie im App-Browser nachgewiesen. Offline-Teilantworten und Sprünge geprüft. Prüfung auf echten Mobilgeräten und finale audiovisuelle Qualitätsabnahme bleiben offen.
 - [ ] **Q03 · Neue Inhalte didaktisch und sprachlich abnehmen.** Beispiele, Rückmeldungen, Grenzen und Quellen prüfen; Hör- und Sichtprobe der finalen Coaches. Keine allgemeine Gedächtnissteigerung allein aus XP oder Kursabschluss ableiten.
 - [ ] **Q04 · Nach Integration den vollständigen strengen CI-Gate starten.** Typecheck, Kernprüfungen, Build, Größen-/Kaltstartbudget, Worker/Push-Dry-Run, Smoke, OAuth/Reset/Core/Push, Layout sowie Desktop-/Mobile-Regression am endgültigen Commit prüfen. Fehler beheben und betroffene Prüfungen wiederholen. Kein Produktionsdeploy und kein Merge von PR #57.
 
@@ -476,3 +476,14 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 - Vor der gesprochenen Lösung wechselt der Player in dieselbe Abrufübung wie Lesen; kein zweiter Fortschrittszähler und kein Abschluss durch bloßes Anhören.
 - Rund 3 MB Audio ausdrücklich im PWA-Cache; keine Sprachmodelle, privaten Nutzeraufnahmen oder großen Videos gebündelt.
 - Akzeptierte deutsche Tonspur bytegleich übernommen. Hörprüfung von EN/FR, weitere Kursmedien und natürliche Sprechbewegungen bleiben offen.
+
+
+### Aktueller Arbeitsstand: Kursstufen und vollständige Audiobibliothek
+
+- K02–K12 als Lese-/Übungskurse umgesetzt: zwölf DE/EN/FR-Kurse mit jeweils geführtem Beispiel, neuem Beispiel und eigenem Material. Wortgetreues Lernen hat einen begrenzten lokalen Wort-/Satzzeichenvergleich; kein automatischer Verständnis- oder Gedächtnisscore.
+- C06/I01/I02 umgesetzt: gemeinsame Übung und Fortschritt, gespeicherter Lese-/Audiomodus, Tempo/Dauer, lokale Medien, bewusster Download mit SHA-256, Abbruch/Fortsetzung und Entfernen. Kein Autoplay.
+- C05 teilweise: elf Methodenschemata plus zeitgesteuerte Geschichtenillustration. Natürliche Coach-Sprechbewegungen sind noch nicht erreicht.
+- Q01 erweitert: Kursstufen, einmalige XP, Offline-Download, Sprachwechsel mit passendem Beispiel und durchgehende reale Wiedergabe. 598 Kernprüfungen bestanden.
+- I05: OFFEN als historischen Stand gekennzeichnet; Kursmedienvorschlag und Quellen auf aktuellen Arbeitsstand gebracht.
+- S02/S03/C03/Q03 bleiben wegen weiterer Untertitel und abschließender Hör-/Sprachprüfung offen. Keine falschen Übersetzungen aus dem verworfenen M2M100-Versuch übernommen.
+- Haken bei den Kursfunktionen bestätigen die Implementierung; sie ersetzen nicht die gesondert offenen Medien-, Geräte- und CI-Abnahmen.

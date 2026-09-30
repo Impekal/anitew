@@ -119,7 +119,7 @@ export const de = {
     complete: 'Alle Etappen erreicht',
     progress: 'Fortschritt zum nächsten Trainingslevel',
     path: 'Level und Spielregeln',
-    rules: '10 XP pro abgeschlossenem Trainingstag, 2 XP pro Wiedersehen nach dem ersten Tag. Mehrere Einheiten am selben Tag zählen einmal.',
+    rules: '10 XP pro abgeschlossenem Trainingstag, 2 XP pro Wiedersehen nach dem ersten Tag. Mehrere Einheiten am selben Tag zählen einmal. Für jede erstmals abgeschlossene Kursübung gibt es 10 XP; erneutes Üben zählt nicht doppelt.',
     note: 'XP zeigen deine Trainingsaktivität, keine gemessene Gedächtnisleistung. Pausen kosten keine XP. Alle Methoden bleiben jederzeit verfügbar.'
   },
   session: {

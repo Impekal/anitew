@@ -11,3 +11,9 @@ it('uses recorded reviews, survives missing counts and caps the level', () => {
   expect(trainingLevel([], '2026-09-29', 25)).toMatchObject({ level: 3, xp: 50, progress: 0 })
   expect(trainingLevel([], '2026-09-29', 5000)).toMatchObject({ level: LEVEL_THRESHOLDS.length, remaining: 0, progress: 1 })
 })
+
+it('adds course XP once per valid completed exercise, never from repetition or unknown imports', () => {
+  expect(trainingLevel([], '2026-09-30', 0, ['story-method','story-method','long-words','unknown',null])).toMatchObject({xp:20,practisedCourses:2,level:2})
+  expect(trainingLevel([], '2026-09-30', 0, {course:'story-method'}).xp).toBe(0)
+  expect(trainingLevel(['2026-09-30'], '2026-09-30', 2, ['story-method']).xp).toBe(24)
+})
