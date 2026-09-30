@@ -2737,3 +2737,7 @@ und ist kein App-Asset. Finaler strenger CI-Gate folgt auf dem neuen Commit.
 ## Medienkorrektur 30. September 2026
 
 Aktuelle Bewegungsvorschau wegen unzureichender Mundöffnung und Lippensynchronität abgelehnt; Renderlauf gestoppt. Videokatalog bleibt leer, Testdateien werden nicht ausgeliefert. Neue Vorgabe: drei unterschiedliche Männerstimmen für Noah, Lin, Atta; Noah behält die akzeptierte Stimme. C01–C03 bleiben offen. CI #1640 auf d0ccd42 ist grün, nicht als Nachweis für spätere lokale Änderungen verwenden.
+
+Lin und Atta sind inzwischen als deutsche Kurzstimmen vom Nutzer bestätigt.
+Atta ist Standard für alle Kurse; explizite Auswahl bleibt wirksam. Die zweite
+Lippenprobe ist ebenfalls verworfen. Neue vollständige Tonspuren bleiben offen.

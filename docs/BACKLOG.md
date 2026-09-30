@@ -507,3 +507,9 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 - Nutzer lehnt die kurze LivePortrait-Bewegungsprobe ab: zu geringe Mundöffnung und fehlende Lippensynchronität. Der lange Renderlauf wurde gestoppt. Keine abgelehnten Clips oder isolierten Testvideos im App-Katalog.
 - Drei unterschiedliche Stimmen ersetzen die frühere gemeinsame Stimme. Neue kurze deutsche Vergleichsproben für Lin und Atta in Arbeit; keine behauptete akustische Freigabe.
 - Vorbereitete Videotechnik: zehn gezielte Player-/Download-/Layoutprüfungen bestanden mit isolierten Testdateien. Dies bestätigt keine Medienqualität. Strenger CI #1640 ist auf d0ccd42 grün; neue lokale Änderungen brauchen einen neuen Gate.
+
+### Bestätigung der Stimmen und zweite Video-Ablehnung
+
+- Nutzer bestätigt die neuen Qwen-VoiceDesign-Proben für Lin und Atta ausdrücklich als hervorragend. Atta wird Standardcoach für alle Kurse; gespeicherte globale und individuelle Auswahlen bleiben wirksam.
+- Die sechssekündige LivePortrait/MuseTalk-Hybridprobe wurde ebenfalls abgelehnt: weiter unpassende Lippenbewegung und verschwommener Mundbereich. Kein Clip wird übernommen.
+- Bestätigte Stimmproben sind Referenzen, noch keine fertigen Kurstonspuren. Konsistente Stimmen, Namensaussprache, Satzübergänge und DE/EN/FR-Fassungen müssen noch erzeugt und geprüft werden.

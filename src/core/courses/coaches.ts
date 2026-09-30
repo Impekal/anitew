@@ -4,12 +4,9 @@ export type CoachId = typeof COACH_IDS[number]
 export type CoachMode = 'default' | 'global' | 'custom'
 export interface CoachPreferences { mode: CoachMode; global: CoachId; courses: Partial<Record<CourseId, CoachId>> }
 export const COACH_SETTINGS_KEY = 'courses.coaches.v1'
-export const DEFAULT_COACHES: Record<CourseId, CoachId> = {
-  'text-meaning': 'lin', 'text-verbatim': 'rafael', 'long-words': 'original',
-  'active-recall': 'original', 'spaced-practice': 'rafael', 'meaningful-groups': 'lin',
-  'self-explanation': 'lin', 'story-method': 'rafael', 'method-of-loci': 'lin',
-  'keyword-method': 'original', 'number-images': 'rafael', 'interleaved-practice': 'original',
-}
+// Atta is the default; explicit global and per-course choices still take priority.
+export const DEFAULT_COACHES = Object.fromEntries(COURSE_IDS.map(id => [id, 'rafael'])) as Record<CourseId, CoachId>
+
 const record = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null && !Array.isArray(value)
 function coach(value: unknown): CoachId | undefined {
   if (value === 'elena') return 'original'

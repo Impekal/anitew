@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { COURSE_IDS } from '../../src/core/courses/progress.ts'
-import { COACH_IDS, DEFAULT_COACHES, coachFor, coachPreferences } from '../../src/core/courses/coaches.ts'
+import { DEFAULT_COACHES, coachFor, coachPreferences } from '../../src/core/courses/coaches.ts'
 
 describe('course coach preferences', () => {
-  it('assigns a supported default to every course', () => {
+  it('uses Atta for every course unless the user explicitly chooses a coach', () => {
     expect(Object.keys(DEFAULT_COACHES).sort()).toEqual([...COURSE_IDS].sort())
-    for (const id of COURSE_IDS) expect(COACH_IDS).toContain(coachFor(id, coachPreferences(null)))
+    for (const id of COURSE_IDS) expect(coachFor(id, coachPreferences(null))).toBe('rafael')
   })
   it('resolves global and individual choices without erasing inactive choices', () => {
     const config = { mode: 'custom', global: 'lin', courses: { 'story-method': 'original' } }

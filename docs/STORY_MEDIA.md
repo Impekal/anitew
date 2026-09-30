@@ -102,3 +102,8 @@ je eine eigene, natürlich sprechende Männerstimme. Keine künstlich gebrochene
 Sprache oder aus dem Aussehen abgeleitete Akzente. Zuerst kurze Stimm- und
 Lippensynchronproben, anschließend vollständige Kurse. Die bestätigte
 ANITEW-Aussprache bleibt die Referenz für alle Stimmen und Tonsprachen.
+
+Die neuen kurzen deutschen Qwen-VoiceDesign-Proben für Lin und Atta wurden
+vom Nutzer ausdrücklich bestätigt. Atta wird Standardcoach. Die anschließende
+LivePortrait/MuseTalk-Lippenkorrektur wurde wegen Unschärfe und weiterhin
+unpassender Bewegung abgelehnt. Keine solche Videodatei ist gebündelt.

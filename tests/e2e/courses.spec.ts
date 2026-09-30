@@ -188,7 +188,7 @@ test('coach choices persist and changing assignment preserves a recall answer', 
   await visit(page)
   await openPage(page, 'Lernkurse')
   await page.getByRole('button', {name:'Kurs öffnen : Lange Wörter sicher behalten',exact:true}).click()
-  await expect(page.locator('.course-coach-current img')).toHaveAttribute('src','/coaches/original.webp')
+  await expect(page.locator('.course-coach-current img')).toHaveAttribute('src','/coaches/rafael.webp')
   await page.getByRole('button', {name:'Vorlage ausblenden und üben',exact:true}).click()
   await page.getByLabel('Deine Antwort', {exact:true}).fill('Meine Antwort bleibt bestehen')
   await page.locator('.course-coaches summary').click()
