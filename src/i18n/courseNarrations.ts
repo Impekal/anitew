@@ -3,6 +3,7 @@ import type { CoachId } from '../core/courses/coaches.ts'
 import type { SpokenLanguage } from '../core/courses/media.ts'
 import type { DownloadAsset } from '../app/courseDownloads.ts'
 export interface CourseNarration extends DownloadAsset {
+ synthesis?:'qwen-own-name'|'qwen-openvoice'|'kyutai-openvoice';
  course:CourseId;coach:CoachId;language:SpokenLanguage;duration:number;
  cues:ReadonlyArray<{start:number;end:number;text:string;section?:string}>
 }
@@ -2149,6 +2150,357 @@ export const courseNarrations:CourseNarration[]=[
     "src": "/course-media/library/lin-text-verbatim-de-a3c20bd63dd7.m4a",
     "bytes": 1039815,
     "sha256": "a3c20bd63dd70b220ce0a3d87e1b9319851da0a5633f1860309abd0a8df98eb2"
+  },
+  {
+    "course": "story-method",
+    "coach": "rafael",
+    "language": "en",
+    "duration": 90.95004166666665,
+    "cues": [
+      {
+        "start": 0.0,
+        "end": 1.96,
+        "text": "Welcome to ANITEW."
+      },
+      {
+        "start": 2.51,
+        "end": 5.31,
+        "text": "I am an AI-generated learning coach."
+      },
+      {
+        "start": 5.659999999999999,
+        "end": 8.139999999999999,
+        "text": "Today we will explore the story method."
+      },
+      {
+        "start": 8.489999999999998,
+        "end": 14.889999999999999,
+        "text": "The story method is a memory technique: you connect separate pieces of information in a single story."
+      },
+      {
+        "start": 15.239999999999998,
+        "end": 20.599999999999998,
+        "text": "It can help you remember a sequence, such as a shopping list or the main points of a talk."
+      },
+      {
+        "start": 20.95,
+        "end": 23.91,
+        "text": "It does not replace understanding the material."
+      },
+      {
+        "start": 24.26,
+        "end": 30.18,
+        "text": "In this course, you will first learn the idea, see an example, and then try the method yourself."
+      },
+      {
+        "start": 30.53,
+        "end": 34.21004166666667,
+        "text": "Your goal is to recall three words in the correct order."
+      },
+      {
+        "start": 34.56004166666667,
+        "end": 38.56004166666667,
+        "text": "Our example is: key, lemon, bicycle."
+      },
+      {
+        "start": 38.91004166666667,
+        "end": 42.51004166666667,
+        "text": "First, imagine a giant key squeezing a lemon."
+      },
+      {
+        "start": 42.860041666666675,
+        "end": 47.180041666666675,
+        "text": "The lemon juice splashes onto a bicycle and makes its wheels turn."
+      },
+      {
+        "start": 47.530041666666676,
+        "end": 53.13004166666668,
+        "text": "One action connects the first word to the second, and another connects the second to the third."
+      },
+      {
+        "start": 53.48004166666668,
+        "end": 56.60004166666668,
+        "text": "The unusual story is simply a memory aid."
+      },
+      {
+        "start": 56.95004166666668,
+        "end": 60.47004166666668,
+        "text": "What matters is imagining the actions clearly for yourself."
+      },
+      {
+        "start": 60.82004166666668,
+        "end": 62.98004166666668,
+        "text": "Now the pictures will disappear."
+      },
+      {
+        "start": 63.33004166666668,
+        "end": 66.93004166666668,
+        "text": "Pause here and name the three words in the correct order."
+      },
+      {
+        "start": 67.28004166666668,
+        "end": 70.00004166666668,
+        "text": "When you are ready, reveal the answer."
+      },
+      {
+        "start": 70.35004166666667,
+        "end": 74.19004166666667,
+        "text": "The words were: key, lemon, bicycle."
+      },
+      {
+        "start": 74.54004166666667,
+        "end": 79.02004166666667,
+        "text": "If you missed a word, look at its connection again and have another try."
+      },
+      {
+        "start": 79.37004166666667,
+        "end": 85.53004166666666,
+        "text": "Finally, make up your own story with three different words and recall them without looking."
+      },
+      {
+        "start": 85.88004166666666,
+        "end": 90.60004166666666,
+        "text": "You can also read the entire course and do every exercise at your own pace."
+      }
+    ],
+    "src": "/course-media/library/atta-story-en-09771673ca2a.m4a",
+    "bytes": 1032953,
+    "sha256": "09771673ca2ab4eafc6d424170f8a9c1e8c8972ab4b7fa3f7b84d5557d53d69b",
+    "synthesis": "qwen-own-name"
+  },
+  {
+    "course": "story-method",
+    "coach": "original",
+    "language": "en",
+    "duration": 90.83746031746028,
+    "cues": [
+      {
+        "start": 0.0,
+        "end": 1.96,
+        "text": "Welcome to ANITEW."
+      },
+      {
+        "start": 2.5100226757369613,
+        "end": 5.308027210884354,
+        "text": "I am an AI-generated learning coach."
+      },
+      {
+        "start": 5.658004535147392,
+        "end": 8.130929705215419,
+        "text": "Today we will explore the story method."
+      },
+      {
+        "start": 8.480907029478457,
+        "end": 14.87800453514739,
+        "text": "The story method is a memory technique: you connect separate pieces of information in a single story."
+      },
+      {
+        "start": 15.227981859410429,
+        "end": 20.58018140589569,
+        "text": "It can help you remember a sequence, such as a shopping list or the main points of a talk."
+      },
+      {
+        "start": 20.930158730158727,
+        "end": 23.87909297052154,
+        "text": "It does not replace understanding the material."
+      },
+      {
+        "start": 24.229070294784577,
+        "end": 30.138548752834463,
+        "text": "In this course, you will first learn the idea, see an example, and then try the method yourself."
+      },
+      {
+        "start": 30.4885260770975,
+        "end": 34.15727891156462,
+        "text": "Your goal is to recall three words in the correct order."
+      },
+      {
+        "start": 34.507256235827654,
+        "end": 38.50108843537414,
+        "text": "Our example is: key, lemon, bicycle."
+      },
+      {
+        "start": 38.85106575963718,
+        "end": 42.45015873015872,
+        "text": "First, imagine a giant key squeezing a lemon."
+      },
+      {
+        "start": 42.800136054421756,
+        "end": 47.119047619047606,
+        "text": "The lemon juice splashes onto a bicycle and makes its wheels turn."
+      },
+      {
+        "start": 47.46902494331064,
+        "end": 53.06503401360543,
+        "text": "One action connects the first word to the second, and another connects the second to the third."
+      },
+      {
+        "start": 53.415011337868464,
+        "end": 56.526485260770954,
+        "text": "The unusual story is simply a memory aid."
+      },
+      {
+        "start": 56.87646258503399,
+        "end": 60.394285714285694,
+        "text": "What matters is imagining the actions clearly for yourself."
+      },
+      {
+        "start": 60.74426303854873,
+        "end": 62.903718820861656,
+        "text": "Now the pictures will disappear."
+      },
+      {
+        "start": 63.25369614512469,
+        "end": 66.85278911564623,
+        "text": "Pause here and name the three words in the correct order."
+      },
+      {
+        "start": 67.20276643990927,
+        "end": 69.91950113378682,
+        "text": "When you are ready, reveal the answer."
+      },
+      {
+        "start": 70.26947845804986,
+        "end": 74.10077097505666,
+        "text": "The words were: key, lemon, bicycle."
+      },
+      {
+        "start": 74.4507482993197,
+        "end": 78.92058956916097,
+        "text": "If you missed a word, look at its connection again and have another try."
+      },
+      {
+        "start": 79.270566893424,
+        "end": 85.42385487528341,
+        "text": "Finally, make up your own story with three different words and recall them without looking."
+      },
+      {
+        "start": 85.77383219954645,
+        "end": 90.48748299319725,
+        "text": "You can also read the entire course and do every exercise at your own pace."
+      }
+    ],
+    "src": "/course-media/library/noah-story-en-557998b9fa71.m4a",
+    "bytes": 1026059,
+    "sha256": "557998b9fa7176b694cad727b3890d8d6717bcd59f3e26508842c9e872af071f",
+    "synthesis": "qwen-openvoice"
+  },
+  {
+    "course": "story-method",
+    "coach": "rafael",
+    "language": "fr",
+    "duration": 82.93714285714283,
+    "cues": [
+      {
+        "start": 0.0,
+        "end": 1.8499773242630386,
+        "text": "Bienvenue sur ANITEW."
+      },
+      {
+        "start": 2.4,
+        "end": 5.465034013605442,
+        "text": "Je suis un coach pédagogique créé par intelligence artificielle."
+      },
+      {
+        "start": 5.815011337868481,
+        "end": 9.089024943310658,
+        "text": "Aujourd'hui, nous allons découvrir la méthode des histoires."
+      },
+      {
+        "start": 9.439002267573697,
+        "end": 14.930521541950114,
+        "text": "La méthode des histoires est une technique de mémorisation : elle relie plusieurs informations dans une même histoire."
+      },
+      {
+        "start": 15.280498866213152,
+        "end": 22.15360544217687,
+        "text": "Elle peut aider à retenir un ordre, par exemple une liste de courses ou les points principaux d'un exposé."
+      },
+      {
+        "start": 22.50358276643991,
+        "end": 24.930068027210883,
+        "text": "Elle ne remplace pas la compréhension du contenu."
+      },
+      {
+        "start": 25.28004535147392,
+        "end": 31.770022675736957,
+        "text": "Dans ce cours, tu découvriras le principe, tu verras un exemple, puis tu essaieras la méthode toi-même."
+      },
+      {
+        "start": 32.12,
+        "end": 34.75546485260771,
+        "text": "Ton objectif : retrouver trois mots dans le bon ordre."
+      },
+      {
+        "start": 35.105442176870746,
+        "end": 38.30979591836734,
+        "text": "Voici notre exemple : clé, citron, vélo."
+      },
+      {
+        "start": 38.65977324263038,
+        "end": 42.514285714285705,
+        "text": "Imagine d'abord une clé géante qui presse un citron."
+      },
+      {
+        "start": 42.86426303854874,
+        "end": 46.498185941043076,
+        "text": "Le jus de citron éclabousse un vélo et fait tourner ses roues."
+      },
+      {
+        "start": 46.84816326530611,
+        "end": 51.77079365079364,
+        "text": "Une action relie le premier mot au deuxième, puis une autre relie le deuxième au troisième."
+      },
+      {
+        "start": 52.12077097505668,
+        "end": 54.825895691609965,
+        "text": "Cette histoire inhabituelle sert simplement d'aide-mémoire."
+      },
+      {
+        "start": 55.175873015873,
+        "end": 58.17124716553287,
+        "text": "L'essentiel est de te représenter clairement les actions."
+      },
+      {
+        "start": 58.521224489795905,
+        "end": 60.51814058956915,
+        "text": "Les images vont maintenant disparaître."
+      },
+      {
+        "start": 60.86811791383219,
+        "end": 63.5035827664399,
+        "text": "Fais une pause et retrouve les trois mots dans le bon ordre."
+      },
+      {
+        "start": 63.853560090702935,
+        "end": 66.2219954648526,
+        "text": "Quand tu es prêt, affiche la réponse."
+      },
+      {
+        "start": 66.57197278911563,
+        "end": 69.27709750566892,
+        "text": "Les mots étaient : clé, citron, vélo."
+      },
+      {
+        "start": 69.62707482993196,
+        "end": 73.62090702947845,
+        "text": "Si tu as oublié un mot, revois le lien correspondant et essaie à nouveau."
+      },
+      {
+        "start": 73.97088435374148,
+        "end": 79.10249433106574,
+        "text": "Pour terminer, invente une histoire avec trois autres mots, puis retrouve-les sans regarder."
+      },
+      {
+        "start": 79.45247165532878,
+        "end": 82.5871655328798,
+        "text": "Tu peux aussi lire tout le cours et faire chaque exercice à ton rythme."
+      }
+    ],
+    "src": "/course-media/library/atta-story-fr-2bc2ae1550f1.m4a",
+    "bytes": 855535,
+    "sha256": "2bc2ae1550f19bb46cfb403f4681ce6387ac53f59495726ff6bdfc348ae84884",
+    "synthesis": "kyutai-openvoice"
   }
 ]
 export function courseNarration(course:CourseId,language:SpokenLanguage,coach:CoachId|null){

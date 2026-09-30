@@ -133,3 +133,26 @@ Both models are Apache-2.0. The local runtime is
 user recording or third-party speaker recording is distributed. The accepted
 ANITEW name excerpt remains the existing Piper v14 reference. Per-file hashes
 and provenance are recorded in `public/course-media/coach-narration-manifest.json`.
+
+## Revised English and French story narration (2026-10-01)
+
+The revised English story recordings for Atta and Noah use the user-approved
+synthetic Atta performance (Qwen3-TTS, Apache-2.0). Noah uses full-utterance
+OpenVoice V2 tone conversion (MIT) toward the existing synthetic Piper Joe
+voice (CC0 dataset). The full greeting stays in each coach's own voice.
+
+Atta's revised French story uses Kyutai TTS 1.6B en_fr (CC-BY-4.0), the Fabien
+voice reference (CC0), and OpenVoice V2 (MIT) conversion toward CML-TTS French
+speaker 1406 (CC-BY-4.0). CML-TTS: Frederico S. Oliveira et al.,
+https://openslr.org/146/. Voice source:
+https://huggingface.co/kyutai/tts-voices/blob/main/README.md, file
+`cml-tts/fr/1406_1028_000009-0003_enhanced.wav`.
+The generated recording is adapted by ANITEW (tempo and synthetic tone-color
+conversion); attribution and licence links are shown in the player.
+CC-BY-4.0: https://creativecommons.org/licenses/by/4.0/.
+Model: https://huggingface.co/kyutai/tts-1.6b-en_fr.
+Converter: https://github.com/myshell-ai/OpenVoice.
+The app bundles only narration, not model weights or reference speaker recordings.
+
+Short reference recordings were explicitly accepted by the user. Full narration
+has separate automatic content checks; this is not a full human listening review.

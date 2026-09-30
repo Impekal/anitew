@@ -2,7 +2,7 @@ import {test,expect} from '@playwright/test'
 import {visit,openPage} from './helpers.ts'
 import {courseNarration} from '../../src/i18n/courseNarrations.ts'
 test.use({channel:'chromium',launchOptions:{args:['--disable-gpu']}})
-test('Atta and Lin use different saved voices offline, while Noah keeps his original recording',async({page,context})=>{
+for (const language of ['de'] as const) test(`${language}: Atta and Lin use different saved voices offline, while Noah keeps his original recording`,async({page,context})=>{
  test.setTimeout(90_000)
  const external:string[]=[]
  const origin=new URL(test.info().project.use.baseURL!).origin
@@ -11,8 +11,10 @@ test('Atta and Lin use different saved voices offline, while Noah keeps his orig
  await openPage(page,'Lernkurse')
  await page.getByRole('button',{name:'Kurs öffnen : Begriffe durch Geschichten verbinden',exact:true}).click()
  await page.getByRole('button',{name:'Anhören und ansehen',exact:true}).click()
+ await page.locator('#course-audio-language').selectOption(language)
  const audio=page.locator('.course-media audio')
- const atta=courseNarration('story-method','de','rafael')!,lin=courseNarration('story-method','de','lin')!
+ await expect(page.locator('.course-caption')).toHaveAttribute('lang','de')
+ const atta=courseNarration('story-method',language,'rafael')!,lin=courseNarration('story-method',language,'lin')!
  await expect(audio).toHaveAttribute('src',atta.src)
  await expect(page.getByText('Kursstimme: Atta.',{exact:true})).toBeVisible()
  await page.getByRole('button',{name:'Für offline laden / fortsetzen',exact:true}).click()
@@ -30,14 +32,17 @@ test('Atta and Lin use different saved voices offline, while Noah keeps his orig
  await expect(audio).toHaveAttribute('src',lin.src)
  await audio.evaluate(async(el:HTMLAudioElement)=>{await el.play()})
  await expect.poll(()=>audio.evaluate((el:HTMLAudioElement)=>el.currentTime)).toBeGreaterThan(.2)
+ const previousPlayer=await audio.elementHandle()
  await page.locator('.course-coaches summary').click()
  await page.locator('#course-coach-all').selectOption('rafael')
  await expect(audio).toHaveAttribute('src',atta.src)
+ await expect.poll(()=>previousPlayer!.evaluate((el:HTMLAudioElement)=>el.paused)).toBe(true)
+ await previousPlayer!.dispose()
  await audio.evaluate((el:HTMLAudioElement)=>el.load())
  await expect.poll(()=>audio.evaluate((el:HTMLAudioElement)=>el.readyState)).toBeGreaterThan(0)
  expect(await audio.evaluate((el:HTMLAudioElement)=>el.paused)).toBe(true)
  await page.locator('#course-coach-all').selectOption('original')
- await expect(audio).toHaveAttribute('src','/course-media/story/de.m4a')
+ await expect(audio).toHaveAttribute('src',`/course-media/story/${language}.m4a`)
  await page.locator('#course-coach-all').selectOption('rafael')
  await audio.evaluate((el:HTMLAudioElement)=>el.load())
  await expect.poll(()=>audio.evaluate((el:HTMLAudioElement)=>el.readyState)).toBeGreaterThan(0)
@@ -46,4 +51,39 @@ test('Atta and Lin use different saved voices offline, while Noah keeps his orig
  await expect(audio).toHaveCount(0)
  await expect(page.locator('.course-caption')).toHaveCount(0)
  expect(external).toEqual([])
+})
+
+for(const language of ['en','fr'] as const) test(`${language}: approved story voice downloads and plays offline with matching credits`,async({page,context})=>{
+ test.setTimeout(90_000)
+ await visit(page)
+ await openPage(page,'Lernkurse')
+ await page.getByRole('button',{name:'Kurs öffnen : Begriffe durch Geschichten verbinden',exact:true}).click()
+ await page.getByRole('button',{name:'Anhören und ansehen',exact:true}).click()
+ await page.locator('#course-audio-language').selectOption(language)
+ const audio=page.locator('.course-media audio')
+ const atta=courseNarration('story-method',language,'rafael')!
+ await expect(audio).toHaveAttribute('src',atta.src)
+ await expect(page.locator('.course-caption')).toHaveAttribute('lang','de')
+ await page.getByRole('button',{name:'Für offline laden / fortsetzen',exact:true}).click()
+ await expect(page.getByText(/Diese Tonspur ist offline verfügbar/)).toBeVisible()
+ await page.locator('.course-media details').filter({has:page.locator('summary',{hasText:'Stimmen und Quellen'})}).locator('summary').click()
+ await expect(page.getByRole('link',{name:language==='fr'?'Kyutai TTS · CC BY 4.0':'Qwen3-TTS · Apache 2.0',exact:true})).toBeVisible()
+ await context.setOffline(true)
+ await page.reload()
+ await openPage(page,'Lernkurse')
+ await page.getByRole('button',{name:'Kurs öffnen : Begriffe durch Geschichten verbinden',exact:true}).click()
+ await expect(audio).toHaveAttribute('src',atta.src)
+ await audio.evaluate(async(el:HTMLAudioElement)=>{await el.play()})
+ await expect.poll(()=>audio.evaluate((el:HTMLAudioElement)=>el.currentTime)).toBeGreaterThan(.2)
+ if(language==='en'){
+  await context.setOffline(false)
+  await page.locator('.course-coaches summary').click()
+  await page.locator('#course-coach-mode').selectOption('global')
+  const old=await audio.elementHandle()
+  await page.locator('#course-coach-all').selectOption('original')
+  await expect(audio).toHaveAttribute('src',courseNarration('story-method','en','original')!.src)
+  await expect.poll(()=>old!.evaluate((el:HTMLAudioElement)=>el.paused)).toBe(true)
+  await old!.dispose()
+  await expect(page.getByText('Kursstimme: Noah.',{exact:true})).toBeVisible()
+ }
 })

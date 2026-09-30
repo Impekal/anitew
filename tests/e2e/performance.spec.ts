@@ -55,26 +55,26 @@ test('hält den Hauptthread frei — keine lange Aufgabe im Leerlauf', async ({ 
   await expect(startButton(page)).toBeVisible()
 
   const longTasks = await page.evaluate(async () => {
-    return await new Promise<number>((resolve) => {
-      let count = 0
+    return await new Promise<Array<{duration:number;startTime:number;name:string}>>((resolve) => {
+      const tasks:Array<{duration:number;startTime:number;name:string}>=[]
       let observer: PerformanceObserver | undefined
       try {
         observer = new PerformanceObserver((list) => {
-          count += list.getEntries().length
+          tasks.push(...list.getEntries().map(({duration,startTime,name})=>({duration,startTime,name})))
         })
         observer.observe({ entryTypes: ['longtask'] })
       } catch {
         // Kennt der Browser keine Longtask-API, gilt der Test als bestanden —
         // er kann dann schlicht nichts behaupten.
-        resolve(0)
+        resolve([])
         return
       }
       setTimeout(() => {
         observer?.disconnect()
-        resolve(count)
+        resolve(tasks)
       }, 1000)
     })
   })
 
-  expect(longTasks, 'lange Aufgaben im Leerlauf').toBe(0)
+  expect(longTasks, `lange Aufgaben im Leerlauf: ${JSON.stringify(longTasks)}`).toHaveLength(0)
 })

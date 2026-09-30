@@ -520,3 +520,29 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 - Die 24 zusätzlichen Dateien werden gezielt heruntergeladen und danach lokal wiedergegeben. Untertitel, Kapitel und Abrufsperre folgen den Zeitmarken der gewählten Stimme. Quellen, Dateigrößen und Prüfsummen sind im Narrationsmanifest dokumentiert.
 - Automatische Inhaltsprüfung plus gezielte Kontrolle der erkannten Abweichungen: Brüche werden sprachlich ausgeschrieben; fremdsprachige Vokabelbeispiele werden in ihrer Zielsprache gesprochen. Dies ersetzt keine vollständige Hörabnahme.
 - Englisch und Französisch für Atta und Lin werden noch erstellt und geprüft. Die neuen Kurzproben stehen zur Hörabnahme bereit. Beide abgelehnten Sprechvideo-Varianten bleiben außerhalb der App.
+
+### Sprachkorrektur nach Hörprobe (2026-10-01)
+
+- Nutzer lehnt den hörbaren Wechsel zur eingefügten Namensreferenz ab. Jeder Coach muss ANITEW in seiner eigenen Stimme sprechen; die bestätigte Lautfolge bleibt das Ziel. Die vorhandenen deutschen Stimmreferenzen bleiben bestätigt, die Namensstellen der Vollaufnahmen brauchen eine Korrektur.
+- Die neuen französischen Qwen-Fassungen sind wegen hörbaren Akzents abgelehnt. Weitere Massenerzeugung und automatische Übernahme wurden gestoppt. Zuerst kurze Vergleichsproben mit französischen Stimmgrundlagen und durchgehender Namensaussprache; keine Freigabe aus einer automatischen Transkription ableiten.
+
+### Zweite sprachliche Hörkorrektur (2026-10-01)
+
+- Englisch: Attas Stimmklang positiv bewertet; ANITEW weiterhin falsch, kein deutsches „tiwu“ oder angehängtes „wou“. Noahs Einstieg zu schnell; ruhigere durchgehende Probe erforderlich. Keine Namensfreigabe.
+- Französisch: Probe A (Tom) und D (CML 4724) abgelehnt. Probe C (CML 1406) stimmlich gut, Name falsch. Probe B (Fabien) etwas besser und Name fast passend, aber Tempo zu langsam und Betonung noch ungenau. Neue kurze Namensvarianten für C; B separat mit 12 % höherem Tempo vergleichen.
+- Alle neuen Proben bleiben außerhalb des App-Katalogs. Keine eingesetzte Namensaufnahme einer anderen Stimme.
+
+### Bestätigte englische Probe und französischer Stimmtransfer (2026-10-01)
+
+- Atta Englisch: Nutzer bestätigt die neue komplette Kurzprobe ausdrücklich als „top“. Datei: coach-atta-en-name-v2.wav. Diese Aussprache und dieser Sprecher bleiben als bestätigte Referenz erhalten.
+- Noah Englisch: beide Varianten unzureichend; Variante 1 besser, Pause nach ANITEW fehlt. Keine Freigabe.
+- Französisch B (zügigere Probe): Aussprache, Rhythmus und Tonhöhen bestätigt. Gewünscht ist Cs Stimmklang auf dieser Darbietung. Lokaler OpenVoice-V2-Versuch über die gesamte Aufnahme, keine eingesetzte Namensaufnahme. Ergebnis braucht Hörvergleich.
+
+### Sprachliche Freigabe der kurzen Referenzen (2026-10-01)
+
+- Nutzer bestätigt „Cs ist gut; Noah Neu passt; Atta bestätigt“. Damit sind die französische OpenVoice-Übertragung B→C, die englische Übertragung Atta→Noah und Attas englische Anytew-Probe bestätigt. Exakte Referenzdateien und SHA-256-Prüfsummen lokal gesichert.
+- Vollständige Kurse werden anhand dieser Einstellungen neu aufgebaut und inhaltlich geprüft. Die Freigabe der kurzen Referenz ist keine pauschale Freigabe aller später erzeugten Aufnahmen. Abgelehnte Namensschnitte und französische Qwen-Aufnahmen bleiben gesperrt.
+
+- Bestätigte französische C-Stimme wird auf ausdrücklichen Wunsch Atta zugeordnet. Geschichtenkurs EN (Atta/Noah) und FR (Atta) werden zuerst übernommen. CI #1643 scheiterte an einer langen Aufgabe im Desktop-Leerlauf (auch beim Wiederholen); Messgrenze bleibt unverändert, Diagnoseausgabe wird verbessert.
+
+- Geschichtenkurs: neue EN-Tonspuren für Atta/Noah und FR-Tonspur für Atta lokal integriert, mit passenden Untertiteltakten, Quellen und Offline-Download. 606 Kerntests, 6 Desktop-/Mobil-Stimmenprüfungen und 3 Wiederholungen des unveränderten Leerlauftests bestanden; Typprüfung, Build und Kaltstartbudget grün. CI #1643 bleibt fehlgeschlagen; ein neuer Gate folgt auf diesem Stand. Weitere Kurse, übrige Sprach-/Coach-Kombinationen, deutsche Namensmigration und Sprechvideoqualität bleiben offen.

@@ -516,5 +516,82 @@
       "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
       "https://github.com/Blaizzy/mlx-audio"
     ]
+  },
+  {
+    "coach": "rafael",
+    "language": "en",
+    "course": "story-method",
+    "duration": 90.95004166666665,
+    "bytes": 1032953,
+    "sha256": "09771673ca2ab4eafc6d424170f8a9c1e8c8972ab4b7fa3f7b84d5557d53d69b",
+    "status": "Short reference explicitly approved by user; full narration decoded and checked with transcription, not a complete human listening approval.",
+    "recipe": "Qwen3-TTS Atta original approved DE reference + own approved English greeting; OpenVoice full-cue conversion for Noah",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/atta-story-en-09771673ca2a.m4a",
+    "synthesis": "qwen-own-name",
+    "nameReference": "Same-coach complete approved greeting; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://github.com/myshell-ai/OpenVoice"
+    ],
+    "voiceSource": "Synthetic approved Atta voice; Noah timbre from existing Piper Joe synthetic sample",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "atta-en": "839c32cbe230d24598ed6d4e9d34f9bced2edc58aad3905c69160f85b400c0db"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta."
+  },
+  {
+    "coach": "original",
+    "language": "en",
+    "course": "story-method",
+    "duration": 90.83746031746028,
+    "bytes": 1026059,
+    "sha256": "557998b9fa7176b694cad727b3890d8d6717bcd59f3e26508842c9e872af071f",
+    "status": "Short reference explicitly approved by user; full narration decoded and checked with transcription, not a complete human listening approval.",
+    "recipe": "Qwen3-TTS Atta original approved DE reference + own approved English greeting; OpenVoice full-cue conversion for Noah",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/noah-story-en-557998b9fa71.m4a",
+    "synthesis": "qwen-openvoice",
+    "nameReference": "Same-coach complete approved greeting; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://github.com/myshell-ai/OpenVoice"
+    ],
+    "voiceSource": "Synthetic approved Atta voice; Noah timbre from existing Piper Joe synthetic sample",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "atta-en": "839c32cbe230d24598ed6d4e9d34f9bced2edc58aad3905c69160f85b400c0db",
+      "noah-en": "2425373782da52e6cf0b326e75b0cf16c6b31b0fbb91914b023183a43a30dfff"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta."
+  },
+  {
+    "coach": "rafael",
+    "language": "fr",
+    "course": "story-method",
+    "duration": 82.93714285714283,
+    "bytes": 855535,
+    "sha256": "2bc2ae1550f19bb46cfb403f4681ce6387ac53f59495726ff6bdfc348ae84884",
+    "status": "Short reference explicitly approved by user; full narration decoded and checked with transcription, not a complete human listening approval.",
+    "recipe": "Kyutai Fabien at 1.12 tempo; OpenVoice CML1406 tone conversion; own approved complete greeting",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/atta-story-fr-2bc2ae1550f1.m4a",
+    "synthesis": "kyutai-openvoice",
+    "nameReference": "Same-coach complete approved greeting; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
+      "https://openslr.org/146/",
+      "https://github.com/myshell-ai/OpenVoice"
+    ],
+    "voiceSource": "Kyutai Fabien CC0 performance; CML-TTS French speaker1406 CC-BY-4.0 target; generated narration adapted by ANITEW",
+    "modelLicense": "Kyutai CC-BY-4.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "preferred-fr": "5b7babe4ac4a2b402555868c0dcb630dcee40a89ee4346c782b28fb710d6cbd5",
+      "fr-performance": "1b1f71d289f4586f49a50a4bd3afcfff9be057b42e73a3c5432951f6bb94ca98",
+      "fr-timbre": "d9e21ce03fd29e6bd4645ca126bf10dc14f8e6f07e4124cafd722276904b0e07"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta."
   }
 ]

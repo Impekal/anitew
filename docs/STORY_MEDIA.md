@@ -123,3 +123,27 @@ Die neuen Vollaufnahmen sind dekodiert und automatisch transkribiert; diese
 Prüfung ersetzt keine vollständige Hörabnahme. Es werden keine Modelle oder
 privaten Nutzeraufnahmen gebündelt. Quellen und Hashes stehen im lokalen
 `public/course-media/coach-narration-manifest.json`.
+
+
+## Approved voice update, 2026-10-01
+
+The user accepted the exact short English Atta and Noah recordings and the
+French B-to-C voice conversion, then assigned that French voice to Atta.
+The story course now has new English recordings for Atta and Noah and a new
+French recording for Atta. Other courses retain their existing recordings.
+All new audio is local, uses the normal verified download cache, and has
+recording-specific cue times and recall boundaries. The full approved greeting
+is retained in the same coach voice; no other speaker's name fragment is inserted.
+
+English content was synthesized with Atta's approved Qwen reference. Noah's
+full utterances use the same OpenVoice V2 conversion recipe as his approved
+sample. French uses Kyutai's Fabien voice at 1.12 tempo followed by conversion
+toward CML-TTS French speaker 1406, matching the approved sample. Three French
+cues were regenerated after transcription discrepancies; the final full-course
+transcription retains the lesson and examples. Automatic transcription is a
+content check and cannot certify pronunciation or full listening quality.
+
+The manifest records file hashes, recipes and sources. Player credits link to
+Kyutai, CML-TTS and their CC-BY-4.0 licences, and to OpenVoice (MIT). The existing
+German recordings' old name handling still needs migration; these new story
+recordings do not silently certify or replace every earlier language track.
