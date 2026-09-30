@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 import type { Platform } from '../core/index.ts'
-import { COACH_IDS, COACH_SETTINGS_KEY, DEFAULT_COACHES, coachFor, coachPreferences, type CoachPreferences } from '../core/courses/coaches.ts'
+import { COACH_IDS, COACH_SETTINGS_KEY, DEFAULT_COACHES, coachFor, coachPreferences, type CoachId, type CoachPreferences } from '../core/courses/coaches.ts'
 import type { CourseId } from '../core/courses/progress.ts'
 import type { ReadingCourse } from '../i18n/courses.ts'
 import type { CourseLanguage } from '../i18n/courseUi.ts'
 import { courseCoachCopy } from '../i18n/courseCoaches.ts'
 
-export function CourseCoachPanel({ platform, locale, courses, selected }: { platform: Platform; locale: CourseLanguage; courses: ReadingCourse[]; selected: CourseId | null }) {
+export function CourseCoachPanel({ platform, locale, courses, selected, onChange }: { onChange?:(coach:CoachId|null)=>void; platform: Platform; locale: CourseLanguage; courses: ReadingCourse[]; selected: CourseId | null }) {
   const t = courseCoachCopy[locale]
   const [preferences, setPreferences] = useState(() => coachPreferences(undefined))
   const [ready, setReady] = useState(false)
@@ -40,6 +40,7 @@ export function CourseCoachPanel({ platform, locale, courses, selected }: { plat
   }
   const options = COACH_IDS.map(id => <option key={id} value={id}>{t.names[id]}</option>)
   const chosen = selected ? coachFor(selected, preferences) : null
+  useEffect(()=>{if(ready)onChange?.(chosen)},[ready,chosen,onChange])
   return <section className="course-coaches" aria-label={t.title}>
     {chosen && ready && <figure className="course-coach-current">
       <img src={`/coaches/${chosen}.webp`} width="80" height="96" alt={`${t.names[chosen]} · ${t.portrait}`} />

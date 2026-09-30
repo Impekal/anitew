@@ -50,3 +50,11 @@
 .course-illustration li { flex:1 1 5rem; padding:.6rem; border:1px solid var(--an-line,currentColor); border-radius:.5rem; margin:0; }
 .illustration-number { display:block; font-size:.75em; margin-bottom:.3rem; color:var(--an-gold,#c2a564); }
 .illustration-long-words li,.illustration-number-images li { font-family:monospace; }
+
+.course-media video { display:block; width:100%; max-width:32rem; aspect-ratio:1; margin:1rem auto; border-radius:1rem; background:#080d0c; }
+
+.course-media { container-type:inline-size; }
+.course-screen,.course-visuals { min-width:0; }
+@container (min-width:40rem) {
+ .course-playback.has-video { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:1.25rem; align-items:center; }
+}

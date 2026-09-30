@@ -1,6 +1,6 @@
 export const COURSE_AUDIO_CACHE = 'anitew-course-audio-v1'
 const PARTIAL_CACHE = 'anitew-course-audio-partial-v1'
-export interface DownloadAsset { src:string; bytes:number; sha256:string }
+export interface DownloadAsset { src:string; bytes:number; sha256:string; mime?:'video/mp4' }
 export async function downloaded(asset:DownloadAsset):Promise<boolean> {
  const cache=await caches.open(COURSE_AUDIO_CACHE)
  const response=await cache.match(asset.src)
@@ -33,12 +33,12 @@ export async function downloadAudio(asset:DownloadAsset,signal:AbortSignal,progr
    if(received>asset.bytes)throw new Error('Unexpected download length')
   }
   signal.throwIfAborted()
-  const blob=new Blob(chunks,{type:'audio/mp4'})
+  const blob=new Blob(chunks,{type:asset.mime??'audio/mp4'})
   if(blob.size!==asset.bytes)throw new Error('Incomplete audio')
   const digest=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',await blob.arrayBuffer())),v=>v.toString(16).padStart(2,'0')).join('')
   if(digest!==asset.sha256){await partialCache.delete(asset.src);chunks=[];throw new Error('Audio checksum mismatch')}
   signal.throwIfAborted()
-  await (await caches.open(COURSE_AUDIO_CACHE)).put(asset.src,new Response(blob,{headers:{'Content-Type':'audio/mp4','Content-Length':String(blob.size),'Accept-Ranges':'bytes','X-ANITEW-SHA256':asset.sha256,'X-ANITEW-Offline':'verified'}}))
+  await (await caches.open(COURSE_AUDIO_CACHE)).put(asset.src,new Response(blob,{headers:{'Content-Type':asset.mime??'audio/mp4','Content-Length':String(blob.size),'Accept-Ranges':'bytes','X-ANITEW-SHA256':asset.sha256,'X-ANITEW-Offline':'verified'}}))
   await partialCache.delete(asset.src)
  }catch(error){
   if(chunks.length && received<asset.bytes)await partialCache.put(asset.src,new Response(new Blob(chunks),{headers:{'X-ANITEW-SHA256':asset.sha256}})).catch(()=>undefined)

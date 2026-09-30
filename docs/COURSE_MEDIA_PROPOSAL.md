@@ -13,8 +13,8 @@ Die älteren Major-, Palast-, Geschichten- und Verknüpfungslektionen im
 Training bleiben erhalten. Neue Kurse sind ausdrücklich zusätzliche Zugänge.
 Die französische Fassung ist integriert; ihre abschließende sprachliche Durchsicht steht noch aus.
 
-Die Coach-Zuordnung ist integriert: jüngerer Coach, Lin und Rafael als lokal
-gebündelte, gekennzeichnete fiktive Standbilder. Standard je Kurs, ein Coach für
+Die Coach-Zuordnung ist integriert: Noah, Lin und Atta als lokal
+gebündelte Portraits mit der Kennzeichnung KI-Coach. Standard je Kurs, ein Coach für
 alle Kurse oder eigene Zuordnung werden sprachübergreifend gespeichert.
 Ein Wechsel unterbricht eine laufende Leseübung nicht.
 
@@ -27,24 +27,18 @@ in dieselbe Abrufübung wie beim Lesen; beide Wege teilen den Kursabschluss.
 Die übrigen elf Kurse bieten ebenfalls je drei lokale Tonspuren mit bewusstem Offline-Download. Alle zwölf Kurse haben drei Übungsstufen und einen gemeinsamen Lernfortschritt. Quellen, Dateinachweise und
 Prüfgrenzen stehen in [STORY_MEDIA.md](STORY_MEDIA.md).
 
-## Separate lokale Medienvorschau
+## Sprechvideos und individuelle Stimmen in Überarbeitung
 
-Die Geschichten-Vorschau außerhalb des Repositories bietet ein illustriertes
-Beispiel, Lesemodus, Tempo, Coach-Auswahl und drei Tonsprachen (DE/EN/FR).
-Elf Untertitelsprachen liegen als Entwürfe vor. Die Geschichten-Audioprobe wurde inzwischen integriert; dies ist noch keine Integration
-aller Kursmedien in die App und keine sprachliche Abnahme der neuen Fassungen.
+Die erste Bewegungsprobe wurde wegen zu geringer Mundöffnung und fehlender
+Lippensynchronität abgelehnt. Der lange Renderlauf wurde gestoppt; diese
+Clips werden nicht integriert. Die Player-, Untertitel- und Offline-Technik
+wurde mit isolierten Testdateien geprüft, die nicht ausgeliefert werden.
 
-Aktive Portraitauswahl: ursprünglicher jüngerer männlicher Coach, Lin und
-Rafael, ohne traditionelle Kleidung. Pro Kurs gilt ein Standard; alternativ
-kann ein Coach für alle oder eine individuelle Zuordnung gewählt werden.
-Alle drei nutzen dieselbe Stimme pro Tonspur. Die ursprüngliche deutsche
-Männerstimme wurde vom Nutzer akzeptiert. Der bestätigte Namensausschnitt aus
-Probe 14 dient als gemeinsame ANITEW-Aussprache in den Sprachfassungen.
-
-Die bisher erzeugten Sprechbewegungen wurden als unnatürlich abgelehnt. Die
-aktive Vorschau zeigt deshalb statische Portraits und kennzeichnet das.
-Ein Standbild erfüllt das Ziel eines natürlich sprechenden Coaches nicht.
-Englische und französische Stimmen benötigen weiterhin eine Hörprüfung.
+Noah behält die bestätigte Männerstimme. Lin und Atta sollen jeweils eine
+eigene natürliche Männerstimme erhalten. Die bisherige Entscheidung für
+eine gemeinsame Stimme ist damit ersetzt. Kurze Hör- und Sprechproben
+gehen der Produktion vollständiger Kurse voraus. Die akzeptierte
+ANITEW-Aussprache bleibt sprachübergreifend die Referenz.
 
 ## Weitere Integration
 

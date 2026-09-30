@@ -2,7 +2,7 @@ import { afterEach,expect,it,vi } from 'vitest'
 import { webcrypto } from 'node:crypto'
 import { COURSE_AUDIO_CACHE,downloadAudio,downloaded,removeDownload } from '../../src/app/courseDownloads.ts'
 afterEach(()=>vi.unstubAllGlobals())
-it('resumes an interrupted download, verifies it, then removes both complete and partial copies',async()=>{
+it.each(['audio','video'] as const)('resumes and verifies an interrupted %s download, then removes every copy',async(kind)=>{
  const stores=new Map<string,Map<string,Response>>()
  vi.stubGlobal('crypto',webcrypto)
  vi.stubGlobal('caches',{open:async(name:string)=>{
@@ -12,7 +12,7 @@ it('resumes an interrupted download, verifies it, then removes both complete and
  }})
  const content=new TextEncoder().encode('complete local media bytes')
  const hash=Array.from(new Uint8Array(await webcrypto.subtle.digest('SHA-256',content)),v=>v.toString(16).padStart(2,'0')).join('')
- const asset={src:'/course-media/library/test.m4a',bytes:content.length,sha256:hash}
+ const asset={src:kind==='video'?'/course-media/video/test.mp4':'/course-media/library/test.m4a',bytes:content.length,sha256:hash,...(kind==='video'?{mime:'video/mp4' as const}:{})}
  const abort=new AbortController()
  const fetchMock=vi.fn(async(_url:string,options:RequestInit)=>{
   if(!options.headers || !('Range' in options.headers))return new Response(new ReadableStream({start(controller){controller.enqueue(content.slice(0,8));options.signal!.addEventListener('abort',()=>controller.error(options.signal!.reason),{once:true})}}))
@@ -25,6 +25,7 @@ it('resumes an interrupted download, verifies it, then removes both complete and
  await downloadAudio(asset,new AbortController().signal,()=>undefined)
  expect(fetchMock).toHaveBeenCalledTimes(2)
  expect(await downloaded(asset)).toBe(true)
+ expect(stores.get(COURSE_AUDIO_CACHE)!.get(asset.src)!.headers.get('Content-Type')).toBe(kind==='video'?'video/mp4':'audio/mp4')
  expect(await stores.get(COURSE_AUDIO_CACHE)!.get(asset.src)!.text()).toBe('complete local media bytes')
  await removeDownload(asset)
  expect(await downloaded(asset)).toBe(false)

@@ -402,7 +402,7 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 
 - [ ] **C01 · Natürliche Sprechbewegungen erreichen.** Lippensynchronität, Mimik, Blick und kleine Kopfbewegungen mit geeigneten kostenlosen Werkzeugen prüfen und brauchbare Clips erzeugen. Bisherige Animation abgelehnt; derzeit nur statische Portraits. Ein Standbild erfüllt dieses Ziel nicht.
 - [ ] **C02 · Bestätigte Namensaussprache in allen Kursen sichern.** Die akzeptierte männliche Referenz aus Probe 14 für ANITEW verwenden; Wortübergänge, Betonung und Lautstärke in DE/FR/EN prüfen. Keine neue Aussprache aus Schreibvarianten ableiten.
-- [ ] **C03 · Tonqualität und Sprachfassungen prüfen.** Bestätigte deutsche Männerstimme erhalten; englische und französische Fassungen auf Natürlichkeit, flüssige Aussprache, korrekte Wörter und Akzente prüfen und nötigenfalls verbessern. Nutzer-Hörprüfung der neuen Fassungen bleibt offen.
+- [ ] **C03 · Drei eigene Stimmen und Sprachfassungen prüfen.** Neue Nutzervorgabe vom 30. September: unterschiedliche Stimmen für Noah, Lin und Atta. Bestätigte deutsche Männerstimme für Noah erhalten; natürliche eigene Männerstimmen für Lin und Atta auswählen, ohne künstliche Alters- oder Herkunftsakzente; englische und französische Fassungen auf Natürlichkeit, flüssige Aussprache, korrekte Wörter und Akzente prüfen und nötigenfalls verbessern. Nutzer-Hörprüfung der neuen Fassungen bleibt offen.
 - [x] **C04 · Coach-Auswahl in die App übernehmen.** Noah, Lin und Atta als gekennzeichnete KI-Coaches mit Standbildern integriert: Standard je Kurs, global oder individuell; dauerhaft und sprachübergreifend gespeichert. Alte Einstellungen derselben Origin werden übernommen. Die separate Vorschau auf einem anderen Port kann nicht automatisch ausgelesen werden. Sprechvideos bleiben C01–C03.
 - [ ] **C05 · Illustrationen und Animationen je Methode erstellen.** Bilder schrittweise passend zur Erklärung aufbauen; Beispiele vor dem Abruf ausblenden. Bewegungen müssen Lerninhalte erklären und die reduzierte Bewegungseinstellung respektieren.
 - [x] **C06 · Lesen und Ansehen gleichwertig integrieren.** Vollständigen Text, Übungen und denselben Fortschritt anbieten; Tempo, Pause, Kapitel, tatsächliche Dauer und gespeicherte Auswahl übernehmen. App-Schrift, Farben und Button-Stile verwenden. Als illustrierter Audiokurs integriert; natürliche Coach-Bewegung bleibt C01.
@@ -501,3 +501,9 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 - Die korrigierte Geometrieprüfung bestand anschließend zwölfmal (Desktop/Mobil, Hell/Dunkel, drei Wiederholungen). Typprüfung, Build und Kaltstartbudget mit Noah/KI-Coach ebenfalls grün. Neuer Gesamt-Gate auf diesem Stand erforderlich.
 
 - Nutzerkorrektur: Rafael heißt in der Oberfläche jetzt Atta. Die interne Kennung bleibt für vorhandene Coach-Zuordnungen erhalten.
+
+### Medienkorrektur am 30. September 2026
+
+- Nutzer lehnt die kurze LivePortrait-Bewegungsprobe ab: zu geringe Mundöffnung und fehlende Lippensynchronität. Der lange Renderlauf wurde gestoppt. Keine abgelehnten Clips oder isolierten Testvideos im App-Katalog.
+- Drei unterschiedliche Stimmen ersetzen die frühere gemeinsame Stimme. Neue kurze deutsche Vergleichsproben für Lin und Atta in Arbeit; keine behauptete akustische Freigabe.
+- Vorbereitete Videotechnik: zehn gezielte Player-/Download-/Layoutprüfungen bestanden mit isolierten Testdateien. Dies bestätigt keine Medienqualität. Strenger CI #1640 ist auf d0ccd42 grün; neue lokale Änderungen brauchen einen neuen Gate.

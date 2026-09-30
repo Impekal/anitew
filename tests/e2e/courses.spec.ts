@@ -359,6 +359,7 @@ test('additional narration downloads deliberately and works after an offline res
  await page.getByRole('button',{name:'Anhören und ansehen',exact:true}).click()
  const audio=page.locator('.course-media audio')
  const source=await audio.getAttribute('src')
+ await expect(page.locator('.course-download')).toHaveCount(1)
  expect(source).toMatch(/^\/course-media\/library\/long-words-de-/)
  expect(await page.evaluate(async(src)=>!!await (await caches.open('anitew-course-audio-v1')).match(src!),source)).toBe(false)
  await page.getByRole('button',{name:'Für offline laden / fortsetzen',exact:true}).click()

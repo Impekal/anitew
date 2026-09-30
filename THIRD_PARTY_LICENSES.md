@@ -89,11 +89,11 @@ under the [Pexels License](https://www.pexels.com/license/), not the code licens
 See `docs/PORTRAITS.md` and `public/portraits/manifest.json` for per-file sources,
 credits, modifications and restrictions.
 
-## Fictional course coaches
+## AI course coaches
 
-`public/coaches/original.webp`, `lin.webp` and `rafael.webp` are fictional
+`public/coaches/original.webp`, `lin.webp` and `rafael.webp` are
 AI-generated portraits created for ANITEW, not photographs of real coaches.
-They are labelled as fictional still portraits in the course interface.
+They are labelled as AI coaches in the course interface; their display names are Noah, Lin and Atta.
 They are separate from the licensed photographs used in person training.
 No third-party photo licence or CC0 claim is made for these generated assets.
 `public/coaches/manifest.json` records source filenames, provenance, checksums
@@ -114,3 +114,10 @@ Additional subtitle drafts were produced locally with Qwen3-4B-Instruct-2507
 (Apache 2.0 model) and revised for the course content. Neither the model nor
 its runtime is distributed. See [STORY_MEDIA.md](docs/STORY_MEDIA.md) for
 provenance and the outstanding final language review.
+
+
+## Speaking video research (not distributed)
+
+The rejected local SadTalker/LivePortrait motion experiments are not bundled.
+No video manifest or approved speaking clips are currently distributed.
+Licences and provenance must be recorded for the eventual replacement clips.

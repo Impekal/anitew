@@ -33,3 +33,8 @@ it('preserves the accepted German narration byte for byte',()=>{
   const audio=readFileSync('public/course-media/story/de.m4a')
   expect(createHash('sha256').update(audio).digest('hex')).toBe('d32cfdbcb103610d1d387dc32ef8fb4585dd51efbf8db8c0b513d544c455dd80')
 })
+
+it('remembers an explicit video choice without enabling it from untrusted strings',()=>{
+ expect(mediaPreferences({video:true}).video).toBe(true)
+ expect(mediaPreferences({video:'true'}).video).toBeUndefined()
+})

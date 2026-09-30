@@ -88,3 +88,17 @@ Die Lesefassung bleibt verfügbar. Medienwahl, Sprache und Geschwindigkeit
 werden gespeichert; sie starten keine automatische Wiedergabe. Die Übung
 verwendet das zuvor gehörte Beispiel. Die höheren Kursstufen haben neue
 Leseübungen und eigenes Material, keine irreführend wiederverwendete Beispieltonspur.
+
+
+## Sprechvideos: Qualitätskorrektur vom 30. September 2026
+
+Die kurze SadTalker-/LivePortrait-Probe wurde vom Nutzer abgelehnt: Der Mund
+öffnet sich zu wenig und passt nicht zur Stimme. Der lange Renderlauf wurde
+gestoppt. Keine dieser Proben und keine Testdateien werden ausgeliefert.
+Die vorbereitete Video-Infrastruktur ist noch nicht mit freigegebenen Clips befüllt.
+
+Neu gilt: Noah behält die akzeptierte Männerstimme; Lin und Atta erhalten
+je eine eigene, natürlich sprechende Männerstimme. Keine künstlich gebrochene
+Sprache oder aus dem Aussehen abgeleitete Akzente. Zuerst kurze Stimm- und
+Lippensynchronproben, anschließend vollständige Kurse. Die bestätigte
+ANITEW-Aussprache bleibt die Referenz für alle Stimmen und Tonsprachen.

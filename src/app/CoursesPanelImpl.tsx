@@ -10,12 +10,14 @@ import { courseStageUi } from '../i18n/courseStageUi.ts'
 import { advancedExample } from '../i18n/courseAdvanced.ts'
 import { CourseIllustration } from './CourseIllustration.tsx'
 import { VerbatimComparison } from './VerbatimComparison.tsx'
+import type { CoachId } from '../core/courses/coaches.ts'
 import './courses.css'
 
 export function CoursesPanelImpl({ language, platform }: { language: Language; platform: Platform }) {
   const locale = courseLanguage(language)
   const copy = (german: string, english: Parameters<typeof courseCopy>[2]) => courseCopy(locale, german, english)
   const courses = readingCourses[locale]
+  const [coach,setCoach]=useState<CoachId|null>(null)
   const [selected, select] = useState<CourseId | null>(null)
   const [studyStage, setStudyStage] = useState<CourseStage>(1)
   const [stages, setStages] = useState<CourseStages>({})
@@ -53,7 +55,7 @@ export function CoursesPanelImpl({ language, platform }: { language: Language; p
     <p className="hint">{copy('Lesen, selbst abrufen, vergleichen. Die Übungen funktionieren ohne Netz. Die bisherigen Trainingslektionen bleiben verfügbar. Coach-Videos sind noch in Arbeit.', 'Read, recall and compare. These exercises work offline. The existing training lessons remain available. Coach videos are still being developed.')}</p>
     {language !== 'de' && language !== 'en' && language !== 'fr' && <p className="hint">These reading courses are currently available in English, German and French.</p>}
     <p role="status">{notice}</p>
-    <CourseCoachPanel platform={platform} locale={locale} courses={courses} selected={selected} />
+    <CourseCoachPanel platform={platform} locale={locale} courses={courses} selected={selected} onChange={setCoach} />
     {!course ? <>
       <p>{locale === 'fr' ? `${completed.length} exercices effectués sur ${courses.length}` : locale === 'de' ? `${completed.length} von ${courses.length} Übungen durchgeführt` : `${completed.length} of ${courses.length} exercises practised`}</p>
       <p className="hint">{copy('Der Abschluss dokumentiert eine Übung, keine gemessene Gedächtnisleistung.', 'Completion records practice, not measured memory performance.')}</p>
@@ -68,12 +70,12 @@ export function CoursesPanelImpl({ language, platform }: { language: Language; p
         {([1,2,3] as const).map(level=><option key={level} value={level} disabled={level>availableCourseStage(course.id,completed,stages)}>{stageCopy.names[level-1]}</option>)}
       </select>
       <p className="hint">{stageCopy.hint} {availableCourseStage(course.id,completed,stages)<3 ? stageCopy.locked : ''}</p>
-      <ReadingLesson personal={studyStage===3} mediaAvailable={studyStage===1} platform={platform} language={language} key={`${course.id}-${locale}-${studyStage}`} course={course} locale={locale} onBack={() => select(null)} onComplete={() => save(course.id, studyStage)} />
+      <ReadingLesson coach={coach} personal={studyStage===3} mediaAvailable={studyStage===1} platform={platform} language={language} key={`${course.id}-${locale}-${studyStage}`} course={course} locale={locale} onBack={() => select(null)} onComplete={() => save(course.id, studyStage)} />
     </>}
   </section>
 }
 
-function ReadingLesson({ course, locale, onBack, onComplete, platform, language, personal, mediaAvailable }: { personal:boolean; mediaAvailable:boolean; platform: Platform; language: Language; course: ReadingCourse; locale: CourseLanguage; onBack: () => void; onComplete: () => Promise<void> }) {
+function ReadingLesson({ coach, course, locale, onBack, onComplete, platform, language, personal, mediaAvailable }: { coach:CoachId|null; personal:boolean; mediaAvailable:boolean; platform: Platform; language: Language; course: ReadingCourse; locale: CourseLanguage; onBack: () => void; onComplete: () => Promise<void> }) {
   const copy = (german: string, english: Parameters<typeof courseCopy>[2]) => courseCopy(locale, german, english)
   const [stage, setStage] = useState<'learn' | 'recall' | 'compare' | 'done'>('learn')
   const [answer, setAnswer] = useState('')
@@ -97,7 +99,7 @@ function ReadingLesson({ course, locale, onBack, onComplete, platform, language,
   return <article className="course-lesson">
     <button type="button" onClick={onBack}>{copy('Zur Kursübersicht', 'Back to courses')}</button>
     <h3 ref={heading} tabIndex={-1}>{course.title} · {courseStages[locale][stage]}</h3>
-    {mediaAvailable && !usingOwn && (stage === 'learn' || stage === 'compare') && <StoryCourseMedia onMaterial={stage==='learn'?setNarrated:undefined} onPresentation={setListening} courseId={course.id} courseTitle={course.title} key={stage} platform={platform} language={language} solution={stage === 'compare'} onRecall={material => {setNarrated(material);setAnswer('');setChecked([]);setStage('recall')}} />}
+    {mediaAvailable && !usingOwn && (stage === 'learn' || stage === 'compare') && <StoryCourseMedia coach={coach} onMaterial={stage==='learn'?setNarrated:undefined} onPresentation={setListening} courseId={course.id} courseTitle={course.title} key={stage} platform={platform} language={language} solution={stage === 'compare'} onRecall={material => {setNarrated(material);setAnswer('');setChecked([]);setStage('recall')}} />}
     {stage === 'learn' && !listening && <>
       <h4>{copy('Was ist das und wozu dient es?', 'What is it for?')}</h4><p lang={narrated?.textLanguage ?? locale} dir="auto">{narrated?.purpose ?? course.purpose}</p>
       <h4>{copy('Grenzen und Voraussetzungen', 'Limits and prerequisites')}</h4><p lang={narrated?.textLanguage ?? locale} dir="auto">{narrated?.limit ?? course.limit}</p>

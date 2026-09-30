@@ -55,7 +55,7 @@ export default defineConfig({
         // Complete audio is warmed during installation; the runtime handler
         // must return partial 206 responses for native seeking, including offline.
         runtimeCaching: [{
-          urlPattern: ({url}) => url.origin === self.location.origin && /^\/course-media\/library\/[a-z0-9-]+\.m4a$/.test(url.pathname),
+          urlPattern: ({url}) => url.origin === self.location.origin && /^\/course-media\/(library\/[a-z0-9-]+\.m4a|video\/[a-z0-9-]+\.mp4)$/.test(url.pathname),
           handler: 'CacheFirst',
           options: { cacheName: 'anitew-course-audio-v1', rangeRequests: true, cacheableResponse: { headers: { 'X-ANITEW-Offline': 'verified' } } },
         }, {
