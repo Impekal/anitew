@@ -13,6 +13,11 @@ Die älteren Major-, Palast-, Geschichten- und Verknüpfungslektionen im
 Training bleiben erhalten. Neue Kurse sind ausdrücklich zusätzliche Zugänge.
 Die französische Fassung ist integriert; ihre abschließende sprachliche Durchsicht steht noch aus.
 
+Die Coach-Zuordnung ist integriert: jüngerer Coach, Lin und Rafael als lokal
+gebündelte, gekennzeichnete fiktive Standbilder. Standard je Kurs, ein Coach für
+alle Kurse oder eigene Zuordnung werden sprachübergreifend gespeichert.
+Ein Wechsel unterbricht eine laufende Leseübung nicht.
+
 ## Separate lokale Medienvorschau
 
 Die Geschichten-Vorschau außerhalb des Repositories bietet ein illustriertes

@@ -403,7 +403,7 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 - [ ] **C01 · Natürliche Sprechbewegungen erreichen.** Lippensynchronität, Mimik, Blick und kleine Kopfbewegungen mit geeigneten kostenlosen Werkzeugen prüfen und brauchbare Clips erzeugen. Bisherige Animation abgelehnt; derzeit nur statische Portraits. Ein Standbild erfüllt dieses Ziel nicht.
 - [ ] **C02 · Bestätigte Namensaussprache in allen Kursen sichern.** Die akzeptierte männliche Referenz aus Probe 14 für ANITEW verwenden; Wortübergänge, Betonung und Lautstärke in DE/FR/EN prüfen. Keine neue Aussprache aus Schreibvarianten ableiten.
 - [ ] **C03 · Tonqualität und Sprachfassungen prüfen.** Bestätigte deutsche Männerstimme erhalten; englische und französische Fassungen auf Natürlichkeit, flüssige Aussprache, korrekte Wörter und Akzente prüfen und nötigenfalls verbessern. Nutzer-Hörprüfung der neuen Fassungen bleibt offen.
-- [ ] **C04 · Coach-Auswahl in die App übernehmen.** Originaler jüngerer Coach, Lin und Rafael, ohne traditionelle Kleidung. Standard je Kurs, ein Coach für alle oder individuelle Zuordnung; Auswahl dauerhaft speichern und alte Zuordnungen migrieren. Im Prototyp vorhanden.
+- [x] **C04 · Coach-Auswahl in die App übernehmen.** Jüngerer Coach, Lin und Rafael als gekennzeichnete fiktive Standbilder integriert: Standard je Kurs, global oder individuell; dauerhaft und sprachübergreifend gespeichert. Alte Einstellungen derselben Origin werden übernommen. Die separate Vorschau auf einem anderen Port kann nicht automatisch ausgelesen werden. Sprechvideos bleiben C01–C03.
 - [ ] **C05 · Illustrationen und Animationen je Methode erstellen.** Bilder schrittweise passend zur Erklärung aufbauen; Beispiele vor dem Abruf ausblenden. Bewegungen müssen Lerninhalte erklären und die reduzierte Bewegungseinstellung respektieren.
 - [ ] **C06 · Lesen und Ansehen gleichwertig integrieren.** Vollständigen Text, Übungen und denselben Fortschritt anbieten; Tempo, Pause, Kapitel, tatsächliche Dauer und gespeicherte Auswahl übernehmen. App-Schrift, Farben und Button-Stile verwenden. Im Prototyp teilweise vorhanden.
 
@@ -462,3 +462,10 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 - Sprachwechsel nutzt dieselben Kurskennungen und denselben Abschlussstand. Französische eigene Textübungen verwenden allgemeine Kriterien statt Antworten aus dem Beispiel.
 - **Neue Nutzerentscheidung zur Zeitdarstellung:** Die Startzeit bleibt unverändert (z. B. 6:15), jedoch ohne vorangestelltes Zeichen. Unter den Modusnamen stehen klein 60–120 s, 3–4 Min, 5–7 Min und 15–20 Min. Kein Eingriff in Trainings-, Einpräge- oder Antwortzeiten.
 - **CI #1631:** 158 Desktop-Prüfungen bestanden direkt; der bestehende KI-Memory-Ablauf lief beim abschließenden Rückweg in sein gesamtes 30-Sekunden-Limit und bestand erst im Retry. Der strenge Gate blieb daher rot. Dieser einzelne Szenariotest erhält 60 Sekunden für seine mehreren Core-Wechsel und den Netzfehlerpfad; einzelne Assertions und das Verbot flakiger CI-Ergebnisse bleiben bestehen. Neue CI-Abnahme erforderlich.
+
+### Arbeitsstand: Coach-Zuordnung (2026-09-30)
+
+- Drei lokal gebündelte, fiktive Portraits mit Herkunftsmanifest; Kursauswahl auf Deutsch, Englisch und Französisch.
+- Coach-Wechsel erhält eine laufende Abrufantwort. Globale und individuelle Auswahl sind getrennt gespeichert.
+- Zeitspannen unter den Zeitwahl-Buttons auf 72 % der Hauptschrift verkleinert und farblich gedämpft; Startdauer unverändert.
+- Natürliche Sprechbewegungen und die Integration der Tonspuren sind weiterhin offen.

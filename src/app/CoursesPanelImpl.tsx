@@ -3,6 +3,7 @@ import type { Language, Platform } from '../core/index.ts'
 import { COURSE_PROGRESS_KEY, courseProgress, type CourseId } from '../core/courses/progress.ts'
 import { readingCourses, type ReadingCourse } from '../i18n/courses.ts'
 import { courseLanguage, courseCopy, courseStages, type CourseLanguage } from '../i18n/courseUi.ts'
+import { CourseCoachPanel } from './CourseCoachPanel.tsx'
 import './courses.css'
 
 export function CoursesPanelImpl({ language, platform }: { language: Language; platform: Platform }) {
@@ -34,6 +35,7 @@ export function CoursesPanelImpl({ language, platform }: { language: Language; p
     <p className="hint">{copy('Lesen, selbst abrufen, vergleichen. Die Übungen funktionieren ohne Netz. Die bisherigen Trainingslektionen bleiben verfügbar. Coach-Videos sind noch in Arbeit.', 'Read, recall and compare. These exercises work offline. The existing training lessons remain available. Coach videos are still being developed.')}</p>
     {language !== 'de' && language !== 'en' && language !== 'fr' && <p className="hint">These reading courses are currently available in English, German and French.</p>}
     <p role="status">{notice}</p>
+    <CourseCoachPanel platform={platform} locale={locale} courses={courses} selected={selected} />
     {!course ? <>
       <p>{locale === 'fr' ? `${completed.length} exercices effectués sur ${courses.length}` : locale === 'de' ? `${completed.length} von ${courses.length} Übungen durchgeführt` : `${completed.length} of ${courses.length} exercises practised`}</p>
       <p className="hint">{copy('Der Abschluss dokumentiert eine Übung, keine gemessene Gedächtnisleistung.', 'Completion records practice, not measured memory performance.')}</p>

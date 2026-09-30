@@ -2671,3 +2671,16 @@ Auf Nutzerwunsch zeigt der Startknopf die vorhandene Zeit ohne vorangestelltes Z
 CI #1631 war wegen eines einzigen flakigen bestehenden KI-Memory-Tests rot (158 direkte Erfolge). Der Test überschritt beim letzten Core-Rückweg sein Gesamtlimit von 30 Sekunden; dieses konkrete Mehrschritt-Szenario erhält 60 Sekunden. Die einzelnen Erwartungen und failOnFlakyTests bleiben unverändert.
 
 Validierung: Typprüfung, Build und Größenbudget bestanden; 17 gezielte Kernprüfungen für Kurskatalog, gespeicherte Kennungen und unveränderte Antwortreserve grün. 28 von 30 Browserprüfungen bestanden zunächst direkt. Die beiden französischen Offline-Neustarts luden unmittelbar nach Auswahl der Sprache neu; nach Öffnen der französischen Kursansicht vor dem Neustart bestanden auch diese beiden auf Desktop und Mobilgerät, einschließlich sprachübergreifendem Fortschritt. Mobile Sichtprüfung zeigt 6:15 ohne Zeichen und die vier kleinen Zeitspannen ohne horizontalen Überlauf.
+
+## 2026-09-30 — Coach-Zuordnung und ruhigere Zeitwahl
+
+Drei fiktive männliche Coach-Portraits lokal integriert. Standard/global/individuell
+pro Kurs, persistent und sprachübergreifend, mit Übernahme gültiger alter
+Einstellungen derselben Origin. Standbilder sind ausdrücklich gekennzeichnet;
+Sprechvideos bleiben offen. Zeitspannen unter den Auswahlbuttons sind kleiner
+und gedämpft; keine weitere Änderung der Trainingsdauer.
+
+Lokale Prüfung: 583 Kerntests und 32 Kursprüfungen auf Desktop/Mobilgerät
+bestanden; Typecheck, Build und Kaltstartbudget eingehalten. Coach-Auswahl
+auf schmalem Bildschirm visuell geprüft. Neuer strenger CI-Lauf folgt auf
+Push; daraus wird vor dessen Abschluss kein vollständig grüner Gate abgeleitet.

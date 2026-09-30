@@ -1,0 +1,32 @@
+[
+  {
+    "id": "original",
+    "file": "original.webp",
+    "sourceFile": "ki-coach-entwurf.png",
+    "sourceSha256": "898b00e3b1513420bf5b5ac9ffab43a83df26ba589de88af259bbecf4f638f3d",
+    "sha256": "151f99570532c0129ef698d858336b85bcd5ccc29f64d678b294bf349d845f8f",
+    "bytes": 1417596,
+    "origin": "AI-generated fictional coach portrait for ANITEW, 2026-09-30",
+    "conversion": "Lossless WebP; decoded RGBA pixels verified identical to source. No resizing or visual changes."
+  },
+  {
+    "id": "lin",
+    "file": "lin.webp",
+    "sourceFile": "coach-lin-v1.png",
+    "sourceSha256": "38ab145538b53416e2c467f61fd9ea5c63fd0dc61886ab2c38b191746865997b",
+    "sha256": "25326190f4e17baaac4d652fa4a032498562db09c8ac2e93d3a20029de4fa3f5",
+    "bytes": 1512826,
+    "origin": "AI-generated fictional coach portrait for ANITEW, 2026-09-30",
+    "conversion": "Lossless WebP; decoded RGBA pixels verified identical to source. No resizing or visual changes."
+  },
+  {
+    "id": "rafael",
+    "file": "rafael.webp",
+    "sourceFile": "coach-rafael-v1.png",
+    "sourceSha256": "5b21d0faebf86072460ab26ef82c27018fb016c11df3ca9fbbb6a74cdb156ef6",
+    "sha256": "0506bda8f5bb89eca92b668c3115713d26d1d0cd428baf00029aabcb4f18f151",
+    "bytes": 1564994,
+    "origin": "AI-generated fictional coach portrait for ANITEW, 2026-09-30",
+    "conversion": "Lossless WebP; decoded RGBA pixels verified identical to source. No resizing or visual changes."
+  }
+]

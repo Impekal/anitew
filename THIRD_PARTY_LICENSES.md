@@ -79,10 +79,8 @@ Build-Werkzeugkette benutzt. Datensammlung, kein Code im Ergebnis.
 - **Schriften**, falls je eine eigene dazukommt. Bisher ausschließlich
   Systemschriften — nichts zu lizenzieren, nichts nachzuladen.
 
-Nicht vorgesehen und ausdrücklich nicht vorhanden: Fotos oder Gesichter
-Dritter. Gesichter erzeugt ANITEW selbst (D-005) — das umgeht neben dem
-Urheberrecht auch die Persönlichkeitsrechte, die ein „lizenzfreies“ Foto eines
-echten Menschen nicht mit abdeckt.
+Historischer Stand von D-005: Gesichter wurden zunächst erzeugt. Seit V4.2
+verwendet das Personentraining die nachfolgend dokumentierten Portraitfotos.
 
 ## Portrait photographs
 
@@ -90,3 +88,13 @@ The files in `public/portraits/*.webp` are by their credited photographers,
 under the [Pexels License](https://www.pexels.com/license/), not the code license.
 See `docs/PORTRAITS.md` and `public/portraits/manifest.json` for per-file sources,
 credits, modifications and restrictions.
+
+## Fictional course coaches
+
+`public/coaches/original.webp`, `lin.webp` and `rafael.webp` are fictional
+AI-generated portraits created for ANITEW, not photographs of real coaches.
+They are labelled as fictional still portraits in the course interface.
+They are separate from the licensed photographs used in person training.
+No third-party photo licence or CC0 claim is made for these generated assets.
+`public/coaches/manifest.json` records source filenames, provenance, checksums
+and the lossless WebP conversion. Decoded pixels match the source PNG files.
