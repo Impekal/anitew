@@ -2700,3 +2700,12 @@ Wartebedingung für suchbare Medien ergänzt und weitere Playerereignisse
 abgesichert. Die Wiederholung traf unter hoher lokaler CPU-Auslastung auf
 Timeouts bereits in Navigation/Offline-Installation. Deshalb noch kein grüner
 Browser-Gate für diesen Stand behauptet; strenger CI muss dies verifizieren.
+
+### Korrektur Offline-Vorspulen
+
+CI #1634 war rot: 34 Kursprüfungen bestanden, Vorspulen auf Desktop und Mobil
+fehlgeschlagen. Ursache: volle Precache-Antworten ohne Range-Unterstützung
+machten die französische Tonspur nicht suchbar. Vollständiges Laden in einen
+versionierten Mediencache plus Workbox RangeRequests und CORS-Modus beheben
+das. Vier gezielte Browserprüfungen jetzt grün, inklusive Offline-206-Antwort
+mit korrektem Content-Range und exakt 100 angeforderten Bytes.

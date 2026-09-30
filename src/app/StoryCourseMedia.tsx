@@ -57,7 +57,7 @@ export function StoryCourseMedia({language,platform,solution=false,onRecall}:{la
         }}>{MEDIA_SPEEDS.map(speed=><option key={speed} value={speed}>{speed}×</option>)}</select>
       </fieldset>
       <p className="hint">{t.captions}: {language.toUpperCase()} · {t.draft}</p>
-      <audio key={spoken} ref={audio} controls preload="none" src={pack.src} aria-label={t.title} onError={()=>setError(t.failed)} onTimeUpdate={sync} onSeeking={sync} onSeeked={sync} onPlay={sync} onLoadedMetadata={()=>{
+      <audio key={spoken} ref={audio} controls crossOrigin="anonymous" preload="none" src={pack.src} aria-label={t.title} onError={()=>setError(t.failed)} onTimeUpdate={sync} onSeeking={sync} onSeeked={sync} onPlay={sync} onLoadedMetadata={()=>{
         if(audio.current){audio.current.playbackRate=preferences.speed;audio.current.preservesPitch=true;if(solution){audio.current.currentTime=gate;setTime(gate)}}
       }}/>
       <div className="course-media-chapters">

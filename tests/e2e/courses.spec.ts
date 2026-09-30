@@ -265,7 +265,7 @@ test('story narration has independent language, persistent speed and the same re
   await page.getByRole('button',{name:'Listen and watch',exact:true}).click()
   await audio.evaluate((element:HTMLAudioElement)=>element.load())
   await expect.poll(()=>audio.evaluate((element:HTMLAudioElement)=>element.readyState)).toBeGreaterThan(0)
-  await expect.poll(()=>audio.evaluate((element:HTMLAudioElement)=>element.seekable.length)).toBeGreaterThan(0)
+  await expect.poll(()=>audio.evaluate((element:HTMLAudioElement)=>element.seekable.length ? element.seekable.end(0) : 0)).toBeGreaterThan(60)
   // Seeking past the solution boundary must enter recall rather than reveal it.
   await audio.evaluate((element:HTMLAudioElement)=>{element.currentTime=element.duration-1})
   await expect(page.getByLabel('Your answer',{exact:true})).toBeVisible()
@@ -308,6 +308,10 @@ test('all three story audio tracks are cached offline and no external media is r
     expect(await audio.evaluate((element:HTMLAudioElement)=>element.duration)).toBeGreaterThan(60)
     expect(await audio.evaluate((element:HTMLAudioElement)=>new URL(element.currentSrc).origin===location.origin)).toBe(true)
   }
+  const range=await page.evaluate(async()=>{const response=await fetch('/course-media/story/fr.m4a',{headers:{Range:'bytes=100-199'}});return {status:response.status,size:(await response.arrayBuffer()).byteLength,range:response.headers.get('Content-Range')}})
+  expect(range.status).toBe(206)
+  expect(range.size).toBe(100)
+  expect(range.range).toMatch(/^bytes 100-199\/\d+$/)
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true)
   await context.setOffline(false)
 })

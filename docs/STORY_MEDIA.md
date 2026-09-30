@@ -41,7 +41,12 @@ Selbstprüfungen speichern den gemeinsamen Kursabschluss. Anhören allein zählt
 nicht als abgeschlossene Übung. Eigenes Material wird weiterhin ohne die
 Beispieltonspur geübt.
 
-Nur diese drei kleinen M4A-Dateien sind ausdrücklich im PWA-Precache enthalten.
+Nur diese drei kleinen M4A-Dateien werden bei der PWA-Installation vollständig
+in einen versionierten Mediencache geladen. Workbox liefert daraus auch
+HTTP-Teilantworten (206) fürs Offline-Vorspulen; Audio verwendet CORS-Modus.
+Bei Änderungen an den Dateien muss die Cacheversion in Vite und
+course-media-sw.js gemeinsam erhöht werden. Grundlage:
+https://developer.chrome.com/docs/workbox/serving-cached-audio-and-video .
 Große Videos werden weiterhin nicht automatisch geladen. Die Darstellung ist
 eine illustrierte Audiollektion mit statischem Coach, kein natürlich animiertes
 Sprechvideo. Automatisierte Medien-/Steuerungstests ersetzen keine Hörprüfung.

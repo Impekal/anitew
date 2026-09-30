@@ -48,10 +48,17 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,webp,json,woff2}', 'course-media/story/*.m4a'],
+        globPatterns: ['**/*.{js,css,html,svg,png,webp,json,woff2}'],
         // Der kleine Push-Handler bleibt eigenes, gut prüfbares JS und wird in
         // den von Workbox erzeugten Service Worker importiert.
-        importScripts: ['push-sw.js'],
+        importScripts: ['push-sw.js', 'course-media-sw.js'],
+        // Complete audio is warmed during installation; the runtime handler
+        // must return partial 206 responses for native seeking, including offline.
+        runtimeCaching: [{
+          urlPattern: ({url}) => url.origin === self.location.origin && /^\/course-media\/story\/(de|en|fr)\.m4a$/.test(url.pathname),
+          handler: 'CacheFirst',
+          options: { cacheName: 'anitew-story-audio-v1', rangeRequests: true, cacheableResponse: { statuses: [200] } },
+        }],
         // OAuth und Push sind echte Worker-Endpunkte. Der PWA-Navigations-
         // Fallback darf sie niemals mit einer gecachten index.html beantworten.
         navigateFallbackDenylist: [/^\/oauth\/google\//, /^\/push\//],
