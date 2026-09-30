@@ -1,5 +1,5 @@
 /** Course completion records practice, not measured memory performance. */
-export const COURSE_IDS = ['text-meaning', 'text-verbatim', 'long-words'] as const
+export const COURSE_IDS = ['text-meaning', 'text-verbatim', 'long-words', 'active-recall', 'spaced-practice'] as const
 export type CourseId = (typeof COURSE_IDS)[number]
 export const COURSE_PROGRESS_KEY = 'courses.practised.v1'
 export function courseProgress(value: unknown): CourseId[] {

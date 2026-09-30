@@ -56,7 +56,7 @@ function ReadingLesson({ course, de, onBack, onComplete }: { course: ReadingCour
   const source = usingOwn ? own : course.example
   const criteria = usingOwn && course.id === 'text-meaning' ? (de
     ? ['Die wesentlichen Aussagen sind enthalten.', 'Die Beziehungen zwischen den Aussagen stimmen.', 'Fehlende oder falsche Aussagen wurden mit dem Original abgeglichen.']
-    : ['The main ideas are included.', 'The relationships between ideas are correct.', 'Missing or mistaken ideas were checked against the source.']) : course.criteria
+    : ['The main ideas are included.', 'The relationships between ideas are correct.', 'Missing or mistaken ideas were checked against the source.']) : usingOwn ? course.ownCriteria ?? course.criteria : course.criteria
   useEffect(() => { heading.current?.focus() }, [stage])
   async function finish() {
     setSaving(true); setError('')
@@ -72,12 +72,12 @@ function ReadingLesson({ course, de, onBack, onComplete }: { course: ReadingCour
       <h4>{de ? 'Grenzen und Voraussetzungen' : 'Limits and prerequisites'}</h4><p>{course.limit}</p>
       <h4>{de ? 'So gehst du vor' : 'How to practise'}</h4><ol>{course.steps.map(step => <li key={step}>{step}</li>)}</ol>
       <h4>{de ? 'Durchgearbeitetes Beispiel' : 'Worked example'}</h4><blockquote>{course.example}</blockquote><p>{course.explanation}</p>
-      <details><summary>{de ? 'Mit eigenem Material üben' : 'Practise with your own material'}</summary>
+      {course.allowOwn !== false && <details><summary>{de ? 'Mit eigenem Material üben' : 'Practise with your own material'}</summary>
         <p>{course.transfer}</p><label htmlFor="course-own">{de ? 'Eigener Text oder eigenes Wort (nur für diesen Versuch)' : 'Your text or word (for this attempt only)'}</label>
         <textarea id="course-own" maxLength={6000} value={own} onChange={event => setOwn(event.target.value)} />
         <p className="hint">{de ? 'Dein Material und deine Antwort werden weder gespeichert noch versendet. Beim Verlassen dieses Kurses gehen sie verloren.' : 'Your material and answer are neither saved nor sent. They are discarded when you leave this course.'}</p>
         <label><input type="checkbox" checked={usingOwn} onChange={event => setUsingOwn(event.target.checked)} /> {de ? 'Eigenes Material statt Beispiel verwenden' : 'Use my material instead of the example'}</label>
-      </details>
+      </details>}
       <button type="button" className="primary" disabled={usingOwn && !own.trim()} onClick={() => {setAnswer('');setChecked([]);setStage('recall')}}>{de ? 'Vorlage ausblenden und üben' : 'Hide source and practise'}</button>
     </>}
     {(stage === 'recall' || stage === 'compare') && <>

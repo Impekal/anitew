@@ -10,3 +10,7 @@ describe('course progress from local settings or backup', () => {
     expect(courseProgress(['long-words', 'text-meaning', 'long-words'])).toEqual(['text-meaning', 'long-words'])
   })
 })
+
+it('keeps earlier completion identifiers when the course library grows', () => {
+  expect(courseProgress(['text-verbatim', 'active-recall', 'long-words', 'spaced-practice'])).toEqual(['text-verbatim', 'long-words', 'active-recall', 'spaced-practice'])
+})

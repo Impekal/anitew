@@ -437,3 +437,9 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 - **K02–K04, K11, C06, I01, Q01 teilweise umgesetzt:** Eigenständiger Menüpunkt Lernkurse, drei vollständige geführte Leseübungen auf Deutsch/Englisch mit Zweck, Grenzen, Vorgehen, Beispiel, Abruf, Selbstvergleich und Transfer. Eigenes Material ist nur im Arbeitsspeicher; persistiert werden ausschließlich Kurskennungen abgeschlossener Übungen. Noch offen: Medienfassungen, weiterführende Kursstufen und vollständige Sprachabdeckung.
 - **Keine automatische Leistungsbewertung:** Der Nutzer prüft anhand von Kriterien; „Übung durchgeführt“ ist kein Nachweis beherrschter Inhalte. Noch keine zusätzliche XP-Vergabe oder zweite Wiederholungsplanung.
 - Die Kursdateien werden beim ersten Öffnen geladen und vom PWA-Service-Worker für Offline-Nutzung mitgesichert. Videos und große Medienpakete sind weiterhin offen.
+
+### Arbeitsstand: Abrufen und verteiltes Wiederholen (2026-09-30)
+
+- **K05/K06 teilweise umgesetzt:** Zwei weitere eigenständige Lesekurse auf Deutsch und Englisch. Aktives Abrufen enthält einen vollständigen Versuch mit Rückmeldung und erneutem Abruf; bei eigenem Material gelten passende allgemeine Kriterien statt Kriterien aus dem Beispiel.
+- Verteiltes Wiederholen erklärt Pausen, Abruf vor dem Nachsehen und leistungsabhängige Abstände. Die Übung prüft das Verständnis des Vorgehens; sie behauptet keinen langfristigen Lernerfolg durch einmaliges Lesen. Der Abschluss erzeugt ausdrücklich keine neuen Wiederholungskarten und keine zweite Terminplanung.
+- Kursbibliothek jetzt fünf Lesekurse; bestehende Abschlusskennungen bleiben gültig. Die Medienfassungen, höheren Stufen und weiteren Sprachen bleiben offen.

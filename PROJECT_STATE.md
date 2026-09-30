@@ -2646,3 +2646,8 @@ Auf Nutzerwunsch wurden 31 offene Aufgaben mit stabilen Kennungen in docs/BACKLO
 ## 2026-09-30 · Erste Kursbibliothek in der App
 
 Auf dem Branch anitew-v4-2-living-memory wurde ein eigener Core-Menüpunkt Lernkurse ergänzt. Die drei Lesekurse behandeln inhaltlichen Textabruf, wortgetreues Lernen und lange Wörter, jeweils in DE/EN. Die Vorlage ist während des Abrufs vollständig aus dem sichtbaren DOM entfernt. Selbstvergleich und bewusster Abschluss speichern ausschließlich Kurskennungen über den vorhandenen Settings-Port; eigene Texte und Antworten bleiben flüchtig. Fehler beim Speichern werden sichtbar und lassen die Antwort erhalten. Der Kursbereich wird nachgeladen und im PWA-Precache erfasst. Natürliche Coach-Videos, weitere Methoden, weitere Sprachen und höhere Kursstufen sind damit noch nicht fertig.
+
+
+## 2026-09-30 · Kursbibliothek um Lern-Grundlagen erweitert
+
+Aktives Abrufen und verteiltes Wiederholen sind als weitere DE/EN-Lesekurse integriert. Der Player unterstützt optionale Kriterien für eigenes Material und kann die freie Materialeingabe bei einer methodischen Verständnisübung ausblenden. So werden keine Beispielkriterien auf fremde Inhalte angewandt. Die Kursbibliothek zählt fünf Kurse; gespeicherte Abschlüsse der ersten drei bleiben erhalten. Die CI des vorherigen Stands bestätigte bereits die Kursprüfung auf Desktop/Mobilgerät, Offline-Nutzung sowie die Layout- und V4.2-Regressionsgruppen; die komplette Regression war beim Beginn dieses Ausbaus noch aktiv.
