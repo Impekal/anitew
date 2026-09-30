@@ -2651,3 +2651,12 @@ Auf dem Branch anitew-v4-2-living-memory wurde ein eigener Core-Menüpunkt Lernk
 ## 2026-09-30 · Kursbibliothek um Lern-Grundlagen erweitert
 
 Aktives Abrufen und verteiltes Wiederholen sind als weitere DE/EN-Lesekurse integriert. Der Player unterstützt optionale Kriterien für eigenes Material und kann die freie Materialeingabe bei einer methodischen Verständnisübung ausblenden. So werden keine Beispielkriterien auf fremde Inhalte angewandt. Die Kursbibliothek zählt fünf Kurse; gespeicherte Abschlüsse der ersten drei bleiben erhalten. Die CI des vorherigen Stands bestätigte bereits die Kursprüfung auf Desktop/Mobilgerät, Offline-Nutzung sowie die Layout- und V4.2-Regressionsgruppen; die komplette Regression war beim Beginn dieses Ausbaus noch aktiv.
+
+
+## 2026-09-30 · Zwölf ergänzende Lesekurse, alte Methoden erhalten
+
+Sieben weitere DE/EN-Lesekurse ergänzen die Bibliothek: Gruppieren, Selbsterklärung, Geschichten, Loci, Schlüsselworttechnik, Zahl-Bild-System und gezieltes Mischen verwandter Aufgaben. Bestehende Session-Lektionen, deren Fortschritt und Palastverwaltung wurden nicht verändert. Auf ausdrücklichen Nutzerwunsch ist das additive Vorgehen im Backlog festgehalten. Die zwölf Lesekurse sind keine fertigen Coach-Videokurse; Medien und weitere Sprachfassungen bleiben offen.
+
+Bei der lokalen Browserregression fing eine angehaltene Startanimation den Einstiegsklick ab. Das Start-Overlay erhält deshalb zusätzlich zum CSS-Ende eine Zeitgrenze (bestehende 3/6 Sekunden plus 0,5 Sekunden Reserve) und eine Prüfung beim Sichtbarwerden. Ein Browsertest pausiert die Animation absichtlich. Das ist eine Absicherung des App-Zugangs, keine Änderung der Kurs- oder Trainingslogik.
+
+Validierung dieses Ausbaus: 580 Kernprüfungen, Typprüfung, Build und Größenbudget bestanden. Von 44 Browserprüfungen der Kurse und älteren Palast-/Techniklektionen bestanden zunächst 43; ein Kurszugang scheiterte am Start-Overlay. Nach der Absicherung bestanden alle acht gezielten Nachprüfungen auf Desktop/Mobilgerät (betroffener Kurs, normaler Erst-/Folgestart und absichtlich pausierte Startanimation). Der vollständige CI-Gate für den endgültigen Commit steht separat aus.

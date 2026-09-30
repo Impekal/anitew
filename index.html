@@ -305,6 +305,27 @@
       <div class="anitew-launch-tagline">Train the memory you actually use. Remember what matters.</div>
       <div class="anitew-launch-powered">Powered by Impekal</div>
     </div>
+    <script>
+      // A suspended CSS animation must not leave a permanent input blocker.
+      (() => {
+        const launch = document.getElementById('anitew-launch')
+        if (!launch) return
+        const duration = document.documentElement.dataset.anitewFirstLaunch === 'true' ? 6000 : 3000
+        const deadline = performance.now() + duration + 500
+        let timer
+        const finish = () => {
+          clearTimeout(timer)
+          launch.remove()
+          document.removeEventListener('visibilitychange', resume)
+        }
+        const resume = () => { if (performance.now() >= deadline) finish() }
+        launch.addEventListener('animationend', event => {
+          if (event.target === launch && event.animationName === 'anitew-launch-away') finish()
+        })
+        timer = setTimeout(finish, duration + 500)
+        document.addEventListener('visibilitychange', resume)
+      })()
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

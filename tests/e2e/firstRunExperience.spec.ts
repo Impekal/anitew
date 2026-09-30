@@ -182,3 +182,16 @@ test('der Core schließt eindeutig und startet standardmäßig dunkel', async ({
   await page.locator('.drawer-close').click()
   await expect(page.locator('.drawer')).toBeHidden()
 })
+
+test('a suspended splash animation cannot permanently block the app', async ({ page }) => {
+  await page.addInitScript(() => {
+    document.addEventListener('DOMContentLoaded', () => {
+      const splash = document.getElementById('anitew-launch')
+      if (splash) splash.style.animationPlayState = 'paused'
+    }, { once: true })
+  })
+  await page.goto('/')
+  await expect(page.locator('#anitew-launch')).toBeHidden({ timeout: 6000 })
+  await page.locator('.arrival .quiet').click()
+  await expect(startButton(page)).toBeVisible()
+})

@@ -443,3 +443,15 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 - **K05/K06 teilweise umgesetzt:** Zwei weitere eigenständige Lesekurse auf Deutsch und Englisch. Aktives Abrufen enthält einen vollständigen Versuch mit Rückmeldung und erneutem Abruf; bei eigenem Material gelten passende allgemeine Kriterien statt Kriterien aus dem Beispiel.
 - Verteiltes Wiederholen erklärt Pausen, Abruf vor dem Nachsehen und leistungsabhängige Abstände. Die Übung prüft das Verständnis des Vorgehens; sie behauptet keinen langfristigen Lernerfolg durch einmaliges Lesen. Der Abschluss erzeugt ausdrücklich keine neuen Wiederholungskarten und keine zweite Terminplanung.
 - Kursbibliothek jetzt fünf Lesekurse; bestehende Abschlusskennungen bleiben gültig. Die Medienfassungen, höheren Stufen und weiteren Sprachen bleiben offen.
+
+### Arbeitsstand: zwölf ergänzende Lesekurse (2026-09-30)
+
+**Verbindliche Ergänzung des Nutzers:** Alte Methodenkurse nicht löschen oder ersetzen. Die bisherigen Major-, Loci-, Geschichten- und Verknüpfungslektionen im Training sowie deren gespeicherter Fortschritt bleiben erhalten. Die Kursbibliothek ist ein zusätzlicher Zugang.
+
+- **K07–K10 als Lesegrundlagen umgesetzt, Medienausbau weiterhin offen:** Sinnvolle Einheiten, Selbsterklärung, Geschichten, Loci, Schlüsselwörter, Zahl-Bild-System und wechselnde Aufgabentypen ergänzen die ersten fünf Lesekurse. Insgesamt zwölf DE/EN-Kurse, weil die zehn Techniken zusätzlich in getrennte Lernziele für Texte und Wörter aufgegliedert sind.
+- Jede neue Lektion enthält Zweck, Grenzen, Schritte, ein durchgearbeitetes Beispiel, Abruf ohne Vorlage, bewussten Selbstvergleich und Transfer. Methodenbeispiele mit festem Aufgabenformat bieten keine irreführende freie Materialeingabe; dort wird der eigene Transfer nach dem Beispiel erklärt.
+- **Kein Abschluss des gesamten K08/K09 oder der Videokurse:** Dies sind ergänzende Leseeinführungen. Coach-Medien, visuelle Erläuterungen, höhere Stufen und die übrigen Sprachfassungen stehen weiterhin aus.
+- Regression prüft, dass die ursprünglichen Kurskennungen und Abschlussdaten beim Ausbau gültig bleiben und beide angebotenen Sprachen jeden Kurs enthalten.
+
+- **Q01/Q02 zusätzliche Startabsicherung:** Eine gestoppte CSS-Startanimation darf die App nicht dauerhaft verdecken. Unabhängige Zeitgrenze und gezielte Browserregression ergänzen den vorhandenen Ablauf.
+- **Französisch weiterhin offen:** Die zwölf neuen Lesekurse sind derzeit nur DE/EN. Die französische Tonspur der separaten Geschichten-Vorschau ist keine französische Fassung dieser Kursbibliothek.

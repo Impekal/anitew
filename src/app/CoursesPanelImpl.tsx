@@ -29,7 +29,7 @@ export function CoursesPanelImpl({ language, platform }: { language: Language; p
   }
   const course = courses.find(item => item.id === selected)
   return <section className="courses" lang={de ? 'de' : 'en'} dir="ltr">
-    <p className="hint">{de ? 'Lesen, selbst abrufen, vergleichen. Die Übungen funktionieren ohne Netz. Weitere Methoden und Coach-Videos folgen.' : 'Read, recall and compare. These exercises work offline. More methods and coach videos are being developed.'}</p>
+    <p className="hint">{de ? 'Lesen, selbst abrufen, vergleichen. Die Übungen funktionieren ohne Netz. Die bisherigen Trainingslektionen bleiben verfügbar. Coach-Videos sind noch in Arbeit.' : 'Read, recall and compare. These exercises work offline. The existing training lessons remain available. Coach videos are still being developed.'}</p>
     {language !== 'de' && language !== 'en' && <p className="hint">These reading courses are currently available in English and German.</p>}
     <p role="status">{notice}</p>
     {!course ? <>

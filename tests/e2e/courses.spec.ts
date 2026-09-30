@@ -18,7 +18,7 @@ test('course hides the source, requires review and retains completion after relo
   await expect(page.getByText('Übung durchgeführt und gespeichert.', {exact:true})).toBeVisible()
   await page.reload()
   await openPage(page, 'Lernkurse')
-  await expect(page.getByText('1 von 5 Übungen durchgeführt', {exact:true})).toBeVisible()
+  await expect(page.getByText('1 von 12 Übungen durchgeführt', {exact:true})).toBeVisible()
 })
 
 test('own text is hidden during recall and discarded when leaving the course', async ({ page }) => {
@@ -88,3 +88,53 @@ test('English spaced practice explains the existing schedule without promising n
   await page.getByRole('button', {name:'Complete exercise',exact:true}).click()
   await expect(page.getByText(/Completing this reading course does not create new review cards/)).toBeVisible()
 })
+
+test('grouping requires recall of the items, not only headings', async ({ page }) => {
+  await visit(page)
+  await openPage(page, 'Lernkurse')
+  await page.getByRole('button', {name:'Kurs öffnen : Sinnvolle Einheiten bilden',exact:true}).click()
+  await expect(page.locator('.course-lesson blockquote')).toContainText('Apfel · Hammer · Hemd')
+  await page.getByRole('button', {name:'Vorlage ausblenden und üben',exact:true}).click()
+  await expect(page.locator('.course-lesson blockquote')).toHaveCount(0)
+  await page.getByLabel('Deine Antwort', {exact:true}).fill('Obst: Apfel, Birne, Banane. Werkzeug: Hammer, Säge, Zange. Kleidung: Hemd, Jacke, Hose.')
+  await page.getByRole('button', {name:'Mit der Vorlage vergleichen',exact:true}).click()
+  await expect(page.getByText('Ich habe alle neun Begriffe mit der Vorlage abgeglichen und fehlende oder zusätzliche Begriffe korrigiert.', {exact:true})).toBeVisible()
+  await expect(page.getByRole('button', {name:'Übung abschließen',exact:true})).toBeDisabled()
+})
+
+test('self explanation offers an example and appropriate checks for personal material', async ({ page }) => {
+  await visit(page)
+  await openPage(page, 'Lernkurse')
+  await page.getByRole('button', {name:'Kurs öffnen : Zusammenhänge selbst erklären',exact:true}).click()
+  await expect(page.locator('.course-lesson blockquote')).toContainText('3/4 = 6/8')
+  await page.getByText('Mit eigenem Material üben', {exact:true}).click()
+  await page.getByLabel('Eigener Text oder eigenes Wort (nur für diesen Versuch)', {exact:true}).fill('Eine Begründung aus meinem Lernstoff.')
+  await page.getByLabel('Eigenes Material statt Beispiel verwenden', {exact:true}).check()
+  await page.getByRole('button', {name:'Vorlage ausblenden und üben',exact:true}).click()
+  await page.getByLabel('Deine Antwort', {exact:true}).fill('Meine Erklärung und ein ähnliches Beispiel.')
+  await page.getByRole('button', {name:'Mit der Vorlage vergleichen',exact:true}).click()
+  await expect(page.getByText('Ich habe eine Warum- oder Wie-Frage zu meinem Material beantwortet.', {exact:true})).toBeVisible()
+  await expect(page.getByText('Ich erkläre, dass jedes gleich große Teil noch einmal halbiert wird.', {exact:true})).toHaveCount(0)
+})
+
+for (const [title, example] of [
+  ['Begriffe durch Geschichten verbinden', 'Schlüssel → Zitrone → Fahrrad'],
+  ['Orte als Gedächtnisstützen nutzen', 'Beispielweg: Haustür'],
+  ['Neue Vokabeln mit Schlüsselwörtern verbinden', 'Englisch: bell = Glocke'],
+  ['Zahlen in Bilder übersetzen', '1 → t/d; 2 → n'],
+  ['Passende Vorgehensweisen unterscheiden', 'Rechteck: Fläche'],
+]) {
+  test(`additional method ${title} hides its worked example before recall`, async ({ page }) => {
+    await visit(page)
+    await openPage(page, 'Lernkurse')
+    await page.getByRole('button', {name:`Kurs öffnen : ${title}`,exact:true}).click()
+    await expect(page.locator('.course-lesson blockquote')).toContainText(example)
+    await page.getByRole('button', {name:'Vorlage ausblenden und üben',exact:true}).click()
+    await expect(page.locator('.course-lesson blockquote')).toHaveCount(0)
+    await page.getByLabel('Deine Antwort', {exact:true}).fill('Mein eigener Abrufversuch')
+    await page.getByRole('button', {name:'Mit der Vorlage vergleichen',exact:true}).click()
+    await expect(page.locator('.course-lesson blockquote')).toContainText(example)
+    await expect(page.locator('.course-check')).toHaveCount(3)
+    await expect(page.getByRole('button', {name:'Übung abschließen',exact:true})).toBeDisabled()
+  })
+}
