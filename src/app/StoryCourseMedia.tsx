@@ -1,3 +1,5 @@
+import { courseNarration } from '../i18n/courseNarrations.ts'
+import { courseCoachCopy } from '../i18n/courseCoaches.ts'
 import { videoCaptions } from '../core/courses/captions.ts'
 import type { CoachId } from '../core/courses/coaches.ts'
 import { courseVideo,courseVideoCopy } from '../i18n/courseVideos.ts'
@@ -33,7 +35,10 @@ export function StoryCourseMedia({coach,language,platform,solution=false,onRecal
   const MediaElement=playingVideo?'video':'audio'
   const vt=courseVideoCopy[locale]
   const library=courseId==='story-method'?undefined:courseLibraryMedia[courseId]
-  const pack=library?library[spoken]:storyMedia.packs[spoken]
+  const narration=courseNarration(courseId,spoken,coach)
+  const pack=narration??(library?library[spoken]:storyMedia.packs[spoken])
+  const downloadAsset=playingVideo?videoAsset:narration??library?.[spoken]
+  const voiceName=courseCoachCopy[locale].names[narration?.coach??'original']
   const mediaSrc=playingVideo?videoAsset!.src:pack.src
   const translated=courseId!=='story-method'?libraryCaptions(courseId,spoken,language):undefined
   const subtitleLanguage=library?(translated?language:spoken):language
@@ -99,9 +104,10 @@ export function StoryCourseMedia({coach,language,platform,solution=false,onRecal
           setSaving(true);void platform.settings.write(MEDIA_SETTINGS_KEY,{...preferences,speed}).catch(()=>setError(t.saveFailed)).finally(()=>setSaving(false))
         }}>{MEDIA_SPEEDS.map(speed=><option key={speed} value={speed}>{speed}×</option>)}</select>
       </fieldset>
+      <p className="hint">{locale==='de'?'Kursstimme':locale==='fr'?'Voix du cours':'Course voice'}: {voiceName}. {coach&&coach!=='original'&&!narration&&(locale==='de'?`Die Aufnahme mit ${courseCoachCopy.de.names[coach]} ist für diesen Kurs und diese Sprache noch in Arbeit.`:locale==='fr'?`L’enregistrement avec ${courseCoachCopy.fr.names[coach]} pour ce cours et cette langue est en préparation.`:`The recording with ${courseCoachCopy.en.names[coach]} for this course and language is in preparation.`)}</p>
       <p className="hint">{t.captions}: {subtitleLanguage.toUpperCase()} · {t.draft}</p>
       {videoAsset && <><label htmlFor="course-format">{vt.format}</label><select id="course-format" disabled={saving} value={playingVideo?'video':'audio'} onChange={e=>void save({...preferences,video:e.target.value==='video'?true:undefined})}><option value="audio">{vt.audio}</option><option value="video">{vt.video}</option></select></>}
-      {(playingVideo&&videoAsset || library&&library[spoken]) && <CourseDownload key={`download-${playingVideo?videoAsset!.src:pack.src}`} asset={playingVideo?videoAsset!:library![spoken]} locale={locale} />}
+      {downloadAsset && <CourseDownload key={`download-${downloadAsset.src}`} asset={downloadAsset} locale={locale} />}
       {library && language!==subtitleLanguage && <p className="hint">The translated subtitles for this audio track are being prepared. Its original spoken text is shown here.</p>}
       <div className={`course-playback${playingVideo?' has-video':''}`}><div className="course-screen">
       <MediaElement {...(playingVideo&&coach?{poster:`/coaches/${coach}.webp`}:{})} key={`player-${mediaSrc}`} ref={element=>{player.current=element}} controls playsInline crossOrigin="anonymous" preload="none" src={mediaSrc} aria-label={t.title} onError={()=>setError(playingVideo?vt.failed:t.failed)} onTimeUpdate={sync} onSeeking={sync} onSeeked={sync} onPlay={sync} onLoadedMetadata={()=>{
@@ -124,8 +130,8 @@ export function StoryCourseMedia({coach,language,platform,solution=false,onRecal
       <p className="course-caption" lang={subtitleLanguage} dir="auto">{safeCue>=0?captions[safeCue]:''}</p>
       </div></div>
       <details><summary>{t.transcript}</summary><div lang={subtitleLanguage} dir={subtitleLanguage==='ar'?'rtl':'ltr'}>{captions.map((line,index)=><p key={index} dir="auto">{line}</p>)}</div></details>
-      <details><summary>{t.credits}</summary><p>Piper · Deutsch: Thorsten (CC0-Datensatz) · English: Joe (CC0 dataset) · Français: Tom (AGPLv3 model/dataset). Synthetic audio; models are not included.</p>
-        <ul><li><a href="https://github.com/thorstenMueller/Thorsten-Voice">Thorsten Voice</a></li><li><a href="https://huggingface.co/rhasspy/piper-voices/blob/main/en/en_US/joe/medium/MODEL_CARD">Joe model card</a></li><li><a href="https://huggingface.co/rhasspy/piper-voices/blob/main/fr/fr_FR/tom/medium/MODEL_CARD">Tom model card</a></li></ul>
+      <details><summary>{t.credits}</summary>{narration?<p>Qwen3-TTS · Apache 2.0 · {voiceName} · {locale==='de'?'KI-Stimme, lokal erzeugt.':'Locally generated AI voice.'} <a href="https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base">Qwen3-TTS</a> · ANITEW: Thorsten (CC0), <a href="https://github.com/thorstenMueller/Thorsten-Voice">Namensreferenz / name reference</a>.</p>:<><p>Piper · Deutsch: Thorsten (CC0-Datensatz) · English: Joe (CC0 dataset) · Français: Tom (AGPLv3 model/dataset). Synthetic audio; models are not included.</p>
+        <ul><li><a href="https://github.com/thorstenMueller/Thorsten-Voice">Thorsten Voice</a></li><li><a href="https://huggingface.co/rhasspy/piper-voices/blob/main/en/en_US/joe/medium/MODEL_CARD">Joe model card</a></li><li><a href="https://huggingface.co/rhasspy/piper-voices/blob/main/fr/fr_FR/tom/medium/MODEL_CARD">Tom model card</a></li></ul></>}
         {playingVideo && <ul><li><a href="https://github.com/OpenTalker/SadTalker">SadTalker · Apache 2.0</a></li><li><a href="https://github.com/KlingAIResearch/LivePortrait/blob/main/LICENSE">LivePortrait · MIT</a></li></ul>}
       </details>
     </>}

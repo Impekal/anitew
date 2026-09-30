@@ -121,3 +121,15 @@ provenance and the outstanding final language review.
 The rejected local SadTalker/LivePortrait motion experiments are not bundled.
 No video manifest or approved speaking clips are currently distributed.
 Licences and provenance must be recorded for the eventual replacement clips.
+
+## Lin and Atta course narration
+
+The new synthetic German voices were generated locally with
+[Qwen3-TTS VoiceDesign](https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign)
+and explicitly approved by the user. New lesson narration uses those generated
+references with [Qwen3-TTS Base](https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base).
+Both models are Apache-2.0. The local runtime is
+[MLX Audio](https://github.com/Blaizzy/mlx-audio) (MIT). No model weights, private
+user recording or third-party speaker recording is distributed. The accepted
+ANITEW name excerpt remains the existing Piper v14 reference. Per-file hashes
+and provenance are recorded in `public/course-media/coach-narration-manifest.json`.

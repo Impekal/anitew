@@ -513,3 +513,10 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 - Nutzer bestätigt die neuen Qwen-VoiceDesign-Proben für Lin und Atta ausdrücklich als hervorragend. Atta wird Standardcoach für alle Kurse; gespeicherte globale und individuelle Auswahlen bleiben wirksam.
 - Die sechssekündige LivePortrait/MuseTalk-Hybridprobe wurde ebenfalls abgelehnt: weiter unpassende Lippenbewegung und verschwommener Mundbereich. Kein Clip wird übernommen.
 - Bestätigte Stimmproben sind Referenzen, noch keine fertigen Kurstonspuren. Konsistente Stimmen, Namensaussprache, Satzübergänge und DE/EN/FR-Fassungen müssen noch erzeugt und geprüft werden.
+
+### Eigene deutsche Kurstonspuren (2026-10-01)
+
+- Alle zwölf deutschen Kurse haben zusätzlich vollständige Aufnahmen mit den bestätigten synthetischen Stimmen von Atta und Lin. Die 36 bisherigen Tonspuren bleiben erhalten. Atta ist Standard; gespeicherte Coach-Zuordnungen bleiben wirksam.
+- Die 24 zusätzlichen Dateien werden gezielt heruntergeladen und danach lokal wiedergegeben. Untertitel, Kapitel und Abrufsperre folgen den Zeitmarken der gewählten Stimme. Quellen, Dateigrößen und Prüfsummen sind im Narrationsmanifest dokumentiert.
+- Automatische Inhaltsprüfung plus gezielte Kontrolle der erkannten Abweichungen: Brüche werden sprachlich ausgeschrieben; fremdsprachige Vokabelbeispiele werden in ihrer Zielsprache gesprochen. Dies ersetzt keine vollständige Hörabnahme.
+- Englisch und Französisch für Atta und Lin werden noch erstellt und geprüft. Die neuen Kurzproben stehen zur Hörabnahme bereit. Beide abgelehnten Sprechvideo-Varianten bleiben außerhalb der App.

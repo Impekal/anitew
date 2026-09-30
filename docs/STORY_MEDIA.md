@@ -107,3 +107,19 @@ Die neuen kurzen deutschen Qwen-VoiceDesign-Proben für Lin und Atta wurden
 vom Nutzer ausdrücklich bestätigt. Atta wird Standardcoach. Die anschließende
 LivePortrait/MuseTalk-Lippenkorrektur wurde wegen Unschärfe und weiterhin
 unpassender Bewegung abgelehnt. Keine solche Videodatei ist gebündelt.
+
+## Individuelle Kursstimmen
+
+Für alle zwölf deutschen Kurse liegen separate vollständige Tonspuren mit
+Atta und Lin vor. Die Auswahl des Coaches wählt auch die passende Aufnahme.
+Noahs Originaltonspur bleibt unverändert. Zusätzliche Spuren werden bewusst
+heruntergeladen und danach vollständig lokal wiedergegeben. Cue-Zeiten,
+Untertitel, Kapitel und Lösungssperre richten sich nach der jeweiligen Aufnahme.
+Fehlende Kurs-/Sprachkombinationen nennen die tatsächlich verfügbare Stimme.
+
+Die vom Nutzer bestätigten synthetischen Kurzstimmen dienen als Referenzen für
+Qwen3-TTS Base. Der Markenname verwendet den akzeptierten v14-Ausschnitt.
+Die neuen Vollaufnahmen sind dekodiert und automatisch transkribiert; diese
+Prüfung ersetzt keine vollständige Hörabnahme. Es werden keine Modelle oder
+privaten Nutzeraufnahmen gebündelt. Quellen und Hashes stehen im lokalen
+`public/course-media/coach-narration-manifest.json`.

@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { leavePage, openPage, visit } from './helpers.ts'
+import { courseNarration } from '../../src/i18n/courseNarrations.ts'
 
 test('course hides the source, requires review and retains completion after reload', async ({ page }) => {
   await visit(page)
@@ -249,10 +250,10 @@ test('story narration has independent language, persistent speed and the same re
   await page.getByRole('button',{name:'Open course : Connect items through stories',exact:true}).click()
   await page.getByRole('button',{name:'Listen and watch',exact:true}).click()
   const audio=page.locator('.course-media audio')
-  await expect(audio).toHaveAttribute('src','/course-media/story/en.m4a')
+  await expect(audio).toHaveAttribute('src',courseNarration('story-method','en','rafael')?.src??'/course-media/story/en.m4a')
   await expect(page.locator('.course-caption')).toHaveAttribute('lang','es')
   await page.locator('#course-audio-language').selectOption('fr')
-  await expect(audio).toHaveAttribute('src','/course-media/story/fr.m4a')
+  await expect(audio).toHaveAttribute('src',courseNarration('story-method','fr','rafael')?.src??'/course-media/story/fr.m4a')
   await expect(page.locator('.course-caption')).toHaveAttribute('lang','es')
   await page.locator('#course-speed').selectOption('1.5')
   await expect(page.locator('#course-speed')).toBeEnabled()
@@ -287,7 +288,7 @@ test('story narration has independent language, persistent speed and the same re
   await expect(page.locator('#course-speed')).toHaveValue('1.5')
 })
 
-test('all three story audio tracks are cached offline and no external media is required',async({page,context})=>{
+test('all three original story audio tracks are cached offline and no external media is required',async({page,context})=>{
   test.setTimeout(60_000) // Wait for complete offline installation and decode all three tracks.
   await visit(page)
   await page.evaluate(async()=>{
@@ -298,6 +299,9 @@ test('all three story audio tracks are cached offline and no external media is r
   await page.reload()
   await openPage(page,'Lernkurse')
   await page.getByRole('button',{name:'Kurs öffnen : Begriffe durch Geschichten verbinden',exact:true}).click()
+  await page.locator('.course-coaches summary').click()
+  await page.locator('#course-coach-mode').selectOption('global')
+  await page.locator('#course-coach-all').selectOption('original')
   await page.getByRole('button',{name:'Anhören und ansehen',exact:true}).click()
   for(const language of ['de','en','fr']){
     await page.locator('#course-audio-language').selectOption(language)
@@ -360,7 +364,7 @@ test('additional narration downloads deliberately and works after an offline res
  const audio=page.locator('.course-media audio')
  const source=await audio.getAttribute('src')
  await expect(page.locator('.course-download')).toHaveCount(1)
- expect(source).toMatch(/^\/course-media\/library\/long-words-de-/)
+ expect(source).toBe(courseNarration('long-words','de','rafael')!.src)
  expect(await page.evaluate(async(src)=>!!await (await caches.open('anitew-course-audio-v1')).match(src!),source)).toBe(false)
  await page.getByRole('button',{name:'Für offline laden / fortsetzen',exact:true}).click()
  await expect(page.getByText(/Diese Tonspur ist offline verfügbar/)).toBeVisible()
