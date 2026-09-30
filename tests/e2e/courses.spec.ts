@@ -1,0 +1,58 @@
+import { expect, test } from '@playwright/test'
+import { openPage, visit } from './helpers.ts'
+
+test('course hides the source, requires review and retains completion after reload', async ({ page }) => {
+  await visit(page)
+  await openPage(page, 'Lernkurse')
+  await page.getByRole('button', {name:'Kurs öffnen : Lange Wörter sicher behalten', exact:true}).click()
+  await expect(page.getByText('Was ist das und wozu dient es?')).toBeVisible()
+  await expect(page.locator('.course-lesson blockquote')).toHaveText('Krankenversicherungsbeitrag')
+  await page.getByRole('button', {name:'Vorlage ausblenden und üben',exact:true}).click()
+  await expect(page.locator('.course-lesson blockquote')).toHaveCount(0)
+  await expect(page.getByRole('button', {name:'Mit der Vorlage vergleichen',exact:true})).toBeDisabled()
+  await page.getByLabel('Deine Antwort', {exact:true}).fill('Krankenversicherungsbeitrag')
+  await page.getByRole('button', {name:'Mit der Vorlage vergleichen',exact:true}).click()
+  await expect(page.getByRole('button', {name:'Übung abschließen',exact:true})).toBeDisabled()
+  for (const checkbox of await page.locator('.course-check input').all()) await checkbox.check()
+  await page.getByRole('button', {name:'Übung abschließen',exact:true}).click()
+  await expect(page.getByText('Übung durchgeführt und gespeichert.', {exact:true})).toBeVisible()
+  await page.reload()
+  await openPage(page, 'Lernkurse')
+  await expect(page.getByText('1 von 3 Übungen durchgeführt', {exact:true})).toBeVisible()
+})
+
+test('own text is hidden during recall and discarded when leaving the course', async ({ page }) => {
+  await visit(page)
+  await openPage(page, 'Lernkurse')
+  await page.getByRole('button', {name:'Kurs öffnen : Lange Texte inhaltlich behalten',exact:true}).click()
+  await page.getByText('Mit eigenem Material üben', {exact:true}).click()
+  await page.getByLabel('Eigenes Material statt Beispiel verwenden', {exact:true}).check()
+  await expect(page.getByRole('button', {name:'Vorlage ausblenden und üben',exact:true})).toBeDisabled()
+  await page.getByLabel('Eigener Text oder eigenes Wort (nur für diesen Versuch)', {exact:true}).fill('Meine private Probe über rote Schiffe.')
+  await page.getByRole('button', {name:'Vorlage ausblenden und üben',exact:true}).click()
+  await expect(page.getByText('Meine private Probe über rote Schiffe.', {exact:true})).toHaveCount(0)
+  await page.getByLabel('Deine Antwort', {exact:true}).fill('Rote Schiffe')
+  await page.getByRole('button', {name:'Mit der Vorlage vergleichen',exact:true}).click()
+  await expect(page.locator('.course-lesson blockquote')).toHaveText('Meine private Probe über rote Schiffe.')
+  await expect(page.getByText('Die wesentlichen Aussagen sind enthalten.', {exact:true})).toBeVisible()
+  await page.getByRole('button', {name:'Zur Kursübersicht',exact:true}).click()
+  await page.getByRole('button', {name:'Kurs öffnen : Lange Texte inhaltlich behalten',exact:true}).click()
+  await page.getByText('Mit eigenem Material üben', {exact:true}).click()
+  await expect(page.getByLabel('Eigener Text oder eigenes Wort (nur für diesen Versuch)', {exact:true})).toHaveValue('')
+})
+
+test('downloaded app can open an unvisited reading course offline', async ({ page, context }) => {
+  await visit(page)
+  await page.evaluate(async () => {
+    await navigator.serviceWorker.ready
+    if (!navigator.serviceWorker.controller) await new Promise<void>(resolve => navigator.serviceWorker.addEventListener('controllerchange', () => resolve(), {once:true}))
+  })
+  await context.setOffline(true)
+  await page.reload()
+  await openPage(page, 'Lernkurse')
+  await page.getByRole('button', {name:'Kurs öffnen : Texte wortgetreu lernen',exact:true}).click()
+  await expect(page.getByText('Am Morgen öffne ich das Fenster. Frische Luft strömt ins Zimmer. Danach beginne ich meinen Tag.', {exact:true})).toBeVisible()
+  await page.getByRole('button', {name:'Vorlage ausblenden und üben',exact:true}).click()
+  await expect(page.getByLabel('Deine Antwort', {exact:true})).toBeVisible()
+  await context.setOffline(false)
+})

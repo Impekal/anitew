@@ -2636,3 +2636,13 @@ Hauptpfad aus Produktversprechen, erster echter Erinnerung und Zeitbudget.
 FOCUS/ENCODE/CONNECT/RETRIEVE/INTERFERE/RETURN geben der unveränderten Session
 eine eigene Sprache. Die fünf Momente sind damit im Produkt: Entstehen,
 Verknüpfen, FSRS-Wiederbegegnung, sichtbarer Recall und belastbarer Benchmark.
+
+
+## 2026-09-30 · Offene Kursaufgaben erfasst
+
+Auf Nutzerwunsch wurden 31 offene Aufgaben mit stabilen Kennungen in docs/BACKLOG.md ergänzt: Methodenkurse einschließlich langer Texte und Wörter, natürliche männliche Coaches, bestätigte Namensaussprache, drei Tonsprachen, Untertitel, App-Integration, Offline-Pakete, Rechte und abschließender strenger CI-Gate. Prototypfunktionen sind ausdrücklich von fertigen App-Funktionen getrennt. In diesem Schritt wurden nur Aufgaben dokumentiert; kein Produktcode, Deployment oder PR-Merge.
+
+
+## 2026-09-30 · Erste Kursbibliothek in der App
+
+Auf dem Branch anitew-v4-2-living-memory wurde ein eigener Core-Menüpunkt Lernkurse ergänzt. Die drei Lesekurse behandeln inhaltlichen Textabruf, wortgetreues Lernen und lange Wörter, jeweils in DE/EN. Die Vorlage ist während des Abrufs vollständig aus dem sichtbaren DOM entfernt. Selbstvergleich und bewusster Abschluss speichern ausschließlich Kurskennungen über den vorhandenen Settings-Port; eigene Texte und Antworten bleiben flüchtig. Fehler beim Speichern werden sichtbar und lassen die Antwort erhalten. Der Kursbereich wird nachgeladen und im PWA-Precache erfasst. Natürliche Coach-Videos, weitere Methoden, weitere Sprachen und höhere Kursstufen sind damit noch nicht fertig.

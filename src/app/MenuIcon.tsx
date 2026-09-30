@@ -15,6 +15,7 @@ export type MenuIconKind =
   | 'about'
   | 'palace'
   | 'reminder'
+  | 'courses'
   | 'science'
   | 'install'
   | 'privacy'
@@ -46,6 +47,8 @@ function Glyph({ kind }: { kind: MenuIconKind }) {
           <path d="M12 1.7v1.1" />
         </>
       )
+    case 'courses':
+      return <path d="M12 6Q7 2 3 5v14q4-3 9 0 5-3 9 0V5q-4-3-9 1v13M6 8l3 1M15 9l3-1M6 12l3 1M15 13l3-1" />
     case 'science':
       return (
         <>

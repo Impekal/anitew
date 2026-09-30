@@ -92,6 +92,7 @@ import { AboutPanel } from './AboutPanel.tsx'
 import { BackupPanel } from './BackupPanel.tsx'
 import { MenuIcon, type MenuIconKind } from './MenuIcon.tsx'
 import { OnboardingScreen } from './onboarding/OnboardingScreen.tsx'
+import { CoursesPanel } from './CoursesPanel.tsx'
 import { PalacePanel } from './PalacePanel.tsx'
 import { ProfilePanel } from './ProfilePanel.tsx'
 import { ReminderPanel } from './ReminderPanel.tsx'
@@ -920,6 +921,10 @@ export function App() {
           />
         ),
       },
+      courses: {
+        title: language === 'de' ? 'Lernkurse' : 'Learning courses',
+        body: <CoursesPanel language={language} platform={platform} />,
+      },
       science: {
         title: dictionary.science.heading,
         body: <SciencePanel dictionary={dictionary} />,
@@ -1409,6 +1414,10 @@ export function App() {
               <button type="button" className="drawer-item" onClick={() => openPage('reminder')}>
                 <MenuIcon kind="reminder" />
                 <span>{dictionary.reminder.heading}</span>
+              </button>
+              <button type="button" className="drawer-item" onClick={() => openPage('courses')}>
+                <MenuIcon kind="courses" />
+                <span>{language === 'de' ? 'Lernkurse' : 'Learning courses'}</span>
               </button>
               <button type="button" className="drawer-item" onClick={() => openPage('science')}>
                 <MenuIcon kind="science" />

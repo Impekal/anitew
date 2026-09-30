@@ -1,0 +1,11 @@
+.courses { overflow-wrap:anywhere; }
+.course-list { display:grid; gap:1.25rem; }
+.course-list article,.course-lesson { padding:1rem; border:1px solid var(--an-line, currentColor); border-radius:1rem; }
+.courses textarea { display:block; box-sizing:border-box; width:100%; min-height:8rem; margin:.75rem 0; font:inherit; padding:.75rem; color:inherit; background:transparent; border:1px solid currentColor; border-radius:.5rem; }
+.courses button { margin:.5rem .5rem .5rem 0; }
+.courses li { margin-bottom:.65rem; }
+.courses blockquote { margin:1rem 0; padding:1rem; border-inline-start:3px solid currentColor; white-space:pre-wrap; }
+.course-check { display:flex; align-items:flex-start; gap:.6rem; margin:1rem 0; }
+.course-check input { flex:none; margin-top:.3rem; }
+
+.course-sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }
