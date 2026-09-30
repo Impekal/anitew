@@ -21,3 +21,14 @@ it('provides different advanced examples and complete recall criteria in all thr
   expect(advanced.criteria).toHaveLength(3)
  }
 })
+
+import { mergeCourseHistory } from '../../src/core/courses/stages.ts'
+it('merges practice from two devices without rollback, duplication or unearned stages',()=>{
+ const a=[['text-meaning'],{'text-meaning':3}] as const
+ const b=[['long-words'],{'long-words':2,'text-verbatim':3}] as const
+ const merged=mergeCourseHistory(...a,...b)
+ expect(merged.completed).toEqual(['text-meaning','long-words'])
+ expect(merged.stages).toEqual({'text-meaning':3,'long-words':2})
+ expect(mergeCourseHistory(...b,...a)).toEqual(merged)
+ expect(mergeCourseHistory(merged.completed,merged.stages,...a)).toEqual(merged)
+})

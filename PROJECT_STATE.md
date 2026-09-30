@@ -2720,3 +2720,16 @@ mit korrektem Content-Range und exakt 100 angeforderten Bytes.
 - Durchgehende Geschichten-Wiedergabe in vollständigem Chromium mit Software-Grafik bestanden; der separate Headless-Shell-Medientakt ist lokal ungeeignet. Kein Test übersprungen, keine Zeit simuliert.
 - 598 Kernprüfungen bestanden. Vollständige Kursregression und finaler strenger CI-Gate werden weiter geprüft.
 - Natürlich sprechende Coaches, abschließende Hör-/Sprachprüfung und echte Mobilgeräte bleiben offene Qualitätsaufgaben. Kein Produktionsdeploy und kein Merge.
+
+
+## Kursuntertitel und sichere Fortschrittsübernahme · 2026-09-30
+
+264 weitere Untertitelspuren decken die acht zusätzlichen App-Sprachen für
+alle elf weiteren Kurse und drei Tonsprachen ab. Originale Lernwörter bleiben
+erhalten; arabischer Text wird RTL dargestellt. Sprachliche Endabnahme bleibt
+offen. Kursgeschichte wird bei Sicherungsimporten vereinigt, die höhere
+gültige Stufe bleibt erhalten. 600 Kernprüfungen bestanden.
+
+MuseTalk lokal mit eigenem fiktivem Portrait und bestehender Tonspur erprobt.
+Die drei Sekunden lange Probe erfüllt natürliche Kopf-/Blickbewegung nicht
+und ist kein App-Asset. Finaler strenger CI-Gate folgt auf dem neuen Commit.

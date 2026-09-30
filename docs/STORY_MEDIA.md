@@ -67,11 +67,22 @@ sind abgedeckt. Normales Streaming lädt kein dauerhaftes Paket. Workbox liefert
 Teilantworten aus dem ausdrücklich gefüllten Mediencache. Alle URLs bleiben
 auf der eigenen Origin; die Wiedergabe benötigt weder API-Schlüssel noch KI.
 
-Die drei Hauptsprachen erhalten Untertitel zum tatsächlich gesprochenen
-Beispiel. Wort-, Schlüsselwort- und Major-Beispiele unterscheiden sich je
-Tonspur; ihre Lernwörter werden beim Sprachwechsel erhalten. Fehlende weitere
-Übersetzungen werden ausdrücklich angezeigt. Ein erster lokaler M2M100-Versuch
-wurde wegen falscher Fachbegriffe und übersetzter Lernwörter verworfen.
+Alle elf App-Sprachen erhalten Untertitel zum tatsächlich gesprochenen
+Beispiel, unabhängig von der gewählten DE/EN/FR-Tonspur. Für die elf weiteren
+Kurse sind 264 zusätzliche Untertitelspuren für ES/IT/PT/NL/TR/AR/ZH/JA
+lokal gebündelt. Wort-, Schlüsselwort- und Major-Beispiele erhalten ihre
+ursprünglichen Lernwörter. Arabische Absätze verwenden RTL-Ausrichtung.
+Beim wortgetreuen Abruf erklärt ein Hinweis die ursprüngliche Ton-Sprache.
+
+Ein lokaler M2M100-Versuch wurde wegen falscher Fachbegriffe und übersetzter
+Lernwörter verworfen. Weitere Entwürfe wurden lokal mit
+[Qwen3-4B-Instruct-2507](https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507)
+(Apache 2.0, MLX-4bit-Konvertierung) erzeugt, anschließend abschnittsweise
+korrigiert; die arabischen Texte wurden vollständig neu formuliert.
+Lernwörter, Listen, Bruchrechnung und Merkbilder wurden gezielt abgeglichen.
+Das Modell und seine Laufzeit werden nicht ausgeliefert. Die Untertitel sind
+weiterhin als Entwürfe gekennzeichnet: technische Vollständigkeit ersetzt
+keine abschließende Prüfung durch Muttersprachler.
 
 Die Lesefassung bleibt verfügbar. Medienwahl, Sprache und Geschwindigkeit
 werden gespeichert; sie starten keine automatische Wiedergabe. Die Übung

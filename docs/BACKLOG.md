@@ -409,9 +409,9 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 
 ### 3. Sprachen und Zugänglichkeit
 
-- [x] **S01 · Sprachregel in die echte App integrieren.** Für die integrierte Geschichten-Audioprobe umgesetzt: DE/FR/EN automatisch, andere App-Sprachen Englisch; ausdrückliche Tonwahl unabhängig von den Untertiteln in der App-Sprache. Weitere Kursmedien bleiben S03.
+- [x] **S01 · Sprachregel in die echte App integrieren.** Für alle zwölf integrierten Audiokurse umgesetzt: DE/FR/EN automatisch, andere App-Sprachen Englisch; ausdrückliche Tonwahl unabhängig von den Untertiteln in der App-Sprache. Die abschließende Medienprüfung bleibt S03.
 - [ ] **S02 · Übersetzungen und Untertitel prüfen.** Derzeit elf Untertitelsprachen als Entwürfe: DE, FR, EN, ES, IT, PT, NL, TR, AR, ZH, JA. Inhalt, Fachbegriffe, Lesbarkeit und Zeitabgleich für jede Tonspur prüfen; weitere tatsächlich unterstützte App-Sprachen ergänzen oder fehlende Übersetzung ehrlich anzeigen.
-- [ ] **S03 · Alle fertigen Kurse in drei Tonsprachen bereitstellen.** 36 Tonspuren für zwölf Kurse integriert, 33 davon bewusst herunterladbar. Vollständige Untertitelabdeckung und abschließende Hörprüfung bleiben offen.
+- [ ] **S03 · Alle fertigen Kurse in drei Tonsprachen bereitstellen.** 36 Tonspuren für zwölf Kurse integriert, 33 davon bewusst herunterladbar. Alle elf App-Sprachen sind als Untertitel abgedeckt; abschließende Sprach- und Hörprüfung bleiben offen.
 - [ ] **S04 · Barrierefreiheit und Geräteverhalten prüfen.** Tastatur, Fokus, Screenreader, Kontrast, Textvergrößerung, RTL und schmale Displays prüfen; Untertitel, Tempo und Pausen auf echten Mobilgeräten testen.
 
 ### 4. Integration, Offline-Nutzung und Rechte
@@ -487,3 +487,10 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 - I05: OFFEN als historischen Stand gekennzeichnet; Kursmedienvorschlag und Quellen auf aktuellen Arbeitsstand gebracht.
 - S02/S03/C03/Q03 bleiben wegen weiterer Untertitel und abschließender Hör-/Sprachprüfung offen. Keine falschen Übersetzungen aus dem verworfenen M2M100-Versuch übernommen.
 - Haken bei den Kursfunktionen bestätigen die Implementierung; sie ersetzen nicht die gesondert offenen Medien-, Geräte- und CI-Abnahmen.
+
+### Arbeitsstand: Untertitel und Sicherungen (2026-09-30)
+
+- Alle zwölf Audiokurse bieten Untertitel in den elf App-Sprachen, unabhängig von DE/EN/FR-Tonwahl. 264 zusätzliche Spuren sind lokal gebündelt. Sprachabhängige Lernwörter bleiben in ihrer Originalsprache; Arabisch erhält passende Schreibrichtung. Die endgültige Sprachabnahme bleibt S02/Q03.
+- Kursabschluss und freigeschaltete Stufen werden beim Import einer Sicherung zusammengeführt. Ältere Sicherungen setzen den Kursfortschritt nicht zurück. Eigene Texte und Antworten bleiben ausschließlich im Arbeitsspeicher.
+- 600 Kernprüfungen bestanden. Der letzte CI-Lauf #1637 prüft noch den vorausgehenden Commit; der neue Gesamtstand benötigt einen eigenen strengen Gate.
+- Dreisekündige lokale MuseTalk-Probe außerhalb der App erstellt: Mundbewegung vorhanden, Kopf/Blick statisch und unteres Gesicht weichgezeichnet. Nicht als fertiges Coach-Video übernommen; C01 bleibt offen.

@@ -30,5 +30,20 @@ it('keeps caption cues aligned and preserves the actual language-specific mnemon
  expect(libraryCaptions('long-words','en','de')!.join(' ')).toContain('unpredictability')
  expect(libraryCaptions('keyword-method','en','de')!.join(' ')).toContain('Je mange du pain.')
  expect(libraryCaptions('number-images','de','fr')!.join(' ')).toContain('Tanne')
- expect(libraryCaptions('long-words','en','ja')).toBeUndefined()
+ expect(libraryCaptions('long-words','en','unknown')).toBeUndefined()
+})
+
+it('provides all caption languages without changing spelling targets, fractions or list items',()=>{
+ for(const id of COURSE_IDS.filter(id=>id!=='story-method'))for(const spoken of ['de','en','fr'] as const)for(const language of ['de','en','fr','es','it','pt','nl','tr','ar','zh','ja']){
+  const cues=courseLibraryMedia[id][spoken].cues
+  const captions=libraryCaptions(id,spoken,language)!
+  expect(captions).toHaveLength(cues.length)
+  expect(captions.every(line=>line.trim().length>0)).toBe(true)
+  const example=captions[cues.findIndex(cue=>cue.section==='example')]!
+  if(id==='long-words')expect(example).toBe(cues.find(cue=>cue.section==='example')!.text)
+  if(id==='self-explanation')expect(example.replaceAll(' ','')).toContain('3/4=6/8')
+  if(id==='meaningful-groups')expect(example.split('·')).toHaveLength(9)
+  if(id==='keyword-method')expect(example).toContain(spoken==='en'?'Je mange du pain.':'The bell rings.')
+  if(id==='number-images')expect(example).toContain({de:'Tanne',en:'tin',fr:'tonne'}[spoken])
+ }
 })

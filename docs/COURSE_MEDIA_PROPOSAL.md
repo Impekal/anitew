@@ -46,6 +46,13 @@ aktive Vorschau zeigt deshalb statische Portraits und kennzeichnet das.
 Ein Standbild erfüllt das Ziel eines natürlich sprechenden Coaches nicht.
 Englische und französische Stimmen benötigen weiterhin eine Hörprüfung.
 
+## Weitere Integration
+
+Alle zwölf Kurse haben DE/EN/FR-Tonspuren und Untertitelentwürfe in allen elf
+App-Sprachen. Tonwechsel erhält die Originalwörter des gehörten Beispiels.
+Die Endprüfung durch Muttersprachler und auf echten Mobilgeräten bleibt offen.
+Sicherungsimporte führen Kursfortschritte zusammen und behalten höhere Stufen.
+
 ## Verbindlicher weiterer Ausbau
 
 - Jeder Kurs beginnt mit Zweck, Einsatzgebiet und Grenzen; danach Erklärung,

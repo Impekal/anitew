@@ -1,3 +1,4 @@
+import { courseExtraCaptions } from './courseExtraCaptions.ts'
 import { courseLibraryMedia } from './courseLibraryMedia.ts'
 import type { CourseId } from '../core/courses/progress.ts'
 import type { CourseLanguage } from './courseUi.ts'
@@ -23,7 +24,7 @@ const examples = {
 } as const
 
 export function libraryCaptions(id:Exclude<CourseId,'story-method'>,spoken:CourseLanguage,target:string):string[]|undefined {
- if(target!=='de'&&target!=='en'&&target!=='fr')return undefined
+ if(target!=='de'&&target!=='en'&&target!=='fr')return courseExtraCaptions[id]?.[spoken]?.[target]
  const source=courseLibraryMedia[id][spoken]
  const translated:string[]=courseLibraryMedia[id][target].cues.map(cue=>cue.text)
  if(spoken===target)return translated

@@ -107,3 +107,10 @@ voices Thorsten, Joe and Tom. Model/dataset provenance, licence references,
 pronunciation handling and review limitations are documented in
 [STORY_MEDIA.md](docs/STORY_MEDIA.md). Only generated narration is bundled;
 voice models, synthesis programs and the user's private recording are excluded.
+
+## Subtitle drafting
+
+Additional subtitle drafts were produced locally with Qwen3-4B-Instruct-2507
+(Apache 2.0 model) and revised for the course content. Neither the model nor
+its runtime is distributed. See [STORY_MEDIA.md](docs/STORY_MEDIA.md) for
+provenance and the outstanding final language review.

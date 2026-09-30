@@ -99,10 +99,10 @@ function ReadingLesson({ course, locale, onBack, onComplete, platform, language,
     <h3 ref={heading} tabIndex={-1}>{course.title} · {courseStages[locale][stage]}</h3>
     {mediaAvailable && !usingOwn && (stage === 'learn' || stage === 'compare') && <StoryCourseMedia onMaterial={stage==='learn'?setNarrated:undefined} onPresentation={setListening} courseId={course.id} courseTitle={course.title} key={stage} platform={platform} language={language} solution={stage === 'compare'} onRecall={material => {setNarrated(material);setAnswer('');setChecked([]);setStage('recall')}} />}
     {stage === 'learn' && !listening && <>
-      <h4>{copy('Was ist das und wozu dient es?', 'What is it for?')}</h4><p>{narrated?.purpose ?? course.purpose}</p>
-      <h4>{copy('Grenzen und Voraussetzungen', 'Limits and prerequisites')}</h4><p>{narrated?.limit ?? course.limit}</p>
-      <h4>{copy('So gehst du vor', 'How to practise')}</h4><ol>{(narrated?.steps ?? course.steps).map(step => <li key={step}>{step}</li>)}</ol>
-      {!personal && <><h4>{copy('Durchgearbeitetes Beispiel', 'Worked example')}</h4><blockquote lang={narrated?.language ?? locale}>{narrated?.example ?? course.example}</blockquote><p>{narrated?.explanation ?? course.explanation}</p>{mediaAvailable && <CourseIllustration id={course.id} locale={narrated?.language==='de'||narrated?.language==='fr'||narrated?.language==='en'?narrated.language:locale} />}</>}
+      <h4>{copy('Was ist das und wozu dient es?', 'What is it for?')}</h4><p lang={narrated?.textLanguage ?? locale} dir="auto">{narrated?.purpose ?? course.purpose}</p>
+      <h4>{copy('Grenzen und Voraussetzungen', 'Limits and prerequisites')}</h4><p lang={narrated?.textLanguage ?? locale} dir="auto">{narrated?.limit ?? course.limit}</p>
+      <h4>{copy('So gehst du vor', 'How to practise')}</h4><ol lang={narrated?.textLanguage ?? locale} dir="auto">{(narrated?.steps ?? course.steps).map(step => <li key={step}>{step}</li>)}</ol>
+      {!personal && <><h4>{copy('Durchgearbeitetes Beispiel', 'Worked example')}</h4><blockquote lang={narrated?.language ?? locale}>{narrated?.example ?? course.example}</blockquote><p lang={narrated?.textLanguage ?? locale} dir="auto">{narrated?.explanation ?? course.explanation}</p>{mediaAvailable && <CourseIllustration id={course.id} locale={narrated?.language==='de'||narrated?.language==='fr'||narrated?.language==='en'?narrated.language:locale} />}</>}
       {course.allowOwn !== false && <details open={personal || undefined}><summary>{copy('Mit eigenem Material üben', 'Practise with your own material')}</summary>
         <p>{personal ? courseStageUi[locale].own : course.transfer}</p><label htmlFor="course-own">{copy('Eigener Text oder eigenes Wort (nur für diesen Versuch)', 'Your text or word (for this attempt only)')}</label>
         <textarea id="course-own" maxLength={6000} value={own} onChange={event => setOwn(event.target.value)} />
@@ -112,7 +112,7 @@ function ReadingLesson({ course, locale, onBack, onComplete, platform, language,
       <button type="button" className="primary" disabled={usingOwn && !own.trim()} onClick={() => {setAnswer('');setChecked([]);setStage('recall')}}>{copy('Vorlage ausblenden und üben', 'Hide source and practise')}</button>
     </>}
     {(stage === 'recall' || stage === 'compare') && <>
-      <p>{usingOwn ? (copy('Rufe dein Material passend zum Lernziel ohne Vorlage ab.', 'Recall your material without looking, following the course goal.')) : narrated?.prompt ?? course.prompt}</p>
+      <p lang={usingOwn?locale:narrated?.textLanguage ?? locale} dir="auto">{usingOwn ? (copy('Rufe dein Material passend zum Lernziel ohne Vorlage ab.', 'Recall your material without looking, following the course goal.')) : narrated?.prompt ?? course.prompt}</p>
       <label htmlFor="course-answer">{copy('Deine Antwort', 'Your answer')}</label>
       <textarea id="course-answer" value={answer} maxLength={10000} onChange={event => setAnswer(event.target.value)} />
       {stage === 'recall' && <><button type="button" disabled={!answer.trim()} onClick={() => setStage('compare')}>{copy('Mit der Vorlage vergleichen', 'Compare with the source')}</button><button type="button" onClick={() => setStage('learn')}>{copy('Noch einmal ansehen', 'Study again')}</button></>}

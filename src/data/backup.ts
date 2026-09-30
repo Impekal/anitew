@@ -23,6 +23,8 @@ import {
 } from '../core/index.ts'
 
 import { db } from './db.ts'
+import { COURSE_PROGRESS_KEY } from '../core/courses/progress.ts'
+import { COURSE_STAGES_KEY, mergeCourseHistory } from '../core/courses/stages.ts'
 
 /** Liest die ganze Datenbank in eine Datei ein. */
 export async function exportBackup(now: number, app: string): Promise<BackupFile> {
@@ -84,7 +86,7 @@ export async function importBackup(file: BackupFile): Promise<ImportReport> {
     [db.settings, db.sessions, db.events, db.itemStates, db.benchmarks],
     async () => {
       /*
-       * Einstellungen sind Vorlieben, keine Geschichte: Was in der Sicherung
+       * Gewöhnliche Einstellungen sind Vorlieben: Was in der Sicherung
        * steht, ist das, was zuletzt gewählt wurde, und das gewinnt.
        *
        * Gezählt wird trotzdem genau. Vorher galt jede Einstellung als „neu
@@ -94,9 +96,24 @@ export async function importBackup(file: BackupFile): Promise<ImportReport> {
        * Sicherung besonders schlecht: Er ist das Einzige, woran man erkennt,
        * ob etwas angekommen ist.
        */
+      const incomingCourses=file.tables.settings.find(row=>row.key===COURSE_PROGRESS_KEY)
+      const incomingStages=file.tables.settings.find(row=>row.key===COURSE_STAGES_KEY)
+      if(incomingCourses || incomingStages){
+        const mine=await db.settings.get(COURSE_PROGRESS_KEY)
+        const mineStages=await db.settings.get(COURSE_STAGES_KEY)
+        const merged=mergeCourseHistory(mine?.value,mineStages?.value,incomingCourses?.value,incomingStages?.value)
+        for(const [key,value,previous] of [[COURSE_PROGRESS_KEY,merged.completed,mine],[COURSE_STAGES_KEY,merged.stages,mineStages]] as const){
+          if(previous===undefined)added['settings']=(added['settings']??0)+1
+          else if(JSON.stringify(previous.value)!==JSON.stringify(value))replaced++
+          else {kept++;continue}
+          await db.settings.put({key,value})
+        }
+      }
       for (const setting of file.tables.settings) {
+        if(setting.key===COURSE_PROGRESS_KEY || setting.key===COURSE_STAGES_KEY)continue
+
         /*
-         * Der Memory-Graph (D-036) ist die eine Einstellung, die **keine**
+         * Der Memory-Graph (D-036) ist wie die Kursgeschichte **keine**
          * Vorliebe ist, sondern Geschichte: „Datei gewinnt“ hieße hier,
          * die Erinnerungen des einen Geräts mit denen des anderen zu
          * überschreiben. Er wird deshalb vereinigt (N9) — dieselbe Regel

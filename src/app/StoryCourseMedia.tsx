@@ -3,6 +3,7 @@ import type { Language, Platform } from '../core/index.ts'
 import { MEDIA_SETTINGS_KEY, MEDIA_SPEEDS, cueAt, mediaPreferences, spokenLanguage, type MediaPreferences } from '../core/courses/media.ts'
 import { storyMedia } from '../i18n/storyMedia.ts'
 import { courseMediaUi } from '../i18n/courseMediaUi.ts'
+import { literalRecallHint } from '../i18n/courseRecallLanguage.ts'
 import { libraryCaptions } from '../i18n/courseCaptions.ts'
 import { courseLibraryMedia } from '../i18n/courseLibraryMedia.ts'
 import { CourseIllustration } from './CourseIllustration.tsx'
@@ -10,7 +11,7 @@ import { CourseDownload } from './CourseDownload.tsx'
 import type { CourseId } from '../core/courses/progress.ts'
 import { courseLanguage } from '../i18n/courseUi.ts'
 
-export interface NarratedLesson { example:string;prompt:string;language:Language;purpose:string;limit:string;steps:string[];explanation:string }
+export interface NarratedLesson { example:string;prompt:string;language:Language;textLanguage:Language;purpose:string;limit:string;steps:string[];explanation:string }
 
 export function StoryCourseMedia({language,platform,solution=false,onRecall,courseId,courseTitle,onMaterial,onPresentation}:{onMaterial?:(material:NarratedLesson|undefined)=>void;onPresentation:(enabled:boolean)=>void;language:Language;platform:Platform;solution?:boolean;onRecall:(material?:NarratedLesson)=>void;courseId:CourseId;courseTitle:string}) {
   const locale=courseLanguage(language)
@@ -51,13 +52,13 @@ export function StoryCourseMedia({language,platform,solution=false,onRecall,cour
     if(!library)return undefined
     const cues=library[spoken].cues
     const text=(section:string)=>captions[cues.findIndex(cue=>cue.section===section)]??''
-    return {example:library[spoken].cues[exampleIndex].text,prompt:text('recall'),language:spoken,purpose:text('purpose'),limit:text('limit'),steps:cues.flatMap((cue,index)=>cue.section.startsWith('step-')?[captions[index]]:[]),explanation:text('explanation')}
+    return {example:library[spoken].cues[exampleIndex].text,prompt:text('recall')+((courseId==='text-verbatim'||courseId==='long-words')&&language!==spoken?' '+literalRecallHint[language]:''),language:spoken,textLanguage:subtitleLanguage,purpose:text('purpose'),limit:text('limit'),steps:cues.flatMap((cue,index)=>cue.section.startsWith('step-')?[captions[index]]:[]),explanation:text('explanation')}
   }
   useEffect(()=>{
     onPresentation(enabled)
     if(enabled)onMaterial?.(material())
     return()=>onPresentation(false)
-  },[enabled,spoken,courseId,onMaterial,onPresentation])
+  },[enabled,spoken,language,courseId,onMaterial,onPresentation])
   function recall() { audio.current?.pause();onRecall(material()) }
   function sync() {
     const element=audio.current
@@ -101,8 +102,8 @@ export function StoryCourseMedia({language,platform,solution=false,onRecall,cour
         <g fill="none" stroke="currentColor" strokeWidth="3"><circle cx="247" cy="76" r="21"/><circle cx="303" cy="76" r="21"/><path d="m247 76 16-31 18 31h-34l37-25 19 25m-19-25-4-14h12m-35 8h17"/></g>
       </svg>}
       {library && safeCue>=exampleIndex && safeCue<stopIndex && <CourseIllustration id={courseId} locale={spoken} />}
-      <p className="course-caption" lang={subtitleLanguage} dir={subtitleLanguage==='ar'?'rtl':'ltr'}>{safeCue>=0?captions[safeCue]:''}</p>
-      <details><summary>{t.transcript}</summary><div lang={subtitleLanguage} dir={subtitleLanguage==='ar'?'rtl':'ltr'}>{captions.map((line,index)=><p key={index}>{line}</p>)}</div></details>
+      <p className="course-caption" lang={subtitleLanguage} dir="auto">{safeCue>=0?captions[safeCue]:''}</p>
+      <details><summary>{t.transcript}</summary><div lang={subtitleLanguage} dir={subtitleLanguage==='ar'?'rtl':'ltr'}>{captions.map((line,index)=><p key={index} dir="auto">{line}</p>)}</div></details>
       <details><summary>{t.credits}</summary><p>Piper · Deutsch: Thorsten (CC0-Datensatz) · English: Joe (CC0 dataset) · Français: Tom (AGPLv3 model/dataset). Synthetic audio; models are not included.</p>
         <ul><li><a href="https://github.com/thorstenMueller/Thorsten-Voice">Thorsten Voice</a></li><li><a href="https://huggingface.co/rhasspy/piper-voices/blob/main/en/en_US/joe/medium/MODEL_CARD">Joe model card</a></li><li><a href="https://huggingface.co/rhasspy/piper-voices/blob/main/fr/fr_FR/tom/medium/MODEL_CARD">Tom model card</a></li></ul>
       </details>
