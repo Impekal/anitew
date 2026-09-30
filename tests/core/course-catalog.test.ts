@@ -6,12 +6,12 @@ describe('additive reading course library', () => {
   it('preserves the original five course identities and imported completion records', () => {
     const original = ['text-meaning', 'text-verbatim', 'long-words', 'active-recall', 'spaced-practice']
     expect(courseProgress(original)).toEqual(original)
-    for (const language of ['de', 'en'] as const) {
+    for (const language of ['de', 'en', 'fr'] as const) {
       expect(readingCourses[language].map(course => course.id)).toEqual(expect.arrayContaining(original))
     }
   })
-  it('has a unique, complete course in both offered languages for every persisted identity', () => {
-    for (const language of ['de', 'en'] as const) {
+  it('has a unique, complete course in each offered language for every persisted identity', () => {
+    for (const language of ['de', 'en', 'fr'] as const) {
       const courses = readingCourses[language]
       expect(courses.map(course => course.id).sort()).toEqual([...COURSE_IDS].sort())
       for (const course of courses) {

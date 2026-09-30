@@ -1,6 +1,6 @@
 import type { CourseId } from '../core/courses/progress.ts'
 export interface ReadingCourse { id: CourseId; title: string; purpose: string; limit: string; steps: string[]; example: string; explanation: string; prompt: string; criteria: string[]; transfer: string; ownCriteria?: string[]; allowOwn?: boolean }
-export const readingCourses: Record<'de' | 'en', ReadingCourse[]> = {
+export const readingCourses: Record<'de' | 'en' | 'fr', ReadingCourse[]> = {
   "de": [
     {
       "id": "text-meaning",
@@ -23,7 +23,12 @@ export const readingCourses: Record<'de' | 'en', ReadingCourse[]> = {
         "Schatten und Verdunstung tragen zur Kühlung bei.",
         "Wasser und Wurzelraum werden als Bedingungen genannt."
       ],
-      "transfer": "Nimm einen eigenen kurzen Sachtext. Erstelle drei Leitfragen, lege den Text weg und beantworte sie. Steigere später die Länge, nicht nur die Anzahl der Wiederholungen."
+      "transfer": "Nimm einen eigenen kurzen Sachtext. Erstelle drei Leitfragen, lege den Text weg und beantworte sie. Steigere später die Länge, nicht nur die Anzahl der Wiederholungen.",
+      "ownCriteria": [
+        "Die wesentlichen Aussagen sind enthalten.",
+        "Die Beziehungen zwischen den Aussagen stimmen.",
+        "Fehlende oder falsche Aussagen wurden mit dem Original abgeglichen."
+      ]
     },
     {
       "id": "text-verbatim",
@@ -321,7 +326,12 @@ export const readingCourses: Record<'de' | 'en', ReadingCourse[]> = {
         "Shade and evaporation contribute to cooling.",
         "Water and root space are identified as requirements."
       ],
-      "transfer": "Choose a short factual text of your own. Write three guiding questions, put the text away and answer them. Gradually increase the length."
+      "transfer": "Choose a short factual text of your own. Write three guiding questions, put the text away and answer them. Gradually increase the length.",
+      "ownCriteria": [
+        "The main ideas are included.",
+        "The relationships between ideas are correct.",
+        "Missing or mistaken ideas were checked against the source."
+      ]
     },
     {
       "id": "text-verbatim",
@@ -595,6 +605,309 @@ export const readingCourses: Record<'de' | 'en', ReadingCourse[]> = {
       ],
       "transfer": "Choose two or three related task types you have already studied. Mix them and explain which approach fits before solving each one.",
       "allowOwn": false
+    }
+  ],
+  "fr": [
+    {
+      "id": "text-meaning",
+      "title": "Retenir le sens d’un texte long",
+      "purpose": "Apprends à restituer les idées et les liens d’un texte sans le regarder. Cette méthode convient aux textes documentaires, aux présentations et à la préparation d’un examen.",
+      "limit": "Un résumé ne conserve pas tous les détails. Travaille séparément les chiffres ou les formulations exactes lorsqu’ils sont importants. Commence par un court passage et allonge-le lorsque tu sais l’expliquer.",
+      "steps": [
+        "Lis un passage et clarifie les termes inconnus.",
+        "Découpe-le en idées et donne un titre court à chacune.",
+        "Pose une question par partie : que se passe-t-il, pourquoi et avec quelles conséquences ?",
+        "Cache le texte et réponds avec tes propres mots.",
+        "Compare avec l’original. Corrige les idées manquantes et les liens erronés.",
+        "Essaie de nouveau plus tard. Adapte l’intervalle à la qualité de ton rappel."
+      ],
+      "example": "Une ville plante des arbres le long d’une route très fréquentée. Leur feuillage apporte de l’ombre. L’eau qui s’évapore par les feuilles contribue au refroidissement. Pour rester en bonne santé pendant les périodes sèches, les arbres ont besoin de suffisamment d’eau et d’espace pour leurs racines.",
+      "explanation": "Trois parties : l’action (planter des arbres), les effets (ombre et évaporation) et les conditions (eau et espace pour les racines). Ce plan conserve les liens entre les idées.",
+      "prompt": "Sans regarder le texte, explique l’action décrite, ses effets et ses conditions.",
+      "criteria": [
+        "J’ai indiqué que des arbres sont plantés le long de la route.",
+        "J’ai expliqué que l’ombre et l’évaporation contribuent au refroidissement.",
+        "J’ai cité l’eau et l’espace pour les racines comme conditions."
+      ],
+      "ownCriteria": [
+        "Les idées essentielles sont présentes.",
+        "Les liens entre les idées sont corrects.",
+        "J’ai vérifié les idées manquantes ou erronées dans l’original."
+      ],
+      "transfer": "Choisis un court texte documentaire. Prépare trois questions, mets le texte de côté et réponds. Augmente progressivement la longueur du passage."
+    },
+    {
+      "id": "text-verbatim",
+      "title": "Apprendre un texte mot pour mot",
+      "purpose": "Travaille la formulation exacte d’un poème, d’une définition ou d’un court discours. Les petits mots et leur ordre comptent aussi.",
+      "limit": "Réciter exactement ne prouve pas que tu as compris. Clarifie d’abord le sens. Des images mentales peuvent soutenir l’ordre des idées, mais elles ne remplacent pas le travail sur les mots.",
+      "steps": [
+        "Comprends le texte et choisis un court passage cohérent.",
+        "Lis-le attentivement et prononce-le clairement une fois.",
+        "Cache-le, puis récite-le ou écris-le de mémoire.",
+        "Compare mot à mot. Corrige les omissions, les inversions et les ajouts.",
+        "Travaille le passage suivant, puis la transition entre les deux. Commence parfois au milieu.",
+        "Essaie de nouveau plus tard sans modèle. Allonge le passage lorsque le rappel devient fiable."
+      ],
+      "example": "Le matin, j’ouvre la fenêtre. L’air frais entre dans la pièce. Ensuite, je commence ma journée.",
+      "explanation": "Les trois phrases forment trois unités de travail. Apprends la première, puis la deuxième et leur transition. Lors d’un autre essai, commence aussi par « L’air frais… ».",
+      "prompt": "Écris les trois phrases de mémoire en respectant leur formulation aussi précisément que possible.",
+      "criteria": [
+        "Tous les mots sont présents dans le bon ordre.",
+        "Je peux passer d’une phrase à l’autre sans regarder.",
+        "Je peux expliquer le sens du texte."
+      ],
+      "transfer": "Choisis un court passage dont la formulation compte pour toi. Vérifie les mots dans l’original : une reformulation ne répond pas à cet objectif précis."
+    },
+    {
+      "id": "long-words",
+      "title": "Retenir les mots longs",
+      "purpose": "Décompose un mot long en éléments compréhensibles, puis reconstitue-le. Travaille son sens, sa prononciation et son orthographe.",
+      "limit": "Les éléments de sens ne correspondent pas toujours aux syllabes prononcées. Certains termes techniques sont entièrement nouveaux. Vérifie leur sens et leur prononciation avant de les travailler.",
+      "steps": [
+        "Clarifie le sens du mot entier.",
+        "Repère des éléments connus et explique leur rôle.",
+        "Observe les changements d’orthographe et les éléments de liaison.",
+        "Prononce les parties lentement, puis le mot entier avec fluidité. Les frontières syllabiques peuvent être différentes.",
+        "Cache le modèle, écris le mot entier et explique-le.",
+        "Vérifie l’orthographe et le sens. Travaille les parties incertaines, puis rassemble à nouveau le mot."
+      ],
+      "example": "incompréhensible",
+      "explanation": "in | compréhensible : ce qui ne peut pas être compris. Le préfixe in- apporte ici la négation. « Compréhensible » est lié au verbe comprendre. Ce découpage aide à saisir le sens ; il ne constitue pas une transcription de la prononciation.",
+      "prompt": "Écris le mot entier de mémoire. Explique ensuite son sens à voix haute et prononce-le avec fluidité.",
+      "criteria": [
+        "Le mot entier est correctement orthographié.",
+        "Je peux expliquer son sens.",
+        "J’ai prononcé le mot entier ; en cas de doute, je vérifie sa prononciation auprès d’une source fiable."
+      ],
+      "transfer": "Choisis un mot long utile dans ta vie. Repère ses éléments de sens, puis travaille le mot entier. Respecte les règles de formation et de prononciation de sa langue."
+    },
+    {
+      "id": "active-recall",
+      "title": "Pratiquer le rappel actif",
+      "purpose": "Essaie de retrouver une information sans regarder sa source. Tu distingues ainsi ce que tu peux rappeler toi-même de ce qui demande encore du travail. Cette méthode s’applique aux faits, aux notions et aux relations.",
+      "limit": "Reconnaître une réponse en la lisant ne signifie pas savoir la retrouver. Un échec n’est pas un verdict : vérifie et comprends la bonne réponse, puis réessaie. Deviner plusieurs fois sans correction peut renforcer des erreurs.",
+      "steps": [
+        "Choisis une petite quantité d’information que tu comprends.",
+        "Pose une question précise à laquelle le contenu permet de répondre.",
+        "Écarte la source et réponds avant de vérifier.",
+        "Compare avec l’original. Corrige les éléments manquants ou erronés.",
+        "Cache la réponse et essaie de la rappeler à nouveau.",
+        "Teste-toi aussi plus tard. Répéter immédiatement peut sembler facile sans démontrer une mémorisation durable."
+      ],
+      "example": "Question : pourquoi l’eau qui s’évapore peut-elle refroidir une surface ?\nRéponse : l’évaporation demande de l’énergie. Cette énergie est prélevée sous forme de chaleur dans la surface et son environnement.",
+      "explanation": "Lis et comprends d’abord la réponse. Cache-la ensuite et réponds toi-même. « L’eau refroidit » ne suffit pas à expliquer le lien : le besoin d’énergie et le prélèvement de chaleur sont essentiels.",
+      "prompt": "Pourquoi l’eau qui s’évapore peut-elle refroidir une surface ? Explique le lien sans regarder.",
+      "criteria": [
+        "Ma réponse précise que l’évaporation demande de l’énergie.",
+        "Ma réponse explique le prélèvement de chaleur dans la surface et son environnement.",
+        "J’ai comparé mon explication avec la source et corrigé les erreurs."
+      ],
+      "ownCriteria": [
+        "J’ai posé une question précise sur mon contenu.",
+        "J’ai tenté de répondre sans regarder.",
+        "J’ai vérifié et corrigé les éléments manquants ou erronés dans l’original."
+      ],
+      "transfer": "Formule une question précise sur ton propre contenu. Réponds sans regarder, compare ensuite et réessaie plus tard. ANITEW utilise aussi le rappel dans ses séances d’entraînement."
+    },
+    {
+      "id": "spaced-practice",
+      "title": "Espacer les révisions",
+      "purpose": "Répartis les tentatives de rappel dans le temps. Tu vérifies ainsi ce qui reste après une pause, plutôt que de répéter une réponse juste après l’avoir lue.",
+      "limit": "Aucun intervalle ne convient à tous les contenus et à toutes les personnes. La difficulté, les connaissances antérieures et la durée de rétention souhaitée comptent. Cet exercice explique la démarche ; seuls des rappels ultérieurs permettent de vérifier la rétention dans le temps.",
+      "steps": [
+        "Apprends une information limitée et essaie de la rappeler une fois sans modèle.",
+        "Prévois une autre tentative après un délai.",
+        "Essaie de répondre avant d’afficher la solution.",
+        "Après une erreur, clarifie le sens, corrige et rappelle à nouveau. Raccourcis l’intervalle suivant si le rappel était trop difficile.",
+        "Lorsque le rappel devient fiable, l’intervalle peut augmenter.",
+        "ANITEW planifie déjà les révisions des éléments d’entraînement enregistrés. Suis les révisions dues plutôt que de créer un calendrier concurrent."
+      ],
+      "example": "Mira apprend une nouvelle notion et l’explique sans modèle. Après une pause, elle réessaie et découvre une lacune. Elle compare avec la bonne explication, corrige la lacune et prévoit le prochain essai plus tôt. Elle augmente l’intervalle seulement lorsque le rappel devient fiable.",
+      "explanation": "Le délai et la tentative de rappel comptent. Relire dix fois de suite ne remplace pas un rappel ultérieur. L’erreur indique à Mira ce qu’elle doit retravailler et l’aide à adapter l’intervalle.",
+      "prompt": "Décris la démarche de Mira : que fait-elle avant de vérifier ? Comment réagit-elle à la lacune ? Quand peut-elle augmenter l’intervalle ?",
+      "criteria": [
+        "Je décris le rappel avant la consultation de la réponse.",
+        "Je décris la comparaison, la correction et un intervalle suivant plus court après un rappel difficile.",
+        "J’augmente les intervalles lorsque le rappel devient fiable, sans prétendre qu’un calendrier unique convient à tout le monde."
+      ],
+      "allowOwn": false,
+      "transfer": "Utilise les révisions dues pour les éléments d’entraînement enregistrés. Pour un contenu extérieur à l’application, prévois un test ultérieur et adapte le délai au rappel réel. Terminer ce cours ne crée pas de nouvelles cartes de révision."
+    },
+    {
+      "id": "meaningful-groups",
+      "title": "Former des groupes cohérents",
+      "purpose": "Organise des informations en groupes compréhensibles. Une structure utile peut t’aider à voir l’ensemble et à chercher les éléments méthodiquement lors du rappel.",
+      "limit": "Regrouper ne garantit pas un rappel complet. Les groupes doivent avoir un sens pour toi ; un titre ne suffit pas à expliquer des termes inconnus. Si l’ordre initial compte, travaille-le aussi.",
+      "steps": [
+        "Précise ton objectif : le contenu, son ordre ou les deux.",
+        "Cherche des caractéristiques communes ou des relations.",
+        "Crée quelques groupes faciles à parcourir avec des titres informatifs.",
+        "Explique pourquoi chaque élément appartient à son groupe.",
+        "Cache la source. Rappelle d’abord les groupes, puis leur contenu.",
+        "Compare avec l’original, corrige les omissions et réessaie plus tard."
+      ],
+      "example": "Pomme · marteau · chemise · poire · scie · veste · banane · pince · pantalon",
+      "explanation": "Une organisation possible : fruits (pomme, poire, banane), outils (marteau, scie, pince), vêtements (chemise, veste, pantalon). Les titres servent d’indices. L’objectif est de retenir les neuf éléments, pas leur ordre initial.",
+      "prompt": "Rappelle les trois groupes et autant des neuf éléments que possible, sans regarder. L’ordre dans chaque groupe est libre.",
+      "criteria": [
+        "J’ai nommé les groupes fruits, outils et vêtements.",
+        "J’ai vérifié les neuf éléments et corrigé les omissions ou les ajouts.",
+        "Je peux expliquer pourquoi les éléments correspondent à leur groupe."
+      ],
+      "ownCriteria": [
+        "Mes groupes ont des titres compréhensibles.",
+        "J’ai rappelé le contenu sans modèle et l’ai comparé à la source.",
+        "J’ai vérifié que le regroupement conserve les ordres ou relations importants."
+      ],
+      "transfer": "Organise un passage par idées ou une liste par catégories utiles. N’invente pas des groupes pour atteindre un nombre fixé. Vérifie le contenu complet, pas seulement les titres."
+    },
+    {
+      "id": "self-explanation",
+      "title": "Expliquer soi-même les relations",
+      "purpose": "Explique avec tes propres mots pourquoi une étape a du sens ou comment deux affirmations sont liées. Tu peux ainsi découvrir des lacunes qui passent inaperçues à la lecture.",
+      "limit": "Une explication fluide peut être fausse. Vérifie-la dans une source fiable et reconnais les incertitudes. Cette méthode accompagne la pratique ; elle ne remplace ni les connaissances du sujet ni la vérification.",
+      "steps": [
+        "Choisis une relation limitée que tu veux comprendre.",
+        "Demande-toi pourquoi l’étape suit, ce qui reste identique et ce qui changerait dans d’autres conditions.",
+        "Formule une explication sans copier la source.",
+        "Compare avec le raisonnement original. Distingue les faits établis des suppositions.",
+        "Corrige les lacunes et applique ton explication à un exemple similaire.",
+        "Explique de nouveau la relation plus tard, sans regarder."
+      ],
+      "example": "Trois quarts valent six huitièmes : 3/4 = 6/8. En coupant chacune des quatre parts égales en deux, on obtient huit parts égales. Les trois quarts sélectionnés deviennent six huitièmes. La quantité sélectionnée reste identique.",
+      "explanation": "« Multiplier le numérateur et le dénominateur par deux » décrit une règle. Couper les parts égales en deux explique pourquoi la valeur ne change pas. Pour transférer l’idée, cherche pourquoi 2/3 et 4/6 représentent la même proportion.",
+      "prompt": "Explique sans modèle pourquoi 3/4 et 6/8 sont égaux. Applique ensuite ton raisonnement à 2/3 et 4/6.",
+      "criteria": [
+        "J’explique que chaque part égale est coupée en deux.",
+        "J’explique pourquoi la quantité sélectionnée reste identique.",
+        "J’ai appliqué le raisonnement à 2/3 et 4/6 et vérifié le même principe."
+      ],
+      "ownCriteria": [
+        "J’ai répondu à une question sur le pourquoi ou le comment de mon contenu.",
+        "J’ai vérifié mon explication sans présenter des suppositions comme des faits.",
+        "J’ai appliqué mon explication à un exemple similaire ou indiqué une limite à son utilisation."
+      ],
+      "transfer": "Choisis une étape de ton cours et explique pourquoi elle est valable. Trouve un exemple similaire pour vérifier ton raisonnement. Si tu ne peux pas vérifier de façon fiable, note la question ouverte plutôt que de prétendre être certain."
+    },
+    {
+      "id": "story-method",
+      "title": "Relier des éléments par une histoire",
+      "purpose": "Relie des éléments par une action imaginée. Ces liens peuvent aider à rappeler une courte liste dans l’ordre souhaité.",
+      "limit": "Une histoire mémorable ne conserve pas automatiquement les mots exacts d’un texte. Vérifie que tes images te ramènent bien aux éléments prévus.",
+      "steps": [
+        "Choisis quelques éléments concrets.",
+        "Relie-les par des actions dans l’ordre voulu.",
+        "Imagine les actions : chaque image doit conduire à la suivante.",
+        "Cache la liste et parcours mentalement l’histoire.",
+        "Nomme les éléments, vérifie leur ordre et améliore les liens peu clairs."
+      ],
+      "example": "Clé → citron → vélo",
+      "explanation": "Une clé géante presse un citron. Son jus fait tourner les roues d’un vélo. Les deux transitions sont des actions ; trois images isolées ne créeraient pas ces liens.",
+      "prompt": "Rappelle les trois éléments dans l’ordre et décris les actions qui les relient.",
+      "criteria": [
+        "J’ai nommé la clé, le citron et le vélo dans cet ordre.",
+        "J’ai expliqué l’action entre la clé et le citron, puis entre le citron et le vélo.",
+        "J’ai vérifié mon rappel dans la source."
+      ],
+      "ownCriteria": [
+        "J’ai rappelé mes éléments dans l’ordre nécessaire.",
+        "Mon histoire relie les éléments successifs par des actions claires.",
+        "J’ai vérifié les éléments manquants dans la liste originale."
+      ],
+      "transfer": "Essaie avec une courte liste personnelle. Si un élément manque, améliore le lien qui y conduit. La leçon sur les histoires déjà présente dans l’entraînement reste disponible."
+    },
+    {
+      "id": "method-of-loci",
+      "title": "Utiliser les lieux comme indices",
+      "purpose": "Avec la méthode des loci, tu places mentalement des contenus à des endroits fixes d’un trajet familier. Parcourir ce trajet dans ta tête fournit des indices pour les retrouver.",
+      "limit": "Apprends d’abord un trajet stable. Des images semblables au même endroit peuvent se confondre. Les lieux soutiennent la structure et l’ordre, mais pas automatiquement la formulation exacte.",
+      "steps": [
+        "Choisis un trajet familier avec des endroits clairement distincts.",
+        "Fixe leur ordre et répète le trajet sans contenu à apprendre.",
+        "Associe un élément à chaque endroit par un événement imaginé marquant.",
+        "Parcours le trajet sans modèle et nomme les éléments.",
+        "Compare ton rappel et améliore les lieux confus ou les images peu efficaces."
+      ],
+      "example": "Trajet d’exemple : porte d’entrée → meuble à chaussures → table de cuisine. Éléments : pain → savon → bougie.",
+      "explanation": "Un pain géant bloque la porte. Le meuble à chaussures déborde de mousse de savon. Une bougie brille sur la table de cuisine. Ce trajet est seulement un exemple ; choisis un trajet réellement familier pour ton propre apprentissage.",
+      "prompt": "Visite mentalement les trois endroits. Écris l’élément associé à chacun.",
+      "criteria": [
+        "J’ai associé le pain à la porte, le savon au meuble à chaussures et la bougie à la table.",
+        "J’ai rappelé les endroits dans l’ordre fixé.",
+        "J’ai comparé les associations avec la source."
+      ],
+      "allowOwn": false,
+      "transfer": "Dans le palais de mémoire existant de l’application, crée un trajet familier ou utilise un trajet proposé. Commence par quelques endroits et vérifie que tu les distingues clairement."
+    },
+    {
+      "id": "keyword-method",
+      "title": "Relier le vocabulaire à des mots-clés",
+      "purpose": "Un mot connu dont le son est proche peut servir de pont vers le sens d’un mot étranger. Relie ce mot-clé et le sens dans une image, puis vérifie le mot à apprendre.",
+      "limit": "Un son proche n’est pas une prononciation correcte. Certains mots ne se prêtent pas à cette technique. Vérifie séparément la prononciation, l’orthographe et l’emploi dans une phrase.",
+      "steps": [
+        "Vérifie le sens et la prononciation correcte du nouveau mot.",
+        "Cherche un mot connu au son proche.",
+        "Imagine un lien clair entre ce mot-clé et le sens.",
+        "Retrouve le sens à partir du mot, puis le mot à partir du sens.",
+        "Vérifie la prononciation, l’orthographe et une phrase d’exemple."
+      ],
+      "example": "Anglais : bell = cloche. Exemple : The bell rings. = La cloche sonne.",
+      "explanation": "Le mot français « belle » peut servir d’indice sonore : imagine une très belle cloche qui sonne. « Belle » est l’aide-mémoire, pas une transcription de la prononciation anglaise de bell.",
+      "prompt": "Quel mot anglais signifie cloche ? Écris le mot, son sens et la phrase d’exemple de mémoire.",
+      "criteria": [
+        "J’ai correctement associé bell à cloche.",
+        "J’ai comparé « The bell rings. » avec la source.",
+        "Je distingue l’indice sonore de la prononciation anglaise et je consulte une source fiable en cas de doute."
+      ],
+      "allowOwn": false,
+      "transfer": "Essaie avec un mot dont tu as réellement besoin. Teste aussi le sens inverse : peux-tu retrouver la forme étrangère à partir du sens ? Si le mot-clé te perturbe, change de lien ou utilise le rappel direct."
+    },
+    {
+      "id": "number-images",
+      "title": "Transformer les nombres en images",
+      "purpose": "Le système majeur associe des sons consonantiques aux chiffres. Tu formes un mot et imagines une image que tu peux ensuite reconvertir en nombre.",
+      "limit": "Apprends d’abord les correspondances. Une image qui ne permet pas de retrouver exactement le nombre n’aide pas au rappel précis. Cette introduction utilise deux chiffres ; les leçons existantes du système majeur présentent d’autres correspondances.",
+      "steps": [
+        "Apprends d’abord quelques correspondances fixes entre chiffres et sons.",
+        "Lis les sons dans l’ordre des chiffres.",
+        "Ajoute des voyelles pour former un mot concret.",
+        "Vérifie si le mot contient d’autres consonnes prononcées qui coderaient des chiffres supplémentaires.",
+        "Retrouve le mot à partir de l’image, puis le nombre à partir de ses sons."
+      ],
+      "example": "1 → t/d ; 2 → n. Le nombre 12 peut devenir l’image d’une tonne de sable : t + n.",
+      "explanation": "La voyelle ne compte pas ici. Dans tonne, les deux lettres n représentent un seul son consonantique. Au retour, t donne 1 et n donne 2 : tu retrouves 12. Ce sont les sons qui comptent, pas simplement les lettres écrites.",
+      "prompt": "Quel nombre code l’image d’une tonne de sable ? Explique le retour par les deux consonnes prononcées.",
+      "criteria": [
+        "J’ai donné le nombre 12.",
+        "J’ai associé t à 1 et n à 2.",
+        "J’ai expliqué pourquoi la voyelle et le double n écrit n’ajoutent pas de chiffre."
+      ],
+      "allowOwn": false,
+      "transfer": "Travaille les autres correspondances fixes dans les leçons existantes avant de mémoriser des nombres plus longs. Vérifie que chaque image te ramène exactement au nombre voulu."
+    },
+    {
+      "id": "interleaved-practice",
+      "title": "Choisir entre des démarches proches",
+      "purpose": "Mélange des types d’exercices proches et choisis toi-même la démarche adaptée. Tu travailles ainsi le choix de la méthode autant que son application.",
+      "limit": "Apprends d’abord chaque démarche avec des exemples clairs. Changer de sujet au hasard ou faire plusieurs choses à la fois est différent. L’intérêt du mélange dépend du contenu et de tes connaissances antérieures.",
+      "steps": [
+        "Comprends d’abord chaque démarche séparément.",
+        "Mélange ensuite quelques types d’exercices proches.",
+        "Avant de répondre, identifie le type et explique ton choix.",
+        "Résous l’exercice et vérifie séparément ton choix et ton résultat.",
+        "Retravaille les erreurs, puis reviens aux exercices mélangés."
+      ],
+      "example": "Rectangle : aire = longueur × largeur. Triangle : aire = base × hauteur correspondante ÷ 2. Un rectangle de 4 cm sur 3 cm a une aire de 12 cm². Un triangle de base 4 cm et de hauteur correspondante 3 cm a une aire de 6 cm².",
+      "explanation": "Des nombres identiques n’impliquent pas le même calcul. La figure détermine la règle : le triangle demande le facteur un demi. Dans un mélange d’exercices, il faut identifier le type avant d’appliquer la règle.",
+      "prompt": "Exercice A : triangle de base 6 cm et de hauteur correspondante 4 cm. Exercice B : rectangle de longueur 6 cm et de largeur 4 cm. Donne la règle et l’aire de chaque figure.",
+      "criteria": [
+        "A : j’ai choisi la règle du triangle et obtenu 12 cm².",
+        "B : j’ai choisi la règle du rectangle et obtenu 24 cm².",
+        "J’ai justifié les calculs par les types de figures, pas par l’ordre des exercices."
+      ],
+      "allowOwn": false,
+      "transfer": "Choisis deux ou trois types d’exercices proches que tu connais déjà. Mélange-les et justifie ta démarche avant chaque résolution."
     }
   ]
 }

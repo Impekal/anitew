@@ -119,6 +119,7 @@ import { useTrainingLanguage } from './useTrainingLanguage.ts'
 import { useSoundSetting } from './useSoundSetting.ts'
 
 const MODE_ORDER: readonly TrainingMode[] = ['emergency', 'short', 'daily', 'extended']
+const MODE_RANGES: Record<TrainingMode, string> = { emergency: '60–120 s', short: '3–4 Min', daily: '5–7 Min', extended: '15–20 Min' }
 
 export function App() {
   const platform = useMemo(() => createWebPlatform(), [])
@@ -922,7 +923,7 @@ export function App() {
         ),
       },
       courses: {
-        title: language === 'de' ? 'Lernkurse' : 'Learning courses',
+        title: language === 'de' ? 'Lernkurse' : language === 'fr' ? 'Cours d’apprentissage' : 'Learning courses',
         body: <CoursesPanel language={language} platform={platform} />,
       },
       science: {
@@ -1192,7 +1193,7 @@ export function App() {
         {/* Kein Titel über dem Knopf — „5:00 Beginnen“ erklärt sich, und ein
             Etikett darüber wäre genau das Möbel, das G-2 weglässt. */}
         <button type="button" className="start" onClick={start}>
-          <span className="start-time">≤ {label}</span>
+          <span className="start-time">{label}</span>
           <span className="start-label">{dictionary.start.start}</span>
         </button>
 
@@ -1241,9 +1242,11 @@ export function App() {
               type="button"
               className={id === mode ? 'mode mode-active' : 'mode'}
               aria-pressed={id === mode}
+              aria-describedby={`mode-range-${id}`}
               onClick={() => setMode(id)}
             >
               {dictionary.start.modes[id]}
+              <small id={`mode-range-${id}`} className="mode-range" aria-hidden="true">{MODE_RANGES[id]}</small>
             </button>
           ))}
         </div>
@@ -1417,7 +1420,7 @@ export function App() {
               </button>
               <button type="button" className="drawer-item" onClick={() => openPage('courses')}>
                 <MenuIcon kind="courses" />
-                <span>{language === 'de' ? 'Lernkurse' : 'Learning courses'}</span>
+                <span>{language === 'de' ? 'Lernkurse' : language === 'fr' ? 'Cours d’apprentissage' : 'Learning courses'}</span>
               </button>
               <button type="button" className="drawer-item" onClick={() => openPage('science')}>
                 <MenuIcon kind="science" />

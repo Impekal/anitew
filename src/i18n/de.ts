@@ -83,7 +83,7 @@ export const de = {
     'Vergessen ist kein Defekt. Es ist planbar.',
   ],
   start: {
-    answerTime: 'Die Modusnamen nennen die Basisdauer. Dazu kommen 25 % mehr Antwortzeit; oben steht die Obergrenze. Beim Start siehst du die genaue geplante Dauer.',
+    answerTime: 'Die kleinen Zeitspannen helfen bei der Auswahl. Die Antwortzeiten enthalten 25 % mehr Zeit. Beim Start siehst du die genaue geplante Dauer.',
     // Die Frage steht über den Knöpfen, nicht auf jedem einzelnen: „Ich habe
     // 15 Minuten“ bricht auf einem Telefon um, und vier umbrechende Knöpfe
     // sind vier Unruheherde (D-011/G-2).

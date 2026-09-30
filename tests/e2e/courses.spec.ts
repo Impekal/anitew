@@ -138,3 +138,48 @@ for (const [title, example] of [
     await expect(page.getByRole('button', {name:'Übung abschließen',exact:true})).toBeDisabled()
   })
 }
+
+test('French course content and controls work offline and share progress with German', async ({ page, context }) => {
+  await visit(page)
+  await page.getByRole('combobox', {name:'Sprache',exact:true}).selectOption('fr')
+  // Let the selected language take effect before the offline document restart.
+  await openPage(page, 'Cours d’apprentissage')
+  await expect(page.locator('.courses')).toHaveAttribute('lang','fr')
+  await page.evaluate(async () => {
+    await navigator.serviceWorker.ready
+    if (!navigator.serviceWorker.controller) await new Promise<void>(resolve => navigator.serviceWorker.addEventListener('controllerchange', () => resolve(), {once:true}))
+  })
+  await context.setOffline(true)
+  await page.reload()
+  await openPage(page, 'Cours d’apprentissage')
+  await expect(page.locator('.courses')).toHaveAttribute('lang','fr')
+  await page.getByRole('button', {name:'Ouvrir le cours : Retenir les mots longs',exact:true}).click()
+  await expect(page.locator('.course-lesson blockquote')).toHaveText('incompréhensible')
+  await page.getByRole('button', {name:'Masquer le modèle et s’entraîner',exact:true}).click()
+  await expect(page.locator('.course-lesson blockquote')).toHaveCount(0)
+  await page.getByLabel('Ta réponse', {exact:true}).fill('incompréhensible')
+  await page.getByRole('button', {name:'Comparer avec le modèle',exact:true}).click()
+  for (const checkbox of await page.locator('.course-check input').all()) await checkbox.check()
+  await page.getByRole('button', {name:'Terminer l’exercice',exact:true}).click()
+  await expect(page.getByText('Exercice effectué et progression enregistrée.', {exact:true})).toBeVisible()
+  await context.setOffline(false)
+  await page.reload()
+  await page.getByRole('combobox', {name:'Language',exact:true}).selectOption('de')
+  await openPage(page, 'Lernkurse')
+  await expect(page.getByText('1 von 12 Übungen durchgeführt', {exact:true})).toBeVisible()
+})
+
+test('French personal-text criteria never use the example’s factual answers', async ({ page }) => {
+  await visit(page)
+  await page.getByRole('combobox', {name:'Sprache',exact:true}).selectOption('fr')
+  await openPage(page, 'Cours d’apprentissage')
+  await page.getByRole('button', {name:'Ouvrir le cours : Retenir le sens d’un texte long',exact:true}).click()
+  await page.getByText('S’entraîner avec son propre contenu', {exact:true}).click()
+  await page.getByLabel('Ton texte ou ton mot (pour cet essai uniquement)', {exact:true}).fill('Mon texte personnel sur un bateau.')
+  await page.getByLabel('Utiliser mon contenu à la place de l’exemple', {exact:true}).check()
+  await page.getByRole('button', {name:'Masquer le modèle et s’entraîner',exact:true}).click()
+  await page.getByLabel('Ta réponse', {exact:true}).fill('Un bateau')
+  await page.getByRole('button', {name:'Comparer avec le modèle',exact:true}).click()
+  await expect(page.getByText('Les idées essentielles sont présentes.', {exact:true})).toBeVisible()
+  await expect(page.getByText('J’ai indiqué que des arbres sont plantés le long de la route.', {exact:true})).toHaveCount(0)
+})

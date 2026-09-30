@@ -455,3 +455,10 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 
 - **Q01/Q02 zusätzliche Startabsicherung:** Eine gestoppte CSS-Startanimation darf die App nicht dauerhaft verdecken. Unabhängige Zeitgrenze und gezielte Browserregression ergänzen den vorhandenen Ablauf.
 - **Französisch weiterhin offen:** Die zwölf neuen Lesekurse sind derzeit nur DE/EN. Die französische Tonspur der separaten Geschichten-Vorschau ist keine französische Fassung dieser Kursbibliothek.
+
+### Arbeitsstand: Französisch und Zeitwahl (2026-09-30)
+
+- **S01/S02 teilweise erweitert:** Alle zwölf Lesekurse samt Bedienung und Selbstvergleich sind jetzt DE/EN/FR. Die französischen Wort- und Vokabelbeispiele sind sprachlich angepasst; die endgültige sprachliche Durchsicht bleibt offen. Andere App-Sprachen verwenden weiterhin englische Lesekurse mit ausdrücklichem Hinweis. Dies ändert nicht die vereinbarte künftige Ton-/Untertitelregel.
+- Sprachwechsel nutzt dieselben Kurskennungen und denselben Abschlussstand. Französische eigene Textübungen verwenden allgemeine Kriterien statt Antworten aus dem Beispiel.
+- **Neue Nutzerentscheidung zur Zeitdarstellung:** Die Startzeit bleibt unverändert (z. B. 6:15), jedoch ohne vorangestelltes Zeichen. Unter den Modusnamen stehen klein 60–120 s, 3–4 Min, 5–7 Min und 15–20 Min. Kein Eingriff in Trainings-, Einpräge- oder Antwortzeiten.
+- **CI #1631:** 158 Desktop-Prüfungen bestanden direkt; der bestehende KI-Memory-Ablauf lief beim abschließenden Rückweg in sein gesamtes 30-Sekunden-Limit und bestand erst im Retry. Der strenge Gate blieb daher rot. Dieser einzelne Szenariotest erhält 60 Sekunden für seine mehreren Core-Wechsel und den Netzfehlerpfad; einzelne Assertions und das Verbot flakiger CI-Ergebnisse bleiben bestehen. Neue CI-Abnahme erforderlich.

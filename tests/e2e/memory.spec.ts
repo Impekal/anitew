@@ -143,6 +143,10 @@ test('trainiert die Erinnerung in der Einheit — und FSRS bekommt die Termine',
 test('schlägt mit KI vor — nur mit Schlüssel, Anbieter gestubbt, bestätigt wird von Hand', async ({
   page,
 }) => {
+  // Includes three Core round trips, successful extraction and the bounded
+  // network-failure path. A 30s whole-test budget expired on the final return
+  // in CI; keep action assertions strict while allowing the complete scenario.
+  test.setTimeout(60_000)
   // Kein Test ruft wirklich hinaus: Gemini antwortet aus der Route (D-037).
   await page.route('https://generativelanguage.googleapis.com/**', (route) =>
     route.fulfill({

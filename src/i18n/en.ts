@@ -35,7 +35,7 @@ export const en: Dictionary = {
     'Forgetting is not a defect. It is predictable.',
   ],
   start: {
-    answerTime: 'Mode names show the base duration. An extra 25% answer time is added; the maximum is shown above. The exact planned duration appears when you start.',
+    answerTime: 'The small time ranges help you choose. Answer times include an extra 25%. The exact planned duration appears when you start.',
     heading: 'How much time do you have?',
     start: 'Begin',
     modes: {

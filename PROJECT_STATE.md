@@ -2660,3 +2660,14 @@ Sieben weitere DE/EN-Lesekurse ergänzen die Bibliothek: Gruppieren, Selbsterkl�
 Bei der lokalen Browserregression fing eine angehaltene Startanimation den Einstiegsklick ab. Das Start-Overlay erhält deshalb zusätzlich zum CSS-Ende eine Zeitgrenze (bestehende 3/6 Sekunden plus 0,5 Sekunden Reserve) und eine Prüfung beim Sichtbarwerden. Ein Browsertest pausiert die Animation absichtlich. Das ist eine Absicherung des App-Zugangs, keine Änderung der Kurs- oder Trainingslogik.
 
 Validierung dieses Ausbaus: 580 Kernprüfungen, Typprüfung, Build und Größenbudget bestanden. Von 44 Browserprüfungen der Kurse und älteren Palast-/Techniklektionen bestanden zunächst 43; ein Kurszugang scheiterte am Start-Overlay. Nach der Absicherung bestanden alle acht gezielten Nachprüfungen auf Desktop/Mobilgerät (betroffener Kurs, normaler Erst-/Folgestart und absichtlich pausierte Startanimation). Der vollständige CI-Gate für den endgültigen Commit steht separat aus.
+
+
+## 2026-09-30 · Französische Lesekurse und ruhigere Zeitbeschriftung
+
+Alle zwölf Lesekurse sind zusätzlich in Französisch integriert, einschließlich Bedienlabels, Rückmeldungen und Kriterien für eigenes Material. Sprachabhängige Beispiele wurden angepasst. Abschlusskennungen bleiben sprachübergreifend identisch; die endgültige französische Sprachprüfung steht noch aus.
+
+Auf Nutzerwunsch zeigt der Startknopf die vorhandene Zeit ohne vorangestelltes Zeichen. Kleine Angaben unter den vier Modusnamen zeigen 60–120 s, 3–4 Min, 5–7 Min und 15–20 Min. Die Engine-Zeiten wurden nicht geändert. Die zusätzlichen Angaben sind über aria-describedby zugänglich, ohne die bisherigen Buttonnamen zu verändern.
+
+CI #1631 war wegen eines einzigen flakigen bestehenden KI-Memory-Tests rot (158 direkte Erfolge). Der Test überschritt beim letzten Core-Rückweg sein Gesamtlimit von 30 Sekunden; dieses konkrete Mehrschritt-Szenario erhält 60 Sekunden. Die einzelnen Erwartungen und failOnFlakyTests bleiben unverändert.
+
+Validierung: Typprüfung, Build und Größenbudget bestanden; 17 gezielte Kernprüfungen für Kurskatalog, gespeicherte Kennungen und unveränderte Antwortreserve grün. 28 von 30 Browserprüfungen bestanden zunächst direkt. Die beiden französischen Offline-Neustarts luden unmittelbar nach Auswahl der Sprache neu; nach Öffnen der französischen Kursansicht vor dem Neustart bestanden auch diese beiden auf Desktop und Mobilgerät, einschließlich sprachübergreifendem Fortschritt. Mobile Sichtprüfung zeigt 6:15 ohne Zeichen und die vier kleinen Zeitspannen ohne horizontalen Überlauf.

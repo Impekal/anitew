@@ -2,7 +2,7 @@
 
 ## Bereits in der App
 
-Zwölf ergänzende Lesekurse auf Deutsch und Englisch: Textinhalte, genauer
+Zwölf ergänzende Lesekurse auf Deutsch, Englisch und Französisch: Textinhalte, genauer
 Wortlaut, lange Wörter, aktives Abrufen, verteiltes Wiederholen, Gruppieren,
 Selbsterklärung, Geschichten, Loci, Schlüsselwörter, Zahl-Bild-System und
 gezielt gemischte Aufgabentypen. Einführung und Grenzen stehen vor Erklärung,
@@ -11,7 +11,7 @@ bezeichnet eine durchgeführte Übung, keine gemessene Gedächtnisleistung.
 
 Die älteren Major-, Palast-, Geschichten- und Verknüpfungslektionen im
 Training bleiben erhalten. Neue Kurse sind ausdrücklich zusätzliche Zugänge.
-Die französische Fassung der neuen Lesekurse steht noch aus.
+Die französische Fassung ist integriert; ihre abschließende sprachliche Durchsicht steht noch aus.
 
 ## Separate lokale Medienvorschau
 
