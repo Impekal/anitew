@@ -32,7 +32,8 @@ test('erzeugt in unter drei Schritten die erste echte Erinnerung, ohne ein Urtei
 
   // Danach steht der Startbildschirm mit der gewählten Dauer …
   await expect(page.locator('.challenge')).toBeVisible()
-  await expect(page.locator('.mode-active')).toHaveText('3 Minuten')
+  await expect(page.locator('.mode-active')).toHaveAccessibleName('3 Minuten')
+  await expect(page.locator('.mode-active .mode-range')).toHaveText('3–4 Min')
 
   // … und der echten ersten Erinnerung im lokalen Graphen.
   await openPage(page, 'Mein Gedächtnis')
