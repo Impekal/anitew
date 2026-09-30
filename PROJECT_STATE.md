@@ -2684,3 +2684,19 @@ Lokale Prüfung: 583 Kerntests und 32 Kursprüfungen auf Desktop/Mobilgerät
 bestanden; Typecheck, Build und Kaltstartbudget eingehalten. Coach-Auswahl
 auf schmalem Bildschirm visuell geprüft. Neuer strenger CI-Lauf folgt auf
 Push; daraus wird vor dessen Abschluss kein vollständig grüner Gate abgeleitet.
+
+## 2026-09-30 — Geschichten-Audioprobe integriert
+
+Drei lokale Tonspuren, elf Untertitelentwürfe, gespeicherte Tonwahl und Tempo,
+Sprechtext, einfache Vektorillustrationen und Kapitel in der App. Lesen und
+Anhören teilen die bestehende Abrufübung und denselben Abschluss. Der Player
+stoppt vor der gesprochenen Lösung, auch beim Vorspulen; eigene Materialien
+bleiben im bisherigen Lesemodus. Weitere Kursmedien und natürliche Mimik offen.
+
+Typecheck, Build und Kaltstartbudget bestanden. Die vier neuen Kerntests
+bestanden, einschließlich Prüfsumme der unveränderten deutschen Tonspur.
+Erster Offline-Audiotest auf Desktop bestanden; beim Vorspultest wurde die
+Wartebedingung für suchbare Medien ergänzt und weitere Playerereignisse
+abgesichert. Die Wiederholung traf unter hoher lokaler CPU-Auslastung auf
+Timeouts bereits in Navigation/Offline-Installation. Deshalb noch kein grüner
+Browser-Gate für diesen Stand behauptet; strenger CI muss dies verifizieren.

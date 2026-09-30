@@ -1,0 +1,26 @@
+[
+  {
+    "language": "de",
+    "file": "de.m4a",
+    "bytes": 994853,
+    "sha256": "d32cfdbcb103610d1d387dc32ef8fb4585dd51efbf8db8c0b513d544c455dd80",
+    "source": "geschichten-methode.m4a",
+    "synthetic": true
+  },
+  {
+    "language": "en",
+    "file": "en.m4a",
+    "bytes": 888850,
+    "sha256": "9f0ba00dfee509c9496c223bbe2bc9808a8dd257d4e39e3deb186a9181a57bce",
+    "source": "story-method-en.m4a",
+    "synthetic": true
+  },
+  {
+    "language": "fr",
+    "file": "fr.m4a",
+    "bytes": 1135794,
+    "sha256": "8bb39767ef6afd10ee9fd5e9928aad105be7111f88d203fda608e56561110e75",
+    "source": "story-method-fr.m4a",
+    "synthetic": true
+  }
+]

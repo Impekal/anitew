@@ -18,12 +18,21 @@ gebündelte, gekennzeichnete fiktive Standbilder. Standard je Kurs, ein Coach f�
 alle Kurse oder eigene Zuordnung werden sprachübergreifend gespeichert.
 Ein Wechsel unterbricht eine laufende Leseübung nicht.
 
+## Integrierte illustrierte Audioprobe
+
+Die Geschichten-Methode bietet jetzt drei lokale Tonspuren, elf synchronisierte
+Untertitelentwürfe, vollständigen Sprechtext, Tempo und Kapitelsprünge.
+Tonwahl und Tempo werden gespeichert. Vor der gesprochenen Lösung geht es
+in dieselbe Abrufübung wie beim Lesen; beide Wege teilen den Kursabschluss.
+Die übrigen elf Kurse bleiben vorerst Lesekurse. Quellen, Dateinachweise und
+Prüfgrenzen stehen in [STORY_MEDIA.md](STORY_MEDIA.md).
+
 ## Separate lokale Medienvorschau
 
 Die Geschichten-Vorschau außerhalb des Repositories bietet ein illustriertes
 Beispiel, Lesemodus, Tempo, Coach-Auswahl und drei Tonsprachen (DE/EN/FR).
-Elf Untertitelsprachen liegen als Entwürfe vor. Dies ist noch keine Integration
-aller Medien in die App und keine sprachliche Abnahme der neuen Fassungen.
+Elf Untertitelsprachen liegen als Entwürfe vor. Die Geschichten-Audioprobe wurde inzwischen integriert; dies ist noch keine Integration
+aller Kursmedien in die App und keine sprachliche Abnahme der neuen Fassungen.
 
 Aktive Portraitauswahl: ursprünglicher jüngerer männlicher Coach, Lin und
 Rafael, ohne traditionelle Kleidung. Pro Kurs gilt ein Standard; alternativ

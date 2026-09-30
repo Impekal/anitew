@@ -4,6 +4,7 @@ import { COURSE_PROGRESS_KEY, courseProgress, type CourseId } from '../core/cour
 import { readingCourses, type ReadingCourse } from '../i18n/courses.ts'
 import { courseLanguage, courseCopy, courseStages, type CourseLanguage } from '../i18n/courseUi.ts'
 import { CourseCoachPanel } from './CourseCoachPanel.tsx'
+import { StoryCourseMedia } from './StoryCourseMedia.tsx'
 import './courses.css'
 
 export function CoursesPanelImpl({ language, platform }: { language: Language; platform: Platform }) {
@@ -44,11 +45,11 @@ export function CoursesPanelImpl({ language, platform }: { language: Language; p
         {completed.includes(item.id) && <p>{copy('Übung durchgeführt', 'Exercise practised')}</p>}
         <button type="button" disabled={!loaded} onClick={() => select(item.id)}>{copy('Kurs öffnen', 'Open course')}<span className="course-sr-only">: {item.title}</span></button>
       </article>)}</div>
-    </> : <ReadingLesson key={`${course.id}-${locale}`} course={course} locale={locale} onBack={() => select(null)} onComplete={() => save(course.id)} />}
+    </> : <ReadingLesson platform={platform} language={language} key={`${course.id}-${locale}`} course={course} locale={locale} onBack={() => select(null)} onComplete={() => save(course.id)} />}
   </section>
 }
 
-function ReadingLesson({ course, locale, onBack, onComplete }: { course: ReadingCourse; locale: CourseLanguage; onBack: () => void; onComplete: () => Promise<void> }) {
+function ReadingLesson({ course, locale, onBack, onComplete, platform, language }: { platform: Platform; language: Language; course: ReadingCourse; locale: CourseLanguage; onBack: () => void; onComplete: () => Promise<void> }) {
   const copy = (german: string, english: Parameters<typeof courseCopy>[2]) => courseCopy(locale, german, english)
   const [stage, setStage] = useState<'learn' | 'recall' | 'compare' | 'done'>('learn')
   const [answer, setAnswer] = useState('')
@@ -70,6 +71,7 @@ function ReadingLesson({ course, locale, onBack, onComplete }: { course: Reading
   return <article className="course-lesson">
     <button type="button" onClick={onBack}>{copy('Zur Kursübersicht', 'Back to courses')}</button>
     <h3 ref={heading} tabIndex={-1}>{course.title} · {courseStages[locale][stage]}</h3>
+    {course.id === 'story-method' && !usingOwn && (stage === 'learn' || stage === 'compare') && <StoryCourseMedia key={stage} platform={platform} language={language} solution={stage === 'compare'} onRecall={() => {setAnswer('');setChecked([]);setStage('recall')}} />}
     {stage === 'learn' && <>
       <h4>{copy('Was ist das und wozu dient es?', 'What is it for?')}</h4><p>{course.purpose}</p>
       <h4>{copy('Grenzen und Voraussetzungen', 'Limits and prerequisites')}</h4><p>{course.limit}</p>

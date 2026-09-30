@@ -409,7 +409,7 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 
 ### 3. Sprachen und Zugänglichkeit
 
-- [ ] **S01 · Sprachregel in die echte App integrieren.** DE/FR/EN als Tonsprachen; für andere App-Sprachen standardmäßig Englisch mit eigenen Untertiteln. Deutsch oder Französisch wählbar, Untertitelsprache bleibt erhalten. Einstellungen aus der echten App verwenden, nicht aus dem Prototyp-Simulator.
+- [x] **S01 · Sprachregel in die echte App integrieren.** Für die integrierte Geschichten-Audioprobe umgesetzt: DE/FR/EN automatisch, andere App-Sprachen Englisch; ausdrückliche Tonwahl unabhängig von den Untertiteln in der App-Sprache. Weitere Kursmedien bleiben S03.
 - [ ] **S02 · Übersetzungen und Untertitel prüfen.** Derzeit elf Untertitelsprachen als Entwürfe: DE, FR, EN, ES, IT, PT, NL, TR, AR, ZH, JA. Inhalt, Fachbegriffe, Lesbarkeit und Zeitabgleich für jede Tonspur prüfen; weitere tatsächlich unterstützte App-Sprachen ergänzen oder fehlende Übersetzung ehrlich anzeigen.
 - [ ] **S03 · Alle fertigen Kurse in drei Tonsprachen bereitstellen.** Bisher existiert nur die Geschichten-Kursprobe. Für jede neue Lektion geprüfte DE/FR/EN-Tonspuren, Transkripte und passende Untertitel erzeugen; heruntergeladene Medien eindeutig beschriften.
 - [ ] **S04 · Barrierefreiheit und Geräteverhalten prüfen.** Tastatur, Fokus, Screenreader, Kontrast, Textvergrößerung, RTL und schmale Displays prüfen; Untertitel, Tempo und Pausen auf echten Mobilgeräten testen.
@@ -469,3 +469,10 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 - Coach-Wechsel erhält eine laufende Abrufantwort. Globale und individuelle Auswahl sind getrennt gespeichert.
 - Zeitspannen unter den Zeitwahl-Buttons auf 72 % der Hauptschrift verkleinert und farblich gedämpft; Startdauer unverändert.
 - Natürliche Sprechbewegungen und die Integration der Tonspuren sind weiterhin offen.
+
+### Arbeitsstand: illustrierte Geschichten-Audioprobe (2026-09-30)
+
+- C05/C06/I01/I03/Q01 teilweise umgesetzt: lokale DE/EN/FR-Tonspuren, elf Untertitelentwürfe, vollständiger Sprechtext, Tempo 0,5–2×, Kapitel und Vorlese-/Lesewechsel.
+- Vor der gesprochenen Lösung wechselt der Player in dieselbe Abrufübung wie Lesen; kein zweiter Fortschrittszähler und kein Abschluss durch bloßes Anhören.
+- Rund 3 MB Audio ausdrücklich im PWA-Cache; keine Sprachmodelle, privaten Nutzeraufnahmen oder großen Videos gebündelt.
+- Akzeptierte deutsche Tonspur bytegleich übernommen. Hörprüfung von EN/FR, weitere Kursmedien und natürliche Sprechbewegungen bleiben offen.
