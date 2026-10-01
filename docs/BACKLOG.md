@@ -587,3 +587,17 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 - Sechs unveränderte lokale Wiederholungen des betroffenen englischen Lin-Ablaufs bestanden mit aktivierter Fehleraufzeichnung. Die Ursache ist damit nicht abschließend geklärt; keine Produktkorrektur oder vollständige Abnahme behaupten.
 - Kursprüfungen behalten jetzt die Aufzeichnung des ersten fehlgeschlagenen Versuchs. Browserfehler erhalten ein Bildschirmfoto; GitHub CI sichert vorhandene Diagnoseartefakte bei Fehlern für sieben Tage. Timeouts, Assertions, Retry-Regeln und failOnFlakyTests bleiben unverändert.
 - Typprüfung und Testsammlung bestanden. Ein neuer vollständiger Gate prüft diesen Stand. Weitere Lernbilder für Wörter/Zahlen bleiben bis dahin zurückgestellt.
+
+### Wortbausteine und Zahl-Rückweg (lokal vorbereitet, 2026-10-01)
+
+- Lange Wörter zeigen nach den Bausteinen wieder die vollständige Schreibung: Krankenversicherungsbeitrag, unpredictability und incompréhensible. Die Bausteine bleiben Lernhilfen und ersetzen nicht die Ausspracheerklärung des Kurses.
+- Zahlenbilder zeigen Tanne, Dose beziehungsweise eine Tonne Sand passend zur jeweiligen Tonspur. Der Rückweg ordnet t der 1 und n der 2 zu; die Erläuterung unterscheidet Konsonantenlaute von Vokalen und doppelt geschriebenen Buchstaben.
+- Sechs Prüfungen für DE/EN/FR auf Desktop und Mobilansicht bestanden: richtige Wörter/Bilder, Rückdekodierung, kein horizontaler Überlauf und Ausblenden bei der Abruffrage. Typprüfung, Build und unverändertes Größenbudget bestanden.
+- CI #1649 hat den zuvor schwankenden Offline-Kurstest und die Layout-Matrix bestanden; Vollregression noch laufend. Diese neuen Lernbilder bleiben zunächst lokal, damit der laufende vollständige Gate nicht durch einen weiteren Push abgebrochen wird. Die Ursache des früheren einmaligen Offline-Ausfalls bleibt ungeklärt.
+
+### CI #1649: Rennen beim Ankommen behoben (2026-10-01)
+
+- Alle Kursprüfungen einschließlich des vorherigen Offline-Falls bestanden. Desktop-Vollregression: 194 bestanden, ein schwankender Techniktest; Mobile-Gate dadurch übersprungen.
+- Die gesicherte Fehleransicht zeigt bereits die richtige erste Major-Lektion. Der Test wartete trotzdem weiter auf einen Klick auf den verschwundenen Ankommen-Knopf: Der reale Drei-Sekunden-Timer hatte den Übergang vorher abgeschlossen.
+- Der gemeinsame Starthelfer der Techniktests wartet jetzt auf die echte Lektion nach dem automatischen Übergang. Keine erzwungenen Klicks, keine simulierte Uhr und keine Änderung am Produktablauf. Die inhaltlichen Prüfungen und failOnFlakyTests bleiben unverändert.
+- Die lokal vorbereiteten Wort-/Zahlenbilder werden zusammen mit dieser Testkorrektur in den nächsten vollständigen Gate aufgenommen. Die Ursache des früheren Offline-Ausfalls bleibt gesondert offen, obwohl der Ablauf in #1649 bestanden hat.

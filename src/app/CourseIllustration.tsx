@@ -5,6 +5,11 @@ const labels={
  en:{title:'The method in a diagram',meaning:['Action','Effect','Condition'],verbatim:['Sentence 1','Sentence 2','Sentence 3'],recall:['Study the source','Hide it','Recall','Compare'],spaced:['Recall','Pause','Recall again','Adjust interval'],groups:['Fruit','Tools','Clothing'],explain:['Claim','Reason','Check an example'],loci:['Door · bread','Shelf · soap','Table · candle'],keyword:['pain','pan → jumping bread','bread'],word:['un','predict','ability'],number:['12','t + n','tin'],mixed:['Identify the goal','Choose a method','Check the solution']},
  fr:{title:'La méthode en schéma',meaning:['Mesure','Effet','Condition'],verbatim:['Phrase 1','Phrase 2','Phrase 3'],recall:['Étudier le modèle','Le masquer','Rappeler','Comparer'],spaced:['Rappel','Pause','Nouveau rappel','Adapter l’intervalle'],groups:['Fruits','Outils','Vêtements'],explain:['Affirmation','Raison','Vérifier un exemple'],loci:['Porte · pain','Étagère · savon','Table · bougie'],keyword:['bell','belle','cloche'],word:['in','compréhensible'],number:['12','t + n','tonne'],mixed:['Identifier le but','Choisir une méthode','Vérifier la solution']},
 }
+const reconstruction={
+ de:{word:'Bausteine zusammenfügen',reverse:'Vom Bild zurück zur Zahl',note:'Konsonantenlaute zählen; Vokale und doppelte Buchstaben zählen nicht zusätzlich.'},
+ en:{word:'Put the word parts together',reverse:'From the image back to the number',note:'Count consonant sounds; vowels and doubled letters do not add digits.'},
+ fr:{word:'Réunir les parties du mot',reverse:'De l’image au nombre',note:'Compte les sons consonantiques ; les voyelles et les lettres doublées n’ajoutent pas de chiffres.'},
+}
 const groupedItems={
  de:[['Apfel','Birne','Banane'],['Hammer','Säge','Zange'],['Hemd','Jacke','Hose']],
  en:[['Apple','Pear','Banana'],['Hammer','Saw','Pliers'],['Shirt','Jacket','Trousers']],
@@ -46,6 +51,11 @@ export function CourseIllustration({id,locale}:{id:CourseId;locale:CourseLanguag
    </g>
    <g fill="currentColor" textAnchor="middle" fontSize="13"><text x="55" y="137">1</text><text x="160" y="137">2</text><text x="274" y="137">3</text></g>
   </svg>}
+  {id==='number-images'&&<svg viewBox="0 0 300 120" role="img" aria-label={t.number[2]}>
+   <g fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round">
+    {locale==='de'?<><path d="M150 10 120 46h15l-30 32h30l-35 25h100l-35-25h30l-30-32h15Z" fill="var(--an-gold,#c2a564)"/><path d="M145 103v12h10v-12"/></>:locale==='en'?<><ellipse cx="150" cy="25" rx="36" ry="12"/><path d="M114 25v68c0 16 72 16 72 0V25M114 45c0 16 72 16 72 0m-72 28c0 16 72 16 72 0"/></>:<><path d="m80 102 65-77 75 77Z" fill="var(--an-gold,#c2a564)"/><path d="M95 102h110v12H95Z"/><text x="150" y="89" textAnchor="middle" fill="currentColor" stroke="none" fontSize="18">1 t</text></>}
+   </g>
+  </svg>}
   <ol>{steps.map((label,index)=><li key={label}>
    <span className="illustration-number" aria-hidden="true">{index+1}</span>{label}
    {id==='meaningful-groups'&&<>
@@ -53,6 +63,16 @@ export function CourseIllustration({id,locale}:{id:CourseId;locale:CourseLanguag
     {groupedItems[locale][index].map(item=><p key={item}>{item}</p>)}
    </>}
   </li>)}</ol>
+  {id==='long-words'&&<div className="word-reconstruction">
+   <p>{reconstruction[locale].word}</p>
+   <p aria-hidden="true">{t.word.join(' + ')} →</p>
+   <p><strong style={{overflowWrap:'anywhere'}}>{t.word.join('')}</strong></p>
+  </div>}
+  {id==='number-images'&&<div className="number-reconstruction">
+   <p>{reconstruction[locale].reverse}</p>
+   <p>{t.number[2]} → t → 1; n → 2 ⇒ <strong>12</strong></p>
+   <p>{reconstruction[locale].note}</p>
+  </div>}
  </figure>
 }
 

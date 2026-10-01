@@ -573,3 +573,35 @@ for(const copy of [
   await context.setOffline(false)
  })
 }
+
+for(const language of ['de','en','fr'] as const){
+ test(`word reconstruction and number decoding follow the ${language} example`,async({page})=>{
+  await visit(page)
+  await openPage(page,'Lernkurse')
+  for(const [title,id,expected] of [
+   ['Lange Wörter sicher behalten','long-words',{de:'Krankenversicherungsbeitrag',en:'unpredictability',fr:'incompréhensible'}[language]],
+   ['Zahlen in Bilder übersetzen','number-images',{de:'Tanne',en:'tin',fr:'tonne'}[language]],
+  ]){
+   await page.getByRole('button',{name:`Kurs öffnen : ${title}`,exact:true}).click()
+   await page.getByRole('button',{name:'Anhören und ansehen',exact:true}).click()
+   await page.locator('#course-audio-language').selectOption(language)
+   const pack=courseNarration(id as 'long-words'|'number-images',language,'rafael')!
+   const audio=page.locator('.course-media audio')
+   await audio.evaluate((element:HTMLAudioElement)=>element.load())
+   await expect.poll(()=>audio.evaluate((element:HTMLAudioElement)=>element.readyState)).toBeGreaterThan(0)
+   const seek=async(section:string)=>{await audio.evaluate((element:HTMLAudioElement,time)=>{element.currentTime=time;element.dispatchEvent(new Event('timeupdate'))},pack.cues.find(cue=>cue.section===section)!.start+.1)}
+   await seek('example')
+   const diagram=page.locator('.course-media .course-illustration')
+   if(id==='long-words')await expect(diagram.locator('.word-reconstruction strong')).toHaveText(expected)
+   else {
+    await expect(diagram.getByRole('img',{name:expected,exact:true})).toBeVisible()
+    await expect(diagram.locator('.number-reconstruction')).toContainText('t → 1; n → 2 ⇒ 12')
+   }
+   await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true)
+   await seek('recall')
+   await expect(diagram).toHaveCount(0)
+   await page.getByRole('button',{name:'Nur lesen',exact:true}).click()
+   await page.getByRole('button',{name:'Zur Kursübersicht',exact:true}).click()
+  }
+ })
+}

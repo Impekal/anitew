@@ -76,7 +76,10 @@ async function seedTaught(page: Page, digits: readonly number[]) {
 async function startShort(page: Page) {
   await page.getByRole('button', { name: '3 Minuten' }).click()
   await startButton(page).click()
-  await page.locator('.settle').click()
+  // Arriving ends automatically after three seconds. A click can race that
+  // transition and then wait forever for a button that correctly disappeared.
+  // These tests verify lessons; let the real timer reveal the lesson instead.
+  await expect(page.locator('.lesson')).toBeVisible({ timeout: 10_000 })
 }
 
 test('der Gedächtnispalast bleibt stehen, bis der Mensch bewusst weitergeht', async ({ page }) => {
