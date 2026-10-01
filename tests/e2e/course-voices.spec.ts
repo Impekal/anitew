@@ -1,7 +1,9 @@
 import {test,expect} from '@playwright/test'
 import {visit,openPage} from './helpers.ts'
 import {courseNarration} from '../../src/i18n/courseNarrations.ts'
-test.use({channel:'chromium',launchOptions:{args:['--disable-gpu']}})
+// On macOS a missing audio output device can freeze Chromium's playback clock.
+// Keep real media decoding and timing, but use its silent output sink in local tests.
+test.use({channel:'chromium',launchOptions:{args:['--disable-gpu',...(process.platform==='darwin'?['--disable-audio-output']:[])]}})
 for (const language of ['de'] as const) test(`${language}: Atta and Lin use different saved voices offline, while Noah keeps his original recording`,async({page,context})=>{
  test.setTimeout(90_000)
  const external:string[]=[]

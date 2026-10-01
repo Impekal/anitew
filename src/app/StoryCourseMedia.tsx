@@ -42,7 +42,8 @@ export function StoryCourseMedia({coach,language,platform,solution=false,onRecal
   const mediaSrc=playingVideo?videoAsset!.src:pack.src
   const translated=courseId!=='story-method'?libraryCaptions(courseId,spoken,language):undefined
   const subtitleLanguage=library?(translated?language:spoken):language
-  const captions=library?translated??library[spoken].cues.map(cue=>cue.text):storyMedia.subtitles[language]
+  const baseCaptions=library?translated??library[spoken].cues.map(cue=>cue.text):storyMedia.subtitles[language]
+  const captions=subtitleLanguage===spoken&&narration?baseCaptions.map((text,index)=>narration.cues[index]?.spokenText??text):baseCaptions
   const vtt=enabled&&playingVideo?videoCaptions(pack.cues,captions):''
   useEffect(()=>{
     if(!vtt){setCaptionSource('');return}
@@ -87,7 +88,9 @@ export function StoryCourseMedia({coach,language,platform,solution=false,onRecal
     if(!solution && element.currentTime>=recallBoundary){element.pause();recall();return}
     setTime(element.currentTime)
   }
-  function seek(index:number){if(player.current){player.current.currentTime=pack.cues[index].start;setTime(pack.cues[index].start)}}
+  // Native media clocks may round a fractional cue boundary slightly backwards.
+  // Seek inside the cue so a chapter does not display the preceding silent gap.
+  function seek(index:number){if(player.current){const target=Math.min(pack.cues[index].start+.01,pack.cues[index].end);player.current.currentTime=target;setTime(target)}}
   return <section className="course-media" aria-label={t.title}>
     <h4>{t.title}</h4><p className="hint">{playingVideo?vt.note:t.note}</p>
     <p className="hint">{locale==='de'?'Tonspur':locale==='fr'?'Piste audio':'Audio'}: {Math.floor(Math.ceil(pack.duration/preferences.speed)/60)}:{String(Math.ceil(pack.duration/preferences.speed)%60).padStart(2,'0')} · {locale==='de'?'Übungszeit zusätzlich':locale==='fr'?'temps de pratique en plus':'plus practice time'}</p>
@@ -111,7 +114,7 @@ export function StoryCourseMedia({coach,language,platform,solution=false,onRecal
       {library && language!==subtitleLanguage && <p className="hint">The translated subtitles for this audio track are being prepared. Its original spoken text is shown here.</p>}
       <div className={`course-playback${playingVideo?' has-video':''}`}><div className="course-screen">
       <MediaElement {...(playingVideo&&coach?{poster:`/coaches/${coach}.webp`}:{})} key={`player-${mediaSrc}`} ref={element=>{player.current=element}} controls playsInline crossOrigin="anonymous" preload="none" src={mediaSrc} aria-label={t.title} onError={()=>setError(playingVideo?vt.failed:t.failed)} onTimeUpdate={sync} onSeeking={sync} onSeeked={sync} onPlay={sync} onLoadedMetadata={()=>{
-        if(player.current){player.current.playbackRate=preferences.speed;player.current.preservesPitch=true;if(solution){player.current.currentTime=gate;setTime(gate)}}
+        if(player.current){player.current.playbackRate=preferences.speed;player.current.preservesPitch=true;if(solution){player.current.currentTime=gate+.01;setTime(gate+.01)}}
       }}>{playingVideo&&captionSource&&<track key={captionSource} kind="captions" src={captionSource} srcLang={subtitleLanguage} label={subtitleLanguage.toUpperCase()} default />}</MediaElement>
       <div className="course-media-chapters">
         <button type="button" onClick={()=>seek(0)}>{t.intro}</button>
@@ -130,7 +133,7 @@ export function StoryCourseMedia({coach,language,platform,solution=false,onRecal
       <p className="course-caption" lang={subtitleLanguage} dir="auto">{safeCue>=0?captions[safeCue]:''}</p>
       </div></div>
       <details><summary>{t.transcript}</summary><div lang={subtitleLanguage} dir={subtitleLanguage==='ar'?'rtl':'ltr'}>{captions.map((line,index)=><p key={index} dir="auto">{line}</p>)}</div></details>
-      <details><summary>{t.credits}</summary>{narration?.synthesis==='kyutai-openvoice'?<p>{voiceName} · KI / AI · <a href="https://huggingface.co/kyutai/tts-1.6b-en_fr">Kyutai TTS · CC BY 4.0</a>. Fabien (CC0) → <a href="https://huggingface.co/kyutai/tts-voices/blob/main/README.md">CML-TTS FR 1406 · CC BY 4.0</a>. <a href="https://openslr.org/146/">CML-TTS: Oliveira et al.</a> · <a href="https://github.com/myshell-ai/OpenVoice">OpenVoice V2 · MIT</a>. Adaptation: ANITEW · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.</p>:narration?.synthesis?<p>{voiceName} · KI / AI · <a href="https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base">Qwen3-TTS · Apache 2.0</a>{narration.synthesis==='qwen-openvoice'&&<> · <a href="https://github.com/myshell-ai/OpenVoice">OpenVoice V2 · MIT</a> · <a href="https://huggingface.co/rhasspy/piper-voices/blob/main/en/en_US/joe/medium/MODEL_CARD">Piper Joe · CC0</a></>}.</p>:narration?<p>Qwen3-TTS · Apache 2.0 · {voiceName} · {locale==='de'?'KI-Stimme, lokal erzeugt.':'Locally generated AI voice.'} <a href="https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base">Qwen3-TTS</a> · ANITEW: Thorsten (CC0), <a href="https://github.com/thorstenMueller/Thorsten-Voice">Namensreferenz / name reference</a>.</p>:<><p>Piper · Deutsch: Thorsten (CC0-Datensatz) · English: Joe (CC0 dataset) · Français: Tom (AGPLv3 model/dataset). Synthetic audio; models are not included.</p>
+      <details><summary>{t.credits}</summary>{narration?.synthesis==='kyutai-openvoice'?<p>{voiceName} · KI / AI · <a href="https://huggingface.co/kyutai/tts-1.6b-en_fr">Kyutai TTS · CC BY 4.0</a>. Fabien (CC0) → {narration.coach==='lin'?<a href="https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign">Lin · Qwen VoiceDesign · Apache 2.0</a>:<><a href="https://huggingface.co/kyutai/tts-voices/blob/main/README.md">CML-TTS FR 1406 · CC BY 4.0</a>. <a href="https://openslr.org/146/">CML-TTS: Oliveira et al.</a></>} · <a href="https://github.com/myshell-ai/OpenVoice">OpenVoice V2 · MIT</a>. Adaptation: ANITEW · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.</p>:narration?.synthesis?<p>{voiceName} · KI / AI · <a href="https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base">Qwen3-TTS · Apache 2.0</a>{narration.synthesis==='qwen-openvoice'&&<> · <a href="https://github.com/myshell-ai/OpenVoice">OpenVoice V2 · MIT</a> · {narration.coach==='lin'?<a href="https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign">Lin · Qwen VoiceDesign · Apache 2.0</a>:<a href="https://huggingface.co/rhasspy/piper-voices/blob/main/en/en_US/joe/medium/MODEL_CARD">Piper Joe · CC0</a>}</>}.</p>:narration?<p>Qwen3-TTS · Apache 2.0 · {voiceName} · {locale==='de'?'KI-Stimme, lokal erzeugt.':'Locally generated AI voice.'} <a href="https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base">Qwen3-TTS</a> · ANITEW: Thorsten (CC0), <a href="https://github.com/thorstenMueller/Thorsten-Voice">Namensreferenz / name reference</a>.</p>:<><p>Piper · Deutsch: Thorsten (CC0-Datensatz) · English: Joe (CC0 dataset) · Français: Tom (AGPLv3 model/dataset). Synthetic audio; models are not included.</p>
         <ul><li><a href="https://github.com/thorstenMueller/Thorsten-Voice">Thorsten Voice</a></li><li><a href="https://huggingface.co/rhasspy/piper-voices/blob/main/en/en_US/joe/medium/MODEL_CARD">Joe model card</a></li><li><a href="https://huggingface.co/rhasspy/piper-voices/blob/main/fr/fr_FR/tom/medium/MODEL_CARD">Tom model card</a></li></ul></>}
         {playingVideo && <ul><li><a href="https://github.com/OpenTalker/SadTalker">SadTalker · Apache 2.0</a></li><li><a href="https://github.com/KlingAIResearch/LivePortrait/blob/main/LICENSE">LivePortrait · MIT</a></li></ul>}
       </details>

@@ -1,4 +1,4 @@
-# Kursmedien — Stand 2026-09-30
+# Kursmedien — Stand 2026-10-01
 
 ## Bereits in der App
 
@@ -34,11 +34,13 @@ Lippensynchronität abgelehnt. Der lange Renderlauf wurde gestoppt; diese
 Clips werden nicht integriert. Die Player-, Untertitel- und Offline-Technik
 wurde mit isolierten Testdateien geprüft, die nicht ausgeliefert werden.
 
-Noah behält die bestätigte Männerstimme. Lin und Atta sollen jeweils eine
-eigene natürliche Männerstimme erhalten. Die bisherige Entscheidung für
-eine gemeinsame Stimme ist damit ersetzt. Kurze Hör- und Sprechproben
-gehen der Produktion vollständiger Kurse voraus. Die akzeptierte
-ANITEW-Aussprache bleibt sprachübergreifend die Referenz.
+Drei eigene Männerstimmen ersetzen die frühere gemeinsame Stimme. Bestätigt
+sind Atta und Lin auf Deutsch, Englisch und Französisch sowie Noah auf
+Englisch. Noahs neue französische Probe wurde nicht akzeptiert. Sie bleibt
+außerhalb der App; die bisherigen Basistonspuren bleiben erhalten.
+Die bestätigten Kurzproben dienen als Referenzen für die vollständigen Kurse;
+sie ersetzen keine vollständige Hörabnahme. Deutsche Namensstellen benötigen
+noch die Umstellung auf die jeweilige eigene Stimme.
 
 ## Weitere Integration
 

@@ -147,3 +147,25 @@ The manifest records file hashes, recipes and sources. Player credits link to
 Kyutai, CML-TTS and their CC-BY-4.0 licences, and to OpenVoice (MIT). The existing
 German recordings' old name handling still needs migration; these new story
 recordings do not silently certify or replace every earlier language track.
+
+## Ausbau der bestätigten Stimmen auf die Bibliothek, 2026-10-01
+
+Lin wurde auch auf Englisch und Französisch bestätigt. Die vollständigen zwölf
+Kurse erhalten Atta/Noah/Lin auf Englisch und Atta/Lin auf Französisch. Zusammen
+mit den 24 deutschen Aufnahmen enthält der Coach-Katalog 84 zusätzliche
+Tonspuren; die 36 ursprünglichen Dateien bleiben erhalten. Noahs neue
+französische Probe bleibt ausdrücklich ausgeschlossen.
+
+Die Inhaltsprüfung verwendet vollständige, unabhängige Transkriptionen und
+gezielte Zweitprüfungen auffälliger Sätze. Französische Formeln werden
+sprachlich erklärt; schwierige isolierte Buchstabennamen werden durch
+Lautbeispiele wie tapis/dos/nez ergänzt. Gleichsprachige Untertitel und
+Sprechtext übernehmen diese dokumentierten Formulierungen, übersetzte
+Untertitel behalten den Lerninhalt und die jeweiligen Zeitmarken. Das
+ursprüngliche Übungsbeispiel bleibt die Grundlage des Selbstvergleichs.
+
+Diese Prüfung bestätigt keine muttersprachliche Hörqualität. Vollständige
+Hörabnahme, Noah Französisch, deutsche Namensstellen und natürliche
+Sprechvideos bleiben offen. Die bereits verworfenen Videoproben werden
+nicht ausgeliefert. Zusätzliche Medien werden bewusst heruntergeladen;
+beim Start wird keine gesamte Coach-Bibliothek vorgeladen.

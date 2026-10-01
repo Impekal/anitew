@@ -401,7 +401,7 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 ### 2. Coaches, Stimme und Kursdarstellung
 
 - [ ] **C01 · Natürliche Sprechbewegungen erreichen.** Lippensynchronität, Mimik, Blick und kleine Kopfbewegungen mit geeigneten kostenlosen Werkzeugen prüfen und brauchbare Clips erzeugen. Bisherige Animation abgelehnt; derzeit nur statische Portraits. Ein Standbild erfüllt dieses Ziel nicht.
-- [ ] **C02 · Bestätigte Namensaussprache in allen Kursen sichern.** Die akzeptierte männliche Referenz aus Probe 14 für ANITEW verwenden; Wortübergänge, Betonung und Lautstärke in DE/FR/EN prüfen. Keine neue Aussprache aus Schreibvarianten ableiten.
+- [ ] **C02 · Bestätigte Namensaussprache in allen Kursen sichern.** Die zuletzt ausdrücklich bestätigten Kurzreferenzen für jede Stimme verwenden; ANITEW soll sprachübergreifend dieselbe Lautfolge und Betonung haben. Jeder Coach spricht den Namen selbst, ohne eingesetzte fremde Namensstimme. Wortübergänge und Lautstärke prüfen. Die älteren deutschen Namensstellen benötigen noch eine Korrektur.
 - [ ] **C03 · Drei eigene Stimmen und Sprachfassungen prüfen.** Neue Nutzervorgabe vom 30. September: unterschiedliche Stimmen für Noah, Lin und Atta. Bestätigte deutsche Männerstimme für Noah erhalten; natürliche eigene Männerstimmen für Lin und Atta auswählen, ohne künstliche Alters- oder Herkunftsakzente; englische und französische Fassungen auf Natürlichkeit, flüssige Aussprache, korrekte Wörter und Akzente prüfen und nötigenfalls verbessern. Nutzer-Hörprüfung der neuen Fassungen bleibt offen.
 - [x] **C04 · Coach-Auswahl in die App übernehmen.** Noah, Lin und Atta als gekennzeichnete KI-Coaches mit Standbildern integriert: Standard je Kurs, global oder individuell; dauerhaft und sprachübergreifend gespeichert. Alte Einstellungen derselben Origin werden übernommen. Die separate Vorschau auf einem anderen Port kann nicht automatisch ausgelesen werden. Sprechvideos bleiben C01–C03.
 - [ ] **C05 · Illustrationen und Animationen je Methode erstellen.** Bilder schrittweise passend zur Erklärung aufbauen; Beispiele vor dem Abruf ausblenden. Bewegungen müssen Lerninhalte erklären und die reduzierte Bewegungseinstellung respektieren.
@@ -546,3 +546,21 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 - Bestätigte französische C-Stimme wird auf ausdrücklichen Wunsch Atta zugeordnet. Geschichtenkurs EN (Atta/Noah) und FR (Atta) werden zuerst übernommen. CI #1643 scheiterte an einer langen Aufgabe im Desktop-Leerlauf (auch beim Wiederholen); Messgrenze bleibt unverändert, Diagnoseausgabe wird verbessert.
 
 - Geschichtenkurs: neue EN-Tonspuren für Atta/Noah und FR-Tonspur für Atta lokal integriert, mit passenden Untertiteltakten, Quellen und Offline-Download. 606 Kerntests, 6 Desktop-/Mobil-Stimmenprüfungen und 3 Wiederholungen des unveränderten Leerlauftests bestanden; Typprüfung, Build und Kaltstartbudget grün. CI #1643 bleibt fehlgeschlagen; ein neuer Gate folgt auf diesem Stand. Weitere Kurse, übrige Sprach-/Coach-Kombinationen, deutsche Namensmigration und Sprechvideoqualität bleiben offen.
+
+### Weiterarbeit ohne Rückfragen, 2026-10-01
+
+- Nutzer bestätigt Lin auf Englisch und Französisch. Beide Varianten werden auf vollständige Kurse übertragen. Noah Französisch ist weiterhin abgelehnt und bleibt als offener Hörpunkt für morgen außerhalb des neuen Katalogs.
+- Nutzer geht schlafen: keine weiteren Fragen; alle unabhängig ausführbaren Arbeiten fortsetzen. Hörentscheidungen und ungelöste Sprechvideoqualität getrennt offen halten.
+- CI #1644 scheiterte am alten Offline-Test: Noahs neue EN-Datei benötigt den gezielten Download. Test angepasst, ursprüngliche Dateien zusätzlich offline geprüft; Desktop und Mobilgerät bestanden. Messgrenzen unverändert.
+
+### Ausbau nach Freigabe von Lin (2026-10-01)
+
+- Lin Englisch und Französisch ausdrücklich bestätigt. Noahs neue französische Probe bleibt abgelehnt und wird nicht ausgeliefert. Keine weiteren Fragen während der vom Nutzer angekündigten Nachtpause.
+- 57 weitere vollständige Tonspuren integriert: elf zusätzliche Kurse für Atta/Noah Englisch und Atta Französisch sowie alle zwölf für Lin Englisch/Französisch. Der Katalog umfasst damit 84 Coach-Aufnahmen neben den 36 erhaltenen Basistonspuren.
+- Unabhängige Volltranskriptionen und gezielte Zweitprüfungen führten zu Korrekturen französischer Formeln, Zahl-Laut-Beispiele und Übungsanweisungen. Gleichsprachige Untertitel und Sprechtext übernehmen die dokumentierten mündlichen Formulierungen; übersetzte Untertitel und Übungsmaterial bleiben inhaltlich konsistent. Automatische Prüfung ist keine abschließende Hörfreigabe.
+- Quellen unterscheiden nun Lins synthetische Qwen-Stimmreferenz von Noahs Piper-Joe- und Attas französischer CML-TTS-Referenz. Alle Medien bleiben lokal und werden gezielt heruntergeladen.
+- Für die morgige Bewertung offen: Noah Französisch, vollständige Hörabnahme einschließlich der Namensstellen, deutsche eigene Namensaussprache und natürliche Sprechvideos. Echte Mobilgeräte und abschließende Untertitelprüfung bleiben gesonderte Abnahmen.
+
+- Lokale Prüfung: 606 Kernprüfungen, Typprüfung, Build und Kaltstartbudget bestanden. Eine mobile Rundung der Medienzeit konnte nach einem Kapitelsprung einen leeren Untertitel anzeigen; Kapitelsprünge liegen jetzt 10 ms innerhalb des Zielabschnitts.
+- Lokale macOS-Testumgebung: Chromium blieb auch bei einer unveränderten alten Tonspur ohne App-Player bei 23–43 ms stehen. Mit stummer Audioausgabe läuft die reale Medienuhr korrekt. Die beiden Wiedergabetests nutzen deshalb ausschließlich auf macOS Chromiums stumme Ausgabe; echte Dekodierung, Zeitfortschritt und alle Assertions bleiben erhalten. Linux-CI unverändert.
+- Nach den Korrekturen bestanden alle 14 gezielten Desktop-/Mobilprüfungen: eigene Stimmen, Offline-Neustart, erhaltene Basistonspuren, französischer Sprechtext/Quellen, passende Zeitmarken und Abrufsperre. Neuer strenger Gesamt-Gate auf diesem Commit erforderlich.

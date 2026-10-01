@@ -525,17 +525,17 @@
     "bytes": 1032953,
     "sha256": "09771673ca2ab4eafc6d424170f8a9c1e8c8972ab4b7fa3f7b84d5557d53d69b",
     "status": "Short reference explicitly approved by user; full narration decoded and checked with transcription, not a complete human listening approval.",
-    "recipe": "Qwen3-TTS Atta original approved DE reference + own approved English greeting; OpenVoice full-cue conversion for Noah",
+    "recipe": "Qwen3-TTS with approved synthetic Atta reference; whole cues in the same voice",
     "referenceManifest": "approved-language-references/manifest.json",
     "src": "/course-media/library/atta-story-en-09771673ca2a.m4a",
     "synthesis": "qwen-own-name",
     "nameReference": "Same-coach complete approved greeting; no other-speaker name insertion.",
     "sources": [
       "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "https://github.com/myshell-ai/OpenVoice"
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
     ],
-    "voiceSource": "Synthetic approved Atta voice; Noah timbre from existing Piper Joe synthetic sample",
-    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT",
+    "voiceSource": "Synthetic approved Atta voice generated with Qwen3-TTS VoiceDesign and Base",
+    "modelLicense": "Qwen3-TTS Apache-2.0",
     "approvedReferenceHashes": {
       "atta-en": "839c32cbe230d24598ed6d4e9d34f9bced2edc58aad3905c69160f85b400c0db"
     },
@@ -593,5 +593,2130 @@
       "fr-timbre": "d9e21ce03fd29e6bd4645ca126bf10dc14f8e6f07e4124cafd722276904b0e07"
     },
     "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta."
+  },
+  {
+    "coach": "rafael",
+    "language": "en",
+    "course": "active-recall",
+    "duration": 90.51,
+    "bytes": 1081144,
+    "sha256": "40e068d14139a166b72699303ebdf446598b5c264f980ad963f070323015e616",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Qwen3-TTS with approved synthetic Atta reference; whole cues in the same voice",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/atta-active-recall-en-40e068d14139.m4a",
+    "synthesis": "qwen-own-name",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic approved Atta voice generated with Qwen3-TTS VoiceDesign and Base",
+    "modelLicense": "Qwen3-TTS Apache-2.0",
+    "approvedReferenceHashes": {
+      "atta-en": "839c32cbe230d24598ed6d4e9d34f9bced2edc58aad3905c69160f85b400c0db"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "40e068d14139a166b72699303ebdf446598b5c264f980ad963f070323015e616",
+      "notes": "Brand recognized as Any2/Any tool; spelling is not a pronunciation verdict. Singular/plural recognition does not change the instruction."
+    }
+  },
+  {
+    "coach": "rafael",
+    "language": "en",
+    "course": "interleaved-practice",
+    "duration": 94.96008333333332,
+    "bytes": 1166445,
+    "sha256": "59cda2e395b39f1c431a1c8895fee2c7db5e91023baa86ce32c54bc444894d41",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Qwen3-TTS with approved synthetic Atta reference; whole cues in the same voice",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/atta-interleaved-practice-en-59cda2e395b3.m4a",
+    "synthesis": "qwen-own-name",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic approved Atta voice generated with Qwen3-TTS VoiceDesign and Base",
+    "modelLicense": "Qwen3-TTS Apache-2.0",
+    "approvedReferenceHashes": {
+      "atta-en": "839c32cbe230d24598ed6d4e9d34f9bced2edc58aad3905c69160f85b400c0db"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "59cda2e395b39f1c431a1c8895fee2c7db5e91023baa86ce32c54bc444894d41",
+      "notes": "Spoken formulas match rectangle length times width and triangle base times height divided by two; 12 and 6 square centimetres verified."
+    }
+  },
+  {
+    "coach": "rafael",
+    "language": "en",
+    "course": "keyword-method",
+    "duration": 84.96,
+    "bytes": 1010546,
+    "sha256": "92226bc3950ca0125267c80bff903ab30594f89e37792dc9e015eba346adc198",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Qwen3-TTS with approved synthetic Atta reference; whole cues in the same voice",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/atta-keyword-method-en-92226bc3950c.m4a",
+    "synthesis": "qwen-own-name",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic approved Atta voice generated with Qwen3-TTS VoiceDesign and Base",
+    "modelLicense": "Qwen3-TTS Apache-2.0",
+    "approvedReferenceHashes": {
+      "atta-en": "839c32cbe230d24598ed6d4e9d34f9bced2edc58aad3905c69160f85b400c0db"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "92226bc3950ca0125267c80bff903ab30594f89e37792dc9e015eba346adc198",
+      "notes": "French pain and Je mange du pain retained; isolated French recognition checked. Spelling differences across recognition languages are not voice approval."
+    }
+  },
+  {
+    "coach": "rafael",
+    "language": "en",
+    "course": "long-words",
+    "duration": 82.63,
+    "bytes": 960557,
+    "sha256": "9da6ab5e71fe9233ec57eb54e6627a4958c1aed81229afce5388a3bb67905f1b",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Qwen3-TTS with approved synthetic Atta reference; whole cues in the same voice",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/atta-long-words-en-9da6ab5e71fe.m4a",
+    "synthesis": "qwen-own-name",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic approved Atta voice generated with Qwen3-TTS VoiceDesign and Base",
+    "modelLicense": "Qwen3-TTS Apache-2.0",
+    "approvedReferenceHashes": {
+      "atta-en": "839c32cbe230d24598ed6d4e9d34f9bced2edc58aad3905c69160f85b400c0db"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "9da6ab5e71fe9233ec57eb54e6627a4958c1aed81229afce5388a3bb67905f1b",
+      "notes": "un/predict/ability rendered with separate pauses; recognition may concatenate parts. Negative prefix and full word retained."
+    }
+  },
+  {
+    "coach": "rafael",
+    "language": "en",
+    "course": "meaningful-groups",
+    "duration": 93.86999999999999,
+    "bytes": 1127582,
+    "sha256": "7297b86ca75aa49eab1d867b315614cbc5cc9176679a043111b3fe596fbe99ff",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Qwen3-TTS with approved synthetic Atta reference; whole cues in the same voice",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/atta-meaningful-groups-en-7297b86ca75a.m4a",
+    "synthesis": "qwen-own-name",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic approved Atta voice generated with Qwen3-TTS VoiceDesign and Base",
+    "modelLicense": "Qwen3-TTS Apache-2.0",
+    "approvedReferenceHashes": {
+      "atta-en": "839c32cbe230d24598ed6d4e9d34f9bced2edc58aad3905c69160f85b400c0db"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "7297b86ca75aa49eab1d867b315614cbc5cc9176679a043111b3fe596fbe99ff",
+      "notes": "Nine-item list regenerated with explicit pauses; Hammer/Pliers restored. Pear/pier and trousers spelling remain recognition ambiguities for final listening."
+    }
+  },
+  {
+    "coach": "rafael",
+    "language": "en",
+    "course": "method-of-loci",
+    "duration": 79.92,
+    "bytes": 957790,
+    "sha256": "ffb92e2c77c5fa30f5579452e92d08934f5b15e537103532559eb6815165750f",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Qwen3-TTS with approved synthetic Atta reference; whole cues in the same voice",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/atta-method-of-loci-en-ffb92e2c77c5.m4a",
+    "synthesis": "qwen-own-name",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic approved Atta voice generated with Qwen3-TTS VoiceDesign and Base",
+    "modelLicense": "Qwen3-TTS Apache-2.0",
+    "approvedReferenceHashes": {
+      "atta-en": "839c32cbe230d24598ed6d4e9d34f9bced2edc58aad3905c69160f85b400c0db"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "ffb92e2c77c5fa30f5579452e92d08934f5b15e537103532559eb6815165750f",
+      "notes": "Route and bread/soap/candle mappings retained; loci/lochi and cues/queues are recognition spellings."
+    }
+  },
+  {
+    "coach": "rafael",
+    "language": "en",
+    "course": "number-images",
+    "duration": 78.07999999999998,
+    "bytes": 946815,
+    "sha256": "8dab2d766116b8a8ee3266fe5d3a8064008127d6cc3568457853fc893b2bec1a",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Qwen3-TTS with approved synthetic Atta reference; whole cues in the same voice",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/atta-number-images-en-8dab2d766116.m4a",
+    "synthesis": "qwen-own-name",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic approved Atta voice generated with Qwen3-TTS VoiceDesign and Base",
+    "modelLicense": "Qwen3-TTS Apache-2.0",
+    "approvedReferenceHashes": {
+      "atta-en": "839c32cbe230d24598ed6d4e9d34f9bced2edc58aad3905c69160f85b400c0db"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "8dab2d766116b8a8ee3266fe5d3a8064008127d6cc3568457853fc893b2bec1a",
+      "notes": "T/D=1,N=2; tin returns 12. Spoken letter names and added connectors explain the symbols."
+    }
+  },
+  {
+    "coach": "rafael",
+    "language": "en",
+    "course": "self-explanation",
+    "duration": 96.67004166666666,
+    "bytes": 1183825,
+    "sha256": "7394e28b3ecb26ce6163c892e6ad996701e254f19cc97f066458d51105dbea3f",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Qwen3-TTS with approved synthetic Atta reference; whole cues in the same voice",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/atta-self-explanation-en-7394e28b3ecb.m4a",
+    "synthesis": "qwen-own-name",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic approved Atta voice generated with Qwen3-TTS VoiceDesign and Base",
+    "modelLicense": "Qwen3-TTS Apache-2.0",
+    "approvedReferenceHashes": {
+      "atta-en": "839c32cbe230d24598ed6d4e9d34f9bced2edc58aad3905c69160f85b400c0db"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "7394e28b3ecb26ce6163c892e6ad996701e254f19cc97f066458d51105dbea3f",
+      "notes": "3/4=6/8 and transfer 2/3=4/6 retained. Fractions spoken as words."
+    }
+  },
+  {
+    "coach": "rafael",
+    "language": "en",
+    "course": "spaced-practice",
+    "duration": 106.58999999999999,
+    "bytes": 1299417,
+    "sha256": "9746d25a3ac917786a4ff0d9b7bd24eb8c7089696de4a9ee3ddd679d509b1ed8",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Qwen3-TTS with approved synthetic Atta reference; whole cues in the same voice",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/atta-spaced-practice-en-9746d25a3ac9.m4a",
+    "synthesis": "qwen-own-name",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic approved Atta voice generated with Qwen3-TTS VoiceDesign and Base",
+    "modelLicense": "Qwen3-TTS Apache-2.0",
+    "approvedReferenceHashes": {
+      "atta-en": "839c32cbe230d24598ed6d4e9d34f9bced2edc58aad3905c69160f85b400c0db"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "9746d25a3ac917786a4ff0d9b7bd24eb8c7089696de4a9ee3ddd679d509b1ed8",
+      "notes": "Delay adjustment and no automatic extra review cards retained. Brand spelling and due/do are recognition ambiguities."
+    }
+  },
+  {
+    "coach": "rafael",
+    "language": "en",
+    "course": "text-meaning",
+    "duration": 88.11004166666666,
+    "bytes": 1057255,
+    "sha256": "1ac4b24baefd031bd3b1879037920fa97fa0e4c750ac151eb6bbdef6e8ca5db8",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Qwen3-TTS with approved synthetic Atta reference; whole cues in the same voice",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/atta-text-meaning-en-1ac4b24baefd.m4a",
+    "synthesis": "qwen-own-name",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic approved Atta voice generated with Qwen3-TTS VoiceDesign and Base",
+    "modelLicense": "Qwen3-TTS Apache-2.0",
+    "approvedReferenceHashes": {
+      "atta-en": "839c32cbe230d24598ed6d4e9d34f9bced2edc58aad3905c69160f85b400c0db"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "1ac4b24baefd031bd3b1879037920fa97fa0e4c750ac151eb6bbdef6e8ca5db8",
+      "notes": "Tree shade, evaporation, water/root-space conditions retained. Spurious Thank you starts at 87.6s and extends beyond 88s file end; treated as ASR silence hallucination, not a spoken sentence."
+    }
+  },
+  {
+    "coach": "rafael",
+    "language": "en",
+    "course": "text-verbatim",
+    "duration": 76.99004166666667,
+    "bytes": 916940,
+    "sha256": "c8f7054d2dae91b0bf7b19cdc2aaa38672924b4660dad3fa59b5b2b4b0c12501",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Qwen3-TTS with approved synthetic Atta reference; whole cues in the same voice",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/atta-text-verbatim-en-c8f7054d2dae.m4a",
+    "synthesis": "qwen-own-name",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic approved Atta voice generated with Qwen3-TTS VoiceDesign and Base",
+    "modelLicense": "Qwen3-TTS Apache-2.0",
+    "approvedReferenceHashes": {
+      "atta-en": "839c32cbe230d24598ed6d4e9d34f9bced2edc58aad3905c69160f85b400c0db"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "c8f7054d2dae91b0bf7b19cdc2aaa38672924b4660dad3fa59b5b2b4b0c12501",
+      "notes": "Hide-source instruction repaired and recognized. Exact three-sentence example retained."
+    }
+  },
+  {
+    "coach": "original",
+    "language": "en",
+    "course": "active-recall",
+    "duration": 90.43138321995463,
+    "bytes": 1064217,
+    "sha256": "bcde9144226ddfb4109dc799101c7104aa37f052f562fa001d04b5636f5569e9",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Qwen3-TTS Atta original approved DE reference; OpenVoice full-cue conversion for Noah",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/noah-active-recall-en-bcde9144226d.m4a",
+    "synthesis": "qwen-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://github.com/myshell-ai/OpenVoice"
+    ],
+    "voiceSource": "Synthetic approved Atta voice; Noah timbre from existing Piper Joe synthetic sample",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "atta-en": "839c32cbe230d24598ed6d4e9d34f9bced2edc58aad3905c69160f85b400c0db",
+      "noah-en": "2425373782da52e6cf0b326e75b0cf16c6b31b0fbb91914b023183a43a30dfff"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "bcde9144226ddfb4109dc799101c7104aa37f052f562fa001d04b5636f5569e9",
+      "notes": "Brand recognized as Any2/Any tool; spelling is not a pronunciation verdict. Singular/plural recognition does not change the instruction."
+    }
+  },
+  {
+    "coach": "original",
+    "language": "en",
+    "course": "interleaved-practice",
+    "duration": 94.89954648526076,
+    "bytes": 1152048,
+    "sha256": "c7dabb1ec36c0e3280d4e7d0b7797cfbc624b8173e3cc78fd2fe8188f1c287ac",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Qwen3-TTS Atta original approved DE reference; OpenVoice full-cue conversion for Noah",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/noah-interleaved-practice-en-c7dabb1ec36c.m4a",
+    "synthesis": "qwen-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://github.com/myshell-ai/OpenVoice"
+    ],
+    "voiceSource": "Synthetic approved Atta voice; Noah timbre from existing Piper Joe synthetic sample",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "atta-en": "839c32cbe230d24598ed6d4e9d34f9bced2edc58aad3905c69160f85b400c0db",
+      "noah-en": "2425373782da52e6cf0b326e75b0cf16c6b31b0fbb91914b023183a43a30dfff"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "c7dabb1ec36c0e3280d4e7d0b7797cfbc624b8173e3cc78fd2fe8188f1c287ac",
+      "notes": "Spoken formulas match rectangle length times width and triangle base times height divided by two; 12 and 6 square centimetres verified."
+    }
+  },
+  {
+    "coach": "original",
+    "language": "en",
+    "course": "keyword-method",
+    "duration": 84.91496598639453,
+    "bytes": 985328,
+    "sha256": "db1d76286a1eb89723c38fdfe235ec95ae71bdba04b1438dd483edada630fe98",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Qwen3-TTS Atta original approved DE reference; OpenVoice full-cue conversion for Noah",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/noah-keyword-method-en-db1d76286a1e.m4a",
+    "synthesis": "qwen-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://github.com/myshell-ai/OpenVoice"
+    ],
+    "voiceSource": "Synthetic approved Atta voice; Noah timbre from existing Piper Joe synthetic sample",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "atta-en": "839c32cbe230d24598ed6d4e9d34f9bced2edc58aad3905c69160f85b400c0db",
+      "noah-en": "2425373782da52e6cf0b326e75b0cf16c6b31b0fbb91914b023183a43a30dfff"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "db1d76286a1eb89723c38fdfe235ec95ae71bdba04b1438dd483edada630fe98",
+      "notes": "French pain and Je mange du pain retained; isolated French recognition checked. Spelling differences across recognition languages are not voice approval."
+    }
+  },
+  {
+    "coach": "original",
+    "language": "en",
+    "course": "long-words",
+    "duration": 82.54820861678003,
+    "bytes": 944915,
+    "sha256": "1dc187f56f489d115bddc3bb6a6d15051d69a1ecc9b832fc26ab3309bc592398",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Qwen3-TTS Atta original approved DE reference; OpenVoice full-cue conversion for Noah",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/noah-long-words-en-1dc187f56f48.m4a",
+    "synthesis": "qwen-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://github.com/myshell-ai/OpenVoice"
+    ],
+    "voiceSource": "Synthetic approved Atta voice; Noah timbre from existing Piper Joe synthetic sample",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "atta-en": "839c32cbe230d24598ed6d4e9d34f9bced2edc58aad3905c69160f85b400c0db",
+      "noah-en": "2425373782da52e6cf0b326e75b0cf16c6b31b0fbb91914b023183a43a30dfff"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "1dc187f56f489d115bddc3bb6a6d15051d69a1ecc9b832fc26ab3309bc592398",
+      "notes": "un/predict/ability rendered with separate pauses; recognition may concatenate parts. Negative prefix and full word retained."
+    }
+  },
+  {
+    "coach": "original",
+    "language": "en",
+    "course": "meaningful-groups",
+    "duration": 93.77505668934238,
+    "bytes": 1098213,
+    "sha256": "1f8ba5a369a1c609848e399362de9e97856897337a71128baa559756f40dfdf5",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Qwen3-TTS Atta original approved DE reference; OpenVoice full-cue conversion for Noah",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/noah-meaningful-groups-en-1f8ba5a369a1.m4a",
+    "synthesis": "qwen-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://github.com/myshell-ai/OpenVoice"
+    ],
+    "voiceSource": "Synthetic approved Atta voice; Noah timbre from existing Piper Joe synthetic sample",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "atta-en": "839c32cbe230d24598ed6d4e9d34f9bced2edc58aad3905c69160f85b400c0db",
+      "noah-en": "2425373782da52e6cf0b326e75b0cf16c6b31b0fbb91914b023183a43a30dfff"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "1f8ba5a369a1c609848e399362de9e97856897337a71128baa559756f40dfdf5",
+      "notes": "Nine-item list regenerated with explicit pauses; Hammer/Pliers restored. Pear/pier and trousers spelling remain recognition ambiguities for final listening."
+    }
+  },
+  {
+    "coach": "original",
+    "language": "en",
+    "course": "method-of-loci",
+    "duration": 79.86462585034012,
+    "bytes": 942723,
+    "sha256": "0a9b0022651c25b2bcb581264ee532fe09fec41fe8996a8e473b30b0ee9a0306",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Qwen3-TTS Atta original approved DE reference; OpenVoice full-cue conversion for Noah",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/noah-method-of-loci-en-0a9b0022651c.m4a",
+    "synthesis": "qwen-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://github.com/myshell-ai/OpenVoice"
+    ],
+    "voiceSource": "Synthetic approved Atta voice; Noah timbre from existing Piper Joe synthetic sample",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "atta-en": "839c32cbe230d24598ed6d4e9d34f9bced2edc58aad3905c69160f85b400c0db",
+      "noah-en": "2425373782da52e6cf0b326e75b0cf16c6b31b0fbb91914b023183a43a30dfff"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "0a9b0022651c25b2bcb581264ee532fe09fec41fe8996a8e473b30b0ee9a0306",
+      "notes": "Route and bread/soap/candle mappings retained; loci/lochi and cues/queues are recognition spellings."
+    }
+  },
+  {
+    "coach": "original",
+    "language": "en",
+    "course": "number-images",
+    "duration": 78.0186394557823,
+    "bytes": 929277,
+    "sha256": "4d160fcbb31367742ab6bf62b2cc5a17c2257d36c17d689dce3d45f94161e193",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Qwen3-TTS Atta original approved DE reference; OpenVoice full-cue conversion for Noah",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/noah-number-images-en-4d160fcbb313.m4a",
+    "synthesis": "qwen-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://github.com/myshell-ai/OpenVoice"
+    ],
+    "voiceSource": "Synthetic approved Atta voice; Noah timbre from existing Piper Joe synthetic sample",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "atta-en": "839c32cbe230d24598ed6d4e9d34f9bced2edc58aad3905c69160f85b400c0db",
+      "noah-en": "2425373782da52e6cf0b326e75b0cf16c6b31b0fbb91914b023183a43a30dfff"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "4d160fcbb31367742ab6bf62b2cc5a17c2257d36c17d689dce3d45f94161e193",
+      "notes": "T/D=1,N=2; tin returns 12. Spoken letter names and added connectors explain the symbols."
+    }
+  },
+  {
+    "coach": "original",
+    "language": "en",
+    "course": "self-explanation",
+    "duration": 96.58467120181405,
+    "bytes": 1171429,
+    "sha256": "6f3e59e4024c7ea78e85f87ca6ca9be8b83681cc7728b8f7f42313e2eaddd08b",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Qwen3-TTS Atta original approved DE reference; OpenVoice full-cue conversion for Noah",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/noah-self-explanation-en-6f3e59e4024c.m4a",
+    "synthesis": "qwen-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://github.com/myshell-ai/OpenVoice"
+    ],
+    "voiceSource": "Synthetic approved Atta voice; Noah timbre from existing Piper Joe synthetic sample",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "atta-en": "839c32cbe230d24598ed6d4e9d34f9bced2edc58aad3905c69160f85b400c0db",
+      "noah-en": "2425373782da52e6cf0b326e75b0cf16c6b31b0fbb91914b023183a43a30dfff"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "6f3e59e4024c7ea78e85f87ca6ca9be8b83681cc7728b8f7f42313e2eaddd08b",
+      "notes": "3/4=6/8 and transfer 2/3=4/6 retained. Fractions spoken as words."
+    }
+  },
+  {
+    "coach": "original",
+    "language": "en",
+    "course": "spaced-practice",
+    "duration": 106.49959183673468,
+    "bytes": 1279142,
+    "sha256": "e6e1ef4bf57931154528792acbd82b6dd3eda06bd66119667a0320f859189256",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Qwen3-TTS Atta original approved DE reference; OpenVoice full-cue conversion for Noah",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/noah-spaced-practice-en-e6e1ef4bf579.m4a",
+    "synthesis": "qwen-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://github.com/myshell-ai/OpenVoice"
+    ],
+    "voiceSource": "Synthetic approved Atta voice; Noah timbre from existing Piper Joe synthetic sample",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "atta-en": "839c32cbe230d24598ed6d4e9d34f9bced2edc58aad3905c69160f85b400c0db",
+      "noah-en": "2425373782da52e6cf0b326e75b0cf16c6b31b0fbb91914b023183a43a30dfff"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "e6e1ef4bf57931154528792acbd82b6dd3eda06bd66119667a0320f859189256",
+      "notes": "Delay adjustment and no automatic extra review cards retained. Brand spelling and due/do are recognition ambiguities."
+    }
+  },
+  {
+    "coach": "original",
+    "language": "en",
+    "course": "text-meaning",
+    "duration": 88.03972789115645,
+    "bytes": 1032031,
+    "sha256": "815db06251b2b8a3537ba60af4ece76afc4ed77405860c5e7875b49ac0e9da4f",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Qwen3-TTS Atta original approved DE reference; OpenVoice full-cue conversion for Noah",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/noah-text-meaning-en-815db06251b2.m4a",
+    "synthesis": "qwen-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://github.com/myshell-ai/OpenVoice"
+    ],
+    "voiceSource": "Synthetic approved Atta voice; Noah timbre from existing Piper Joe synthetic sample",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "atta-en": "839c32cbe230d24598ed6d4e9d34f9bced2edc58aad3905c69160f85b400c0db",
+      "noah-en": "2425373782da52e6cf0b326e75b0cf16c6b31b0fbb91914b023183a43a30dfff"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "815db06251b2b8a3537ba60af4ece76afc4ed77405860c5e7875b49ac0e9da4f",
+      "notes": "Tree shade, evaporation, water/root-space conditions retained. Spurious Thank you starts at 87.6s and extends beyond 88s file end; treated as ASR silence hallucination, not a spoken sentence."
+    }
+  },
+  {
+    "coach": "original",
+    "language": "en",
+    "course": "text-verbatim",
+    "duration": 76.88253968253966,
+    "bytes": 902942,
+    "sha256": "8a2682b857e6f5c08cb054f106330f8ba230b7828b0c0b163d6cbf7a4e2437e0",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Qwen3-TTS Atta original approved DE reference; OpenVoice full-cue conversion for Noah",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/noah-text-verbatim-en-8a2682b857e6.m4a",
+    "synthesis": "qwen-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://github.com/myshell-ai/OpenVoice"
+    ],
+    "voiceSource": "Synthetic approved Atta voice; Noah timbre from existing Piper Joe synthetic sample",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "atta-en": "839c32cbe230d24598ed6d4e9d34f9bced2edc58aad3905c69160f85b400c0db",
+      "noah-en": "2425373782da52e6cf0b326e75b0cf16c6b31b0fbb91914b023183a43a30dfff"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "8a2682b857e6f5c08cb054f106330f8ba230b7828b0c0b163d6cbf7a4e2437e0",
+      "notes": "Hide-source instruction repaired and recognized. Exact three-sentence example retained."
+    }
+  },
+  {
+    "coach": "rafael",
+    "language": "fr",
+    "course": "active-recall",
+    "duration": 94.34394557823124,
+    "bytes": 1012238,
+    "sha256": "fa8c58ddb568cfe8461f1ad04a295703ca7761e126f7b9559076ca05b3039855",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Kyutai Fabien at 1.12 tempo; OpenVoice CML1406 tone conversion",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/atta-active-recall-fr-fa8c58ddb568.m4a",
+    "synthesis": "kyutai-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
+      "https://openslr.org/146/",
+      "https://github.com/myshell-ai/OpenVoice"
+    ],
+    "voiceSource": "Kyutai Fabien CC0 performance; CML-TTS French speaker1406 CC-BY-4.0 target; generated narration adapted by ANITEW",
+    "modelLicense": "Kyutai CC-BY-4.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "preferred-fr": "5b7babe4ac4a2b402555868c0dcb630dcee40a89ee4346c782b28fb710d6cbd5",
+      "fr-performance": "1b1f71d289f4586f49a50a4bd3afcfff9be057b42e73a3c5432951f6bb94ca98",
+      "fr-timbre": "d9e21ce03fd29e6bd4645ca126bf10dc14f8e6f07e4124cafd722276904b0e07"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "fa8c58ddb568cfe8461f1ad04a295703ca7761e126f7b9559076ca05b3039855",
+      "notes": "Repaired distinguishing known/unknown and read/understand instructions. Evaporation/energy relation retained. Brand recognition spelling is not pronunciation approval."
+    },
+    "spokenClarifications": [
+      {
+        "cue": 1,
+        "spokenText": "Essaie de retrouver une information sans regarder sa source. Tu distingues ainsi deux choses : ce que tu peux rappeler toi-même, et ce qui demande encore du travail. Cette méthode s’applique aux faits, aux notions et aux relations."
+      },
+      {
+        "cue": 10,
+        "spokenText": "Commence par lire et comprendre la réponse. Cache-la ensuite et réponds toi-même. « L’eau refroidit » ne suffit pas à expliquer le lien : le besoin d’énergie et le prélèvement de chaleur sont essentiels."
+      }
+    ]
+  },
+  {
+    "coach": "rafael",
+    "language": "fr",
+    "course": "interleaved-practice",
+    "duration": 101.94680272108842,
+    "bytes": 1117637,
+    "sha256": "7596ef23e3164b2836af42fe4505e95428a86d7917b2382f61c5646fe54ea222",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Kyutai Fabien at 1.12 tempo; OpenVoice CML1406 tone conversion",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/atta-interleaved-practice-fr-7596ef23e316.m4a",
+    "synthesis": "kyutai-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
+      "https://openslr.org/146/",
+      "https://github.com/myshell-ai/OpenVoice"
+    ],
+    "voiceSource": "Kyutai Fabien CC0 performance; CML-TTS French speaker1406 CC-BY-4.0 target; generated narration adapted by ANITEW",
+    "modelLicense": "Kyutai CC-BY-4.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "preferred-fr": "5b7babe4ac4a2b402555868c0dcb630dcee40a89ee4346c782b28fb710d6cbd5",
+      "fr-performance": "1b1f71d289f4586f49a50a4bd3afcfff9be057b42e73a3c5432951f6bb94ca98",
+      "fr-timbre": "d9e21ce03fd29e6bd4645ca126bf10dc14f8e6f07e4124cafd722276904b0e07"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "7596ef23e3164b2836af42fe4505e95428a86d7917b2382f61c5646fe54ea222",
+      "notes": "All formulas spoken explicitly. Replaced ambiguous un demi with divide product by two; final 12/6 and exercise dimensions retained."
+    },
+    "spokenClarifications": [
+      {
+        "cue": 8,
+        "spokenText": "Pour un rectangle, l’aire est égale à la longueur multipliée par la largeur. Pour un triangle, l’aire est égale à la base multipliée par la hauteur correspondante, puis divisée par deux. Un rectangle de quatre centimètres sur trois centimètres a une aire de douze centimètres carrés. Un triangle de base quatre centimètres et de hauteur correspondante trois centimètres a une aire de six centimètres carrés."
+      },
+      {
+        "cue": 10,
+        "spokenText": "Exercice A. Un triangle de base six centimètres et de hauteur correspondante quatre centimètres. Exercice B. Un rectangle de longueur six centimètres et de largeur quatre centimètres. Donne la règle et l’aire de chaque figure."
+      },
+      {
+        "cue": 9,
+        "spokenText": "Des nombres identiques ne donnent pas forcément le même calcul. La figure détermine la règle. Pour le triangle, il faut diviser le produit par deux. Dans un mélange d’exercices, commence par identifier le type de figure avant d’appliquer la règle."
+      }
+    ]
+  },
+  {
+    "coach": "rafael",
+    "language": "fr",
+    "course": "keyword-method",
+    "duration": 79.4002267573696,
+    "bytes": 839728,
+    "sha256": "6d3604a8dd537f7e5f4e1ab33ecbcc41ab8a42fdbaeb06eb1bfc14377bac8e36",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Kyutai Fabien at 1.12 tempo; OpenVoice CML1406 tone conversion",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/atta-keyword-method-fr-6d3604a8dd53.m4a",
+    "synthesis": "kyutai-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
+      "https://openslr.org/146/",
+      "https://github.com/myshell-ai/OpenVoice"
+    ],
+    "voiceSource": "Kyutai Fabien CC0 performance; CML-TTS French speaker1406 CC-BY-4.0 target; generated narration adapted by ANITEW",
+    "modelLicense": "Kyutai CC-BY-4.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "preferred-fr": "5b7babe4ac4a2b402555868c0dcb630dcee40a89ee4346c782b28fb710d6cbd5",
+      "fr-performance": "1b1f71d289f4586f49a50a4bd3afcfff9be057b42e73a3c5432951f6bb94ca98",
+      "fr-timbre": "d9e21ce03fd29e6bd4645ca126bf10dc14f8e6f07e4124cafd722276904b0e07"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "6d3604a8dd537f7e5f4e1ab33ecbcc41ab8a42fdbaeb06eb1bfc14377bac8e36",
+      "notes": "Bell and The bell rings retained; corrected opening connective and transfer instruction. French ASR renders bell as belle, which does not certify English pronunciation."
+    },
+    "spokenClarifications": [
+      {
+        "cue": 1,
+        "spokenText": "Un mot connu dont le son est proche peut servir de pont vers le sens d’un mot étranger. Relie ce mot-clé et le sens dans une image. Puis vérifie le mot à apprendre."
+      },
+      {
+        "cue": 11,
+        "spokenText": "Fais un essai avec un mot dont tu as réellement besoin. Teste aussi le sens inverse : peux-tu retrouver la forme étrangère à partir du sens ? Si le mot-clé te perturbe, change de lien ou utilise le rappel direct."
+      }
+    ]
+  },
+  {
+    "coach": "rafael",
+    "language": "fr",
+    "course": "long-words",
+    "duration": 82.93133786848071,
+    "bytes": 891201,
+    "sha256": "149351df0c066b2839bf02809d0083d2fcb12300589a53ebf88425690e000533",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Kyutai Fabien at 1.12 tempo; OpenVoice CML1406 tone conversion",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/atta-long-words-fr-149351df0c06.m4a",
+    "synthesis": "kyutai-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
+      "https://openslr.org/146/",
+      "https://github.com/myshell-ai/OpenVoice"
+    ],
+    "voiceSource": "Kyutai Fabien CC0 performance; CML-TTS French speaker1406 CC-BY-4.0 target; generated narration adapted by ANITEW",
+    "modelLicense": "Kyutai CC-BY-4.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "preferred-fr": "5b7babe4ac4a2b402555868c0dcb630dcee40a89ee4346c782b28fb710d6cbd5",
+      "fr-performance": "1b1f71d289f4586f49a50a4bd3afcfff9be057b42e73a3c5432951f6bb94ca98",
+      "fr-timbre": "d9e21ce03fd29e6bd4645ca126bf10dc14f8e6f07e4124cafd722276904b0e07"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "149351df0c066b2839bf02809d0083d2fcb12300589a53ebf88425690e000533",
+      "notes": "Negative prefix in and incomprehensible meaning restored; full word and prefix explanation verified in both voices."
+    },
+    "spokenClarifications": [
+      {
+        "cue": 9,
+        "spokenText": "Exemple : incompréhensible."
+      },
+      {
+        "cue": 10,
+        "spokenText": "Le mot incompréhensible signifie : ce qui ne peut pas être compris. On sépare le préfixe in et le mot compréhensible. Le préfixe in apporte ici la négation. Compréhensible est lié au verbe comprendre. Ce découpage aide à saisir le sens. Il ne constitue pas une transcription de la prononciation."
+      }
+    ]
+  },
+  {
+    "coach": "rafael",
+    "language": "fr",
+    "course": "meaningful-groups",
+    "duration": 92.88108843537414,
+    "bytes": 983718,
+    "sha256": "8041cea94c49138b5e58c8697deb713803f39be11317a756c3f17522dd026fdf",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Kyutai Fabien at 1.12 tempo; OpenVoice CML1406 tone conversion",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/atta-meaningful-groups-fr-8041cea94c49.m4a",
+    "synthesis": "kyutai-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
+      "https://openslr.org/146/",
+      "https://github.com/myshell-ai/OpenVoice"
+    ],
+    "voiceSource": "Kyutai Fabien CC0 performance; CML-TTS French speaker1406 CC-BY-4.0 target; generated narration adapted by ANITEW",
+    "modelLicense": "Kyutai CC-BY-4.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "preferred-fr": "5b7babe4ac4a2b402555868c0dcb630dcee40a89ee4346c782b28fb710d6cbd5",
+      "fr-performance": "1b1f71d289f4586f49a50a4bd3afcfff9be057b42e73a3c5432951f6bb94ca98",
+      "fr-timbre": "d9e21ce03fd29e6bd4645ca126bf10dc14f8e6f07e4124cafd722276904b0e07"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "8041cea94c49138b5e58c8697deb713803f39be11317a756c3f17522dd026fdf",
+      "notes": "Nine words with articles regenerated after scie/veste distortion; final transcript retains pomme,marteau,chemise,poire,scie,veste,banane,pince,pantalon and groups."
+    },
+    "spokenClarifications": [
+      {
+        "cue": 7,
+        "spokenText": "Cache la source. Ensuite, rappelle d’abord les groupes, puis leur contenu."
+      },
+      {
+        "cue": 11,
+        "spokenText": "Rappelle les trois groupes et autant des neuf éléments que possible. Fais-le sans regarder la liste. L’ordre dans chaque groupe est libre."
+      },
+      {
+        "cue": 12,
+        "spokenText": "Organise un passage par idées ou une liste par catégories utiles. N’invente pas des groupes pour atteindre un nombre fixé. Vérifie tout le contenu. Ne te limite pas aux titres."
+      },
+      {
+        "cue": 9,
+        "spokenText": "Une pomme. Un marteau. Une chemise. Une poire. Une scie. Une veste. Une banane. Une pince. Un pantalon."
+      }
+    ]
+  },
+  {
+    "coach": "rafael",
+    "language": "fr",
+    "course": "method-of-loci",
+    "duration": 82.79034013605441,
+    "bytes": 907392,
+    "sha256": "4c3a046dcc0675f037ec26e470a41088afa4773fb5138354f5260e07a74f13fc",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Kyutai Fabien at 1.12 tempo; OpenVoice CML1406 tone conversion",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/atta-method-of-loci-fr-4c3a046dcc06.m4a",
+    "synthesis": "kyutai-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
+      "https://openslr.org/146/",
+      "https://github.com/myshell-ai/OpenVoice"
+    ],
+    "voiceSource": "Kyutai Fabien CC0 performance; CML-TTS French speaker1406 CC-BY-4.0 target; generated narration adapted by ANITEW",
+    "modelLicense": "Kyutai CC-BY-4.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "preferred-fr": "5b7babe4ac4a2b402555868c0dcb630dcee40a89ee4346c782b28fb710d6cbd5",
+      "fr-performance": "1b1f71d289f4586f49a50a4bd3afcfff9be057b42e73a3c5432951f6bb94ca98",
+      "fr-timbre": "d9e21ce03fd29e6bd4645ca126bf10dc14f8e6f07e4124cafd722276904b0e07"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "4c3a046dcc0675f037ec26e470a41088afa4773fb5138354f5260e07a74f13fc",
+      "notes": "Door/shoe rack/table and bread/soap/candle mappings retained; homophone pain/peint does not change the intended example."
+    },
+    "spokenClarifications": [
+      {
+        "cue": 4,
+        "spokenText": "Fixe leur ordre. Répète ensuite le trajet sans contenu à apprendre."
+      },
+      {
+        "cue": 7,
+        "spokenText": "Compare ton rappel. Améliore ensuite les lieux confus ou les images peu efficaces."
+      },
+      {
+        "cue": 10,
+        "spokenText": "Visite mentalement les trois endroits. Puis écris l’élément associé à chacun."
+      }
+    ]
+  },
+  {
+    "coach": "rafael",
+    "language": "fr",
+    "course": "number-images",
+    "duration": 92.00866213151926,
+    "bytes": 989067,
+    "sha256": "ebf0a0e02bbc2323c6060fff5aa34d5a2f03932fe4fc792e9a38e33d7d4b2e10",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Kyutai Fabien at 1.12 tempo; OpenVoice CML1406 tone conversion",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/atta-number-images-fr-ebf0a0e02bbc.m4a",
+    "synthesis": "kyutai-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
+      "https://openslr.org/146/",
+      "https://github.com/myshell-ai/OpenVoice"
+    ],
+    "voiceSource": "Kyutai Fabien CC0 performance; CML-TTS French speaker1406 CC-BY-4.0 target; generated narration adapted by ANITEW",
+    "modelLicense": "Kyutai CC-BY-4.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "preferred-fr": "5b7babe4ac4a2b402555868c0dcb630dcee40a89ee4346c782b28fb710d6cbd5",
+      "fr-performance": "1b1f71d289f4586f49a50a4bd3afcfff9be057b42e73a3c5432951f6bb94ca98",
+      "fr-timbre": "d9e21ce03fd29e6bd4645ca126bf10dc14f8e6f07e4124cafd722276904b0e07"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "ebf0a0e02bbc2323c6060fff5aa34d5a2f03932fe4fc792e9a38e33d7d4b2e10",
+      "notes": "Replaced ambiguous standalone letter readings with initial sounds of tapis/dos/nez. Both voices retain 1/2/12 and one consonant sound for doubled n."
+    },
+    "spokenClarifications": [
+      {
+        "cue": 4,
+        "spokenText": "Lis les sons, dans l’ordre des chiffres."
+      },
+      {
+        "cue": 11,
+        "spokenText": "Travaille les autres correspondances fixes dans les leçons existantes avant de mémoriser des nombres plus longs. Assure-toi que chaque image te ramène exactement au nombre voulu."
+      },
+      {
+        "cue": 8,
+        "spokenText": "Pour le chiffre un, utilise le premier son de tapis ou de dos. Pour le chiffre deux, utilise le premier son de nez. Pour douze, imagine une tonne de sable. Dans tonne, tu retrouves le son initial de tapis, puis celui de nez."
+      },
+      {
+        "cue": 9,
+        "spokenText": "Dans cet exercice, les voyelles ne comptent pas. Le mot tonne s’écrit avec deux lettres identiques au milieu, mais elles représentent un seul son. Le premier son consonantique code un. Le second code deux. Tu retrouves douze. On compte les sons, pas le nombre de lettres."
+      }
+    ]
+  },
+  {
+    "coach": "rafael",
+    "language": "fr",
+    "course": "self-explanation",
+    "duration": 102.94693877551018,
+    "bytes": 1144403,
+    "sha256": "6401fe1a41f6f700bcbcddc7c1ef20f481aa464b2cc77407f1efecf0f3d9c0cc",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Kyutai Fabien at 1.12 tempo; OpenVoice CML1406 tone conversion",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/atta-self-explanation-fr-6401fe1a41f6.m4a",
+    "synthesis": "kyutai-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
+      "https://openslr.org/146/",
+      "https://github.com/myshell-ai/OpenVoice"
+    ],
+    "voiceSource": "Kyutai Fabien CC0 performance; CML-TTS French speaker1406 CC-BY-4.0 target; generated narration adapted by ANITEW",
+    "modelLicense": "Kyutai CC-BY-4.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "preferred-fr": "5b7babe4ac4a2b402555868c0dcb630dcee40a89ee4346c782b28fb710d6cbd5",
+      "fr-performance": "1b1f71d289f4586f49a50a4bd3afcfff9be057b42e73a3c5432951f6bb94ca98",
+      "fr-timbre": "d9e21ce03fd29e6bd4645ca126bf10dc14f8e6f07e4124cafd722276904b0e07"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "6401fe1a41f6f700bcbcddc7c1ef20f481aa464b2cc77407f1efecf0f3d9c0cc",
+      "notes": "Repaired formulate instruction. 3/4=6/8 and 2/3=4/6 retained; oral fraction forms match formulas."
+    },
+    "spokenClarifications": [
+      {
+        "cue": 5,
+        "spokenText": "Maintenant, explique avec tes propres mots. Ne copie pas la source."
+      }
+    ]
+  },
+  {
+    "coach": "rafael",
+    "language": "fr",
+    "course": "spaced-practice",
+    "duration": 112.4322902494331,
+    "bytes": 1231577,
+    "sha256": "3c9902a34909cbad5d004711040e7bc34ef6c9e8471c3b96ac3a532aea75b20e",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Kyutai Fabien at 1.12 tempo; OpenVoice CML1406 tone conversion",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/atta-spaced-practice-fr-3c9902a34909.m4a",
+    "synthesis": "kyutai-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
+      "https://openslr.org/146/",
+      "https://github.com/myshell-ai/OpenVoice"
+    ],
+    "voiceSource": "Kyutai Fabien CC0 performance; CML-TTS French speaker1406 CC-BY-4.0 target; generated narration adapted by ANITEW",
+    "modelLicense": "Kyutai CC-BY-4.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "preferred-fr": "5b7babe4ac4a2b402555868c0dcb630dcee40a89ee4346c782b28fb710d6cbd5",
+      "fr-performance": "1b1f71d289f4586f49a50a4bd3afcfff9be057b42e73a3c5432951f6bb94ca98",
+      "fr-timbre": "d9e21ce03fd29e6bd4645ca126bf10dc14f8e6f07e4124cafd722276904b0e07"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "3c9902a34909cbad5d004711040e7bc34ef6c9e8471c3b96ac3a532aea75b20e",
+      "notes": "Repaired delayed-recall introduction and adaptation instruction; no additional review cards claim retained. Brand recognition varies and awaits listening assessment."
+    },
+    "spokenClarifications": [
+      {
+        "cue": 12,
+        "spokenText": "Utilise les révisions dues pour les éléments d’entraînement enregistrés. Pour un contenu extérieur à l’application, prévois un test ultérieur et adapte le délai au rappel réel. Ce cours ne crée aucune nouvelle carte de révision quand tu le termines."
+      },
+      {
+        "cue": 1,
+        "spokenText": "Répartis les tentatives de rappel dans le temps. Après une pause, essaie de retrouver la réponse. Tu vérifies ainsi ce que tu as retenu. Répéter immédiatement une réponse que tu viens de lire ne suffit pas."
+      },
+      {
+        "cue": 10,
+        "spokenText": "Le délai et la tentative de rappel comptent. Relire dix fois de suite ne remplace pas un rappel ultérieur. Grâce à son erreur, Mira sait ce qu’elle doit retravailler. Elle peut aussi adapter le délai avant son prochain essai."
+      }
+    ]
+  },
+  {
+    "coach": "rafael",
+    "language": "fr",
+    "course": "text-meaning",
+    "duration": 104.9554648526077,
+    "bytes": 1159779,
+    "sha256": "46fad85d9e3461059cf2eed161887ecd742e70680e4b528796eb34f6b0446455",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Kyutai Fabien at 1.12 tempo; OpenVoice CML1406 tone conversion",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/atta-text-meaning-fr-46fad85d9e34.m4a",
+    "synthesis": "kyutai-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
+      "https://openslr.org/146/",
+      "https://github.com/myshell-ai/OpenVoice"
+    ],
+    "voiceSource": "Kyutai Fabien CC0 performance; CML-TTS French speaker1406 CC-BY-4.0 target; generated narration adapted by ANITEW",
+    "modelLicense": "Kyutai CC-BY-4.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "preferred-fr": "5b7babe4ac4a2b402555868c0dcb630dcee40a89ee4346c782b28fb710d6cbd5",
+      "fr-performance": "1b1f71d289f4586f49a50a4bd3afcfff9be057b42e73a3c5432951f6bb94ca98",
+      "fr-timbre": "d9e21ce03fd29e6bd4645ca126bf10dc14f8e6f07e4124cafd722276904b0e07"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "46fad85d9e3461059cf2eed161887ecd742e70680e4b528796eb34f6b0446455",
+      "notes": "Repaired return-to-recall instruction and evaporation wording; shade, evaporation, water and root space all retained in final independent transcripts."
+    },
+    "spokenClarifications": [
+      {
+        "cue": 2,
+        "spokenText": "Un résumé ne conserve pas tous les détails. Travaille séparément les chiffres ou les formulations exactes lorsqu’ils sont importants. Commence par un court passage. Allonge ce passage quand tu peux en expliquer le sens."
+      },
+      {
+        "cue": 3,
+        "spokenText": "Commence par lire un passage. Clarifie les termes inconnus."
+      },
+      {
+        "cue": 4,
+        "spokenText": "Repère les idées du passage. Donne un titre court à chacune."
+      },
+      {
+        "cue": 7,
+        "spokenText": "Compare ton rappel avec le texte original. Ajoute les idées manquantes. Corrige les erreurs dans les liens entre les idées."
+      },
+      {
+        "cue": 10,
+        "spokenText": "On distingue trois parties. Premièrement, l’action : planter des arbres. Deuxièmement, les effets : l’ombre et l’évaporation. Troisièmement, les conditions : de l’eau et de l’espace pour les racines. Ce plan conserve les liens entre les idées."
+      },
+      {
+        "cue": 8,
+        "spokenText": "Plus tard, recommence le rappel. Adapte le délai selon la qualité de ta réponse."
+      },
+      {
+        "cue": 9,
+        "spokenText": "Une ville plante des arbres le long d’une route très fréquentée. Leur feuillage apporte de l’ombre. Les feuilles rejettent de l’eau par évaporation. Cette évaporation contribue au refroidissement. Pendant les périodes sèches, les arbres ont besoin de suffisamment d’eau. Leurs racines ont aussi besoin d’espace pour rester en bonne santé."
+      }
+    ]
+  },
+  {
+    "coach": "rafael",
+    "language": "fr",
+    "course": "text-verbatim",
+    "duration": 85.03274376417232,
+    "bytes": 906622,
+    "sha256": "334d7bb4e457633092f20675012327d298324e26264673c4f7722d344dab487e",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Kyutai Fabien at 1.12 tempo; OpenVoice CML1406 tone conversion",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/atta-text-verbatim-fr-334d7bb4e457.m4a",
+    "synthesis": "kyutai-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
+      "https://openslr.org/146/",
+      "https://github.com/myshell-ai/OpenVoice"
+    ],
+    "voiceSource": "Kyutai Fabien CC0 performance; CML-TTS French speaker1406 CC-BY-4.0 target; generated narration adapted by ANITEW",
+    "modelLicense": "Kyutai CC-BY-4.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "preferred-fr": "5b7babe4ac4a2b402555868c0dcb630dcee40a89ee4346c782b28fb710d6cbd5",
+      "fr-performance": "1b1f71d289f4586f49a50a4bd3afcfff9be057b42e73a3c5432951f6bb94ca98",
+      "fr-timbre": "d9e21ce03fd29e6bd4645ca126bf10dc14f8e6f07e4124cafd722276904b0e07"
+    },
+    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "334d7bb4e457633092f20675012327d298324e26264673c4f7722d344dab487e",
+      "notes": "Read-source and alternate starting-point instructions repaired. Exact window/fresh-air/day three-sentence passage retained."
+    },
+    "spokenClarifications": [
+      {
+        "cue": 4,
+        "spokenText": "Commence par lire le passage attentivement. Prononce le passage clairement une fois."
+      },
+      {
+        "cue": 10,
+        "spokenText": "Les trois phrases forment trois unités de travail. Apprends la première, puis la deuxième et leur transition. Au prochain essai, commence aussi par les mots : l’air frais."
+      }
+    ]
+  },
+  {
+    "coach": "lin",
+    "language": "en",
+    "course": "story-method",
+    "duration": 90.83746031746028,
+    "bytes": 1009218,
+    "sha256": "69ad7b51b2432d299c1358f09366342c59e32505486fd4816ba23487004b8171",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Approved complete utterance tone conversion to synthetic Lin reference; own approved greeting for story",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/lin-story-method-en-69ad7b51b243.m4a",
+    "synthesis": "qwen-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://github.com/myshell-ai/OpenVoice",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic Qwen VoiceDesign Lin target, Apache 2.0; source Qwen Atta synthetic performance, Apache 2.0",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "lin-en": "a43712ba2f3e37eb8186ec8731803b8b3f2d434bdb1ef137994b73d53fd64709"
+    },
+    "referenceApproval": "User explicitly accepted Lin English and French short references on 2026-10-01; full-course listening remains open.",
+    "sourceSha256": "09771673ca2ab4eafc6d424170f8a9c1e8c8972ab4b7fa3f7b84d5557d53d69b",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "69ad7b51b2432d299c1358f09366342c59e32505486fd4816ba23487004b8171",
+      "notes": "Full selected-coach approved greeting; key/lemon/bicycle exercise and recall boundary retained."
+    },
+    "voiceTarget": "Synthetic Qwen VoiceDesign Lin reference, Apache 2.0",
+    "approvedReference": "approved-language-references/lin-en.wav"
+  },
+  {
+    "coach": "lin",
+    "language": "en",
+    "course": "active-recall",
+    "duration": 90.43138321995463,
+    "bytes": 1049643,
+    "sha256": "554a9b4a17fd1700197e41ce0e56651098494a8aa35d2d496d9bd926fb13aa84",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Approved complete utterance tone conversion to synthetic Lin reference; own approved greeting for story",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/lin-active-recall-en-554a9b4a17fd.m4a",
+    "synthesis": "qwen-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://github.com/myshell-ai/OpenVoice",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic Qwen VoiceDesign Lin target, Apache 2.0; source Qwen Atta synthetic performance, Apache 2.0",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "lin-en": "a43712ba2f3e37eb8186ec8731803b8b3f2d434bdb1ef137994b73d53fd64709"
+    },
+    "referenceApproval": "User explicitly accepted Lin English and French short references on 2026-10-01; full-course listening remains open.",
+    "sourceSha256": "40e068d14139a166b72699303ebdf446598b5c264f980ad963f070323015e616",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "554a9b4a17fd1700197e41ce0e56651098494a8aa35d2d496d9bd926fb13aa84",
+      "notes": "Brand recognized as Any2/Any tool; spelling is not a pronunciation verdict. Singular/plural recognition does not change the instruction."
+    },
+    "voiceTarget": "Synthetic Qwen VoiceDesign Lin reference, Apache 2.0",
+    "approvedReference": "approved-language-references/lin-en.wav"
+  },
+  {
+    "coach": "lin",
+    "language": "en",
+    "course": "interleaved-practice",
+    "duration": 94.89954648526076,
+    "bytes": 1133641,
+    "sha256": "7e1de0edb02780fa660b3d5f79cb7b28c6de63b3fcd2fdadbd84c4b3792d6033",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Approved complete utterance tone conversion to synthetic Lin reference; own approved greeting for story",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/lin-interleaved-practice-en-7e1de0edb027.m4a",
+    "synthesis": "qwen-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://github.com/myshell-ai/OpenVoice",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic Qwen VoiceDesign Lin target, Apache 2.0; source Qwen Atta synthetic performance, Apache 2.0",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "lin-en": "a43712ba2f3e37eb8186ec8731803b8b3f2d434bdb1ef137994b73d53fd64709"
+    },
+    "referenceApproval": "User explicitly accepted Lin English and French short references on 2026-10-01; full-course listening remains open.",
+    "sourceSha256": "59cda2e395b39f1c431a1c8895fee2c7db5e91023baa86ce32c54bc444894d41",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "7e1de0edb02780fa660b3d5f79cb7b28c6de63b3fcd2fdadbd84c4b3792d6033",
+      "notes": "Spoken formulas match rectangle length times width and triangle base times height divided by two; 12 and 6 square centimetres verified."
+    },
+    "voiceTarget": "Synthetic Qwen VoiceDesign Lin reference, Apache 2.0",
+    "approvedReference": "approved-language-references/lin-en.wav"
+  },
+  {
+    "coach": "lin",
+    "language": "en",
+    "course": "keyword-method",
+    "duration": 84.91496598639453,
+    "bytes": 966685,
+    "sha256": "2a77dfa2609c39a197a97475f0af20857c60752b204f50338dedffde24920cca",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Approved complete utterance tone conversion to synthetic Lin reference; own approved greeting for story",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/lin-keyword-method-en-2a77dfa2609c.m4a",
+    "synthesis": "qwen-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://github.com/myshell-ai/OpenVoice",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic Qwen VoiceDesign Lin target, Apache 2.0; source Qwen Atta synthetic performance, Apache 2.0",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "lin-en": "a43712ba2f3e37eb8186ec8731803b8b3f2d434bdb1ef137994b73d53fd64709"
+    },
+    "referenceApproval": "User explicitly accepted Lin English and French short references on 2026-10-01; full-course listening remains open.",
+    "sourceSha256": "92226bc3950ca0125267c80bff903ab30594f89e37792dc9e015eba346adc198",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "2a77dfa2609c39a197a97475f0af20857c60752b204f50338dedffde24920cca",
+      "notes": "French pain and Je mange du pain retained; isolated French recognition checked. Spelling differences across recognition languages are not voice approval."
+    },
+    "voiceTarget": "Synthetic Qwen VoiceDesign Lin reference, Apache 2.0",
+    "approvedReference": "approved-language-references/lin-en.wav"
+  },
+  {
+    "coach": "lin",
+    "language": "en",
+    "course": "long-words",
+    "duration": 82.54820861678003,
+    "bytes": 928749,
+    "sha256": "b29a91de354e0cb2f3e7c02e28746ed4bf8f24a92fa55a1b624a9702d55133c6",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Approved complete utterance tone conversion to synthetic Lin reference; own approved greeting for story",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/lin-long-words-en-b29a91de354e.m4a",
+    "synthesis": "qwen-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://github.com/myshell-ai/OpenVoice",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic Qwen VoiceDesign Lin target, Apache 2.0; source Qwen Atta synthetic performance, Apache 2.0",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "lin-en": "a43712ba2f3e37eb8186ec8731803b8b3f2d434bdb1ef137994b73d53fd64709"
+    },
+    "referenceApproval": "User explicitly accepted Lin English and French short references on 2026-10-01; full-course listening remains open.",
+    "sourceSha256": "9da6ab5e71fe9233ec57eb54e6627a4958c1aed81229afce5388a3bb67905f1b",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "b29a91de354e0cb2f3e7c02e28746ed4bf8f24a92fa55a1b624a9702d55133c6",
+      "notes": "un/predict/ability rendered with separate pauses; recognition may concatenate parts. Negative prefix and full word retained."
+    },
+    "voiceTarget": "Synthetic Qwen VoiceDesign Lin reference, Apache 2.0",
+    "approvedReference": "approved-language-references/lin-en.wav"
+  },
+  {
+    "coach": "lin",
+    "language": "en",
+    "course": "meaningful-groups",
+    "duration": 93.77505668934238,
+    "bytes": 1081063,
+    "sha256": "88d951948653bdb887adca5a08f2797ae4100f0a8ea63763f53f9f2c6688e9ff",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Approved complete utterance tone conversion to synthetic Lin reference; own approved greeting for story",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/lin-meaningful-groups-en-88d951948653.m4a",
+    "synthesis": "qwen-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://github.com/myshell-ai/OpenVoice",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic Qwen VoiceDesign Lin target, Apache 2.0; source Qwen Atta synthetic performance, Apache 2.0",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "lin-en": "a43712ba2f3e37eb8186ec8731803b8b3f2d434bdb1ef137994b73d53fd64709"
+    },
+    "referenceApproval": "User explicitly accepted Lin English and French short references on 2026-10-01; full-course listening remains open.",
+    "sourceSha256": "7297b86ca75aa49eab1d867b315614cbc5cc9176679a043111b3fe596fbe99ff",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "88d951948653bdb887adca5a08f2797ae4100f0a8ea63763f53f9f2c6688e9ff",
+      "notes": "Nine-item list regenerated with explicit pauses; Hammer/Pliers restored. Pear/pier and trousers spelling remain recognition ambiguities for final listening."
+    },
+    "voiceTarget": "Synthetic Qwen VoiceDesign Lin reference, Apache 2.0",
+    "approvedReference": "approved-language-references/lin-en.wav"
+  },
+  {
+    "coach": "lin",
+    "language": "en",
+    "course": "method-of-loci",
+    "duration": 79.86462585034012,
+    "bytes": 921907,
+    "sha256": "6cf01f4b09fc31899b386ce2018033b89537b3ba6c4a0962b0bb72ae6bbad9e0",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Approved complete utterance tone conversion to synthetic Lin reference; own approved greeting for story",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/lin-method-of-loci-en-6cf01f4b09fc.m4a",
+    "synthesis": "qwen-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://github.com/myshell-ai/OpenVoice",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic Qwen VoiceDesign Lin target, Apache 2.0; source Qwen Atta synthetic performance, Apache 2.0",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "lin-en": "a43712ba2f3e37eb8186ec8731803b8b3f2d434bdb1ef137994b73d53fd64709"
+    },
+    "referenceApproval": "User explicitly accepted Lin English and French short references on 2026-10-01; full-course listening remains open.",
+    "sourceSha256": "ffb92e2c77c5fa30f5579452e92d08934f5b15e537103532559eb6815165750f",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "6cf01f4b09fc31899b386ce2018033b89537b3ba6c4a0962b0bb72ae6bbad9e0",
+      "notes": "Route and bread/soap/candle mappings retained; loci/lochi and cues/queues are recognition spellings."
+    },
+    "voiceTarget": "Synthetic Qwen VoiceDesign Lin reference, Apache 2.0",
+    "approvedReference": "approved-language-references/lin-en.wav"
+  },
+  {
+    "coach": "lin",
+    "language": "en",
+    "course": "number-images",
+    "duration": 78.0186394557823,
+    "bytes": 920142,
+    "sha256": "d3c8d1eae08490dcd5efbe3d67c0ffb4b283b8b2c4ccd27284a64deb521bdec5",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Approved complete utterance tone conversion to synthetic Lin reference; own approved greeting for story",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/lin-number-images-en-d3c8d1eae084.m4a",
+    "synthesis": "qwen-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://github.com/myshell-ai/OpenVoice",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic Qwen VoiceDesign Lin target, Apache 2.0; source Qwen Atta synthetic performance, Apache 2.0",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "lin-en": "a43712ba2f3e37eb8186ec8731803b8b3f2d434bdb1ef137994b73d53fd64709"
+    },
+    "referenceApproval": "User explicitly accepted Lin English and French short references on 2026-10-01; full-course listening remains open.",
+    "sourceSha256": "8dab2d766116b8a8ee3266fe5d3a8064008127d6cc3568457853fc893b2bec1a",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "d3c8d1eae08490dcd5efbe3d67c0ffb4b283b8b2c4ccd27284a64deb521bdec5",
+      "notes": "T/D=1,N=2; tin returns 12. Spoken letter names and added connectors explain the symbols."
+    },
+    "voiceTarget": "Synthetic Qwen VoiceDesign Lin reference, Apache 2.0",
+    "approvedReference": "approved-language-references/lin-en.wav"
+  },
+  {
+    "coach": "lin",
+    "language": "en",
+    "course": "self-explanation",
+    "duration": 96.58467120181405,
+    "bytes": 1153114,
+    "sha256": "66cb885a457ad81c3f1149767fe15956b6591cde9e82f0973cd00c1edc0935b3",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Approved complete utterance tone conversion to synthetic Lin reference; own approved greeting for story",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/lin-self-explanation-en-66cb885a457a.m4a",
+    "synthesis": "qwen-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://github.com/myshell-ai/OpenVoice",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic Qwen VoiceDesign Lin target, Apache 2.0; source Qwen Atta synthetic performance, Apache 2.0",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "lin-en": "a43712ba2f3e37eb8186ec8731803b8b3f2d434bdb1ef137994b73d53fd64709"
+    },
+    "referenceApproval": "User explicitly accepted Lin English and French short references on 2026-10-01; full-course listening remains open.",
+    "sourceSha256": "7394e28b3ecb26ce6163c892e6ad996701e254f19cc97f066458d51105dbea3f",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "66cb885a457ad81c3f1149767fe15956b6591cde9e82f0973cd00c1edc0935b3",
+      "notes": "3/4=6/8 and transfer 2/3=4/6 retained. Fractions spoken as words."
+    },
+    "voiceTarget": "Synthetic Qwen VoiceDesign Lin reference, Apache 2.0",
+    "approvedReference": "approved-language-references/lin-en.wav"
+  },
+  {
+    "coach": "lin",
+    "language": "en",
+    "course": "spaced-practice",
+    "duration": 106.49959183673468,
+    "bytes": 1264983,
+    "sha256": "6dedd16106ad075aa2ebe219b88e695a3f853eccd6d7af7bcd1f488496267331",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Approved complete utterance tone conversion to synthetic Lin reference; own approved greeting for story",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/lin-spaced-practice-en-6dedd16106ad.m4a",
+    "synthesis": "qwen-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://github.com/myshell-ai/OpenVoice",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic Qwen VoiceDesign Lin target, Apache 2.0; source Qwen Atta synthetic performance, Apache 2.0",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "lin-en": "a43712ba2f3e37eb8186ec8731803b8b3f2d434bdb1ef137994b73d53fd64709"
+    },
+    "referenceApproval": "User explicitly accepted Lin English and French short references on 2026-10-01; full-course listening remains open.",
+    "sourceSha256": "9746d25a3ac917786a4ff0d9b7bd24eb8c7089696de4a9ee3ddd679d509b1ed8",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "6dedd16106ad075aa2ebe219b88e695a3f853eccd6d7af7bcd1f488496267331",
+      "notes": "Delay adjustment and no automatic extra review cards retained. Brand spelling and due/do are recognition ambiguities."
+    },
+    "voiceTarget": "Synthetic Qwen VoiceDesign Lin reference, Apache 2.0",
+    "approvedReference": "approved-language-references/lin-en.wav"
+  },
+  {
+    "coach": "lin",
+    "language": "en",
+    "course": "text-meaning",
+    "duration": 88.03972789115645,
+    "bytes": 1015585,
+    "sha256": "6f28a8684ba5984f337c09211c419c3941e79c1691d04245a64c552a01c38b3d",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Approved complete utterance tone conversion to synthetic Lin reference; own approved greeting for story",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/lin-text-meaning-en-6f28a8684ba5.m4a",
+    "synthesis": "qwen-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://github.com/myshell-ai/OpenVoice",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic Qwen VoiceDesign Lin target, Apache 2.0; source Qwen Atta synthetic performance, Apache 2.0",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "lin-en": "a43712ba2f3e37eb8186ec8731803b8b3f2d434bdb1ef137994b73d53fd64709"
+    },
+    "referenceApproval": "User explicitly accepted Lin English and French short references on 2026-10-01; full-course listening remains open.",
+    "sourceSha256": "1ac4b24baefd031bd3b1879037920fa97fa0e4c750ac151eb6bbdef6e8ca5db8",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "6f28a8684ba5984f337c09211c419c3941e79c1691d04245a64c552a01c38b3d",
+      "notes": "Tree shade, evaporation, water/root-space conditions retained. Spurious Thank you starts at 87.6s and extends beyond 88s file end; treated as ASR silence hallucination, not a spoken sentence."
+    },
+    "voiceTarget": "Synthetic Qwen VoiceDesign Lin reference, Apache 2.0",
+    "approvedReference": "approved-language-references/lin-en.wav"
+  },
+  {
+    "coach": "lin",
+    "language": "en",
+    "course": "text-verbatim",
+    "duration": 76.88253968253966,
+    "bytes": 889663,
+    "sha256": "ca60f82e8c04175a033d9852c0f8d3f02df1edb5cfc18306de93e8302ddcfcb5",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Approved complete utterance tone conversion to synthetic Lin reference; own approved greeting for story",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/lin-text-verbatim-en-ca60f82e8c04.m4a",
+    "synthesis": "qwen-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://github.com/myshell-ai/OpenVoice",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic Qwen VoiceDesign Lin target, Apache 2.0; source Qwen Atta synthetic performance, Apache 2.0",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT",
+    "approvedReferenceHashes": {
+      "lin-en": "a43712ba2f3e37eb8186ec8731803b8b3f2d434bdb1ef137994b73d53fd64709"
+    },
+    "referenceApproval": "User explicitly accepted Lin English and French short references on 2026-10-01; full-course listening remains open.",
+    "sourceSha256": "c8f7054d2dae91b0bf7b19cdc2aaa38672924b4660dad3fa59b5b2b4b0c12501",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "ca60f82e8c04175a033d9852c0f8d3f02df1edb5cfc18306de93e8302ddcfcb5",
+      "notes": "Hide-source instruction repaired and recognized. Exact three-sentence example retained."
+    },
+    "voiceTarget": "Synthetic Qwen VoiceDesign Lin reference, Apache 2.0",
+    "approvedReference": "approved-language-references/lin-en.wav"
+  },
+  {
+    "coach": "lin",
+    "language": "fr",
+    "course": "story-method",
+    "duration": 82.93714285714283,
+    "bytes": 888025,
+    "sha256": "0265553f6e572169fba5dc5f1fff49c0424bb482bce0400d7605a4f1536b0dd0",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Approved complete utterance tone conversion to synthetic Lin reference; own approved greeting for story",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/lin-story-method-fr-0265553f6e57.m4a",
+    "synthesis": "kyutai-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
+      "https://github.com/myshell-ai/OpenVoice",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic Qwen VoiceDesign Lin target, Apache 2.0; source Kyutai Fabien CC0, model CC-BY-4.0",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT; Kyutai CC-BY-4.0",
+    "approvedReferenceHashes": {
+      "lin-fr": "216afd07493f946fa09d8b4c162b12baca4fb5aa379ab6ff3123d931519e0377"
+    },
+    "referenceApproval": "User explicitly accepted Lin English and French short references on 2026-10-01; full-course listening remains open.",
+    "sourceSha256": "2bc2ae1550f19bb46cfb403f4681ce6387ac53f59495726ff6bdfc348ae84884",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "0265553f6e572169fba5dc5f1fff49c0424bb482bce0400d7605a4f1536b0dd0",
+      "notes": "Uses full approved Lin greeting; key/lemon/bicycle content retained. Les/mes ASR variation remains a final listening detail."
+    },
+    "voiceTarget": "Synthetic Qwen VoiceDesign Lin reference, Apache 2.0",
+    "approvedReference": "approved-language-references/lin-fr.wav",
+    "spokenClarifications": []
+  },
+  {
+    "coach": "lin",
+    "language": "fr",
+    "course": "active-recall",
+    "duration": 94.34394557823124,
+    "bytes": 1046102,
+    "sha256": "057cf3da4f11364523e26c855e68c7c1dbebecdde15df39a0d09dc74b61fd2ce",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Approved complete utterance tone conversion to synthetic Lin reference; own approved greeting for story",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/lin-active-recall-fr-057cf3da4f11.m4a",
+    "synthesis": "kyutai-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
+      "https://github.com/myshell-ai/OpenVoice",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic Qwen VoiceDesign Lin target, Apache 2.0; source Kyutai Fabien CC0, model CC-BY-4.0",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT; Kyutai CC-BY-4.0",
+    "approvedReferenceHashes": {
+      "lin-fr": "216afd07493f946fa09d8b4c162b12baca4fb5aa379ab6ff3123d931519e0377"
+    },
+    "referenceApproval": "User explicitly accepted Lin English and French short references on 2026-10-01; full-course listening remains open.",
+    "sourceSha256": "fa8c58ddb568cfe8461f1ad04a295703ca7761e126f7b9559076ca05b3039855",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "057cf3da4f11364523e26c855e68c7c1dbebecdde15df39a0d09dc74b61fd2ce",
+      "notes": "Repaired distinguishing known/unknown and read/understand instructions. Evaporation/energy relation retained. Brand recognition spelling is not pronunciation approval."
+    },
+    "voiceTarget": "Synthetic Qwen VoiceDesign Lin reference, Apache 2.0",
+    "approvedReference": "approved-language-references/lin-fr.wav",
+    "spokenClarifications": [
+      {
+        "cue": 1,
+        "spokenText": "Essaie de retrouver une information sans regarder sa source. Tu distingues ainsi deux choses : ce que tu peux rappeler toi-même, et ce qui demande encore du travail. Cette méthode s’applique aux faits, aux notions et aux relations."
+      },
+      {
+        "cue": 10,
+        "spokenText": "Commence par lire et comprendre la réponse. Cache-la ensuite et réponds toi-même. « L’eau refroidit » ne suffit pas à expliquer le lien : le besoin d’énergie et le prélèvement de chaleur sont essentiels."
+      }
+    ]
+  },
+  {
+    "coach": "lin",
+    "language": "fr",
+    "course": "interleaved-practice",
+    "duration": 101.94680272108842,
+    "bytes": 1168747,
+    "sha256": "ec628c8361793f5305d002b0e3b0c95a4ef6d8fc23f4500d691176cdd44d4d68",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Approved complete utterance tone conversion to synthetic Lin reference; own approved greeting for story",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/lin-interleaved-practice-fr-ec628c836179.m4a",
+    "synthesis": "kyutai-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
+      "https://github.com/myshell-ai/OpenVoice",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic Qwen VoiceDesign Lin target, Apache 2.0; source Kyutai Fabien CC0, model CC-BY-4.0",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT; Kyutai CC-BY-4.0",
+    "approvedReferenceHashes": {
+      "lin-fr": "216afd07493f946fa09d8b4c162b12baca4fb5aa379ab6ff3123d931519e0377"
+    },
+    "referenceApproval": "User explicitly accepted Lin English and French short references on 2026-10-01; full-course listening remains open.",
+    "sourceSha256": "7596ef23e3164b2836af42fe4505e95428a86d7917b2382f61c5646fe54ea222",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "ec628c8361793f5305d002b0e3b0c95a4ef6d8fc23f4500d691176cdd44d4d68",
+      "notes": "All formulas spoken explicitly. Replaced ambiguous un demi with divide product by two; final 12/6 and exercise dimensions retained."
+    },
+    "voiceTarget": "Synthetic Qwen VoiceDesign Lin reference, Apache 2.0",
+    "approvedReference": "approved-language-references/lin-fr.wav",
+    "spokenClarifications": [
+      {
+        "cue": 8,
+        "spokenText": "Pour un rectangle, l’aire est égale à la longueur multipliée par la largeur. Pour un triangle, l’aire est égale à la base multipliée par la hauteur correspondante, puis divisée par deux. Un rectangle de quatre centimètres sur trois centimètres a une aire de douze centimètres carrés. Un triangle de base quatre centimètres et de hauteur correspondante trois centimètres a une aire de six centimètres carrés."
+      },
+      {
+        "cue": 10,
+        "spokenText": "Exercice A. Un triangle de base six centimètres et de hauteur correspondante quatre centimètres. Exercice B. Un rectangle de longueur six centimètres et de largeur quatre centimètres. Donne la règle et l’aire de chaque figure."
+      },
+      {
+        "cue": 9,
+        "spokenText": "Des nombres identiques ne donnent pas forcément le même calcul. La figure détermine la règle. Pour le triangle, il faut diviser le produit par deux. Dans un mélange d’exercices, commence par identifier le type de figure avant d’appliquer la règle."
+      }
+    ]
+  },
+  {
+    "coach": "lin",
+    "language": "fr",
+    "course": "keyword-method",
+    "duration": 79.4002267573696,
+    "bytes": 870667,
+    "sha256": "3d5406bca3efd52768f8e25e20cb0ae77eb883d91c54850bdb3ce569ef07ccc1",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Approved complete utterance tone conversion to synthetic Lin reference; own approved greeting for story",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/lin-keyword-method-fr-3d5406bca3ef.m4a",
+    "synthesis": "kyutai-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
+      "https://github.com/myshell-ai/OpenVoice",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic Qwen VoiceDesign Lin target, Apache 2.0; source Kyutai Fabien CC0, model CC-BY-4.0",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT; Kyutai CC-BY-4.0",
+    "approvedReferenceHashes": {
+      "lin-fr": "216afd07493f946fa09d8b4c162b12baca4fb5aa379ab6ff3123d931519e0377"
+    },
+    "referenceApproval": "User explicitly accepted Lin English and French short references on 2026-10-01; full-course listening remains open.",
+    "sourceSha256": "6d3604a8dd537f7e5f4e1ab33ecbcc41ab8a42fdbaeb06eb1bfc14377bac8e36",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "3d5406bca3efd52768f8e25e20cb0ae77eb883d91c54850bdb3ce569ef07ccc1",
+      "notes": "Bell and The bell rings retained; corrected opening connective and transfer instruction. French ASR renders bell as belle, which does not certify English pronunciation."
+    },
+    "voiceTarget": "Synthetic Qwen VoiceDesign Lin reference, Apache 2.0",
+    "approvedReference": "approved-language-references/lin-fr.wav",
+    "spokenClarifications": [
+      {
+        "cue": 1,
+        "spokenText": "Un mot connu dont le son est proche peut servir de pont vers le sens d’un mot étranger. Relie ce mot-clé et le sens dans une image. Puis vérifie le mot à apprendre."
+      },
+      {
+        "cue": 11,
+        "spokenText": "Fais un essai avec un mot dont tu as réellement besoin. Teste aussi le sens inverse : peux-tu retrouver la forme étrangère à partir du sens ? Si le mot-clé te perturbe, change de lien ou utilise le rappel direct."
+      }
+    ]
+  },
+  {
+    "coach": "lin",
+    "language": "fr",
+    "course": "long-words",
+    "duration": 82.93133786848071,
+    "bytes": 916473,
+    "sha256": "4333d1632092e79e0ff1f0e49f2178a3c937523a2da788ef5432fb31ca19873d",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Approved complete utterance tone conversion to synthetic Lin reference; own approved greeting for story",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/lin-long-words-fr-4333d1632092.m4a",
+    "synthesis": "kyutai-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
+      "https://github.com/myshell-ai/OpenVoice",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic Qwen VoiceDesign Lin target, Apache 2.0; source Kyutai Fabien CC0, model CC-BY-4.0",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT; Kyutai CC-BY-4.0",
+    "approvedReferenceHashes": {
+      "lin-fr": "216afd07493f946fa09d8b4c162b12baca4fb5aa379ab6ff3123d931519e0377"
+    },
+    "referenceApproval": "User explicitly accepted Lin English and French short references on 2026-10-01; full-course listening remains open.",
+    "sourceSha256": "149351df0c066b2839bf02809d0083d2fcb12300589a53ebf88425690e000533",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "4333d1632092e79e0ff1f0e49f2178a3c937523a2da788ef5432fb31ca19873d",
+      "notes": "Negative prefix in and incomprehensible meaning restored; full word and prefix explanation verified in both voices."
+    },
+    "voiceTarget": "Synthetic Qwen VoiceDesign Lin reference, Apache 2.0",
+    "approvedReference": "approved-language-references/lin-fr.wav",
+    "spokenClarifications": [
+      {
+        "cue": 9,
+        "spokenText": "Exemple : incompréhensible."
+      },
+      {
+        "cue": 10,
+        "spokenText": "Le mot incompréhensible signifie : ce qui ne peut pas être compris. On sépare le préfixe in et le mot compréhensible. Le préfixe in apporte ici la négation. Compréhensible est lié au verbe comprendre. Ce découpage aide à saisir le sens. Il ne constitue pas une transcription de la prononciation."
+      }
+    ]
+  },
+  {
+    "coach": "lin",
+    "language": "fr",
+    "course": "meaningful-groups",
+    "duration": 92.88108843537414,
+    "bytes": 1013153,
+    "sha256": "490a1d2854406d5c00566c7c70f2e0a1d64f6a7284ef339be15f82e8e0effd47",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Approved complete utterance tone conversion to synthetic Lin reference; own approved greeting for story",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/lin-meaningful-groups-fr-490a1d285440.m4a",
+    "synthesis": "kyutai-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
+      "https://github.com/myshell-ai/OpenVoice",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic Qwen VoiceDesign Lin target, Apache 2.0; source Kyutai Fabien CC0, model CC-BY-4.0",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT; Kyutai CC-BY-4.0",
+    "approvedReferenceHashes": {
+      "lin-fr": "216afd07493f946fa09d8b4c162b12baca4fb5aa379ab6ff3123d931519e0377"
+    },
+    "referenceApproval": "User explicitly accepted Lin English and French short references on 2026-10-01; full-course listening remains open.",
+    "sourceSha256": "8041cea94c49138b5e58c8697deb713803f39be11317a756c3f17522dd026fdf",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "490a1d2854406d5c00566c7c70f2e0a1d64f6a7284ef339be15f82e8e0effd47",
+      "notes": "Nine words with articles regenerated after scie/veste distortion; final transcript retains pomme,marteau,chemise,poire,scie,veste,banane,pince,pantalon and groups."
+    },
+    "voiceTarget": "Synthetic Qwen VoiceDesign Lin reference, Apache 2.0",
+    "approvedReference": "approved-language-references/lin-fr.wav",
+    "spokenClarifications": [
+      {
+        "cue": 7,
+        "spokenText": "Cache la source. Ensuite, rappelle d’abord les groupes, puis leur contenu."
+      },
+      {
+        "cue": 11,
+        "spokenText": "Rappelle les trois groupes et autant des neuf éléments que possible. Fais-le sans regarder la liste. L’ordre dans chaque groupe est libre."
+      },
+      {
+        "cue": 12,
+        "spokenText": "Organise un passage par idées ou une liste par catégories utiles. N’invente pas des groupes pour atteindre un nombre fixé. Vérifie tout le contenu. Ne te limite pas aux titres."
+      },
+      {
+        "cue": 9,
+        "spokenText": "Une pomme. Un marteau. Une chemise. Une poire. Une scie. Une veste. Une banane. Une pince. Un pantalon."
+      }
+    ]
+  },
+  {
+    "coach": "lin",
+    "language": "fr",
+    "course": "method-of-loci",
+    "duration": 82.79034013605441,
+    "bytes": 932886,
+    "sha256": "f958a4570af48dbc48aa9f2496550ca48f582cbe523f7fe20f081afef95f1f08",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Approved complete utterance tone conversion to synthetic Lin reference; own approved greeting for story",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/lin-method-of-loci-fr-f958a4570af4.m4a",
+    "synthesis": "kyutai-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
+      "https://github.com/myshell-ai/OpenVoice",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic Qwen VoiceDesign Lin target, Apache 2.0; source Kyutai Fabien CC0, model CC-BY-4.0",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT; Kyutai CC-BY-4.0",
+    "approvedReferenceHashes": {
+      "lin-fr": "216afd07493f946fa09d8b4c162b12baca4fb5aa379ab6ff3123d931519e0377"
+    },
+    "referenceApproval": "User explicitly accepted Lin English and French short references on 2026-10-01; full-course listening remains open.",
+    "sourceSha256": "4c3a046dcc0675f037ec26e470a41088afa4773fb5138354f5260e07a74f13fc",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "f958a4570af48dbc48aa9f2496550ca48f582cbe523f7fe20f081afef95f1f08",
+      "notes": "Door/shoe rack/table and bread/soap/candle mappings retained; homophone pain/peint does not change the intended example."
+    },
+    "voiceTarget": "Synthetic Qwen VoiceDesign Lin reference, Apache 2.0",
+    "approvedReference": "approved-language-references/lin-fr.wav",
+    "spokenClarifications": [
+      {
+        "cue": 4,
+        "spokenText": "Fixe leur ordre. Répète ensuite le trajet sans contenu à apprendre."
+      },
+      {
+        "cue": 7,
+        "spokenText": "Compare ton rappel. Améliore ensuite les lieux confus ou les images peu efficaces."
+      },
+      {
+        "cue": 10,
+        "spokenText": "Visite mentalement les trois endroits. Puis écris l’élément associé à chacun."
+      }
+    ]
+  },
+  {
+    "coach": "lin",
+    "language": "fr",
+    "course": "number-images",
+    "duration": 92.00866213151926,
+    "bytes": 1026198,
+    "sha256": "38faeb8523568a04a5e79da485da1e1ddcb9f205a36a7884691525d5b9cfc75f",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Approved complete utterance tone conversion to synthetic Lin reference; own approved greeting for story",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/lin-number-images-fr-38faeb852356.m4a",
+    "synthesis": "kyutai-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
+      "https://github.com/myshell-ai/OpenVoice",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic Qwen VoiceDesign Lin target, Apache 2.0; source Kyutai Fabien CC0, model CC-BY-4.0",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT; Kyutai CC-BY-4.0",
+    "approvedReferenceHashes": {
+      "lin-fr": "216afd07493f946fa09d8b4c162b12baca4fb5aa379ab6ff3123d931519e0377"
+    },
+    "referenceApproval": "User explicitly accepted Lin English and French short references on 2026-10-01; full-course listening remains open.",
+    "sourceSha256": "ebf0a0e02bbc2323c6060fff5aa34d5a2f03932fe4fc792e9a38e33d7d4b2e10",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "38faeb8523568a04a5e79da485da1e1ddcb9f205a36a7884691525d5b9cfc75f",
+      "notes": "Replaced ambiguous standalone letter readings with initial sounds of tapis/dos/nez. Both voices retain 1/2/12 and one consonant sound for doubled n."
+    },
+    "voiceTarget": "Synthetic Qwen VoiceDesign Lin reference, Apache 2.0",
+    "approvedReference": "approved-language-references/lin-fr.wav",
+    "spokenClarifications": [
+      {
+        "cue": 4,
+        "spokenText": "Lis les sons, dans l’ordre des chiffres."
+      },
+      {
+        "cue": 11,
+        "spokenText": "Travaille les autres correspondances fixes dans les leçons existantes avant de mémoriser des nombres plus longs. Assure-toi que chaque image te ramène exactement au nombre voulu."
+      },
+      {
+        "cue": 8,
+        "spokenText": "Pour le chiffre un, utilise le premier son de tapis ou de dos. Pour le chiffre deux, utilise le premier son de nez. Pour douze, imagine une tonne de sable. Dans tonne, tu retrouves le son initial de tapis, puis celui de nez."
+      },
+      {
+        "cue": 9,
+        "spokenText": "Dans cet exercice, les voyelles ne comptent pas. Le mot tonne s’écrit avec deux lettres identiques au milieu, mais elles représentent un seul son. Le premier son consonantique code un. Le second code deux. Tu retrouves douze. On compte les sons, pas le nombre de lettres."
+      }
+    ]
+  },
+  {
+    "coach": "lin",
+    "language": "fr",
+    "course": "self-explanation",
+    "duration": 102.94693877551018,
+    "bytes": 1182895,
+    "sha256": "1969dacfaa2833e8f00059d13fe4a30848862cb60418cf70a1e844f16fa11b2b",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Approved complete utterance tone conversion to synthetic Lin reference; own approved greeting for story",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/lin-self-explanation-fr-1969dacfaa28.m4a",
+    "synthesis": "kyutai-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
+      "https://github.com/myshell-ai/OpenVoice",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic Qwen VoiceDesign Lin target, Apache 2.0; source Kyutai Fabien CC0, model CC-BY-4.0",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT; Kyutai CC-BY-4.0",
+    "approvedReferenceHashes": {
+      "lin-fr": "216afd07493f946fa09d8b4c162b12baca4fb5aa379ab6ff3123d931519e0377"
+    },
+    "referenceApproval": "User explicitly accepted Lin English and French short references on 2026-10-01; full-course listening remains open.",
+    "sourceSha256": "6401fe1a41f6f700bcbcddc7c1ef20f481aa464b2cc77407f1efecf0f3d9c0cc",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "1969dacfaa2833e8f00059d13fe4a30848862cb60418cf70a1e844f16fa11b2b",
+      "notes": "Repaired formulate instruction. 3/4=6/8 and 2/3=4/6 retained; oral fraction forms match formulas."
+    },
+    "voiceTarget": "Synthetic Qwen VoiceDesign Lin reference, Apache 2.0",
+    "approvedReference": "approved-language-references/lin-fr.wav",
+    "spokenClarifications": [
+      {
+        "cue": 5,
+        "spokenText": "Maintenant, explique avec tes propres mots. Ne copie pas la source."
+      }
+    ]
+  },
+  {
+    "coach": "lin",
+    "language": "fr",
+    "course": "spaced-practice",
+    "duration": 112.4322902494331,
+    "bytes": 1282923,
+    "sha256": "bcbd79b8a6cb1df13cc0cb7f6e7670c74fba48bd62c8eba0f94b6bd6cc5acad3",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Approved complete utterance tone conversion to synthetic Lin reference; own approved greeting for story",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/lin-spaced-practice-fr-bcbd79b8a6cb.m4a",
+    "synthesis": "kyutai-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
+      "https://github.com/myshell-ai/OpenVoice",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic Qwen VoiceDesign Lin target, Apache 2.0; source Kyutai Fabien CC0, model CC-BY-4.0",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT; Kyutai CC-BY-4.0",
+    "approvedReferenceHashes": {
+      "lin-fr": "216afd07493f946fa09d8b4c162b12baca4fb5aa379ab6ff3123d931519e0377"
+    },
+    "referenceApproval": "User explicitly accepted Lin English and French short references on 2026-10-01; full-course listening remains open.",
+    "sourceSha256": "3c9902a34909cbad5d004711040e7bc34ef6c9e8471c3b96ac3a532aea75b20e",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "bcbd79b8a6cb1df13cc0cb7f6e7670c74fba48bd62c8eba0f94b6bd6cc5acad3",
+      "notes": "Repaired delayed-recall introduction and adaptation instruction; no additional review cards claim retained. Brand recognition varies and awaits listening assessment."
+    },
+    "voiceTarget": "Synthetic Qwen VoiceDesign Lin reference, Apache 2.0",
+    "approvedReference": "approved-language-references/lin-fr.wav",
+    "spokenClarifications": [
+      {
+        "cue": 12,
+        "spokenText": "Utilise les révisions dues pour les éléments d’entraînement enregistrés. Pour un contenu extérieur à l’application, prévois un test ultérieur et adapte le délai au rappel réel. Ce cours ne crée aucune nouvelle carte de révision quand tu le termines."
+      },
+      {
+        "cue": 1,
+        "spokenText": "Répartis les tentatives de rappel dans le temps. Après une pause, essaie de retrouver la réponse. Tu vérifies ainsi ce que tu as retenu. Répéter immédiatement une réponse que tu viens de lire ne suffit pas."
+      },
+      {
+        "cue": 10,
+        "spokenText": "Le délai et la tentative de rappel comptent. Relire dix fois de suite ne remplace pas un rappel ultérieur. Grâce à son erreur, Mira sait ce qu’elle doit retravailler. Elle peut aussi adapter le délai avant son prochain essai."
+      }
+    ]
+  },
+  {
+    "coach": "lin",
+    "language": "fr",
+    "course": "text-meaning",
+    "duration": 104.9554648526077,
+    "bytes": 1193938,
+    "sha256": "da6c2a657e656d36be6f89b7eb2782827a1af9f7302008598fe9a08dde826417",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Approved complete utterance tone conversion to synthetic Lin reference; own approved greeting for story",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/lin-text-meaning-fr-da6c2a657e65.m4a",
+    "synthesis": "kyutai-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
+      "https://github.com/myshell-ai/OpenVoice",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic Qwen VoiceDesign Lin target, Apache 2.0; source Kyutai Fabien CC0, model CC-BY-4.0",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT; Kyutai CC-BY-4.0",
+    "approvedReferenceHashes": {
+      "lin-fr": "216afd07493f946fa09d8b4c162b12baca4fb5aa379ab6ff3123d931519e0377"
+    },
+    "referenceApproval": "User explicitly accepted Lin English and French short references on 2026-10-01; full-course listening remains open.",
+    "sourceSha256": "46fad85d9e3461059cf2eed161887ecd742e70680e4b528796eb34f6b0446455",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "da6c2a657e656d36be6f89b7eb2782827a1af9f7302008598fe9a08dde826417",
+      "notes": "Repaired return-to-recall instruction and evaporation wording; shade, evaporation, water and root space all retained in final independent transcripts."
+    },
+    "voiceTarget": "Synthetic Qwen VoiceDesign Lin reference, Apache 2.0",
+    "approvedReference": "approved-language-references/lin-fr.wav",
+    "spokenClarifications": [
+      {
+        "cue": 2,
+        "spokenText": "Un résumé ne conserve pas tous les détails. Travaille séparément les chiffres ou les formulations exactes lorsqu’ils sont importants. Commence par un court passage. Allonge ce passage quand tu peux en expliquer le sens."
+      },
+      {
+        "cue": 3,
+        "spokenText": "Commence par lire un passage. Clarifie les termes inconnus."
+      },
+      {
+        "cue": 4,
+        "spokenText": "Repère les idées du passage. Donne un titre court à chacune."
+      },
+      {
+        "cue": 7,
+        "spokenText": "Compare ton rappel avec le texte original. Ajoute les idées manquantes. Corrige les erreurs dans les liens entre les idées."
+      },
+      {
+        "cue": 10,
+        "spokenText": "On distingue trois parties. Premièrement, l’action : planter des arbres. Deuxièmement, les effets : l’ombre et l’évaporation. Troisièmement, les conditions : de l’eau et de l’espace pour les racines. Ce plan conserve les liens entre les idées."
+      },
+      {
+        "cue": 8,
+        "spokenText": "Plus tard, recommence le rappel. Adapte le délai selon la qualité de ta réponse."
+      },
+      {
+        "cue": 9,
+        "spokenText": "Une ville plante des arbres le long d’une route très fréquentée. Leur feuillage apporte de l’ombre. Les feuilles rejettent de l’eau par évaporation. Cette évaporation contribue au refroidissement. Pendant les périodes sèches, les arbres ont besoin de suffisamment d’eau. Leurs racines ont aussi besoin d’espace pour rester en bonne santé."
+      }
+    ]
+  },
+  {
+    "coach": "lin",
+    "language": "fr",
+    "course": "text-verbatim",
+    "duration": 85.03274376417232,
+    "bytes": 946570,
+    "sha256": "95ada954b40945213786927671892fbb6638835936dfe478267d3ccd242e5e5e",
+    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
+    "recipe": "Approved complete utterance tone conversion to synthetic Lin reference; own approved greeting for story",
+    "referenceManifest": "approved-language-references/manifest.json",
+    "src": "/course-media/library/lin-text-verbatim-fr-95ada954b409.m4a",
+    "synthesis": "kyutai-openvoice",
+    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "sources": [
+      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
+      "https://github.com/myshell-ai/OpenVoice",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+    ],
+    "voiceSource": "Synthetic Qwen VoiceDesign Lin target, Apache 2.0; source Kyutai Fabien CC0, model CC-BY-4.0",
+    "modelLicense": "Qwen3-TTS Apache-2.0; OpenVoice MIT; Kyutai CC-BY-4.0",
+    "approvedReferenceHashes": {
+      "lin-fr": "216afd07493f946fa09d8b4c162b12baca4fb5aa379ab6ff3123d931519e0377"
+    },
+    "referenceApproval": "User explicitly accepted Lin English and French short references on 2026-10-01; full-course listening remains open.",
+    "sourceSha256": "334d7bb4e457633092f20675012327d298324e26264673c4f7722d344dab487e",
+    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
+    "contentReview": {
+      "audioSha256": "95ada954b40945213786927671892fbb6638835936dfe478267d3ccd242e5e5e",
+      "notes": "Read-source and alternate starting-point instructions repaired. Exact window/fresh-air/day three-sentence passage retained."
+    },
+    "voiceTarget": "Synthetic Qwen VoiceDesign Lin reference, Apache 2.0",
+    "approvedReference": "approved-language-references/lin-fr.wav",
+    "spokenClarifications": [
+      {
+        "cue": 4,
+        "spokenText": "Commence par lire le passage attentivement. Prononce le passage clairement une fois."
+      },
+      {
+        "cue": 10,
+        "spokenText": "Les trois phrases forment trois unités de travail. Apprends la première, puis la deuxième et leur transition. Au prochain essai, commence aussi par les mots : l’air frais."
+      }
+    ]
   }
 ]

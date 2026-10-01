@@ -8,7 +8,7 @@ it('retains every German course and registers only reviewed language and coach c
  const languages=[...new Set(courseNarrations.map(pack=>pack.language))]
  expect(languages).toContain('de')
  const courses=['story-method',...Object.keys(courseLibraryMedia)]
- const expected=[...courses.flatMap(course=>['rafael','lin'].map(coach=>`${course}:${coach}:de`)), 'story-method:rafael:en','story-method:original:en','story-method:rafael:fr']
+ const expected=courses.flatMap(course=>[`${course}:rafael:de`,`${course}:lin:de`,`${course}:rafael:en`,`${course}:original:en`,`${course}:rafael:fr`,`${course}:lin:en`,`${course}:lin:fr`])
  expect(courseNarrations.map(pack=>`${pack.course}:${pack.coach}:${pack.language}`).sort()).toEqual(expected.sort())
  const manifest=JSON.parse(readFileSync('public/course-media/coach-narration-manifest.json','utf8')) as {src:string;sha256:string;bytes:number}[]
  expect(manifest.map(({src,sha256,bytes})=>({src,sha256,bytes}))).toEqual(courseNarrations.map(({src,sha256,bytes})=>({src,sha256,bytes})))
@@ -20,7 +20,8 @@ it('keeps distinct verified local voices and the same lesson cues',()=>{
  expect(courseNarration('story-method','en','original')?.synthesis).toBe('qwen-openvoice')
  expect(courseNarration('story-method','fr','rafael')?.synthesis).toBe('kyutai-openvoice')
  expect(courseNarration('story-method','en','rafael')?.synthesis).toBe('qwen-own-name')
- expect(courseNarration('story-method','fr','lin')).toBeUndefined()
+ expect(courseNarration('story-method','fr','lin')?.synthesis).toBe('kyutai-openvoice')
+ expect(courseNarration('story-method','fr','original')).toBeUndefined()
  expect(courseNarration('story-method','de',null)).toBeUndefined()
  expect(new Set(courseNarrations.map(p=>p.sha256)).size).toBe(courseNarrations.length)
  for(const pack of courseNarrations){

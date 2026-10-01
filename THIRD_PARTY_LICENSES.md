@@ -134,14 +134,14 @@ user recording or third-party speaker recording is distributed. The accepted
 ANITEW name excerpt remains the existing Piper v14 reference. Per-file hashes
 and provenance are recorded in `public/course-media/coach-narration-manifest.json`.
 
-## Revised English and French story narration (2026-10-01)
+## Revised English and French course narration (2026-10-01)
 
-The revised English story recordings for Atta and Noah use the user-approved
+The revised English course recordings for Atta and Noah use the user-approved
 synthetic Atta performance (Qwen3-TTS, Apache-2.0). Noah uses full-utterance
 OpenVoice V2 tone conversion (MIT) toward the existing synthetic Piper Joe
 voice (CC0 dataset). The full greeting stays in each coach's own voice.
 
-Atta's revised French story uses Kyutai TTS 1.6B en_fr (CC-BY-4.0), the Fabien
+Atta's revised French narration uses Kyutai TTS 1.6B en_fr (CC-BY-4.0), the Fabien
 voice reference (CC0), and OpenVoice V2 (MIT) conversion toward CML-TTS French
 speaker 1406 (CC-BY-4.0). CML-TTS: Frederico S. Oliveira et al.,
 https://openslr.org/146/. Voice source:
@@ -156,3 +156,13 @@ The app bundles only narration, not model weights or reference speaker recording
 
 Short reference recordings were explicitly accepted by the user. Full narration
 has separate automatic content checks; this is not a full human listening review.
+
+Lin’s English and French course recordings use the same source performances
+converted to the separately approved synthetic Lin voice (Qwen3-TTS VoiceDesign,
+Apache-2.0). They do not use Piper Joe or CML-TTS 1406 as the target voice.
+The French source remains Kyutai Fabien (CC0), with Kyutai TTS (CC-BY-4.0)
+and OpenVoice V2 (MIT). ANITEW adapted the pace, phrasing and synthetic timbre.
+Short Lin references were accepted on 2026-10-01; full-course listening remains
+separate. Per-file checksums, source links and spoken clarifications are in
+`public/course-media/coach-narration-manifest.json`. No rejected new Noah
+French recording is distributed.

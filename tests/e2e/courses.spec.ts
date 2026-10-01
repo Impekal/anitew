@@ -288,21 +288,39 @@ test('story narration has independent language, persistent speed and the same re
   await expect(page.locator('#course-speed')).toHaveValue('1.5')
 })
 
-test('all three original story audio tracks are cached offline and no external media is required',async({page,context})=>{
+test('original story tracks remain cached and selected Noah recordings play offline after download',async({page,context})=>{
   test.setTimeout(60_000) // Wait for complete offline installation and decode all three tracks.
   await visit(page)
   await page.evaluate(async()=>{
     await navigator.serviceWorker.ready
     if(!navigator.serviceWorker.controller)await new Promise<void>(resolve=>navigator.serviceWorker.addEventListener('controllerchange',()=>resolve(),{once:true}))
   })
-  await context.setOffline(true)
-  await page.reload()
   await openPage(page,'Lernkurse')
   await page.getByRole('button',{name:'Kurs öffnen : Begriffe durch Geschichten verbinden',exact:true}).click()
   await page.locator('.course-coaches summary').click()
   await page.locator('#course-coach-mode').selectOption('global')
   await page.locator('#course-coach-all').selectOption('original')
   await page.getByRole('button',{name:'Anhören und ansehen',exact:true}).click()
+  for(const language of ['de','en','fr'] as const){
+    await page.locator('#course-audio-language').selectOption(language)
+    if(courseNarration('story-method',language,'original')){
+      await page.getByRole('button',{name:'Für offline laden / fortsetzen',exact:true}).click()
+      await expect(page.getByText(/Diese Tonspur ist offline verfügbar/)).toBeVisible()
+    }
+  }
+  await context.setOffline(true)
+  // All three original baseline files remain available independently of new coach choices.
+  for(const language of ['de','en','fr']){
+    const result=await page.evaluate(async lang=>{
+      const response=await fetch(`/course-media/story/${lang}.m4a`)
+      return {status:response.status,bytes:(await response.arrayBuffer()).byteLength}
+    },language)
+    expect(result.status).toBe(200)
+    expect(result.bytes).toBeGreaterThan(100_000)
+  }
+  await page.reload()
+  await openPage(page,'Lernkurse')
+  await page.getByRole('button',{name:'Kurs öffnen : Begriffe durch Geschichten verbinden',exact:true}).click()
   for(const language of ['de','en','fr']){
     await page.locator('#course-audio-language').selectOption(language)
     await expect(page.locator('#course-audio-language')).toBeEnabled()
@@ -414,3 +432,49 @@ test('exact wording comparison also helps with private material without saving i
  await page.getByRole('button',{name:'Kurs öffnen : Texte wortgetreu lernen',exact:true}).click()
  await expect(page.getByLabel('Eigener Text oder eigenes Wort (nur für diesen Versuch)',{exact:true})).toHaveValue('')
 })
+
+for(const language of ['en','fr'] as const){
+ test(`Lin ${language} library narration keeps its timing and recall boundary offline`,async({page,context})=>{
+  test.setTimeout(60_000)
+  const pack=courseNarration('long-words',language,'lin')!
+  await visit(page)
+  const externalMedia:string[]=[]
+  page.on('request',request=>{if(['media','image'].includes(request.resourceType())&&!request.url().startsWith(new URL(page.url()).origin))externalMedia.push(request.url())})
+  await openPage(page,'Lernkurse')
+  await page.getByRole('button',{name:'Kurs öffnen : Lange Wörter sicher behalten',exact:true}).click()
+  await page.locator('.course-coaches summary').click()
+  await page.locator('#course-coach-mode').selectOption('global')
+  await page.locator('#course-coach-all').selectOption('lin')
+  await page.getByRole('button',{name:'Anhören und ansehen',exact:true}).click()
+  await page.locator('#course-audio-language').selectOption(language)
+  const audio=page.locator('.course-media audio')
+  await expect(audio).toHaveAttribute('src',pack.src)
+  await page.getByRole('button',{name:'Für offline laden / fortsetzen',exact:true}).click()
+  await expect(page.getByText(/Diese Tonspur ist offline verfügbar/)).toBeVisible()
+  await page.evaluate(async()=>{await navigator.serviceWorker.ready;if(!navigator.serviceWorker.controller)await new Promise<void>(resolve=>navigator.serviceWorker.addEventListener('controllerchange',()=>resolve(),{once:true}))})
+  await context.setOffline(true)
+  await page.reload()
+  await openPage(page,'Lernkurse')
+  await page.getByRole('button',{name:'Kurs öffnen : Lange Wörter sicher behalten',exact:true}).click()
+  await expect(audio).toHaveAttribute('src',pack.src)
+  await audio.evaluate((element:HTMLAudioElement)=>element.load())
+  await expect.poll(()=>audio.evaluate((element:HTMLAudioElement)=>element.readyState)).toBeGreaterThan(0)
+  expect(await audio.evaluate((element:HTMLAudioElement)=>element.duration)).toBeCloseTo(pack.duration,0)
+  const example=pack.cues.find(cue=>cue.section==='example')!
+  await audio.evaluate((element:HTMLAudioElement,time)=>{element.currentTime=time;element.dispatchEvent(new Event('timeupdate'))},example.start+.1)
+  await expect(page.locator('.course-caption')).toHaveAttribute('lang','de')
+  const previousPlayer=await audio.elementHandle()
+  const transfer=pack.cues.find(cue=>cue.section==='transfer')!
+  await audio.evaluate((element:HTMLAudioElement,time)=>{element.currentTime=time;element.dispatchEvent(new Event('timeupdate'))},transfer.start+.1)
+  await expect(page.getByLabel('Deine Antwort',{exact:true})).toBeVisible()
+  await expect(page.locator('.course-lesson blockquote')).toHaveCount(0)
+  expect(await previousPlayer!.evaluate((element:HTMLAudioElement)=>element.paused)).toBe(true)
+  await previousPlayer!.dispose()
+  await expect(audio).toHaveCount(0)
+  await page.getByLabel('Deine Antwort',{exact:true}).fill(language==='en'?'unpredictability':'incompréhensible')
+  await page.getByRole('button',{name:'Mit der Vorlage vergleichen',exact:true}).click()
+  await expect(page.locator('.course-lesson blockquote')).toHaveText(language==='en'?'unpredictability':'incompréhensible')
+  expect(externalMedia).toEqual([])
+  await context.setOffline(false)
+ })
+}
