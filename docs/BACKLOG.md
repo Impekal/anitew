@@ -572,3 +572,11 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 - Beispielgrafiken verschwinden bereits beim gesprochenen Abrufauftrag, bevor das Antwortfeld öffnet. Im Lesemodus bleiben die vollständigen Grafiken verfügbar. Keine zusätzliche Animation oder externe Medienanfrage.
 - Lokale Prüfung: sechs neue Desktop-/Mobil-Prüfungen für DE/EN/FR bestanden, ebenso beide Prüfungen der gleichen Bruchflächen. Typprüfung, Build und unverändertes Kaltstartbudget bestanden. Der strenge CI-Gate wird auf dem neuen Commit gestartet.
 - C05 bleibt teilweise offen: methodenspezifische reichhaltigere Illustrationen und abschließende Sichtprüfung. Stimmfreigaben und abgelehnte Videos bleiben unverändert.
+
+### Konkrete Lernbilder für Gruppierung und Orte (2026-10-01)
+
+- Die Gruppierungsansicht enthält jetzt alle neun Begriffe in den drei Kategorien Obst, Werkzeug und Kleidung, mit lokalen Symbolen. DE/EN/FR bleiben mit den jeweiligen Kursbeispielen konsistent.
+- Der Beispielweg zeigt Brot an der Tür, Seifenschaum am Regal und die Kerze auf dem Tisch mit klarer Laufrichtung. Die zugängliche Bildbeschreibung und die beschrifteten Stationen bleiben erhalten.
+- Keine externen Assets oder neue Animationen. Farben und Typografie stammen aus der App; bestehende Kurse und Abrufsperren bleiben erhalten.
+- Sechs neue Desktop-/Mobilprüfungen für die drei Sprachen bestanden: vollständige Begriffsgruppen, zugängliche Stationsfolge, kein horizontaler Überlauf, Offline-Neustart und ausgeblendete Lernbilder beim Abruf. Desktop- und Mobilbilder visuell kontrolliert; Typprüfung, Build und unverändertes Größenbudget bestanden.
+- CI #1647 hatte auf dem vorherigen Commit die Kurse, Layout-Matrix und alle frühen Hardening-Gates bestanden; die Vollregression lief zum Zeitpunkt dieses Eintrags noch. Der neue Stand erhält einen eigenen strengen Gate. C05 bleibt bis zur weiteren Ausarbeitung und finalen Sichtprüfung offen.

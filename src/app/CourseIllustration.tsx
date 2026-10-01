@@ -5,6 +5,16 @@ const labels={
  en:{title:'The method in a diagram',meaning:['Action','Effect','Condition'],verbatim:['Sentence 1','Sentence 2','Sentence 3'],recall:['Study the source','Hide it','Recall','Compare'],spaced:['Recall','Pause','Recall again','Adjust interval'],groups:['Fruit','Tools','Clothing'],explain:['Claim','Reason','Check an example'],loci:['Door · bread','Shelf · soap','Table · candle'],keyword:['pain','pan → jumping bread','bread'],word:['un','predict','ability'],number:['12','t + n','tin'],mixed:['Identify the goal','Choose a method','Check the solution']},
  fr:{title:'La méthode en schéma',meaning:['Mesure','Effet','Condition'],verbatim:['Phrase 1','Phrase 2','Phrase 3'],recall:['Étudier le modèle','Le masquer','Rappeler','Comparer'],spaced:['Rappel','Pause','Nouveau rappel','Adapter l’intervalle'],groups:['Fruits','Outils','Vêtements'],explain:['Affirmation','Raison','Vérifier un exemple'],loci:['Porte · pain','Étagère · savon','Table · bougie'],keyword:['bell','belle','cloche'],word:['in','compréhensible'],number:['12','t + n','tonne'],mixed:['Identifier le but','Choisir une méthode','Vérifier la solution']},
 }
+const groupedItems={
+ de:[['Apfel','Birne','Banane'],['Hammer','Säge','Zange'],['Hemd','Jacke','Hose']],
+ en:[['Apple','Pear','Banana'],['Hammer','Saw','Pliers'],['Shirt','Jacket','Trousers']],
+ fr:[['Pomme','Poire','Banane'],['Marteau','Scie','Pince'],['Chemise','Veste','Pantalon']],
+}
+const groupSymbols=[
+ 'M30 15c-9-8-20 0-18 12s9 20 18 15c9 5 16-3 18-15s-9-20-18-12m0 0c0-8 5-12 11-12',
+ 'M13 8h27v12H30v27H20V20h-7Z',
+ 'm20 8-15 9 7 12 8-4v23h22V25l8 4 7-12-15-9c-4 9-18 9-22 0Z',
+]
 export function CourseIllustration({id,locale}:{id:CourseId;locale:CourseLanguage}){
  const t=labels[locale]
  const steps=id==='text-meaning'?t.meaning:id==='text-verbatim'?t.verbatim:id==='long-words'?t.word:id==='active-recall'?t.recall:id==='spaced-practice'?t.spaced:id==='meaningful-groups'?t.groups:id==='self-explanation'?t.explain:id==='method-of-loci'?t.loci:id==='keyword-method'?t.keyword:id==='number-images'?t.number:t.mixed
@@ -22,7 +32,27 @@ export function CourseIllustration({id,locale}:{id:CourseId;locale:CourseLanguag
    <rect x="15" y="12" width="100" height="75" fill="#c2a564" fillOpacity=".35" stroke="currentColor"/><path d="M170 87V12L270 87Z" fill="#c2a564" fillOpacity=".35" stroke="currentColor"/>
    <text x="40" y="110" fill="currentColor">12 cm²</text><text x="200" y="110" fill="currentColor">6 cm²</text>
   </svg>}
-  <ol>{steps.map((label,index)=><li key={label}><span className="illustration-number" aria-hidden="true">{index+1}</span>{label}</li>)}</ol>
+  {id==='method-of-loci'&&<svg viewBox="0 0 330 145" role="img" aria-label={t.loci.join(' → ')}>
+   <g fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round">
+    <path d="M30 112V20h50v92M70 65h3"/>
+    <path d="M22 69c-7-25 57-29 64-8l-4 25-57 6Z" fill="var(--an-gold,#c2a564)"/>
+    <path d="m39 60 4 17m11-20 4 17m10-20 4 17"/>
+    <path d="M128 112V35h65v77m-65-47h65m-65 25h65"/>
+    {[{x:137,y:60,r:10},{x:155,y:51,r:13},{x:176,y:61,r:12},{x:146,y:80,r:12},{x:166,y:87,r:15},{x:184,y:100,r:11}].map(({x,y,r})=><circle key={x} cx={x} cy={y} r={r} fill="var(--an-bg,#142523)"/>)}
+    <path d="M239 85h70v10h-70Zm8 10v20m54-20v20"/>
+    <path d="M267 85V48h14v37Z" fill="var(--an-gold,#c2a564)"/>
+    <path d="M274 46c-13-8 0-17 0-24 9 12 11 18 0 24Z" fill="var(--an-gold,#c2a564)"/>
+    <path d="M94 123h24m-6-5 6 5-6 5m88-5h24m-6-5 6 5-6 5"/>
+   </g>
+   <g fill="currentColor" textAnchor="middle" fontSize="13"><text x="55" y="137">1</text><text x="160" y="137">2</text><text x="274" y="137">3</text></g>
+  </svg>}
+  <ol>{steps.map((label,index)=><li key={label}>
+   <span className="illustration-number" aria-hidden="true">{index+1}</span>{label}
+   {id==='meaningful-groups'&&<>
+    <svg viewBox="0 0 64 56" aria-hidden="true" height="56"><path d={groupSymbols[index]} fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/></svg>
+    {groupedItems[locale][index].map(item=><p key={item}>{item}</p>)}
+   </>}
+  </li>)}</ol>
  </figure>
 }
 

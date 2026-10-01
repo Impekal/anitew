@@ -537,3 +537,36 @@ for(const language of ['de','en','fr'] as const){
   await expect(page.locator('.course-illustration')).toHaveCount(0)
  })
 }
+
+for(const copy of [
+ {language:'de',page:'Lernkurse',open:'Kurs öffnen',groups:'Sinnvolle Einheiten bilden',loci:'Orte als Gedächtnisstützen nutzen',back:'Zur Kursübersicht',hide:'Vorlage ausblenden und üben',items:[['Apfel','Birne','Banane'],['Hammer','Säge','Zange'],['Hemd','Jacke','Hose']],route:'Haustür · Brot → Regal · Seife → Tisch · Kerze'},
+ {language:'en',page:'Learning courses',open:'Open course',groups:'Build meaningful groups',loci:'Use places as memory cues',back:'Back to courses',hide:'Hide source and practise',items:[['Apple','Pear','Banana'],['Hammer','Saw','Pliers'],['Shirt','Jacket','Trousers']],route:'Door · bread → Shelf · soap → Table · candle'},
+ {language:'fr',page:'Cours d’apprentissage',open:'Ouvrir le cours',groups:'Former des groupes cohérents',loci:'Utiliser les lieux comme indices',back:'Retour aux cours',hide:'Masquer le modèle et s’entraîner',items:[['Pomme','Poire','Banane'],['Marteau','Scie','Pince'],['Chemise','Veste','Pantalon']],route:'Porte · pain → Étagère · savon → Table · bougie'},
+]){
+ test(`concrete ${copy.language} learning diagrams retain all items and disappear for recall`,async({page,context},testInfo)=>{
+  await visit(page)
+  await page.getByRole('combobox',{name:'Sprache',exact:true}).selectOption(copy.language)
+  await openPage(page,copy.page)
+  await page.getByRole('button',{name:`${copy.open} : ${copy.groups}`,exact:true}).click()
+  const diagram=page.locator('.course-illustration')
+  await expect(diagram.locator('li')).toHaveCount(3)
+  for(let index=0;index<3;index++)await expect(diagram.locator('li').nth(index).locator('p')).toHaveText(copy.items[index])
+  await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true)
+  await diagram.screenshot({path:testInfo.outputPath('groups.png')})
+  await page.getByRole('button',{name:copy.hide,exact:true}).click()
+  await expect(diagram).toHaveCount(0)
+  await page.getByRole('button',{name:copy.back,exact:true}).click()
+  await page.getByRole('button',{name:`${copy.open} : ${copy.loci}`,exact:true}).click()
+  await expect(diagram.getByRole('img',{name:copy.route,exact:true})).toBeVisible()
+  await diagram.screenshot({path:testInfo.outputPath('route.png')})
+  await page.evaluate(async()=>{await navigator.serviceWorker.ready;if(!navigator.serviceWorker.controller)await new Promise<void>(resolve=>navigator.serviceWorker.addEventListener('controllerchange',()=>resolve(),{once:true}))})
+  await context.setOffline(true)
+  await page.reload()
+  await openPage(page,copy.page)
+  await page.getByRole('button',{name:`${copy.open} : ${copy.loci}`,exact:true}).click()
+  await expect(diagram.getByRole('img',{name:copy.route,exact:true})).toBeVisible()
+  await page.getByRole('button',{name:copy.hide,exact:true}).click()
+  await expect(diagram).toHaveCount(0)
+  await context.setOffline(false)
+ })
+}
