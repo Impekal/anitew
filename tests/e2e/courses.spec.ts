@@ -605,3 +605,34 @@ for(const language of ['de','en','fr'] as const){
   }
  })
 }
+
+for(const [language,foreign,bridge,meaning,target,scene] of [
+ ['de','bell','bellen','Glocke','en','Eine Glocke bellt wie ein Hund.'],
+ ['en','pain','pan','bread','fr','Bread leaps out of a pan.'],
+ ['fr','bell','belle','cloche','en','Une très belle cloche qui sonne.'],
+] as const){
+ test(`keyword picture keeps the ${language} sound cue separate from the foreign word`,async({page},testInfo)=>{
+  await visit(page)
+  await openPage(page,'Lernkurse')
+  await page.getByRole('button',{name:'Kurs öffnen : Neue Vokabeln mit Schlüsselwörtern verbinden',exact:true}).click()
+  await page.getByRole('button',{name:'Anhören und ansehen',exact:true}).click()
+  await page.locator('#course-audio-language').selectOption(language)
+  const pack=courseNarration('keyword-method',language,'rafael')!
+  const audio=page.locator('.course-media audio')
+  await audio.evaluate((element:HTMLAudioElement)=>element.load())
+  await expect.poll(()=>audio.evaluate((element:HTMLAudioElement)=>element.readyState)).toBeGreaterThan(0)
+  const seek=async(section:string)=>{await audio.evaluate((element:HTMLAudioElement,time)=>{element.currentTime=time;element.dispatchEvent(new Event('timeupdate'))},pack.cues.find(cue=>cue.section===section)!.start+.1)}
+  await seek('example')
+  const diagram=page.locator('.course-media .illustration-keyword-method')
+  await expect(diagram).toHaveAttribute('lang',language)
+  await expect(diagram.locator('li strong')).toHaveText([foreign,bridge,meaning])
+  await expect(diagram.locator('li p').first()).toHaveAttribute('lang',target)
+  await expect(diagram.locator('li p').nth(1)).toHaveAttribute('lang',language)
+  await expect(diagram.getByRole('img',{name:scene,exact:true})).toBeVisible()
+  await expect(diagram.locator('.keyword-pronunciation-note')).toBeVisible()
+  await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true)
+  await diagram.screenshot({path:testInfo.outputPath('keyword.png')})
+  await seek('recall')
+  await expect(diagram).toHaveCount(0)
+ })
+}

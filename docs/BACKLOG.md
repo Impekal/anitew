@@ -601,3 +601,10 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 - Die gesicherte Fehleransicht zeigt bereits die richtige erste Major-Lektion. Der Test wartete trotzdem weiter auf einen Klick auf den verschwundenen Ankommen-Knopf: Der reale Drei-Sekunden-Timer hatte den Übergang vorher abgeschlossen.
 - Der gemeinsame Starthelfer der Techniktests wartet jetzt auf die echte Lektion nach dem automatischen Übergang. Keine erzwungenen Klicks, keine simulierte Uhr und keine Änderung am Produktablauf. Die inhaltlichen Prüfungen und failOnFlakyTests bleiben unverändert.
 - Die lokal vorbereiteten Wort-/Zahlenbilder werden zusammen mit dieser Testkorrektur in den nächsten vollständigen Gate aufgenommen. Die Ursache des früheren Offline-Ausfalls bleibt gesondert offen, obwohl der Ablauf in #1649 bestanden hat.
+
+### Schlüsselwortbilder und Sprachkennzeichnung (2026-10-01)
+
+- CI #1650 auf dee5541 ist vollständig grün, einschließlich Desktop-Vollregression und Mobile-Gate.
+- Die Schlüsselwortmethode zeigt jetzt die drei sprachabhängigen Merkszenen als lokale SVG-Grafiken. Fremdwort, Klanghilfe und Bedeutung sind ausdrücklich beschriftet; der Aussprachehinweis bleibt direkt sichtbar. Deutsche Klanghilfe ist passend zum Kurstext „bellen“.
+- Die Fremdvokabel erhält ihre eigene Sprachkennzeichnung für assistive Technik. Alle Lernbilder tragen die Sprache ihres Beispiels. Vor dem eigenen Abruf werden auch die neuen Merkszenen ausgeblendet.
+- Sechs Desktop-/Mobilprüfungen für DE/EN/FR bestanden: Zuordnung, Sprachkennzeichnung, zugängliche Bildbeschreibung, Aussprachehinweis, Breite und Abrufsperre. Alle drei Desktop-Bildvarianten visuell geprüft. Typprüfung, Build und unverändertes Größenbudget bestanden. Neuer CI-Gate erforderlich; C05 bleibt bis zur weiteren Ausarbeitung und finalen Sichtprüfung offen.
