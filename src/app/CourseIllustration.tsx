@@ -11,8 +11,11 @@ export function CourseIllustration({id,locale}:{id:CourseId;locale:CourseLanguag
  if(id==='story-method')return null
  return <figure className={`course-illustration illustration-${id}`}><figcaption>{t.title}</figcaption>
   {id==='self-explanation'&&<svg viewBox="0 0 300 100" role="img" aria-label="3/4 = 6/8">
-   {Array.from({length:4},(_,i)=><rect key={`a${i}`} x={10+i*65} y="6" width="60" height="28" fill={i<3?'#c2a564':'none'} stroke="currentColor"/>)}
-   {Array.from({length:8},(_,i)=><rect key={`b${i}`} x={10+i*32.5} y="57" width="27.5" height="28" fill={i<6?'#c2a564':'none'} stroke="currentColor"/>)}
+   {[{parts:4,y:6},{parts:8,y:57}].map(({parts,y})=><g key={parts}>
+    <rect className="fraction-selected" x="10" y={y} width="195" height="28" fill="var(--an-gold,#c2a564)"/>
+    <rect className="fraction-whole" x="10" y={y} width="260" height="28" fill="none" stroke="currentColor"/>
+    {Array.from({length:parts-1},(_,i)=><path key={i} d={`M${10+(i+1)*260/parts} ${y}v28`} stroke="currentColor"/>)}
+   </g>)}
    <text x="275" y="27" fill="currentColor" fontSize="11">3/4</text><text x="275" y="78" fill="currentColor" fontSize="11">6/8</text>
   </svg>}
   {id==='interleaved-practice'&&<svg viewBox="0 0 300 120" role="img" aria-label="4 × 3 = 12; 4 × 3 ÷ 2 = 6">

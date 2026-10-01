@@ -478,3 +478,20 @@ for(const language of ['en','fr'] as const){
   await context.setOffline(false)
  })
 }
+
+test('the fraction illustration shows the same whole and selected quantity before and after subdivision',async({page})=>{
+ await visit(page)
+ await openPage(page,'Lernkurse')
+ await page.getByRole('button',{name:'Kurs öffnen : Zusammenhänge selbst erklären',exact:true}).click()
+ const diagram=page.getByRole('img',{name:'3/4 = 6/8',exact:true})
+ await expect(diagram).toBeVisible()
+ const quantities=await diagram.evaluate(svg=>Array.from(svg.querySelectorAll('g')).map(group=>{
+  const selected=(group.querySelector('.fraction-selected') as SVGGraphicsElement).getBBox()
+  const whole=(group.querySelector('.fraction-whole') as SVGGraphicsElement).getBBox()
+  return {whole:whole.width*whole.height,selected:selected.width*selected.height,parts:group.querySelectorAll('path').length+1}
+ }))
+ expect(quantities.map(q=>q.parts)).toEqual([4,8])
+ expect(quantities[0].whole).toBe(quantities[1].whole)
+ expect(quantities[0].selected).toBe(quantities[1].selected)
+ for(const q of quantities)expect(q.selected/q.whole).toBe(.75)
+})
