@@ -636,3 +636,39 @@ for(const [language,foreign,bridge,meaning,target,scene] of [
   await expect(diagram).toHaveCount(0)
  })
 }
+
+for(const language of ['de','en','fr'] as const){
+ test(`text pictures preserve the ${language} learning goal and hide their source`,async({page},testInfo)=>{
+  await visit(page)
+  await openPage(page,'Lernkurse')
+  for(const [title,id] of [['Lange Texte inhaltlich behalten','text-meaning'],['Texte wortgetreu lernen','text-verbatim']] as const){
+   await page.getByRole('button',{name:`Kurs öffnen : ${title}`,exact:true}).click()
+   await page.getByRole('button',{name:'Anhören und ansehen',exact:true}).click()
+   await page.locator('#course-audio-language').selectOption(language)
+   const pack=courseNarration(id,language,'rafael')!
+   const audio=page.locator('.course-media audio')
+   await audio.evaluate((element:HTMLAudioElement)=>element.load())
+   await expect.poll(()=>audio.evaluate((element:HTMLAudioElement)=>element.readyState)).toBeGreaterThan(0)
+   const seek=async(section:string)=>{await audio.evaluate((element:HTMLAudioElement,time)=>{element.currentTime=time;element.dispatchEvent(new Event('timeupdate'))},pack.cues.find(cue=>cue.section===section)!.start+.1)}
+   await seek('example')
+   const diagram=page.locator(`.course-media .illustration-${id}`)
+   await expect(diagram).toHaveAttribute('lang',language)
+   await expect(diagram.locator('li p')).toHaveCount(3)
+   if(id==='text-verbatim'){
+    expect((await diagram.locator('li p').allTextContents()).join(' ')).toBe(pack.cues.find(cue=>cue.section==='example')!.text)
+    await expect(diagram).toContainText('1 → 2 · 2 → 3')
+   }else{
+    await expect(diagram.getByRole('img')).toBeVisible()
+    const ideas=await diagram.locator('li p').allTextContents()
+    expect(new Set(ideas).size).toBe(3)
+    for(const idea of ideas)expect(idea.length).toBeGreaterThan(10)
+   }
+   await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true)
+   await diagram.screenshot({path:testInfo.outputPath(`${id}.png`)})
+   await seek('recall')
+   await expect(diagram).toHaveCount(0)
+   await page.getByRole('button',{name:'Nur lesen',exact:true}).click()
+   await page.getByRole('button',{name:'Zur Kursübersicht',exact:true}).click()
+  }
+ })
+}

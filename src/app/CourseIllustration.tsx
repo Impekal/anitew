@@ -1,9 +1,15 @@
+import { readingCourses } from '../i18n/courses.ts'
 import type { CourseId } from '../core/courses/progress.ts'
 import type { CourseLanguage } from '../i18n/courseUi.ts'
 const labels={
  de:{title:'Die Methode im Bild',meaning:['Maßnahme','Wirkung','Voraussetzung'],verbatim:['Satz 1','Satz 2','Satz 3'],recall:['Vorlage ansehen','Verdecken','Selbst abrufen','Vergleichen'],spaced:['Abrufen','Pause','Erneut abrufen','Abstand anpassen'],groups:['Obst','Werkzeug','Kleidung'],explain:['Behauptung','Begründung','Am Beispiel prüfen'],loci:['Haustür · Brot','Regal · Seife','Tisch · Kerze'],keyword:['bell','bellen','Glocke'],word:['Kranken','versicherung','s','beitrag'],number:['12','t + n','Tanne'],mixed:['Lernziel erkennen','Methode wählen','Lösung prüfen']},
  en:{title:'The method in a diagram',meaning:['Action','Effect','Condition'],verbatim:['Sentence 1','Sentence 2','Sentence 3'],recall:['Study the source','Hide it','Recall','Compare'],spaced:['Recall','Pause','Recall again','Adjust interval'],groups:['Fruit','Tools','Clothing'],explain:['Claim','Reason','Check an example'],loci:['Door · bread','Shelf · soap','Table · candle'],keyword:['pain','pan','bread'],word:['un','predict','ability'],number:['12','t + n','tin'],mixed:['Identify the goal','Choose a method','Check the solution']},
  fr:{title:'La méthode en schéma',meaning:['Mesure','Effet','Condition'],verbatim:['Phrase 1','Phrase 2','Phrase 3'],recall:['Étudier le modèle','Le masquer','Rappeler','Comparer'],spaced:['Rappel','Pause','Nouveau rappel','Adapter l’intervalle'],groups:['Fruits','Outils','Vêtements'],explain:['Affirmation','Raison','Vérifier un exemple'],loci:['Porte · pain','Étagère · savon','Table · bougie'],keyword:['bell','belle','cloche'],word:['in','compréhensible'],number:['12','t + n','tonne'],mixed:['Identifier le but','Choisir une méthode','Vérifier la solution']},
+}
+const textPictures={
+ de:{ideas:['Bäume an der Straße pflanzen','Schatten und Verdunstung tragen zur Kühlung bei','Ausreichend Wasser und Platz für Wurzeln'],meaning:'Erkläre die Zusammenhänge in eigenen Worten. Die Überschriften allein reichen nicht.',verbatim:'Übe die Sätze und ihre Übergänge. Beginne später auch bei Satz 2; vergleiche jedes Wort mit dem Original.',links:'Übergänge üben'},
+ en:{ideas:['Plant trees beside the road','Shade and evaporation contribute to cooling','Enough water and room for roots'],meaning:'Explain the relationships in your own words. The headings alone are not enough.',verbatim:'Practise the sentences and their transitions. Later, also start at sentence 2; compare every word with the original.',links:'Practise transitions'},
+ fr:{ideas:['Planter des arbres le long de la route','L’ombre et l’évaporation contribuent au refroidissement','Assez d’eau et d’espace pour les racines'],meaning:'Explique les liens avec tes propres mots. Les titres seuls ne suffisent pas.',verbatim:'Travaille les phrases et leurs transitions. Commence ensuite aussi à la phrase 2 ; compare chaque mot avec l’original.',links:'Travailler les transitions'},
 }
 const keywordBridge={
  de:{roles:['Fremdwort','Klanghilfe','Bedeutung'],scene:'Eine Glocke bellt wie ein Hund.',note:'„Bellen“ ist nur die Merkhilfe. Prüfe Aussprache, Schreibweise und Beispielsatz von „bell“ am Original.',target:'en'},
@@ -27,9 +33,20 @@ const groupSymbols=[
 ]
 export function CourseIllustration({id,locale}:{id:CourseId;locale:CourseLanguage}){
  const t=labels[locale]
+ const sentences=id==='text-verbatim'?readingCourses[locale].find(course=>course.id===id)!.example.match(/[^.!?]+[.!?]/g)?.map(sentence=>sentence.trim()):undefined
  const steps=id==='text-meaning'?t.meaning:id==='text-verbatim'?t.verbatim:id==='long-words'?t.word:id==='active-recall'?t.recall:id==='spaced-practice'?t.spaced:id==='meaningful-groups'?t.groups:id==='self-explanation'?t.explain:id==='method-of-loci'?t.loci:id==='keyword-method'?t.keyword:id==='number-images'?t.number:t.mixed
  if(id==='story-method')return null
  return <figure lang={locale} className={`course-illustration illustration-${id}`}><figcaption>{t.title}</figcaption>
+  {id==='text-meaning'&&<svg viewBox="0 0 300 140" role="img" aria-label={textPictures[locale].ideas.join('. ')}>
+   <g fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+    <path d="M25 101h250m-220 14h190m-190 13h30m20 0h30m20 0h30m20 0h30"/>
+    <ellipse cx="150" cy="99" rx="65" ry="6" fill="currentColor" opacity=".15" stroke="none"/>
+    <path d="M145 97V48h10v49m-5 4-14 14m14-14 18 15m-18-15v20"/>
+    <path d="M150 12c-20-15-40 3-35 18-26 2-24 32 1 33 7 18 25 16 34 4 13 14 34 10 36-5 27-6 23-32 0-34 1-18-21-29-36-16Z" fill="var(--an-gold,#c2a564)"/>
+    <path d="M215 71c-7-11 7-16 0-27m-5 5 5-5 5 5m18 31c-7-11 7-16 0-27m-5 5 5-5 5 5"/>
+    <path d="M75 67c-15 20-15 29 0 29s15-9 0-29Z"/>
+   </g>
+  </svg>}
   {id==='self-explanation'&&<svg viewBox="0 0 300 100" role="img" aria-label="3/4 = 6/8">
    {[{parts:4,y:6},{parts:8,y:57}].map(({parts,y})=><g key={parts}>
     <rect className="fraction-selected" x="10" y={y} width="195" height="28" fill="var(--an-gold,#c2a564)"/>
@@ -80,11 +97,15 @@ export function CourseIllustration({id,locale}:{id:CourseId;locale:CourseLanguag
   <ol>{steps.map((label,index)=><li key={label}>
    <span className="illustration-number" aria-hidden="true">{index+1}</span>
    {id==='keyword-method'?<><small>{keywordBridge[locale].roles[index]}</small><p lang={index===0?keywordBridge[locale].target:locale}><strong>{label}</strong></p></>:label}
+   {id==='text-meaning'&&<p>{textPictures[locale].ideas[index]}</p>}
+   {id==='text-verbatim'&&<p>{sentences?.[index]}</p>}
    {id==='meaningful-groups'&&<>
     <svg viewBox="0 0 64 56" aria-hidden="true" height="56"><path d={groupSymbols[index]} fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/></svg>
     {groupedItems[locale][index].map(item=><p key={item}>{item}</p>)}
    </>}
   </li>)}</ol>
+  {id==='text-meaning'&&<p>{textPictures[locale].meaning}</p>}
+  {id==='text-verbatim'&&<><p>{textPictures[locale].links}: 1 → 2 · 2 → 3</p><p>{textPictures[locale].verbatim}</p></>}
   {id==='keyword-method'&&<p className="keyword-pronunciation-note">{keywordBridge[locale].note}</p>}
   {id==='long-words'&&<div className="word-reconstruction">
    <p>{reconstruction[locale].word}</p>

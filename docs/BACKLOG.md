@@ -608,3 +608,11 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 - Die Schlüsselwortmethode zeigt jetzt die drei sprachabhängigen Merkszenen als lokale SVG-Grafiken. Fremdwort, Klanghilfe und Bedeutung sind ausdrücklich beschriftet; der Aussprachehinweis bleibt direkt sichtbar. Deutsche Klanghilfe ist passend zum Kurstext „bellen“.
 - Die Fremdvokabel erhält ihre eigene Sprachkennzeichnung für assistive Technik. Alle Lernbilder tragen die Sprache ihres Beispiels. Vor dem eigenen Abruf werden auch die neuen Merkszenen ausgeblendet.
 - Sechs Desktop-/Mobilprüfungen für DE/EN/FR bestanden: Zuordnung, Sprachkennzeichnung, zugängliche Bildbeschreibung, Aussprachehinweis, Breite und Abrufsperre. Alle drei Desktop-Bildvarianten visuell geprüft. Typprüfung, Build und unverändertes Größenbudget bestanden. Neuer CI-Gate erforderlich; C05 bleibt bis zur weiteren Ausarbeitung und finalen Sichtprüfung offen.
+
+### Lernbilder für lange Texte (2026-10-02)
+
+- CI #1651 auf 433a100 ist vollständig grün, einschließlich Desktop-Vollregression und Mobile-Gate.
+- Inhaltliches Erinnern zeigt am vorhandenen Baumbeispiel Maßnahme, Wirkung und Voraussetzungen. Eine lokale Grafik veranschaulicht Baum, Schatten, Verdunstung, Wasser und Wurzeln; die Textkarten benennen die Zusammenhänge.
+- Wortgetreues Lernen zeigt die drei vollständigen Sätze aus der jeweiligen Kursquelle, mit Übergängen 1 → 2 und 2 → 3. Der Hinweis zum Einstieg in der Mitte bleibt erhalten. Kein Ersetzen oder Kürzen vorhandener Kursinhalte.
+- Die Darstellungen verwenden die Sprache des gesprochenen Beispiels und verschwinden vor dem eigenen Abruf. Typprüfung, Build und unverändertes Größenbudget bestanden. Der neue Stand benötigt einen eigenen vollständigen CI-Gate.
+- Sechs Desktop-/Mobilprüfungen für DE/EN/FR bestanden: exakter Satzinhalt gegenüber der Tonspurquelle, Sprachzuordnung, Übergänge, kein horizontaler Überlauf und Abrufsperre. Deutsche Desktopansichten visuell kontrolliert.
