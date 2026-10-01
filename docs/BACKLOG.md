@@ -580,3 +580,10 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 - Keine externen Assets oder neue Animationen. Farben und Typografie stammen aus der App; bestehende Kurse und Abrufsperren bleiben erhalten.
 - Sechs neue Desktop-/Mobilprüfungen für die drei Sprachen bestanden: vollständige Begriffsgruppen, zugängliche Stationsfolge, kein horizontaler Überlauf, Offline-Neustart und ausgeblendete Lernbilder beim Abruf. Desktop- und Mobilbilder visuell kontrolliert; Typprüfung, Build und unverändertes Größenbudget bestanden.
 - CI #1647 hatte auf dem vorherigen Commit die Kurse, Layout-Matrix und alle frühen Hardening-Gates bestanden; die Vollregression lief zum Zeitpunkt dieses Eintrags noch. Der neue Stand erhält einen eigenen strengen Gate. C05 bleibt bis zur weiteren Ausarbeitung und finalen Sichtprüfung offen.
+
+### CI #1648: Offline-Kursöffnung gezielt untersuchen (2026-10-01)
+
+- Der strenge Kurs-Gate scheiterte an einem schwankenden Test: Nach dem Offline-Neustart erschien im ersten Versuch der Knopf zum Öffnen des Kurses „Lange Wörter“ nicht rechtzeitig. Der Wiederholungsversuch bestand; 95 weitere Kursprüfungen bestanden. Der Lauf bleibt zu Recht rot.
+- Sechs unveränderte lokale Wiederholungen des betroffenen englischen Lin-Ablaufs bestanden mit aktivierter Fehleraufzeichnung. Die Ursache ist damit nicht abschließend geklärt; keine Produktkorrektur oder vollständige Abnahme behaupten.
+- Kursprüfungen behalten jetzt die Aufzeichnung des ersten fehlgeschlagenen Versuchs. Browserfehler erhalten ein Bildschirmfoto; GitHub CI sichert vorhandene Diagnoseartefakte bei Fehlern für sieben Tage. Timeouts, Assertions, Retry-Regeln und failOnFlakyTests bleiben unverändert.
+- Typprüfung und Testsammlung bestanden. Ein neuer vollständiger Gate prüft diesen Stand. Weitere Lernbilder für Wörter/Zahlen bleiben bis dahin zurückgestellt.

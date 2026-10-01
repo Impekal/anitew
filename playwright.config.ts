@@ -42,6 +42,7 @@ export default defineConfig({
   use: {
     baseURL: 'http://127.0.0.1:4173',
     trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
     // Die App übernimmt die Sprache des Geräts (D-007) — also muss das Gerät
     // im Test eine haben. Ohne diese Zeile liefe die Prüfung auf en-US, und
     // jeder deutsche Erwartungstext wäre stumm falsch. Der Sprachtest legt
