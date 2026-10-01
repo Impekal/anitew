@@ -565,3 +565,10 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 - Lokale macOS-Testumgebung: Chromium blieb auch bei einer unveränderten alten Tonspur ohne App-Player bei 23–43 ms stehen. Mit stummer Audioausgabe läuft die reale Medienuhr korrekt. Die beiden Wiedergabetests nutzen deshalb ausschließlich auf macOS Chromiums stumme Ausgabe; echte Dekodierung, Zeitfortschritt und alle Assertions bleiben erhalten. Linux-CI unverändert.
 - Nach den Korrekturen bestanden alle 14 gezielten Desktop-/Mobilprüfungen: eigene Stimmen, Offline-Neustart, erhaltene Basistonspuren, französischer Sprechtext/Quellen, passende Zeitmarken und Abrufsperre. Neuer strenger Gesamt-Gate auf diesem Commit erforderlich.
 - Didaktische Grafik korrigiert: 3/4 und 6/8 zeigen jetzt exakt gleich große Ganze und gefüllte Flächen. Durchgehende Balken mit unterschiedlicher Unterteilung ersetzen ungleich große Lücken; Browserregression prüft die dargestellten Flächenverhältnisse.
+
+### Schrittweise Kursbegleitung (2026-10-01)
+
+- Die elf ergänzenden Methodenkurse zeigen erklärte Schritte synchron zur gewählten Tonspur. Der aktuelle Schritt ist hervorgehoben; bereits erklärte Schritte bleiben sichtbar. Kapitelsprünge bauen die Anzeige aus der Medienzeit neu auf. Texte folgen der Untertitelsprache einschließlich ihrer Schreibrichtung.
+- Beispielgrafiken verschwinden bereits beim gesprochenen Abrufauftrag, bevor das Antwortfeld öffnet. Im Lesemodus bleiben die vollständigen Grafiken verfügbar. Keine zusätzliche Animation oder externe Medienanfrage.
+- Lokale Prüfung: sechs neue Desktop-/Mobil-Prüfungen für DE/EN/FR bestanden, ebenso beide Prüfungen der gleichen Bruchflächen. Typprüfung, Build und unverändertes Kaltstartbudget bestanden. Der strenge CI-Gate wird auf dem neuen Commit gestartet.
+- C05 bleibt teilweise offen: methodenspezifische reichhaltigere Illustrationen und abschließende Sichtprüfung. Stimmfreigaben und abgelehnte Videos bleiben unverändert.

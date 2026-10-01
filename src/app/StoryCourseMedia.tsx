@@ -11,7 +11,7 @@ import { courseMediaUi } from '../i18n/courseMediaUi.ts'
 import { literalRecallHint } from '../i18n/courseRecallLanguage.ts'
 import { libraryCaptions } from '../i18n/courseCaptions.ts'
 import { courseLibraryMedia } from '../i18n/courseLibraryMedia.ts'
-import { CourseIllustration } from './CourseIllustration.tsx'
+import { CourseIllustration, CourseStepIllustration } from './CourseIllustration.tsx'
 import { CourseDownload } from './CourseDownload.tsx'
 import type { CourseId } from '../core/courses/progress.ts'
 import { courseLanguage } from '../i18n/courseUi.ts'
@@ -52,6 +52,8 @@ export function StoryCourseMedia({coach,language,platform,solution=false,onRecal
   },[vtt])
   const exampleIndex=library?library[spoken].cues.findIndex(cue=>cue.section==='example'):8
   const stopIndex=library?library[spoken].cues.findIndex(cue=>cue.section==='transfer'):16
+  const recallIndex=library?library[spoken].cues.findIndex(cue=>cue.section==='recall'):16
+  const instructionIndices=library?library[spoken].cues.flatMap((cue,index)=>cue.section.startsWith('step-')?[index]:[]):[]
   const gate=pack.cues[library?exampleIndex:17].start
   const recallBoundary=pack.cues[stopIndex].start
   const cue=cueAt(pack.cues,time)
@@ -129,7 +131,8 @@ export function StoryCourseMedia({coach,language,platform,solution=false,onRecal
         <g className="story-juice" fill="#d1b951"><circle cx="191" cy="44" r="3"/><circle cx="201" cy="51" r="3"/><circle cx="211" cy="60" r="3"/></g>
         <g fill="none" stroke="currentColor" strokeWidth="3"><circle cx="247" cy="76" r="21"/><circle cx="303" cy="76" r="21"/><path d="m247 76 16-31 18 31h-34l37-25 19 25m-19-25-4-14h12m-35 8h17"/></g>
       </svg>}
-      {library && safeCue>=exampleIndex && safeCue<stopIndex && <CourseIllustration id={courseId} locale={spoken} />}
+      {library && instructionIndices.includes(safeCue) && <CourseStepIllustration steps={instructionIndices.map(index=>captions[index])} current={instructionIndices.indexOf(safeCue)} locale={locale} language={subtitleLanguage} />}
+      {library && safeCue>=exampleIndex && safeCue<recallIndex && <CourseIllustration id={courseId} locale={spoken} />}
       <p className="course-caption" lang={subtitleLanguage} dir="auto">{safeCue>=0?captions[safeCue]:''}</p>
       </div></div>
       <details><summary>{t.transcript}</summary><div lang={subtitleLanguage} dir={subtitleLanguage==='ar'?'rtl':'ltr'}>{captions.map((line,index)=><p key={index} dir="auto">{line}</p>)}</div></details>

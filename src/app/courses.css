@@ -58,3 +58,5 @@
 @container (min-width:40rem) {
  .course-playback.has-video { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:1.25rem; align-items:center; }
 }
+
+.course-step-illustration li[aria-current="step"] { border-color:var(--an-gold,#c2a564); font-weight:600; }

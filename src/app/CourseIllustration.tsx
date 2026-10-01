@@ -25,3 +25,14 @@ export function CourseIllustration({id,locale}:{id:CourseId;locale:CourseLanguag
   <ol>{steps.map((label,index)=><li key={label}><span className="illustration-number" aria-hidden="true">{index+1}</span>{label}</li>)}</ol>
  </figure>
 }
+
+/** Reveal only steps already explained by the selected narration. */
+export function CourseStepIllustration({steps,current,locale,language}:{steps:readonly string[];current:number;locale:CourseLanguage;language:string}){
+ const title={de:'Schritt für Schritt',en:'Step by step',fr:'Étape par étape'}[locale]
+ return <figure className="course-illustration course-step-illustration">
+  <figcaption>{title}</figcaption>
+  <ol lang={language} dir="auto">{steps.slice(0,current+1).map((text,index)=><li key={index} aria-current={index===current?'step':undefined}>
+   <span className="illustration-number" aria-hidden="true">{index+1}</span>{text}
+  </li>)}</ol>
+ </figure>
+}

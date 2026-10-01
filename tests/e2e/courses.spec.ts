@@ -495,3 +495,45 @@ test('the fraction illustration shows the same whole and selected quantity befor
  expect(quantities[0].selected).toBe(quantities[1].selected)
  for(const q of quantities)expect(q.selected/q.whole).toBe(.75)
 })
+
+for(const language of ['de','en','fr'] as const){
+ test(`course diagrams follow ${language} narration and disappear before the recall prompt`,async({page})=>{
+  await page.emulateMedia({reducedMotion:'reduce'})
+  await visit(page)
+  await openPage(page,'Lernkurse')
+  await page.getByRole('button',{name:'Kurs öffnen : Lange Wörter sicher behalten',exact:true}).click()
+  await page.getByRole('button',{name:'Anhören und ansehen',exact:true}).click()
+  await page.locator('#course-audio-language').selectOption(language)
+  const pack=courseNarration('long-words',language,'rafael')!
+  const audio=page.locator('.course-media audio')
+  await expect(audio).toHaveAttribute('src',pack.src)
+  await audio.evaluate((element:HTMLAudioElement)=>element.load())
+  await expect.poll(()=>audio.evaluate((element:HTMLAudioElement)=>element.readyState)).toBeGreaterThan(0)
+  const seek=async(section:string)=>{
+   const time=pack.cues.find(cue=>cue.section===section)!.start+.1
+   await audio.evaluate((element:HTMLAudioElement,time)=>{element.currentTime=time;element.dispatchEvent(new Event('timeupdate'))},time)
+  }
+  const diagram=page.locator('.course-media .course-illustration')
+  await seek('step-0')
+  await expect(diagram.locator('li')).toHaveCount(1)
+  await expect(diagram.locator('[aria-current="step"]')).toHaveCount(1)
+  await expect(diagram.locator('ol')).toHaveAttribute('lang','de')
+  await seek('step-2')
+  await expect(diagram.locator('li')).toHaveCount(3)
+  await expect(diagram.locator('li').nth(2)).toHaveAttribute('aria-current','step')
+  await expect(diagram.locator('li').nth(2)).toContainText((await page.locator('.course-caption').textContent())!)
+  await seek('step-0')
+  await expect(diagram.locator('li')).toHaveCount(1)
+  await seek('example')
+  await expect(diagram).toBeVisible()
+  await expect(diagram).toHaveClass(/illustration-long-words/)
+  await seek('recall')
+  await expect(diagram).toHaveCount(0)
+  await expect(page.locator('.course-caption')).not.toBeEmpty()
+  await seek('example')
+  await expect(diagram).toBeVisible()
+  await seek('transfer')
+  await expect(page.getByLabel('Deine Antwort',{exact:true})).toBeVisible()
+  await expect(page.locator('.course-illustration')).toHaveCount(0)
+ })
+}
