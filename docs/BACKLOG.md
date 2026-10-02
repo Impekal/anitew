@@ -616,3 +616,11 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 - Wortgetreues Lernen zeigt die drei vollständigen Sätze aus der jeweiligen Kursquelle, mit Übergängen 1 → 2 und 2 → 3. Der Hinweis zum Einstieg in der Mitte bleibt erhalten. Kein Ersetzen oder Kürzen vorhandener Kursinhalte.
 - Die Darstellungen verwenden die Sprache des gesprochenen Beispiels und verschwinden vor dem eigenen Abruf. Typprüfung, Build und unverändertes Größenbudget bestanden. Der neue Stand benötigt einen eigenen vollständigen CI-Gate.
 - Sechs Desktop-/Mobilprüfungen für DE/EN/FR bestanden: exakter Satzinhalt gegenüber der Tonspurquelle, Sprachzuordnung, Übergänge, kein horizontaler Überlauf und Abrufsperre. Deutsche Desktopansichten visuell kontrolliert.
+
+### Abrufen und Abstände anschaulich erklären (2026-10-02)
+
+- CI #1652 auf 8997525 ist vollständig grün.
+- Aktives Abrufen zeigt den Ablauf Vorlage → verdecken → selbst antworten → vergleichen als lokale Grafik. Der Hinweis zum Klären von Fehlern und späteren erneuten Abruf erscheint einmal darunter.
+- Verteiltes Üben unterscheidet zwei Entscheidungen: bei schwierigem Abruf vergleichen/korrigieren und den nächsten Abstand kürzen; bei zuverlässigem Abruf kann er länger werden. Keine festen Kalendertage und kein Versprechen automatisch erzeugter Karten.
+- Sechs Desktop-/Mobilprüfungen für DE/EN/FR bestanden: beide Entscheidungen, Hinweis auf nicht erzeugte Karten, Sprachzuordnung, Breite und Ausblenden vor dem Abruf. Ein bei der Sichtprüfung entdeckter mehrfacher Hinweis wurde vor Abschluss korrigiert. Deutsche Beschriftung „Vergleich“ vermeidet einen Wortumbruch in schmalen Karten.
+- Typprüfung, Build und unverändertes Größenbudget bestanden. Neuer vollständiger CI-Gate folgt; finale Sicht-/Medienabnahme bleibt offen.

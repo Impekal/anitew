@@ -672,3 +672,44 @@ for(const language of ['de','en','fr'] as const){
   }
  })
 }
+
+for(const [language,shorter,longer,noCards] of [
+ ['de','kürzer','länger','keine neuen Wiederholungskarten'],
+ ['en','shorter','longer','does not create new review cards'],
+ ['fr','raccourcir','plus long','ne crée pas de nouvelles cartes'],
+] as const){
+ test(`retrieval diagrams distinguish correction and reliable ${language} recall`,async({page},testInfo)=>{
+  await visit(page)
+  await openPage(page,'Lernkurse')
+  for(const [title,id] of [['Aktives Abrufen','active-recall'],['Verteiltes Wiederholen','spaced-practice']] as const){
+   await page.getByRole('button',{name:`Kurs öffnen : ${title}`,exact:true}).click()
+   await page.getByRole('button',{name:'Anhören und ansehen',exact:true}).click()
+   await page.locator('#course-audio-language').selectOption(language)
+   const pack=courseNarration(id,language,'rafael')!
+   const audio=page.locator('.course-media audio')
+   await audio.evaluate((element:HTMLAudioElement)=>element.load())
+   await expect.poll(()=>audio.evaluate((element:HTMLAudioElement)=>element.readyState)).toBeGreaterThan(0)
+   const seek=async(section:string)=>{await audio.evaluate((element:HTMLAudioElement,time)=>{element.currentTime=time;element.dispatchEvent(new Event('timeupdate'))},pack.cues.find(cue=>cue.section===section)!.start+.1)}
+   await seek('example')
+   const diagram=page.locator(`.course-media .illustration-${id}`)
+   await expect(diagram).toHaveAttribute('lang',language)
+   if(id==='active-recall'){
+    await expect(diagram.getByRole('img')).toBeVisible()
+    await expect(diagram.locator('li')).toHaveCount(4)
+    await expect(diagram.locator('.recall-review-note')).toHaveCount(1)
+   }else{
+    const alternatives=diagram.locator('.practice-feedback li')
+    await expect(alternatives).toHaveCount(2)
+    await expect(alternatives.first()).toContainText(shorter)
+    await expect(alternatives.last()).toContainText(longer)
+    await expect(diagram).toContainText(noCards)
+   }
+   await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true)
+   await diagram.screenshot({path:testInfo.outputPath(`${id}.png`)})
+   await seek('recall')
+   await expect(diagram).toHaveCount(0)
+   await page.getByRole('button',{name:'Nur lesen',exact:true}).click()
+   await page.getByRole('button',{name:'Zur Kursübersicht',exact:true}).click()
+  }
+ })
+}

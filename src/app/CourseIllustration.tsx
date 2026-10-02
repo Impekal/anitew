@@ -2,9 +2,14 @@ import { readingCourses } from '../i18n/courses.ts'
 import type { CourseId } from '../core/courses/progress.ts'
 import type { CourseLanguage } from '../i18n/courseUi.ts'
 const labels={
- de:{title:'Die Methode im Bild',meaning:['Maßnahme','Wirkung','Voraussetzung'],verbatim:['Satz 1','Satz 2','Satz 3'],recall:['Vorlage ansehen','Verdecken','Selbst abrufen','Vergleichen'],spaced:['Abrufen','Pause','Erneut abrufen','Abstand anpassen'],groups:['Obst','Werkzeug','Kleidung'],explain:['Behauptung','Begründung','Am Beispiel prüfen'],loci:['Haustür · Brot','Regal · Seife','Tisch · Kerze'],keyword:['bell','bellen','Glocke'],word:['Kranken','versicherung','s','beitrag'],number:['12','t + n','Tanne'],mixed:['Lernziel erkennen','Methode wählen','Lösung prüfen']},
+ de:{title:'Die Methode im Bild',meaning:['Maßnahme','Wirkung','Voraussetzung'],verbatim:['Satz 1','Satz 2','Satz 3'],recall:['Vorlage ansehen','Verdecken','Selbst abrufen','Vergleich'],spaced:['Abrufen','Pause','Erneut abrufen','Abstand anpassen'],groups:['Obst','Werkzeug','Kleidung'],explain:['Behauptung','Begründung','Am Beispiel prüfen'],loci:['Haustür · Brot','Regal · Seife','Tisch · Kerze'],keyword:['bell','bellen','Glocke'],word:['Kranken','versicherung','s','beitrag'],number:['12','t + n','Tanne'],mixed:['Lernziel erkennen','Methode wählen','Lösung prüfen']},
  en:{title:'The method in a diagram',meaning:['Action','Effect','Condition'],verbatim:['Sentence 1','Sentence 2','Sentence 3'],recall:['Study the source','Hide it','Recall','Compare'],spaced:['Recall','Pause','Recall again','Adjust interval'],groups:['Fruit','Tools','Clothing'],explain:['Claim','Reason','Check an example'],loci:['Door · bread','Shelf · soap','Table · candle'],keyword:['pain','pan','bread'],word:['un','predict','ability'],number:['12','t + n','tin'],mixed:['Identify the goal','Choose a method','Check the solution']},
  fr:{title:'La méthode en schéma',meaning:['Mesure','Effet','Condition'],verbatim:['Phrase 1','Phrase 2','Phrase 3'],recall:['Étudier le modèle','Le masquer','Rappeler','Comparer'],spaced:['Rappel','Pause','Nouveau rappel','Adapter l’intervalle'],groups:['Fruits','Outils','Vêtements'],explain:['Affirmation','Raison','Vérifier un exemple'],loci:['Porte · pain','Étagère · savon','Table · bougie'],keyword:['bell','belle','cloche'],word:['in','compréhensible'],number:['12','t + n','tonne'],mixed:['Identifier le but','Choisir une méthode','Vérifier la solution']},
+}
+const practicePictures={
+ de:{recall:'Vorlage ansehen, verdecken, selbst antworten und anschließend vergleichen.',later:'Nach dem Vergleich: Fehler klären und später erneut ohne Vorlage abrufen.',hard:'Lücke oder schwieriger Abruf',fix:'Vergleichen und korrigieren; nächsten Abstand kürzer wählen.',reliable:'Zuverlässiger Abruf',extend:'Der nächste Abstand kann länger werden.',spacing:'Erst selbst antworten, dann nachsehen. Es gibt keinen für alle gültigen Abstand; dieser Kurs legt keine neuen Wiederholungskarten an.'},
+ en:{recall:'Study the source, hide it, answer from memory, then compare.',later:'After comparing: clarify mistakes and retrieve again later without the source.',hard:'A gap or difficult retrieval',fix:'Compare and correct; choose a shorter next interval.',reliable:'Reliable retrieval',extend:'The next interval can be longer.',spacing:'Answer first, then check. There is no universal interval; this course does not create new review cards.'},
+ fr:{recall:'Étudier le modèle, le masquer, répondre de mémoire, puis comparer.',later:'Après la comparaison : clarifier les erreurs et rappeler plus tard sans modèle.',hard:'Lacune ou rappel difficile',fix:'Comparer et corriger ; raccourcir le prochain intervalle.',reliable:'Rappel fiable',extend:'Le prochain intervalle peut être plus long.',spacing:'Répondre d’abord, puis vérifier. Aucun intervalle ne convient à tous ; ce cours ne crée pas de nouvelles cartes de révision.'},
 }
 const textPictures={
  de:{ideas:['Bäume an der Straße pflanzen','Schatten und Verdunstung tragen zur Kühlung bei','Ausreichend Wasser und Platz für Wurzeln'],meaning:'Erkläre die Zusammenhänge in eigenen Worten. Die Überschriften allein reichen nicht.',verbatim:'Übe die Sätze und ihre Übergänge. Beginne später auch bei Satz 2; vergleiche jedes Wort mit dem Original.',links:'Übergänge üben'},
@@ -37,6 +42,16 @@ export function CourseIllustration({id,locale}:{id:CourseId;locale:CourseLanguag
  const steps=id==='text-meaning'?t.meaning:id==='text-verbatim'?t.verbatim:id==='long-words'?t.word:id==='active-recall'?t.recall:id==='spaced-practice'?t.spaced:id==='meaningful-groups'?t.groups:id==='self-explanation'?t.explain:id==='method-of-loci'?t.loci:id==='keyword-method'?t.keyword:id==='number-images'?t.number:t.mixed
  if(id==='story-method')return null
  return <figure lang={locale} className={`course-illustration illustration-${id}`}><figcaption>{t.title}</figcaption>
+  {id==='active-recall'&&<svg viewBox="0 0 320 112" role="img" aria-label={practicePictures[locale].recall}>
+   <g fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round">
+    <rect x="12" y="20" width="40" height="53" rx="4"/><path d="M21 34h22m-22 10h22m-22 10h15"/>
+    <path d="M63 46h14m-5-5 5 5-5 5"/>
+    <rect x="91" y="20" width="40" height="53" rx="4" fill="var(--an-gold,#c2a564)"/><path d="M99 28l24 37m18-19h14m-5-5 5 5-5 5"/>
+    <path d="M174 24h45v38h-16l-13 12V62h-16Z"/><text x="196" y="52" fill="currentColor" stroke="none" textAnchor="middle" fontSize="26">?</text>
+    <path d="M230 46h14m-5-5 5 5-5 5"/>
+    <rect x="260" y="20" width="40" height="53" rx="4"/><path d="M267 34h23m-23 10h12m-12 10h12m4-7 4 5 8-13M280 83v16H32V83m-5 5 5-5 5 5"/>
+   </g>
+  </svg>}
   {id==='text-meaning'&&<svg viewBox="0 0 300 140" role="img" aria-label={textPictures[locale].ideas.join('. ')}>
    <g fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
     <path d="M25 101h250m-220 14h190m-190 13h30m20 0h30m20 0h30m20 0h30"/>
@@ -97,13 +112,23 @@ export function CourseIllustration({id,locale}:{id:CourseId;locale:CourseLanguag
   <ol>{steps.map((label,index)=><li key={label}>
    <span className="illustration-number" aria-hidden="true">{index+1}</span>
    {id==='keyword-method'?<><small>{keywordBridge[locale].roles[index]}</small><p lang={index===0?keywordBridge[locale].target:locale}><strong>{label}</strong></p></>:label}
-   {id==='text-meaning'&&<p>{textPictures[locale].ideas[index]}</p>}
+  {id==='text-meaning'&&<p>{textPictures[locale].ideas[index]}</p>}
    {id==='text-verbatim'&&<p>{sentences?.[index]}</p>}
    {id==='meaningful-groups'&&<>
     <svg viewBox="0 0 64 56" aria-hidden="true" height="56"><path d={groupSymbols[index]} fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/></svg>
     {groupedItems[locale][index].map(item=><p key={item}>{item}</p>)}
    </>}
   </li>)}</ol>
+   {id==='active-recall'&&<p className="recall-review-note">{practicePictures[locale].later}</p>}
+  {id==='spaced-practice'&&<div className="practice-feedback">
+   <svg viewBox="0 0 300 90" aria-hidden="true">
+    <g fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+     <circle cx="150" cy="21" r="15"/><path d="M150 11v11l7 4m-7 10v12H70v23m80-23h80v23m-165-6 5 6 5-6m150 0 5 6 5-6"/>
+    </g>
+   </svg>
+   <ol><li><strong>{practicePictures[locale].hard}</strong><p>{practicePictures[locale].fix}</p></li><li><strong>{practicePictures[locale].reliable}</strong><p>{practicePictures[locale].extend}</p></li></ol>
+   <p>{practicePictures[locale].spacing}</p>
+  </div>}
   {id==='text-meaning'&&<p>{textPictures[locale].meaning}</p>}
   {id==='text-verbatim'&&<><p>{textPictures[locale].links}: 1 → 2 · 2 → 3</p><p>{textPictures[locale].verbatim}</p></>}
   {id==='keyword-method'&&<p className="keyword-pronunciation-note">{keywordBridge[locale].note}</p>}
