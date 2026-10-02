@@ -60,3 +60,4 @@
 }
 
 .course-step-illustration li[aria-current="step"] { border-color:var(--an-gold,#c2a564); font-weight:600; }
+.illustration-active-recall>ol,.illustration-spaced-practice>ol { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
