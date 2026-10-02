@@ -105,7 +105,11 @@ test('hält die Breite auf jeder Menüseite — und in der Schublade', async ({ 
     await page.locator('.page').waitFor()
     await noHorizontalOverflow(page)
 
-    await page.locator('.page-back').click({ force: true })
+    // Die Seite selbst fährt beim Öffnen 380 ms ein. Hier muss der Klick auf
+    // die stabile Position warten: force kann den noch wandernden Knopf
+    // verfehlen (CI #1655, iPhone 15, Lernkurse). Anders als die Core-Knoten
+    // hat dieser Knopf keine dauerhafte Bewegungsanimation.
+    await page.locator('.page-back').click()
     await expect(page.locator('.page')).toBeHidden()
 
     if (!(await drawer.isVisible())) {
