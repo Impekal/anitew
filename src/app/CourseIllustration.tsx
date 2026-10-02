@@ -70,10 +70,23 @@ export function CourseIllustration({id,locale}:{id:CourseId;locale:CourseLanguag
    </g>)}
    <text x="275" y="27" fill="currentColor" fontSize="11">3/4</text><text x="275" y="78" fill="currentColor" fontSize="11">6/8</text>
   </svg>}
-  {id==='interleaved-practice'&&<svg viewBox="0 0 300 120" role="img" aria-label="4 × 3 = 12; 4 × 3 ÷ 2 = 6">
-   <rect x="15" y="12" width="100" height="75" fill="#c2a564" fillOpacity=".35" stroke="currentColor"/><path d="M170 87V12L270 87Z" fill="#c2a564" fillOpacity=".35" stroke="currentColor"/>
-   <text x="40" y="110" fill="currentColor">12 cm²</text><text x="200" y="110" fill="currentColor">6 cm²</text>
-  </svg>}
+  {id==='interleaved-practice'&&<>
+   <svg viewBox="0 0 340 165" role="img" aria-label="4 × 3 = 12; 4 × 3 ÷ 2 = 6">
+    <g fill="var(--an-gold,#c2a564)" fillOpacity=".35" stroke="currentColor" strokeWidth="2">
+     <rect className="area-rectangle" x="35" y="25" width="100" height="75"/>
+     <path className="area-triangle" d="M205 100V25L305 100Z"/>
+    </g>
+    <path d="M205 25h100v75" fill="none" stroke="currentColor" strokeDasharray="4 4"/>
+    <path d="M205 89h11v11M35 89h11v11" fill="none" stroke="currentColor"/>
+    <g fill="currentColor" fontSize="12" textAnchor="middle">
+     <text x="85" y="117">4 cm</text><text x="255" y="117">4 cm</text>
+     <text x="16" y="65" transform="rotate(-90 16 65)">3 cm</text>
+     <text x="186" y="65" transform="rotate(-90 186 65)">3 cm</text>
+     <text x="85" y="145">4 × 3 = 12 cm²</text><text x="255" y="145">4 × 3 ÷ 2 = 6 cm²</text>
+    </g>
+   </svg>
+   <p>{locale==='de'?'Gleiche Grundseite und Höhe, andere Form: Das Dreieck füllt die Hälfte des gestrichelten Rechtecks. Wähle die Regel nach der Form.':locale==='fr'?'Même base et même hauteur, forme différente : le triangle occupe la moitié du rectangle en pointillés. Choisis la règle selon la forme.':'Same base and height, different shape: the triangle fills half of the dashed rectangle. Choose the rule from the shape.'}</p>
+  </>}
   {id==='method-of-loci'&&<svg viewBox="0 0 330 145" role="img" aria-label={t.loci.join(' → ')}>
    <g fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round">
     <path d="M30 112V20h50v92M70 65h3"/>

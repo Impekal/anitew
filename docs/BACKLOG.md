@@ -411,7 +411,7 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 
 - [x] **S01 · Sprachregel in die echte App integrieren.** Für alle zwölf integrierten Audiokurse umgesetzt: DE/FR/EN automatisch, andere App-Sprachen Englisch; ausdrückliche Tonwahl unabhängig von den Untertiteln in der App-Sprache. Die abschließende Medienprüfung bleibt S03.
 - [ ] **S02 · Übersetzungen und Untertitel prüfen.** Derzeit elf Untertitelsprachen als Entwürfe: DE, FR, EN, ES, IT, PT, NL, TR, AR, ZH, JA. Inhalt, Fachbegriffe, Lesbarkeit und Zeitabgleich für jede Tonspur prüfen; weitere tatsächlich unterstützte App-Sprachen ergänzen oder fehlende Übersetzung ehrlich anzeigen.
-- [ ] **S03 · Alle fertigen Kurse in drei Tonsprachen bereitstellen.** 36 Tonspuren für zwölf Kurse integriert, 33 davon bewusst herunterladbar. Alle elf App-Sprachen sind als Untertitel abgedeckt; abschließende Sprach- und Hörprüfung bleiben offen.
+- [ ] **S03 · Alle fertigen Kurse in drei Tonsprachen bereitstellen.** 84 zusätzliche Coach-Aufnahmen neben 36 erhaltenen Basistonspuren für zwölf Kurse integriert. Zusätzliche Medien werden bewusst heruntergeladen. Elf App-Sprachen haben Untertitelentwürfe; Noah Französisch, abschließende Sprach- und Hörprüfung bleiben offen.
 - [ ] **S04 · Barrierefreiheit und Geräteverhalten prüfen.** Tastatur, Fokus, Screenreader, Kontrast, Textvergrößerung, RTL und schmale Displays prüfen; Untertitel, Tempo und Pausen auf echten Mobilgeräten testen.
 
 ### 4. Integration, Offline-Nutzung und Rechte
@@ -624,3 +624,11 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 - Verteiltes Üben unterscheidet zwei Entscheidungen: bei schwierigem Abruf vergleichen/korrigieren und den nächsten Abstand kürzen; bei zuverlässigem Abruf kann er länger werden. Keine festen Kalendertage und kein Versprechen automatisch erzeugter Karten.
 - Sechs Desktop-/Mobilprüfungen für DE/EN/FR bestanden: beide Entscheidungen, Hinweis auf nicht erzeugte Karten, Sprachzuordnung, Breite und Ausblenden vor dem Abruf. Ein bei der Sichtprüfung entdeckter mehrfacher Hinweis wurde vor Abschluss korrigiert. Deutsche Beschriftung „Vergleich“ vermeidet einen Wortumbruch in schmalen Karten.
 - Typprüfung, Build und unverändertes Größenbudget bestanden. Neuer vollständiger CI-Gate folgt; finale Sicht-/Medienabnahme bleibt offen.
+
+### Flächenvergleich verständlich beschriften (2026-10-02)
+
+- CI #1654 auf 3693df5 ist vollständig grün.
+- Das Beispiel für gemischte Aufgabentypen zeigt jetzt beide Grundseiten (4 cm), die zugehörigen Höhen (3 cm), rechte Winkel und vollständige Rechnungen. Ein gestricheltes Rechteck ergänzt das Dreieck; der Begleittext erklärt die halbe Fläche in DE/EN/FR.
+- Die Regel wird weiterhin nach dem Aufgabentyp gewählt. Beispielwerte und Originalkurse bleiben erhalten; die Grafik verschwindet vor dem eigenen Abruf.
+- Typprüfung, Build und unverändertes Größenbudget bestanden. Neuer strenger CI-Gate folgt. Quellen-/Stimmabnahme, natürliche Sprechvideos und echte Gerätetests bleiben offen.
+- Sechs Desktop-/Mobilprüfungen für DE/EN/FR bestanden: Maßangaben, gleicher Grundseiten-/Höhenbezug, geometrisches Flächenverhältnis 1:2 und Abrufsperre. Deutsche Desktop-/Mobilansichten visuell geprüft.

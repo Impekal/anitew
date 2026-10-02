@@ -713,3 +713,39 @@ for(const [language,shorter,longer,noCards] of [
   }
  })
 }
+
+for(const language of ['de','en','fr'] as const){
+ test(`area diagram explains the half rectangle in the ${language} example`,async({page},testInfo)=>{
+  await visit(page)
+  await openPage(page,'Lernkurse')
+  await page.getByRole('button',{name:'Kurs öffnen : Passende Vorgehensweisen unterscheiden',exact:true}).click()
+  await page.getByRole('button',{name:'Anhören und ansehen',exact:true}).click()
+  await page.locator('#course-audio-language').selectOption(language)
+  const pack=courseNarration('interleaved-practice',language,'rafael')!
+  const audio=page.locator('.course-media audio')
+  await audio.evaluate((element:HTMLAudioElement)=>element.load())
+  await expect.poll(()=>audio.evaluate((element:HTMLAudioElement)=>element.readyState)).toBeGreaterThan(0)
+  const seek=async(section:string)=>{await audio.evaluate((element:HTMLAudioElement,time)=>{element.currentTime=time;element.dispatchEvent(new Event('timeupdate'))},pack.cues.find(cue=>cue.section===section)!.start+.1)}
+  await seek('example')
+  const figure=page.locator('.course-media .illustration-interleaved-practice')
+  await expect(figure).toHaveAttribute('lang',language)
+  const svg=figure.getByRole('img')
+  await expect(svg.locator('text')).toHaveText(['4 cm','4 cm','3 cm','3 cm','4 × 3 = 12 cm²','4 × 3 ÷ 2 = 6 cm²'])
+  const ratio=await svg.evaluate(element=>{
+   const box=(element.querySelector('.area-rectangle') as SVGGraphicsElement).getBBox()
+   const triangle=element.querySelector('.area-triangle') as SVGPathElement
+   const bounds=triangle.getBBox()
+   const length=triangle.getTotalLength()
+   const points=Array.from({length:120},(_,i)=>triangle.getPointAtLength(i*length/120))
+   const area=Math.abs(points.reduce((sum,p,i)=>{const next=points[(i+1)%points.length];return sum+p.x*next.y-next.x*p.y},0))/2
+   return {width:bounds.width/box.width,height:bounds.height/box.height,area:area/(box.width*box.height)}
+  })
+  expect(ratio.width).toBe(1)
+  expect(ratio.height).toBe(1)
+  expect(ratio.area).toBeCloseTo(.5,2)
+  await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true)
+  await figure.screenshot({path:testInfo.outputPath('area.png')})
+  await seek('recall')
+  await expect(figure).toHaveCount(0)
+ })
+}
