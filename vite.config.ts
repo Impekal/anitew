@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs'
+import { courseRangePlugin } from './scripts/course-range-plugin.ts'
 
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
@@ -57,11 +58,11 @@ export default defineConfig({
         runtimeCaching: [{
           urlPattern: ({url}) => url.origin === self.location.origin && /^\/course-media\/(library\/[a-z0-9-]+\.m4a|video\/[a-z0-9-]+\.mp4)$/.test(url.pathname),
           handler: 'CacheFirst',
-          options: { cacheName: 'anitew-course-audio-v1', rangeRequests: true, cacheableResponse: { headers: { 'X-ANITEW-Offline': 'verified' } } },
+          options: { cacheName: 'anitew-course-audio-v1', plugins: [courseRangePlugin], cacheableResponse: { headers: { 'X-ANITEW-Offline': 'verified' } } },
         }, {
           urlPattern: ({url}) => url.origin === self.location.origin && /^\/course-media\/story\/(de|en|fr)\.m4a$/.test(url.pathname),
           handler: 'CacheFirst',
-          options: { cacheName: 'anitew-story-audio-v1', rangeRequests: true, cacheableResponse: { statuses: [200] } },
+          options: { cacheName: 'anitew-story-audio-v1', plugins: [courseRangePlugin], cacheableResponse: { statuses: [200] } },
         }],
         // OAuth und Push sind echte Worker-Endpunkte. Der PWA-Navigations-
         // Fallback darf sie niemals mit einer gecachten index.html beantworten.

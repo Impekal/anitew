@@ -654,3 +654,10 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 - Pauschale SadTalker-/LivePortrait-Links aus dem Videoplayer entfernt. Der Videokatalog verlangt nun Quellen-/Lizenzangaben pro Video, und der Player zeigt diese Angaben des tatsächlich gewählten Assets.
 - Katalog bleibt leer, bis ein vollständiger geprüfter Clip vorliegt. Diese Schemaänderung bestätigt keine neuen Modell- oder Medienrechte.
 - Lokal bestanden: Typprüfung, Build, Größenbudget und vorhandener Test gegen Veröffentlichung verworfener Videos. Keine GitHub Actions, kein Push, Deploy oder Merge.
+
+
+### Offline-Video und korrekte Teilabrufe (2026-10-04)
+
+- Neuer lokaler Browser-Test mit synthetischem Zwei-Sekunden-Testvideo: Offline-Neustart, native Wiedergabe und Sprünge, feste/offene/Suffix-Bytebereiche sowie Entfernen aus dem Cache. Die Testdatei liegt ausschließlich unter tests/fixtures, nicht im Produktkatalog.
+- Dabei reproduzierter Fehler der bisherigen Range-Behandlung: Abruf hinter dem Dateiende lieferte 206 statt 416. Selbstständiger Workbox-Hook für Kursmedien behebt dies, begrenzt überlange Endpositionen und erhält vollständige Antworten für nicht unterstützte Mehrfachbereiche. Keine Cache- oder Speicherformatmigration.
+- Lokal bestanden: 13 Kernprüfungen, Typprüfung/Build/Größenbudget und vier Desktop-/Mobilprüfungen für Audio und Video. Echte Geräte und die fertigen Coach-Videodateien bleiben separat zu prüfen. Kein GitHub-Actions-Lauf, Push oder Deploy.
