@@ -342,7 +342,7 @@ test('original story tracks remain cached and selected Noah recordings play offl
 })
 
 
-test('course stages unlock progressively and course XP cannot be farmed',async({page})=>{
+test('course stages unlock progressively and course AP cannot be farmed',async({page})=>{
   test.setTimeout(60_000)
   await visit(page)
   await openPage(page,'Lernkurse')
@@ -366,14 +366,14 @@ test('course stages unlock progressively and course XP cannot be farmed',async({
   await page.getByLabel('Eigener Text oder eigenes Wort (nur für diesen Versuch)',{exact:true}).fill('Frage: Wie schreibe ich mein Wort? Vorlage: Sonnenblumenkern.')
   await complete('Sonnenblumenkern: Sonnenblume und Kern.')
   await leavePage(page)
-  await expect(page.locator('.journey-xp')).toContainText('10 XP')
+  await expect(page.locator('.journey-xp')).toContainText('10 AP')
   await page.reload()
   await openPage(page,'Lernkurse')
   await page.getByRole('button',{name:'Kurs öffnen : Lange Wörter sicher behalten',exact:true}).click()
   await expect(page.locator('#course-stage option[value="3"]')).toBeEnabled()
   await complete('Krankenversicherungsbeitrag')
   await leavePage(page)
-  await expect(page.locator('.journey-xp')).toContainText('10 XP')
+  await expect(page.locator('.journey-xp')).toContainText('10 AP')
 })
 
 test('additional narration downloads deliberately and works after an offline restart',async({page,context})=>{

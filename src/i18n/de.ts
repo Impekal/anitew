@@ -101,6 +101,11 @@ export const de = {
     off: 'Ton aus',
   },
   journey: {
+    help: 'Hilfe & Fragen zu AP',
+    pointsQuestion: 'Was sind AP?',
+    pointsAnswer: 'AP steht für ANITEW Points. Du sammelst sie durch abgeschlossene Trainingstage, Wiedersehen und erstmals abgeschlossene Kursübungen. Sie bestimmen deine Fortschrittsstufe.',
+    earnQuestion: 'Wie erhalte ich AP?',
+    meaningQuestion: 'Was sagen AP aus? Verliere ich sie bei Pausen?',
     heading: 'Dein Trainingsweg',
     level: 'Level',
     names: [
@@ -115,12 +120,12 @@ export const de = {
       'Weiterdenken',
       'Erfahrung'
     ],
-    next: 'Noch {xp} XP bis Level {level}',
+    next: 'Noch {xp} AP bis Level {level}',
     complete: 'Alle Etappen erreicht',
     progress: 'Fortschritt zum nächsten Trainingslevel',
     path: 'Level und Spielregeln',
-    rules: '10 XP pro abgeschlossenem Trainingstag, 2 XP pro Wiedersehen nach dem ersten Tag. Mehrere Einheiten am selben Tag zählen einmal. Für jede erstmals abgeschlossene Kursübung gibt es 10 XP; erneutes Üben zählt nicht doppelt.',
-    note: 'XP zeigen deine Trainingsaktivität, keine gemessene Gedächtnisleistung. Pausen kosten keine XP. Alle Methoden bleiben jederzeit verfügbar.'
+    rules: '10 AP pro abgeschlossenem Trainingstag, 2 AP pro Wiedersehen nach dem ersten Tag. Mehrere Einheiten am selben Tag zählen einmal. Für jede erstmals abgeschlossene Kursübung gibt es 10 AP; erneutes Üben zählt nicht doppelt.',
+    note: 'AP zeigen deine Trainingsaktivität, keine gemessene Gedächtnisleistung. Pausen kosten keine AP. Alle Methoden bleiben jederzeit verfügbar.'
   },
   session: {
     plannedTime: 'Geplante Trainingszeit: {time} inklusive Antwortreserve',

@@ -50,6 +50,11 @@ export const en: Dictionary = {
     off: 'Sound off',
   },
   journey: {
+    help: 'Help & questions about AP',
+    pointsQuestion: 'What are AP?',
+    pointsAnswer: 'AP stands for ANITEW Points. You earn them through completed training days, reviews and first-time course exercise completions. They determine your progress level.',
+    earnQuestion: 'How do I earn AP?',
+    meaningQuestion: 'What do AP mean? Do I lose them when I take a break?',
     heading: 'Your training journey',
     level: 'Level',
     names: [
@@ -64,12 +69,12 @@ export const en: Dictionary = {
       'Discover more',
       'Experience'
     ],
-    next: '{xp} XP to level {level}',
+    next: '{xp} AP to level {level}',
     complete: 'All milestones reached',
     progress: 'Progress to the next training level',
     path: 'Levels and game rules',
-    rules: '10 XP per completed training day, 2 XP per review after the first day. Multiple sessions on one day count once. Each course exercise earns 10 XP on its first completion; repeating it does not count twice.',
-    note: 'XP reflect training activity, not measured memory ability. Breaks cost no XP. All methods remain available.'
+    rules: '10 AP per completed training day, 2 AP per review after the first day. Multiple sessions on one day count once. Each course exercise earns 10 AP on its first completion; repeating it does not count twice.',
+    note: 'AP reflect training activity, not measured memory ability. Breaks cost no AP. All methods remain available.'
   },
   session: {
     plannedTime: 'Planned training time: {time}, including answer reserve',

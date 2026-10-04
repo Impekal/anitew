@@ -632,3 +632,11 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 - Die Regel wird weiterhin nach dem Aufgabentyp gewählt. Beispielwerte und Originalkurse bleiben erhalten; die Grafik verschwindet vor dem eigenen Abruf.
 - Typprüfung, Build und unverändertes Größenbudget bestanden. Neuer strenger CI-Gate folgt. Quellen-/Stimmabnahme, natürliche Sprechvideos und echte Gerätetests bleiben offen.
 - Sechs Desktop-/Mobilprüfungen für DE/EN/FR bestanden: Maßangaben, gleicher Grundseiten-/Höhenbezug, geometrisches Flächenverhältnis 1:2 und Abrufsperre. Deutsche Desktop-/Mobilansichten visuell geprüft.
+
+
+### ANITEW Points und Coach-Referenz (2026-10-04)
+
+- Sichtbare Einheit verbindlich **AP – ANITEW Points**. Fortschrittsanzeige, Stufenschwellen und Kurshinweise angepasst; bestehende Berechnung und gespeicherter Fortschritt bleiben erhalten.
+- „Hilfe & Fragen zu AP“ am Trainingsweg erklärt Bedeutung, Vergaberegeln, Pausen ohne Punktverlust und den Unterschied zwischen Trainingsaktivität und gemessener Gedächtnisleistung.
+- Typprüfung, Build, Kaltstartbudget sowie vier gezielte Desktop-/Mobilprüfungen für Fortschritt, Hilfe und einmalige Kursvergabe bestanden. Kein neuer vollständiger CI-Lauf für diese einzelne Text-/Hilfeerweiterung gestartet.
+- Atta-Videoprobe v15 außerhalb der App als vorläufige Arbeitsreferenz bestätigt. Noch kein vollständiger Videokurs integriert. Erste Vorbereitung für den Geschichtenkurs mit vorhandener englischer Atta-Tonspur: 90,95 Sekunden, 21 Abschnitte, Coach-Auftritte an Anfang und Ende, Lernbilder und Abrufaufgabe dazwischen. Neuer Videoabschnitt wird zunächst separat geprüft.
