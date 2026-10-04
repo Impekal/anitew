@@ -647,3 +647,10 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 - Native Video-Untertitel enden jetzt an der Abrufgrenze, solange die Lösung nicht freigegeben ist. Spätere Lösungs-Cues fehlen in der geladenen VTT-Spur; ein über die Grenze reichender Cue wird gekürzt. Nach Freigabe steht die vollständige Spur bereit.
 - Strukturprüfung der Geschichten-Untertitel für alle vorhandenen Coach-Tonspuren: elf Sprachen, vollständige Zeilenzuordnung, nicht überlappende Zeitmarken innerhalb der Tonlänge. Für Atta Englisch zusätzlich Textgleichheit mit den Tonspur-Metadaten und Audio-Prüfsumme bestätigt. Keine muttersprachliche Hörabnahme daraus abgeleitet.
 - Lokal bestanden: acht Kernprüfungen, Typprüfung/Build, Größenbudget und je eine Desktop-/Mobilprüfung für Sprache, Tempo und Abrufsperre. GitHub Actions bleiben wegen ausgeschöpfter Inklusivminuten bis 1. November 2026 ausgesetzt; kein Push, Deploy oder Merge.
+
+
+### Videoquellen je Asset (2026-10-04)
+
+- Pauschale SadTalker-/LivePortrait-Links aus dem Videoplayer entfernt. Der Videokatalog verlangt nun Quellen-/Lizenzangaben pro Video, und der Player zeigt diese Angaben des tatsächlich gewählten Assets.
+- Katalog bleibt leer, bis ein vollständiger geprüfter Clip vorliegt. Diese Schemaänderung bestätigt keine neuen Modell- oder Medienrechte.
+- Lokal bestanden: Typprüfung, Build, Größenbudget und vorhandener Test gegen Veröffentlichung verworfener Videos. Keine GitHub Actions, kein Push, Deploy oder Merge.

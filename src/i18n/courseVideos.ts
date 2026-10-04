@@ -2,7 +2,12 @@ import type { CourseId } from '../core/courses/progress.ts'
 import type { CoachId } from '../core/courses/coaches.ts'
 import type { SpokenLanguage } from '../core/courses/media.ts'
 import type { DownloadAsset } from '../app/courseDownloads.ts'
-export interface CourseVideo extends DownloadAsset { course:CourseId; coach:CoachId; language:SpokenLanguage; mime:'video/mp4' }
+/** Verified attribution for this video's actual production pipeline. */
+export interface CourseVideoCredit { name:string; url:string; license:string }
+export interface CourseVideo extends DownloadAsset {
+ course:CourseId; coach:CoachId; language:SpokenLanguage; mime:'video/mp4'
+ credits:readonly CourseVideoCredit[]
+}
 // Only complete locally bundled clips are listed here. No synthesized fallback.
 export const courseVideos:CourseVideo[]=[]
 export function courseVideo(course:CourseId,language:SpokenLanguage,coach:CoachId|null){
