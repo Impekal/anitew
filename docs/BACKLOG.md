@@ -640,3 +640,10 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 - „Hilfe & Fragen zu AP“ am Trainingsweg erklärt Bedeutung, Vergaberegeln, Pausen ohne Punktverlust und den Unterschied zwischen Trainingsaktivität und gemessener Gedächtnisleistung.
 - Typprüfung, Build, Kaltstartbudget sowie vier gezielte Desktop-/Mobilprüfungen für Fortschritt, Hilfe und einmalige Kursvergabe bestanden. Kein neuer vollständiger CI-Lauf für diese einzelne Text-/Hilfeerweiterung gestartet.
 - Atta-Videoprobe v15 außerhalb der App als vorläufige Arbeitsreferenz bestätigt. Noch kein vollständiger Videokurs integriert. Erste Vorbereitung für den Geschichtenkurs mit vorhandener englischer Atta-Tonspur: 90,95 Sekunden, 21 Abschnitte, Coach-Auftritte an Anfang und Ende, Lernbilder und Abrufaufgabe dazwischen. Neuer Videoabschnitt wird zunächst separat geprüft.
+
+
+### Untertitel vor der Lösungsfreigabe (2026-10-04)
+
+- Native Video-Untertitel enden jetzt an der Abrufgrenze, solange die Lösung nicht freigegeben ist. Spätere Lösungs-Cues fehlen in der geladenen VTT-Spur; ein über die Grenze reichender Cue wird gekürzt. Nach Freigabe steht die vollständige Spur bereit.
+- Strukturprüfung der Geschichten-Untertitel für alle vorhandenen Coach-Tonspuren: elf Sprachen, vollständige Zeilenzuordnung, nicht überlappende Zeitmarken innerhalb der Tonlänge. Für Atta Englisch zusätzlich Textgleichheit mit den Tonspur-Metadaten und Audio-Prüfsumme bestätigt. Keine muttersprachliche Hörabnahme daraus abgeleitet.
+- Lokal bestanden: acht Kernprüfungen, Typprüfung/Build, Größenbudget und je eine Desktop-/Mobilprüfung für Sprache, Tempo und Abrufsperre. GitHub Actions bleiben wegen ausgeschöpfter Inklusivminuten bis 1. November 2026 ausgesetzt; kein Push, Deploy oder Merge.

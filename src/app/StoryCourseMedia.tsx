@@ -44,18 +44,18 @@ export function StoryCourseMedia({coach,language,platform,solution=false,onRecal
   const subtitleLanguage=library?(translated?language:spoken):language
   const baseCaptions=library?translated??library[spoken].cues.map(cue=>cue.text):storyMedia.subtitles[language]
   const captions=subtitleLanguage===spoken&&narration?baseCaptions.map((text,index)=>narration.cues[index]?.spokenText??text):baseCaptions
-  const vtt=enabled&&playingVideo?videoCaptions(pack.cues,captions):''
-  useEffect(()=>{
-    if(!vtt){setCaptionSource('');return}
-    const url=URL.createObjectURL(new Blob([vtt],{type:'text/vtt'}));setCaptionSource(url)
-    return()=>URL.revokeObjectURL(url)
-  },[vtt])
   const exampleIndex=library?library[spoken].cues.findIndex(cue=>cue.section==='example'):8
   const stopIndex=library?library[spoken].cues.findIndex(cue=>cue.section==='transfer'):16
   const recallIndex=library?library[spoken].cues.findIndex(cue=>cue.section==='recall'):16
   const instructionIndices=library?library[spoken].cues.flatMap((cue,index)=>cue.section.startsWith('step-')?[index]:[]):[]
   const gate=pack.cues[library?exampleIndex:17].start
   const recallBoundary=pack.cues[stopIndex].start
+  const vtt=enabled&&playingVideo?videoCaptions(pack.cues,captions,solution?Infinity:recallBoundary):''
+  useEffect(()=>{
+    if(!vtt){setCaptionSource('');return}
+    const url=URL.createObjectURL(new Blob([vtt],{type:'text/vtt'}));setCaptionSource(url)
+    return()=>URL.revokeObjectURL(url)
+  },[vtt])
   const cue=cueAt(pack.cues,time)
   const safeCue=!solution && cue>=stopIndex ? -1 : cue
   useEffect(()=>{
