@@ -686,3 +686,10 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 - Alle fünf lokalen Entwürfe auf Desktop und Mobilansicht geprüft: 10 erfolgreiche Durchläufe für Zeitmarken, Tempo, Lesemodus, Untertitel, Übungssteuerung und keine externen Medienabrufe.
 - Untertitelkorrektur: Bei langen Wörtern folgt auch der Hinweis zu Verbindungselementen der gesprochenen Sprache. Englischer/französischer Ton erhält keinen ungesprochenen deutschen Hinweis auf Versicherungsbeitrag; deutscher Ton behält diesen Hinweis in EN/FR-Untertiteln. Sieben gezielte Core-Tests und Typecheck bestanden.
 - DE/FR-Coach-Proben laufen separat. Vollständige Coach-Fassungen und subjektive Qualitätsfreigaben bleiben offen.
+
+
+### 2026-10-08 · Videoformat und vergrößerte Vorschautexte
+
+- Der Kursplayer verwendet nach dem Laden das Seitenverhältnis der Videodatei. Ein quadratisches Coach-Vorschaubild erzwingt dadurch keinen quadratischen Rahmen für den breiten Kursfilm. Vor dem Laden dient 16:9 als Platzhalter.
+- Alle Vorschauseiten umbrechen lange Wörter und begrenzen Steuerelemente auf die verfügbare Breite. Sechs Desktop-/Mobilprüfungen der Wortkursentwürfe mit doppelter Schriftgröße bestanden.
+- Build/Typprüfung und Kaltstartbudget bestanden. Vier lokale Desktop-/Mobiltests für reales Offline-Video inklusive Verhältnisprüfung bestanden; die mobile Darstellung wurde zusätzlich visuell geprüft.

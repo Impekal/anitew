@@ -51,7 +51,7 @@
 .illustration-number { display:block; font-size:.75em; margin-bottom:.3rem; color:var(--an-gold,#c2a564); }
 .illustration-long-words li,.illustration-number-images li { font-family:monospace; }
 
-.course-media video { display:block; width:100%; max-width:32rem; aspect-ratio:1; margin:1rem auto; border-radius:1rem; background:#080d0c; }
+.course-media video { display:block; width:100%; max-width:32rem; height:auto; aspect-ratio:16/9; margin:1rem auto; border-radius:1rem; background:#080d0c; }
 
 .course-media { container-type:inline-size; }
 .course-screen,.course-visuals { min-width:0; }

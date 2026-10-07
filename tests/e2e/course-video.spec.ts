@@ -43,6 +43,11 @@ test.describe('complete edited video',()=>{
   await video.evaluate((el:HTMLVideoElement)=>el.load())
   await expect.poll(()=>video.evaluate((el:HTMLVideoElement)=>el.readyState)).toBeGreaterThanOrEqual(2)
   expect(await video.evaluate((el:HTMLVideoElement)=>el.duration)).toBeCloseTo(asset.duration,1)
+  const ratios=await video.evaluate((el:HTMLVideoElement)=>{
+   const box=el.getBoundingClientRect()
+   return {display:box.width/box.height,source:el.videoWidth/el.videoHeight}
+  })
+  expect(ratios.display).toBeCloseTo(ratios.source,2)
   await page.locator('.course-media-chapters button').nth(1).click()
   await expect.poll(()=>video.evaluate((el:HTMLVideoElement)=>el.currentTime)).toBeCloseTo(asset.cues[8].start+.01,1)
   await page.locator('#course-speed').selectOption('1.5')

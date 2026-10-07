@@ -118,6 +118,7 @@ export function StoryCourseMedia({coach,language,platform,solution=false,onRecal
       {library && language!==subtitleLanguage && <p className="hint">The translated subtitles for this audio track are being prepared. Its original spoken text is shown here.</p>}
       <div className={`course-playback${playingVideo?' has-video':''}`}><div className="course-screen">
       <MediaElement {...(playingVideo&&coach?{poster:`/coaches/${coach}.webp`}:{})} key={`player-${mediaSrc}`} ref={element=>{player.current=element}} controls playsInline crossOrigin="anonymous" preload="none" src={mediaSrc} aria-label={t.title} onError={()=>setError(playingVideo?vt.failed:t.failed)} onTimeUpdate={sync} onSeeking={sync} onSeeked={sync} onPlay={sync} onLoadedMetadata={()=>{
+        if(player.current instanceof HTMLVideoElement && player.current.videoWidth>0 && player.current.videoHeight>0){player.current.style.aspectRatio=`${player.current.videoWidth} / ${player.current.videoHeight}`}
         if(player.current){player.current.playbackRate=preferences.speed;player.current.preservesPitch=true;if(solution){player.current.currentTime=gate+.01;setTime(gate+.01)}}
       }}>{playingVideo&&captionSource&&<track key={captionSource} kind="captions" src={captionSource} srcLang={subtitleLanguage} label={subtitleLanguage.toUpperCase()} default />}</MediaElement>
       <div className="course-media-chapters">
