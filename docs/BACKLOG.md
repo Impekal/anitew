@@ -677,3 +677,12 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 - Lokale Ton- und Videodatei ersetzt, Hashes und folgende Zeitmarken aktualisiert. Videolänge jetzt 98,68 Sekunden; Vorschau zeigt 1:39.
 - Wortlaut per lokaler Transkription bestätigt. Aussprachequalität bleibt eine Hörbewertung; keine neue Nutzerfreigabe behauptet.
 - Lokal geprüft: 7 gezielte Core-Tests, Typecheck/Build/Kaltstartbudget und 4 Desktop-/Mobiltests für Offline-Video, Kapitel, Untertitel und Abrufübung bestanden. Kein Actions-Lauf, Push, Merge oder Deployment.
+
+
+### 2026-10-08 · Weitere lokale Kursentwürfe und passende Untertitel
+
+- Geschichten-Methode: vollständige deutsche und französische Illustrationsentwürfe mit vorhandenen Atta-Tonspuren; 21 Tafeln je Sprache. Noch keine ungeprüften Coach-Bilder integriert.
+- Lange Wörter: je 13 Tafeln und ein vollständiger Illustrationsentwurf auf DE/EN/FR, mit Wortbausteinen, eigener Antwort vor Lösungsvergleich und anschließender Anwendung. Noch nicht in den App-Videokatalog aufgenommen.
+- Alle fünf lokalen Entwürfe auf Desktop und Mobilansicht geprüft: 10 erfolgreiche Durchläufe für Zeitmarken, Tempo, Lesemodus, Untertitel, Übungssteuerung und keine externen Medienabrufe.
+- Untertitelkorrektur: Bei langen Wörtern folgt auch der Hinweis zu Verbindungselementen der gesprochenen Sprache. Englischer/französischer Ton erhält keinen ungesprochenen deutschen Hinweis auf Versicherungsbeitrag; deutscher Ton behält diesen Hinweis in EN/FR-Untertiteln. Sieben gezielte Core-Tests und Typecheck bestanden.
+- DE/FR-Coach-Proben laufen separat. Vollständige Coach-Fassungen und subjektive Qualitätsfreigaben bleiben offen.

@@ -34,6 +34,11 @@ export function libraryCaptions(id:Exclude<CourseId,'story-method'>,spoken:Cours
   for(const [index,cue] of source.cues.entries()) {
    if(cue.section==='example')translated[index]=replacement[0]!
    if(cue.section==='explanation')translated[index]=replacement[1]!
+   if(id==='long-words'&&cue.section==='step-2') {
+    translated[index]=spoken==='de'
+     ? target==='fr'?'Observe les éléments de liaison, comme le s dans Versicherungsbeitrag.':'Notice connecting elements such as the s in Versicherungsbeitrag.'
+     : target==='de'?'Achte auf Änderungen der Schreibweise und auf Verbindungselemente.':translated[index]!
+   }
    if(cue.section==='recall')translated[index]=target==='de'?'Rufe das gehörte Beispiel ohne Vorlage ab. Erkläre die Bedeutung und den Weg der Merkhilfe.':target==='fr'?'Rappelle l’exemple entendu sans modèle. Explique son sens et le chemin de l’aide-mémoire.':'Recall the example you heard without looking. Explain its meaning and how the memory cue works.'
   }
  }

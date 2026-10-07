@@ -41,3 +41,17 @@ it('keeps all eleven story caption tracks within each actual narration and hides
   }
  }
 })
+
+import { libraryCaptions } from '../../src/i18n/courseCaptions.ts'
+import { courseLibraryMedia } from '../../src/i18n/courseLibraryMedia.ts'
+it('keeps the long-word spelling instruction tied to the spoken language example',()=>{
+ for(const spoken of ['de','en','fr'] as const){
+  const index=courseLibraryMedia['long-words'][spoken].cues.findIndex(c=>c.section==='step-2')
+  for(const target of ['de','en','fr'] as const){
+   const line=libraryCaptions('long-words',spoken,target)![index]!
+   if(spoken==='de')expect(line).toContain('Versicherungsbeitrag')
+   else expect(line).not.toContain('Versicherungsbeitrag')
+   expect(line.length).toBeGreaterThan(20)
+  }
+ }
+})
