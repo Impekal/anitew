@@ -669,3 +669,11 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 - Included per-asset attribution for MultiTalk, Wan2.1, WanGP and Qwen3-TTS. No model weights or rendering software are shipped. See `public/course-media/video/manifest.json`.
 - Local checks: 619 core tests; build and cold-start budget passed; desktop/mobile video tests cover the real offline download, captions, chapters, speed and recall/solution gate. Broader course regression results are recorded in the local work report.
 - Full-course visual review by the user and physical-device checks remain distinct from these automated checks. No deploy, merge, push or GitHub Actions run.
+
+
+### 2026-10-08 · Englische Aussprache im Atta-Kurs
+
+- „Pause here and name the three words in the correct order“ mit bestätigter englischer Atta-Referenz und expliziter Sprache Englisch neu erzeugt; ohne Tempoänderung oder fremde Stimmenschnipsel.
+- Lokale Ton- und Videodatei ersetzt, Hashes und folgende Zeitmarken aktualisiert. Videolänge jetzt 98,68 Sekunden; Vorschau zeigt 1:39.
+- Wortlaut per lokaler Transkription bestätigt. Aussprachequalität bleibt eine Hörbewertung; keine neue Nutzerfreigabe behauptet.
+- Lokal geprüft: 7 gezielte Core-Tests, Typecheck/Build/Kaltstartbudget und 4 Desktop-/Mobiltests für Offline-Video, Kapitel, Untertitel und Abrufübung bestanden. Kein Actions-Lauf, Push, Merge oder Deployment.

@@ -16,10 +16,10 @@ export const courseVideos:CourseVideo[]=[
     "coach": "rafael",
     "language": "en",
     "mime": "video/mp4",
-    "src": "/course-media/video/atta-story-en-be78bfff43b7.mp4",
-    "bytes": 1791901,
-    "sha256": "be78bfff43b720113f802889ccc6ad52506be4371df16d40b41301dcdd221e0a",
-    "duration": 98.36,
+    "src": "/course-media/video/atta-story-en-798e41c0c793.mp4",
+    "bytes": 1775668,
+    "sha256": "798e41c0c79399926a50b2f7984533e86ad375fb480fd743382d7eae8b116da3",
+    "duration": 98.67999999999999,
     "cues": [
       {
         "start": 0,
@@ -83,27 +83,27 @@ export const courseVideos:CourseVideo[]=[
       },
       {
         "start": 69.08,
-        "end": 73.04
+        "end": 73.36
       },
       {
-        "start": 73.04,
-        "end": 76.12
+        "start": 73.36,
+        "end": 76.44
       },
       {
-        "start": 76.12,
-        "end": 80.32
+        "start": 76.44,
+        "end": 80.63999999999999
       },
       {
-        "start": 80.32,
-        "end": 85.76
+        "start": 80.63999999999999,
+        "end": 86.08
       },
       {
-        "start": 85.76,
-        "end": 92.28
+        "start": 86.08,
+        "end": 92.6
       },
       {
-        "start": 92.28,
-        "end": 98.36
+        "start": 92.6,
+        "end": 98.67999999999999
       }
     ],
     "credits": [

@@ -2155,7 +2155,7 @@ export const courseNarrations:CourseNarration[]=[
     "course": "story-method",
     "coach": "rafael",
     "language": "en",
-    "duration": 90.95004166666665,
+    "duration": 91.28004166666666,
     "cues": [
       {
         "start": 0.0,
@@ -2234,38 +2234,38 @@ export const courseNarrations:CourseNarration[]=[
       },
       {
         "start": 63.33004166666668,
-        "end": 66.93004166666668,
+        "end": 67.25004166666668,
         "text": "Pause here and name the three words in the correct order."
       },
       {
-        "start": 67.28004166666668,
-        "end": 70.00004166666668,
+        "start": 67.61004166666667,
+        "end": 70.33004166666667,
         "text": "When you are ready, reveal the answer."
       },
       {
-        "start": 70.35004166666667,
-        "end": 74.19004166666667,
+        "start": 70.68004166666667,
+        "end": 74.52004166666667,
         "text": "The words were: key, lemon, bicycle."
       },
       {
-        "start": 74.54004166666667,
-        "end": 79.02004166666667,
+        "start": 74.87004166666667,
+        "end": 79.35004166666667,
         "text": "If you missed a word, look at its connection again and have another try."
       },
       {
-        "start": 79.37004166666667,
-        "end": 85.53004166666666,
+        "start": 79.70004166666666,
+        "end": 85.86004166666666,
         "text": "Finally, make up your own story with three different words and recall them without looking."
       },
       {
-        "start": 85.88004166666666,
-        "end": 90.60004166666666,
+        "start": 86.21004166666665,
+        "end": 90.93004166666665,
         "text": "You can also read the entire course and do every exercise at your own pace."
       }
     ],
-    "src": "/course-media/library/atta-story-en-09771673ca2a.m4a",
-    "bytes": 1032953,
-    "sha256": "09771673ca2ab4eafc6d424170f8a9c1e8c8972ab4b7fa3f7b84d5557d53d69b",
+    "src": "/course-media/library/atta-story-en-cdcb90e36055.m4a",
+    "bytes": 1037561,
+    "sha256": "cdcb90e36055c25ffcbb4ec1fa077ab615880bd12f2024d524e419ac8d4d7324",
     "synthesis": "qwen-own-name"
   },
   {
