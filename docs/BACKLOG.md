@@ -661,3 +661,11 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 - Neuer lokaler Browser-Test mit synthetischem Zwei-Sekunden-Testvideo: Offline-Neustart, native Wiedergabe und Sprünge, feste/offene/Suffix-Bytebereiche sowie Entfernen aus dem Cache. Die Testdatei liegt ausschließlich unter tests/fixtures, nicht im Produktkatalog.
 - Dabei reproduzierter Fehler der bisherigen Range-Behandlung: Abruf hinter dem Dateiende lieferte 206 statt 416. Selbstständiger Workbox-Hook für Kursmedien behebt dies, begrenzt überlange Endpositionen und erhält vollständige Antworten für nicht unterstützte Mehrfachbereiche. Keine Cache- oder Speicherformatmigration.
 - Lokal bestanden: 13 Kernprüfungen, Typprüfung/Build/Größenbudget und vier Desktop-/Mobilprüfungen für Audio und Video. Echte Geräte und die fertigen Coach-Videodateien bleiben separat zu prüfen. Kein GitHub-Actions-Lauf, Push oder Deploy.
+
+### 2026-10-07 · Complete Atta English story video (local)
+
+- Added the complete 98.36-second story-method video as a local, explicitly downloadable asset (about 1.8 MB). Uses the user-approved greeting/short coach shots, original narration, original animated diagrams, recall screen and transfer exercise. The rejected five-part face continuation is excluded.
+- The edited video has its own 21-cue timeline. Chapter navigation, native translated captions, displayed duration, recall stop and solution resume use that timeline; audio-only courses retain their original timing.
+- Included per-asset attribution for MultiTalk, Wan2.1, WanGP and Qwen3-TTS. No model weights or rendering software are shipped. See `public/course-media/video/manifest.json`.
+- Local checks: 619 core tests; build and cold-start budget passed; desktop/mobile video tests cover the real offline download, captions, chapters, speed and recall/solution gate. Broader course regression results are recorded in the local work report.
+- Full-course visual review by the user and physical-device checks remain distinct from these automated checks. No deploy, merge, push or GitHub Actions run.

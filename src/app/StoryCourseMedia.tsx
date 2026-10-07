@@ -37,6 +37,8 @@ export function StoryCourseMedia({coach,language,platform,solution=false,onRecal
   const library=courseId==='story-method'?undefined:courseLibraryMedia[courseId]
   const narration=courseNarration(courseId,spoken,coach)
   const pack=narration??(library?library[spoken]:storyMedia.packs[spoken])
+  const playbackCues=playingVideo?videoAsset!.cues:pack.cues
+  const playbackDuration=playingVideo?videoAsset!.duration:pack.duration
   const downloadAsset=playingVideo?videoAsset:narration??library?.[spoken]
   const voiceName=courseCoachCopy[locale].names[narration?.coach??'original']
   const mediaSrc=playingVideo?videoAsset!.src:pack.src
@@ -48,15 +50,15 @@ export function StoryCourseMedia({coach,language,platform,solution=false,onRecal
   const stopIndex=library?library[spoken].cues.findIndex(cue=>cue.section==='transfer'):16
   const recallIndex=library?library[spoken].cues.findIndex(cue=>cue.section==='recall'):16
   const instructionIndices=library?library[spoken].cues.flatMap((cue,index)=>cue.section.startsWith('step-')?[index]:[]):[]
-  const gate=pack.cues[library?exampleIndex:17].start
-  const recallBoundary=pack.cues[stopIndex].start
-  const vtt=enabled&&playingVideo?videoCaptions(pack.cues,captions,solution?Infinity:recallBoundary):''
+  const gate=playbackCues[library?exampleIndex:17].start
+  const recallBoundary=playbackCues[stopIndex].start
+  const vtt=enabled&&playingVideo?videoCaptions(playbackCues,captions,solution?Infinity:recallBoundary):''
   useEffect(()=>{
     if(!vtt){setCaptionSource('');return}
     const url=URL.createObjectURL(new Blob([vtt],{type:'text/vtt'}));setCaptionSource(url)
     return()=>URL.revokeObjectURL(url)
   },[vtt])
-  const cue=cueAt(pack.cues,time)
+  const cue=cueAt(playbackCues,time)
   const safeCue=!solution && cue>=stopIndex ? -1 : cue
   useEffect(()=>{
     let active=true
@@ -92,10 +94,10 @@ export function StoryCourseMedia({coach,language,platform,solution=false,onRecal
   }
   // Native media clocks may round a fractional cue boundary slightly backwards.
   // Seek inside the cue so a chapter does not display the preceding silent gap.
-  function seek(index:number){if(player.current){const target=Math.min(pack.cues[index].start+.01,pack.cues[index].end);player.current.currentTime=target;setTime(target)}}
+  function seek(index:number){if(player.current){const target=Math.min(playbackCues[index].start+.01,playbackCues[index].end);player.current.currentTime=target;setTime(target)}}
   return <section className="course-media" aria-label={t.title}>
     <h4>{t.title}</h4><p className="hint">{playingVideo?vt.note:t.note}</p>
-    <p className="hint">{locale==='de'?'Tonspur':locale==='fr'?'Piste audio':'Audio'}: {Math.floor(Math.ceil(pack.duration/preferences.speed)/60)}:{String(Math.ceil(pack.duration/preferences.speed)%60).padStart(2,'0')} · {locale==='de'?'Übungszeit zusätzlich':locale==='fr'?'temps de pratique en plus':'plus practice time'}</p>
+    <p className="hint">{playingVideo?(locale==='de'?'Videodauer':locale==='fr'?'Durée vidéo':'Video duration'):(locale==='de'?'Tonspur':locale==='fr'?'Piste audio':'Audio')}: {Math.floor(Math.ceil(playbackDuration/preferences.speed)/60)}:{String(Math.ceil(playbackDuration/preferences.speed)%60).padStart(2,'0')} · {locale==='de'?'Übungszeit zusätzlich':locale==='fr'?'temps de pratique en plus':'plus practice time'}</p>
     <button type="button" aria-pressed={enabled} disabled={!ready} onClick={()=>{player.current?.pause();setTime(0);setEnabled(!enabled);void save({...preferences,view:enabled?'read':'listen'})}}>{enabled?t.read:t.listen}</button>
     {enabled && <>
       <fieldset disabled={saving}><legend className="course-sr-only">{t.title}</legend>
