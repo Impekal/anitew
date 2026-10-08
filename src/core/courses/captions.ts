@@ -7,3 +7,9 @@ export function videoCaptions(cues:readonly {start:number;end:number}[],captions
  const escape=(text:string)=>text.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replace(/\n\s*\n/g,'\n')
  return 'WEBVTT\n\n'+cues.flatMap((cue,index)=>cue.start>=until?[]:[`${index+1}\n${stamp(cue.start)} --> ${stamp(Math.min(cue.end,until))}\n${escape(captions[index]??'')}\n`]).join('\n')
 }
+
+/** A montage may add a greeting without changing the original lesson recording. */
+export function playbackCaptions(audio:readonly string[],video?:readonly string[]):readonly string[] {
+ // Use complete tracks only: mixing partial tracks would misalign lesson sections.
+ return video?.length===audio.length && video.every(line=>typeof line==='string'&&line.trim().length>0) ? video : audio
+}

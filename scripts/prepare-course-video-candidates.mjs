@@ -40,8 +40,8 @@ for(const name of await readdir(root)){
   await writeFile(join(dir,before),gated);await writeFile(join(dir,after),full)
   tracks.push({language:locale,beforeExercise:before,withSolution:after})
  }
- const proposedCatalogEntry={course:p.course,coach:'rafael',language:p.language,mime:'video/mp4',src:`/course-media/video/atta-${p.course}-${p.language}-${sha256.slice(0,12)}.mp4`,bytes:bytes.length,sha256,duration:t.duration,cues:t.cues.map(({start,end})=>({start,end})),credits:p.credits}
- const packet={status:'prepared-for-review',userApproved:false,catalogChanged:false,sourceVideo:relative(dest,join(folder,filename)),proposedCatalogEntry,tracks,captions:data.captions,recallBoundary:gate,remainingIntegrationWork:['Review complete montage','Preserve video-specific greeting captions when integrating; audio captions remain unchanged','Copy approved media and register catalog entry','Run offline app playback checks']}
+ const proposedCatalogEntry={course:p.course,coach:'rafael',language:p.language,mime:'video/mp4',src:`/course-media/video/atta-${p.course}-${p.language}-${sha256.slice(0,12)}.mp4`,bytes:bytes.length,sha256,duration:t.duration,cues:t.cues.map(({start,end})=>({start,end})),credits:p.credits,captions:data.captions}
+ const packet={status:'prepared-for-review',userApproved:false,catalogChanged:false,sourceVideo:relative(dest,join(folder,filename)),proposedCatalogEntry,tracks,captions:data.captions,recallBoundary:gate,remainingIntegrationWork:['Review complete montage','Copy approved media and register catalog entry','Run offline app playback checks']}
  await writeFile(join(dir,'packet.json'),JSON.stringify(packet,null,2)+'\n')
  entries.push({course:p.course,language:p.language,packet:relative(dest,join(dir,'packet.json')),sha256})
 }

@@ -1,5 +1,5 @@
 import { expect,it } from 'vitest'
-import { videoCaptions } from '../../src/core/courses/captions.ts'
+import { videoCaptions, playbackCaptions } from '../../src/core/courses/captions.ts'
 it('creates valid local fullscreen captions and preserves timing across minute boundaries',()=>{
  const text=videoCaptions([{start:59.9996,end:61.005},{start:3600,end:3601}],['3 < 4 & 5\n\nNext','نص عربي'])
  expect(text).toContain('00:01:00.000 --> 00:01:01.005')
@@ -53,5 +53,26 @@ it('keeps the long-word spelling instruction tied to the spoken language example
    else expect(line).not.toContain('Versicherungsbeitrag')
    expect(line.length).toBeGreaterThan(20)
   }
+ }
+})
+
+it('uses complete localized video captions without changing audio or leaking the solution',()=>{
+ const audio=['Long words','Try it yourself','Solution']
+ const montage=['Welcome to ANITEW. Long words','Try it yourself','Solution']
+ const french=['Bienvenue sur ANITEW. Mots longs','À vous','Solution']
+ expect(playbackCaptions(audio,montage)).toEqual(montage)
+ expect(playbackCaptions(audio,french)).toEqual(french)
+ expect(playbackCaptions(audio)).toBe(audio)
+ expect(audio[0]).toBe('Long words')
+ const cues=[{start:0,end:5},{start:5,end:8},{start:8,end:11}]
+ const locked=videoCaptions(cues,playbackCaptions(audio,montage),8)
+ expect(locked).toContain('Welcome to ANITEW. Long words')
+ expect(locked).not.toContain('Solution')
+ expect(videoCaptions(cues,playbackCaptions(audio,montage))).toContain('Solution')
+})
+it('falls back as a whole for incomplete or blank montage subtitle tracks',()=>{
+ const audio=['Title','Practice','Solution']
+ for(const invalid of [[],['Only title'],['Title','','Solution'],['Title',' ','Solution'],['Title','Practice','Solution','Extra']]){
+  expect(playbackCaptions(audio,invalid)).toBe(audio)
  }
 })

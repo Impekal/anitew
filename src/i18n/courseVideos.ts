@@ -1,3 +1,4 @@
+import type { Language } from '../core/index.ts'
 import type { CourseId } from '../core/courses/progress.ts'
 import type { CoachId } from '../core/courses/coaches.ts'
 import type { SpokenLanguage } from '../core/courses/media.ts'
@@ -7,6 +8,8 @@ export interface CourseVideoCredit { name:string; url:string; license:string }
 export interface CourseVideo extends DownloadAsset {
  course:CourseId; coach:CoachId; language:SpokenLanguage; mime:'video/mp4'
  duration:number; cues:ReadonlyArray<{start:number;end:number}>
+ /** Optional complete subtitle tracks for this edited video, in app languages. */
+ captions?:Partial<Record<Language,readonly string[]>>
  credits:readonly CourseVideoCredit[]
 }
 // Complete locally bundled courses only; each video supplies its edited caption timeline.

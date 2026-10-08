@@ -1,6 +1,6 @@
 import { courseNarration } from '../i18n/courseNarrations.ts'
 import { courseCoachCopy } from '../i18n/courseCoaches.ts'
-import { videoCaptions } from '../core/courses/captions.ts'
+import { videoCaptions, playbackCaptions } from '../core/courses/captions.ts'
 import type { CoachId } from '../core/courses/coaches.ts'
 import { courseVideo,courseVideoCopy } from '../i18n/courseVideos.ts'
 import { useEffect, useRef, useState } from 'react'
@@ -45,7 +45,8 @@ export function StoryCourseMedia({coach,language,platform,solution=false,onRecal
   const translated=courseId!=='story-method'?libraryCaptions(courseId,spoken,language):undefined
   const subtitleLanguage=library?(translated?language:spoken):language
   const baseCaptions=library?translated??library[spoken].cues.map(cue=>cue.text):storyMedia.subtitles[language]
-  const captions=subtitleLanguage===spoken&&narration?baseCaptions.map((text,index)=>narration.cues[index]?.spokenText??text):baseCaptions
+  const audioCaptions=subtitleLanguage===spoken&&narration?baseCaptions.map((text,index)=>narration.cues[index]?.spokenText??text):baseCaptions
+  const captions=playbackCaptions(audioCaptions,playingVideo?videoAsset?.captions?.[subtitleLanguage]:undefined)
   const exampleIndex=library?library[spoken].cues.findIndex(cue=>cue.section==='example'):8
   const stopIndex=library?library[spoken].cues.findIndex(cue=>cue.section==='transfer'):16
   const recallIndex=library?library[spoken].cues.findIndex(cue=>cue.section==='recall'):16
@@ -77,8 +78,8 @@ export function StoryCourseMedia({coach,language,platform,solution=false,onRecal
   function material():NarratedLesson|undefined {
     if(!library)return undefined
     const cues=library[spoken].cues
-    const text=(section:string)=>captions[cues.findIndex(cue=>cue.section===section)]??''
-    return {example:library[spoken].cues[exampleIndex].text,prompt:text('recall')+((courseId==='text-verbatim'||courseId==='long-words')&&language!==spoken?' '+literalRecallHint[language]:''),language:spoken,textLanguage:subtitleLanguage,purpose:text('purpose'),limit:text('limit'),steps:cues.flatMap((cue,index)=>cue.section.startsWith('step-')?[captions[index]]:[]),explanation:text('explanation')}
+    const text=(section:string)=>audioCaptions[cues.findIndex(cue=>cue.section===section)]??''
+    return {example:library[spoken].cues[exampleIndex].text,prompt:text('recall')+((courseId==='text-verbatim'||courseId==='long-words')&&language!==spoken?' '+literalRecallHint[language]:''),language:spoken,textLanguage:subtitleLanguage,purpose:text('purpose'),limit:text('limit'),steps:cues.flatMap((cue,index)=>cue.section.startsWith('step-')?[audioCaptions[index]]:[]),explanation:text('explanation')}
   }
   useEffect(()=>{
     onPresentation(enabled)
