@@ -573,20 +573,22 @@
     "course": "story-method",
     "coach": "rafael",
     "language": "fr",
-    "duration": 67.499,
-    "src": "/course-media/library/atta-story-fr-1b52029cbf56.m4a",
-    "bytes": 785826,
-    "sha256": "1b52029cbf56e2dcb385d9280b257c2e21a687aa814c9a178a5f8b021ff41bbc",
-    "synthesis": "kyutai-native",
-    "voice": "Kyutai Fabien CC0",
+    "duration": 88.69675,
+    "src": "/course-media/library/atta-story-fr-74f96a4e4728.m4a",
+    "bytes": 916040,
+    "sha256": "74f96a4e47281683b8f069f287b29e8e05ca59e0c17a5b7e28232b533e889cb7",
+    "synthesis": "kyutai-cml-native",
+    "voice": "cml-tts/fr/1406_1028_000009-0003_enhanced.wav",
     "voiceConversion": false,
-    "status": "Voice selected by user; full continuous recording prepared for listening",
+    "status": "Whole recording approved by user 2026-10-09: Audio in Fr ist jetzt gut. Weiter",
     "sources": [
       "https://huggingface.co/kyutai/tts-1.6b-en_fr",
-      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md"
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
+      "https://openslr.org/146/"
     ],
     "license": "Kyutai CC BY 4.0; Fabien CC0",
-    "generation": "Single uninterrupted fixed-Fabien generation; no sentence assembly or voice conversion"
+    "generation": "Single continuous direct CML-TTS FR1406 generation; waveform-aligned sentence and board pauses; no voice splice or conversion",
+    "attribution": "CML-TTS, Oliveira et al., CC BY 4.0. Adapted by ANITEW."
   },
   {
     "coach": "rafael",

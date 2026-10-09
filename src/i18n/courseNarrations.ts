@@ -3,7 +3,7 @@ import type { CoachId } from '../core/courses/coaches.ts'
 import type { SpokenLanguage } from '../core/courses/media.ts'
 import type { DownloadAsset } from '../app/courseDownloads.ts'
 export interface CourseNarration extends DownloadAsset {
- synthesis?:'qwen-own-name'|'qwen-openvoice'|'kyutai-openvoice'|'kyutai-native';
+ synthesis?:'qwen-own-name'|'qwen-openvoice'|'kyutai-openvoice'|'kyutai-native'|'kyutai-cml-native';
  course:CourseId;coach:CoachId;language:SpokenLanguage;duration:number;
  cues:ReadonlyArray<{start:number;end:number;text:string;spokenText?:string;section?:string}>
 }
@@ -2390,118 +2390,139 @@ export const courseNarrations:CourseNarration[]=[
     "course": "story-method",
     "coach": "rafael",
     "language": "fr",
-    "duration": 67.499,
+    "duration": 88.69675,
     "cues": [
       {
         "start": 0,
-        "end": 1.76,
-        "text": "Bienvenue sur ANITEW."
+        "end": 2.02,
+        "text": "Bienvenue sur ANITEW.",
+        "spokenText": "Bienvenue sur ANITEW."
       },
       {
-        "start": 1.8399999999999999,
-        "end": 4.92,
-        "text": "Je suis un coach pédagogique créé par intelligence artificielle."
+        "start": 3.1466250000000002,
+        "end": 6.506625,
+        "text": "Je suis un coach pédagogique créé par intelligence artificielle.",
+        "spokenText": "Je suis un coach pédagogique créé par intelligence artificielle."
       },
       {
-        "start": 4.96,
-        "end": 7.44,
-        "text": "Aujourd'hui, nous allons découvrir la méthode des histoires."
+        "start": 7.249583333333333,
+        "end": 9.969583333333333,
+        "text": "Aujourd'hui, nous allons découvrir la méthode des histoires.",
+        "spokenText": "Aujourd'hui, nous allons découvrir la méthode des histoires."
       },
       {
-        "start": 7.7,
-        "end": 13.36,
-        "text": "La méthode des histoires est une technique de mémorisation : elle relie plusieurs informations dans une même histoire."
+        "start": 11.4975,
+        "end": 17.739041666666665,
+        "text": "La méthode des histoires est une technique de mémorisation : elle relie plusieurs informations dans une même histoire.",
+        "spokenText": "La méthode des histoires est une technique de mémorisation. Elle relie plusieurs informations dans une même histoire."
       },
       {
-        "start": 13.69,
-        "end": 18.5,
-        "text": "Elle peut aider à retenir un ordre, par exemple une liste de courses ou les points principaux d'un exposé."
+        "start": 18.159041666666667,
+        "end": 24.816499999999998,
+        "text": "Elle peut aider à retenir un ordre, par exemple une liste de courses ou les points principaux d'un exposé.",
+        "spokenText": "Elle peut aider à retenir un ordre. Par exemple une liste de courses ou les points principaux d'un exposé."
       },
       {
-        "start": 18.71,
-        "end": 20.8,
-        "text": "Elle ne remplace pas la compréhension du contenu."
+        "start": 26.237416666666668,
+        "end": 28.457416666666667,
+        "text": "Elle ne remplace pas la compréhension du contenu.",
+        "spokenText": "Elle ne remplace pas la compréhension du contenu."
       },
       {
-        "start": 21.009999999999998,
-        "end": 25.9,
-        "text": "Dans ce cours, tu découvriras le principe, tu verras un exemple, puis tu essaieras la méthode toi-même."
+        "start": 29.917791666666666,
+        "end": 35.57779166666667,
+        "text": "Dans ce cours, tu découvriras le principe, tu verras un exemple, puis tu essaieras la méthode toi-même.",
+        "spokenText": "Dans ce cours, tu découvriras le principe, tu verras un exemple, puis tu essaieras la méthode toi-même."
       },
       {
-        "start": 26.1,
-        "end": 28.66,
-        "text": "Ton objectif : retrouver trois mots dans le bon ordre."
+        "start": 35.57779166666667,
+        "end": 39.960791666666665,
+        "text": "Ton objectif : retrouver trois mots dans le bon ordre.",
+        "spokenText": "Ton objectif est de retrouver trois mots dans le bon ordre."
       },
       {
-        "start": 28.66,
-        "end": 31.08,
-        "text": "Voici notre exemple : clé, citron, vélo."
+        "start": 40.24079166666667,
+        "end": 43.619708333333335,
+        "text": "Voici notre exemple : clé, citron, vélo.",
+        "spokenText": "Voici notre exemple. clé, citron, vélo."
       },
       {
-        "start": 31.27,
-        "end": 33.94,
-        "text": "Imagine d'abord une clé géante qui presse un citron."
+        "start": 45.070708333333336,
+        "end": 47.67070833333333,
+        "text": "Imagine d'abord une clé géante qui presse un citron.",
+        "spokenText": "Imagine d'abord une clé géante qui presse un citron."
       },
       {
-        "start": 34.2,
-        "end": 37.12,
-        "text": "Le jus de citron éclabousse un vélo et fait tourner ses roues."
+        "start": 49.22570833333334,
+        "end": 52.125708333333336,
+        "text": "Le jus de citron éclabousse un vélo et fait tourner ses roues.",
+        "spokenText": "Le jus de citron éclabousse un vélo et fait tourner ses roues."
       },
       {
-        "start": 37.32,
-        "end": 41.78,
-        "text": "Une action relie le premier mot au deuxième, puis une autre relie le deuxième au troisième."
+        "start": 53.54375,
+        "end": 58.103750000000005,
+        "text": "Une action relie le premier mot au deuxième, puis une autre relie le deuxième au troisième.",
+        "spokenText": "Une action relie le premier mot au deuxième, puis une autre relie le deuxième au troisième."
       },
       {
-        "start": 42.010000000000005,
-        "end": 44.72,
-        "text": "Cette histoire inhabituelle sert simplement d'aide-mémoire."
+        "start": 58.583749999999995,
+        "end": 61.34375,
+        "text": "Cette histoire inhabituelle sert simplement d'aide-mémoire.",
+        "spokenText": "Cette histoire inhabituelle sert simplement d'aide-mémoire."
       },
       {
-        "start": 44.78,
-        "end": 47.18,
-        "text": "L'essentiel est de te représenter clairement les actions."
+        "start": 61.62375,
+        "end": 64.170125,
+        "text": "L'essentiel est de te représenter clairement les actions.",
+        "spokenText": "L'essentiel est de te représenter clairement les actions."
       },
       {
-        "start": 47.45,
-        "end": 49.3,
-        "text": "Les images vont maintenant disparaître."
+        "start": 64.710125,
+        "end": 67.36175,
+        "text": "Les images vont maintenant disparaître.",
+        "spokenText": "Les images vont maintenant disparaître."
       },
       {
-        "start": 49.45,
-        "end": 51.74,
-        "text": "Fais une pause et retrouve les trois mots dans le bon ordre."
+        "start": 67.68175000000001,
+        "end": 70.34175,
+        "text": "Fais une pause et retrouve les trois mots dans le bon ordre.",
+        "spokenText": "Fais une pause et retrouve les trois mots dans le bon ordre."
       },
       {
-        "start": 51.95,
-        "end": 53.66,
-        "text": "Quand tu es prêt, affiche la réponse."
+        "start": 70.34175,
+        "end": 72.44175,
+        "text": "Quand tu es prêt, affiche la réponse.",
+        "spokenText": "Quand tu es prêt, affiche la réponse."
       },
       {
-        "start": 53.87,
-        "end": 56.0,
-        "text": "Les mots étaient : clé, citron, vélo."
+        "start": 72.96175,
+        "end": 75.12175,
+        "text": "Les mots étaient : clé, citron, vélo.",
+        "spokenText": "Les mots étaient : clé, citron, vélo."
       },
       {
-        "start": 56.0,
-        "end": 59.72,
-        "text": "Si tu as oublié un mot, revois le lien correspondant et essaie à nouveau."
+        "start": 75.38175,
+        "end": 78.80175,
+        "text": "Si tu as oublié un mot, revois le lien correspondant et essaie à nouveau.",
+        "spokenText": "Si tu as oublié un mot, revois le lien correspondant et essaie à nouveau."
       },
       {
-        "start": 59.989999999999995,
-        "end": 63.98,
-        "text": "Pour terminer, invente une histoire avec trois autres mots, puis retrouve-les sans regarder."
+        "start": 80.29887500000001,
+        "end": 84.57887500000001,
+        "text": "Pour terminer, invente une histoire avec trois autres mots, puis retrouve-les sans regarder.",
+        "spokenText": "Pour terminer, invente une histoire avec trois autres mots, puis retrouve-les sans regarder."
       },
       {
-        "start": 64.26,
-        "end": 67.26,
-        "text": "Tu peux aussi lire tout le cours et faire chaque exercice à ton rythme."
+        "start": 85.058875,
+        "end": 88.478875,
+        "text": "Tu peux aussi lire tout le cours et faire chaque exercice à ton rythme.",
+        "spokenText": "Tu peux aussi lire tout le cours et faire chaque exercice à ton rythme."
       }
     ],
-    "src": "/course-media/library/atta-story-fr-1b52029cbf56.m4a",
-    "bytes": 785826,
-    "sha256": "1b52029cbf56e2dcb385d9280b257c2e21a687aa814c9a178a5f8b021ff41bbc",
-    "synthesis": "kyutai-native"
+    "src": "/course-media/library/atta-story-fr-74f96a4e4728.m4a",
+    "bytes": 916040,
+    "sha256": "74f96a4e47281683b8f069f287b29e8e05ca59e0c17a5b7e28232b533e889cb7",
+    "synthesis": "kyutai-cml-native"
   },
   {
     "course": "active-recall",

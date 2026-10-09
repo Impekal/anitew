@@ -169,3 +169,31 @@ Hörabnahme, Noah Französisch, deutsche Namensstellen und natürliche
 Sprechvideos bleiben offen. Die bereits verworfenen Videoproben werden
 nicht ausgeliefert. Zusätzliche Medien werden bewusst heruntergeladen;
 beim Start wird keine gesamte Coach-Bibliothek vorgeladen.
+
+
+## Französischer Geschichtenkurs: Gesamtaufnahme bestätigt, 9. Oktober 2026
+
+Der Nutzer hat die vollständige direkte CML-TTS-FR1406-Aufnahme V3 bestätigt
+(„Audio in Fr ist jetzt gut. Weiter“). Registriert ist
+`atta-story-fr-74f96a4e4728.m4a` mit 88,69675 Sekunden. Sie ersetzt für diesen
+Kurs die verworfene Fabien-Aufnahme. Keine Stimmumwandlung oder fremde
+Namenseinfügung. Die elf weiteren französischen Atta-Kurse verwenden noch
+den verworfenen älteren Stand und müssen vor einer Veröffentlichung ersetzt
+werden; diese Freigabe gilt nicht automatisch für neue Gesamtaufnahmen.
+
+Die französischen Untertitel verwenden den tatsächlichen Sprechtext einschließlich
+„mémorisation. Elle relie…“, „un ordre. Par exemple…“ und „Ton objectif est de
+retrouver…“. Quellen: Kyutai TTS und CML-TTS FR1406 (Oliveira et al., jeweils
+CC BY 4.0); Bearbeitung durch ANITEW. Die genaue Quelle, Dateiprüfsumme und
+Freigabe stehen im Medienmanifest.
+
+Die lokale Illustrationsvorschau übernimmt die bestätigte AAC-Tonspur unverändert.
+Bereits enthaltene Satz- und Tafelpausen werden nicht nochmals verlängert.
+Der spätere Coach-Auftritt bleibt eine separate, noch nicht freigegebene Probe.
+
+Prüfung: neun Kernprüfungen, Typecheck, Build und Größenbudget bestanden;
+französischer Download und Offline-Wiedergabe auf Desktop und Mobilansicht
+(Chromium) bestanden. Vier DE/FR-Vorschauprüfungen bestätigen Untertitel,
+Geschwindigkeit, Lesemodus, Abrufsperre und keine externen Medienrequests.
+Die dekodierte Videotonspur ist mit der bestätigten Aufnahme identisch.
+Keine GitHub Actions, kein Push oder Deployment.
