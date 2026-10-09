@@ -790,117 +790,118 @@ export const courseNarrations:CourseNarration[]=[
     "course": "story-method",
     "coach": "rafael",
     "language": "de",
-    "duration": 93.86008333333331,
+    "duration": 94.38008333333333,
     "cues": [
       {
-        "start": 0.0,
-        "end": 1.78,
+        "start": 0,
+        "end": 2.25,
         "text": "Willkommen bei ANITEW."
       },
       {
-        "start": 2.08,
-        "end": 4.640000000000001,
+        "start": 2.6,
+        "end": 5.16,
         "text": "Ich bin ein KI-generierter Lerncoach."
       },
       {
-        "start": 4.9399999999999995,
-        "end": 7.02,
+        "start": 5.459999999999999,
+        "end": 7.539999999999999,
         "text": "Heute geht es um die Geschichten-Methode."
       },
       {
-        "start": 7.319999999999999,
-        "end": 14.380041666666667,
+        "start": 7.84,
+        "end": 14.900041666666667,
         "text": "Die Geschichten-Methode ist eine Merktechnik: Du verknüpfst einzelne Informationen zu einer zusammenhängenden Geschichte."
       },
       {
-        "start": 14.680041666666666,
-        "end": 21.640083333333333,
+        "start": 15.200041666666666,
+        "end": 22.160083333333333,
         "text": "Sie kann dir helfen, eine Reihenfolge zu behalten, etwa bei einer Einkaufsliste oder den Stichpunkten eines Vortrags."
       },
       {
-        "start": 21.940083333333334,
-        "end": 24.180083333333336,
+        "start": 22.460083333333333,
+        "end": 24.700083333333335,
         "text": "Sie ersetzt nicht das Verstehen des Inhalts."
       },
       {
-        "start": 24.480083333333333,
-        "end": 30.960083333333333,
+        "start": 25.000083333333333,
+        "end": 31.480083333333333,
         "text": "In diesem Kurs lernst du zuerst das Prinzip, siehst ein Beispiel und probierst die Methode anschließend selbst aus."
       },
       {
-        "start": 31.260083333333334,
-        "end": 35.260083333333334,
+        "start": 31.780083333333334,
+        "end": 35.78008333333334,
         "text": "Dein Ziel: drei Begriffe in der richtigen Reihenfolge erinnern."
       },
       {
-        "start": 35.56008333333333,
-        "end": 39.40008333333333,
+        "start": 36.080083333333334,
+        "end": 39.92008333333333,
         "text": "Unser Beispiel ist: Schlüssel, Zitrone, Fahrrad."
       },
       {
-        "start": 39.70008333333333,
-        "end": 44.18008333333333,
+        "start": 40.220083333333335,
+        "end": 44.70008333333333,
         "text": "Zuerst stellst du dir vor, wie ein riesiger Schlüssel eine Zitrone aufdrückt."
       },
       {
-        "start": 44.48008333333333,
-        "end": 48.96008333333333,
+        "start": 45.000083333333336,
+        "end": 49.48008333333333,
         "text": "Der Zitronensaft spritzt auf ein Fahrrad und setzt seine Räder in Bewegung."
       },
       {
-        "start": 49.260083333333334,
-        "end": 55.180083333333336,
+        "start": 49.78008333333334,
+        "end": 55.70008333333334,
         "text": "So verbindet eine Handlung den ersten Begriff mit dem zweiten, und eine weitere den zweiten mit dem dritten."
       },
       {
-        "start": 55.48008333333333,
-        "end": 58.60008333333333,
+        "start": 56.000083333333336,
+        "end": 59.12008333333333,
         "text": "Die ungewöhnliche Geschichte ist nur eine Merkhilfe."
       },
       {
-        "start": 58.900083333333335,
-        "end": 62.74008333333333,
+        "start": 59.42008333333334,
+        "end": 63.260083333333334,
         "text": "Entscheidend ist, dass du dir die Handlung selbst deutlich vorstellst."
       },
       {
-        "start": 63.040083333333335,
-        "end": 64.88008333333333,
+        "start": 63.56008333333334,
+        "end": 65.40008333333333,
         "text": "Jetzt verschwinden die Bilder."
       },
       {
-        "start": 65.18008333333333,
-        "end": 69.50008333333332,
+        "start": 65.70008333333332,
+        "end": 70.02008333333332,
         "text": "Pausiere hier und nenne die drei Begriffe in der richtigen Reihenfolge."
       },
       {
-        "start": 69.80008333333333,
-        "end": 72.52008333333333,
+        "start": 70.32008333333333,
+        "end": 73.04008333333333,
         "text": "Wenn du bereit bist, blende die Lösung ein."
       },
       {
-        "start": 72.82008333333333,
-        "end": 76.18008333333333,
+        "start": 73.34008333333333,
+        "end": 76.70008333333332,
         "text": "Es waren: Schlüssel, Zitrone, Fahrrad."
       },
       {
-        "start": 76.48008333333333,
-        "end": 81.92008333333332,
+        "start": 77.00008333333332,
+        "end": 82.44008333333332,
         "text": "Fehlt dir ein Begriff, schau dir die passende Verbindung noch einmal an und versuche es erneut."
       },
       {
-        "start": 82.22008333333332,
-        "end": 88.38008333333332,
+        "start": 82.74008333333332,
+        "end": 88.90008333333331,
         "text": "Zum Schluss: Erfinde eine eigene Geschichte mit drei anderen Begriffen und rufe sie ohne Vorlage ab."
       },
       {
-        "start": 88.68008333333331,
-        "end": 93.56008333333331,
+        "start": 89.20008333333331,
+        "end": 94.0800833333333,
         "text": "Du kannst den gesamten Kurs auch lesen und alle Übungen in deinem eigenen Tempo machen."
       }
     ],
-    "src": "/course-media/library/atta-story-de-bdc66ff18ee4.m4a",
-    "bytes": 1118418,
-    "sha256": "bdc66ff18ee47b5a492da62d90e1492319c1c57d96883eb73b184637bc865f83"
+    "src": "/course-media/library/atta-story-de-74d05d37735a.m4a",
+    "bytes": 1178065,
+    "sha256": "74d05d37735aa85c9721a8c05cd36e5d94d2d0578ed41190e186690c91409021",
+    "synthesis": "qwen-own-name"
   },
   {
     "course": "text-meaning",
@@ -2389,117 +2390,117 @@ export const courseNarrations:CourseNarration[]=[
     "course": "story-method",
     "coach": "rafael",
     "language": "fr",
-    "duration": 83.08641666666666,
+    "duration": 67.499,
     "cues": [
       {
-        "start": 0.0,
-        "end": 1.85,
+        "start": 0,
+        "end": 1.76,
         "text": "Bienvenue sur ANITEW."
       },
       {
-        "start": 2.4,
-        "end": 5.472,
+        "start": 1.8399999999999999,
+        "end": 4.92,
         "text": "Je suis un coach pédagogique créé par intelligence artificielle."
       },
       {
-        "start": 5.822,
-        "end": 9.107333333333333,
+        "start": 4.96,
+        "end": 7.44,
         "text": "Aujourd'hui, nous allons découvrir la méthode des histoires."
       },
       {
-        "start": 9.457333333333333,
-        "end": 14.959208333333333,
+        "start": 7.7,
+        "end": 13.36,
         "text": "La méthode des histoires est une technique de mémorisation : elle relie plusieurs informations dans une même histoire."
       },
       {
-        "start": 15.309208333333334,
-        "end": 22.183541666666667,
+        "start": 13.69,
+        "end": 18.5,
         "text": "Elle peut aider à retenir un ordre, par exemple une liste de courses ou les points principaux d'un exposé."
       },
       {
-        "start": 22.533541666666668,
-        "end": 24.96275,
+        "start": 18.71,
+        "end": 20.8,
         "text": "Elle ne remplace pas la compréhension du contenu."
       },
       {
-        "start": 25.31275,
-        "end": 31.814125,
+        "start": 21.009999999999998,
+        "end": 25.9,
         "text": "Dans ce cours, tu découvriras le principe, tu verras un exemple, puis tu essaieras la méthode toi-même."
       },
       {
-        "start": 32.164125,
-        "end": 34.80945833333333,
+        "start": 26.1,
+        "end": 28.66,
         "text": "Ton objectif : retrouver trois mots dans le bon ordre."
       },
       {
-        "start": 35.15945833333333,
-        "end": 38.37466666666667,
+        "start": 28.66,
+        "end": 31.08,
         "text": "Voici notre exemple : clé, citron, vélo."
       },
       {
-        "start": 38.724666666666664,
-        "end": 42.586,
+        "start": 31.27,
+        "end": 33.94,
         "text": "Imagine d'abord une clé géante qui presse un citron."
       },
       {
-        "start": 42.936,
-        "end": 46.57958333333333,
+        "start": 34.2,
+        "end": 37.12,
         "text": "Le jus de citron éclabousse un vélo et fait tourner ses roues."
       },
       {
-        "start": 46.92958333333333,
-        "end": 51.85520833333333,
+        "start": 37.32,
+        "end": 41.78,
         "text": "Une action relie le premier mot au deuxième, puis une autre relie le deuxième au troisième."
       },
       {
-        "start": 52.20520833333333,
-        "end": 54.91908333333333,
+        "start": 42.010000000000005,
+        "end": 44.72,
         "text": "Cette histoire inhabituelle sert simplement d'aide-mémoire."
       },
       {
-        "start": 55.269083333333334,
-        "end": 58.269375,
+        "start": 44.78,
+        "end": 47.18,
         "text": "L'essentiel est de te représenter clairement les actions."
       },
       {
-        "start": 58.619375,
-        "end": 60.622125,
+        "start": 47.45,
+        "end": 49.3,
         "text": "Les images vont maintenant disparaître."
       },
       {
-        "start": 60.972125,
-        "end": 63.61745833333333,
+        "start": 49.45,
+        "end": 51.74,
         "text": "Fais une pause et retrouve les trois mots dans le bon ordre."
       },
       {
-        "start": 63.96745833333333,
-        "end": 66.339625,
+        "start": 51.95,
+        "end": 53.66,
         "text": "Quand tu es prêt, affiche la réponse."
       },
       {
-        "start": 66.689625,
-        "end": 69.40320833333334,
+        "start": 53.87,
+        "end": 56.0,
         "text": "Les mots étaient : clé, citron, vélo."
       },
       {
-        "start": 69.75320833333333,
-        "end": 73.752125,
+        "start": 56.0,
+        "end": 59.72,
         "text": "Si tu as oublié un mot, revois le lien correspondant et essaie à nouveau."
       },
       {
-        "start": 74.102125,
-        "end": 79.24345833333334,
+        "start": 59.989999999999995,
+        "end": 63.98,
         "text": "Pour terminer, invente une histoire avec trois autres mots, puis retrouve-les sans regarder."
       },
       {
-        "start": 79.59345833333333,
-        "end": 82.73641666666667,
+        "start": 64.26,
+        "end": 67.26,
         "text": "Tu peux aussi lire tout le cours et faire chaque exercice à ton rythme."
       }
     ],
-    "src": "/course-media/library/atta-story-method-fr-374f8d329525.m4a",
-    "bytes": 887780,
-    "sha256": "374f8d329525aa51f4bba13479e6250667623ddb17e21995d82dd2ef791e4e09",
+    "src": "/course-media/library/atta-story-fr-1b52029cbf56.m4a",
+    "bytes": 785826,
+    "sha256": "1b52029cbf56e2dcb385d9280b257c2e21a687aa814c9a178a5f8b021ff41bbc",
     "synthesis": "kyutai-native"
   },
   {

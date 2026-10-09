@@ -195,18 +195,18 @@
     ]
   },
   {
-    "coach": "atta",
+    "coach": "rafael",
     "course": "story-method",
     "language": "de",
-    "duration": 93.86008333333331,
-    "bytes": 1118418,
-    "sha256": "bdc66ff18ee47b5a492da62d90e1492319c1c57d96883eb73b184637bc865f83",
+    "duration": 94.38008333333333,
+    "bytes": 1178065,
+    "sha256": "74d05d37735aa85c9721a8c05cd36e5d94d2d0578ed41190e186690c91409021",
     "reference_sha256": "da57d8cd4e41b636e6e90d63822db8764499a67008e6bcb366f792967788d0de",
     "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-Base-6bit",
     "status": "Synthetic reference voice approved by user; full recordings generated, decoded and reviewed through automatic transcription. Final native-speaker listening review remains open.",
     "speechExpansionVersion": 3,
-    "src": "/course-media/library/atta-story-de-bdc66ff18ee4.m4a",
-    "nameReference": "approved-v14",
+    "src": "/course-media/library/atta-story-de-74d05d37735a.m4a",
+    "nameReference": "User-approved complete same-voice greeting 2026-10-09; Eni-tju",
     "modelRevision": "34ff5318365b59cba9c03ff729f2eee0814caf72",
     "voiceDesignRevision": "ffc6545dc9cb086950aa46c6cd3db490e6ece3e1",
     "license": "Apache-2.0 models; generated synthetic references",
@@ -214,7 +214,9 @@
       "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
       "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
       "https://github.com/Blaizzy/mlx-audio"
-    ]
+    ],
+    "synthesis": "qwen-own-name",
+    "nameSplice": false
   },
   {
     "coach": "atta",
@@ -571,19 +573,20 @@
     "course": "story-method",
     "coach": "rafael",
     "language": "fr",
-    "duration": 83.08641666666666,
-    "src": "/course-media/library/atta-story-method-fr-374f8d329525.m4a",
-    "bytes": 887780,
-    "sha256": "374f8d329525aa51f4bba13479e6250667623ddb17e21995d82dd2ef791e4e09",
+    "duration": 67.499,
+    "src": "/course-media/library/atta-story-fr-1b52029cbf56.m4a",
+    "bytes": 785826,
+    "sha256": "1b52029cbf56e2dcb385d9280b257c2e21a687aa814c9a178a5f8b021ff41bbc",
     "synthesis": "kyutai-native",
     "voice": "Kyutai Fabien CC0",
     "voiceConversion": false,
-    "status": "Original performance voice selected by user 2026-10-09; complete course listening remains reviewable",
+    "status": "Voice selected by user; full continuous recording prepared for listening",
     "sources": [
       "https://huggingface.co/kyutai/tts-1.6b-en_fr",
       "https://huggingface.co/kyutai/tts-voices/blob/main/README.md"
     ],
-    "license": "Kyutai CC BY 4.0; Fabien CC0"
+    "license": "Kyutai CC BY 4.0; Fabien CC0",
+    "generation": "Single uninterrupted fixed-Fabien generation; no sentence assembly or voice conversion"
   },
   {
     "coach": "rafael",
