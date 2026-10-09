@@ -18,7 +18,7 @@ it('keeps distinct verified local voices and the same lesson cues',()=>{
  expect(courseNarration('story-method','de','lin')).toBeDefined()
  expect(courseNarration('story-method','de','original')).toBeUndefined()
  expect(courseNarration('story-method','en','original')?.synthesis).toBe('qwen-openvoice')
- expect(courseNarration('story-method','fr','rafael')?.synthesis).toBe('kyutai-openvoice')
+ expect(courseNarration('story-method','fr','rafael')?.synthesis).toBe('kyutai-native')
  expect(courseNarration('story-method','en','rafael')?.synthesis).toBe('qwen-own-name')
  expect(courseNarration('story-method','fr','lin')?.synthesis).toBe('kyutai-openvoice')
  expect(courseNarration('story-method','fr','original')).toBeUndefined()
@@ -39,4 +39,10 @@ it('keeps distinct verified local voices and the same lesson cues',()=>{
   if(pack.course==='story-method')expect(pack.cues[17].start).toBeGreaterThan(pack.cues[16].end)
   else expect(pack.cues.findIndex(cue=>cue.section==='transfer')).toBeGreaterThan(pack.cues.findIndex(cue=>cue.section==='example'))
  }
+})
+
+it('uses the selected original French voice for all twelve Atta courses',()=>{
+ const french=courseNarrations.filter(p=>p.coach==='rafael'&&p.language==='fr')
+ expect(french).toHaveLength(12)
+ expect(french.every(p=>p.synthesis==='kyutai-native')).toBe(true)
 })

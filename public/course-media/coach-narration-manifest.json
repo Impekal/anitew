@@ -568,32 +568,22 @@
     "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta."
   },
   {
+    "course": "story-method",
     "coach": "rafael",
     "language": "fr",
-    "course": "story-method",
-    "duration": 82.93714285714283,
-    "bytes": 855535,
-    "sha256": "2bc2ae1550f19bb46cfb403f4681ce6387ac53f59495726ff6bdfc348ae84884",
-    "status": "Short reference explicitly approved by user; full narration decoded and checked with transcription, not a complete human listening approval.",
-    "recipe": "Kyutai Fabien at 1.12 tempo; OpenVoice CML1406 tone conversion; own approved complete greeting",
-    "referenceManifest": "approved-language-references/manifest.json",
-    "src": "/course-media/library/atta-story-fr-2bc2ae1550f1.m4a",
-    "synthesis": "kyutai-openvoice",
-    "nameReference": "Same-coach complete approved greeting; no other-speaker name insertion.",
+    "duration": 83.08641666666666,
+    "src": "/course-media/library/atta-story-method-fr-374f8d329525.m4a",
+    "bytes": 887780,
+    "sha256": "374f8d329525aa51f4bba13479e6250667623ddb17e21995d82dd2ef791e4e09",
+    "synthesis": "kyutai-native",
+    "voice": "Kyutai Fabien CC0",
+    "voiceConversion": false,
+    "status": "Original performance voice selected by user 2026-10-09; complete course listening remains reviewable",
     "sources": [
       "https://huggingface.co/kyutai/tts-1.6b-en_fr",
-      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
-      "https://openslr.org/146/",
-      "https://github.com/myshell-ai/OpenVoice"
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md"
     ],
-    "voiceSource": "Kyutai Fabien CC0 performance; CML-TTS French speaker1406 CC-BY-4.0 target; generated narration adapted by ANITEW",
-    "modelLicense": "Kyutai CC-BY-4.0; OpenVoice MIT",
-    "approvedReferenceHashes": {
-      "preferred-fr": "5b7babe4ac4a2b402555868c0dcb630dcee40a89ee4346c782b28fb710d6cbd5",
-      "fr-performance": "1b1f71d289f4586f49a50a4bd3afcfff9be057b42e73a3c5432951f6bb94ca98",
-      "fr-timbre": "d9e21ce03fd29e6bd4645ca126bf10dc14f8e6f07e4124cafd722276904b0e07"
-    },
-    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta."
+    "license": "Kyutai CC BY 4.0; Fabien CC0"
   },
   {
     "coach": "rafael",
@@ -1245,521 +1235,202 @@
     }
   },
   {
-    "coach": "rafael",
-    "language": "fr",
     "course": "active-recall",
-    "duration": 94.34394557823124,
-    "bytes": 1012238,
-    "sha256": "fa8c58ddb568cfe8461f1ad04a295703ca7761e126f7b9559076ca05b3039855",
-    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
-    "recipe": "Kyutai Fabien at 1.12 tempo; OpenVoice CML1406 tone conversion",
-    "referenceManifest": "approved-language-references/manifest.json",
-    "src": "/course-media/library/atta-active-recall-fr-fa8c58ddb568.m4a",
-    "synthesis": "kyutai-openvoice",
-    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
-    "sources": [
-      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
-      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
-      "https://openslr.org/146/",
-      "https://github.com/myshell-ai/OpenVoice"
-    ],
-    "voiceSource": "Kyutai Fabien CC0 performance; CML-TTS French speaker1406 CC-BY-4.0 target; generated narration adapted by ANITEW",
-    "modelLicense": "Kyutai CC-BY-4.0; OpenVoice MIT",
-    "approvedReferenceHashes": {
-      "preferred-fr": "5b7babe4ac4a2b402555868c0dcb630dcee40a89ee4346c782b28fb710d6cbd5",
-      "fr-performance": "1b1f71d289f4586f49a50a4bd3afcfff9be057b42e73a3c5432951f6bb94ca98",
-      "fr-timbre": "d9e21ce03fd29e6bd4645ca126bf10dc14f8e6f07e4124cafd722276904b0e07"
-    },
-    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
-    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
-    "contentReview": {
-      "audioSha256": "fa8c58ddb568cfe8461f1ad04a295703ca7761e126f7b9559076ca05b3039855",
-      "notes": "Repaired distinguishing known/unknown and read/understand instructions. Evaporation/energy relation retained. Brand recognition spelling is not pronunciation approval."
-    },
-    "spokenClarifications": [
-      {
-        "cue": 1,
-        "spokenText": "Essaie de retrouver une information sans regarder sa source. Tu distingues ainsi deux choses : ce que tu peux rappeler toi-même, et ce qui demande encore du travail. Cette méthode s’applique aux faits, aux notions et aux relations."
-      },
-      {
-        "cue": 10,
-        "spokenText": "Commence par lire et comprendre la réponse. Cache-la ensuite et réponds toi-même. « L’eau refroidit » ne suffit pas à expliquer le lien : le besoin d’énergie et le prélèvement de chaleur sont essentiels."
-      }
-    ]
-  },
-  {
     "coach": "rafael",
     "language": "fr",
+    "duration": 94.410875,
+    "src": "/course-media/library/atta-active-recall-fr-783a70e475d9.m4a",
+    "bytes": 1041475,
+    "sha256": "783a70e475d9f574a069e3fad1d3f95b243e2337b29f21b69cfbb83afc488c1b",
+    "synthesis": "kyutai-native",
+    "voice": "Kyutai Fabien CC0",
+    "voiceConversion": false,
+    "status": "Original performance voice selected by user 2026-10-09; complete course listening remains reviewable",
+    "sources": [
+      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md"
+    ],
+    "license": "Kyutai CC BY 4.0; Fabien CC0"
+  },
+  {
     "course": "interleaved-practice",
-    "duration": 101.94680272108842,
-    "bytes": 1117637,
-    "sha256": "7596ef23e3164b2836af42fe4505e95428a86d7917b2382f61c5646fe54ea222",
-    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
-    "recipe": "Kyutai Fabien at 1.12 tempo; OpenVoice CML1406 tone conversion",
-    "referenceManifest": "approved-language-references/manifest.json",
-    "src": "/course-media/library/atta-interleaved-practice-fr-7596ef23e316.m4a",
-    "synthesis": "kyutai-openvoice",
-    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
-    "sources": [
-      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
-      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
-      "https://openslr.org/146/",
-      "https://github.com/myshell-ai/OpenVoice"
-    ],
-    "voiceSource": "Kyutai Fabien CC0 performance; CML-TTS French speaker1406 CC-BY-4.0 target; generated narration adapted by ANITEW",
-    "modelLicense": "Kyutai CC-BY-4.0; OpenVoice MIT",
-    "approvedReferenceHashes": {
-      "preferred-fr": "5b7babe4ac4a2b402555868c0dcb630dcee40a89ee4346c782b28fb710d6cbd5",
-      "fr-performance": "1b1f71d289f4586f49a50a4bd3afcfff9be057b42e73a3c5432951f6bb94ca98",
-      "fr-timbre": "d9e21ce03fd29e6bd4645ca126bf10dc14f8e6f07e4124cafd722276904b0e07"
-    },
-    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
-    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
-    "contentReview": {
-      "audioSha256": "7596ef23e3164b2836af42fe4505e95428a86d7917b2382f61c5646fe54ea222",
-      "notes": "All formulas spoken explicitly. Replaced ambiguous un demi with divide product by two; final 12/6 and exercise dimensions retained."
-    },
-    "spokenClarifications": [
-      {
-        "cue": 8,
-        "spokenText": "Pour un rectangle, l’aire est égale à la longueur multipliée par la largeur. Pour un triangle, l’aire est égale à la base multipliée par la hauteur correspondante, puis divisée par deux. Un rectangle de quatre centimètres sur trois centimètres a une aire de douze centimètres carrés. Un triangle de base quatre centimètres et de hauteur correspondante trois centimètres a une aire de six centimètres carrés."
-      },
-      {
-        "cue": 10,
-        "spokenText": "Exercice A. Un triangle de base six centimètres et de hauteur correspondante quatre centimètres. Exercice B. Un rectangle de longueur six centimètres et de largeur quatre centimètres. Donne la règle et l’aire de chaque figure."
-      },
-      {
-        "cue": 9,
-        "spokenText": "Des nombres identiques ne donnent pas forcément le même calcul. La figure détermine la règle. Pour le triangle, il faut diviser le produit par deux. Dans un mélange d’exercices, commence par identifier le type de figure avant d’appliquer la règle."
-      }
-    ]
-  },
-  {
     "coach": "rafael",
     "language": "fr",
+    "duration": 102.03966666666666,
+    "src": "/course-media/library/atta-interleaved-practice-fr-f1adb21121d9.m4a",
+    "bytes": 1143859,
+    "sha256": "f1adb21121d99f72e871f65f01bd9931d3d4c39d36108678f306d8ebe5160553",
+    "synthesis": "kyutai-native",
+    "voice": "Kyutai Fabien CC0",
+    "voiceConversion": false,
+    "status": "Original performance voice selected by user 2026-10-09; complete course listening remains reviewable",
+    "sources": [
+      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md"
+    ],
+    "license": "Kyutai CC BY 4.0; Fabien CC0"
+  },
+  {
     "course": "keyword-method",
-    "duration": 79.4002267573696,
-    "bytes": 839728,
-    "sha256": "6d3604a8dd537f7e5f4e1ab33ecbcc41ab8a42fdbaeb06eb1bfc14377bac8e36",
-    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
-    "recipe": "Kyutai Fabien at 1.12 tempo; OpenVoice CML1406 tone conversion",
-    "referenceManifest": "approved-language-references/manifest.json",
-    "src": "/course-media/library/atta-keyword-method-fr-6d3604a8dd53.m4a",
-    "synthesis": "kyutai-openvoice",
-    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
-    "sources": [
-      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
-      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
-      "https://openslr.org/146/",
-      "https://github.com/myshell-ai/OpenVoice"
-    ],
-    "voiceSource": "Kyutai Fabien CC0 performance; CML-TTS French speaker1406 CC-BY-4.0 target; generated narration adapted by ANITEW",
-    "modelLicense": "Kyutai CC-BY-4.0; OpenVoice MIT",
-    "approvedReferenceHashes": {
-      "preferred-fr": "5b7babe4ac4a2b402555868c0dcb630dcee40a89ee4346c782b28fb710d6cbd5",
-      "fr-performance": "1b1f71d289f4586f49a50a4bd3afcfff9be057b42e73a3c5432951f6bb94ca98",
-      "fr-timbre": "d9e21ce03fd29e6bd4645ca126bf10dc14f8e6f07e4124cafd722276904b0e07"
-    },
-    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
-    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
-    "contentReview": {
-      "audioSha256": "6d3604a8dd537f7e5f4e1ab33ecbcc41ab8a42fdbaeb06eb1bfc14377bac8e36",
-      "notes": "Bell and The bell rings retained; corrected opening connective and transfer instruction. French ASR renders bell as belle, which does not certify English pronunciation."
-    },
-    "spokenClarifications": [
-      {
-        "cue": 1,
-        "spokenText": "Un mot connu dont le son est proche peut servir de pont vers le sens d’un mot étranger. Relie ce mot-clé et le sens dans une image. Puis vérifie le mot à apprendre."
-      },
-      {
-        "cue": 11,
-        "spokenText": "Fais un essai avec un mot dont tu as réellement besoin. Teste aussi le sens inverse : peux-tu retrouver la forme étrangère à partir du sens ? Si le mot-clé te perturbe, change de lien ou utilise le rappel direct."
-      }
-    ]
-  },
-  {
     "coach": "rafael",
     "language": "fr",
+    "duration": 79.47066666666667,
+    "src": "/course-media/library/atta-keyword-method-fr-b96dc1df4fc0.m4a",
+    "bytes": 868945,
+    "sha256": "b96dc1df4fc0a77df05eb6b2e62438b3ad4646375b07b965bd4256ffd46fab69",
+    "synthesis": "kyutai-native",
+    "voice": "Kyutai Fabien CC0",
+    "voiceConversion": false,
+    "status": "Original performance voice selected by user 2026-10-09; complete course listening remains reviewable",
+    "sources": [
+      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md"
+    ],
+    "license": "Kyutai CC BY 4.0; Fabien CC0"
+  },
+  {
     "course": "long-words",
-    "duration": 82.93133786848071,
-    "bytes": 891201,
-    "sha256": "149351df0c066b2839bf02809d0083d2fcb12300589a53ebf88425690e000533",
-    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
-    "recipe": "Kyutai Fabien at 1.12 tempo; OpenVoice CML1406 tone conversion",
-    "referenceManifest": "approved-language-references/manifest.json",
-    "src": "/course-media/library/atta-long-words-fr-149351df0c06.m4a",
-    "synthesis": "kyutai-openvoice",
-    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
-    "sources": [
-      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
-      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
-      "https://openslr.org/146/",
-      "https://github.com/myshell-ai/OpenVoice"
-    ],
-    "voiceSource": "Kyutai Fabien CC0 performance; CML-TTS French speaker1406 CC-BY-4.0 target; generated narration adapted by ANITEW",
-    "modelLicense": "Kyutai CC-BY-4.0; OpenVoice MIT",
-    "approvedReferenceHashes": {
-      "preferred-fr": "5b7babe4ac4a2b402555868c0dcb630dcee40a89ee4346c782b28fb710d6cbd5",
-      "fr-performance": "1b1f71d289f4586f49a50a4bd3afcfff9be057b42e73a3c5432951f6bb94ca98",
-      "fr-timbre": "d9e21ce03fd29e6bd4645ca126bf10dc14f8e6f07e4124cafd722276904b0e07"
-    },
-    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
-    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
-    "contentReview": {
-      "audioSha256": "149351df0c066b2839bf02809d0083d2fcb12300589a53ebf88425690e000533",
-      "notes": "Negative prefix in and incomprehensible meaning restored; full word and prefix explanation verified in both voices."
-    },
-    "spokenClarifications": [
-      {
-        "cue": 9,
-        "spokenText": "Exemple : incompréhensible."
-      },
-      {
-        "cue": 10,
-        "spokenText": "Le mot incompréhensible signifie : ce qui ne peut pas être compris. On sépare le préfixe in et le mot compréhensible. Le préfixe in apporte ici la négation. Compréhensible est lié au verbe comprendre. Ce découpage aide à saisir le sens. Il ne constitue pas une transcription de la prononciation."
-      }
-    ]
-  },
-  {
     "coach": "rafael",
     "language": "fr",
+    "duration": 83.00191666666667,
+    "src": "/course-media/library/atta-long-words-fr-0f9fe7f11248.m4a",
+    "bytes": 912213,
+    "sha256": "0f9fe7f11248018e478b1e8bd3af9d9ff066541dcc79261dca3b1b69a8832cd4",
+    "synthesis": "kyutai-native",
+    "voice": "Kyutai Fabien CC0",
+    "voiceConversion": false,
+    "status": "Original performance voice selected by user 2026-10-09; complete course listening remains reviewable",
+    "sources": [
+      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md"
+    ],
+    "license": "Kyutai CC BY 4.0; Fabien CC0"
+  },
+  {
     "course": "meaningful-groups",
-    "duration": 92.88108843537414,
-    "bytes": 983718,
-    "sha256": "8041cea94c49138b5e58c8697deb713803f39be11317a756c3f17522dd026fdf",
-    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
-    "recipe": "Kyutai Fabien at 1.12 tempo; OpenVoice CML1406 tone conversion",
-    "referenceManifest": "approved-language-references/manifest.json",
-    "src": "/course-media/library/atta-meaningful-groups-fr-8041cea94c49.m4a",
-    "synthesis": "kyutai-openvoice",
-    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
-    "sources": [
-      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
-      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
-      "https://openslr.org/146/",
-      "https://github.com/myshell-ai/OpenVoice"
-    ],
-    "voiceSource": "Kyutai Fabien CC0 performance; CML-TTS French speaker1406 CC-BY-4.0 target; generated narration adapted by ANITEW",
-    "modelLicense": "Kyutai CC-BY-4.0; OpenVoice MIT",
-    "approvedReferenceHashes": {
-      "preferred-fr": "5b7babe4ac4a2b402555868c0dcb630dcee40a89ee4346c782b28fb710d6cbd5",
-      "fr-performance": "1b1f71d289f4586f49a50a4bd3afcfff9be057b42e73a3c5432951f6bb94ca98",
-      "fr-timbre": "d9e21ce03fd29e6bd4645ca126bf10dc14f8e6f07e4124cafd722276904b0e07"
-    },
-    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
-    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
-    "contentReview": {
-      "audioSha256": "8041cea94c49138b5e58c8697deb713803f39be11317a756c3f17522dd026fdf",
-      "notes": "Nine words with articles regenerated after scie/veste distortion; final transcript retains pomme,marteau,chemise,poire,scie,veste,banane,pince,pantalon and groups."
-    },
-    "spokenClarifications": [
-      {
-        "cue": 7,
-        "spokenText": "Cache la source. Ensuite, rappelle d’abord les groupes, puis leur contenu."
-      },
-      {
-        "cue": 11,
-        "spokenText": "Rappelle les trois groupes et autant des neuf éléments que possible. Fais-le sans regarder la liste. L’ordre dans chaque groupe est libre."
-      },
-      {
-        "cue": 12,
-        "spokenText": "Organise un passage par idées ou une liste par catégories utiles. N’invente pas des groupes pour atteindre un nombre fixé. Vérifie tout le contenu. Ne te limite pas aux titres."
-      },
-      {
-        "cue": 9,
-        "spokenText": "Une pomme. Un marteau. Une chemise. Une poire. Une scie. Une veste. Une banane. Une pince. Un pantalon."
-      }
-    ]
-  },
-  {
     "coach": "rafael",
     "language": "fr",
+    "duration": 92.94741666666667,
+    "src": "/course-media/library/atta-meaningful-groups-fr-00565e90b513.m4a",
+    "bytes": 996786,
+    "sha256": "00565e90b51399650fb03993bc8f2e776eb717ef939b98c780d55c7020f33d2f",
+    "synthesis": "kyutai-native",
+    "voice": "Kyutai Fabien CC0",
+    "voiceConversion": false,
+    "status": "Original performance voice selected by user 2026-10-09; complete course listening remains reviewable",
+    "sources": [
+      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md"
+    ],
+    "license": "Kyutai CC BY 4.0; Fabien CC0"
+  },
+  {
     "course": "method-of-loci",
-    "duration": 82.79034013605441,
-    "bytes": 907392,
-    "sha256": "4c3a046dcc0675f037ec26e470a41088afa4773fb5138354f5260e07a74f13fc",
-    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
-    "recipe": "Kyutai Fabien at 1.12 tempo; OpenVoice CML1406 tone conversion",
-    "referenceManifest": "approved-language-references/manifest.json",
-    "src": "/course-media/library/atta-method-of-loci-fr-4c3a046dcc06.m4a",
-    "synthesis": "kyutai-openvoice",
-    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
-    "sources": [
-      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
-      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
-      "https://openslr.org/146/",
-      "https://github.com/myshell-ai/OpenVoice"
-    ],
-    "voiceSource": "Kyutai Fabien CC0 performance; CML-TTS French speaker1406 CC-BY-4.0 target; generated narration adapted by ANITEW",
-    "modelLicense": "Kyutai CC-BY-4.0; OpenVoice MIT",
-    "approvedReferenceHashes": {
-      "preferred-fr": "5b7babe4ac4a2b402555868c0dcb630dcee40a89ee4346c782b28fb710d6cbd5",
-      "fr-performance": "1b1f71d289f4586f49a50a4bd3afcfff9be057b42e73a3c5432951f6bb94ca98",
-      "fr-timbre": "d9e21ce03fd29e6bd4645ca126bf10dc14f8e6f07e4124cafd722276904b0e07"
-    },
-    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
-    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
-    "contentReview": {
-      "audioSha256": "4c3a046dcc0675f037ec26e470a41088afa4773fb5138354f5260e07a74f13fc",
-      "notes": "Door/shoe rack/table and bread/soap/candle mappings retained; homophone pain/peint does not change the intended example."
-    },
-    "spokenClarifications": [
-      {
-        "cue": 4,
-        "spokenText": "Fixe leur ordre. Répète ensuite le trajet sans contenu à apprendre."
-      },
-      {
-        "cue": 7,
-        "spokenText": "Compare ton rappel. Améliore ensuite les lieux confus ou les images peu efficaces."
-      },
-      {
-        "cue": 10,
-        "spokenText": "Visite mentalement les trois endroits. Puis écris l’élément associé à chacun."
-      }
-    ]
-  },
-  {
     "coach": "rafael",
     "language": "fr",
+    "duration": 82.8585,
+    "src": "/course-media/library/atta-method-of-loci-fr-2157bbe154e5.m4a",
+    "bytes": 920114,
+    "sha256": "2157bbe154e55094f69ee2bfd3b963736405c0fa0088ddcecda33e9ba4204a43",
+    "synthesis": "kyutai-native",
+    "voice": "Kyutai Fabien CC0",
+    "voiceConversion": false,
+    "status": "Original performance voice selected by user 2026-10-09; complete course listening remains reviewable",
+    "sources": [
+      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md"
+    ],
+    "license": "Kyutai CC BY 4.0; Fabien CC0"
+  },
+  {
     "course": "number-images",
-    "duration": 92.00866213151926,
-    "bytes": 989067,
-    "sha256": "ebf0a0e02bbc2323c6060fff5aa34d5a2f03932fe4fc792e9a38e33d7d4b2e10",
-    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
-    "recipe": "Kyutai Fabien at 1.12 tempo; OpenVoice CML1406 tone conversion",
-    "referenceManifest": "approved-language-references/manifest.json",
-    "src": "/course-media/library/atta-number-images-fr-ebf0a0e02bbc.m4a",
-    "synthesis": "kyutai-openvoice",
-    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
-    "sources": [
-      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
-      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
-      "https://openslr.org/146/",
-      "https://github.com/myshell-ai/OpenVoice"
-    ],
-    "voiceSource": "Kyutai Fabien CC0 performance; CML-TTS French speaker1406 CC-BY-4.0 target; generated narration adapted by ANITEW",
-    "modelLicense": "Kyutai CC-BY-4.0; OpenVoice MIT",
-    "approvedReferenceHashes": {
-      "preferred-fr": "5b7babe4ac4a2b402555868c0dcb630dcee40a89ee4346c782b28fb710d6cbd5",
-      "fr-performance": "1b1f71d289f4586f49a50a4bd3afcfff9be057b42e73a3c5432951f6bb94ca98",
-      "fr-timbre": "d9e21ce03fd29e6bd4645ca126bf10dc14f8e6f07e4124cafd722276904b0e07"
-    },
-    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
-    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
-    "contentReview": {
-      "audioSha256": "ebf0a0e02bbc2323c6060fff5aa34d5a2f03932fe4fc792e9a38e33d7d4b2e10",
-      "notes": "Replaced ambiguous standalone letter readings with initial sounds of tapis/dos/nez. Both voices retain 1/2/12 and one consonant sound for doubled n."
-    },
-    "spokenClarifications": [
-      {
-        "cue": 4,
-        "spokenText": "Lis les sons, dans l’ordre des chiffres."
-      },
-      {
-        "cue": 11,
-        "spokenText": "Travaille les autres correspondances fixes dans les leçons existantes avant de mémoriser des nombres plus longs. Assure-toi que chaque image te ramène exactement au nombre voulu."
-      },
-      {
-        "cue": 8,
-        "spokenText": "Pour le chiffre un, utilise le premier son de tapis ou de dos. Pour le chiffre deux, utilise le premier son de nez. Pour douze, imagine une tonne de sable. Dans tonne, tu retrouves le son initial de tapis, puis celui de nez."
-      },
-      {
-        "cue": 9,
-        "spokenText": "Dans cet exercice, les voyelles ne comptent pas. Le mot tonne s’écrit avec deux lettres identiques au milieu, mais elles représentent un seul son. Le premier son consonantique code un. Le second code deux. Tu retrouves douze. On compte les sons, pas le nombre de lettres."
-      }
-    ]
-  },
-  {
     "coach": "rafael",
     "language": "fr",
+    "duration": 92.08025,
+    "src": "/course-media/library/atta-number-images-fr-978d4b7e8296.m4a",
+    "bytes": 1014380,
+    "sha256": "978d4b7e8296224bfd659ad74425490bd8bfd2a80fe82f5335bd28be9b79fee1",
+    "synthesis": "kyutai-native",
+    "voice": "Kyutai Fabien CC0",
+    "voiceConversion": false,
+    "status": "Original performance voice selected by user 2026-10-09; complete course listening remains reviewable",
+    "sources": [
+      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md"
+    ],
+    "license": "Kyutai CC BY 4.0; Fabien CC0"
+  },
+  {
     "course": "self-explanation",
-    "duration": 102.94693877551018,
-    "bytes": 1144403,
-    "sha256": "6401fe1a41f6f700bcbcddc7c1ef20f481aa464b2cc77407f1efecf0f3d9c0cc",
-    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
-    "recipe": "Kyutai Fabien at 1.12 tempo; OpenVoice CML1406 tone conversion",
-    "referenceManifest": "approved-language-references/manifest.json",
-    "src": "/course-media/library/atta-self-explanation-fr-6401fe1a41f6.m4a",
-    "synthesis": "kyutai-openvoice",
-    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
-    "sources": [
-      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
-      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
-      "https://openslr.org/146/",
-      "https://github.com/myshell-ai/OpenVoice"
-    ],
-    "voiceSource": "Kyutai Fabien CC0 performance; CML-TTS French speaker1406 CC-BY-4.0 target; generated narration adapted by ANITEW",
-    "modelLicense": "Kyutai CC-BY-4.0; OpenVoice MIT",
-    "approvedReferenceHashes": {
-      "preferred-fr": "5b7babe4ac4a2b402555868c0dcb630dcee40a89ee4346c782b28fb710d6cbd5",
-      "fr-performance": "1b1f71d289f4586f49a50a4bd3afcfff9be057b42e73a3c5432951f6bb94ca98",
-      "fr-timbre": "d9e21ce03fd29e6bd4645ca126bf10dc14f8e6f07e4124cafd722276904b0e07"
-    },
-    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
-    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
-    "contentReview": {
-      "audioSha256": "6401fe1a41f6f700bcbcddc7c1ef20f481aa464b2cc77407f1efecf0f3d9c0cc",
-      "notes": "Repaired formulate instruction. 3/4=6/8 and 2/3=4/6 retained; oral fraction forms match formulas."
-    },
-    "spokenClarifications": [
-      {
-        "cue": 5,
-        "spokenText": "Maintenant, explique avec tes propres mots. Ne copie pas la source."
-      }
-    ]
-  },
-  {
     "coach": "rafael",
     "language": "fr",
+    "duration": 103.02179166666667,
+    "src": "/course-media/library/atta-self-explanation-fr-27a43dbf58bb.m4a",
+    "bytes": 1167255,
+    "sha256": "27a43dbf58bbe19705449a99a6636eeb838bb7db64e5f1799255bdb0784f4752",
+    "synthesis": "kyutai-native",
+    "voice": "Kyutai Fabien CC0",
+    "voiceConversion": false,
+    "status": "Original performance voice selected by user 2026-10-09; complete course listening remains reviewable",
+    "sources": [
+      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md"
+    ],
+    "license": "Kyutai CC BY 4.0; Fabien CC0"
+  },
+  {
     "course": "spaced-practice",
-    "duration": 112.4322902494331,
-    "bytes": 1231577,
-    "sha256": "3c9902a34909cbad5d004711040e7bc34ef6c9e8471c3b96ac3a532aea75b20e",
-    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
-    "recipe": "Kyutai Fabien at 1.12 tempo; OpenVoice CML1406 tone conversion",
-    "referenceManifest": "approved-language-references/manifest.json",
-    "src": "/course-media/library/atta-spaced-practice-fr-3c9902a34909.m4a",
-    "synthesis": "kyutai-openvoice",
-    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
-    "sources": [
-      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
-      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
-      "https://openslr.org/146/",
-      "https://github.com/myshell-ai/OpenVoice"
-    ],
-    "voiceSource": "Kyutai Fabien CC0 performance; CML-TTS French speaker1406 CC-BY-4.0 target; generated narration adapted by ANITEW",
-    "modelLicense": "Kyutai CC-BY-4.0; OpenVoice MIT",
-    "approvedReferenceHashes": {
-      "preferred-fr": "5b7babe4ac4a2b402555868c0dcb630dcee40a89ee4346c782b28fb710d6cbd5",
-      "fr-performance": "1b1f71d289f4586f49a50a4bd3afcfff9be057b42e73a3c5432951f6bb94ca98",
-      "fr-timbre": "d9e21ce03fd29e6bd4645ca126bf10dc14f8e6f07e4124cafd722276904b0e07"
-    },
-    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
-    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
-    "contentReview": {
-      "audioSha256": "3c9902a34909cbad5d004711040e7bc34ef6c9e8471c3b96ac3a532aea75b20e",
-      "notes": "Repaired delayed-recall introduction and adaptation instruction; no additional review cards claim retained. Brand recognition varies and awaits listening assessment."
-    },
-    "spokenClarifications": [
-      {
-        "cue": 12,
-        "spokenText": "Utilise les révisions dues pour les éléments d’entraînement enregistrés. Pour un contenu extérieur à l’application, prévois un test ultérieur et adapte le délai au rappel réel. Ce cours ne crée aucune nouvelle carte de révision quand tu le termines."
-      },
-      {
-        "cue": 1,
-        "spokenText": "Répartis les tentatives de rappel dans le temps. Après une pause, essaie de retrouver la réponse. Tu vérifies ainsi ce que tu as retenu. Répéter immédiatement une réponse que tu viens de lire ne suffit pas."
-      },
-      {
-        "cue": 10,
-        "spokenText": "Le délai et la tentative de rappel comptent. Relire dix fois de suite ne remplace pas un rappel ultérieur. Grâce à son erreur, Mira sait ce qu’elle doit retravailler. Elle peut aussi adapter le délai avant son prochain essai."
-      }
-    ]
-  },
-  {
     "coach": "rafael",
     "language": "fr",
+    "duration": 112.51479166666667,
+    "src": "/course-media/library/atta-spaced-practice-fr-09ffd5f85377.m4a",
+    "bytes": 1266675,
+    "sha256": "09ffd5f853778b7e43eb73509bab02ec81de689c46686f93b2b25a243d572f83",
+    "synthesis": "kyutai-native",
+    "voice": "Kyutai Fabien CC0",
+    "voiceConversion": false,
+    "status": "Original performance voice selected by user 2026-10-09; complete course listening remains reviewable",
+    "sources": [
+      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md"
+    ],
+    "license": "Kyutai CC BY 4.0; Fabien CC0"
+  },
+  {
     "course": "text-meaning",
-    "duration": 104.9554648526077,
-    "bytes": 1159779,
-    "sha256": "46fad85d9e3461059cf2eed161887ecd742e70680e4b528796eb34f6b0446455",
-    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
-    "recipe": "Kyutai Fabien at 1.12 tempo; OpenVoice CML1406 tone conversion",
-    "referenceManifest": "approved-language-references/manifest.json",
-    "src": "/course-media/library/atta-text-meaning-fr-46fad85d9e34.m4a",
-    "synthesis": "kyutai-openvoice",
-    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
-    "sources": [
-      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
-      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
-      "https://openslr.org/146/",
-      "https://github.com/myshell-ai/OpenVoice"
-    ],
-    "voiceSource": "Kyutai Fabien CC0 performance; CML-TTS French speaker1406 CC-BY-4.0 target; generated narration adapted by ANITEW",
-    "modelLicense": "Kyutai CC-BY-4.0; OpenVoice MIT",
-    "approvedReferenceHashes": {
-      "preferred-fr": "5b7babe4ac4a2b402555868c0dcb630dcee40a89ee4346c782b28fb710d6cbd5",
-      "fr-performance": "1b1f71d289f4586f49a50a4bd3afcfff9be057b42e73a3c5432951f6bb94ca98",
-      "fr-timbre": "d9e21ce03fd29e6bd4645ca126bf10dc14f8e6f07e4124cafd722276904b0e07"
-    },
-    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
-    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
-    "contentReview": {
-      "audioSha256": "46fad85d9e3461059cf2eed161887ecd742e70680e4b528796eb34f6b0446455",
-      "notes": "Repaired return-to-recall instruction and evaporation wording; shade, evaporation, water and root space all retained in final independent transcripts."
-    },
-    "spokenClarifications": [
-      {
-        "cue": 2,
-        "spokenText": "Un résumé ne conserve pas tous les détails. Travaille séparément les chiffres ou les formulations exactes lorsqu’ils sont importants. Commence par un court passage. Allonge ce passage quand tu peux en expliquer le sens."
-      },
-      {
-        "cue": 3,
-        "spokenText": "Commence par lire un passage. Clarifie les termes inconnus."
-      },
-      {
-        "cue": 4,
-        "spokenText": "Repère les idées du passage. Donne un titre court à chacune."
-      },
-      {
-        "cue": 7,
-        "spokenText": "Compare ton rappel avec le texte original. Ajoute les idées manquantes. Corrige les erreurs dans les liens entre les idées."
-      },
-      {
-        "cue": 10,
-        "spokenText": "On distingue trois parties. Premièrement, l’action : planter des arbres. Deuxièmement, les effets : l’ombre et l’évaporation. Troisièmement, les conditions : de l’eau et de l’espace pour les racines. Ce plan conserve les liens entre les idées."
-      },
-      {
-        "cue": 8,
-        "spokenText": "Plus tard, recommence le rappel. Adapte le délai selon la qualité de ta réponse."
-      },
-      {
-        "cue": 9,
-        "spokenText": "Une ville plante des arbres le long d’une route très fréquentée. Leur feuillage apporte de l’ombre. Les feuilles rejettent de l’eau par évaporation. Cette évaporation contribue au refroidissement. Pendant les périodes sèches, les arbres ont besoin de suffisamment d’eau. Leurs racines ont aussi besoin d’espace pour rester en bonne santé."
-      }
-    ]
-  },
-  {
     "coach": "rafael",
     "language": "fr",
-    "course": "text-verbatim",
-    "duration": 85.03274376417232,
-    "bytes": 906622,
-    "sha256": "334d7bb4e457633092f20675012327d298324e26264673c4f7722d344dab487e",
-    "status": "Approved short voice reference; complete course content checked using transcription and targeted cue review. Not a full human listening approval.",
-    "recipe": "Kyutai Fabien at 1.12 tempo; OpenVoice CML1406 tone conversion",
-    "referenceManifest": "approved-language-references/manifest.json",
-    "src": "/course-media/library/atta-text-verbatim-fr-334d7bb4e457.m4a",
-    "synthesis": "kyutai-openvoice",
-    "nameReference": "Each cue is entirely in the selected coach voice; no other-speaker name insertion.",
+    "duration": 105.03408333333333,
+    "src": "/course-media/library/atta-text-meaning-fr-1eae55f6d9d5.m4a",
+    "bytes": 1182891,
+    "sha256": "1eae55f6d9d5fc8e2eab0e4560d8dee540388853f1991449d73fbcec51beb7ea",
+    "synthesis": "kyutai-native",
+    "voice": "Kyutai Fabien CC0",
+    "voiceConversion": false,
+    "status": "Original performance voice selected by user 2026-10-09; complete course listening remains reviewable",
     "sources": [
       "https://huggingface.co/kyutai/tts-1.6b-en_fr",
-      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md",
-      "https://openslr.org/146/",
-      "https://github.com/myshell-ai/OpenVoice"
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md"
     ],
-    "voiceSource": "Kyutai Fabien CC0 performance; CML-TTS French speaker1406 CC-BY-4.0 target; generated narration adapted by ANITEW",
-    "modelLicense": "Kyutai CC-BY-4.0; OpenVoice MIT",
-    "approvedReferenceHashes": {
-      "preferred-fr": "5b7babe4ac4a2b402555868c0dcb630dcee40a89ee4346c782b28fb710d6cbd5",
-      "fr-performance": "1b1f71d289f4586f49a50a4bd3afcfff9be057b42e73a3c5432951f6bb94ca98",
-      "fr-timbre": "d9e21ce03fd29e6bd4645ca126bf10dc14f8e6f07e4124cafd722276904b0e07"
-    },
-    "referenceApproval": "User explicitly accepted these short samples on 2026-10-01; French C assigned to Atta.",
-    "contentCheckModel": "mlx-community/whisper-large-v3-turbo",
-    "contentReview": {
-      "audioSha256": "334d7bb4e457633092f20675012327d298324e26264673c4f7722d344dab487e",
-      "notes": "Read-source and alternate starting-point instructions repaired. Exact window/fresh-air/day three-sentence passage retained."
-    },
-    "spokenClarifications": [
-      {
-        "cue": 4,
-        "spokenText": "Commence par lire le passage attentivement. Prononce le passage clairement une fois."
-      },
-      {
-        "cue": 10,
-        "spokenText": "Les trois phrases forment trois unités de travail. Apprends la première, puis la deuxième et leur transition. Au prochain essai, commence aussi par les mots : l’air frais."
-      }
-    ]
+    "license": "Kyutai CC BY 4.0; Fabien CC0"
+  },
+  {
+    "course": "text-verbatim",
+    "coach": "rafael",
+    "language": "fr",
+    "duration": 85.12195833333334,
+    "src": "/course-media/library/atta-text-verbatim-fr-c557766106e5.m4a",
+    "bytes": 928963,
+    "sha256": "c557766106e55f7573459e1fcac0dcb5d7ace55b88bdc57efefc6392b934ecc7",
+    "synthesis": "kyutai-native",
+    "voice": "Kyutai Fabien CC0",
+    "voiceConversion": false,
+    "status": "Original performance voice selected by user 2026-10-09; complete course listening remains reviewable",
+    "sources": [
+      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
+      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md"
+    ],
+    "license": "Kyutai CC BY 4.0; Fabien CC0"
   },
   {
     "coach": "lin",
