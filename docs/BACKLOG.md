@@ -752,3 +752,16 @@ Acht Desktop-/Mobilprüfungen bestanden: Eingabe vor dem Abschlusssatz,
 Vergleich, Weiterhören bis zum Ende, Tempo, elf Untertitelsprachen und
 Lesemodus. Audiodaten unverändert; keine externen Medienrequests.
 Die Sichtfreigabe bleibt offen; keine Übernahme neuer Videos in den App-Katalog.
+
+
+## 2026-10-10 · Zwölf französische Bildfassungen vorbereitet
+
+Aktives Abrufen, Verteiltes Wiederholen, Sinnvolle Gruppen und Selbst erklären
+sind vom Nutzer mit „top“ bestätigt. Damit sind acht Bildfassungen freigegeben.
+Gedächtnispalast, Zahlenbilder, abwechselndes Üben und Geschichtenmethode
+liegen ebenfalls als lokale Bildfassungen vor; ihre Sichtfreigabe bleibt offen.
+Sechs Methodenprüfungen und zwei Geschichtenprüfungen auf Desktop/Mobilansicht
+bestanden einschließlich Übung, Weiterhören, Tempo, Untertiteln und Lesemodus.
+Alle zwölf französischen Tonaufnahmen bleiben unverändert. Neue Fassungen
+sind Vorschauen; App-Videokatalog, andere Tonsprachen und natürliche
+Coach-Auftritte sind noch separat zu bearbeiten.
