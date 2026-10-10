@@ -1243,55 +1243,64 @@
     "course": "active-recall",
     "coach": "rafael",
     "language": "fr",
-    "duration": 94.410875,
-    "src": "/course-media/library/atta-active-recall-fr-783a70e475d9.m4a",
-    "bytes": 1041475,
-    "sha256": "783a70e475d9f574a069e3fad1d3f95b243e2337b29f21b69cfbb83afc488c1b",
-    "synthesis": "kyutai-native",
-    "voice": "Kyutai Fabien CC0",
+    "duration": 94.69320833333333,
+    "src": "/course-media/library/atta-active-recall-fr-83547c9c8c09.m4a",
+    "bytes": 1105904,
+    "sha256": "83547c9c8c09a3fe8ad6e31f9d871a3736fb489d70a73d34caab5ca50a73695a",
+    "synthesis": "qwen-french-shared",
+    "voice": "ANITEW shared synthetic French voice",
     "voiceConversion": false,
-    "status": "Original performance voice selected by user 2026-10-09; complete course listening remains reviewable",
+    "status": "Voice approved 2026-10-10; full take content checked, subjective pronunciation review remains open",
     "sources": [
-      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
-      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md"
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
     ],
-    "license": "Kyutai CC BY 4.0; Fabien CC0"
+    "license": "Kyutai CC BY 4.0; Fabien CC0",
+    "generation": "Continuous French Qwen3-TTS take using the approved synthetic VoiceDesign reference; original samples preserved with board silence extensions only",
+    "attribution": "Qwen3-TTS Base and VoiceDesign models: Apache 2.0. Original synthetic ANITEW voice reference.",
+    "referenceSHA256": "4f8706fe9ae8e28b7eaf534d7ee7e554eae9d71beb79bf255f7e7c561b295757"
   },
   {
     "course": "interleaved-practice",
     "coach": "rafael",
     "language": "fr",
-    "duration": 102.03966666666666,
-    "src": "/course-media/library/atta-interleaved-practice-fr-f1adb21121d9.m4a",
-    "bytes": 1143859,
-    "sha256": "f1adb21121d99f72e871f65f01bd9931d3d4c39d36108678f306d8ebe5160553",
-    "synthesis": "kyutai-native",
-    "voice": "Kyutai Fabien CC0",
+    "duration": 95.92279166666667,
+    "src": "/course-media/library/atta-interleaved-practice-fr-26859ab46dc1.m4a",
+    "bytes": 1168357,
+    "sha256": "26859ab46dc1b8ef431ad8a2ce26974d9c6e8ec83dfffb4d92b3070d600b369e",
+    "synthesis": "qwen-french-shared",
+    "voice": "ANITEW shared synthetic French voice",
     "voiceConversion": false,
-    "status": "Original performance voice selected by user 2026-10-09; complete course listening remains reviewable",
+    "status": "Voice approved 2026-10-10; full take content checked, subjective pronunciation review remains open",
     "sources": [
-      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
-      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md"
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
     ],
-    "license": "Kyutai CC BY 4.0; Fabien CC0"
+    "license": "Kyutai CC BY 4.0; Fabien CC0",
+    "generation": "Continuous French Qwen3-TTS take using the approved synthetic VoiceDesign reference; original samples preserved with board silence extensions only",
+    "attribution": "Qwen3-TTS Base and VoiceDesign models: Apache 2.0. Original synthetic ANITEW voice reference.",
+    "referenceSHA256": "4f8706fe9ae8e28b7eaf534d7ee7e554eae9d71beb79bf255f7e7c561b295757"
   },
   {
     "course": "keyword-method",
     "coach": "rafael",
     "language": "fr",
-    "duration": 79.47066666666667,
-    "src": "/course-media/library/atta-keyword-method-fr-b96dc1df4fc0.m4a",
-    "bytes": 868945,
-    "sha256": "b96dc1df4fc0a77df05eb6b2e62438b3ad4646375b07b965bd4256ffd46fab69",
-    "synthesis": "kyutai-native",
-    "voice": "Kyutai Fabien CC0",
+    "duration": 76.880125,
+    "src": "/course-media/library/atta-keyword-method-fr-4293781c55df.m4a",
+    "bytes": 888918,
+    "sha256": "4293781c55df9c9b676d11a7e62530d1f8a08eea104dff1e12573198c2ed5954",
+    "synthesis": "qwen-french-shared",
+    "voice": "ANITEW shared synthetic French voice",
     "voiceConversion": false,
-    "status": "Original performance voice selected by user 2026-10-09; complete course listening remains reviewable",
+    "status": "Voice approved 2026-10-10; full take content checked, subjective pronunciation review remains open",
     "sources": [
-      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
-      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md"
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
     ],
-    "license": "Kyutai CC BY 4.0; Fabien CC0"
+    "license": "Kyutai CC BY 4.0; Fabien CC0",
+    "generation": "Continuous French Qwen3-TTS take using the approved synthetic VoiceDesign reference; original samples preserved with board silence extensions only",
+    "attribution": "Qwen3-TTS Base and VoiceDesign models: Apache 2.0. Original synthetic ANITEW voice reference.",
+    "referenceSHA256": "4f8706fe9ae8e28b7eaf534d7ee7e554eae9d71beb79bf255f7e7c561b295757"
   },
   {
     "course": "long-words",
@@ -1318,127 +1327,148 @@
     "course": "meaningful-groups",
     "coach": "rafael",
     "language": "fr",
-    "duration": 92.94741666666667,
-    "src": "/course-media/library/atta-meaningful-groups-fr-00565e90b513.m4a",
-    "bytes": 996786,
-    "sha256": "00565e90b51399650fb03993bc8f2e776eb717ef939b98c780d55c7020f33d2f",
-    "synthesis": "kyutai-native",
-    "voice": "Kyutai Fabien CC0",
+    "duration": 93.278125,
+    "src": "/course-media/library/atta-meaningful-groups-fr-a1ee843c84f9.m4a",
+    "bytes": 1049801,
+    "sha256": "a1ee843c84f976c87ffbc5124a43c394bc1104cdce2f284e7782c15b3421acaf",
+    "synthesis": "qwen-french-shared",
+    "voice": "ANITEW shared synthetic French voice",
     "voiceConversion": false,
-    "status": "Original performance voice selected by user 2026-10-09; complete course listening remains reviewable",
+    "status": "Voice approved 2026-10-10; full take content checked, subjective pronunciation review remains open",
     "sources": [
-      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
-      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md"
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
     ],
-    "license": "Kyutai CC BY 4.0; Fabien CC0"
+    "license": "Kyutai CC BY 4.0; Fabien CC0",
+    "generation": "Continuous French Qwen3-TTS take using the approved synthetic VoiceDesign reference; original samples preserved with board silence extensions only",
+    "attribution": "Qwen3-TTS Base and VoiceDesign models: Apache 2.0. Original synthetic ANITEW voice reference.",
+    "referenceSHA256": "4f8706fe9ae8e28b7eaf534d7ee7e554eae9d71beb79bf255f7e7c561b295757"
   },
   {
     "course": "method-of-loci",
     "coach": "rafael",
     "language": "fr",
-    "duration": 82.8585,
-    "src": "/course-media/library/atta-method-of-loci-fr-2157bbe154e5.m4a",
-    "bytes": 920114,
-    "sha256": "2157bbe154e55094f69ee2bfd3b963736405c0fa0088ddcecda33e9ba4204a43",
-    "synthesis": "kyutai-native",
-    "voice": "Kyutai Fabien CC0",
+    "duration": 78.52770833333334,
+    "src": "/course-media/library/atta-method-of-loci-fr-920c750c76e8.m4a",
+    "bytes": 939746,
+    "sha256": "920c750c76e8ce85a640157d52789346ce1f9d26c1092df57978ebd778e07a21",
+    "synthesis": "qwen-french-shared",
+    "voice": "ANITEW shared synthetic French voice",
     "voiceConversion": false,
-    "status": "Original performance voice selected by user 2026-10-09; complete course listening remains reviewable",
+    "status": "Voice approved 2026-10-10; full take content checked, subjective pronunciation review remains open",
     "sources": [
-      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
-      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md"
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
     ],
-    "license": "Kyutai CC BY 4.0; Fabien CC0"
+    "license": "Kyutai CC BY 4.0; Fabien CC0",
+    "generation": "Continuous French Qwen3-TTS take using the approved synthetic VoiceDesign reference; original samples preserved with board silence extensions only",
+    "attribution": "Qwen3-TTS Base and VoiceDesign models: Apache 2.0. Original synthetic ANITEW voice reference.",
+    "referenceSHA256": "4f8706fe9ae8e28b7eaf534d7ee7e554eae9d71beb79bf255f7e7c561b295757"
   },
   {
     "course": "number-images",
     "coach": "rafael",
     "language": "fr",
-    "duration": 92.08025,
-    "src": "/course-media/library/atta-number-images-fr-978d4b7e8296.m4a",
-    "bytes": 1014380,
-    "sha256": "978d4b7e8296224bfd659ad74425490bd8bfd2a80fe82f5335bd28be9b79fee1",
-    "synthesis": "kyutai-native",
-    "voice": "Kyutai Fabien CC0",
+    "duration": 88.83995833333333,
+    "src": "/course-media/library/atta-number-images-fr-fbbad47c9768.m4a",
+    "bytes": 1048595,
+    "sha256": "fbbad47c9768b58e0039e26c3e3b526ddbd3fa8fa1557dc6b0aa1eb04112face",
+    "synthesis": "qwen-french-shared",
+    "voice": "ANITEW shared synthetic French voice",
     "voiceConversion": false,
-    "status": "Original performance voice selected by user 2026-10-09; complete course listening remains reviewable",
+    "status": "Voice approved 2026-10-10; full take content checked, subjective pronunciation review remains open",
     "sources": [
-      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
-      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md"
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
     ],
-    "license": "Kyutai CC BY 4.0; Fabien CC0"
+    "license": "Kyutai CC BY 4.0; Fabien CC0",
+    "generation": "Continuous French Qwen3-TTS take using the approved synthetic VoiceDesign reference; original samples preserved with board silence extensions only",
+    "attribution": "Qwen3-TTS Base and VoiceDesign models: Apache 2.0. Original synthetic ANITEW voice reference.",
+    "referenceSHA256": "4f8706fe9ae8e28b7eaf534d7ee7e554eae9d71beb79bf255f7e7c561b295757"
   },
   {
     "course": "self-explanation",
     "coach": "rafael",
     "language": "fr",
-    "duration": 103.02179166666667,
-    "src": "/course-media/library/atta-self-explanation-fr-27a43dbf58bb.m4a",
-    "bytes": 1167255,
-    "sha256": "27a43dbf58bbe19705449a99a6636eeb838bb7db64e5f1799255bdb0784f4752",
-    "synthesis": "kyutai-native",
-    "voice": "Kyutai Fabien CC0",
+    "duration": 101.23445833333334,
+    "src": "/course-media/library/atta-self-explanation-fr-5659698bb83e.m4a",
+    "bytes": 1228188,
+    "sha256": "5659698bb83e6d584ed318ef6a47aaa9bca06b00e71aa0ed6a50aa6045ab42d1",
+    "synthesis": "qwen-french-shared",
+    "voice": "ANITEW shared synthetic French voice",
     "voiceConversion": false,
-    "status": "Original performance voice selected by user 2026-10-09; complete course listening remains reviewable",
+    "status": "Voice approved 2026-10-10; full take content checked, subjective pronunciation review remains open",
     "sources": [
-      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
-      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md"
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
     ],
-    "license": "Kyutai CC BY 4.0; Fabien CC0"
+    "license": "Kyutai CC BY 4.0; Fabien CC0",
+    "generation": "Continuous French Qwen3-TTS take using the approved synthetic VoiceDesign reference; original samples preserved with board silence extensions only",
+    "attribution": "Qwen3-TTS Base and VoiceDesign models: Apache 2.0. Original synthetic ANITEW voice reference.",
+    "referenceSHA256": "4f8706fe9ae8e28b7eaf534d7ee7e554eae9d71beb79bf255f7e7c561b295757"
   },
   {
     "course": "spaced-practice",
     "coach": "rafael",
     "language": "fr",
-    "duration": 112.51479166666667,
-    "src": "/course-media/library/atta-spaced-practice-fr-09ffd5f85377.m4a",
-    "bytes": 1266675,
-    "sha256": "09ffd5f853778b7e43eb73509bab02ec81de689c46686f93b2b25a243d572f83",
-    "synthesis": "kyutai-native",
-    "voice": "Kyutai Fabien CC0",
+    "duration": 106.54879166666667,
+    "src": "/course-media/library/atta-spaced-practice-fr-e4847c521915.m4a",
+    "bytes": 1258822,
+    "sha256": "e4847c521915e2dd422926fed8b163bd66403a32f045ec192f95761327c2e93c",
+    "synthesis": "qwen-french-shared",
+    "voice": "ANITEW shared synthetic French voice",
     "voiceConversion": false,
-    "status": "Original performance voice selected by user 2026-10-09; complete course listening remains reviewable",
+    "status": "Voice approved 2026-10-10; full take content checked, subjective pronunciation review remains open",
     "sources": [
-      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
-      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md"
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
     ],
-    "license": "Kyutai CC BY 4.0; Fabien CC0"
+    "license": "Kyutai CC BY 4.0; Fabien CC0",
+    "generation": "Continuous French Qwen3-TTS take using the approved synthetic VoiceDesign reference; original samples preserved with board silence extensions only",
+    "attribution": "Qwen3-TTS Base and VoiceDesign models: Apache 2.0. Original synthetic ANITEW voice reference.",
+    "referenceSHA256": "4f8706fe9ae8e28b7eaf534d7ee7e554eae9d71beb79bf255f7e7c561b295757"
   },
   {
     "course": "text-meaning",
     "coach": "rafael",
     "language": "fr",
-    "duration": 105.03408333333333,
-    "src": "/course-media/library/atta-text-meaning-fr-1eae55f6d9d5.m4a",
-    "bytes": 1182891,
-    "sha256": "1eae55f6d9d5fc8e2eab0e4560d8dee540388853f1991449d73fbcec51beb7ea",
-    "synthesis": "kyutai-native",
-    "voice": "Kyutai Fabien CC0",
+    "duration": 104.95670833333334,
+    "src": "/course-media/library/atta-text-meaning-fr-48de02594a95.m4a",
+    "bytes": 1233825,
+    "sha256": "48de02594a9557f391e117578a12550279d56552fdcc24634126fe133a8dd3bf",
+    "synthesis": "qwen-french-shared",
+    "voice": "ANITEW shared synthetic French voice",
     "voiceConversion": false,
-    "status": "Original performance voice selected by user 2026-10-09; complete course listening remains reviewable",
+    "status": "Voice approved 2026-10-10; full take content checked, subjective pronunciation review remains open",
     "sources": [
-      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
-      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md"
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
     ],
-    "license": "Kyutai CC BY 4.0; Fabien CC0"
+    "license": "Kyutai CC BY 4.0; Fabien CC0",
+    "generation": "Continuous French Qwen3-TTS take using the approved synthetic VoiceDesign reference; original samples preserved with board silence extensions only",
+    "attribution": "Qwen3-TTS Base and VoiceDesign models: Apache 2.0. Original synthetic ANITEW voice reference.",
+    "referenceSHA256": "4f8706fe9ae8e28b7eaf534d7ee7e554eae9d71beb79bf255f7e7c561b295757"
   },
   {
     "course": "text-verbatim",
     "coach": "rafael",
     "language": "fr",
-    "duration": 85.12195833333334,
-    "src": "/course-media/library/atta-text-verbatim-fr-c557766106e5.m4a",
-    "bytes": 928963,
-    "sha256": "c557766106e55f7573459e1fcac0dcb5d7ace55b88bdc57efefc6392b934ecc7",
-    "synthesis": "kyutai-native",
-    "voice": "Kyutai Fabien CC0",
+    "duration": 84.21354166666667,
+    "src": "/course-media/library/atta-text-verbatim-fr-5de147f470ab.m4a",
+    "bytes": 950227,
+    "sha256": "5de147f470abfbb033fadb6c992fb906c8b2af1abdff39ec7ef77dc2865f124f",
+    "synthesis": "qwen-french-shared",
+    "voice": "ANITEW shared synthetic French voice",
     "voiceConversion": false,
-    "status": "Original performance voice selected by user 2026-10-09; complete course listening remains reviewable",
+    "status": "Voice approved 2026-10-10; full take content checked, subjective pronunciation review remains open",
     "sources": [
-      "https://huggingface.co/kyutai/tts-1.6b-en_fr",
-      "https://huggingface.co/kyutai/tts-voices/blob/main/README.md"
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
     ],
-    "license": "Kyutai CC BY 4.0; Fabien CC0"
+    "license": "Kyutai CC BY 4.0; Fabien CC0",
+    "generation": "Continuous French Qwen3-TTS take using the approved synthetic VoiceDesign reference; original samples preserved with board silence extensions only",
+    "attribution": "Qwen3-TTS Base and VoiceDesign models: Apache 2.0. Original synthetic ANITEW voice reference.",
+    "referenceSHA256": "4f8706fe9ae8e28b7eaf534d7ee7e554eae9d71beb79bf255f7e7c561b295757"
   },
   {
     "coach": "lin",

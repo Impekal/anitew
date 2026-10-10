@@ -206,3 +206,12 @@ The user approved the new independent French VoiceDesign voice for all French co
 Only silence at board changes is extended to about 1.5 seconds total (one second after the story greeting). Original PCM samples are preserved in order. Illustrated previews copy the registered AAC packets without re-encoding. No rejected later coach footage is included. Qwen3-TTS Base and VoiceDesign sources are recorded in the local manifest; no real-person voice reference or cross-voice name splice is used.
 
 Validation: 10 narration/caption checks, typecheck/build/size, and two desktop/mobile offline story playback checks passed. The complete new takes remain subject to listening review; voice approval does not imply approval of every pronunciation. No deployment, push or Actions run.
+
+
+## 2026-10-10 — French library batch completed
+
+All twelve French courses now resolve to the same user-approved synthetic French reference for every coach selection. The ten remaining full takes replace the old active French narration; previous files are preserved. Four first takes were withheld and regenerated to correct triangle-area repetition, spoken fraction notation, and unclear wording. Canonical reading content stays intact; `spokenText` records the matching narration.
+
+All ten illustrated drafts copy the registered AAC packets without re-encoding, with matching cue text and source notices. Title and purpose share one board for the French loci and self-explanation introductions because there is no safe silent boundary between them. The preview comparison button was repaired after the shared player template changed to `playVideo()`. These remain illustrated drafts without newly approved coach footage.
+
+Local validation: 624 core tests, typecheck/build/size, eight desktop/mobile narration and offline tests, plus 22 French preview checks for subtitles, playback speed, reading mode, recall gate and zero external requests. Complete-recording listening and real-device checks remain open. No push, GitHub Actions, deployment, or merge.

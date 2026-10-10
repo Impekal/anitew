@@ -93,3 +93,35 @@ for(const language of ['en','fr'] as const) test(`${language}: approved story vo
   await expect(page.getByText('Kursstimme: Noah.',{exact:true})).toBeVisible()
  }
 })
+
+test('French library keeps the shared recording offline across all coach choices',async({page,context})=>{
+ test.setTimeout(90_000)
+ const external:string[]=[]
+ const origin=new URL(test.info().project.use.baseURL!).origin
+ page.on('request',request=>{if(/^https?:/.test(request.url())&&!request.url().startsWith(origin+'/'))external.push(request.url())})
+ await visit(page)
+ await openPage(page,'Lernkurse')
+ const open=()=>page.getByRole('button',{name:'Kurs öffnen : Passende Vorgehensweisen unterscheiden',exact:true}).click()
+ await open()
+ await page.getByRole('button',{name:'Anhören und ansehen',exact:true}).click()
+ await page.locator('#course-audio-language').selectOption('fr')
+ const shared=courseNarration('interleaved-practice','fr','rafael')!
+ const audio=page.locator('.course-media audio')
+ await expect(audio).toHaveAttribute('src',shared.src)
+ await page.getByRole('button',{name:'Für offline laden / fortsetzen',exact:true}).click()
+ await expect(page.getByText(/Diese Tonspur ist offline verfügbar/)).toBeVisible()
+ await context.setOffline(true)
+ await page.reload()
+ await openPage(page,'Lernkurse')
+ await open()
+ await page.locator('.course-coaches summary').click()
+ await page.locator('#course-coach-mode').selectOption('global')
+ for(const coach of ['lin','original','rafael']){
+  await page.locator('#course-coach-all').selectOption(coach)
+  await expect(audio).toHaveAttribute('src',shared.src)
+  await expect(page.getByText(/Diese Tonspur ist offline verfügbar/)).toBeVisible()
+ }
+ await audio.evaluate(async(el:HTMLAudioElement)=>{await el.play()})
+ await expect.poll(()=>audio.evaluate((el:HTMLAudioElement)=>el.currentTime)).toBeGreaterThan(.2)
+ expect(external).toEqual([])
+})

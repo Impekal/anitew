@@ -41,10 +41,10 @@ it('keeps distinct verified local voices and the same lesson cues',()=>{
  }
 })
 
-it('uses the approved shared French voice for upgraded courses and preserves pending recordings',()=>{
+it('uses the approved shared French voice for every French course',()=>{
  const french=courseNarrations.filter(p=>p.coach==='rafael'&&p.language==='fr')
  expect(french).toHaveLength(12)
- expect(french.filter(p=>!['story-method','long-words'].includes(p.course)).every(p=>p.synthesis==='kyutai-native')).toBe(true)
+ expect(french.every(p=>p.synthesis==='qwen-french-shared')).toBe(true)
  const story=french.find(p=>p.course==='story-method')!
  expect(story.synthesis).toBe('qwen-french-shared')
  expect(story.cues[3].spokenText).toContain('mémorisation. Elle relie')
@@ -53,7 +53,7 @@ it('uses the approved shared French voice for upgraded courses and preserves pen
 })
 
 it('shares upgraded French narration across coach choices without changing other languages',()=>{
- for(const course of ['story-method','long-words'] as const){
+ for(const course of courseNarrations.filter(p=>p.language==='fr'&&p.coach==='rafael').map(p=>p.course)){
   const shared=courseNarration(course,'fr','rafael')
   for(const coach of ['original','lin',null] as const)expect(courseNarration(course,'fr',coach)).toBe(shared)
   expect(shared?.synthesis).toBe('qwen-french-shared')

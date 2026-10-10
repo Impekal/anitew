@@ -4460,266 +4460,296 @@ export const courseNarrations:CourseNarration[]=[
     "course": "active-recall",
     "coach": "rafael",
     "language": "fr",
-    "duration": 94.410875,
+    "duration": 94.69320833333333,
     "cues": [
       {
         "section": "title",
         "text": "Pratiquer le rappel actif",
-        "start": 0.0,
-        "end": 1.803625
+        "start": 0,
+        "end": 1.86,
+        "spokenText": "Pratiquer le rappel actif"
       },
       {
         "section": "purpose",
         "text": "Essaie de retrouver une information sans regarder sa source. Tu distingues ainsi ce que tu peux rappeler toi-même de ce qui demande encore du travail. Cette méthode s’applique aux faits, aux notions et aux relations.",
-        "start": 2.353625,
-        "end": 15.300916666666666,
+        "start": 3.3314166666666667,
+        "end": 15.691416666666667,
         "spokenText": "Essaie de retrouver une information sans regarder sa source. Tu distingues ainsi deux choses : ce que tu peux rappeler toi-même, et ce qui demande encore du travail. Cette méthode s’applique aux faits, aux notions et aux relations."
       },
       {
         "section": "limit",
         "text": "Reconnaître une réponse en la lisant ne signifie pas savoir la retrouver. Un échec n’est pas un verdict : vérifie et comprends la bonne réponse, puis réessaie. Deviner plusieurs fois sans correction peut renforcer des erreurs.",
-        "start": 15.650916666666667,
-        "end": 28.38383333333333
+        "start": 17.342291666666664,
+        "end": 29.269833666666667,
+        "spokenText": "Reconnaître une réponse en la lisant ne signifie pas savoir la retrouver. Un échec n’est pas un verdict : vérifie et comprends la bonne réponse, puis réessaie. Deviner plusieurs fois sans correction peut renforcer des erreurs."
       },
       {
         "section": "step-0",
         "text": "Choisis une petite quantité d’information que tu comprends.",
-        "start": 28.733833333333333,
-        "end": 31.609458333333333
+        "start": 30.769833,
+        "end": 32.975667,
+        "spokenText": "Choisis une petite quantité d’information que tu comprends."
       },
       {
         "section": "step-1",
         "text": "Pose une question précise à laquelle le contenu permet de répondre.",
-        "start": 31.959458333333334,
-        "end": 36.049166666666665
+        "start": 34.475667,
+        "end": 37.324125,
+        "spokenText": "Pose une question précise à laquelle le contenu permet de répondre."
       },
       {
         "section": "step-2",
         "text": "Écarte la source et réponds avant de vérifier.",
-        "start": 36.399166666666666,
-        "end": 39.48920833333333
+        "start": 38.86445833333334,
+        "end": 40.82445833333333,
+        "spokenText": "Écarte la source et réponds avant de vérifier."
       },
       {
         "section": "step-3",
         "text": "Compare avec l’original. Corrige les éléments manquants ou erronés.",
-        "start": 39.83920833333333,
-        "end": 44.46491666666667
+        "start": 42.34141666666667,
+        "end": 45.70141666666667,
+        "spokenText": "Compare avec l’original. Corrige les éléments manquants ou erronés."
       },
       {
         "section": "step-4",
         "text": "Cache la réponse et essaie de la rappeler à nouveau.",
-        "start": 44.81491666666667,
-        "end": 47.76029166666667
+        "start": 47.21216666666667,
+        "end": 48.95216666666667,
+        "spokenText": "Cache la réponse et essaie de la rappeler à nouveau."
       },
       {
         "section": "step-5",
         "text": "Teste-toi aussi plus tard. Répéter immédiatement peut sembler facile sans démontrer une mémorisation durable.",
-        "start": 48.11029166666667,
-        "end": 54.448625
+        "start": 50.4925,
+        "end": 56.0925,
+        "spokenText": "Teste-toi aussi plus tard. Répéter immédiatement peut sembler facile sans démontrer une mémorisation durable."
       },
       {
         "section": "example",
         "text": "Question : pourquoi l’eau qui s’évapore peut-elle refroidir une surface ?\nRéponse : l’évaporation demande de l’énergie. Cette énergie est prélevée sous forme de chaleur dans la surface et son environnement.",
-        "start": 54.798625,
-        "end": 66.95808333333333
+        "start": 57.73,
+        "end": 67.636708,
+        "spokenText": "Question : pourquoi l’eau qui s’évapore peut-elle refroidir une surface ?\nRéponse : l’évaporation demande de l’énergie. Cette énergie est prélevée sous forme de chaleur dans la surface et son environnement."
       },
       {
         "section": "explanation",
         "text": "Lis et comprends d’abord la réponse. Cache-la ensuite et réponds toi-même. « L’eau refroidit » ne suffit pas à expliquer le lien : le besoin d’énergie et le prélèvement de chaleur sont essentiels.",
-        "start": 67.30808333333333,
-        "end": 77.931875,
+        "start": 69.136708,
+        "end": 79.479125,
         "spokenText": "Commence par lire et comprendre la réponse. Cache-la ensuite et réponds toi-même. « L’eau refroidit » ne suffit pas à expliquer le lien : le besoin d’énergie et le prélèvement de chaleur sont essentiels."
       },
       {
         "section": "recall",
         "text": "Pourquoi l’eau qui s’évapore peut-elle refroidir une surface ? Explique le lien sans regarder.",
-        "start": 78.281875,
-        "end": 83.62054166666667
+        "start": 80.93854166666667,
+        "end": 84.83854166666666,
+        "spokenText": "Pourquoi l’eau qui s’évapore peut-elle refroidir une surface ? Explique le lien sans regarder."
       },
       {
         "section": "transfer",
         "text": "Formule une question précise sur ton propre contenu. Réponds sans regarder, compare ensuite et réessaie plus tard. ANITEW utilise aussi le rappel dans ses séances d’entraînement.",
-        "start": 83.97054166666666,
-        "end": 94.060875
+        "start": 86.30487500000001,
+        "end": 94.564875,
+        "spokenText": "Formule une question précise sur ton propre contenu. Réponds sans regarder, compare ensuite et réessaie plus tard. ANITEW utilise aussi le rappel dans ses séances d’entraînement."
       }
     ],
-    "src": "/course-media/library/atta-active-recall-fr-783a70e475d9.m4a",
-    "bytes": 1041475,
-    "sha256": "783a70e475d9f574a069e3fad1d3f95b243e2337b29f21b69cfbb83afc488c1b",
-    "synthesis": "kyutai-native"
+    "src": "/course-media/library/atta-active-recall-fr-83547c9c8c09.m4a",
+    "bytes": 1105904,
+    "sha256": "83547c9c8c09a3fe8ad6e31f9d871a3736fb489d70a73d34caab5ca50a73695a",
+    "synthesis": "qwen-french-shared"
   },
   {
     "course": "interleaved-practice",
     "coach": "rafael",
     "language": "fr",
-    "duration": 102.03966666666666,
+    "duration": 95.92279166666667,
     "cues": [
       {
         "section": "title",
         "text": "Choisir entre des démarches proches",
-        "start": 0.0,
-        "end": 2.0180416666666665
+        "start": 0,
+        "end": 2.02,
+        "spokenText": "Choisir entre des démarches proches"
       },
       {
         "section": "purpose",
         "text": "Mélange des types d’exercices proches et choisis toi-même la démarche adaptée. Tu travailles ainsi le choix de la méthode autant que son application.",
-        "start": 2.568041666666667,
-        "end": 11.192458333333333
+        "start": 3.4786666666666664,
+        "end": 10.918666666666667,
+        "spokenText": "Mélange des types d’exercices proches et choisis toi-même la démarche adaptée. Tu travailles ainsi le choix de la méthode autant que son application."
       },
       {
         "section": "limit",
         "text": "Apprends d’abord chaque démarche avec des exemples clairs. Changer de sujet au hasard ou faire plusieurs choses à la fois est différent. L’intérêt du mélange dépend du contenu et de tes connaissances antérieures.",
-        "start": 11.542458333333334,
-        "end": 24.060958333333332
+        "start": 12.751625,
+        "end": 23.031625,
+        "spokenText": "Apprends d’abord chaque démarche avec des exemples clairs. Changer de sujet au hasard ou faire plusieurs choses à la fois est différent. L’intérêt du mélange dépend du contenu et de tes connaissances antérieures."
       },
       {
         "section": "step-0",
         "text": "Comprends d’abord chaque démarche séparément.",
-        "start": 24.410958333333333,
-        "end": 26.999875
+        "start": 24.412458333333333,
+        "end": 25.972458333333332,
+        "spokenText": "Comprends d’abord chaque démarche séparément."
       },
       {
         "section": "step-1",
         "text": "Mélange ensuite quelques types d’exercices proches.",
-        "start": 27.349875,
-        "end": 30.796375
+        "start": 27.513624999999998,
+        "end": 29.453625000000002,
+        "spokenText": "Mélange ensuite quelques types d’exercices proches."
       },
       {
         "section": "step-2",
         "text": "Avant de répondre, identifie le type et explique ton choix.",
-        "start": 31.146375,
-        "end": 34.592875
+        "start": 30.7915,
+        "end": 33.893542,
+        "spokenText": "Avant de répondre, identifie le type et explique ton choix."
       },
       {
         "section": "step-3",
         "text": "Résous l’exercice et vérifie séparément ton choix et ton résultat.",
-        "start": 34.942875,
-        "end": 39.31675
+        "start": 35.39354133333333,
+        "end": 39.730583333333335,
+        "spokenText": "Fais le calcul. Vérifie ensuite deux choses séparément : ton choix de méthode et ton résultat."
       },
       {
         "section": "step-4",
         "text": "Retravaille les erreurs, puis reviens aux exercices mélangés.",
-        "start": 39.66675,
-        "end": 42.612125
+        "start": 41.15804166666667,
+        "end": 43.55804166666667,
+        "spokenText": "Retravaille les erreurs, puis reviens aux exercices mélangés."
       },
       {
         "section": "example",
         "text": "Rectangle : aire = longueur × largeur. Triangle : aire = base × hauteur correspondante ÷ 2. Un rectangle de 4 cm sur 3 cm a une aire de 12 cm². Un triangle de base 4 cm et de hauteur correspondante 3 cm a une aire de 6 cm².",
-        "start": 42.962125,
-        "end": 64.944,
-        "spokenText": "Pour un rectangle, l’aire est égale à la longueur multipliée par la largeur. Pour un triangle, l’aire est égale à la base multipliée par la hauteur correspondante, puis divisée par deux. Un rectangle de quatre centimètres sur trois centimètres a une aire de douze centimètres carrés. Un triangle de base quatre centimètres et de hauteur correspondante trois centimètres a une aire de six centimètres carrés."
+        "start": 44.9785,
+        "end": 63.13849999999999,
+        "spokenText": "Pour un rectangle, multiplie la longueur par la largeur. Un rectangle de quatre centimètres sur trois centimètres a donc une aire de douze centimètres carrés. Pour un triangle, multiplie la base par la hauteur correspondante. Divise ensuite ce résultat par deux. Avec une base de quatre centimètres et une hauteur de trois centimètres, le calcul donne six centimètres carrés."
       },
       {
         "section": "explanation",
         "text": "Des nombres identiques n’impliquent pas le même calcul. La figure détermine la règle : le triangle demande le facteur un demi. Dans un mélange d’exercices, il faut identifier le type avant d’appliquer la règle.",
-        "start": 65.294,
-        "end": 79.70466666666667,
+        "start": 63.13849999999999,
+        "end": 75.57849999999999,
         "spokenText": "Des nombres identiques ne donnent pas forcément le même calcul. La figure détermine la règle. Pour le triangle, il faut diviser le produit par deux. Dans un mélange d’exercices, commence par identifier le type de figure avant d’appliquer la règle."
       },
       {
         "section": "recall",
         "text": "Exercice A : triangle de base 6 cm et de hauteur correspondante 4 cm. Exercice B : rectangle de longueur 6 cm et de largeur 4 cm. Donne la règle et l’aire de chaque figure.",
-        "start": 80.05466666666666,
-        "end": 94.78691666666667,
+        "start": 77.14933333333333,
+        "end": 88.56933333333333,
         "spokenText": "Exercice A. Un triangle de base six centimètres et de hauteur correspondante quatre centimètres. Exercice B. Un rectangle de longueur six centimètres et de largeur quatre centimètres. Donne la règle et l’aire de chaque figure."
       },
       {
         "section": "transfer",
         "text": "Choisis deux ou trois types d’exercices proches que tu connais déjà. Mélange-les et justifie ta démarche avant chaque résolution.",
-        "start": 95.13691666666666,
-        "end": 101.68966666666667
+        "start": 90.02279166666666,
+        "end": 95.74279166666666,
+        "spokenText": "Choisis deux ou trois types d’exercices proches que tu connais déjà. Mélange-les et justifie ta démarche avant chaque résolution."
       }
     ],
-    "src": "/course-media/library/atta-interleaved-practice-fr-f1adb21121d9.m4a",
-    "bytes": 1143859,
-    "sha256": "f1adb21121d99f72e871f65f01bd9931d3d4c39d36108678f306d8ebe5160553",
-    "synthesis": "kyutai-native"
+    "src": "/course-media/library/atta-interleaved-practice-fr-26859ab46dc1.m4a",
+    "bytes": 1168357,
+    "sha256": "26859ab46dc1b8ef431ad8a2ce26974d9c6e8ec83dfffb4d92b3070d600b369e",
+    "synthesis": "qwen-french-shared"
   },
   {
     "course": "keyword-method",
     "coach": "rafael",
     "language": "fr",
-    "duration": 79.47066666666667,
+    "duration": 76.880125,
     "cues": [
       {
         "section": "title",
         "text": "Relier le vocabulaire à des mots-clés",
-        "start": 0.0,
-        "end": 2.3021666666666665
+        "start": 0,
+        "end": 1.94,
+        "spokenText": "Relier le vocabulaire à des mots-clés"
       },
       {
         "section": "purpose",
         "text": "Un mot connu dont le son est proche peut servir de pont vers le sens d’un mot étranger. Relie ce mot-clé et le sens dans une image, puis vérifie le mot à apprendre.",
-        "start": 2.8521666666666667,
-        "end": 13.36875,
+        "start": 3.3356250000000003,
+        "end": 11.895624999999999,
         "spokenText": "Un mot connu dont le son est proche peut servir de pont vers le sens d’un mot étranger. Relie ce mot-clé et le sens dans une image. Puis vérifie le mot à apprendre."
       },
       {
         "section": "limit",
         "text": "Un son proche n’est pas une prononciation correcte. Certains mots ne se prêtent pas à cette technique. Vérifie séparément la prononciation, l’orthographe et l’emploi dans une phrase.",
-        "start": 13.71875,
-        "end": 23.307958333333332
+        "start": 13.456083333333334,
+        "end": 22.196083333333334,
+        "spokenText": "Un son proche n’est pas une prononciation correcte. Certains mots ne se prêtent pas à cette technique. Vérifie séparément la prononciation, l’orthographe et l’emploi dans une phrase."
       },
       {
         "section": "step-0",
         "text": "Vérifie le sens et la prononciation correcte du nouveau mot.",
-        "start": 23.657958333333333,
-        "end": 27.176791666666666
+        "start": 23.85875,
+        "end": 26.77875,
+        "spokenText": "Vérifie le sens et la prononciation correcte du nouveau mot."
       },
       {
         "section": "step-1",
         "text": "Cherche un mot connu au son proche.",
-        "start": 27.526791666666668,
-        "end": 29.901291666666665
+        "start": 28.253208333333333,
+        "end": 29.713208333333334,
+        "spokenText": "Cherche un mot connu au son proche."
       },
       {
         "section": "step-2",
         "text": "Imagine un lien clair entre ce mot-clé et le sens.",
-        "start": 30.251291666666667,
-        "end": 33.483375
+        "start": 31.060541666666666,
+        "end": 33.66320866666667,
+        "spokenText": "Imagine un lien clair entre ce mot-clé et le sens."
       },
       {
         "section": "step-3",
         "text": "Retrouve le sens à partir du mot, puis le mot à partir du sens.",
-        "start": 33.833375,
-        "end": 37.49429166666667
+        "start": 35.16320833333334,
+        "end": 38.05733333333334,
+        "spokenText": "Retrouve le sens à partir du mot, puis le mot à partir du sens."
       },
       {
         "section": "step-4",
         "text": "Vérifie la prononciation, l’orthographe et une phrase d’exemple.",
-        "start": 37.84429166666666,
-        "end": 41.076375
+        "start": 39.60187500000001,
+        "end": 42.801874999999995,
+        "spokenText": "Vérifie la prononciation, l’orthographe et une phrase d’exemple."
       },
       {
         "section": "example",
         "text": "Anglais : bell = cloche. Exemple : The bell rings. = La cloche sonne.",
-        "start": 41.426375,
-        "end": 47.909375
+        "start": 44.138374999999996,
+        "end": 48.998374999999996,
+        "spokenText": "Anglais : bell = cloche. Exemple : The bell rings. = La cloche sonne."
       },
       {
         "section": "explanation",
         "text": "Le mot français « belle » peut servir d’indice sonore : imagine une très belle cloche qui sonne. « Belle » est l’aide-mémoire, pas une transcription de la prononciation anglaise de bell.",
-        "start": 48.259375,
-        "end": 59.34941666666667
+        "start": 49.398375,
+        "end": 58.498374999999996,
+        "spokenText": "Le mot français « belle » peut servir d’indice sonore : imagine une très belle cloche qui sonne. « Belle » est l’aide-mémoire, pas une transcription de la prononciation anglaise de bell."
       },
       {
         "section": "recall",
         "text": "Quel mot anglais signifie cloche ? Écris le mot, son sens et la phrase d’exemple de mémoire.",
-        "start": 59.699416666666664,
-        "end": 65.89566666666667
+        "start": 59.95708333333333,
+        "end": 65.07708333333333,
+        "spokenText": "Quel mot anglais signifie cloche ? Écris le mot, son sens et la phrase d’exemple de mémoire."
       },
       {
         "section": "transfer",
         "text": "Essaie avec un mot dont tu as réellement besoin. Teste aussi le sens inverse : peux-tu retrouver la forme étrangère à partir du sens ? Si le mot-clé te perturbe, change de lien ou utilise le rappel direct.",
-        "start": 66.24566666666666,
-        "end": 79.12066666666666,
+        "start": 66.460125,
+        "end": 76.58012500000001,
         "spokenText": "Fais un essai avec un mot dont tu as réellement besoin. Teste aussi le sens inverse : peux-tu retrouver la forme étrangère à partir du sens ? Si le mot-clé te perturbe, change de lien ou utilise le rappel direct."
       }
     ],
-    "src": "/course-media/library/atta-keyword-method-fr-b96dc1df4fc0.m4a",
-    "bytes": 868945,
-    "sha256": "b96dc1df4fc0a77df05eb6b2e62438b3ad4646375b07b965bd4256ffd46fab69",
-    "synthesis": "kyutai-native"
+    "src": "/course-media/library/atta-keyword-method-fr-4293781c55df.m4a",
+    "bytes": 888918,
+    "sha256": "4293781c55df9c9b676d11a7e62530d1f8a08eea104dff1e12573198c2ed5954",
+    "synthesis": "qwen-french-shared"
   },
   {
     "course": "long-words",
@@ -4828,643 +4858,708 @@ export const courseNarrations:CourseNarration[]=[
     "course": "meaningful-groups",
     "coach": "rafael",
     "language": "fr",
-    "duration": 92.94741666666667,
+    "duration": 93.278125,
     "cues": [
       {
         "section": "title",
         "text": "Former des groupes cohérents",
-        "start": 0.0,
-        "end": 2.661208333333333
+        "start": 0,
+        "end": 1.76,
+        "spokenText": "Former des groupes cohérents"
       },
       {
         "section": "purpose",
         "text": "Organise des informations en groupes compréhensibles. Une structure utile peut t’aider à voir l’ensemble et à chercher les éléments méthodiquement lors du rappel.",
-        "start": 3.2112083333333334,
-        "end": 12.050041666666667
+        "start": 1.86,
+        "end": 11.007916666666667,
+        "spokenText": "Organise des informations en groupes compréhensibles. Une structure utile peut t’aider à voir l’ensemble et à chercher les éléments méthodiquement lors du rappel."
       },
       {
         "section": "limit",
         "text": "Regrouper ne garantit pas un rappel complet. Les groupes doivent avoir un sens pour toi ; un titre ne suffit pas à expliquer des termes inconnus. Si l’ordre initial compte, travaille-le aussi.",
-        "start": 12.400041666666667,
-        "end": 21.702541666666665
+        "start": 12.455,
+        "end": 22.195,
+        "spokenText": "Regrouper ne garantit pas un rappel complet. Les groupes doivent avoir un sens pour toi ; un titre ne suffit pas à expliquer des termes inconnus. Si l’ordre initial compte, travaille-le aussi."
       },
       {
         "section": "step-0",
         "text": "Précise ton objectif : le contenu, son ordre ou les deux.",
-        "start": 22.052541666666666,
-        "end": 25.78575
+        "start": 23.680125,
+        "end": 27.280124999999998,
+        "spokenText": "Précise ton objectif : le contenu, son ordre ou les deux."
       },
       {
         "section": "step-1",
         "text": "Cherche des caractéristiques communes ou des relations.",
-        "start": 26.13575,
-        "end": 29.011375
+        "start": 28.867333333333335,
+        "end": 30.96454133333333,
+        "spokenText": "Cherche des caractéristiques communes ou des relations."
       },
       {
         "section": "step-2",
         "text": "Crée quelques groupes faciles à parcourir avec des titres informatifs.",
-        "start": 29.361375,
-        "end": 32.807875
+        "start": 32.464542,
+        "end": 35.7405,
+        "spokenText": "Crée quelques groupes faciles à parcourir avec des titres informatifs."
       },
       {
         "section": "step-3",
         "text": "Explique pourquoi chaque élément appartient à son groupe.",
-        "start": 33.157875,
-        "end": 36.462291666666665
+        "start": 37.16308333333333,
+        "end": 39.443083333333334,
+        "spokenText": "Explique pourquoi chaque élément appartient à son groupe."
       },
       {
         "section": "step-4",
         "text": "Cache la source. Rappelle d’abord les groupes, puis leur contenu.",
-        "start": 36.81229166666667,
-        "end": 41.36566666666667,
+        "start": 40.83116666666666,
+        "end": 44.451166666666666,
         "spokenText": "Cache la source. Ensuite, rappelle d’abord les groupes, puis leur contenu."
       },
       {
         "section": "step-5",
         "text": "Compare avec l’original, corrige les omissions et réessaie plus tard.",
-        "start": 41.715666666666664,
-        "end": 45.733041666666665
+        "start": 45.89383333333333,
+        "end": 49.213833333333326,
+        "spokenText": "Compare avec l’original, corrige les omissions et réessaie plus tard."
       },
       {
         "section": "example",
         "text": "Pomme · marteau · chemise · poire · scie · veste · banane · pince · pantalon",
-        "start": 46.08304166666667,
-        "end": 56.74425,
+        "start": 50.68504166666666,
+        "end": 58.16504166666667,
         "spokenText": "Une pomme. Un marteau. Une chemise. Une poire. Une scie. Une veste. Une banane. Une pince. Un pantalon."
       },
       {
         "section": "explanation",
         "text": "Une organisation possible : fruits (pomme, poire, banane), outils (marteau, scie, pince), vêtements (chemise, veste, pantalon). Les titres servent d’indices. L’objectif est de retenir les neuf éléments, pas leur ordre initial.",
-        "start": 57.09425,
-        "end": 70.89658333333334
+        "start": 59.684875,
+        "end": 73.744875,
+        "spokenText": "Une organisation possible : fruits (pomme, poire, banane), outils (marteau, scie, pince), vêtements (chemise, veste, pantalon). Les titres servent d’indices. L’objectif est de retenir les neuf éléments, pas leur ordre initial."
       },
       {
         "section": "recall",
         "text": "Rappelle les trois groupes et autant des neuf éléments que possible, sans regarder. L’ordre dans chaque groupe est libre.",
-        "start": 71.24658333333333,
-        "end": 79.26525,
+        "start": 75.27237500000001,
+        "end": 82.11237500000001,
         "spokenText": "Rappelle les trois groupes et autant des neuf éléments que possible. Fais-le sans regarder la liste. L’ordre dans chaque groupe est libre."
       },
       {
         "section": "transfer",
         "text": "Organise un passage par idées ou une liste par catégories utiles. N’invente pas des groupes pour atteindre un nombre fixé. Vérifie le contenu complet, pas seulement les titres.",
-        "start": 79.61525,
-        "end": 92.59741666666666,
+        "start": 83.53812500000001,
+        "end": 92.698125,
         "spokenText": "Organise un passage par idées ou une liste par catégories utiles. N’invente pas des groupes pour atteindre un nombre fixé. Vérifie tout le contenu. Ne te limite pas aux titres."
       }
     ],
-    "src": "/course-media/library/atta-meaningful-groups-fr-00565e90b513.m4a",
-    "bytes": 996786,
-    "sha256": "00565e90b51399650fb03993bc8f2e776eb717ef939b98c780d55c7020f33d2f",
-    "synthesis": "kyutai-native"
+    "src": "/course-media/library/atta-meaningful-groups-fr-a1ee843c84f9.m4a",
+    "bytes": 1049801,
+    "sha256": "a1ee843c84f976c87ffbc5124a43c394bc1104cdce2f284e7782c15b3421acaf",
+    "synthesis": "qwen-french-shared"
   },
   {
     "course": "method-of-loci",
     "coach": "rafael",
     "language": "fr",
-    "duration": 82.8585,
+    "duration": 78.52770833333334,
     "cues": [
       {
         "section": "title",
         "text": "Utiliser les lieux comme indices",
-        "start": 0.0,
-        "end": 2.516583333333333
+        "start": 0,
+        "end": 1.66,
+        "spokenText": "Utiliser les lieux comme indices"
       },
       {
         "section": "purpose",
         "text": "Avec la méthode des loci, tu places mentalement des contenus à des endroits fixes d’un trajet familier. Parcourir ce trajet dans ta tête fournit des indices pour les retrouver.",
-        "start": 3.0665833333333334,
-        "end": 11.548916666666667
+        "start": 1.66,
+        "end": 10.24,
+        "spokenText": "Avec la méthode des loci, tu places mentalement des contenus à des endroits fixes d’un trajet familier. Parcourir ce trajet dans ta tête fournit des indices pour les retrouver."
       },
       {
         "section": "limit",
         "text": "Apprends d’abord un trajet stable. Des images semblables au même endroit peuvent se confondre. Les lieux soutiennent la structure et l’ordre, mais pas automatiquement la formulation exacte.",
-        "start": 11.898916666666667,
-        "end": 22.201083333333333
+        "start": 11.789250000000001,
+        "end": 20.596916999999998,
+        "spokenText": "Apprends d’abord un trajet stable. Des images semblables au même endroit peuvent se confondre. Les lieux soutiennent la structure et l’ordre, mais pas automatiquement la formulation exacte."
       },
       {
         "section": "step-0",
         "text": "Choisis un trajet familier avec des endroits clairement distincts.",
-        "start": 22.551083333333334,
-        "end": 26.35408333333333
+        "start": 22.096917,
+        "end": 25.030667,
+        "spokenText": "Choisis un trajet familier avec des endroits clairement distincts."
       },
       {
         "section": "step-1",
         "text": "Fixe leur ordre et répète le trajet sans contenu à apprendre.",
-        "start": 26.704083333333333,
-        "end": 31.900666666666666,
+        "start": 26.530666333333333,
+        "end": 29.677958333333333,
         "spokenText": "Fixe leur ordre. Répète ensuite le trajet sans contenu à apprendre."
       },
       {
         "section": "step-2",
         "text": "Associe un élément à chaque endroit par un événement imaginé marquant.",
-        "start": 32.25066666666667,
-        "end": 36.76916666666666
+        "start": 31.07975,
+        "end": 34.07975,
+        "spokenText": "Associe un élément à chaque endroit par un événement imaginé marquant."
       },
       {
         "section": "step-3",
         "text": "Parcours le trajet sans modèle et nomme les éléments.",
-        "start": 37.119166666666665,
-        "end": 40.42358333333333
+        "start": 35.50545833333334,
+        "end": 37.66545833333333,
+        "spokenText": "Parcours le trajet sans modèle et nomme les éléments."
       },
       {
         "section": "step-4",
         "text": "Compare ton rappel et améliore les lieux confus ou les images peu efficaces.",
-        "start": 40.773583333333335,
-        "end": 46.683125,
-        "spokenText": "Compare ton rappel. Améliore ensuite les lieux confus ou les images peu efficaces."
+        "start": 39.24004166666667,
+        "end": 44.64899966666667,
+        "spokenText": "Vérifie les éléments retrouvés avec la liste initiale. Améliore ensuite les lieux confus ou les images peu efficaces."
       },
       {
         "section": "example",
         "text": "Trajet d’exemple : porte d’entrée → meuble à chaussures → table de cuisine. Éléments : pain → savon → bougie.",
-        "start": 47.033125,
-        "end": 54.15675
+        "start": 46.149,
+        "end": 52.42475,
+        "spokenText": "Trajet d’exemple : porte d’entrée → meuble à chaussures → table de cuisine. Éléments : pain → savon → bougie."
       },
       {
         "section": "explanation",
         "text": "Un pain géant bloque la porte. Le meuble à chaussures déborde de mousse de savon. Une bougie brille sur la table de cuisine. Ce trajet est seulement un exemple ; choisis un trajet réellement familier pour ton propre apprentissage.",
-        "start": 54.50675,
-        "end": 67.27454166666666
+        "start": 53.04475,
+        "end": 64.00475,
+        "spokenText": "Un pain géant bloque la porte. Le meuble à chaussures déborde de mousse de savon. Une bougie brille sur la table de cuisine. Ce trajet est seulement un exemple ; choisis un trajet réellement familier pour ton propre apprentissage."
       },
       {
         "section": "recall",
         "text": "Visite mentalement les trois endroits. Écris l’élément associé à chacun.",
-        "start": 67.62454166666667,
-        "end": 72.74879166666666,
+        "start": 65.40695833333334,
+        "end": 68.90695833333334,
         "spokenText": "Visite mentalement les trois endroits. Puis écris l’élément associé à chacun."
       },
       {
         "section": "transfer",
         "text": "Dans le palais de mémoire existant de l’application, crée un trajet familier ou utilise un trajet proposé. Commence par quelques endroits et vérifie que tu les distingues clairement.",
-        "start": 73.09879166666667,
-        "end": 82.5085
+        "start": 70.35795833333333,
+        "end": 78.35795833333333,
+        "spokenText": "Dans le palais de mémoire existant de l’application, crée un trajet familier ou utilise un trajet proposé. Commence par quelques endroits et vérifie que tu les distingues clairement."
       }
     ],
-    "src": "/course-media/library/atta-method-of-loci-fr-2157bbe154e5.m4a",
-    "bytes": 920114,
-    "sha256": "2157bbe154e55094f69ee2bfd3b963736405c0fa0088ddcecda33e9ba4204a43",
-    "synthesis": "kyutai-native"
+    "src": "/course-media/library/atta-method-of-loci-fr-920c750c76e8.m4a",
+    "bytes": 939746,
+    "sha256": "920c750c76e8ce85a640157d52789346ce1f9d26c1092df57978ebd778e07a21",
+    "synthesis": "qwen-french-shared"
   },
   {
     "course": "number-images",
     "coach": "rafael",
     "language": "fr",
-    "duration": 92.08025,
+    "duration": 88.83995833333333,
     "cues": [
       {
         "section": "title",
         "text": "Transformer les nombres en images",
-        "start": 0.0,
-        "end": 2.516583333333333
+        "start": 0,
+        "end": 1.8,
+        "spokenText": "Transformer les nombres en images"
       },
       {
         "section": "purpose",
         "text": "Le système majeur associe des sons consonantiques aux chiffres. Tu formes un mot et imagines une image que tu peux ensuite reconvertir en nombre.",
-        "start": 3.0665833333333334,
-        "end": 11.334541666666667
+        "start": 3.4523333333333333,
+        "end": 11.032333333333334,
+        "spokenText": "Le système majeur associe des sons consonantiques aux chiffres. Tu formes un mot et imagines une image que tu peux ensuite reconvertir en nombre."
       },
       {
         "section": "limit",
         "text": "Apprends d’abord les correspondances. Une image qui ne permet pas de retrouver exactement le nombre n’aide pas au rappel précis. Cette introduction utilise deux chiffres ; les leçons existantes du système majeur présentent d’autres correspondances.",
-        "start": 11.684541666666666,
-        "end": 23.988625
+        "start": 12.541291666666666,
+        "end": 24.24129166666667,
+        "spokenText": "Apprends d’abord les correspondances. Une image qui ne permet pas de retrouver exactement le nombre n’aide pas au rappel précis. Cette introduction utilise deux chiffres ; les leçons existantes du système majeur présentent d’autres correspondances."
       },
       {
         "section": "step-0",
         "text": "Apprends d’abord quelques correspondances fixes entre chiffres et sons.",
-        "start": 24.338625,
-        "end": 28.213916666666666
+        "start": 25.677625,
+        "end": 28.417625,
+        "spokenText": "Apprends d’abord quelques correspondances fixes entre chiffres et sons."
       },
       {
         "section": "step-1",
         "text": "Lis les sons dans l’ordre des chiffres.",
-        "start": 28.563916666666668,
-        "end": 31.439541666666667,
+        "start": 30.001125000000002,
+        "end": 31.531833,
         "spokenText": "Lis les sons, dans l’ordre des chiffres."
       },
       {
         "section": "step-2",
         "text": "Ajoute des voyelles pour former un mot concret.",
-        "start": 31.78954166666667,
-        "end": 34.378458333333334
+        "start": 33.03183333333333,
+        "end": 34.973708333333335,
+        "spokenText": "Ajoute des voyelles pour former un mot concret."
       },
       {
         "section": "step-3",
         "text": "Vérifie si le mot contient d’autres consonnes prononcées qui coderaient des chiffres supplémentaires.",
-        "start": 34.728458333333336,
-        "end": 39.67575
+        "start": 36.558625,
+        "end": 40.238625,
+        "spokenText": "Vérifie si le mot contient d’autres consonnes prononcées qui coderaient des chiffres supplémentaires."
       },
       {
         "section": "step-4",
         "text": "Retrouve le mot à partir de l’image, puis le nombre à partir de ses sons.",
-        "start": 40.02575,
-        "end": 44.32983333333333
+        "start": 41.6665,
+        "end": 44.9865,
+        "spokenText": "Retrouve le mot à partir de l’image, puis le nombre à partir de ses sons."
       },
       {
         "section": "example",
         "text": "1 → t/d ; 2 → n. Le nombre 12 peut devenir l’image d’une tonne de sable : t + n.",
-        "start": 44.679833333333335,
-        "end": 57.662,
+        "start": 46.429125,
+        "end": 58.829125000000005,
         "spokenText": "Pour le chiffre un, utilise le premier son de tapis ou de dos. Pour le chiffre deux, utilise le premier son de nez. Pour douze, imagine une tonne de sable. Dans tonne, tu retrouves le son initial de tapis, puis celui de nez."
       },
       {
         "section": "explanation",
         "text": "La voyelle ne compte pas ici. Dans tonne, les deux lettres n représentent un seul son consonantique. Au retour, t donne 1 et n donne 2 : tu retrouves 12. Ce sont les sons qui comptent, pas simplement les lettres écrites.",
-        "start": 58.012,
-        "end": 74.49433333333333,
+        "start": 59.229125,
+        "end": 73.68912499999999,
         "spokenText": "Dans cet exercice, les voyelles ne comptent pas. Le mot tonne s’écrit avec deux lettres identiques au milieu, mais elles représentent un seul son. Le premier son consonantique code un. Le second code deux. Tu retrouves douze. On compte les sons, pas le nombre de lettres."
       },
       {
         "section": "recall",
         "text": "Quel nombre code l’image d’une tonne de sable ? Explique le retour par les deux consonnes prononcées.",
-        "start": 74.84433333333334,
-        "end": 80.684125
+        "start": 75.07400000000001,
+        "end": 79.53399999999999,
+        "spokenText": "Quel nombre code l’image d’une tonne de sable ? Explique le retour par les deux consonnes prononcées."
       },
       {
         "section": "transfer",
         "text": "Travaille les autres correspondances fixes dans les leçons existantes avant de mémoriser des nombres plus longs. Vérifie que chaque image te ramène exactement au nombre voulu.",
-        "start": 81.034125,
-        "end": 91.73025,
+        "start": 80.91116666666667,
+        "end": 88.81116666666667,
         "spokenText": "Travaille les autres correspondances fixes dans les leçons existantes avant de mémoriser des nombres plus longs. Assure-toi que chaque image te ramène exactement au nombre voulu."
       }
     ],
-    "src": "/course-media/library/atta-number-images-fr-978d4b7e8296.m4a",
-    "bytes": 1014380,
-    "sha256": "978d4b7e8296224bfd659ad74425490bd8bfd2a80fe82f5335bd28be9b79fee1",
-    "synthesis": "kyutai-native"
+    "src": "/course-media/library/atta-number-images-fr-fbbad47c9768.m4a",
+    "bytes": 1048595,
+    "sha256": "fbbad47c9768b58e0039e26c3e3b526ddbd3fa8fa1557dc6b0aa1eb04112face",
+    "synthesis": "qwen-french-shared"
   },
   {
     "course": "self-explanation",
     "coach": "rafael",
     "language": "fr",
-    "duration": 103.02179166666667,
+    "duration": 101.23445833333334,
     "cues": [
       {
         "section": "title",
         "text": "Expliquer soi-même les relations",
-        "start": 0.0,
-        "end": 2.0180416666666665
+        "start": 0,
+        "end": 1.52,
+        "spokenText": "Expliquer soi-même les relations"
       },
       {
         "section": "purpose",
         "text": "Explique avec tes propres mots pourquoi une étape a du sens ou comment deux affirmations sont liées. Tu peux ainsi découvrir des lacunes qui passent inaperçues à la lecture.",
-        "start": 2.568041666666667,
-        "end": 12.620958333333334
+        "start": 1.52,
+        "end": 10.34,
+        "spokenText": "Explique avec tes propres mots pourquoi une étape a du sens ou comment deux affirmations sont liées. Tu peux ainsi découvrir des lacunes qui passent inaperçues à la lecture."
       },
       {
         "section": "limit",
         "text": "Une explication fluide peut être fausse. Vérifie-la dans une source fiable et reconnais les incertitudes. Cette méthode accompagne la pratique ; elle ne remplace ni les connaissances du sujet ni la vérification.",
-        "start": 12.970958333333334,
-        "end": 25.060666666666666
+        "start": 12.070625,
+        "end": 22.810624999999998,
+        "spokenText": "Une explication fluide peut être fausse. Vérifie-la dans une source fiable et reconnais les incertitudes. Cette méthode accompagne la pratique ; elle ne remplace ni les connaissances du sujet ni la vérification."
       },
       {
         "section": "step-0",
         "text": "Choisis une relation limitée que tu veux comprendre.",
-        "start": 25.410666666666668,
-        "end": 28.500708333333332
+        "start": 24.52466666666667,
+        "end": 26.884666666666668,
+        "spokenText": "Choisis une relation limitée que tu veux comprendre."
       },
       {
         "section": "step-1",
         "text": "Demande-toi pourquoi l’étape suit, ce qui reste identique et ce qui changerait dans d’autres conditions.",
-        "start": 28.850708333333333,
-        "end": 33.72570833333333
+        "start": 28.378500000000003,
+        "end": 33.1585,
+        "spokenText": "Demande-toi pourquoi l’étape suit, ce qui reste identique et ce qui changerait dans d’autres conditions."
       },
       {
         "section": "step-2",
         "text": "Formule une explication sans copier la source.",
-        "start": 34.07570833333333,
-        "end": 38.05820833333333,
+        "start": 34.693416666666664,
+        "end": 37.99341666666667,
         "spokenText": "Maintenant, explique avec tes propres mots. Ne copie pas la source."
       },
       {
         "section": "step-3",
         "text": "Compare avec le raisonnement original. Distingue les faits établis des suppositions.",
-        "start": 38.408208333333334,
-        "end": 43.390375
+        "start": 39.609625,
+        "end": 43.789625,
+        "spokenText": "Compare avec le raisonnement original. Distingue les faits établis des suppositions."
       },
       {
         "section": "step-4",
         "text": "Corrige les lacunes et applique ton explication à un exemple similaire.",
-        "start": 43.740375,
-        "end": 48.90208333333333
+        "start": 45.214708333333334,
+        "end": 48.61470833333333,
+        "spokenText": "Corrige les lacunes et applique ton explication à un exemple similaire."
       },
       {
         "section": "step-5",
         "text": "Explique de nouveau la relation plus tard, sans regarder.",
-        "start": 49.25208333333333,
-        "end": 52.26979166666667
+        "start": 49.912958333333336,
+        "end": 52.37295833333334,
+        "spokenText": "Explique de nouveau la relation plus tard, sans regarder."
       },
       {
         "section": "example",
         "text": "Trois quarts valent six huitièmes : 3/4 = 6/8. En coupant chacune des quatre parts égales en deux, on obtient huit parts égales. Les trois quarts sélectionnés deviennent six huitièmes. La quantité sélectionnée reste identique.",
-        "start": 52.619791666666664,
-        "end": 67.10279166666666
+        "start": 53.873333333333335,
+        "end": 66.83333333333333,
+        "spokenText": "Trois quarts valent six huitièmes : trois quarts sont égaux à six huitièmes. En coupant chacune des quatre parts égales en deux, on obtient huit parts égales. Les trois quarts sélectionnés deviennent six huitièmes. La quantité sélectionnée reste identique."
       },
       {
         "section": "explanation",
         "text": "« Multiplier le numérateur et le dénominateur par deux » décrit une règle. Couper les parts égales en deux explique pourquoi la valeur ne change pas. Pour transférer l’idée, cherche pourquoi 2/3 et 4/6 représentent la même proportion.",
-        "start": 67.45279166666667,
-        "end": 81.185375
+        "start": 67.41333333333333,
+        "end": 80.48270833333333,
+        "spokenText": "« Multiplier le numérateur et le dénominateur par deux » décrit une règle. Couper les parts égales en deux explique pourquoi la valeur ne change pas. Pour transférer l’idée, cherche pourquoi deux tiers et quatre sixièmes représentent la même proportion."
       },
       {
         "section": "recall",
         "text": "Explique sans modèle pourquoi 3/4 et 6/8 sont égaux. Applique ensuite ton raisonnement à 2/3 et 4/6.",
-        "start": 81.535375,
-        "end": 89.875625
+        "start": 81.982708,
+        "end": 88.44625,
+        "spokenText": "Explique sans modèle pourquoi trois quarts et six huitièmes sont égaux. Applique ensuite ton raisonnement à deux tiers et quatre sixièmes."
       },
       {
         "section": "transfer",
         "text": "Choisis une étape de ton cours et explique pourquoi elle est valable. Trouve un exemple similaire pour vérifier ton raisonnement. Si tu ne peux pas vérifier de façon fiable, note la question ouverte plutôt que de prétendre être certain.",
-        "start": 90.225625,
-        "end": 102.67179166666666
+        "start": 89.87441666666666,
+        "end": 100.95441666666666,
+        "spokenText": "Choisis une étape de ton cours et explique pourquoi elle est valable. Trouve un exemple similaire pour vérifier ton raisonnement. Si tu ne peux pas vérifier de façon fiable, note la question ouverte plutôt que de prétendre être certain."
       }
     ],
-    "src": "/course-media/library/atta-self-explanation-fr-27a43dbf58bb.m4a",
-    "bytes": 1167255,
-    "sha256": "27a43dbf58bbe19705449a99a6636eeb838bb7db64e5f1799255bdb0784f4752",
-    "synthesis": "kyutai-native"
+    "src": "/course-media/library/atta-self-explanation-fr-5659698bb83e.m4a",
+    "bytes": 1228188,
+    "sha256": "5659698bb83e6d584ed318ef6a47aaa9bca06b00e71aa0ed6a50aa6045ab42d1",
+    "synthesis": "qwen-french-shared"
   },
   {
     "course": "spaced-practice",
     "coach": "rafael",
     "language": "fr",
-    "duration": 112.51479166666667,
+    "duration": 106.54879166666667,
     "cues": [
       {
         "section": "title",
         "text": "Espacer les révisions",
-        "start": 0.0,
-        "end": 1.447125
+        "start": 0,
+        "end": 1.24,
+        "spokenText": "Espacer les révisions"
       },
       {
         "section": "purpose",
         "text": "Répartis les tentatives de rappel dans le temps. Tu vérifies ainsi ce qui reste après une pause, plutôt que de répéter une réponse juste après l’avoir lue.",
-        "start": 1.997125,
-        "end": 15.550208333333334,
+        "start": 2.759875,
+        "end": 13.119875,
         "spokenText": "Répartis les tentatives de rappel dans le temps. Après une pause, essaie de retrouver la réponse. Tu vérifies ainsi ce que tu as retenu. Répéter immédiatement une réponse que tu viens de lire ne suffit pas."
       },
       {
         "section": "limit",
         "text": "Aucun intervalle ne convient à tous les contenus et à toutes les personnes. La difficulté, les connaissances antérieures et la durée de rétention souhaitée comptent. Cet exercice explique la démarche ; seuls des rappels ultérieurs permettent de vérifier la rétention dans le temps.",
-        "start": 15.900208333333333,
-        "end": 29.27375
+        "start": 14.588375000000001,
+        "end": 27.568375,
+        "spokenText": "Aucun intervalle ne convient à tous les contenus et à toutes les personnes. La difficulté, les connaissances antérieures et la durée de rétention souhaitée comptent. Cet exercice explique la démarche ; seuls des rappels ultérieurs permettent de vérifier la rétention dans le temps."
       },
       {
         "section": "step-0",
         "text": "Apprends une information limitée et essaie de la rappeler une fois sans modèle.",
-        "start": 29.62375,
-        "end": 33.92783333333333
+        "start": 28.972708333333333,
+        "end": 32.19600033333333,
+        "spokenText": "Apprends une information limitée et essaie de la rappeler une fois sans modèle."
       },
       {
         "section": "step-1",
         "text": "Prévois une autre tentative après un délai.",
-        "start": 34.277833333333334,
-        "end": 36.65233333333333
+        "start": 33.695999666666665,
+        "end": 35.430416666666666,
+        "spokenText": "Prévois une autre tentative après un délai."
       },
       {
         "section": "step-2",
         "text": "Essaie de répondre avant d’afficher la solution.",
-        "start": 37.00233333333333,
-        "end": 40.092375
+        "start": 36.832708333333336,
+        "end": 38.732708333333335,
+        "spokenText": "Essaie de répondre avant d’afficher la solution."
       },
       {
         "section": "step-3",
         "text": "Après une erreur, clarifie le sens, corrige et rappelle à nouveau. Raccourcis l’intervalle suivant si le rappel était trop difficile.",
-        "start": 40.442375,
-        "end": 47.994791666666664
+        "start": 40.2035,
+        "end": 46.5035,
+        "spokenText": "Après une erreur, clarifie le sens, corrige et rappelle à nouveau. Raccourcis l’intervalle suivant si le rappel était trop difficile."
       },
       {
         "section": "step-4",
         "text": "Lorsque le rappel devient fiable, l’intervalle peut augmenter.",
-        "start": 48.344791666666666,
-        "end": 52.220083333333335
+        "start": 48.08345833333333,
+        "end": 50.783458333333336,
+        "spokenText": "Lorsque le rappel devient fiable, l’intervalle peut augmenter."
       },
       {
         "section": "step-5",
         "text": "ANITEW planifie déjà les révisions des éléments d’entraînement enregistrés. Suis les révisions dues plutôt que de créer un calendrier concurrent.",
-        "start": 52.570083333333336,
-        "end": 60.40920833333333
+        "start": 52.24754166666666,
+        "end": 58.487541666666665,
+        "spokenText": "ANITEW planifie déjà les révisions des éléments d’entraînement enregistrés. Suis les révisions dues plutôt que de créer un calendrier concurrent."
       },
       {
         "section": "example",
         "text": "Mira apprend une nouvelle notion et l’explique sans modèle. Après une pause, elle réessaie et découvre une lacune. Elle compare avec la bonne explication, corrige la lacune et prévoit le prochain essai plus tôt. Elle augmente l’intervalle seulement lorsque le rappel devient fiable.",
-        "start": 60.75920833333333,
-        "end": 76.241875
+        "start": 60.06820833333333,
+        "end": 73.50820833333333,
+        "spokenText": "Mira apprend une nouvelle notion et l’explique sans modèle. Après une pause, elle réessaie et découvre une lacune. Elle compare avec la bonne explication, corrige la lacune et prévoit le prochain essai plus tôt. Elle augmente l’intervalle seulement lorsque le rappel devient fiable."
       },
       {
         "section": "explanation",
         "text": "Le délai et la tentative de rappel comptent. Relire dix fois de suite ne remplace pas un rappel ultérieur. L’erreur indique à Mira ce qu’elle doit retravailler et l’aide à adapter l’intervalle.",
-        "start": 76.591875,
-        "end": 90.21725,
+        "start": 75.09891666666667,
+        "end": 85.25891666666666,
         "spokenText": "Le délai et la tentative de rappel comptent. Relire dix fois de suite ne remplace pas un rappel ultérieur. Grâce à son erreur, Mira sait ce qu’elle doit retravailler. Elle peut aussi adapter le délai avant son prochain essai."
       },
       {
         "section": "recall",
         "text": "Décris la démarche de Mira : que fait-elle avant de vérifier ? Comment réagit-elle à la lacune ? Quand peut-elle augmenter l’intervalle ?",
-        "start": 90.56725,
-        "end": 99.22654166666666
+        "start": 86.70233333333333,
+        "end": 93.18166633333334,
+        "spokenText": "Décris la démarche de Mira : que fait-elle avant de vérifier ? Comment réagit-elle à la lacune ? Quand peut-elle augmenter l’intervalle ?"
       },
       {
         "section": "transfer",
         "text": "Utilise les révisions dues pour les éléments d’entraînement enregistrés. Pour un contenu extérieur à l’application, prévois un test ultérieur et adapte le délai au rappel réel. Terminer ce cours ne crée pas de nouvelles cartes de révision.",
-        "start": 99.57654166666667,
-        "end": 112.16479166666667,
+        "start": 94.68166666666667,
+        "end": 106.44129166666667,
         "spokenText": "Utilise les révisions dues pour les éléments d’entraînement enregistrés. Pour un contenu extérieur à l’application, prévois un test ultérieur et adapte le délai au rappel réel. Ce cours ne crée aucune nouvelle carte de révision quand tu le termines."
       }
     ],
-    "src": "/course-media/library/atta-spaced-practice-fr-09ffd5f85377.m4a",
-    "bytes": 1266675,
-    "sha256": "09ffd5f853778b7e43eb73509bab02ec81de689c46686f93b2b25a243d572f83",
-    "synthesis": "kyutai-native"
+    "src": "/course-media/library/atta-spaced-practice-fr-e4847c521915.m4a",
+    "bytes": 1258822,
+    "sha256": "e4847c521915e2dd422926fed8b163bd66403a32f045ec192f95761327c2e93c",
+    "synthesis": "qwen-french-shared"
   },
   {
     "course": "text-meaning",
     "coach": "rafael",
     "language": "fr",
-    "duration": 105.03408333333333,
+    "duration": 104.95670833333334,
     "cues": [
       {
         "section": "title",
         "text": "Retenir le sens d’un texte long",
-        "start": 0.0,
-        "end": 2.0180416666666665
+        "start": 0,
+        "end": 1.52,
+        "spokenText": "Retenir le sens d’un texte long"
       },
       {
         "section": "purpose",
         "text": "Apprends à restituer les idées et les liens d’un texte sans le regarder. Cette méthode convient aux textes documentaires, aux présentations et à la préparation d’un examen.",
-        "start": 2.568041666666667,
-        "end": 11.334541666666667
+        "start": 2.9992083333333333,
+        "end": 12.539208333333333,
+        "spokenText": "Apprends à restituer les idées et les liens d’un texte sans le regarder. Cette méthode convient aux textes documentaires, aux présentations et à la préparation d’un examen."
       },
       {
         "section": "limit",
         "text": "Un résumé ne conserve pas tous les détails. Travaille séparément les chiffres ou les formulations exactes lorsqu’ils sont importants. Commence par un court passage et allonge-le lorsque tu sais l’expliquer.",
-        "start": 11.684541666666666,
-        "end": 24.939208333333333,
+        "start": 14.118833333333333,
+        "end": 25.77883333333333,
         "spokenText": "Un résumé ne conserve pas tous les détails. Travaille séparément les chiffres ou les formulations exactes lorsqu’ils sont importants. Commence par un court passage. Allonge ce passage quand tu peux en expliquer le sens."
       },
       {
         "section": "step-0",
         "text": "Lis un passage et clarifie les termes inconnus.",
-        "start": 25.289208333333335,
-        "end": 29.770291666666665,
+        "start": 27.368458333333333,
+        "end": 30.420916333333334,
         "spokenText": "Commence par lire un passage. Clarifie les termes inconnus."
       },
       {
         "section": "step-1",
         "text": "Découpe-le en idées et donne un titre court à chacune.",
-        "start": 30.120291666666667,
-        "end": 34.38695833333333,
+        "start": 31.920916666666667,
+        "end": 35.219791666666666,
         "spokenText": "Repère les idées du passage. Donne un titre court à chacune."
       },
       {
         "section": "step-2",
         "text": "Pose une question par partie : que se passe-t-il, pourquoi et avec quelles conséquences ?",
-        "start": 34.736958333333334,
-        "end": 39.82633333333333
+        "start": 36.714875,
+        "end": 41.111625000000004,
+        "spokenText": "Pose une question par partie : que se passe-t-il, pourquoi et avec quelles conséquences ?"
       },
       {
         "section": "step-3",
         "text": "Cache le texte et réponds avec tes propres mots.",
-        "start": 40.17633333333333,
-        "end": 42.55083333333334
+        "start": 42.61162466666667,
+        "end": 44.67316666666667,
+        "spokenText": "Cache le texte et réponds avec tes propres mots."
       },
       {
         "section": "step-4",
         "text": "Compare avec l’original. Corrige les idées manquantes et les liens erronés.",
-        "start": 42.90083333333333,
-        "end": 51.63245833333333,
+        "start": 46.1305,
+        "end": 52.030499999999996,
         "spokenText": "Compare ton rappel avec le texte original. Ajoute les idées manquantes. Corrige les erreurs dans les liens entre les idées."
       },
       {
         "section": "step-5",
         "text": "Essaie de nouveau plus tard. Adapte l’intervalle à la qualité de ton rappel.",
-        "start": 51.982458333333334,
-        "end": 57.17904166666667,
+        "start": 53.42154166666666,
+        "end": 57.54154166666667,
         "spokenText": "Plus tard, recommence le rappel. Adapte le délai selon la qualité de ta réponse."
       },
       {
         "section": "example",
         "text": "Une ville plante des arbres le long d’une route très fréquentée. Leur feuillage apporte de l’ombre. L’eau qui s’évapore par les feuilles contribue au refroidissement. Pour rester en bonne santé pendant les périodes sèches, les arbres ont besoin de suffisamment d’eau et d’espace pour leurs racines.",
-        "start": 57.529041666666664,
-        "end": 77.86804166666667,
+        "start": 59.141666666666666,
+        "end": 75.26166666666667,
         "spokenText": "Une ville plante des arbres le long d’une route très fréquentée. Leur feuillage apporte de l’ombre. Les feuilles rejettent de l’eau par évaporation. Cette évaporation contribue au refroidissement. Pendant les périodes sèches, les arbres ont besoin de suffisamment d’eau. Leurs racines ont aussi besoin d’espace pour rester en bonne santé."
       },
       {
         "section": "explanation",
         "text": "Trois parties : l’action (planter des arbres), les effets (ombre et évaporation) et les conditions (eau et espace pour les racines). Ce plan conserve les liens entre les idées.",
-        "start": 78.21804166666666,
-        "end": 90.23541666666667,
+        "start": 76.79616666666666,
+        "end": 90.37616666666668,
         "spokenText": "On distingue trois parties. Premièrement, l’action : planter des arbres. Deuxièmement, les effets : l’ombre et l’évaporation. Troisièmement, les conditions : de l’eau et de l’espace pour les racines. Ce plan conserve les liens entre les idées."
       },
       {
         "section": "recall",
         "text": "Sans regarder le texte, explique l’action décrite, ses effets et ses conditions.",
-        "start": 90.58541666666666,
-        "end": 95.67479166666666
+        "start": 91.772,
+        "end": 95.712,
+        "spokenText": "Sans regarder le texte, explique l’action décrite, ses effets et ses conditions."
       },
       {
         "section": "transfer",
         "text": "Choisis un court texte documentaire. Prépare trois questions, mets le texte de côté et réponds. Augmente progressivement la longueur du passage.",
-        "start": 96.02479166666667,
-        "end": 104.68408333333333
+        "start": 97.22916666666667,
+        "end": 104.76916666666666,
+        "spokenText": "Choisis un court texte documentaire. Prépare trois questions, mets le texte de côté et réponds. Augmente progressivement la longueur du passage."
       }
     ],
-    "src": "/course-media/library/atta-text-meaning-fr-1eae55f6d9d5.m4a",
-    "bytes": 1182891,
-    "sha256": "1eae55f6d9d5fc8e2eab0e4560d8dee540388853f1991449d73fbcec51beb7ea",
-    "synthesis": "kyutai-native"
+    "src": "/course-media/library/atta-text-meaning-fr-48de02594a95.m4a",
+    "bytes": 1233825,
+    "sha256": "48de02594a9557f391e117578a12550279d56552fdcc24634126fe133a8dd3bf",
+    "synthesis": "qwen-french-shared"
   },
   {
     "course": "text-verbatim",
     "coach": "rafael",
     "language": "fr",
-    "duration": 85.12195833333334,
+    "duration": 84.21354166666667,
     "cues": [
       {
         "section": "title",
         "text": "Apprendre un texte mot pour mot",
-        "start": 0.0,
-        "end": 1.8759583333333334
+        "start": 0,
+        "end": 1.92825,
+        "spokenText": "Apprendre un texte mot pour mot"
       },
       {
         "section": "purpose",
         "text": "Travaille la formulation exacte d’un poème, d’une définition ou d’un court discours. Les petits mots et leur ordre comptent aussi.",
-        "start": 2.4259583333333334,
-        "end": 10.621583333333334
+        "start": 3.428249666666667,
+        "end": 10.649041666666665,
+        "spokenText": "Travaille la formulation exacte d’un poème, d’une définition ou d’un court discours. Les petits mots et leur ordre comptent aussi."
       },
       {
         "section": "limit",
         "text": "Réciter exactement ne prouve pas que tu as compris. Clarifie d’abord le sens. Des images mentales peuvent soutenir l’ordre des idées, mais elles ne remplacent pas le travail sur les mots.",
-        "start": 10.971583333333333,
-        "end": 20.702875
+        "start": 12.245583333333327,
+        "end": 20.80558333333333,
+        "spokenText": "Réciter exactement ne prouve pas que tu as compris. Clarifie d’abord le sens. Des images mentales peuvent soutenir l’ordre des idées, mais elles ne remplacent pas le travail sur les mots."
       },
       {
         "section": "step-0",
         "text": "Comprends le texte et choisis un court passage cohérent.",
-        "start": 21.052875,
-        "end": 24.928166666666666
+        "start": 22.20875,
+        "end": 24.609042,
+        "spokenText": "Comprends le texte et choisis un court passage cohérent."
       },
       {
         "section": "step-1",
         "text": "Lis-le attentivement et prononce-le clairement une fois.",
-        "start": 25.278166666666667,
-        "end": 31.045625,
-        "spokenText": "Commence par lire le passage attentivement. Prononce le passage clairement une fois."
+        "start": 26.10904166666667,
+        "end": 31.14029166666667,
+        "spokenText": "Commence par lire le passage attentivement. Lis ensuite le passage à voix haute, une seule fois."
       },
       {
         "section": "step-2",
         "text": "Cache-le, puis récite-le ou écris-le de mémoire.",
-        "start": 31.395625,
-        "end": 34.413333333333334
+        "start": 32.64029133333333,
+        "end": 35.22083333333333,
+        "spokenText": "Cache-le, puis récite-le ou écris-le de mémoire."
       },
       {
         "section": "step-3",
         "text": "Compare mot à mot. Corrige les omissions, les inversions et les ajouts.",
-        "start": 34.763333333333335,
-        "end": 40.03225
+        "start": 36.560249999999996,
+        "end": 40.640249999999995,
+        "spokenText": "Compare mot à mot. Corrige les omissions, les inversions et les ajouts."
       },
       {
         "section": "step-4",
         "text": "Travaille le passage suivant, puis la transition entre les deux. Commence parfois au milieu.",
-        "start": 40.38225,
-        "end": 45.72091666666667
+        "start": 42.04266666666666,
+        "end": 46.782666666666664,
+        "spokenText": "Travaille le passage suivant, puis la transition entre les deux. Commence parfois au milieu."
       },
       {
         "section": "step-5",
         "text": "Essaie de nouveau plus tard sans modèle. Allonge le passage lorsque le rappel devient fiable.",
-        "start": 46.07091666666667,
-        "end": 51.624
+        "start": 48.39008333333334,
+        "end": 52.41008333333333,
+        "spokenText": "Essaie de nouveau plus tard sans modèle. Allonge le passage lorsque le rappel devient fiable."
       },
       {
         "section": "example",
         "text": "Le matin, j’ouvre la fenêtre. L’air frais entre dans la pièce. Ensuite, je commence ma journée.",
-        "start": 51.974,
-        "end": 57.84866666666667
+        "start": 53.928916666666666,
+        "end": 59.30891666666667,
+        "spokenText": "Le matin, j’ouvre la fenêtre. L’air frais entre dans la pièce. Ensuite, je commence ma journée."
       },
       {
         "section": "explanation",
         "text": "Les trois phrases forment trois unités de travail. Apprends la première, puis la deuxième et leur transition. Lors d’un autre essai, commence aussi par « L’air frais… ».",
-        "start": 58.19866666666667,
-        "end": 68.35879166666666,
+        "start": 60.82754166666666,
+        "end": 69.51054166666667,
         "spokenText": "Les trois phrases forment trois unités de travail. Apprends la première, puis la deuxième et leur transition. Au prochain essai, commence aussi par les mots : l’air frais."
       },
       {
         "section": "recall",
         "text": "Écris les trois phrases de mémoire en respectant leur formulation aussi précisément que possible.",
-        "start": 68.70879166666667,
-        "end": 75.44104166666666
+        "start": 71.010542,
+        "end": 74.808625,
+        "spokenText": "Écris les trois phrases de mémoire en respectant leur formulation aussi précisément que possible."
       },
       {
         "section": "transfer",
         "text": "Choisis un court passage dont la formulation compte pour toi. Vérifie les mots dans l’original : une reformulation ne répond pas à cet objectif précis.",
-        "start": 75.79104166666667,
-        "end": 84.77195833333333
+        "start": 76.39354166666666,
+        "end": 83.95354166666667,
+        "spokenText": "Choisis un court passage dont la formulation compte pour toi. Vérifie les mots dans l’original : une reformulation ne répond pas à cet objectif précis."
       }
     ],
-    "src": "/course-media/library/atta-text-verbatim-fr-c557766106e5.m4a",
-    "bytes": 928963,
-    "sha256": "c557766106e55f7573459e1fcac0dcb5d7ace55b88bdc57efefc6392b934ecc7",
-    "synthesis": "kyutai-native"
+    "src": "/course-media/library/atta-text-verbatim-fr-5de147f470ab.m4a",
+    "bytes": 950227,
+    "sha256": "5de147f470abfbb033fadb6c992fb906c8b2af1abdff39ec7ef77dc2865f124f",
+    "synthesis": "qwen-french-shared"
   },
   {
     "course": "story-method",
