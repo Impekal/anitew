@@ -702,3 +702,15 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 - 624 Kernprüfungen, Build/Größe, acht Offline-/Stimmprüfungen und 22 französische Vorschauprüfungen bestanden. Die Vorschau-Musterlösung wurde nach einer Änderung im gemeinsamen Player repariert.
 - 35 Illustrationsentwürfe auf lokale Dateien und Quellprüfsummen abgeglichen. Zwölf aktuelle französische Integrationspakete mit 264 VTT-Dateien vorbereitet und geprüft; zwei alte DE/FR-Coach-Pakete bleiben gesperrt. Keine neue Videoregistrierung durch diese Vorbereitung.
 - Noch offen: gesamte Hör-/Sichtbewertung, überzeugender späterer Coach-Auftritt, echte Geräte und der ergänzende lokale Gesamtdurchgang außerhalb der bereits geprüften Kurse. Keine Actions, Pushes, Veröffentlichung oder Zusammenführung.
+
+
+## 2026-10-10 · Gebündelte lokale Abschlussprüfung
+
+Auf f04cacce6684786860163189fc531b6d444670c1 bestanden: 147 Desktop-,
+48 Mobilansichts- und 30 Layoutprüfungen, fünf Layoutfälle übersprungen.
+Worker/Push-Syntax und Worker-Dry-Run bestanden; kein Deployment.
+Zusammen mit dem Kursdurchgang (120 direkte Erfolge, zwei korrigierte
+Erwartungen gezielt bestanden) ist die lokale technische Prüfung abgeschlossen.
+Keine Actions, kein Push und kein Merge. Gesamtaufnahmen anhören, Montagen
+bewerten, echte Mobilgeräte prüfen und den späteren Coach-Auftritt neu lösen
+bleiben offen. Keine subjektive Freigabe aus Testergebnissen abgeleitet.
