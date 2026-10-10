@@ -1,6 +1,36 @@
 # Was noch offen ist — und wer es tun muss
 
-## Aktueller Ausbau · 2026-10-10
+
+## 2026-10-11 · Logo, Bildkurse und deutsche Stimmkonsistenz
+
+22 DE/EN-Bildkurse sind jetzt lokal integriert. Der Katalog umfasst 31 Videos:
+den bestätigten englischen Geschichtenfilm, acht freigegebene französische
+Bildkurse und 22 neue DE/EN-Fassungen. Die neuen Fassungen sind technisch geprüft;
+die Übernahme bedeutet keine pauschale subjektive Sicht- oder Hörfreigabe.
+Jeder Folgekurs beginnt mit der vorhandenen kurzen ANITEW-Logoanimation.
+Sie ist stumm, offline vorgeladen und wird bei reduzierter Bewegung durch ein
+ruhendes Logo ersetzt. Keine wiederholten Coach-Aufnahmen in den Folgekursen.
+
+Drei deutsche Passagen wurden vollständig in der jeweiligen Stimme erzeugt:
+Atta/Lin bei Verteilt wiederholen und Lins Geschichten-Begrüßung. Eingeklebte
+fremde Namensclips sind entfernt. Attas bestätigte deutsche Begrüßung bleibt
+erhalten. Wortprüfung und lokale Wiedergabe bestanden; die feine Aussprache
+der drei neuen Passagen bleibt zur Hörprüfung offen. Alte Assets bleiben erhalten.
+Quellen und Prüfsummen stehen im Narrationsmanifest und lesson-intro-source.json.
+
+Die Klangidentität ist als eigene Aufgabe inventarisiert: Training und Core
+verwenden zwei getrennte Tonsysteme. Als nächstes folgen ein gemeinsames
+Klangkonzept und ein Hörvergleich; bestehende App-Töne wurden nicht verändert.
+Prüf-/Arbeitsberichte liegen unter outputs/de-name-consistency-2026-10-11/,
+outputs/lesson-intro-previews-validation.json, outputs/localized-visual-integration.json
+und outputs/anitew-sonic-identity-audit.json im Aufgaben-Arbeitsbereich.
+
+Offen: reale Mobilgeräte, Sichtprüfung neuer Bildkurse, erste Coach-Einführung
+DE/FR sowie optional ein natürlicher kurzer Abschluss im ersten Kurs.
+Keine weiteren langen Avatar-Versuche ohne neuen begründeten Ansatz.
+Weiterarbeit bis 5 % Restnutzung; keine Actions, Pushes, Deployments oder Merges.
+
+## Vorheriger Ausbau · 2026-10-10
 
 Zwölf zusätzliche DE/EN/FR-Lesekurse, Kursstufen, Coach-Auswahl und lokale
 Audiokurse sind integriert. Alle zwölf französischen Kurse verwenden jetzt

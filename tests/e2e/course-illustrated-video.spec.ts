@@ -2,20 +2,20 @@ import {test,expect} from '@playwright/test'
 import {visit,openPage} from './helpers.ts'
 import {courseVideo} from '../../src/i18n/courseVideos.ts'
 test.use({channel:'chromium',launchOptions:{args:['--disable-gpu',...(process.platform==='darwin'?['--disable-audio-output']:[])]}})
-test.describe('approved French illustrated video',()=>{
- test('French visuals retain subtitles, verified offline download and pause before the closing sentence',async({page,context})=>{
+for(const spoken of ['fr','de','en'] as const)test.describe(`${spoken} illustrated video`,()=>{
+ test('visuals retain subtitles, verified offline download and pause before the closing sentence',async({page,context})=>{
   test.setTimeout(90_000)
   const external:string[]=[]
   const origin=new URL(test.info().project.use.baseURL!).origin
   page.on('request',r=>{if(/^https?:/.test(r.url())&&!r.url().startsWith(origin+'/'))external.push(r.url())})
-  const asset=courseVideo('long-words','fr','rafael')!
+  const asset=courseVideo('long-words',spoken,'rafael')!
   await visit(page)
   await openPage(page,'Lernkurse')
   await page.getByRole('button',{name:'Kurs öffnen : Lange Wörter sicher behalten',exact:true}).click()
   await page.getByRole('button',{name:'Anhören und ansehen',exact:true}).click()
-  await page.locator('#course-audio-language').selectOption('fr')
+  await page.locator('#course-audio-language').selectOption(spoken)
   await page.locator('#course-format').selectOption('video')
-  const video=page.locator('.course-media video')
+  const video=page.locator('.course-media video:not([data-lesson-intro])')
   await expect(video).toHaveAttribute('src',asset.src)
   await expect(video).not.toHaveAttribute('poster')
   await expect(page.locator('.course-caption')).toHaveAttribute('lang','de')
@@ -38,6 +38,15 @@ test.describe('approved French illustrated video',()=>{
    return {display:box.width/box.height,source:el.videoWidth/el.videoHeight}
   })
   expect(ratios.display).toBeCloseTo(ratios.source,2)
+  // The local logo works after an offline reload and never overlaps narration.
+  await video.evaluate((el:HTMLVideoElement)=>{el.muted=true;void el.play()})
+  const logo=page.locator('[data-lesson-intro]')
+  await expect(logo).toBeVisible()
+  expect(await video.evaluate((el:HTMLVideoElement)=>el.paused)).toBe(true)
+  expect(await video.evaluate((el:HTMLVideoElement)=>el.currentTime)).toBeLessThan(.1)
+  await expect(logo).toHaveCount(0,{timeout:5000})
+  await expect.poll(()=>video.evaluate((el:HTMLVideoElement)=>el.currentTime)).toBeGreaterThan(.2)
+  await video.evaluate((el:HTMLVideoElement)=>el.pause())
   await page.locator('.course-media-chapters button').nth(1).click()
   await expect.poll(()=>video.evaluate((el:HTMLVideoElement)=>el.currentTime)).toBeCloseTo(asset.cues[9].start+.01,1)
   await page.locator('#course-speed').selectOption('1.5')

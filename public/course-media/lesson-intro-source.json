@@ -1,0 +1,9 @@
+{
+  "date": "2026-10-11",
+  "asset": "/course-media/lesson-intro.mp4",
+  "sha256": "8321f91ff6cd8af3db9700b7e214f6bf3019159bac5d11838c98aa08977e54eb",
+  "source": "outputs/atta-story-en-video/introduction-edited/logo-animated.mp4",
+  "credits": "ANITEW original logo animation",
+  "audio": "silent",
+  "behavior": "One opening per lesson playback; static local logo with reduced motion; pre-cached offline"
+}

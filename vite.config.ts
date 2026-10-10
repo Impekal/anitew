@@ -49,7 +49,7 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,webp,json,woff2}'],
+        globPatterns: ['**/*.{js,css,html,svg,png,webp,json,woff2}', 'course-media/lesson-intro.mp4'],
         // Der kleine Push-Handler bleibt eigenes, gut prüfbares JS und wird in
         // den von Workbox erzeugten Service Worker importiert.
         importScripts: ['push-sw.js', 'course-media-sw.js'],

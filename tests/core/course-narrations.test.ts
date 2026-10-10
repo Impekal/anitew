@@ -60,3 +60,13 @@ it('shares upgraded French narration across coach choices without changing other
  }
  expect(courseNarration('story-method','en','lin')).not.toBe(courseNarration('story-method','en','rafael'))
 })
+
+it('keeps German brand-name passages in the selected synthetic coach voice',()=>{
+ const named=courseNarrations.filter(p=>p.language==='de'&&p.cues.some(c=>c.text.includes('ANITEW')))
+ expect(named).toHaveLength(4)
+ const manifest=JSON.parse(readFileSync('public/course-media/coach-narration-manifest.json','utf8')) as {src:string;nameSplice?:boolean}[]
+ for(const pack of named){
+  expect(pack.synthesis).toBe('qwen-own-name')
+  expect(manifest.find(entry=>entry.src===pack.src)?.nameSplice).toBe(false)
+ }
+})

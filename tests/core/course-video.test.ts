@@ -6,7 +6,7 @@ import {courseNarration} from '../../src/i18n/courseNarrations.ts'
 import {videoCaptions} from '../../src/core/courses/captions.ts'
 import {storyMedia} from '../../src/i18n/storyMedia.ts'
 it('retains the complete Atta English video alongside approved French illustrations',()=>{
- expect(courseVideos).toHaveLength(9)
+ expect(courseVideos).toHaveLength(31)
  const video=courseVideo('story-method','en','rafael')!
  expect(video).toBeDefined()
  expect(video.src).toMatch(/^\/course-media\/video\/atta-story-en-[a-f0-9]+\.mp4$/)
@@ -36,7 +36,7 @@ it('uses the edited timeline for all 21 captions and keeps answers after the exe
 })
 
 it('bundles the eight approved French visual courses for every coach with complete subtitles and a safe practice boundary',()=>{
- const videos=courseVideos.filter(v=>v.presentation==='illustrated')
+ const videos=courseVideos.filter(v=>v.presentation==='illustrated'&&v.language==='fr')
  expect(videos).toHaveLength(8)
  for(const v of videos){
   const bytes=readFileSync(`public${v.src}`)
@@ -51,5 +51,21 @@ it('bundles the eight approved French visual courses for every coach with comple
   expect(v.recallBoundary).toBeGreaterThan(v.cues.at(-2)!.start)
   expect(v.recallBoundary).toBeLessThan(v.cues.at(-1)!.start)
   expect(v.credits.some(c=>c.name.includes('MultiTalk'))).toBe(false)
+ }
+})
+
+ it('bundles 22 DE/EN visual lessons with complete local captions and matching assets',()=>{
+ const videos=courseVideos.filter(v=>v.presentation==='illustrated'&&v.language!=='fr')
+ expect(videos).toHaveLength(22)
+ for(const v of videos){
+  const bytes=readFileSync(`public${v.src}`)
+  expect(bytes.length).toBe(v.bytes)
+  expect(createHash('sha256').update(bytes).digest('hex')).toBe(v.sha256)
+  expect(v.course).not.toBe('story-method')
+  for(const coach of ['original','lin','rafael',null] as const)expect(courseVideo(v.course,v.language,coach)).toBe(v)
+  expect(Object.keys(v.captions!)).toHaveLength(11)
+  for(const lines of Object.values(v.captions!))expect(lines).toHaveLength(v.cues.length)
+  expect(v.recallBoundary).toBeLessThan(v.cues.at(-1)!.start)
+  expect(v.recallBoundary).toBeGreaterThan(v.cues.at(-2)!.start)
  }
 })

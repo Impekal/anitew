@@ -701,7 +701,7 @@ export const courseNarrations:CourseNarration[]=[
     "course": "spaced-practice",
     "coach": "rafael",
     "language": "de",
-    "duration": 115.43999999999998,
+    "duration": 115.42,
     "cues": [
       {
         "section": "title",
@@ -755,36 +755,37 @@ export const courseNarrations:CourseNarration[]=[
         "section": "step-5",
         "text": "Für gespeicherte Trainingsinhalte nutzt ANITEW bereits ein Wiederholungssystem. Folge den fälligen Wiedersehen statt parallel einen zweiten Plan zu führen.",
         "start": 53.03999999999999,
-        "end": 62.57999999999999
+        "end": 62.55999999999999
       },
       {
         "section": "example",
         "text": "Mira lernt einen neuen Begriff. Sie erklärt ihn ohne Vorlage. Nach einer Pause versucht sie es erneut und bemerkt eine Lücke. Sie vergleicht mit der richtigen Erklärung, korrigiert die Lücke und setzt den nächsten Abruf früher an. Erst nach zuverlässigen Abrufen vergrößert sie den Abstand.",
-        "start": 62.87999999999999,
-        "end": 79.6
+        "start": 62.859999999999985,
+        "end": 79.58
       },
       {
         "section": "explanation",
         "text": "Die Pause und der eigene Abruf sind entscheidend. Zehnmal direkt hintereinander zu lesen ersetzt keinen späteren Abruf. Miras Fehler zeigt ihr, wo sie nacharbeiten und den Abstand anpassen sollte.",
-        "start": 79.89999999999999,
-        "end": 91.25999999999999
+        "start": 79.88,
+        "end": 91.24
       },
       {
         "section": "recall",
         "text": "Beschreibe Miras Vorgehen: Was tut sie vor dem Nachsehen? Wie reagiert sie auf die Lücke? Wann kann der Abstand größer werden?",
-        "start": 91.55999999999999,
-        "end": 99.96
+        "start": 91.53999999999999,
+        "end": 99.94
       },
       {
         "section": "transfer",
         "text": "Nutze die fälligen Wiedersehen für deine gespeicherten Trainingsinhalte. Für Material außerhalb der App plane einen späteren Selbsttest; passe den Abstand an den tatsächlichen Abruf an. Ein abgeschlossener Lesekurs legt noch keine neuen Wiederholungskarten an.",
-        "start": 100.25999999999999,
-        "end": 115.13999999999999
+        "start": 100.24,
+        "end": 115.11999999999999
       }
     ],
-    "src": "/course-media/library/atta-spaced-practice-de-623db8ade4f5.m4a",
-    "bytes": 1437721,
-    "sha256": "623db8ade4f5ff12a14f3e5eaacc85ce8b319b58499579193a16a4bdbc5040dd"
+    "src": "/course-media/library/atta-spaced-practice-de-0d0191ab4c30.m4a",
+    "bytes": 1521507,
+    "sha256": "0d0191ab4c304d7e714e6492a165a7d61123baea3fd9d381f3fa78b8c88d927c",
+    "synthesis": "qwen-own-name"
   },
   {
     "course": "story-method",
@@ -1773,7 +1774,7 @@ export const courseNarrations:CourseNarration[]=[
     "course": "spaced-practice",
     "coach": "lin",
     "language": "de",
-    "duration": 116.07999999999998,
+    "duration": 116.06,
     "cues": [
       {
         "section": "title",
@@ -1827,152 +1828,155 @@ export const courseNarrations:CourseNarration[]=[
         "section": "step-5",
         "text": "Für gespeicherte Trainingsinhalte nutzt ANITEW bereits ein Wiederholungssystem. Folge den fälligen Wiedersehen statt parallel einen zweiten Plan zu führen.",
         "start": 54.16,
-        "end": 63.94
+        "end": 63.919999999999995
       },
       {
         "section": "example",
         "text": "Mira lernt einen neuen Begriff. Sie erklärt ihn ohne Vorlage. Nach einer Pause versucht sie es erneut und bemerkt eine Lücke. Sie vergleicht mit der richtigen Erklärung, korrigiert die Lücke und setzt den nächsten Abruf früher an. Erst nach zuverlässigen Abrufen vergrößert sie den Abstand.",
-        "start": 64.24,
-        "end": 81.11999999999999
+        "start": 64.22,
+        "end": 81.1
       },
       {
         "section": "explanation",
         "text": "Die Pause und der eigene Abruf sind entscheidend. Zehnmal direkt hintereinander zu lesen ersetzt keinen späteren Abruf. Miras Fehler zeigt ihr, wo sie nacharbeiten und den Abstand anpassen sollte.",
-        "start": 81.41999999999999,
-        "end": 92.38
+        "start": 81.39999999999999,
+        "end": 92.36
       },
       {
         "section": "recall",
         "text": "Beschreibe Miras Vorgehen: Was tut sie vor dem Nachsehen? Wie reagiert sie auf die Lücke? Wann kann der Abstand größer werden?",
-        "start": 92.67999999999999,
-        "end": 100.91999999999999
+        "start": 92.66,
+        "end": 100.89999999999999
       },
       {
         "section": "transfer",
         "text": "Nutze die fälligen Wiedersehen für deine gespeicherten Trainingsinhalte. Für Material außerhalb der App plane einen späteren Selbsttest; passe den Abstand an den tatsächlichen Abruf an. Ein abgeschlossener Lesekurs legt noch keine neuen Wiederholungskarten an.",
-        "start": 101.21999999999998,
-        "end": 115.77999999999999
+        "start": 101.19999999999999,
+        "end": 115.75999999999999
       }
     ],
-    "src": "/course-media/library/lin-spaced-practice-de-371229af12a0.m4a",
-    "bytes": 1397659,
-    "sha256": "371229af12a0cdec564b60944b59bfeb7002aac0a3ac168f7c987ef6f84359fa"
+    "src": "/course-media/library/lin-spaced-practice-de-d8faeb783870.m4a",
+    "bytes": 1453600,
+    "sha256": "d8faeb783870fa97b20776270fb9aefe064350ed6d66076fcaf148798282a11c",
+    "synthesis": "qwen-own-name"
   },
   {
     "course": "story-method",
     "coach": "lin",
     "language": "de",
-    "duration": 100.74004166666668,
+    "duration": 99.22004166666666,
     "cues": [
       {
-        "start": 0.0,
-        "end": 2.42,
+        "start": 0,
+        "end": 2.6,
         "text": "Willkommen bei ANITEW."
       },
       {
-        "start": 2.7199999999999998,
-        "end": 5.6,
-        "text": "Ich bin ein KI-generierter Lerncoach."
+        "start": 2.6,
+        "end": 4.08,
+        "text": "Ich bin ein KI-generierter Lerncoach.",
+        "spokenText": "Ich bin ein KI-Coach."
       },
       {
-        "start": 5.8999999999999995,
-        "end": 8.059999999999999,
+        "start": 4.38,
+        "end": 6.539999999999999,
         "text": "Heute geht es um die Geschichten-Methode."
       },
       {
-        "start": 8.36,
-        "end": 15.899999999999999,
+        "start": 6.84,
+        "end": 14.379999999999999,
         "text": "Die Geschichten-Methode ist eine Merktechnik: Du verknüpfst einzelne Informationen zu einer zusammenhängenden Geschichte."
       },
       {
-        "start": 16.2,
-        "end": 23.56,
+        "start": 14.68,
+        "end": 22.04,
         "text": "Sie kann dir helfen, eine Reihenfolge zu behalten, etwa bei einer Einkaufsliste oder den Stichpunkten eines Vortrags."
       },
       {
-        "start": 23.86,
-        "end": 26.9,
+        "start": 22.34,
+        "end": 25.38,
         "text": "Sie ersetzt nicht das Verstehen des Inhalts."
       },
       {
-        "start": 27.2,
-        "end": 33.92,
+        "start": 25.68,
+        "end": 32.400000000000006,
         "text": "In diesem Kurs lernst du zuerst das Prinzip, siehst ein Beispiel und probierst die Methode anschließend selbst aus."
       },
       {
-        "start": 34.22,
-        "end": 38.379999999999995,
+        "start": 32.7,
+        "end": 36.86,
         "text": "Dein Ziel: drei Begriffe in der richtigen Reihenfolge erinnern."
       },
       {
-        "start": 38.68,
-        "end": 43.24,
+        "start": 37.16,
+        "end": 41.72,
         "text": "Unser Beispiel ist: Schlüssel, Zitrone, Fahrrad."
       },
       {
-        "start": 43.54,
-        "end": 48.339999999999996,
+        "start": 42.019999999999996,
+        "end": 46.81999999999999,
         "text": "Zuerst stellst du dir vor, wie ein riesiger Schlüssel eine Zitrone aufdrückt."
       },
       {
-        "start": 48.64,
-        "end": 53.04,
+        "start": 47.120000000000005,
+        "end": 51.519999999999996,
         "text": "Der Zitronensaft spritzt auf ein Fahrrad und setzt seine Räder in Bewegung."
       },
       {
-        "start": 53.34,
-        "end": 59.74,
+        "start": 51.82000000000001,
+        "end": 58.22,
         "text": "So verbindet eine Handlung den ersten Begriff mit dem zweiten, und eine weitere den zweiten mit dem dritten."
       },
       {
-        "start": 60.040000000000006,
-        "end": 63.480000000000004,
+        "start": 58.52000000000001,
+        "end": 61.96000000000001,
         "text": "Die ungewöhnliche Geschichte ist nur eine Merkhilfe."
       },
       {
-        "start": 63.78000000000001,
-        "end": 68.02000000000001,
+        "start": 62.260000000000005,
+        "end": 66.50000000000001,
         "text": "Entscheidend ist, dass du dir die Handlung selbst deutlich vorstellst."
       },
       {
-        "start": 68.32000000000001,
-        "end": 70.16000000000001,
+        "start": 66.80000000000001,
+        "end": 68.64000000000001,
         "text": "Jetzt verschwinden die Bilder."
       },
       {
-        "start": 70.46000000000001,
-        "end": 74.62,
+        "start": 68.94000000000001,
+        "end": 73.10000000000001,
         "text": "Pausiere hier und nenne die drei Begriffe in der richtigen Reihenfolge."
       },
       {
-        "start": 74.92,
-        "end": 77.88,
+        "start": 73.4,
+        "end": 76.36,
         "text": "Wenn du bereit bist, blende die Lösung ein."
       },
       {
-        "start": 78.18,
-        "end": 81.78,
+        "start": 76.66000000000001,
+        "end": 80.26,
         "text": "Es waren: Schlüssel, Zitrone, Fahrrad."
       },
       {
-        "start": 82.08000000000001,
-        "end": 88.00000000000001,
+        "start": 80.56000000000002,
+        "end": 86.48000000000002,
         "text": "Fehlt dir ein Begriff, schau dir die passende Verbindung noch einmal an und versuche es erneut."
       },
       {
-        "start": 88.30000000000001,
-        "end": 95.18004166666668,
+        "start": 86.78000000000002,
+        "end": 93.66004166666669,
         "text": "Zum Schluss: Erfinde eine eigene Geschichte mit drei anderen Begriffen und rufe sie ohne Vorlage ab."
       },
       {
-        "start": 95.48004166666668,
-        "end": 100.44004166666667,
+        "start": 93.96004166666668,
+        "end": 98.92004166666668,
         "text": "Du kannst den gesamten Kurs auch lesen und alle Übungen in deinem eigenen Tempo machen."
       }
     ],
-    "src": "/course-media/library/lin-story-de-9d35336d9561.m4a",
-    "bytes": 1139721,
-    "sha256": "9d35336d956192e3be7c86adb0ead201d254ef1a97b95580d633a6f03a0cf754"
+    "src": "/course-media/library/lin-story-de-eaa90981dea4.m4a",
+    "bytes": 1155619,
+    "sha256": "eaa90981dea48721fb5faa573031e99c7c229ce29c89772624bff3d0a2994705",
+    "synthesis": "qwen-own-name"
   },
   {
     "course": "text-meaning",

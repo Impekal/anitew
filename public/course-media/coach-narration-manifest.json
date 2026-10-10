@@ -174,17 +174,17 @@
     ]
   },
   {
-    "coach": "atta",
+    "coach": "rafael",
     "course": "spaced-practice",
     "language": "de",
-    "duration": 115.43999999999998,
-    "bytes": 1437721,
-    "sha256": "623db8ade4f5ff12a14f3e5eaacc85ce8b319b58499579193a16a4bdbc5040dd",
+    "duration": 115.42,
+    "bytes": 1521507,
+    "sha256": "0d0191ab4c304d7e714e6492a165a7d61123baea3fd9d381f3fa78b8c88d927c",
     "reference_sha256": "da57d8cd4e41b636e6e90d63822db8764499a67008e6bcb366f792967788d0de",
     "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-Base-6bit",
     "status": "Synthetic reference voice approved by user; full recordings generated, decoded and reviewed through automatic transcription. Final native-speaker listening review remains open.",
-    "src": "/course-media/library/atta-spaced-practice-de-623db8ade4f5.m4a",
-    "nameReference": "approved-v14",
+    "src": "/course-media/library/atta-spaced-practice-de-0d0191ab4c30.m4a",
+    "nameReference": "Whole passage generated in own synthetic coach voice; pronunciation input Eni-tju; 2026-10-11",
     "modelRevision": "34ff5318365b59cba9c03ff729f2eee0814caf72",
     "voiceDesignRevision": "ffc6545dc9cb086950aa46c6cd3db490e6ece3e1",
     "license": "Apache-2.0 models; generated synthetic references",
@@ -192,7 +192,10 @@
       "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
       "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
       "https://github.com/Blaizzy/mlx-audio"
-    ]
+    ],
+    "synthesis": "qwen-own-name",
+    "nameSplice": false,
+    "listeningReview": "pending"
   },
   {
     "coach": "rafael",
@@ -438,14 +441,14 @@
     "coach": "lin",
     "course": "spaced-practice",
     "language": "de",
-    "duration": 116.07999999999998,
-    "bytes": 1397659,
-    "sha256": "371229af12a0cdec564b60944b59bfeb7002aac0a3ac168f7c987ef6f84359fa",
+    "duration": 116.06,
+    "bytes": 1453600,
+    "sha256": "d8faeb783870fa97b20776270fb9aefe064350ed6d66076fcaf148798282a11c",
     "reference_sha256": "e782d26df9a8e9d78ff96a95f0065ca064f0dd628980dc9227fb145a9d2b04aa",
     "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-Base-6bit",
     "status": "Synthetic reference voice approved by user; full recordings generated, decoded and reviewed through automatic transcription. Final native-speaker listening review remains open.",
-    "src": "/course-media/library/lin-spaced-practice-de-371229af12a0.m4a",
-    "nameReference": "approved-v14",
+    "src": "/course-media/library/lin-spaced-practice-de-d8faeb783870.m4a",
+    "nameReference": "Whole passage generated in own synthetic coach voice; pronunciation input Eni-tju; 2026-10-11",
     "modelRevision": "34ff5318365b59cba9c03ff729f2eee0814caf72",
     "voiceDesignRevision": "ffc6545dc9cb086950aa46c6cd3db490e6ece3e1",
     "license": "Apache-2.0 models; generated synthetic references",
@@ -453,21 +456,24 @@
       "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
       "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
       "https://github.com/Blaizzy/mlx-audio"
-    ]
+    ],
+    "synthesis": "qwen-own-name",
+    "nameSplice": false,
+    "listeningReview": "pending"
   },
   {
     "coach": "lin",
     "course": "story-method",
     "language": "de",
-    "duration": 100.74004166666668,
-    "bytes": 1139721,
-    "sha256": "9d35336d956192e3be7c86adb0ead201d254ef1a97b95580d633a6f03a0cf754",
+    "duration": 99.22004166666666,
+    "bytes": 1155619,
+    "sha256": "eaa90981dea48721fb5faa573031e99c7c229ce29c89772624bff3d0a2994705",
     "reference_sha256": "e782d26df9a8e9d78ff96a95f0065ca064f0dd628980dc9227fb145a9d2b04aa",
     "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-Base-6bit",
     "status": "Synthetic reference voice approved by user; full recordings generated, decoded and reviewed through automatic transcription. Final native-speaker listening review remains open.",
     "speechExpansionVersion": 3,
-    "src": "/course-media/library/lin-story-de-9d35336d9561.m4a",
-    "nameReference": "approved-v14",
+    "src": "/course-media/library/lin-story-de-eaa90981dea4.m4a",
+    "nameReference": "Complete two-sentence own-voice greeting, 2026-10-11; Eni-tju",
     "modelRevision": "34ff5318365b59cba9c03ff729f2eee0814caf72",
     "voiceDesignRevision": "ffc6545dc9cb086950aa46c6cd3db490e6ece3e1",
     "license": "Apache-2.0 models; generated synthetic references",
@@ -475,7 +481,10 @@
       "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
       "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
       "https://github.com/Blaizzy/mlx-audio"
-    ]
+    ],
+    "synthesis": "qwen-own-name",
+    "nameSplice": false,
+    "listeningReview": "pending"
   },
   {
     "coach": "lin",

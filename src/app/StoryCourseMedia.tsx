@@ -1,3 +1,4 @@
+import { LessonIntro } from './LessonIntro.tsx'
 import { courseNarration } from '../i18n/courseNarrations.ts'
 import { courseCoachCopy } from '../i18n/courseCoaches.ts'
 import { videoCaptions, playbackCaptions } from '../core/courses/captions.ts'
@@ -26,6 +27,8 @@ export function StoryCourseMedia({coach,language,platform,solution=false,onRecal
   const [saving,setSaving]=useState(false)
   const [enabled,setEnabled]=useState(false)
   const [time,setTime]=useState(0)
+  const [showIntro,setShowIntro]=useState(false)
+  const introDone=useRef(false)
   const [error,setError]=useState('')
   const [captionSource,setCaptionSource]=useState('')
   const player=useRef<HTMLMediaElement|null>(null)
@@ -40,7 +43,7 @@ export function StoryCourseMedia({coach,language,platform,solution=false,onRecal
   const playbackCues=playingVideo?videoAsset!.cues:pack.cues
   const playbackDuration=playingVideo?videoAsset!.duration:pack.duration
   const downloadAsset=playingVideo?videoAsset:narration??library?.[spoken]
-  const voiceName=courseCoachCopy[locale].names[narration?.coach??'original']
+  const voiceName=courseCoachCopy[locale].names[(playingVideo?videoAsset?.coach:undefined)??narration?.coach??'original']
   const mediaSrc=playingVideo?videoAsset!.src:pack.src
   const translated=courseId!=='story-method'?libraryCaptions(courseId,spoken,language):undefined
   const subtitleLanguage=library?(translated?language:spoken):language
@@ -70,9 +73,10 @@ export function StoryCourseMedia({coach,language,platform,solution=false,onRecal
     const element=player.current
     return()=>{element?.pause()}
   },[enabled,mediaSrc])
-  useEffect(()=>{setTime(0)},[mediaSrc])
+  useEffect(()=>{setTime(0);introDone.current=false;setShowIntro(false)},[mediaSrc])
+  useEffect(()=>{if(!enabled)setShowIntro(false)},[enabled])
   async function save(next:MediaPreferences) {
-    player.current?.pause();setTime(0);setPreferences(next);setSaving(true);setError('')
+    player.current?.pause();setShowIntro(false);setTime(0);setPreferences(next);setSaving(true);setError('')
     try {await platform.settings.write(MEDIA_SETTINGS_KEY,next)} catch {setError(t.saveFailed)} finally {setSaving(false)}
   }
   function material():NarratedLesson|undefined {
@@ -86,7 +90,14 @@ export function StoryCourseMedia({coach,language,platform,solution=false,onRecal
     if(enabled)onMaterial?.(material())
     return()=>onPresentation(false)
   },[enabled,spoken,language,courseId,onMaterial,onPresentation])
-  function recall() { player.current?.pause();onRecall(material()) }
+  function recall() { setShowIntro(false);player.current?.pause();onRecall(material()) }
+  function startPlayback() {
+    if(playingVideo&&courseId!=='story-method'&&!solution&&!introDone.current&&(player.current?.currentTime??0)<.1){
+      introDone.current=true;player.current?.pause();setShowIntro(true);return
+    }
+    sync()
+  }
+  function finishIntro(){setShowIntro(false);if(enabled)void player.current?.play().catch(()=>setError(vt.failed))}
   function sync() {
     const element=player.current
     if(!element)return
@@ -95,7 +106,7 @@ export function StoryCourseMedia({coach,language,platform,solution=false,onRecal
   }
   // Native media clocks may round a fractional cue boundary slightly backwards.
   // Seek inside the cue so a chapter does not display the preceding silent gap.
-  function seek(index:number){if(player.current){const target=Math.min(playbackCues[index].start+.01,playbackCues[index].end);player.current.currentTime=target;setTime(target)}}
+  function seek(index:number){setShowIntro(false);if(player.current){const target=Math.min(playbackCues[index].start+.01,playbackCues[index].end);player.current.currentTime=target;setTime(target)}}
   return <section className="course-media" aria-label={t.title}>
     <h4>{t.title}</h4><p className="hint">{playingVideo?(videoAsset?.presentation==='illustrated'?vt.illustratedNote:vt.note):t.note}</p>
     <p className="hint">{playingVideo?(locale==='de'?'Videodauer':locale==='fr'?'Durée vidéo':'Video duration'):(locale==='de'?'Tonspur':locale==='fr'?'Piste audio':'Audio')}: {Math.floor(Math.ceil(playbackDuration/preferences.speed)/60)}:{String(Math.ceil(playbackDuration/preferences.speed)%60).padStart(2,'0')} · {locale==='de'?'Übungszeit zusätzlich':locale==='fr'?'temps de pratique en plus':'plus practice time'}</p>
@@ -118,7 +129,8 @@ export function StoryCourseMedia({coach,language,platform,solution=false,onRecal
       {downloadAsset && <CourseDownload key={`download-${downloadAsset.src}`} asset={downloadAsset} locale={locale} />}
       {library && language!==subtitleLanguage && <p className="hint">The translated subtitles for this audio track are being prepared. Its original spoken text is shown here.</p>}
       <div className={`course-playback${playingVideo?' has-video':''}`}><div className="course-screen">
-      <MediaElement {...(playingVideo&&coach&&videoAsset?.presentation!=='illustrated'?{poster:`/coaches/${coach}.webp`}:{})} key={`player-${mediaSrc}`} ref={element=>{player.current=element}} controls playsInline crossOrigin="anonymous" preload="none" src={mediaSrc} aria-label={t.title} onError={()=>setError(playingVideo?vt.failed:t.failed)} onTimeUpdate={sync} onSeeking={sync} onSeeked={sync} onPlay={sync} onLoadedMetadata={()=>{
+      {showIntro && <LessonIntro onDone={finishIntro} />}
+      <MediaElement style={showIntro?{display:'none'}:undefined} {...(playingVideo&&coach&&videoAsset?.presentation!=='illustrated'?{poster:`/coaches/${coach}.webp`}:{})} key={`player-${mediaSrc}`} ref={element=>{player.current=element}} controls playsInline crossOrigin="anonymous" preload="none" src={mediaSrc} aria-label={t.title} onError={()=>setError(playingVideo?vt.failed:t.failed)} onTimeUpdate={sync} onSeeking={sync} onSeeked={sync} onPlay={startPlayback} onLoadedMetadata={()=>{
         if(player.current instanceof HTMLVideoElement && player.current.videoWidth>0 && player.current.videoHeight>0){player.current.style.aspectRatio=`${player.current.videoWidth} / ${player.current.videoHeight}`}
         if(player.current){player.current.playbackRate=preferences.speed;player.current.preservesPitch=true;if(solution){player.current.currentTime=gate+.01;setTime(gate+.01)}}
       }}>{playingVideo&&captionSource&&<track key={captionSource} kind="captions" src={captionSource} srcLang={subtitleLanguage} label={subtitleLanguage.toUpperCase()} default />}</MediaElement>
@@ -137,7 +149,7 @@ export function StoryCourseMedia({coach,language,platform,solution=false,onRecal
       </svg>}
       {!playingVideo && library && instructionIndices.includes(safeCue) && <CourseStepIllustration steps={instructionIndices.map(index=>captions[index])} current={instructionIndices.indexOf(safeCue)} locale={locale} language={subtitleLanguage} />}
       {!playingVideo && library && safeCue>=exampleIndex && safeCue<recallIndex && <CourseIllustration id={courseId} locale={spoken} />}
-      <p className="course-caption" lang={subtitleLanguage} dir="auto">{safeCue>=0?captions[safeCue]:''}</p>
+      <p className="course-caption" lang={subtitleLanguage} dir="auto">{!showIntro&&safeCue>=0?captions[safeCue]:''}</p>
       </div></div>
       <details><summary>{t.transcript}</summary><div lang={subtitleLanguage} dir={subtitleLanguage==='ar'?'rtl':'ltr'}>{captions.map((line,index)=><p key={index} dir="auto">{line}</p>)}</div></details>
       <details><summary>{t.credits}</summary>{narration?.synthesis==='kyutai-cml-native'?<p>{voiceName} · KI / AI · <a href="https://huggingface.co/kyutai/tts-1.6b-en_fr">Kyutai TTS · CC BY 4.0</a> · <a href="https://openslr.org/146/">CML-TTS FR 1406 · Oliveira et al. · CC BY 4.0</a>. Adaptation: ANITEW · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.</p>:narration?.synthesis==='kyutai-native'?<p>{voiceName} · KI / AI · <a href="https://huggingface.co/kyutai/tts-1.6b-en_fr">Kyutai TTS · CC BY 4.0</a> · <a href="https://huggingface.co/kyutai/tts-voices/blob/main/README.md">Fabien · CC0</a>. ANITEW: <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.</p>:narration?.synthesis==='kyutai-openvoice'?<p>{voiceName} · KI / AI · <a href="https://huggingface.co/kyutai/tts-1.6b-en_fr">Kyutai TTS · CC BY 4.0</a>. Fabien (CC0) → {narration.coach==='lin'?<a href="https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign">Lin · Qwen VoiceDesign · Apache 2.0</a>:<><a href="https://huggingface.co/kyutai/tts-voices/blob/main/README.md">CML-TTS FR 1406 · CC BY 4.0</a>. <a href="https://openslr.org/146/">CML-TTS: Oliveira et al.</a></>} · <a href="https://github.com/myshell-ai/OpenVoice">OpenVoice V2 · MIT</a>. Adaptation: ANITEW · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.</p>:narration?.synthesis?<p>{voiceName} · KI / AI · <a href="https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base">Qwen3-TTS · Apache 2.0</a>{narration.synthesis==='qwen-french-shared'&&<> · <a href="https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign">ANITEW · Qwen VoiceDesign · Apache 2.0</a></>}{narration.synthesis==='qwen-openvoice'&&<> · <a href="https://github.com/myshell-ai/OpenVoice">OpenVoice V2 · MIT</a> · {narration.coach==='lin'?<a href="https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign">Lin · Qwen VoiceDesign · Apache 2.0</a>:<a href="https://huggingface.co/rhasspy/piper-voices/blob/main/en/en_US/joe/medium/MODEL_CARD">Piper Joe · CC0</a>}</>}.</p>:narration?<p>Qwen3-TTS · Apache 2.0 · {voiceName} · {locale==='de'?'KI-Stimme, lokal erzeugt.':'Locally generated AI voice.'} <a href="https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base">Qwen3-TTS</a> · ANITEW: Thorsten (CC0), <a href="https://github.com/thorstenMueller/Thorsten-Voice">Namensreferenz / name reference</a>.</p>:<><p>Piper · Deutsch: Thorsten (CC0-Datensatz) · English: Joe (CC0 dataset) · Français: Tom (AGPLv3 model/dataset). Synthetic audio; models are not included.</p>
