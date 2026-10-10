@@ -714,3 +714,11 @@ Erwartungen gezielt bestanden) ist die lokale technische Prüfung abgeschlossen.
 Keine Actions, kein Push und kein Merge. Gesamtaufnahmen anhören, Montagen
 bewerten, echte Mobilgeräte prüfen und den späteren Coach-Auftritt neu lösen
 bleiben offen. Keine subjektive Freigabe aus Testergebnissen abgeleitet.
+
+
+## 2026-10-10 · Französische Gesamtaufnahmen freigegeben
+
+Der Nutzer bestätigt alle zwölf vollständigen französischen Aufnahmen der
+Gesamtprüfungsseite: „Franzlsische Gesamtaufnahmen sind top“. Die aktuelle
+Tonfassung bleibt erhalten. Diese Freigabe betrifft die Aufnahmen;
+Coach-Bewegung, Videomontagen und echte Mobilgerätetests bleiben separat offen.

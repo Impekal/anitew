@@ -13,8 +13,8 @@ französischen Videopakete samt 264 Untertiteldateien sind technisch geprüft;
 sie sind Illustrationsentwürfe und noch keine freigegebenen Coach-Videos.
 Zwei veraltete deutsche/französische Coach-Pakete bleiben ausgeschlossen.
 
-Offen bleiben die Hörbewertung kompletter neuer Aufnahmen, die Sichtfreigabe
-weiterer Coach-Montagen, ein überzeugender späterer Coach-Auftritt und echte
+Alle zwölf französischen Gesamtaufnahmen wurden am 10. Oktober 2026 vom
+Nutzer freigegeben. Offen bleiben die Sichtfreigabe weiterer Coach-Montagen, ein überzeugender späterer Coach-Auftritt und echte
 Mobilgerätetests. Technische Tests ersetzen diese Freigaben nicht.
 Der lokale Kursdurchgang deckt 122 Prüfungen ab: 120 bestanden im ersten Lauf; zwei veraltete Erwartungen an eine eigene Lin-FR-Stimme wurden korrigiert und bestanden gezielt auf Desktop und Mobilansicht.
 
