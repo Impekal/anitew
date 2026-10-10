@@ -1,13 +1,26 @@
 # Was noch offen ist — und wer es tun muss
 
-## Aktueller Ausbau · 2026-09-30
+## Aktueller Ausbau · 2026-10-10
 
-Der aktuelle Kursausbau auf `anitew-v4-2-living-memory` wird in
-[BACKLOG.md](BACKLOG.md#1-lernmethoden-und-neue-kurse) geführt. Zwölf
-zusätzliche DE/EN/FR-Lesekurse, Kursstufen, Coach-Auswahl und lokale
-Audiokurse sind integriert. Sprechvideos, vollständige Untertitelabnahme,
-Hörprüfung und finale Geräte-/CI-Abnahme bleiben dort nachvollziehbar offen.
-Dieser Branch wurde nicht in Produktion deployt; PR #57 bleibt ungemergt.
+Zwölf zusätzliche DE/EN/FR-Lesekurse, Kursstufen, Coach-Auswahl und lokale
+Audiokurse sind integriert. Alle zwölf französischen Kurse verwenden jetzt
+bei jeder Coach-Auswahl dieselbe vom Nutzer bestätigte neue KI-Stimme.
+Vollständige Aufnahmen und passende Untertitel sind lokal gebündelt.
+
+624 Kernprüfungen, Build und Größenbudget, acht Offline-/Stimmprüfungen
+sowie 22 französische Vorschauprüfungen sind bestanden. Die zwölf neuen
+französischen Videopakete samt 264 Untertiteldateien sind technisch geprüft;
+sie sind Illustrationsentwürfe und noch keine freigegebenen Coach-Videos.
+Zwei veraltete deutsche/französische Coach-Pakete bleiben ausgeschlossen.
+
+Offen bleiben die Hörbewertung kompletter neuer Aufnahmen, die Sichtfreigabe
+weiterer Coach-Montagen, ein überzeugender späterer Coach-Auftritt und echte
+Mobilgerätetests. Technische Tests ersetzen diese Freigaben nicht.
+Der gebündelte lokale Kursdurchgang folgt auf dem aktuellen Stand.
+
+Keine GitHub Actions oder workflow-auslösenden Pushes vor dem 1. November
+2026. Kein Deployment; PR #57 bleibt ungemergt. Details und Verlauf stehen in
+[BACKLOG.md](BACKLOG.md) und [STORY_MEDIA.md](STORY_MEDIA.md).
 
 Die folgenden Aussagen betreffen ausschließlich den historischen Stand.
 Sie bestätigen weder die Veröffentlichung noch die Abnahme des neuen Kursausbaus.

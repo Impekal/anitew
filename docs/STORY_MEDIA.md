@@ -215,3 +215,8 @@ All twelve French courses now resolve to the same user-approved synthetic French
 All ten illustrated drafts copy the registered AAC packets without re-encoding, with matching cue text and source notices. Title and purpose share one board for the French loci and self-explanation introductions because there is no safe silent boundary between them. The preview comparison button was repaired after the shared player template changed to `playVideo()`. These remain illustrated drafts without newly approved coach footage.
 
 Local validation: 624 core tests, typecheck/build/size, eight desktop/mobile narration and offline tests, plus 22 French preview checks for subtitles, playback speed, reading mode, recall gate and zero external requests. Complete-recording listening and real-device checks remain open. No push, GitHub Actions, deployment, or merge.
+
+
+## 2026-10-10 — Media packet audit
+
+The preview inventory now verifies 35 illustrated drafts and 47 current preview links. Its 70 recorded browser checks retain their report dates; these are not claimed as a new full browser run. Twelve new French illustrated integration packets contain the current source hashes, source-specific credits, matching captions and 264 WebVTT files. Both full tracks and tracks restricted before the exercise boundary are validated. Eleven English review packets remain available; two obsolete DE/FR coach packets are explicitly excluded from the active index. No video catalog registration or subjective approval is inferred from packet preparation.

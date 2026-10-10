@@ -1,6 +1,6 @@
 # BACKLOG — ANITEW (Aufgabenliste)
 
-> **Aktuell: 2026-09-30.** Der datierte Abschnitt „Aktueller Ausbau: Methodenkurse und Coaches“ am Ende enthält die offenen Punkte des aktuellen Gesprächs.
+> **Aktuell: 2026-10-10.** Die neuesten datierten Einträge am Ende und OFFEN.md enthalten den aktuellen Kursstand. Frühere Einträge bleiben als Verlauf erhalten.
 
 > Quelle: Produktgespräch vom 2026-08-15/16 (Chat-Protokoll `Anitew.docx`).
 > Diese Liste ist die Übersetzung dieses Gesprächs in Arbeit — nichts weiter.
@@ -693,3 +693,12 @@ Dieser Abschnitt bündelt die im aktuellen Gespräch vereinbarten offenen Punkte
 - Der Kursplayer verwendet nach dem Laden das Seitenverhältnis der Videodatei. Ein quadratisches Coach-Vorschaubild erzwingt dadurch keinen quadratischen Rahmen für den breiten Kursfilm. Vor dem Laden dient 16:9 als Platzhalter.
 - Alle Vorschauseiten umbrechen lange Wörter und begrenzen Steuerelemente auf die verfügbare Breite. Sechs Desktop-/Mobilprüfungen der Wortkursentwürfe mit doppelter Schriftgröße bestanden.
 - Build/Typprüfung und Kaltstartbudget bestanden. Vier lokale Desktop-/Mobiltests für reales Offline-Video inklusive Verhältnisprüfung bestanden; die mobile Darstellung wurde zusätzlich visuell geprüft.
+
+
+### 2026-10-10 · Französische Kurse und Medienpakete abgeglichen
+
+- Alle zwölf französischen Kurse verwenden bei jeder Coach-Auswahl die neue bestätigte synthetische Stimme. Die abgelehnten Fabien-/CML1406-Fassungen werden nicht weiter ausgerollt. Eine separate Noah-FR-Stimmfreigabe entfällt durch diese Nutzerentscheidung.
+- Zehn vollständige neue Aufnahmen und vier inhaltlich korrigierte Erstfassungen sind geprüft und lokal integriert. Stimmfreigabe und abschließende Aussprache-/Gesamtaufnahmefreigabe bleiben getrennt.
+- 624 Kernprüfungen, Build/Größe, acht Offline-/Stimmprüfungen und 22 französische Vorschauprüfungen bestanden. Die Vorschau-Musterlösung wurde nach einer Änderung im gemeinsamen Player repariert.
+- 35 Illustrationsentwürfe auf lokale Dateien und Quellprüfsummen abgeglichen. Zwölf aktuelle französische Integrationspakete mit 264 VTT-Dateien vorbereitet und geprüft; zwei alte DE/FR-Coach-Pakete bleiben gesperrt. Keine neue Videoregistrierung durch diese Vorbereitung.
+- Noch offen: gesamte Hör-/Sichtbewertung, überzeugender späterer Coach-Auftritt, echte Geräte und der abschließende lokale Kursdurchgang. Keine Actions, Pushes, Veröffentlichung oder Zusammenführung.
