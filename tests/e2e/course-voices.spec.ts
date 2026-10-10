@@ -69,9 +69,9 @@ for(const language of ['en','fr'] as const) test(`${language}: approved story vo
  await page.getByRole('button',{name:'Für offline laden / fortsetzen',exact:true}).click()
  await expect(page.getByText(/Diese Tonspur ist offline verfügbar/)).toBeVisible()
  await page.locator('.course-media details').filter({has:page.locator('summary',{hasText:'Stimmen und Quellen'})}).locator('summary').click()
- await expect(page.getByRole('link',{name:language==='fr'?'Kyutai TTS · CC BY 4.0':'Qwen3-TTS · Apache 2.0',exact:true})).toBeVisible()
+ await expect(page.getByRole('link',{name:'Qwen3-TTS · Apache 2.0',exact:true})).toBeVisible()
  if(language==='fr'){
-  await expect(page.getByRole('link',{name:'CML-TTS FR 1406 · Oliveira et al. · CC BY 4.0',exact:true})).toBeVisible()
+  await expect(page.getByRole('link',{name:'ANITEW · Qwen VoiceDesign · Apache 2.0',exact:true})).toBeVisible()
   await expect(page.getByRole('link',{name:'Fabien · CC0',exact:true})).toHaveCount(0)
  }
  await context.setOffline(true)

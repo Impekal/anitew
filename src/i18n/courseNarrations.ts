@@ -3,7 +3,7 @@ import type { CoachId } from '../core/courses/coaches.ts'
 import type { SpokenLanguage } from '../core/courses/media.ts'
 import type { DownloadAsset } from '../app/courseDownloads.ts'
 export interface CourseNarration extends DownloadAsset {
- synthesis?:'qwen-own-name'|'qwen-openvoice'|'kyutai-openvoice'|'kyutai-native'|'kyutai-cml-native';
+ synthesis?:'qwen-own-name'|'qwen-openvoice'|'kyutai-openvoice'|'kyutai-native'|'kyutai-cml-native'|'qwen-french-shared';
  course:CourseId;coach:CoachId;language:SpokenLanguage;duration:number;
  cues:ReadonlyArray<{start:number;end:number;text:string;spokenText?:string;section?:string}>
 }
@@ -2390,139 +2390,139 @@ export const courseNarrations:CourseNarration[]=[
     "course": "story-method",
     "coach": "rafael",
     "language": "fr",
-    "duration": 88.69675,
+    "duration": 83.89683333333333,
     "cues": [
       {
         "start": 0,
-        "end": 2.02,
+        "end": 1.32,
         "text": "Bienvenue sur ANITEW.",
         "spokenText": "Bienvenue sur ANITEW."
       },
       {
-        "start": 3.1466250000000002,
-        "end": 6.506625,
+        "start": 2.3129166666666667,
+        "end": 5.372916666666667,
         "text": "Je suis un coach pédagogique créé par intelligence artificielle.",
         "spokenText": "Je suis un coach pédagogique créé par intelligence artificielle."
       },
       {
-        "start": 7.249583333333333,
-        "end": 9.969583333333333,
+        "start": 6.032916666666667,
+        "end": 8.672916666666667,
         "text": "Aujourd'hui, nous allons découvrir la méthode des histoires.",
         "spokenText": "Aujourd'hui, nous allons découvrir la méthode des histoires."
       },
       {
-        "start": 11.4975,
-        "end": 17.739041666666665,
+        "start": 10.174375000000001,
+        "end": 15.994375,
         "text": "La méthode des histoires est une technique de mémorisation : elle relie plusieurs informations dans une même histoire.",
         "spokenText": "La méthode des histoires est une technique de mémorisation. Elle relie plusieurs informations dans une même histoire."
       },
       {
-        "start": 18.159041666666667,
-        "end": 24.816499999999998,
+        "start": 17.466541666666664,
+        "end": 22.72654166666667,
         "text": "Elle peut aider à retenir un ordre, par exemple une liste de courses ou les points principaux d'un exposé.",
         "spokenText": "Elle peut aider à retenir un ordre. Par exemple une liste de courses ou les points principaux d'un exposé."
       },
       {
-        "start": 26.237416666666668,
-        "end": 28.457416666666667,
+        "start": 24.14725,
+        "end": 26.00725,
         "text": "Elle ne remplace pas la compréhension du contenu.",
         "spokenText": "Elle ne remplace pas la compréhension du contenu."
       },
       {
-        "start": 29.917791666666666,
-        "end": 35.57779166666667,
+        "start": 27.465333333333334,
+        "end": 32.44533333333333,
         "text": "Dans ce cours, tu découvriras le principe, tu verras un exemple, puis tu essaieras la méthode toi-même.",
         "spokenText": "Dans ce cours, tu découvriras le principe, tu verras un exemple, puis tu essaieras la méthode toi-même."
       },
       {
-        "start": 35.57779166666667,
-        "end": 39.960791666666665,
+        "start": 32.44533333333333,
+        "end": 35.30533333333333,
         "text": "Ton objectif : retrouver trois mots dans le bon ordre.",
         "spokenText": "Ton objectif est de retrouver trois mots dans le bon ordre."
       },
       {
-        "start": 40.24079166666667,
-        "end": 43.619708333333335,
+        "start": 36.655791666666666,
+        "end": 39.57579166666667,
         "text": "Voici notre exemple : clé, citron, vélo.",
         "spokenText": "Voici notre exemple. clé, citron, vélo."
       },
       {
-        "start": 45.070708333333336,
-        "end": 47.67070833333333,
+        "start": 40.968291666666666,
+        "end": 43.20829166666667,
         "text": "Imagine d'abord une clé géante qui presse un citron.",
         "spokenText": "Imagine d'abord une clé géante qui presse un citron."
       },
       {
-        "start": 49.22570833333334,
-        "end": 52.125708333333336,
+        "start": 44.719833333333334,
+        "end": 47.43983333333333,
         "text": "Le jus de citron éclabousse un vélo et fait tourner ses roues.",
         "spokenText": "Le jus de citron éclabousse un vélo et fait tourner ses roues."
       },
       {
-        "start": 53.54375,
-        "end": 58.103750000000005,
+        "start": 48.87029166666667,
+        "end": 52.730291666666666,
         "text": "Une action relie le premier mot au deuxième, puis une autre relie le deuxième au troisième.",
         "spokenText": "Une action relie le premier mot au deuxième, puis une autre relie le deuxième au troisième."
       },
       {
-        "start": 58.583749999999995,
-        "end": 61.34375,
+        "start": 53.410291666666666,
+        "end": 55.850291666666664,
         "text": "Cette histoire inhabituelle sert simplement d'aide-mémoire.",
         "spokenText": "Cette histoire inhabituelle sert simplement d'aide-mémoire."
       },
       {
-        "start": 61.62375,
-        "end": 64.170125,
+        "start": 56.230291666666666,
+        "end": 58.350291666666664,
         "text": "L'essentiel est de te représenter clairement les actions.",
         "spokenText": "L'essentiel est de te représenter clairement les actions."
       },
       {
-        "start": 64.710125,
-        "end": 67.36175,
+        "start": 59.94683333333334,
+        "end": 61.32683333333333,
         "text": "Les images vont maintenant disparaître.",
         "spokenText": "Les images vont maintenant disparaître."
       },
       {
-        "start": 67.68175000000001,
-        "end": 70.34175,
+        "start": 61.80683333333334,
+        "end": 64.14683333333333,
         "text": "Fais une pause et retrouve les trois mots dans le bon ordre.",
         "spokenText": "Fais une pause et retrouve les trois mots dans le bon ordre."
       },
       {
-        "start": 70.34175,
-        "end": 72.44175,
+        "start": 64.46683333333333,
+        "end": 66.32775033333333,
         "text": "Quand tu es prêt, affiche la réponse.",
         "spokenText": "Quand tu es prêt, affiche la réponse."
       },
       {
-        "start": 72.96175,
-        "end": 75.12175,
+        "start": 67.82775033333333,
+        "end": 70.63733333333333,
         "text": "Les mots étaient : clé, citron, vélo.",
         "spokenText": "Les mots étaient : clé, citron, vélo."
       },
       {
-        "start": 75.38175,
-        "end": 78.80175,
+        "start": 71.09733333333332,
+        "end": 74.43733333333333,
         "text": "Si tu as oublié un mot, revois le lien correspondant et essaie à nouveau.",
         "spokenText": "Si tu as oublié un mot, revois le lien correspondant et essaie à nouveau."
       },
       {
-        "start": 80.29887500000001,
-        "end": 84.57887500000001,
+        "start": 75.93683333333334,
+        "end": 79.91683333333334,
         "text": "Pour terminer, invente une histoire avec trois autres mots, puis retrouve-les sans regarder.",
         "spokenText": "Pour terminer, invente une histoire avec trois autres mots, puis retrouve-les sans regarder."
       },
       {
-        "start": 85.058875,
-        "end": 88.478875,
+        "start": 80.61683333333333,
+        "end": 83.63683333333334,
         "text": "Tu peux aussi lire tout le cours et faire chaque exercice à ton rythme.",
         "spokenText": "Tu peux aussi lire tout le cours et faire chaque exercice à ton rythme."
       }
     ],
-    "src": "/course-media/library/atta-story-fr-74f96a4e4728.m4a",
-    "bytes": 916040,
-    "sha256": "74f96a4e47281683b8f069f287b29e8e05ca59e0c17a5b7e28232b533e889cb7",
-    "synthesis": "kyutai-cml-native"
+    "src": "/course-media/library/atta-story-method-fr-444e27a7e362.m4a",
+    "bytes": 952300,
+    "sha256": "444e27a7e3622b62ce2a6d1dd22c0145c681cb10f30e48033c37a2bf01e55dd4",
+    "synthesis": "qwen-french-shared"
   },
   {
     "course": "active-recall",
@@ -4725,93 +4725,104 @@ export const courseNarrations:CourseNarration[]=[
     "course": "long-words",
     "coach": "rafael",
     "language": "fr",
-    "duration": 83.00191666666667,
+    "duration": 90.68475,
     "cues": [
       {
         "section": "title",
         "text": "Retenir les mots longs",
-        "start": 0.0,
-        "end": 1.5892083333333333
+        "start": 0,
+        "end": 3.3,
+        "spokenText": "Dans ce cours, tu vas apprendre à retenir les mots longs."
       },
       {
         "section": "purpose",
         "text": "Décompose un mot long en éléments compréhensibles, puis reconstitue-le. Travaille son sens, sa prononciation et son orthographe.",
-        "start": 2.1392083333333334,
-        "end": 8.836583333333333
+        "start": 3.5,
+        "end": 10.66,
+        "spokenText": "Décompose un mot long en éléments compréhensibles, puis reconstitue-le. Travaille son sens, sa prononciation et son orthographe."
       },
       {
         "section": "limit",
         "text": "Les éléments de sens ne correspondent pas toujours aux syllabes prononcées. Certains termes techniques sont entièrement nouveaux. Vérifie leur sens et leur prononciation avant de les travailler.",
-        "start": 9.186583333333333,
-        "end": 19.276916666666665
+        "start": 12.075041666666667,
+        "end": 22.85504166666667,
+        "spokenText": "Découper un mot pour comprendre son sens ne revient pas toujours à le découper de la même façon à l’oral. Certains termes techniques sont entièrement nouveaux. Vérifie leur sens et leur prononciation avant de les travailler."
       },
       {
         "section": "step-0",
         "text": "Clarifie le sens du mot entier.",
-        "start": 19.626916666666666,
-        "end": 21.430541666666667
+        "start": 24.44954166666667,
+        "end": 25.989541666666668,
+        "spokenText": "Clarifie le sens du mot entier."
       },
       {
         "section": "step-1",
         "text": "Repère des éléments connus et explique leur rôle.",
-        "start": 21.780541666666668,
-        "end": 24.583833333333335
+        "start": 27.578874999999996,
+        "end": 29.758875000000003,
+        "spokenText": "Repère des éléments connus et explique leur rôle."
       },
       {
         "section": "step-2",
         "text": "Observe les changements d’orthographe et les éléments de liaison.",
-        "start": 24.933833333333332,
-        "end": 28.452666666666666
+        "start": 29.758875000000003,
+        "end": 32.898875,
+        "spokenText": "Observe les changements d’orthographe et les éléments de liaison."
       },
       {
         "section": "step-3",
         "text": "Prononce les parties lentement, puis le mot entier avec fluidité. Les frontières syllabiques peuvent être différentes.",
-        "start": 28.802666666666667,
-        "end": 35.487375
+        "start": 34.41370833333333,
+        "end": 40.933708333333335,
+        "spokenText": "Dis chaque partie lentement. Ensuite, dis le mot entier de façon naturelle. Le découpage à l’oral peut être différent."
       },
       {
         "section": "step-4",
         "text": "Cache le modèle, écris le mot entier et explique-le.",
-        "start": 35.837375,
-        "end": 39.06945833333333
+        "start": 42.5055,
+        "end": 45.3255,
+        "spokenText": "Cache le modèle, écris le mot entier et explique-le."
       },
       {
         "section": "step-5",
         "text": "Vérifie l’orthographe et le sens. Travaille les parties incertaines, puis rassemble à nouveau le mot.",
-        "start": 39.41945833333333,
-        "end": 44.61604166666667
+        "start": 46.90716666666667,
+        "end": 51.567166666666665,
+        "spokenText": "Vérifie l’orthographe et le sens. Travaille les parties incertaines, puis rassemble à nouveau le mot."
       },
       {
         "section": "example",
         "text": "incompréhensible",
-        "start": 44.96604166666667,
-        "end": 46.61925,
+        "start": 53.11291666666667,
+        "end": 54.63291666666667,
         "spokenText": "Exemple : incompréhensible."
       },
       {
         "section": "explanation",
         "text": "in | compréhensible : ce qui ne peut pas être compris. Le préfixe in- apporte ici la négation. « Compréhensible » est lié au verbe comprendre. Ce découpage aide à saisir le sens ; il ne constitue pas une transcription de la prononciation.",
-        "start": 46.96925,
-        "end": 65.09445833333334,
+        "start": 56.174875,
+        "end": 73.074875,
         "spokenText": "Le mot incompréhensible signifie : ce qui ne peut pas être compris. On sépare le préfixe in et le mot compréhensible. Le préfixe in apporte ici la négation. Compréhensible est lié au verbe comprendre. Ce découpage aide à saisir le sens. Il ne constitue pas une transcription de la prononciation."
       },
       {
         "section": "recall",
         "text": "Écris le mot entier de mémoire. Explique ensuite son sens à voix haute et prononce-le avec fluidité.",
-        "start": 65.44445833333333,
-        "end": 72.21158333333334
+        "start": 74.55095833333334,
+        "end": 80.27095833333334,
+        "spokenText": "Écris le mot entier de mémoire. Explique ensuite son sens à voix haute et prononce-le avec fluidité."
       },
       {
         "section": "transfer",
         "text": "Choisis un mot long utile dans ta vie. Repère ses éléments de sens, puis travaille le mot entier. Respecte les règles de formation et de prononciation de sa langue.",
-        "start": 72.56158333333333,
-        "end": 82.65191666666666
+        "start": 81.80475,
+        "end": 90.42474999999999,
+        "spokenText": "Choisis un mot long utile dans ta vie. Repère ses éléments de sens, puis travaille le mot entier. Respecte les règles de formation et de prononciation de sa langue."
       }
     ],
-    "src": "/course-media/library/atta-long-words-fr-0f9fe7f11248.m4a",
-    "bytes": 912213,
-    "sha256": "0f9fe7f11248018e478b1e8bd3af9d9ff066541dcc79261dca3b1b69a8832cd4",
-    "synthesis": "kyutai-native"
+    "src": "/course-media/library/atta-long-words-fr-3e786c514c73.m4a",
+    "bytes": 1075636,
+    "sha256": "3e786c514c73f85d26443d5a33642f41fe9c690d201f38571ac04a0f4c93f5cb",
+    "synthesis": "qwen-french-shared"
   },
   {
     "course": "meaningful-groups",
@@ -7656,5 +7667,9 @@ export const courseNarrations:CourseNarration[]=[
   }
 ]
 export function courseNarration(course:CourseId,language:SpokenLanguage,coach:CoachId|null){
+ if(language==='fr'){
+  const shared=courseNarrations.find(pack=>pack.course===course&&pack.language==='fr'&&pack.synthesis==='qwen-french-shared')
+  if(shared)return shared
+ }
  return courseNarrations.find(pack=>pack.course===course&&pack.language===language&&pack.coach===coach)
 }

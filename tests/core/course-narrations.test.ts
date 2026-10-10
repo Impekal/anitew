@@ -18,10 +18,10 @@ it('keeps distinct verified local voices and the same lesson cues',()=>{
  expect(courseNarration('story-method','de','lin')).toBeDefined()
  expect(courseNarration('story-method','de','original')).toBeUndefined()
  expect(courseNarration('story-method','en','original')?.synthesis).toBe('qwen-openvoice')
- expect(courseNarration('story-method','fr','rafael')?.synthesis).toBe('kyutai-cml-native')
+ expect(courseNarration('story-method','fr','rafael')?.synthesis).toBe('qwen-french-shared')
  expect(courseNarration('story-method','en','rafael')?.synthesis).toBe('qwen-own-name')
- expect(courseNarration('story-method','fr','lin')?.synthesis).toBe('kyutai-openvoice')
- expect(courseNarration('story-method','fr','original')).toBeUndefined()
+ expect(courseNarration('story-method','fr','lin')).toBe(courseNarration('story-method','fr','rafael'))
+ expect(courseNarration('story-method','fr','original')).toBe(courseNarration('story-method','fr','rafael'))
  expect(courseNarration('story-method','de',null)).toBeUndefined()
  expect(new Set(courseNarrations.map(p=>p.sha256)).size).toBe(courseNarrations.length)
  for(const pack of courseNarrations){
@@ -41,13 +41,22 @@ it('keeps distinct verified local voices and the same lesson cues',()=>{
  }
 })
 
-it('keeps the approved direct CML story separate from the eleven pending French replacements',()=>{
+it('uses the approved shared French voice for upgraded courses and preserves pending recordings',()=>{
  const french=courseNarrations.filter(p=>p.coach==='rafael'&&p.language==='fr')
  expect(french).toHaveLength(12)
- expect(french.filter(p=>p.course!=='story-method').every(p=>p.synthesis==='kyutai-native')).toBe(true)
+ expect(french.filter(p=>!['story-method','long-words'].includes(p.course)).every(p=>p.synthesis==='kyutai-native')).toBe(true)
  const story=french.find(p=>p.course==='story-method')!
- expect(story.synthesis).toBe('kyutai-cml-native')
+ expect(story.synthesis).toBe('qwen-french-shared')
  expect(story.cues[3].spokenText).toContain('mémorisation. Elle relie')
  expect(story.cues[4].spokenText).toContain('un ordre. Par exemple')
  expect(story.cues[7].spokenText).toContain('Ton objectif est de retrouver')
+})
+
+it('shares upgraded French narration across coach choices without changing other languages',()=>{
+ for(const course of ['story-method','long-words'] as const){
+  const shared=courseNarration(course,'fr','rafael')
+  for(const coach of ['original','lin',null] as const)expect(courseNarration(course,'fr',coach)).toBe(shared)
+  expect(shared?.synthesis).toBe('qwen-french-shared')
+ }
+ expect(courseNarration('story-method','en','lin')).not.toBe(courseNarration('story-method','en','rafael'))
 })

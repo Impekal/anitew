@@ -197,3 +197,12 @@ französischer Download und Offline-Wiedergabe auf Desktop und Mobilansicht
 Geschwindigkeit, Lesemodus, Abrufsperre und keine externen Medienrequests.
 Die dekodierte Videotonspur ist mit der bestätigten Aufnahme identisch.
 Keine GitHub Actions, kein Push oder Deployment.
+
+
+## 2026-10-10 — Shared lively French voice
+
+The user approved the new independent French VoiceDesign voice for all French courses. The story and long-word courses now use complete takes from that exact synthetic reference; all coach choices resolve to this shared French narration for these two courses. Other French courses remain pending replacement. Canonical lesson text is retained; `spokenText` records the actual narration.
+
+Only silence at board changes is extended to about 1.5 seconds total (one second after the story greeting). Original PCM samples are preserved in order. Illustrated previews copy the registered AAC packets without re-encoding. No rejected later coach footage is included. Qwen3-TTS Base and VoiceDesign sources are recorded in the local manifest; no real-person voice reference or cross-voice name splice is used.
+
+Validation: 10 narration/caption checks, typecheck/build/size, and two desktop/mobile offline story playback checks passed. The complete new takes remain subject to listening review; voice approval does not imply approval of every pronunciation. No deployment, push or Actions run.
