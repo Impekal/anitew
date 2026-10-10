@@ -28,6 +28,14 @@ Keine GitHub Actions oder workflow-auslösenden Pushes vor dem 1. November
 2026. Kein Deployment; PR #57 bleibt ungemergt. Details und Verlauf stehen in
 [BACKLOG.md](BACKLOG.md) und [STORY_MEDIA.md](STORY_MEDIA.md).
 
+Zusätzlich sind alle 22 DE/EN-Bildvorschauen der elf ergänzenden Methoden
+technisch vorbereitet: 44 lokale Browserprüfungen und eine unabhängige Prüfung
+von 22 Paketen mit 484 Untertiteldateien bestanden. Vorhandene Audiopakete sind
+unverändert. Sichtfreigabe, App-Übernahme und reale Gerätetests bleiben offen.
+Der vorhandene englische Geschichtenfilm wird nicht ersetzt. Die aktuellen
+Vorschauen sind in `outputs/videokurse-gesamtpruefung.html` im Aufgaben-Arbeitsbereich
+verlinkt; Details stehen am Ende von STORY_MEDIA.md.
+
 Die folgenden Aussagen betreffen ausschließlich den historischen Stand.
 Sie bestätigen weder die Veröffentlichung noch die Abnahme des neuen Kursausbaus.
 

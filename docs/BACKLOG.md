@@ -777,3 +777,34 @@ des Videos. Pausengrenzen liegen vor dem gesprochenen Abschluss.
 20 gezielte Kernprüfungen, sechs Desktop-/Mobilprüfungen inklusive Offline-
 Neustart, Typecheck, Build und Größenbudget bestanden. Keine Actions,
 kein Push, kein Deployment und kein Merge. Nutzergrenze jetzt 20 % Rest.
+
+
+## 2026-10-10 · 22 deutsche/englische Bildvorschauen
+
+Alle elf ergänzenden Methoden sind als eigene DE/EN-Bildfassungen vorbereitet.
+Die Grafiken folgen den jeweiligen Beispielen: etwa Tanne gegenüber tin und
+bell/bellen gegenüber pain/pan. Bei Wort-für-Wort bleibt der kurze Lerntext
+sichtbar; Erklärungstexte stehen in den Untertiteln. Die vorhandenen lokalen
+AAC-Pakete und Zeitachsen sind unverändert. Neue Coach-Aufnahmen sind nicht
+enthalten; der vorhandene englische Geschichtenfilm bleibt erhalten.
+
+44 gezielte Desktop-/Mobilansichtsprüfungen bestanden: Übung vor dem gesprochenen
+Abschluss, Antwort/Vergleich/Weiterhören bis zum Ende, Tempo, elf Untertitelsprachen,
+Lesemodus und keine externen Wiedergabeanfragen. Die Browserprüfung verwendet
+stummgeschaltetes Chromium mit Softwaregrafik; sie bestätigt keine Hörabnahme
+oder echte Mobilgeräte. Videoprüfsummen und identische Audiopakete wurden
+separat geprüft.
+
+22 Review-Pakete mit 484 WebVTT-Dateien enthalten vollständige und vor der Übung
+begrenzte Untertitel, Quellen sowie vorgeschlagene lokale Dateinamen. Eine
+unabhängige Prüfung bestätigt Dateihashes, Texte, Zeitgrenzen und AAC-Identität.
+Die Pakete befinden sich im Aufgaben-Arbeitsbereich unter
+`outputs/localized-visual-packets/`; Berichte:
+`outputs/de-en-visual-batch.json` und
+`outputs/localized-visual-packets-validation.json`.
+
+Diese Fassungen sind noch nicht in den App-Katalog übernommen und nicht
+pauschal vom Nutzer freigegeben. Vier weitere französische Bildfassungen,
+der spätere natürliche Coach-Auftritt und reale Gerätetests bleiben offen.
+Keine Actions, kein Push, kein Deployment, kein Merge. Die neue vom Nutzer
+festgelegte Stoppgrenze beträgt 15 % Restnutzung.
