@@ -736,3 +736,19 @@ Sechs gezielte Desktop-/Mobilprüfungen bestätigen Eingabe vor dem
 Abschluss, vollständige Wiedergabe danach, Tempo, Untertitel und Lesemodus.
 Freigegebene französische Audios bleiben unverändert. Die übrigen Kurse
 und Sprachfassungen brauchen die gleiche visuelle Überarbeitung noch.
+
+
+## 2026-10-10 · Drei weitere Bildfassungen bestätigt
+
+Der Nutzer bestätigt „Lange Wörter“, „Texte verstehen“ und „Wortgetreu
+lernen“ mit „perfekt“. Zusammen mit dem Schlüsselwortkurs sind vier
+französische Bildfassungen freigegeben. Exakte Medien- und Seitenprüfsummen
+sind in den jeweiligen lokalen Vorschauordnern als user-approval.json
+gesichert. Die übrigen Bildfassungen sind dadurch nicht pauschal freigegeben.
+
+Vier weitere französische Bildkurse sind als lokale Vorschauen vorbereitet:
+Aktives Abrufen, Verteiltes Wiederholen, Sinnvolle Gruppen und Selbst erklären.
+Acht Desktop-/Mobilprüfungen bestanden: Eingabe vor dem Abschlusssatz,
+Vergleich, Weiterhören bis zum Ende, Tempo, elf Untertitelsprachen und
+Lesemodus. Audiodaten unverändert; keine externen Medienrequests.
+Die Sichtfreigabe bleibt offen; keine Übernahme neuer Videos in den App-Katalog.
