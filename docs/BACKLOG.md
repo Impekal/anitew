@@ -722,3 +722,17 @@ Der Nutzer bestätigt alle zwölf vollständigen französischen Aufnahmen der
 Gesamtprüfungsseite: „Franzlsische Gesamtaufnahmen sind top“. Die aktuelle
 Tonfassung bleibt erhalten. Diese Freigabe betrifft die Aufnahmen;
 Coach-Bewegung, Videomontagen und echte Mobilgerätetests bleiben separat offen.
+
+
+## 2026-10-10 · Bildsprache der Kursvorschauen
+
+Der Nutzer wünscht Bilder und Abläufe statt wiederholter Erklärtexte.
+Der französische Schlüsselwortkurs mit Klangbrücke und Glocke ist visuell
+bestätigt. Die Übungseingabe erscheint vor dem Abschlusswort „Fais“;
+Antwort, Vergleich und anschließender Abschluss bleiben der Ablauf.
+Drei weitere lokale Vorschauen zeigen Wortbausteine, Zusammenhänge eines
+Sachtexts und kurze Satzbausteine. Ihre Sichtabnahme bleibt offen.
+Sechs gezielte Desktop-/Mobilprüfungen bestätigen Eingabe vor dem
+Abschluss, vollständige Wiedergabe danach, Tempo, Untertitel und Lesemodus.
+Freigegebene französische Audios bleiben unverändert. Die übrigen Kurse
+und Sprachfassungen brauchen die gleiche visuelle Überarbeitung noch.
