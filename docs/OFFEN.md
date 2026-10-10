@@ -16,7 +16,7 @@ Zwei veraltete deutsche/französische Coach-Pakete bleiben ausgeschlossen.
 Offen bleiben die Hörbewertung kompletter neuer Aufnahmen, die Sichtfreigabe
 weiterer Coach-Montagen, ein überzeugender späterer Coach-Auftritt und echte
 Mobilgerätetests. Technische Tests ersetzen diese Freigaben nicht.
-Der gebündelte lokale Kursdurchgang folgt auf dem aktuellen Stand.
+Der lokale Kursdurchgang deckt 122 Prüfungen ab: 120 bestanden im ersten Lauf; zwei veraltete Erwartungen an eine eigene Lin-FR-Stimme wurden korrigiert und bestanden gezielt auf Desktop und Mobilansicht.
 
 Keine GitHub Actions oder workflow-auslösenden Pushes vor dem 1. November
 2026. Kein Deployment; PR #57 bleibt ungemergt. Details und Verlauf stehen in

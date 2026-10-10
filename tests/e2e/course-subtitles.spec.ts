@@ -1,5 +1,6 @@
 import {test,expect} from '@playwright/test'
 import {visit,openPage} from './helpers.ts'
+import {courseNarration} from '../../src/i18n/courseNarrations.ts'
 
 for(const language of ['es','it','pt','nl','tr','ar','zh','ja']) {
  test(`library captions stay ${language} while the spoken language changes`,async({page,context})=>{
@@ -34,7 +35,7 @@ for(const language of ['es','it','pt','nl','tr','ar','zh','ja']) {
  })
 }
 
-test('French captions and transcript use the selected voice’s spoken formula explanation',async({page})=>{
+test('French captions and transcript preserve the shared spoken explanation across coaches',async({page})=>{
  await visit(page)
  await page.getByRole('combobox',{name:'Sprache',exact:true}).selectOption('fr')
  await openPage(page,'Cours d’apprentissage')
@@ -52,13 +53,16 @@ test('French captions and transcript use the selected voice’s spoken formula e
  await page.locator('.course-coaches summary').click()
  await page.locator('#course-coach-mode').selectOption('global')
  await page.locator('#course-coach-all').selectOption('lin')
- await expect(page.locator('.course-media audio')).toHaveAttribute('src',/lin-number-images-fr-/)
+ await expect(page.locator('.course-media audio')).toHaveAttribute('src',courseNarration('number-images','fr','rafael')!.src)
  await page.locator('.course-media audio').evaluate((el:HTMLAudioElement)=>el.load())
  await expect.poll(()=>page.locator('.course-media audio').evaluate((el:HTMLAudioElement)=>el.readyState)).toBeGreaterThan(0)
  await page.getByRole('button',{name:'Exemple',exact:true}).click()
  await expect(page.locator('.course-caption')).toContainText('premier son de tapis')
  const credits=page.locator('.course-media details').filter({has:page.locator('summary',{hasText:'Voix et sources'})})
  await credits.locator('summary').click()
- await expect(credits.getByRole('link',{name:'Lin · Qwen VoiceDesign · Apache 2.0',exact:true})).toBeVisible()
+ await expect(credits.getByRole('link',{name:'ANITEW · Qwen VoiceDesign · Apache 2.0',exact:true})).toBeVisible()
  await expect(credits).not.toContainText('CML-TTS')
+ await page.locator('#course-coach-all').selectOption('original')
+ await expect(page.locator('.course-media audio')).toHaveAttribute('src',courseNarration('number-images','fr','rafael')!.src)
+ await expect(transcript).toContainText('premier son de nez')
 })
