@@ -220,3 +220,21 @@ Local validation: 624 core tests, typecheck/build/size, eight desktop/mobile nar
 ## 2026-10-10 — Media packet audit
 
 The preview inventory now verifies 35 illustrated drafts and 47 current preview links. Its 70 recorded browser checks retain their report dates; these are not claimed as a new full browser run. Twelve new French illustrated integration packets contain the current source hashes, source-specific credits, matching captions and 264 WebVTT files. Both full tracks and tracks restricted before the exercise boundary are validated. Eleven English review packets remain available; two obsolete DE/FR coach packets are explicitly excluded from the active index. No video catalog registration or subjective approval is inferred from packet preparation.
+
+
+## 2026-10-10 · Acht freigegebene französische Bildkurse
+
+Schlüsselwortmethode, Lange Wörter, Texte verstehen, Wortgetreu lernen,
+Aktives Abrufen, Verteiltes Wiederholen, Sinnvolle Gruppen und Selbst erklären
+liegen als lokal gebündelte Videos im Katalog. Zusammen 11.022.975 Bytes.
+Die Videos enthalten die bestätigten französischen Audiopakete unverändert
+und vollständige Untertitel in elf App-Sprachen. Sie zeigen eigene
+ANITEW-Grafiken, keine sprechenden Coach-Aufnahmen, und sind für alle
+Coach-Auswahlen verfügbar. Das Bildvideo ersetzt zusätzliche Erklärungstafeln
+neben dem Player. Der Lesekurs bleibt erhalten.
+
+Große Videos werden weiterhin bewusst über den vorhandenen Downloadpfad
+geladen, geprüft und für Offline-Wiedergabe gespeichert. Kursabhängige
+Pausengrenzen liegen vor Beginn des gesprochenen Abschlusses. EN-Geschichtenfilm
+und bisherige Medien bleiben erhalten. Weitere Vorschauen sind noch nicht
+automatisch in den Katalog übernommen.

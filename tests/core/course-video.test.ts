@@ -5,8 +5,8 @@ import {courseVideos,courseVideo} from '../../src/i18n/courseVideos.ts'
 import {courseNarration} from '../../src/i18n/courseNarrations.ts'
 import {videoCaptions} from '../../src/core/courses/captions.ts'
 import {storyMedia} from '../../src/i18n/storyMedia.ts'
-it('ships only the complete Atta English video with intact local bytes',()=>{
- expect(courseVideos).toHaveLength(1)
+it('retains the complete Atta English video alongside approved French illustrations',()=>{
+ expect(courseVideos).toHaveLength(9)
  const video=courseVideo('story-method','en','rafael')!
  expect(video).toBeDefined()
  expect(video.src).toMatch(/^\/course-media\/video\/atta-story-en-[a-f0-9]+\.mp4$/)
@@ -32,5 +32,24 @@ it('uses the edited timeline for all 21 captions and keeps answers after the exe
   const gated=videoCaptions(video.cues,captions,video.cues[16].start)
   expect(gated).toContain(captions[15].replaceAll('&','&amp;'))
   expect(gated).not.toContain(captions[17])
+ }
+})
+
+it('bundles the eight approved French visual courses for every coach with complete subtitles and a safe practice boundary',()=>{
+ const videos=courseVideos.filter(v=>v.presentation==='illustrated')
+ expect(videos).toHaveLength(8)
+ for(const v of videos){
+  const bytes=readFileSync(`public${v.src}`)
+  expect(createHash('sha256').update(bytes).digest('hex')).toBe(v.sha256)
+  expect(bytes.length).toBe(v.bytes)
+  expect(v.src).toMatch(/^\/course-media\/video\/.*\.mp4$/)
+  for(const coach of ['original','lin','rafael',null] as const)expect(courseVideo(v.course,'fr',coach)).toBe(v)
+  const n=courseNarration(v.course,'fr','rafael')!
+  expect(v.cues).toHaveLength(n.cues.length)
+  expect(Object.keys(v.captions!)).toHaveLength(11)
+  for(const lines of Object.values(v.captions!))expect(lines).toHaveLength(v.cues.length)
+  expect(v.recallBoundary).toBeGreaterThan(v.cues.at(-2)!.start)
+  expect(v.recallBoundary).toBeLessThan(v.cues.at(-1)!.start)
+  expect(v.credits.some(c=>c.name.includes('MultiTalk'))).toBe(false)
  }
 })

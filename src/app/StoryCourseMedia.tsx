@@ -52,7 +52,7 @@ export function StoryCourseMedia({coach,language,platform,solution=false,onRecal
   const recallIndex=library?library[spoken].cues.findIndex(cue=>cue.section==='recall'):16
   const instructionIndices=library?library[spoken].cues.flatMap((cue,index)=>cue.section.startsWith('step-')?[index]:[]):[]
   const gate=playbackCues[library?exampleIndex:17].start
-  const recallBoundary=playbackCues[stopIndex].start
+  const recallBoundary=playingVideo&&videoAsset?.recallBoundary!==undefined?videoAsset.recallBoundary:playbackCues[stopIndex].start
   const vtt=enabled&&playingVideo?videoCaptions(playbackCues,captions,solution?Infinity:recallBoundary):''
   useEffect(()=>{
     if(!vtt){setCaptionSource('');return}
@@ -97,7 +97,7 @@ export function StoryCourseMedia({coach,language,platform,solution=false,onRecal
   // Seek inside the cue so a chapter does not display the preceding silent gap.
   function seek(index:number){if(player.current){const target=Math.min(playbackCues[index].start+.01,playbackCues[index].end);player.current.currentTime=target;setTime(target)}}
   return <section className="course-media" aria-label={t.title}>
-    <h4>{t.title}</h4><p className="hint">{playingVideo?vt.note:t.note}</p>
+    <h4>{t.title}</h4><p className="hint">{playingVideo?(videoAsset?.presentation==='illustrated'?vt.illustratedNote:vt.note):t.note}</p>
     <p className="hint">{playingVideo?(locale==='de'?'Videodauer':locale==='fr'?'Durée vidéo':'Video duration'):(locale==='de'?'Tonspur':locale==='fr'?'Piste audio':'Audio')}: {Math.floor(Math.ceil(playbackDuration/preferences.speed)/60)}:{String(Math.ceil(playbackDuration/preferences.speed)%60).padStart(2,'0')} · {locale==='de'?'Übungszeit zusätzlich':locale==='fr'?'temps de pratique en plus':'plus practice time'}</p>
     <button type="button" aria-pressed={enabled} disabled={!ready} onClick={()=>{player.current?.pause();setTime(0);setEnabled(!enabled);void save({...preferences,view:enabled?'read':'listen'})}}>{enabled?t.read:t.listen}</button>
     {enabled && <>
@@ -118,7 +118,7 @@ export function StoryCourseMedia({coach,language,platform,solution=false,onRecal
       {downloadAsset && <CourseDownload key={`download-${downloadAsset.src}`} asset={downloadAsset} locale={locale} />}
       {library && language!==subtitleLanguage && <p className="hint">The translated subtitles for this audio track are being prepared. Its original spoken text is shown here.</p>}
       <div className={`course-playback${playingVideo?' has-video':''}`}><div className="course-screen">
-      <MediaElement {...(playingVideo&&coach?{poster:`/coaches/${coach}.webp`}:{})} key={`player-${mediaSrc}`} ref={element=>{player.current=element}} controls playsInline crossOrigin="anonymous" preload="none" src={mediaSrc} aria-label={t.title} onError={()=>setError(playingVideo?vt.failed:t.failed)} onTimeUpdate={sync} onSeeking={sync} onSeeked={sync} onPlay={sync} onLoadedMetadata={()=>{
+      <MediaElement {...(playingVideo&&coach&&videoAsset?.presentation!=='illustrated'?{poster:`/coaches/${coach}.webp`}:{})} key={`player-${mediaSrc}`} ref={element=>{player.current=element}} controls playsInline crossOrigin="anonymous" preload="none" src={mediaSrc} aria-label={t.title} onError={()=>setError(playingVideo?vt.failed:t.failed)} onTimeUpdate={sync} onSeeking={sync} onSeeked={sync} onPlay={sync} onLoadedMetadata={()=>{
         if(player.current instanceof HTMLVideoElement && player.current.videoWidth>0 && player.current.videoHeight>0){player.current.style.aspectRatio=`${player.current.videoWidth} / ${player.current.videoHeight}`}
         if(player.current){player.current.playbackRate=preferences.speed;player.current.preservesPitch=true;if(solution){player.current.currentTime=gate+.01;setTime(gate+.01)}}
       }}>{playingVideo&&captionSource&&<track key={captionSource} kind="captions" src={captionSource} srcLang={subtitleLanguage} label={subtitleLanguage.toUpperCase()} default />}</MediaElement>
@@ -128,15 +128,15 @@ export function StoryCourseMedia({coach,language,platform,solution=false,onRecal
         {!solution && <button type="button" onClick={()=>{recall()}}>{t.exercise}</button>}
       </div>
       </div><div className="course-visuals">
-      {!library && safeCue>=8 && safeCue<=13 && <svg className={`story-illustration story-step-${safeCue}`} viewBox="0 0 330 115" aria-hidden="true">
+      {!playingVideo && !library && safeCue>=8 && safeCue<=13 && <svg className={`story-illustration story-step-${safeCue}`} viewBox="0 0 330 115" aria-hidden="true">
         <g className="story-key" fill="none" stroke="currentColor" strokeWidth="6"><circle cx="35" cy="48" r="18"/><path d="M53 48h40v13m-14-13v13"/></g>
         <path d="M110 54h24m-8-7 8 7-8 7" fill="none" stroke="currentColor" strokeWidth="3"/>
         <ellipse cx="163" cy="53" rx="23" ry="30" fill="#d1b951" stroke="currentColor" strokeWidth="2" transform="rotate(25 163 53)"/>
         <g className="story-juice" fill="#d1b951"><circle cx="191" cy="44" r="3"/><circle cx="201" cy="51" r="3"/><circle cx="211" cy="60" r="3"/></g>
         <g fill="none" stroke="currentColor" strokeWidth="3"><circle cx="247" cy="76" r="21"/><circle cx="303" cy="76" r="21"/><path d="m247 76 16-31 18 31h-34l37-25 19 25m-19-25-4-14h12m-35 8h17"/></g>
       </svg>}
-      {library && instructionIndices.includes(safeCue) && <CourseStepIllustration steps={instructionIndices.map(index=>captions[index])} current={instructionIndices.indexOf(safeCue)} locale={locale} language={subtitleLanguage} />}
-      {library && safeCue>=exampleIndex && safeCue<recallIndex && <CourseIllustration id={courseId} locale={spoken} />}
+      {!playingVideo && library && instructionIndices.includes(safeCue) && <CourseStepIllustration steps={instructionIndices.map(index=>captions[index])} current={instructionIndices.indexOf(safeCue)} locale={locale} language={subtitleLanguage} />}
+      {!playingVideo && library && safeCue>=exampleIndex && safeCue<recallIndex && <CourseIllustration id={courseId} locale={spoken} />}
       <p className="course-caption" lang={subtitleLanguage} dir="auto">{safeCue>=0?captions[safeCue]:''}</p>
       </div></div>
       <details><summary>{t.transcript}</summary><div lang={subtitleLanguage} dir={subtitleLanguage==='ar'?'rtl':'ltr'}>{captions.map((line,index)=><p key={index} dir="auto">{line}</p>)}</div></details>

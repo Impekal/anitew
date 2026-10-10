@@ -765,3 +765,15 @@ bestanden einschließlich Übung, Weiterhören, Tempo, Untertiteln und Lesemodus
 Alle zwölf französischen Tonaufnahmen bleiben unverändert. Neue Fassungen
 sind Vorschauen; App-Videokatalog, andere Tonsprachen und natürliche
 Coach-Auftritte sind noch separat zu bearbeiten.
+
+
+## 2026-10-10 · Acht Bildkurse lokal in die App übernommen
+
+Die acht ausdrücklich freigegebenen französischen Bildkurse sind gebündelt
+und per bestehendem Offline-Download verfügbar. Illustrationsvideos werden
+bei jeder Coach-Auswahl angeboten; ihre Hinweise behaupten keine
+sprechende Coach-Aufnahme. Doppelte Erklärungstafeln entfallen während
+des Videos. Pausengrenzen liegen vor dem gesprochenen Abschluss.
+20 gezielte Kernprüfungen, sechs Desktop-/Mobilprüfungen inklusive Offline-
+Neustart, Typecheck, Build und Größenbudget bestanden. Keine Actions,
+kein Push, kein Deployment und kein Merge. Nutzergrenze jetzt 20 % Rest.

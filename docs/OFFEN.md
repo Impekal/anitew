@@ -10,7 +10,9 @@ Vollständige Aufnahmen und passende Untertitel sind lokal gebündelt.
 624 Kernprüfungen, Build und Größenbudget, acht Offline-/Stimmprüfungen
 sowie 22 französische Vorschauprüfungen sind bestanden. Die zwölf neuen
 französischen Videopakete samt 264 Untertiteldateien sind technisch geprüft;
-sie sind Illustrationsentwürfe und noch keine freigegebenen Coach-Videos.
+Acht ausdrücklich freigegebene Bildkurse sind jetzt lokal im Videokatalog
+integriert. Die übrigen Fassungen bleiben Vorschauen. Natürliche
+Coach-Videos sind damit nicht pauschal freigegeben.
 Zwei veraltete deutsche/französische Coach-Pakete bleiben ausgeschlossen.
 
 Alle zwölf französischen Gesamtaufnahmen wurden am 10. Oktober 2026 vom
