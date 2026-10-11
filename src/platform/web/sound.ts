@@ -1,34 +1,8 @@
 import type { Sound, SoundCue } from '../../core/index.ts'
 
-/**
- * Die Töne von ANITEW (D-011/G-9).
- *
- * **Erzeugt, nicht mitgeliefert.** Kein einziges Audiofile: Alles entsteht zur
- * Laufzeit aus Sinusschwingungen. Das ist derselbe Gedanke wie bei den
- * Gesichtern (D-005) — es wiegt nichts, funktioniert offline, hat keine Lizenz
- * und lässt sich unendlich variieren.
- *
- * **Eine Klangfamilie.** Start, Retrieve, Long Return, Completion und Error
- * stammen aus derselben warmen Pentatonik und denselben zwei weichen
- * Sinus-Partialen. Der Fehlerklang ist deshalb kein Alarm: Er löst nach unten
- * auf und sagt nur „noch offen“.
- *
- * **Es ist leise.** Weiche Anschläge, langes Ausklingen, eine Grundlautstärke
- * weit unter dem, was eine Spiele-App nimmt. Ein Ton soll bestätigen, nicht
- * belohnen (G-1): Wer ihn abschaltet, soll nichts vermissen außer der
- * Bestätigung.
- *
- * Zwei Eigenheiten der Browser, die hier gelöst sind:
- *
- * 1. **iOS gibt keinen Ton ohne Berührung.** Der AudioContext entsteht deshalb
- *    erst beim ersten `play()` — und das erste `play()` ist `start`, ausgelöst
- *    vom Fingertipp auf den Startknopf. Wird er trotzdem angehalten geliefert,
- *    versucht `resume()` es bei jedem weiteren Ton erneut.
- * 2. **Der Ton läuft weiter, wenn die App in den Hintergrund geht.** Deshalb
- *    wird der Kontext beim Verstecken angehalten und beim Zurückkommen wieder
- *    aufgenommen.
+/** Shared local sound family based on the selected ANITEW A motif.
+ * UI and training share one context and the saved mute preference.
  */
-
 /** Grundton A3. Tief genug, dass nichts schrill wird. */
 const BASE_HZ = 220
 
@@ -58,11 +32,11 @@ function frequency(step: number): number {
 function notesFor(cue: SoundCue, step: number): Note[] {
   switch (cue) {
     case 'start':
-      // Audio-Logo: 0.18 s Attack-Folge, 1.4 s warmer Ausklang.
+      // Selected A: A3 → E4 → C♯4, starts at 0 / .18 / .43 seconds.
       return [
-        { step: 0, at: 0, decay: 1.1, gain: 0.5 },
-        { step: 2, at: 0.09, decay: 1.1, gain: 0.45 },
-        { step: 4, at: 0.18, decay: 1.4, gain: 0.4 },
+        { step: 0, at: 0, decay: .85, gain: .09 / MASTER },
+        { step: 3, at: .18, decay: .85, gain: .09 / MASTER },
+        { step: 2, at: .43, decay: .85, gain: .09 / MASTER },
       ]
     case 'word':
       return [{ step: 5 + step, at: 0, decay: 0.9, gain: 0.42 }]
@@ -109,8 +83,8 @@ function notesFor(cue: SoundCue, step: number): Note[] {
     case 'done':
       return [
         { step: 0, at: 0, decay: 1.3, gain: 0.34 },
-        { step: 2, at: 0.13, decay: 1.5, gain: 0.32 },
-        { step: 4, at: 0.27, decay: 2.1, gain: 0.3 },
+        { step: 3, at: 0.18, decay: 1.5, gain: 0.32 },
+        { step: 2, at: 0.43, decay: 2.1, gain: 0.3 },
       ]
   }
 }
@@ -144,10 +118,18 @@ function buzz(cue: SoundCue): void {
   }
 }
 
+let interfaceSound: Sound | undefined
+/** Core navigation uses the same context and setting as training. */
+export function sharedWebSound(): Sound { return interfaceSound ?? createWebSound(true) }
+export function playInterfaceSound(cue: SoundCue): void { interfaceSound?.play(cue) }
+export function interfaceSoundEnabled(): boolean { return interfaceSound?.isEnabled() ?? false }
+
 export function createWebSound(enabled: boolean): Sound {
   let on = enabled
   let context: AudioContext | undefined
   let master: GainNode | undefined
+  const active = new Set<OscillatorNode>()
+  const stopAll = () => { for (const oscillator of active) { try { oscillator.stop() } catch {} }; active.clear() }
 
   const ensure = (): AudioContext | undefined => {
     if (context === undefined) {
@@ -160,10 +142,10 @@ export function createWebSound(enabled: boolean): Sound {
       master.gain.value = MASTER
       master.connect(context.destination)
 
+      window.addEventListener('pagehide', () => { stopAll(); if(context)void context.suspend().catch(()=>undefined) })
       document.addEventListener('visibilitychange', () => {
         if (context === undefined) return
-        if (document.hidden) void context.suspend().catch(() => undefined)
-        else void context.resume().catch(() => undefined)
+        if (document.hidden) { stopAll(); void context.suspend().catch(() => undefined) }
       })
     }
     if (context.state === 'suspended') void context.resume().catch(() => undefined)
@@ -176,13 +158,15 @@ export function createWebSound(enabled: boolean): Sound {
 
     const envelope = ctx.createGain()
     envelope.connect(out)
-    envelope.gain.setValueAtTime(0.0001, start)
-    envelope.gain.exponentialRampToValueAtTime(note.gain, start + 0.012)
-    envelope.gain.exponentialRampToValueAtTime(0.0001, start + note.decay)
+    const curve=Float32Array.from({length:256},(_,i)=>{
+      const t=i/255*note.decay
+      return note.gain*Math.min(1,t/.018)*Math.min(1,(note.decay-t)/.07)*Math.exp(-4*t/note.decay)
+    })
+    envelope.gain.setValueCurveAtTime(curve,start,note.decay)
 
     for (const [multiple, level] of [
       [1, 1],
-      [2, 0.28],
+      [2, 0.055],
     ] as const) {
       const oscillator = ctx.createOscillator()
       oscillator.type = 'sine'
@@ -190,14 +174,16 @@ export function createWebSound(enabled: boolean): Sound {
       const voice = ctx.createGain()
       voice.gain.value = level
       oscillator.connect(voice).connect(envelope)
+      active.add(oscillator)
+      oscillator.onended=()=>{active.delete(oscillator);oscillator.disconnect();voice.disconnect()}
       oscillator.start(start)
       oscillator.stop(start + note.decay + 0.05)
     }
   }
 
-  return {
+  const sound: Sound = {
     play(cue, step = 0) {
-      if (!on) return
+      if (!on || document.hidden) return
       const ctx = ensure()
       if (ctx === undefined || master === undefined) return
       buzz(cue)
@@ -209,10 +195,12 @@ export function createWebSound(enabled: boolean): Sound {
     },
     setEnabled(next) {
       on = next
-      if (!next && context !== undefined) void context.suspend().catch(() => undefined)
+      if (!next) { stopAll(); if (context !== undefined) void context.suspend().catch(() => undefined) }
     },
     isEnabled() {
       return on
     },
   }
+  interfaceSound=sound
+  return sound
 }

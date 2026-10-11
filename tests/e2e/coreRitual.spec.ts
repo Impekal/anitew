@@ -78,3 +78,23 @@ test('der Ritual-Pass respektiert Reduced Motion', async ({ page }) => {
     .evaluate((node) => getComputedStyle(node).animationName)
   expect(animation).toBe('none')
 })
+
+test('Core und Training verwenden dieselbe Stummschaltung ohne zweite Tonquelle',async({page})=>{
+ await page.addInitScript(()=>{
+  const state=window as Window & {__soundOscillators?:number}
+  state.__soundOscillators=0
+  const original=AudioContext.prototype.createOscillator
+  AudioContext.prototype.createOscillator=function(){state.__soundOscillators!++;return original.call(this)}
+ })
+ await visit(page)
+ const toggle=page.locator('.sound-toggle')
+ if(await toggle.getAttribute('aria-pressed')==='true')await toggle.click()
+ const mutedCount=await page.evaluate(()=>(window as Window & {__soundOscillators?:number}).__soundOscillators)
+ await page.locator('.hamburger').click()
+ expect(await page.evaluate(()=>(window as Window & {__soundOscillators?:number}).__soundOscillators)).toBe(mutedCount)
+ await page.keyboard.press('Escape')
+ await toggle.click()
+ const before=await page.evaluate(()=>(window as Window & {__soundOscillators?:number}).__soundOscillators!)
+ await page.locator('.hamburger').click()
+ await expect.poll(()=>page.evaluate(()=>(window as Window & {__soundOscillators?:number}).__soundOscillators!)).toBe(before+6)
+})

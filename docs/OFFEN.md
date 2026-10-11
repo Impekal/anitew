@@ -1,5 +1,15 @@
 # Was noch offen ist — und wer es tun muss
 
+## Neuester Stand · Klang A
+
+Klang A ist lokal integriert. Core, Training und Folgekurs-Einstiege teilen
+Toninstanz und Stummschaltung; die Sprache wartet bis zum Ausklang.
+Die früher offene Klangauswahl ist erledigt. Weitere offene Punkte:
+DE/FR-Coach-Einstieg im ersten Kurs, optionale natürliche Schlusssequenz,
+noch nicht bewertete Medien und echte Mobilgeräte. Weitere Details am Ende
+von STORY_MEDIA.md.
+
+
 
 ## 2026-10-11 · Logo, Bildkurse und deutsche Stimmkonsistenz
 

@@ -4,6 +4,6 @@
   "sha256": "8321f91ff6cd8af3db9700b7e214f6bf3019159bac5d11838c98aa08977e54eb",
   "source": "outputs/atta-story-en-video/introduction-edited/logo-animated.mp4",
   "credits": "ANITEW original logo animation",
-  "audio": "silent",
+  "audio": "Video remains silent; shared local A synthesis accompanies it when app sound is enabled. Narration waits at least 1.3 seconds.",
   "behavior": "One opening per lesson playback; static local logo with reduced motion; pre-cached offline"
 }

@@ -93,7 +93,7 @@ export function StoryCourseMedia({coach,language,platform,solution=false,onRecal
   function recall() { setShowIntro(false);player.current?.pause();onRecall(material()) }
   function startPlayback() {
     if(playingVideo&&courseId!=='story-method'&&!solution&&!introDone.current&&(player.current?.currentTime??0)<.1){
-      introDone.current=true;player.current?.pause();setShowIntro(true);return
+      introDone.current=true;player.current?.pause();platform.sound.play('start');setShowIntro(true);return
     }
     sync()
   }
@@ -140,6 +140,10 @@ export function StoryCourseMedia({coach,language,platform,solution=false,onRecal
         {!solution && <button type="button" onClick={()=>{recall()}}>{t.exercise}</button>}
       </div>
       </div><div className="course-visuals">
+      {!playingVideo && !library && ((safeCue>=0&&safeCue<=2) || (solution&&safeCue>=19)) && <figure className="course-coach-presence" style={{margin:'0 auto 16px',textAlign:'center'}}>
+        <img src={`/coaches/${coach??'rafael'}.webp`} width="200" height="240" style={{maxWidth:'100%',objectFit:'contain',borderRadius:16}} alt={`${courseCoachCopy[locale].names[coach??'rafael']} · ${courseCoachCopy[locale].portrait}`} />
+        <figcaption>{courseCoachCopy[locale].names[coach??'rafael']} · {courseCoachCopy[locale].portrait}</figcaption>
+      </figure>}
       {!playingVideo && !library && safeCue>=8 && safeCue<=13 && <svg className={`story-illustration story-step-${safeCue}`} viewBox="0 0 330 115" aria-hidden="true">
         <g className="story-key" fill="none" stroke="currentColor" strokeWidth="6"><circle cx="35" cy="48" r="18"/><path d="M53 48h40v13m-14-13v13"/></g>
         <path d="M110 54h24m-8-7 8 7-8 7" fill="none" stroke="currentColor" strokeWidth="3"/>

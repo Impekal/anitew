@@ -1,3 +1,4 @@
+import { playInterfaceSound, interfaceSoundEnabled } from '../platform/web/sound.ts'
 import '../anitew-living-adaptive.css'
 import '../anitew-core-ritual.css'
 import '../anitew-sensory-light.css'
@@ -16,7 +17,6 @@ let coreTimer: number | undefined
 let enteringFallback: number | undefined
 let arrivalTimer: number | undefined
 let pressTimer: number | undefined
-let ritualAudio: AudioContext | undefined
 
 const root = () => document.documentElement
 
@@ -25,7 +25,7 @@ function clearTimer(timer: number | undefined): void {
 }
 
 function soundEnabled(): boolean {
-  return document.querySelector('.sound-toggle')?.getAttribute('aria-pressed') !== 'false'
+  return interfaceSoundEnabled()
 }
 
 function tactile(pattern: number[]): void {
@@ -41,86 +41,10 @@ function tactile(pattern: number[]): void {
 
 type ToneKind = 'core' | 'portal' | 'select' | 'navigate' | 'confirm'
 
-/**
- * ANITEWs akustische Sprache bleibt klein und bedeutungsvoll: Auswahl ist ein
- * trockener kurzer Impuls, Navigation etwas weicher, Core/Portal tragen die
- * tiefe Marken-DNA. Keine Zufallssounds und keine Belohnungsmaschine.
- */
+/** Shared A-family cues. Session start already supplies the portal signature. */
 function ritualTone(kind: ToneKind): void {
-  if (!soundEnabled()) return
-  try {
-    const Ctor =
-      window.AudioContext ??
-      (window as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
-    if (Ctor === undefined) return
-    ritualAudio ??= new Ctor()
-    if (ritualAudio.state === 'suspended') void ritualAudio.resume().catch(() => undefined)
-
-    const bank: Record<ToneKind, {
-      notes: readonly number[]
-      delays: readonly number[]
-      decays: readonly number[]
-      gains: readonly number[]
-      wave: OscillatorType
-    }> = {
-      core: {
-        notes: [110, 277.18, 440],
-        delays: [0, 0.065, 0.2],
-        decays: [0.8, 1.15, 1.55],
-        gains: [0.034, 0.038, 0.022],
-        wave: 'sine',
-      },
-      portal: {
-        notes: [110, 220, 440],
-        delays: [0, 0.045, 0.18],
-        decays: [1.25, 1.45, 2.15],
-        gains: [0.042, 0.055, 0.032],
-        wave: 'sine',
-      },
-      select: {
-        notes: [330, 494],
-        delays: [0, 0.026],
-        decays: [0.11, 0.16],
-        gains: [0.024, 0.013],
-        wave: 'triangle',
-      },
-      navigate: {
-        notes: [220, 330],
-        delays: [0, 0.035],
-        decays: [0.14, 0.2],
-        gains: [0.018, 0.011],
-        wave: 'sine',
-      },
-      confirm: {
-        notes: [294, 440, 587],
-        delays: [0, 0.035, 0.08],
-        decays: [0.16, 0.22, 0.3],
-        gains: [0.019, 0.017, 0.011],
-        wave: 'sine',
-      },
-    }
-
-    const voice = bank[kind]
-    const now = ritualAudio.currentTime
-    voice.notes.forEach((hz, index) => {
-      const start = now + (voice.delays[index] ?? 0)
-      const decay = voice.decays[index] ?? 0.16
-      const envelope = ritualAudio?.createGain()
-      const oscillator = ritualAudio?.createOscillator()
-      if (envelope === undefined || oscillator === undefined || ritualAudio === undefined) return
-      envelope.gain.setValueAtTime(0.0001, start)
-      envelope.gain.exponentialRampToValueAtTime(voice.gains[index] ?? 0.012, start + 0.008)
-      envelope.gain.exponentialRampToValueAtTime(0.0001, start + decay)
-      oscillator.type = voice.wave
-      oscillator.frequency.value = hz
-      oscillator.connect(envelope).connect(ritualAudio.destination)
-      oscillator.start(start)
-      oscillator.stop(start + decay + 0.04)
-    })
-  } catch {
-    // Ein Browser ohne freigegebenes WebAudio bekommt weiterhin die ganze
-    // visuelle Choreografie; Klang darf niemals den Start blockieren.
-  }
+  if (kind==='portal') return
+  playInterfaceSound(kind==='core'?'start':kind==='select'?'type':kind==='confirm'?'recall':'block')
 }
 
 function flashPress(): void {
@@ -241,7 +165,6 @@ function installCoreRitual(): void {
       clearTimer(arrivalTimer)
       clearTimer(pressTimer)
       unmountNeuralField()
-      if (ritualAudio !== undefined) void ritualAudio.close().catch(() => undefined)
     },
     { once: true },
   )

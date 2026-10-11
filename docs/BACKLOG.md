@@ -838,3 +838,27 @@ Offen: reale Mobilgeräte, Sichtprüfung neuer Bildkurse, erste Coach-Einführun
 DE/FR sowie optional ein natürlicher kurzer Abschluss im ersten Kurs.
 Keine weiteren langen Avatar-Versuche ohne neuen begründeten Ansatz.
 Weiterarbeit bis 5 % Restnutzung; keine Actions, Pushes, Deployments oder Merges.
+
+## 2026-10-11 · Klang A lokal umgesetzt
+
+Der gewählte Klang A ist jetzt der gemeinsame Einstieg von Core, Training und
+Folgelektionen: A3–E4–C♯4 bei 0/0,18/0,43 Sekunden, weicher Ausklang und dieselbe
+zurückhaltende Obertonfarbe wie im Hörentwurf. Navigation und Trainingsfeedback
+verwenden dieselbe Toninstanz und Stummschaltung. Nachgeladene App-Module dürfen
+keine zweite aktive Toninstanz erzeugen. Beim Trainingsstart entfällt die
+zusätzliche Portal-Tonfolge. Beim Stummschalten und Verlassen des Vordergrunds
+werden anstehende Töne beendet; sie spielen später nicht nach.
+
+Der Folgekurs-Einstieg verwendet die bestehende Logoanimation. Sprache beginnt
+frühestens nach 1,3 Sekunden, also nach dem Klang; dies gilt auch beim ruhenden
+Logo bei reduzierter Bewegung. Der bestätigte EN-Geschichtenfilm bleibt erhalten.
+Drei gezielte Tonprüfungen, acht Core-/Stummschaltungsfälle auf Desktop und
+Mobilansicht, Typecheck, Build und Kaltstartbudget bestanden. Die Klangfamilie
+ist lokal umgesetzt, aber nicht veröffentlicht. Reale Geräte/Höreindruck bleiben
+separate Bewertungen. Keine Behauptung markenrechtlicher oder weltweiter Einzigartigkeit.
+
+Sechs Offline-Videoprüfungen (DE/EN/FR, Desktop/Mobilansicht) einschließlich
+1,3-Sekunden-Schutz vor Sprachbeginn bestanden. Der erste Audiokurs zeigt
+das gewählte lokale Coach-Porträt während der Vorstellung und nach der Übung
+kurz zum Abschluss. Dies ist ein Standbild, keine neue Sprechanimation.
+Folgekurse zeigen dieses Porträt nicht.

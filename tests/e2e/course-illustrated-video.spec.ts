@@ -38,7 +38,9 @@ for(const spoken of ['fr','de','en'] as const)test.describe(`${spoken} illustrat
    return {display:box.width/box.height,source:el.videoWidth/el.videoHeight}
   })
   expect(ratios.display).toBeCloseTo(ratios.source,2)
-  // The local logo works after an offline reload and never overlaps narration.
+  // The local logo and A sound finish before narration, including reduced motion.
+  if(spoken==='de')await page.emulateMedia({reducedMotion:'reduce'})
+  const introStarted=Date.now()
   await video.evaluate((el:HTMLVideoElement)=>{el.muted=true;void el.play()})
   const logo=page.locator('[data-lesson-intro]')
   await expect(logo).toBeVisible()
@@ -46,6 +48,7 @@ for(const spoken of ['fr','de','en'] as const)test.describe(`${spoken} illustrat
   expect(await video.evaluate((el:HTMLVideoElement)=>el.currentTime)).toBeLessThan(.1)
   await expect(logo).toHaveCount(0,{timeout:5000})
   await expect.poll(()=>video.evaluate((el:HTMLVideoElement)=>el.currentTime)).toBeGreaterThan(.2)
+  expect(Date.now()-introStarted).toBeGreaterThanOrEqual(1300)
   await video.evaluate((el:HTMLVideoElement)=>el.pause())
   await page.locator('.course-media-chapters button').nth(1).click()
   await expect.poll(()=>video.evaluate((el:HTMLVideoElement)=>el.currentTime)).toBeCloseTo(asset.cues[9].start+.01,1)

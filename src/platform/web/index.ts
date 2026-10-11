@@ -5,7 +5,7 @@ import { createWebCoach } from './coach.ts'
 import { loadCoachKeys } from './coachKeys.ts'
 import { createWebReminders } from './reminders.ts'
 import { createWebSettings } from './settings.ts'
-import { createWebSound } from './sound.ts'
+import { sharedWebSound } from './sound.ts'
 
 /**
  * Die Web-Umsetzung der Plattformschnittstellen aus `core/ports.ts`.
@@ -26,7 +26,7 @@ export function createWebPlatform(): Platform {
     // nachgereicht (siehe useSoundSetting). Anders herum wäre es falsch: Wer
     // Ton eingeschaltet hat, soll ihn nicht erst nach einer Zehntelsekunde
     // bekommen und den ersten Anschlag verpassen.
-    sound: createWebSound(true),
+    sound: sharedWebSound(),
     reminders: createWebReminders(),
   }
 }
