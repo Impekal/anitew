@@ -358,3 +358,19 @@ Katalogvollständigkeit bestanden. Fünf Medien-Kernprüfungen, sechs ergänzend
 FR-Offline-Fälle und zwölf Geschichtenfälle bestanden; zwei veraltete
 Testannahmen zur FR-Pausengrenze wurden korrigiert und gezielt erneut geprüft.
 Build und Kaltstartbudget bestanden. Zusätzliche WebKit-Prüfung folgt.
+
+### Complete video provenance index · 2026-10-11
+
+`public/course-media/video/catalog.json` lists all 36 selectable videos with
+language, presentation, local path, byte size, SHA-256, duration and production
+credits. The older `video/manifest.json` retains the original English film's
+production history. Regenerate the complete index after catalog changes with
+`node scripts/course-video-catalog.mjs`; the provenance regression test detects
+a stale index. Model/tool licenses describe those components, not a new blanket
+license for all generated output.
+
+All 35 illustrated videos' original-language captions match their narration's
+`spokenText` (or `text` when unchanged). This includes the revised French
+sentences. The test also prevents reintroducing superseded French synthesis
+metadata. These checks do not constitute native-speaker approval of translations
+or real-device acceptance. Audio and video files were not changed.

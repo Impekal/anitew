@@ -1,0 +1,1042 @@
+{
+  "description": "Locally bundled ANITEW course videos. Technical metadata is not a claim of subjective approval.",
+  "assets": [
+    {
+      "course": "story-method",
+      "coach": "rafael",
+      "language": "en",
+      "presentation": "coach-and-illustrations",
+      "src": "/course-media/video/atta-story-en-798e41c0c793.mp4",
+      "bytes": 1775668,
+      "sha256": "798e41c0c79399926a50b2f7984533e86ad375fb480fd743382d7eae8b116da3",
+      "duration": 98.67999999999999,
+      "credits": [
+        {
+          "name": "MultiTalk",
+          "url": "https://github.com/MeiGen-AI/MultiTalk",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "Wan2.1 / city96 GGUF",
+          "url": "https://huggingface.co/city96/Wan2.1-I2V-14B-480P-gguf",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "Created with WanGP",
+          "url": "https://github.com/deepbeepmeep/Wan2GP",
+          "license": "WanGP Community License 2.0 (rendering tool)"
+        },
+        {
+          "name": "Atta voice · Qwen3-TTS",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        }
+      ]
+    },
+    {
+      "course": "keyword-method",
+      "coach": "rafael",
+      "language": "fr",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-keyword-method-fr-visual-8a03f3bc58ad.mp4",
+      "bytes": 1240547,
+      "sha256": "8a03f3bc58ad55437827a58988968767ef2f72f2fe8269ad6b7eb65c30348d74",
+      "duration": 76.88,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Atta voice · Qwen3-TTS",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "ANITEW synthetic reference · Qwen VoiceDesign",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        }
+      ]
+    },
+    {
+      "course": "long-words",
+      "coach": "rafael",
+      "language": "fr",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-long-words-fr-visual-09a2b0abf7a4.mp4",
+      "bytes": 1328478,
+      "sha256": "09a2b0abf7a460fd38f2dc3e478cf52b742dc6e8e42768fbe63ef0dbd3ae8cb6",
+      "duration": 90.68,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Atta voice · Qwen3-TTS",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "ANITEW synthetic reference · Qwen VoiceDesign",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        }
+      ]
+    },
+    {
+      "course": "text-meaning",
+      "coach": "rafael",
+      "language": "fr",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-text-meaning-fr-visual-0f5574f84420.mp4",
+      "bytes": 1541823,
+      "sha256": "0f5574f84420ccae89c31f1b7cc83a3b70e9d2af76185c88174e600fc90b1df1",
+      "duration": 104.96,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Atta voice · Qwen3-TTS",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "ANITEW synthetic reference · Qwen VoiceDesign",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        }
+      ]
+    },
+    {
+      "course": "text-verbatim",
+      "coach": "rafael",
+      "language": "fr",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-text-verbatim-fr-visual-d4c94c3c8515.mp4",
+      "bytes": 1175192,
+      "sha256": "d4c94c3c851597654b8db094696e6ca08446d5c3d1a71444894ddb8b85ef6ce7",
+      "duration": 84.2,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Atta voice · Qwen3-TTS",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "ANITEW synthetic reference · Qwen VoiceDesign",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        }
+      ]
+    },
+    {
+      "course": "active-recall",
+      "coach": "rafael",
+      "language": "fr",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-active-recall-fr-visual-9612e89c9536.mp4",
+      "bytes": 1328986,
+      "sha256": "9612e89c9536fbc8f75725d17ac66fcc7d87ebd5ebe1dde12edcad5340a95df0",
+      "duration": 94.68,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Atta voice · Qwen3-TTS",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "ANITEW synthetic reference · Qwen VoiceDesign",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        }
+      ]
+    },
+    {
+      "course": "spaced-practice",
+      "coach": "rafael",
+      "language": "fr",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-spaced-practice-fr-visual-324a10797779.mp4",
+      "bytes": 1568565,
+      "sha256": "324a10797779d1ba5bcc586b8a423f696eed6cde2cc42e32bda2c18ecdb1f074",
+      "duration": 106.56,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Atta voice · Qwen3-TTS",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "ANITEW synthetic reference · Qwen VoiceDesign",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        }
+      ]
+    },
+    {
+      "course": "meaningful-groups",
+      "coach": "rafael",
+      "language": "fr",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-meaningful-groups-fr-visual-7a9163ed083b.mp4",
+      "bytes": 1338019,
+      "sha256": "7a9163ed083b0541ca8f4e1874eec30c52862a347dac5e59604bcfeade033be9",
+      "duration": 93.28,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Atta voice · Qwen3-TTS",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "ANITEW synthetic reference · Qwen VoiceDesign",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        }
+      ]
+    },
+    {
+      "course": "self-explanation",
+      "coach": "rafael",
+      "language": "fr",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-self-explanation-fr-visual-920ff20b787b.mp4",
+      "bytes": 1500365,
+      "sha256": "920ff20b787bb2862735b05a535f02e05ed7c02cde231552a63f688fa3bb9c79",
+      "duration": 101.24,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Atta voice · Qwen3-TTS",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "ANITEW synthetic reference · Qwen VoiceDesign",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        }
+      ]
+    },
+    {
+      "course": "active-recall",
+      "coach": "rafael",
+      "language": "de",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-active-recall-de-visual-07da7b18b29d.mp4",
+      "bytes": 1595023,
+      "sha256": "07da7b18b29df8d203ab4bd3f67a7b7263970f1e3624d0e810fa15d8c8056256",
+      "duration": 111.48,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Qwen3-TTS · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "Synthetic voice reference · Qwen VoiceDesign · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "ANITEW name reference · Thorsten · CC0",
+          "url": "https://github.com/thorstenMueller/Thorsten-Voice",
+          "license": "CC0"
+        }
+      ]
+    },
+    {
+      "course": "active-recall",
+      "coach": "rafael",
+      "language": "en",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-active-recall-en-visual-64b9e309f3ef.mp4",
+      "bytes": 1390559,
+      "sha256": "64b9e309f3efb2fedea6781a69778f1b2ca0ace9c95c0e149e8fa0409442b950",
+      "duration": 99.84,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Qwen3-TTS · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "Synthetic voice reference · Qwen VoiceDesign · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        }
+      ]
+    },
+    {
+      "course": "interleaved-practice",
+      "coach": "rafael",
+      "language": "de",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-interleaved-practice-de-visual-8e8ac9a3af55.mp4",
+      "bytes": 1665271,
+      "sha256": "8e8ac9a3af557f627dfe09f209a0088f5e865e285bc6924f9748ebb2d3da026a",
+      "duration": 112.36,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Qwen3-TTS · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "Synthetic voice reference · Qwen VoiceDesign · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "ANITEW name reference · Thorsten · CC0",
+          "url": "https://github.com/thorstenMueller/Thorsten-Voice",
+          "license": "CC0"
+        }
+      ]
+    },
+    {
+      "course": "interleaved-practice",
+      "coach": "rafael",
+      "language": "en",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-interleaved-practice-en-visual-00c6edb5af66.mp4",
+      "bytes": 1522670,
+      "sha256": "00c6edb5af6685aa933b998f6afa3ad45eb31228f6dcd8d574ab9ab04ba4d769",
+      "duration": 103.04,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Qwen3-TTS · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "Synthetic voice reference · Qwen VoiceDesign · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        }
+      ]
+    },
+    {
+      "course": "keyword-method",
+      "coach": "rafael",
+      "language": "de",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-keyword-method-de-visual-c47b85aeb765.mp4",
+      "bytes": 1372054,
+      "sha256": "c47b85aeb765dd84438e4bf777db5068ff25d5a1ec62f787a52c511161d3cece",
+      "duration": 96.04,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Qwen3-TTS · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "Synthetic voice reference · Qwen VoiceDesign · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "ANITEW name reference · Thorsten · CC0",
+          "url": "https://github.com/thorstenMueller/Thorsten-Voice",
+          "license": "CC0"
+        }
+      ]
+    },
+    {
+      "course": "keyword-method",
+      "coach": "rafael",
+      "language": "en",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-keyword-method-en-visual-55ac557297fd.mp4",
+      "bytes": 1300366,
+      "sha256": "55ac557297fdf8e5f48b45f91008c210a0c4e37aa2826c2eede14a6da1206aa8",
+      "duration": 92.68,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Qwen3-TTS · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "Synthetic voice reference · Qwen VoiceDesign · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        }
+      ]
+    },
+    {
+      "course": "long-words",
+      "coach": "rafael",
+      "language": "de",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-long-words-de-visual-2bb5ab97d897.mp4",
+      "bytes": 1402694,
+      "sha256": "2bb5ab97d897ef86b3e5b31bf7afe7c4792f722a6128eea7d101de79ffaa8333",
+      "duration": 93.8,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Qwen3-TTS · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "Synthetic voice reference · Qwen VoiceDesign · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "ANITEW name reference · Thorsten · CC0",
+          "url": "https://github.com/thorstenMueller/Thorsten-Voice",
+          "license": "CC0"
+        }
+      ]
+    },
+    {
+      "course": "long-words",
+      "coach": "rafael",
+      "language": "en",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-long-words-en-visual-a9f8ee33ebc3.mp4",
+      "bytes": 1258006,
+      "sha256": "a9f8ee33ebc3e642d3480d6049dc14e5d390c04bf4098a937efb48e3042fb471",
+      "duration": 90.44,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Qwen3-TTS · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "Synthetic voice reference · Qwen VoiceDesign · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        }
+      ]
+    },
+    {
+      "course": "meaningful-groups",
+      "coach": "rafael",
+      "language": "de",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-meaningful-groups-de-visual-1d66e5cd233c.mp4",
+      "bytes": 1650261,
+      "sha256": "1d66e5cd233cf08720e5083fc134258230fcd668bfbce89454eac0449a7f0701",
+      "duration": 112.84,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Qwen3-TTS · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "Synthetic voice reference · Qwen VoiceDesign · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "ANITEW name reference · Thorsten · CC0",
+          "url": "https://github.com/thorstenMueller/Thorsten-Voice",
+          "license": "CC0"
+        }
+      ]
+    },
+    {
+      "course": "meaningful-groups",
+      "coach": "rafael",
+      "language": "en",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-meaningful-groups-en-visual-7c65fcea1329.mp4",
+      "bytes": 1472227,
+      "sha256": "7c65fcea13296104f8fef31145003d6d91773b99041ea6db35b5c6c605ebca88",
+      "duration": 103.48,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Qwen3-TTS · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "Synthetic voice reference · Qwen VoiceDesign · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        }
+      ]
+    },
+    {
+      "course": "method-of-loci",
+      "coach": "rafael",
+      "language": "de",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-method-of-loci-de-visual-71a1aa109f03.mp4",
+      "bytes": 1417030,
+      "sha256": "71a1aa109f033031199f152ade71fee4e4a19bab2e36fb940515352ef35d1253",
+      "duration": 96.04,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Qwen3-TTS · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "Synthetic voice reference · Qwen VoiceDesign · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "ANITEW name reference · Thorsten · CC0",
+          "url": "https://github.com/thorstenMueller/Thorsten-Voice",
+          "license": "CC0"
+        }
+      ]
+    },
+    {
+      "course": "method-of-loci",
+      "coach": "rafael",
+      "language": "en",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-method-of-loci-en-visual-12b469b8c5fa.mp4",
+      "bytes": 1273971,
+      "sha256": "12b469b8c5facf21f6e37b11a5cdccc6255478eb7fbd364c835b55576b631c09",
+      "duration": 88,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Qwen3-TTS · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "Synthetic voice reference · Qwen VoiceDesign · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        }
+      ]
+    },
+    {
+      "course": "number-images",
+      "coach": "rafael",
+      "language": "de",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-number-images-de-visual-48bfc64cabfe.mp4",
+      "bytes": 1388495,
+      "sha256": "48bfc64cabfe093da11536b9284dda071e3e5a81bc86fd1de4baa37623a79eb0",
+      "duration": 95.24,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Qwen3-TTS · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "Synthetic voice reference · Qwen VoiceDesign · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "ANITEW name reference · Thorsten · CC0",
+          "url": "https://github.com/thorstenMueller/Thorsten-Voice",
+          "license": "CC0"
+        }
+      ]
+    },
+    {
+      "course": "number-images",
+      "coach": "rafael",
+      "language": "en",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-number-images-en-visual-effcc8342215.mp4",
+      "bytes": 1226686,
+      "sha256": "effcc834221597749ad4eb0f4dbb2fddd3cb871c00ca19f89c2081294b900705",
+      "duration": 86.32,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Qwen3-TTS · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "Synthetic voice reference · Qwen VoiceDesign · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        }
+      ]
+    },
+    {
+      "course": "self-explanation",
+      "coach": "rafael",
+      "language": "de",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-self-explanation-de-visual-5995d5e1f69c.mp4",
+      "bytes": 1778132,
+      "sha256": "5995d5e1f69c0bced0a0cde903c17715566d91f5e326f14b84f6b92d40a13a65",
+      "duration": 122.08,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Qwen3-TTS · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "Synthetic voice reference · Qwen VoiceDesign · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "ANITEW name reference · Thorsten · CC0",
+          "url": "https://github.com/thorstenMueller/Thorsten-Voice",
+          "license": "CC0"
+        }
+      ]
+    },
+    {
+      "course": "self-explanation",
+      "coach": "rafael",
+      "language": "en",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-self-explanation-en-visual-a2f6b2ed1351.mp4",
+      "bytes": 1547851,
+      "sha256": "a2f6b2ed1351926199d5cd5b14145ff483a654eeda49b272fa65cf069a0d9cf6",
+      "duration": 105.44,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Qwen3-TTS · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "Synthetic voice reference · Qwen VoiceDesign · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        }
+      ]
+    },
+    {
+      "course": "spaced-practice",
+      "coach": "rafael",
+      "language": "de",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-spaced-practice-de-visual-bae129d38128.mp4",
+      "bytes": 1894976,
+      "sha256": "bae129d3812855a3c469bb9be287753e91528e4530e6d68df63f69a6d376aa3e",
+      "duration": 125.96,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Qwen3-TTS · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "Synthetic voice reference · Qwen VoiceDesign · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        }
+      ]
+    },
+    {
+      "course": "spaced-practice",
+      "coach": "rafael",
+      "language": "en",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-spaced-practice-en-visual-85297877288e.mp4",
+      "bytes": 1713919,
+      "sha256": "85297877288ebf8484090634ac9bb1a3604ea6a54fc3a94a9786da80a71dbec0",
+      "duration": 116.2,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Qwen3-TTS · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "Synthetic voice reference · Qwen VoiceDesign · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        }
+      ]
+    },
+    {
+      "course": "text-meaning",
+      "coach": "rafael",
+      "language": "de",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-text-meaning-de-visual-16d8dfa7966c.mp4",
+      "bytes": 1612544,
+      "sha256": "16d8dfa7966ceed959a7a4881734feae94b6552e989702e4b5941fabd6313266",
+      "duration": 111.2,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Qwen3-TTS · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "Synthetic voice reference · Qwen VoiceDesign · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "ANITEW name reference · Thorsten · CC0",
+          "url": "https://github.com/thorstenMueller/Thorsten-Voice",
+          "license": "CC0"
+        }
+      ]
+    },
+    {
+      "course": "text-meaning",
+      "coach": "rafael",
+      "language": "en",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-text-meaning-en-visual-1dec9323d795.mp4",
+      "bytes": 1409333,
+      "sha256": "1dec9323d795873934da7ee93790f2c09b072069a53fe03153a183543d011223",
+      "duration": 97.08,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Qwen3-TTS · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "Synthetic voice reference · Qwen VoiceDesign · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        }
+      ]
+    },
+    {
+      "course": "text-verbatim",
+      "coach": "rafael",
+      "language": "de",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-text-verbatim-de-visual-17acd8f748eb.mp4",
+      "bytes": 1356902,
+      "sha256": "17acd8f748eba30b8b45511da71e2f19f6b6f3427c5e0e0c5f7f64ef24b6ea87",
+      "duration": 95.76,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Qwen3-TTS · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "Synthetic voice reference · Qwen VoiceDesign · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "ANITEW name reference · Thorsten · CC0",
+          "url": "https://github.com/thorstenMueller/Thorsten-Voice",
+          "license": "CC0"
+        }
+      ]
+    },
+    {
+      "course": "text-verbatim",
+      "coach": "rafael",
+      "language": "en",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-text-verbatim-en-visual-4ccbcf977a86.mp4",
+      "bytes": 1206768,
+      "sha256": "4ccbcf977a86e60d6dd7a167dc23850ce01046a61ff12663a07ae4081483bd88",
+      "duration": 86.4,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Qwen3-TTS · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "Synthetic voice reference · Qwen VoiceDesign · Apache 2.0",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        }
+      ]
+    },
+    {
+      "course": "method-of-loci",
+      "coach": "rafael",
+      "language": "fr",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-method-of-loci-fr-visual-ca703efe15ce.mp4",
+      "bytes": 1161366,
+      "sha256": "ca703efe15ce244b4dafecb2ace759a8c7caaf202c947f1744fae91466cc5b77",
+      "duration": 78.52,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Atta voice · Qwen3-TTS",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "ANITEW synthetic reference · Qwen VoiceDesign",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        }
+      ]
+    },
+    {
+      "course": "number-images",
+      "coach": "rafael",
+      "language": "fr",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-number-images-fr-visual-75fb3807cd47.mp4",
+      "bytes": 1273876,
+      "sha256": "75fb3807cd47e3fcc7a19cf4eb7a863e23e4d8dbec49d4fde0dc0d836ab9fa54",
+      "duration": 88.84,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Atta voice · Qwen3-TTS",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "ANITEW synthetic reference · Qwen VoiceDesign",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        }
+      ]
+    },
+    {
+      "course": "interleaved-practice",
+      "coach": "rafael",
+      "language": "fr",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-interleaved-practice-fr-visual-8153ae5b2f24.mp4",
+      "bytes": 1429455,
+      "sha256": "8153ae5b2f24ae8597fe46161f63f63c6c3fa8110326c57b97e7883b16df333e",
+      "duration": 95.92,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Atta voice · Qwen3-TTS",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "ANITEW synthetic reference · Qwen VoiceDesign",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        }
+      ]
+    },
+    {
+      "course": "story-method",
+      "coach": "rafael",
+      "language": "de",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-story-de-visual-04f09d8aa552.mp4",
+      "bytes": 1641297,
+      "sha256": "04f09d8aa5520824119183482aa7aa45c42739494cf1f28b261e8afaa7544a3e",
+      "duration": 102.6,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Atta voice · Qwen3-TTS",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "ANITEW synthetic reference · Qwen VoiceDesign",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "ANITEW AI coach portrait and logo animation",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW assets"
+        }
+      ]
+    },
+    {
+      "course": "story-method",
+      "coach": "rafael",
+      "language": "fr",
+      "presentation": "illustrated",
+      "src": "/course-media/video/atta-story-fr-visual-017409c07a09.mp4",
+      "bytes": 1310725,
+      "sha256": "017409c07a09a69f0143e67ee95cbd420075684e07077a2093b3f41cb67fd3c0",
+      "duration": 83.88,
+      "credits": [
+        {
+          "name": "ANITEW original illustrations",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW graphics"
+        },
+        {
+          "name": "Atta voice · Qwen3-TTS",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "ANITEW synthetic reference · Qwen VoiceDesign",
+          "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "license": "Apache-2.0"
+        },
+        {
+          "name": "ANITEW AI coach portrait and logo animation",
+          "url": "https://github.com/Impekal/anitew",
+          "license": "Original ANITEW assets"
+        }
+      ]
+    }
+  ]
+}
