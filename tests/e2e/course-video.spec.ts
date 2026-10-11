@@ -1,6 +1,6 @@
 import {test,expect} from '@playwright/test'
 import {visit,openPage} from './helpers.ts'
-test('unavailable German video is not offered or requested',async({page})=>{
+test('reading view does not load a video before playback is selected',async({page})=>{
  const videos:string[]=[]
  page.on('request',request=>{if(request.url().includes('/course-media/video/'))videos.push(request.url())})
  await visit(page)
@@ -13,18 +13,18 @@ test('unavailable German video is not offered or requested',async({page})=>{
 
 import {courseVideo} from '../../src/i18n/courseVideos.ts'
 test.use({channel:'chromium',launchOptions:{args:['--disable-gpu',...(process.platform==='darwin'?['--disable-audio-output']:[])]}})
-test.describe('complete edited video',()=>{
+for(const spoken of ['en','de','fr'] as const)test.describe(`${spoken} complete edited video`,()=>{
  test('Atta video uses edited chapters, translated captions, offline download and recall gate',async({page,context})=>{
   test.setTimeout(90_000)
   const external:string[]=[]
   const origin=new URL(test.info().project.use.baseURL!).origin
   page.on('request',r=>{if(/^https?:/.test(r.url())&&!r.url().startsWith(origin+'/'))external.push(r.url())})
-  const asset=courseVideo('story-method','en','rafael')!
+  const asset=courseVideo('story-method',spoken,'rafael')!
   await visit(page)
   await openPage(page,'Lernkurse')
   await page.getByRole('button',{name:'Kurs öffnen : Begriffe durch Geschichten verbinden',exact:true}).click()
   await page.getByRole('button',{name:'Anhören und ansehen',exact:true}).click()
-  await page.locator('#course-audio-language').selectOption('en')
+  await page.locator('#course-audio-language').selectOption(spoken)
   await page.locator('#course-format').selectOption('video')
   const video=page.locator('.course-media video')
   await expect(video).toHaveAttribute('src',asset.src)
@@ -58,7 +58,7 @@ test.describe('complete edited video',()=>{
   await video.evaluate((el:HTMLVideoElement)=>{el.currentTime=0})
   await expect.poll(()=>video.evaluate((el:HTMLVideoElement)=>el.seeking)).toBe(false)
   await page.screenshot({path:test.info().outputPath('complete-video.png')})
-  await video.evaluate((el:HTMLVideoElement,boundary)=>{el.currentTime=boundary+.05;el.dispatchEvent(new Event('timeupdate'))},asset.cues[16].start)
+  await video.evaluate((el:HTMLVideoElement,boundary)=>{el.currentTime=boundary+.05;el.dispatchEvent(new Event('timeupdate'))},asset.recallBoundary??asset.cues[16].start)
   await expect(page.getByLabel('Deine Antwort',{exact:true})).toBeVisible()
   await expect(video).toHaveCount(0)
   await page.getByLabel('Deine Antwort',{exact:true}).fill('Schlüssel, Zitrone, Fahrrad')

@@ -6,7 +6,7 @@ import {courseNarration} from '../../src/i18n/courseNarrations.ts'
 import {videoCaptions} from '../../src/core/courses/captions.ts'
 import {storyMedia} from '../../src/i18n/storyMedia.ts'
 it('retains the complete Atta English video alongside approved French illustrations',()=>{
- expect(courseVideos).toHaveLength(31)
+ expect(courseVideos).toHaveLength(36)
  const video=courseVideo('story-method','en','rafael')!
  expect(video).toBeDefined()
  expect(video.src).toMatch(/^\/course-media\/video\/atta-story-en-[a-f0-9]+\.mp4$/)
@@ -14,7 +14,7 @@ it('retains the complete Atta English video alongside approved French illustrati
  expect(bytes.length).toBe(video.bytes)
  expect(createHash('sha256').update(bytes).digest('hex')).toBe(video.sha256)
  expect(video.credits.some(c=>c.name==='Created with WanGP')).toBe(true)
- for(const coach of ['original','lin','rafael'] as const)expect(courseVideo('story-method','de',coach)).toBeUndefined()
+ for(const coach of ['original','lin','rafael'] as const)expect(courseVideo('story-method','de',coach)?.presentation).toBe('illustrated')
  expect(courseVideo('story-method','en','lin')).toBeUndefined()
 })
 it('uses the edited timeline for all 21 captions and keeps answers after the exercise',()=>{
@@ -35,9 +35,9 @@ it('uses the edited timeline for all 21 captions and keeps answers after the exe
  }
 })
 
-it('bundles the eight approved French visual courses for every coach with complete subtitles and a safe practice boundary',()=>{
- const videos=courseVideos.filter(v=>v.presentation==='illustrated'&&v.language==='fr')
- expect(videos).toHaveLength(8)
+it('bundles eleven French visual courses for every coach with complete subtitles and a safe practice boundary',()=>{
+ const videos=courseVideos.filter(v=>v.presentation==='illustrated'&&v.language==='fr'&&v.course!=='story-method')
+ expect(videos).toHaveLength(11)
  for(const v of videos){
   const bytes=readFileSync(`public${v.src}`)
   expect(createHash('sha256').update(bytes).digest('hex')).toBe(v.sha256)
@@ -55,7 +55,7 @@ it('bundles the eight approved French visual courses for every coach with comple
 })
 
  it('bundles 22 DE/EN visual lessons with complete local captions and matching assets',()=>{
- const videos=courseVideos.filter(v=>v.presentation==='illustrated'&&v.language!=='fr')
+ const videos=courseVideos.filter(v=>v.presentation==='illustrated'&&v.language!=='fr'&&v.course!=='story-method')
  expect(videos).toHaveLength(22)
  for(const v of videos){
   const bytes=readFileSync(`public${v.src}`)
@@ -67,5 +67,18 @@ it('bundles the eight approved French visual courses for every coach with comple
   for(const lines of Object.values(v.captions!))expect(lines).toHaveLength(v.cues.length)
   expect(v.recallBoundary).toBeLessThan(v.cues.at(-1)!.start)
   expect(v.recallBoundary).toBeGreaterThan(v.cues.at(-2)!.start)
+ }
+})
+
+it('keeps DE/FR first courses local with complete captions and a gate before answers',()=>{
+ for(const lang of ['de','fr'] as const){
+  const v=courseVideo('story-method',lang,'rafael')!
+  expect(v.cues).toHaveLength(21)
+  expect(Object.keys(v.captions!)).toHaveLength(11)
+  for(const lines of Object.values(v.captions!))expect(lines).toHaveLength(21)
+  expect(v.recallBoundary).toBeLessThan(v.cues[17].start)
+  const bytes=readFileSync(`public${v.src}`)
+  expect(bytes.length).toBe(v.bytes)
+  expect(createHash('sha256').update(bytes).digest('hex')).toBe(v.sha256)
  }
 })

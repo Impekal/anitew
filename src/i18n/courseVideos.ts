@@ -7548,6 +7548,1461 @@ export const courseVideos:CourseVideo[]=[
         "license": "Apache-2.0"
       }
     ]
+  },
+  {
+    "course": "method-of-loci",
+    "coach": "rafael",
+    "language": "fr",
+    "mime": "video/mp4",
+    "presentation": "illustrated",
+    "src": "/course-media/video/atta-method-of-loci-fr-visual-ca703efe15ce.mp4",
+    "bytes": 1161366,
+    "sha256": "ca703efe15ce244b4dafecb2ace759a8c7caaf202c947f1744fae91466cc5b77",
+    "duration": 78.52,
+    "cues": [
+      {
+        "start": 0.0,
+        "end": 1.68
+      },
+      {
+        "start": 1.68,
+        "end": 11.8
+      },
+      {
+        "start": 11.8,
+        "end": 22.08
+      },
+      {
+        "start": 22.08,
+        "end": 26.52
+      },
+      {
+        "start": 26.52,
+        "end": 31.08
+      },
+      {
+        "start": 31.08,
+        "end": 35.52
+      },
+      {
+        "start": 35.52,
+        "end": 39.24
+      },
+      {
+        "start": 39.24,
+        "end": 46.16
+      },
+      {
+        "start": 46.16,
+        "end": 53.04
+      },
+      {
+        "start": 53.04,
+        "end": 65.4
+      },
+      {
+        "start": 65.4,
+        "end": 70.36
+      },
+      {
+        "start": 70.36,
+        "end": 78.52
+      }
+    ],
+    "captions": {
+      "de": [
+        "Orte als Gedächtnisstützen nutzen",
+        "Bei der Loci-Methode legst du vorgestellte Inhalte an feste Orte eines vertrauten Weges. Beim gedanklichen Abgehen helfen die Orte, die Inhalte wiederzufinden.",
+        "Lerne zuerst einen stabilen Weg. Zu viele ähnliche Bilder am selben Ort können sich verwechseln. Die Orte unterstützen Struktur und Reihenfolge, nicht automatisch exakte Formulierungen.",
+        "Wähle einen vertrauten Weg mit klar unterscheidbaren Stationen.",
+        "Lege eine feste Reihenfolge fest und gehe sie einmal ohne Lerninhalt durch.",
+        "Verbinde pro Station einen Begriff durch ein deutliches vorgestelltes Ereignis mit dem Ort.",
+        "Gehe die Stationen ohne Vorlage ab und nenne die Begriffe.",
+        "Vergleiche den Abruf. Verbessere verwechselbare Orte oder schwache Bilder.",
+        "Beispielweg: Haustür → Schuhregal → Küchentisch. Begriffe: Brot → Seife → Kerze.",
+        "An der Haustür klemmt ein riesiges Brot. Das Schuhregal quillt vor Seifenschaum über. Auf dem Küchentisch steht eine leuchtende Kerze. Der Weg dient hier nur als Beispiel; für eigenes Lernen eignet sich ein tatsächlich vertrauter Weg.",
+        "Gehe die drei Stationen gedanklich ab. Schreibe zu jeder Station den zugehörigen Begriff.",
+        "Lege im bestehenden Gedächtnispalast der App deinen vertrauten Weg an oder nutze einen vorhandenen. Beginne mit wenigen Stationen und prüfe, ob du jeden Ort sicher unterscheiden kannst."
+      ],
+      "en": [
+        "Use places as memory cues",
+        "In the method of loci, you place imagined content at fixed locations along a familiar route. Walking the route in your mind provides cues for retrieving it.",
+        "Learn a stable route first. Similar images at the same location can be confused. Locations support structure and order, not automatically exact wording.",
+        "Choose a familiar route with clearly distinct locations.",
+        "Fix their order and rehearse the route without learning material.",
+        "Connect one item to each location through a vivid imagined event.",
+        "Walk the route without looking and name the items.",
+        "Compare your recall and improve confusing locations or weak images.",
+        "Example route: front door → shoe rack → kitchen table. Items: bread → soap → candle.",
+        "A giant loaf blocks the front door. The shoe rack overflows with soap foam. A candle glows on the kitchen table. This is only an example route; use a genuinely familiar route for your own learning.",
+        "Mentally visit the three locations. Write the item associated with each location.",
+        "Use the app’s existing memory palace to create a familiar route or use an available one. Start with a few locations and check that you can clearly distinguish them."
+      ],
+      "fr": [
+        "Utiliser les lieux comme indices",
+        "Avec la méthode des loci, tu places mentalement des contenus à des endroits fixes d’un trajet familier. Parcourir ce trajet dans ta tête fournit des indices pour les retrouver.",
+        "Apprends d’abord un trajet stable. Des images semblables au même endroit peuvent se confondre. Les lieux soutiennent la structure et l’ordre, mais pas automatiquement la formulation exacte.",
+        "Choisis un trajet familier avec des endroits clairement distincts.",
+        "Fixe leur ordre. Répète ensuite le trajet sans contenu à apprendre.",
+        "Associe un élément à chaque endroit par un événement imaginé marquant.",
+        "Parcours le trajet sans modèle et nomme les éléments.",
+        "Vérifie les éléments retrouvés avec la liste initiale. Améliore ensuite les lieux confus ou les images peu efficaces.",
+        "Trajet d’exemple : porte d’entrée → meuble à chaussures → table de cuisine. Éléments : pain → savon → bougie.",
+        "Un pain géant bloque la porte. Le meuble à chaussures déborde de mousse de savon. Une bougie brille sur la table de cuisine. Ce trajet est seulement un exemple ; choisis un trajet réellement familier pour ton propre apprentissage.",
+        "Visite mentalement les trois endroits. Puis écris l’élément associé à chacun.",
+        "Dans le palais de mémoire existant de l’application, crée un trajet familier ou utilise un trajet proposé. Commence par quelques endroits et vérifie que tu les distingues clairement."
+      ],
+      "es": [
+        "Utiliza lugares como pistas de memoria",
+        "En el método de los lugares, colocas contenido imaginado en ubicaciones fijas a lo largo de un recorrido familiar. Al caminar por el recorrido en tu mente, obtienes pistas para recuperar la información.",
+        "Aprende primero un recorrido estable. Las imágenes parecidas en el mismo lugar pueden confundirse. Los lugares ayudan con la estructura y el orden, pero no garantizan recordar las palabras exactas.",
+        "Elige un recorrido familiar con ubicaciones claramente distintas.",
+        "Fija el orden y repasa el recorrido sin incluir material de aprendizaje.",
+        "Conecta un elemento con cada ubicación mediante un evento imaginado vívido.",
+        "Camina por el recorrido sin mirar y nombra los elementos.",
+        "Compara tu recuerdo y mejora ubicaciones confusas o imágenes débiles.",
+        "Ejemplo de recorrido: puerta principal → estantería de zapatos → mesa de la cocina. Elementos: pan → jabón → vela.",
+        "Un pan gigante bloquea la puerta principal. El zapatero rebosa espuma de jabón. Una vela brilla en la mesa de la cocina. Es solo un ejemplo: para aprender tu propio material, utiliza un recorrido que conozcas bien.",
+        "Visita mentalmente las tres ubicaciones. Escribe el elemento asociado a cada una.",
+        "Utiliza el palacio de la memoria existente en la app para crear un recorrido familiar o utiliza uno disponible. Comienza con unas pocas ubicaciones y verifica que puedas distinguirlas claramente."
+      ],
+      "it": [
+        "Usa i luoghi come indizi per ricordare",
+        "Nel metodo dei loci, collochi contenuti immaginati in punti fissi lungo un percorso familiare. Ripercorrerlo mentalmente fornisce indizi per ricordarli.",
+        "Impara prima un percorso stabile. Immagini simili nello stesso luogo possono confondersi. I luoghi aiutano con struttura e ordine, ma non garantiscono il ricordo delle parole esatte.",
+        "Scegli un percorso familiare con posizioni chiaramente distinte.",
+        "Fissa l'ordine e ripeti il percorso senza materiale da imparare.",
+        "Collega un elemento a ogni posizione attraverso un evento immaginato vivido.",
+        "Cammina lungo il percorso senza guardare e nomina gli elementi.",
+        "Confronta il tuo ricordo e migliora le posizioni confuse o le immagini deboli.",
+        "Percorso di esempio: porta d’ingresso → scarpiera → tavolo della cucina. Elementi: pane → sapone → candela.",
+        "Un pane gigante blocca la porta d’ingresso. La scarpiera trabocca di schiuma di sapone. Una candela brilla sul tavolo della cucina. È solo un esempio: per il tuo materiale, usa un percorso che conosci davvero.",
+        "Visita mentalmente le tre posizioni. Scrivi l'elemento associato a ciascuna posizione.",
+        "Usa il palazzo della memoria già presente nell’app per creare un percorso familiare o sceglierne uno disponibile. Inizia con pochi luoghi e verifica di distinguerli bene."
+      ],
+      "pt": [
+        "Use lugares como pistas de memória",
+        "No método das localizações, você coloca conteúdos imaginários em locais fixos ao longo de um percurso familiar. Caminhar pelo percurso na sua mente fornece pistas para recuperar o conteúdo.",
+        "Aprenda primeiro um percurso estável. Imagens semelhantes no mesmo local podem causar confusão. Os locais ajudam com a estrutura e a ordem, mas não garantem recordar as palavras exatas.",
+        "Escolha um percurso familiar com locais claramente distintos.",
+        "Fixe a ordem e repita o percurso sem incluir material de aprendizagem.",
+        "Ligue um item a cada localização por meio de um evento imaginário vívido.",
+        "Caminhe pelo percurso sem olhar e nomeie os itens.",
+        "Compare o que recordou e melhore os locais confusos ou as imagens pouco claras.",
+        "Percurso de exemplo: porta da frente → sapateira → mesa da cozinha. Elementos: pão → sabão → vela.",
+        "Um pão gigante bloqueia a porta da frente. A sapateira transborda de espuma de sabão. Uma vela brilha sobre a mesa da cozinha. É apenas um exemplo: para aprender o seu material, use um percurso que conheça bem.",
+        "Visite mentalmente as três localizações. Escreva o item associado a cada localização.",
+        "Use o palácio da memória da aplicação para criar um percurso familiar ou escolher um disponível. Comece com poucos locais e verifique se consegue distingui-los claramente."
+      ],
+      "nl": [
+        "Gebruik plaatsen als geheugensteuntjes",
+        "Bij de loci-methode plaats je denkbeeldige inhoud op vaste plekken langs een bekende route. Als je die route in gedachten aflegt, helpen de plekken je om de inhoud terug te vinden.",
+        "Leer eerst een vaste route. Vergelijkbare beelden op dezelfde plek kunnen verwarring geven. Plaatsen ondersteunen structuur en volgorde, maar niet automatisch de precieze woorden.",
+        "Kies een bekende route met duidelijk onderscheidende locaties.",
+        "Leg de volgorde vast en oefen de route zonder leerstof.",
+        "Verbind elk element met een plek door een levendige denkbeeldige gebeurtenis.",
+        "Loop de route zonder te kijken en noem de items.",
+        "Vergelijk wat je hebt opgehaald en verbeter verwarrende plekken of onduidelijke beelden.",
+        "Voorbeeldroute: voordeur → schoenrek → keukentafel. Artikelen: brood → zeep → kaars.",
+        "Een enorm brood blokkeert de voordeur. Het schoenenrek stroomt over van zeepschuim. Een kaars brandt op de keukentafel. Dit is alleen een voorbeeldroute; gebruik voor je eigen leerstof een route die je echt kent.",
+        "Bezoek mentaal de drie locaties. Schrijf het item dat bij elke locatie hoort.",
+        "Gebruik het bestaande geheugenpaleis in de app om een bekende route te maken of kies een beschikbare route. Begin met enkele plekken en controleer of je ze duidelijk uit elkaar kunt houden."
+      ],
+      "tr": [
+        "Mekânları hatırlama ipucu olarak kullan",
+        "Loci yönteminde, hayal ettiğin içerikleri tanıdık bir yol üzerindeki sabit yerlere yerleştirirsin. Yolu zihninde yürümek, içerikleri hatırlaman için ipuçları sağlar.",
+        "Önce sabit bir yol öğren. Aynı yerdeki benzer görüntüler karışabilir. Yerler yapıyı ve sırayı destekler; sözcükleri aynen hatırlamayı kendiliğinden sağlamaz.",
+        "Yerleri açıkça ayırt edilebilen, tanıdık bir yol seç.",
+        "Sırayı sabitle ve öğrenilecek malzeme olmadan yolu çalış.",
+        "Her yere bir öğeyi canlı bir hayali olayla bağla.",
+        "Kaynağa bakmadan yolu zihninde yürü ve öğeleri söyle.",
+        "Hatırladıklarını karşılaştır; karışan yerleri veya zayıf görüntüleri iyileştir.",
+        "Örnek yol: giriş kapısı → ayakkabılık → mutfak masası. Öğeler: ekmek → sabun → mum.",
+        "Dev bir ekmek giriş kapısını kapatır. Ayakkabılıktan sabun köpüğü taşar. Mutfak masasında bir mum yanar. Bu yalnızca örnek bir yoldur; kendi öğrenmen için gerçekten bildiğin bir yol kullan.",
+        "Üç yeri zihninde ziyaret et. Her yerle ilişkilendirdiğin öğeyi yaz.",
+        "Tanıdık bir yol oluşturmak veya mevcut birini seçmek için uygulamadaki hafıza sarayını kullan. Birkaç yerle başla ve bunları açıkça ayırt edebildiğini kontrol et."
+      ],
+      "ar": [
+        "استخدم الأماكن دلائل للتذكّر",
+        "في طريقة المواقع، تضع محتوى متخيّلًا في أماكن ثابتة على طريق مألوف. المرور بهذا الطريق ذهنيًا يوفّر دلائل لاسترجاعه.",
+        "تعلّم طريقًا ثابتًا أولًا. قد تختلط الصور المتشابهة في المكان نفسه. تدعم الأماكن البنية والترتيب، لكنها لا تضمن حفظ الألفاظ نفسها.",
+        "اختر طريقًا مألوفًا ذا أماكن يسهل تمييزها.",
+        "ثبّت ترتيب الأماكن وتدرّب على الطريق دون مادة للحفظ.",
+        "اربط كل عنصر بمكان من خلال حدث متخيّل واضح.",
+        "مرّ بالطريق ذهنيًا دون النظر إلى المصدر واذكر العناصر.",
+        "قارن ما استرجعته وحسّن الأماكن المربكة أو الصور الضعيفة.",
+        "طريق نموذجي: باب المنزل → رف الأحذية → طاولة المطبخ. العناصر: خبز → صابون → شمعة.",
+        "رغيف ضخم يسد باب المنزل. يفيض رف الأحذية برغوة الصابون. تضيء شمعة على طاولة المطبخ. هذا طريق نموذجي فقط؛ استخدم طريقًا تعرفه فعلًا لتعلّم مادتك.",
+        "زر الأماكن الثلاثة ذهنيًا. اكتب العنصر المرتبط بكل مكان.",
+        "استخدم قصر الذاكرة الموجود في التطبيق لإنشاء طريق مألوف أو اختيار طريق متاح. ابدأ بأماكن قليلة وتحقّق من قدرتك على تمييزها بوضوح."
+      ],
+      "zh": [
+        "使用地点作为记忆提示",
+        "在位置法中，你将想象中的内容放置在熟悉路线的固定位置上。在脑海中走一遍这条路线，可以作为提取信息的提示。",
+        "先熟悉一条固定路线。同一地点上的相似图像可能混淆。地点有助于记住结构和顺序，但不能自动保证逐字记忆。",
+        "选择一条熟悉的路线，且各个位置清晰分明。",
+        "固定各位置的顺序，并在不学习内容的情况下反复练习路线。",
+        "通过一个生动的想象事件，将每个物品与相应位置连接起来。",
+        "不看原文，在脑海中沿路线前进并说出各项内容。",
+        "将你的回忆结果进行对比，并改进容易混淆的位置或模糊的图像。",
+        "示例路线：前门 → 鞋架 → 厨房餐桌。物品：面包 → 肥皂 → 蜡烛。",
+        "一个巨大的面包挡住前门。鞋架溢出肥皂泡沫。厨房餐桌上亮着一支蜡烛。这只是示例；学习自己的内容时，请使用真正熟悉的路线。",
+        "在脑海中依次访问这三个位置，写下与每个位置相关的物品。",
+        "使用应用中已有的记忆宫殿创建一条熟悉的路线，或使用现有的路线。从几个位置开始，并确保你能清楚地区分它们。"
+      ],
+      "ja": [
+        "場所を記憶の手掛かりにする",
+        "場所法では、想像した内容を、よく知る道順の決まった場所に置きます。その道順を頭の中でたどると、内容を思い出す手掛かりになります。",
+        "まず、安定したルートを学びます。同じ場所に似たイメージは混同されやすいです。場所は構造と順序を支えますが、自動的に正確な言葉を再現するわけではありません。",
+        "明確で異なる場所を持つ、よく知っているルートを選ぶ",
+        "場所の順序を固定し、学習内容なしでルートを繰り返し歩きます。",
+        "各アイテムを、その場所と結びつけるために、鮮明な想定された出来事をつくります。",
+        "資料を見ずに頭の中で道順をたどり、各項目を言いましょう。",
+        "思い出の正確さを比較し、混同しやすい場所や弱いイメージを改善します。",
+        "道順の例：玄関 → 靴棚 → 台所のテーブル。項目：パン → 石けん → ろうそく。",
+        "巨大なパンが玄関をふさぎ、靴棚から石けんの泡があふれ、台所のテーブルではろうそくが光っています。これは例です。自分の学習には、本当によく知っている道順を使いましょう。",
+        "3つの場所を心で訪ね、各場所に関連するアイテムを書き出します。",
+        "アプリの既存の記憶の宮殿を使って、慣れ親しんだルートを作成するか、利用可能なルートを使う。最初は数か所から始め、それらが明確に区別できるか確認します。"
+      ]
+    },
+    "recallBoundary": 69.41480833333333,
+    "credits": [
+      {
+        "name": "ANITEW original illustrations",
+        "url": "https://github.com/Impekal/anitew",
+        "license": "Original ANITEW graphics"
+      },
+      {
+        "name": "Atta voice · Qwen3-TTS",
+        "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+        "license": "Apache-2.0"
+      },
+      {
+        "name": "ANITEW synthetic reference · Qwen VoiceDesign",
+        "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+        "license": "Apache-2.0"
+      }
+    ]
+  },
+  {
+    "course": "number-images",
+    "coach": "rafael",
+    "language": "fr",
+    "mime": "video/mp4",
+    "presentation": "illustrated",
+    "src": "/course-media/video/atta-number-images-fr-visual-75fb3807cd47.mp4",
+    "bytes": 1273876,
+    "sha256": "75fb3807cd47e3fcc7a19cf4eb7a863e23e4d8dbec49d4fde0dc0d836ab9fa54",
+    "duration": 88.84,
+    "cues": [
+      {
+        "start": 0.0,
+        "end": 3.44
+      },
+      {
+        "start": 3.44,
+        "end": 12.56
+      },
+      {
+        "start": 12.56,
+        "end": 25.68
+      },
+      {
+        "start": 25.68,
+        "end": 30.0
+      },
+      {
+        "start": 30.0,
+        "end": 33.04
+      },
+      {
+        "start": 33.04,
+        "end": 36.56
+      },
+      {
+        "start": 36.56,
+        "end": 41.68
+      },
+      {
+        "start": 41.68,
+        "end": 46.44
+      },
+      {
+        "start": 46.44,
+        "end": 59.24
+      },
+      {
+        "start": 59.24,
+        "end": 75.08
+      },
+      {
+        "start": 75.08,
+        "end": 80.92
+      },
+      {
+        "start": 80.92,
+        "end": 88.84
+      }
+    ],
+    "captions": {
+      "de": [
+        "Zahlen in Bilder übersetzen",
+        "Das Major-System ordnet Ziffern Konsonantenlaute zu. Daraus bildest du ein Wort und stellst dir ein Bild vor. Dieses Bild soll sich wieder in die Zahl zurückübersetzen lassen.",
+        "Du musst die Zuordnungen zuerst lernen. Ein Bild ohne verlässliche Rückübersetzung hilft beim Zahlenabruf nicht. Dieser Einstieg übt nur zwei Ziffern; die vorhandenen Major-Lektionen vermitteln weitere Zuordnungen.",
+        "Lerne zunächst wenige feste Ziffer-Laut-Paare.",
+        "Lies die Laute in der Reihenfolge der Ziffern.",
+        "Ergänze passende Vokale zu einem bildhaften Wort.",
+        "Prüfe die Konsonantenlaute: Enthält das Wort zusätzliche zählende Laute?",
+        "Rufe aus dem Bild das Wort und aus dessen Lauten wieder die Zahl ab.",
+        "1 → t/d; 2 → n. Die Zahl 12 kann zum Bild einer Tonne Sand werden, französisch „tonne“: t + n.",
+        "Rückwärts ergibt t die 1 und n die 2, also wieder 12. Entscheidend sind die Konsonantenlaute des französischen Wortes „tonne“, nicht nur die geschriebenen Buchstaben.",
+        "Rufe das gehörte Beispiel ohne Vorlage ab. Erkläre die Bedeutung und den Weg der Merkhilfe.",
+        "Übe die weiteren festen Zuordnungen in den bestehenden Major-Lektionen. Füge erst dann längere Zahlenfolgen hinzu. Prüfe bei jedem eigenen Bild den Rückweg zur exakten Zahl."
+      ],
+      "en": [
+        "Turn numbers into images",
+        "The Major System assigns consonant sounds to digits. Use them to form a word and imagine an image that can be decoded back into the number.",
+        "Learn the mappings first. An image that cannot be decoded reliably does not help exact number recall. This introduction uses two digits; the existing Major lessons teach further mappings.",
+        "Learn a few fixed digit-to-sound pairs first.",
+        "Read the sounds in the order of the digits.",
+        "Add vowels to form a concrete word.",
+        "Check whether the word contains additional consonant sounds that would encode extra digits.",
+        "Retrieve the word from the image and decode its sounds back into the number.",
+        "1 → t/d; 2 → n. The number 12 can become an image of a tonne of sand, “tonne” in French: t + n.",
+        "In reverse, t gives 1 and n gives 2: this recovers 12. The consonant sounds of the French word “tonne” matter, not just the written letters.",
+        "Recall the example you heard without looking. Explain its meaning and how the memory cue works.",
+        "Practise further fixed mappings in the existing Major lessons before tackling longer numbers. Check that every image you create decodes to the exact intended number."
+      ],
+      "fr": [
+        "Transformer les nombres en images",
+        "Le système majeur associe des sons consonantiques aux chiffres. Tu formes un mot et imagines une image que tu peux ensuite reconvertir en nombre.",
+        "Apprends d’abord les correspondances. Une image qui ne permet pas de retrouver exactement le nombre n’aide pas au rappel précis. Cette introduction utilise deux chiffres ; les leçons existantes du système majeur présentent d’autres correspondances.",
+        "Apprends d’abord quelques correspondances fixes entre chiffres et sons.",
+        "Lis les sons, dans l’ordre des chiffres.",
+        "Ajoute des voyelles pour former un mot concret.",
+        "Vérifie si le mot contient d’autres consonnes prononcées qui coderaient des chiffres supplémentaires.",
+        "Retrouve le mot à partir de l’image, puis le nombre à partir de ses sons.",
+        "Pour le chiffre un, utilise le premier son de tapis ou de dos. Pour le chiffre deux, utilise le premier son de nez. Pour douze, imagine une tonne de sable. Dans tonne, tu retrouves le son initial de tapis, puis celui de nez.",
+        "Dans cet exercice, les voyelles ne comptent pas. Le mot tonne s’écrit avec deux lettres identiques au milieu, mais elles représentent un seul son. Le premier son consonantique code un. Le second code deux. Tu retrouves douze. On compte les sons, pas le nombre de lettres.",
+        "Quel nombre code l’image d’une tonne de sable ? Explique le retour par les deux consonnes prononcées.",
+        "Travaille les autres correspondances fixes dans les leçons existantes avant de mémoriser des nombres plus longs. Assure-toi que chaque image te ramène exactement au nombre voulu."
+      ],
+      "es": [
+        "Convertir números en imágenes",
+        "El sistema mayor asigna sonidos consonánticos a los dígitos. Úsalos para formar una palabra e imaginar una imagen que puedas volver a convertir en el número.",
+        "Aprende los mapeos primero. Una imagen que no se pueda decodificar de forma fiable no ayuda en el recuerdo exacto del número. Esta introducción utiliza dos dígitos; las lecciones existentes sobre el Sistema Mayor enseñan mapeos adicionales.",
+        "Aprende unos pocos pares fijos de dígito a sonido primero.",
+        "Lee los sonidos en el orden de los dígitos.",
+        "Agrega vocales para formar una palabra concreta.",
+        "Verifica si la palabra contiene sonidos de consonantes adicionales que codificarían dígitos extra.",
+        "Recupera la palabra desde la imagen y decodifica sus sonidos de nuevo en el número.",
+        "1 → t/d; 2 → n. 12 → tonne (tonelada de arena) → t + n.",
+        "La vocal no cuenta aquí. En la dirección inversa, t da 1 y n da 2, recuperando 12. Importa la secuencia sonora, no solo las letras escritas.",
+        "tonne: ¿Qué número representa esta palabra? Explica cómo lo recuperas a partir de sus dos consonantes.",
+        "Practica más correspondencias fijas en las lecciones existentes del sistema mayor antes de trabajar con números largos. Comprueba que cada imagen permita recuperar exactamente el número previsto."
+      ],
+      "it": [
+        "Trasforma i numeri in immagini",
+        "Il sistema maggiore associa suoni consonantici alle cifre. Usali per formare una parola e immaginare un’immagine che puoi riconvertire nel numero.",
+        "Impara prima le corrispondenze. Un'immagine che non può essere decodificata in modo affidabile non aiuta nella memorizzazione precisa dei numeri. Questa introduzione utilizza due cifre; i corsi esistenti sul Sistema Maggiore insegnano ulteriori mappature.",
+        "Impara prima alcune corrispondenze fisse tra cifre e suoni.",
+        "Leggi i suoni nell'ordine dei numeri.",
+        "Aggiungi vocali per formare una parola concreta.",
+        "Verifica se la parola contiene suoni consonantici aggiuntivi che potrebbero codificare cifre extra.",
+        "Ricorda la parola dall'immagine e decodifica i suoni per ottenere il numero.",
+        "1 → t/d; 2 → n. 12 → tonne (tonnellata di sabbia) → t + n.",
+        "La vocale non conta qui. Nel senso inverso, t dà 1 e n dà 2, ripristinando 12. La sequenza sonora conta, non solo le lettere scritte.",
+        "tonne: Quale numero rappresenta questa parola? Spiega come lo ricavi dai due suoni consonantici.",
+        "Pratica ulteriori mappature fisse nei corsi esistenti sul Sistema Maggiore prima di affrontare numeri più lunghi. Verifica che ogni immagine che crei decodifichi esattamente il numero inteso."
+      ],
+      "pt": [
+        "Transforme números em imagens",
+        "O sistema maior associa sons consonânticos a dígitos. Use-os para formar uma palavra e imaginar uma imagem que possa voltar a converter no número.",
+        "Aprenda os mapeamentos primeiro. Uma imagem que não pode ser decodificada com precisão não ajuda na memória exata dos números. Esta introdução utiliza dois dígitos; as aulas existentes sobre o Major ensinam mapeamentos adicionais.",
+        "Aprenda alguns pares fixos de dígito para som. ",
+        "Leia os sons na ordem dos dígitos.",
+        "Adicione vogais para formar uma palavra concreta.",
+        "Verifique se a palavra contém sons consoantes adicionais que representariam dígitos extras.",
+        "Recupere a palavra a partir da imagem e decodifique seus sons de volta para o número.",
+        "1 → t/d; 2 → n. 12 → tonne (tonelada de areia) → t + n.",
+        "A vogal não conta aqui. Na direção inversa, t dá 1 e n dá 2, recuperando 12. A sequência sonora importa, não apenas as letras escritas.",
+        "tonne: Que número representa esta palavra? Explique como o recupera a partir dos dois sons consonânticos.",
+        "Pratique mapeamentos fixos adicionais nas aulas existentes sobre o Major antes de lidar com números mais longos. Verifique que cada imagem que criar decodifique exatamente o número pretendido."
+      ],
+      "nl": [
+        "Zet cijfers om in beelden",
+        "Het Major-systeem koppelt medeklinkerklanken aan cijfers. Vorm daarmee een woord en een beeld dat je terug kunt vertalen naar het getal.",
+        "Leer eerst de vaste koppelingen. Een beeld dat je niet betrouwbaar kunt ontcijferen, helpt niet bij het precies onthouden van getallen. Deze inleiding gebruikt twee cijfers; de bestaande Major-lessen leren verdere koppelingen.",
+        "Leer eerst enkele vaste koppelingen tussen cijfers en klanken.",
+        "Lees de klanken in de volgorde van de cijfers.",
+        "Voeg klinkers toe om een concreet woord te vormen.",
+        "Controleer of het woord extra medeklinkerklanken bevat die ook extra cijfers zouden weergeven.",
+        "Haal het woord op vanuit het beeld en vertaal de klanken terug naar het getal.",
+        "1 → t/d; 2 → n. 12 → tonne (ton zand) → t + n.",
+        "De klinker telt hier niet mee. Omgekeerd geeft t een 1 en n een 2: zo krijg je 12 terug. Het gaat om de klanken, niet alleen om de geschreven letters.",
+        "tonne: Welk getal stelt dit woord voor? Leg uit hoe je het via de twee medeklinkerklanken terugvindt.",
+        "Oefen verdere vaste koppelingen in de bestaande Major-lessen voordat je langere getallen leert. Controleer of elk beeld precies het bedoelde getal oplevert."
+      ],
+      "tr": [
+        "Sayıları görüntülere dönüştür",
+        "Major sistemi, ünsüz sesleri rakamlarla eşleştirir. Bu seslerle bir sözcük oluştur ve tekrar sayıya çözülebilen bir görüntü hayal et.",
+        "Önce eşleştirmeleri öğren. Güvenilir biçimde çözülemeyen bir görüntü, sayıyı tam hatırlamaya yardımcı olmaz. Bu giriş iki rakam kullanır; mevcut Major dersleri başka eşleştirmeler öğretir.",
+        "Önce birkaç sabit rakam-ses eşleştirmesi öğren.",
+        "Sesleri rakamların sırasıyla oku.",
+        "Somut bir sözcük oluşturmak için ünlüler ekle.",
+        "Sözcükte ek rakamları kodlayacak başka ünsüz sesler olup olmadığını kontrol et.",
+        "Görüntüden sözcüğü hatırla ve seslerini yeniden sayıya çöz.",
+        "1 → t/d; 2 → n. 12 → tonne (bir ton kum) → t + n.",
+        "Burada ünlü sayılmaz. Ters yönde t, 1’i; n, 2’yi verir ve 12 geri elde edilir. Yalnızca yazılı harfler değil, ses dizisi önemlidir.",
+        "tonne: Bu sözcük hangi sayıyı temsil ediyor? İki ünsüz ses üzerinden sayıyı nasıl bulduğunu açıkla.",
+        "Daha uzun sayılara geçmeden önce mevcut Major derslerinde diğer sabit eşleştirmeleri çalış. Oluşturduğun her görüntünün tam olarak amaçlanan sayıya çözüldüğünü kontrol et."
+      ],
+      "ar": [
+        "حوّل الأعداد إلى صور",
+        "يربط نظام ماجور أصوات الحروف الساكنة بالأرقام. استخدمها لتكوين كلمة وصورة ذهنية يمكن فكّها للعودة إلى العدد.",
+        "تعلّم الروابط أولًا. الصورة التي لا تستطيع فكّها بثقة لا تساعد على تذكّر العدد بدقة. تستخدم هذه المقدمة رقمين؛ وتعلّم دروس ماجور الموجودة روابط إضافية.",
+        "تعلّم أولًا بضعة روابط ثابتة بين الأرقام والأصوات.",
+        "اقرأ الأصوات حسب ترتيب الأرقام.",
+        "أضف أصوات العلّة لتكوين كلمة تشير إلى شيء محسوس.",
+        "تحقّق من وجود أصوات ساكنة إضافية قد ترمز إلى أرقام زائدة.",
+        "استرجع الكلمة من الصورة وفكّ أصواتها للعودة إلى العدد.",
+        "1 → t/d; 2 → n. 12 → tonne (طن من الرمل) → t + n.",
+        "صوت العلّة لا يُحسب هنا. في الاتجاه العكسي يعطي t الرقم 1 ويعطي n الرقم 2، فنستعيد 12. المهم هو الأصوات، وليس الحروف المكتوبة فقط.",
+        "tonne: ما العدد الذي تمثّله هذه الكلمة؟ اشرح كيف تستعيده من الصوتين الساكنين.",
+        "تدرّب على روابط ثابتة إضافية في دروس ماجور الموجودة قبل العمل على أعداد أطول. تحقّق من أن كل صورة تعيد العدد المقصود بدقة."
+      ],
+      "zh": [
+        "把数字变成图像",
+        "Major 编码系统把辅音与数字对应起来。用这些辅音组成词，再形成能反向还原出数字的图像。",
+        "先学会固定对应关系。不能可靠还原的图像无助于准确记住数字。本入门练习使用两个数字；已有的 Major 课程会介绍更多对应关系。",
+        "先学会几个固定的数字与辅音对应关系。",
+        "按数字顺序读取音素。",
+        "加上元音形成一个具体的词。",
+        "检查这个词中是否包含额外的辅音音素，这些音素可能对应额外的数字。",
+        "从图像中提取这个词，并将其中的音素解码回数字。",
+        "1 → t/d; 2 → n. 12 → tonne (一吨沙子) → t + n.",
+        "这里元音不计。在反向过程中，t对应1，n对应2，从而恢复出12。音素的模式比单纯的文字更重要。",
+        "tonne: 这个词代表哪个数字？请说明怎样通过两个辅音还原数字。",
+        "在处理更长的数字之前，先在已有的 Major 课程中练习更多固定对应关系。确认每幅图像都能准确还原成原定的数字。"
+      ],
+      "ja": [
+        "数字をイメージに変える",
+        "Major法は子音の音を数字に対応させる方法です。その音で単語を作り、元の数字に戻せるイメージを思い浮かべます。",
+        "先に対応関係を覚えましょう。確実に数字に戻せないイメージは、正確な数字の記憶に役立ちません。ここでは2桁を扱います。既存のMajor法のレッスンでは、さらに多くの対応を学べます。",
+        "まず数字と子音の決まった対応をいくつか覚えましょう。",
+        "数字の順に音を読む。",
+        "母音を加えて、具体的な物を表す単語を作りましょう。",
+        "余計な数字を表す子音が単語に含まれていないか、確認しましょう。",
+        "イメージから単語を思い出して、その音を数字に戻す。",
+        "1 → t/d; 2 → n. 12 → tonne (1トンの砂) → t + n.",
+        "ここでは母音は数えません。逆にたどるとtは1、nは2なので、12に戻ります。文字だけでなく、子音の並びが重要です。",
+        "tonne: この単語はどの数字を表しますか。2つの子音から数字に戻す手順を説明しましょう。",
+        "長い数字を扱う前に、既存のMajor法のレッスンで他の固定した対応も練習しましょう。作ったイメージから、意図した数字を正確に取り出せるか確認します。"
+      ]
+    },
+    "recallBoundary": 80.01600833333333,
+    "credits": [
+      {
+        "name": "ANITEW original illustrations",
+        "url": "https://github.com/Impekal/anitew",
+        "license": "Original ANITEW graphics"
+      },
+      {
+        "name": "Atta voice · Qwen3-TTS",
+        "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+        "license": "Apache-2.0"
+      },
+      {
+        "name": "ANITEW synthetic reference · Qwen VoiceDesign",
+        "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+        "license": "Apache-2.0"
+      }
+    ]
+  },
+  {
+    "course": "interleaved-practice",
+    "coach": "rafael",
+    "language": "fr",
+    "mime": "video/mp4",
+    "presentation": "illustrated",
+    "src": "/course-media/video/atta-interleaved-practice-fr-visual-8153ae5b2f24.mp4",
+    "bytes": 1429455,
+    "sha256": "8153ae5b2f24ae8597fe46161f63f63c6c3fa8110326c57b97e7883b16df333e",
+    "duration": 95.92,
+    "cues": [
+      {
+        "start": 0.0,
+        "end": 3.48
+      },
+      {
+        "start": 3.48,
+        "end": 12.76
+      },
+      {
+        "start": 12.76,
+        "end": 24.4
+      },
+      {
+        "start": 24.4,
+        "end": 27.52
+      },
+      {
+        "start": 27.52,
+        "end": 30.8
+      },
+      {
+        "start": 30.8,
+        "end": 35.4
+      },
+      {
+        "start": 35.4,
+        "end": 41.16
+      },
+      {
+        "start": 41.16,
+        "end": 44.96
+      },
+      {
+        "start": 44.96,
+        "end": 63.12
+      },
+      {
+        "start": 63.12,
+        "end": 77.16
+      },
+      {
+        "start": 77.16,
+        "end": 90.04
+      },
+      {
+        "start": 90.04,
+        "end": 95.92
+      }
+    ],
+    "captions": {
+      "de": [
+        "Passende Vorgehensweisen unterscheiden",
+        "Beim gezielten Mischen wechselst du zwischen ähnlichen Aufgabentypen und entscheidest selbst, welches Vorgehen passt. So übst du auch die Auswahl einer Methode.",
+        "Lerne neue Vorgehensweisen zuerst an klaren Beispielen. Wahlloses Themenwechseln oder Multitasking ist nicht dasselbe. Ob das Mischen hilft, hängt auch vom Material und deinem Vorwissen ab.",
+        "Verstehe die einzelnen Vorgehensweisen zunächst getrennt.",
+        "Mische anschließend wenige verwandte Aufgabentypen.",
+        "Bestimme vor dem Rechnen oder Antworten, welcher Typ vorliegt und warum.",
+        "Löse die Aufgabe und prüfe Auswahl und Ergebnis getrennt.",
+        "Arbeite Fehler gezielt nach und kehre danach zur gemischten Übung zurück.",
+        "Rechteck: Fläche = Länge × Breite. Dreieck: Fläche = Grundseite × zugehörige Höhe ÷ 2. Beispiel: Ein Rechteck mit 4 cm Länge und 3 cm Breite hat 12 cm². Ein Dreieck mit 4 cm Grundseite und 3 cm zugehöriger Höhe hat 6 cm².",
+        "Gleiche Zahlen verlangen nicht automatisch dieselbe Rechnung. Die Figur entscheidet: Beim Dreieck gehört der Faktor ein Halb dazu. In gemischten Aufgaben muss die Aufgabenart erkannt werden, bevor die Regel angewandt wird.",
+        "Aufgabe A: Dreieck mit Grundseite 6 cm und zugehöriger Höhe 4 cm. Aufgabe B: Rechteck mit Länge 6 cm und Breite 4 cm. Nenne jeweils die passende Regel und die Fläche.",
+        "Wähle zwei oder drei bereits eingeführte, verwandte Aufgabentypen aus deinem Lernstoff. Mische sie und begründe vor jeder Lösung deine Auswahl des Vorgehens."
+      ],
+      "en": [
+        "Choose between related approaches",
+        "Mix related types of tasks and choose the appropriate approach yourself. This practises selecting a method as well as applying it.",
+        "First learn new approaches through clear examples. Random topic switching or multitasking is different. Benefits depend on the material and your prior knowledge.",
+        "Understand each approach separately first.",
+        "Then mix a few related task types.",
+        "Before answering, identify the type and explain your choice.",
+        "Solve the task and check your choice and result separately.",
+        "Work on errors specifically, then return to mixed practice.",
+        "Rectangle: area = length × width. Triangle: area = base × corresponding height ÷ 2. A rectangle 4 cm long and 3 cm wide has an area of 12 cm². A triangle with base 4 cm and corresponding height 3 cm has an area of 6 cm².",
+        "Identical numbers do not imply identical calculations. The shape determines the rule: the triangle needs the factor one half. Mixed tasks require recognising the type before applying a rule.",
+        "Task A: a triangle with base 6 cm and corresponding height 4 cm. Task B: a rectangle 6 cm long and 4 cm wide. Give the rule and area for each.",
+        "Choose two or three related task types you have already studied. Mix them and explain which approach fits before solving each one."
+      ],
+      "fr": [
+        "Choisir entre des démarches proches",
+        "Mélange des types d’exercices proches et choisis toi-même la démarche adaptée. Tu travailles ainsi le choix de la méthode autant que son application.",
+        "Apprends d’abord chaque démarche avec des exemples clairs. Changer de sujet au hasard ou faire plusieurs choses à la fois est différent. L’intérêt du mélange dépend du contenu et de tes connaissances antérieures.",
+        "Comprends d’abord chaque démarche séparément.",
+        "Mélange ensuite quelques types d’exercices proches.",
+        "Avant de répondre, identifie le type et explique ton choix.",
+        "Fais le calcul. Vérifie ensuite deux choses séparément : ton choix de méthode et ton résultat.",
+        "Retravaille les erreurs, puis reviens aux exercices mélangés.",
+        "Pour un rectangle, multiplie la longueur par la largeur. Un rectangle de quatre centimètres sur trois centimètres a donc une aire de douze centimètres carrés. Pour un triangle, multiplie la base par la hauteur correspondante. Divise ensuite ce résultat par deux. Avec une base de quatre centimètres et une hauteur de trois centimètres, le calcul donne six centimètres carrés.",
+        "Des nombres identiques ne donnent pas forcément le même calcul. La figure détermine la règle. Pour le triangle, il faut diviser le produit par deux. Dans un mélange d’exercices, commence par identifier le type de figure avant d’appliquer la règle.",
+        "Exercice A. Un triangle de base six centimètres et de hauteur correspondante quatre centimètres. Exercice B. Un rectangle de longueur six centimètres et de largeur quatre centimètres. Donne la règle et l’aire de chaque figure.",
+        "Choisis deux ou trois types d’exercices proches que tu connais déjà. Mélange-les et justifie ta démarche avant chaque résolution."
+      ],
+      "es": [
+        "Elige entre métodos relacionados",
+        "Mezcle tipos relacionados de tareas y elija usted mismo el enfoque adecuado. Esto practica la selección de un método así como su aplicación.",
+        "Aprenda nuevos enfoques a través de ejemplos claros. Cambiar de tema de forma aleatoria o multitarea es diferente. Los beneficios dependen del material y de su conocimiento previo.",
+        "Entienda cada enfoque por separado primero.",
+        "Luego combine un par de tipos de tareas relacionados.",
+        "Antes de responder, identifique el tipo y explique su elección.",
+        "Resuelva la tarea y verifique por separado su elección y resultado.",
+        "Trabaje específicamente en los errores, luego regrese a la práctica mezclada.",
+        "Rectángulo: área = longitud × anchura. Triángulo: área = base × altura correspondiente ÷ 2. Un rectángulo de 4 cm por 3 cm tiene un área de 12 cm². Un triángulo de base 4 cm y altura correspondiente 3 cm tiene un área de 6 cm².",
+        "Los mismos números no implican el mismo cálculo. La figura determina la regla: en el triángulo hay que dividir entre dos. Al mezclar tareas, debes reconocer el tipo antes de aplicar la regla.",
+        "Tarea A: un triángulo con base de 6 cm y altura correspondiente de 4 cm. Tarea B: un rectángulo de 6 cm de longitud y 4 cm de anchura. Proporcione la regla y el área para cada una.",
+        "Elige dos o tres tipos de tareas relacionadas que ya hayas estudiado. Mézclalas y explica qué método corresponde antes de resolver cada una."
+      ],
+      "it": [
+        "Scegli tra approcci correlati",
+        "Alterna tipi di esercizio correlati e scegli il metodo adatto. In questo modo ti eserciti sia a scegliere un metodo sia ad applicarlo.",
+        "Apprendi prima i nuovi approcci attraverso esempi chiari. Cambiare argomento in modo casuale o multitasking è diverso. I benefici dipendono dal materiale e dalle tue conoscenze precedenti.",
+        "Capisci ogni approccio separatamente prima.",
+        "Poi mescola alcuni tipi di compito correlati.",
+        "Prima di rispondere, identifica il tipo e spiega il tuo ragionamento.",
+        "Risolvi l’esercizio e controlla separatamente la scelta del metodo e il risultato.",
+        "Lavora specificamente sugli errori, poi ritorna alla pratica mista.",
+        "Rettangolo: area = lunghezza × larghezza. Triangolo: area = base × altezza corrispondente ÷ 2. Un rettangolo di 4 cm di lunghezza e 3 cm di larghezza ha un'area di 12 cm². Un triangolo con base 4 cm e altezza corrispondente 3 cm ha un'area di 6 cm².",
+        "Gli stessi numeri non richiedono sempre lo stesso calcolo. La figura determina la regola: per il triangolo bisogna dividere per due. Gli esercizi misti richiedono di riconoscere il tipo prima di applicare una regola.",
+        "Compito A: un triangolo con base 6 cm e altezza corrispondente 4 cm. Compito B: un rettangolo di 6 cm di lunghezza e 4 cm di larghezza. Fornisci la regola e l'area per ciascuno.",
+        "Scegli due o tre tipi di compito correlati che hai già studiato. Mescolali e spiega quale approccio si adatta prima di risolvere ciascuno."
+      ],
+      "pt": [
+        "Escolha entre abordagens relacionadas",
+        "Misture tipos relacionados de tarefas e escolha o método apropriado sozinho. Isso pratica a seleção de um método e sua aplicação.",
+        "Aprenda primeiramente as novas abordagens por meio de exemplos claros. Alterar de tópico aleatoriamente ou multitarefas é diferente. Os benefícios dependem do conteúdo e do seu conhecimento prévio.",
+        "Entenda cada abordagem separadamente primeiro.",
+        "Em seguida, misture alguns tipos de tarefa relacionados.",
+        "Antes de responder, identifique o tipo e explique sua escolha.",
+        "Resolva a tarefa e verifique separadamente sua escolha e resultado.",
+        "Trabalhe especificamente com erros, depois retorne à prática mista.",
+        "Retângulo: área = comprimento × largura. Triângulo: área = base × altura correspondente ÷ 2. Um retângulo de 4 cm de comprimento e 3 cm de largura tem área de 12 cm². Um triângulo com base de 4 cm e altura correspondente de 3 cm tem área de 6 cm².",
+        "Números iguais não implicam cálculos idênticos. A forma determina a regra: o triângulo exige o fator um meio. Tarefas mistas exigem reconhecer o tipo antes de aplicar a regra.",
+        "Tarefa A: um triângulo com base de 6 cm e altura correspondente de 4 cm. Tarefa B: um retângulo de 6 cm de comprimento e 4 cm de largura. Forneça a regra e a área para cada uma.",
+        "Escolha dois ou três tipos de tarefa relacionados que já estudou. Misture-os e explique qual método é adequado antes de resolver cada tarefa."
+      ],
+      "nl": [
+        "Kies tussen gerelateerde aanpakken",
+        "Combineer gerelateerde soorten opgaven en kies zelf de juiste aanpak. Dit oefent het kiezen van een methode en het toepassen ervan.",
+        "Leer nieuwe aanpakken eerst met duidelijke voorbeelden. Willekeurig van onderwerp wisselen of multitasken is iets anders. Het voordeel hangt af van de leerstof en je voorkennis.",
+        "Begrijp eerst elke aanpak afzonderlijk.",
+        "Meng daarna enkele verwante soorten opgaven.",
+        "Voor het antwoorden bepaal je eerst het type en leg je keuze uit.",
+        "Los de opgave op en controleer je keuze en resultaat apart.",
+        "Werk gericht aan fouten en ga daarna terug naar gemengde oefening.",
+        "Rechthoek: oppervlakte = lengte × breedte. Driehoek: oppervlakte = basis × overeenkomende hoogte ÷ 2. Een rechthoek van 4 cm lengte en 3 cm breedte heeft een oppervlakte van 12 cm². Een driehoek met basis 4 cm en overeenkomende hoogte  3 cm heeft een oppervlakte van 6 cm².",
+        "Dezelfde getallen vragen niet altijd om dezelfde berekening. De vorm bepaalt de regel: bij een driehoek deel je door twee. Bij gemengde opgaven moet je het type herkennen voordat je de regel toepast.",
+        "Opgave A: een driehoek met basis 6 cm en overeenkomende hoogte 4 cm. Opgave B: een rechthoek van 6 cm lengte en 4 cm breedte. Geef de regel en oppervlakte voor elk.",
+        "Kies twee of drie gerelateerde opgaventypen die je al hebt bestudeerd. Combineer ze en leg uit welke aanpak past voordat je elke opgave oplost."
+      ],
+      "tr": [
+        "İlgili yöntemler arasında seçim yap",
+        "Birbiriyle ilişkili soru türlerini karıştır ve uygun yöntemi kendin seç. Böylece hem yöntem seçmeyi hem de uygulamayı çalışırsın.",
+        "Yeni yöntemleri önce açık örneklerle öğren. Rastgele konu değiştirmek veya aynı anda birden çok iş yapmak farklıdır. Yararı, çalışma malzemesine ve önceki bilgine bağlıdır.",
+        "Önce her yöntemi ayrı ayrı anla.",
+        "Sonra birbiriyle ilişkili birkaç soru türünü karıştır.",
+        "Cevaplamadan önce soru türünü belirle ve seçimini açıkla.",
+        "Soruyu çöz; yöntem seçimini ve sonucu ayrı ayrı kontrol et.",
+        "Hatalar üzerinde özellikle çalış, sonra karışık alıştırmalara dön.",
+        "Dikdörtgen: alan = uzunluk × genişlik. Üçgen: alan = taban × karşılık gelen yükseklik ÷ 2. 4 cm uzunluğunda ve 3 cm genişliğinde bir dikdörtgenin alanı 12 cm²’dir. 4 cm tabanlı ve karşılık gelen yüksekliği 3 cm olan bir üçgenin alanı 6 cm²’dir.",
+        "Aynı sayılar aynı hesabı gerektirmez. Kuralı şekil belirler: üçgende ikiye bölmek gerekir. Karışık sorularda kuralı uygulamadan önce soru türünü tanımak gerekir.",
+        "Görev A: 6 cm tabanlı ve karşılık gelen yüksekliği 4 cm olan bir üçgen. Görev B: 6 cm uzunluğunda ve 4 cm genişliğinde bir dikdörtgen. Her ikisinde kural ve alanları verin.",
+        "Daha önce öğrendiğin iki veya üç ilişkili soru türünü seç. Bunları karıştır ve her birini çözmeden önce hangi yöntemin uygun olduğunu açıkla."
+      ],
+      "ar": [
+        "اختر بين طرق مترابطة",
+        "امزج أنواعًا مترابطة من المسائل واختر بنفسك الطريقة المناسبة. بذلك تتدرّب على اختيار الطريقة وعلى تطبيقها.",
+        "تعلّم الطرق الجديدة أولًا من أمثلة واضحة. التنقل العشوائي بين المواضيع أو أداء مهام متعددة في الوقت نفسه أمر مختلف. تعتمد الفائدة على المادة ومعرفتك السابقة.",
+        "افهم كل طريقة على حدة أولًا.",
+        "ثم امزج بضعة أنواع مترابطة من المسائل.",
+        "قبل الإجابة، حدّد نوع المسألة واشرح اختيارك.",
+        "حل المسألة وتحقّق من اختيار الطريقة ومن النتيجة كلٍّ على حدة.",
+        "عالج الأخطاء تحديدًا ثم عد إلى التدريب المختلط.",
+        "المستطيل: المساحة = الطول × العرض. المثلث: المساحة = القاعدة × الارتفاع المقابل ÷ 2. مستطيل طوله 4 سم وعرضه 3 سم مساحته 12 سم². مثلث قاعدته 4 سم وارتفاعه المقابل 3 سم مساحته 6 سم².",
+        "تساوي الأعداد لا يعني استخدام الحساب نفسه. الشكل يحدّد القاعدة: المثلث يحتاج إلى القسمة على اثنين. في المسائل المختلطة يجب تمييز النوع قبل تطبيق القاعدة.",
+        "المسألة أ: مثلث قاعدته 6 سم وارتفاعه المقابل 4 سم. المسألة ب: مستطيل طوله 6 سم وعرضه 4 سم. اذكر القاعدة والمساحة لكل منهما.",
+        "اختر نوعين أو ثلاثة من المسائل المترابطة التي درستها. امزجها واشرح الطريقة المناسبة قبل حل كل مسألة."
+      ],
+      "zh": [
+        "在相关方法之间进行选择",
+        "混合练习几种相关的任务，并自行选择合适的方法。这样既练习选择方法，也练习应用方法。",
+        "先通过清晰的例子学会每种新方法。随机切换主题或同时处理多个任务是另一回事。效果取决于学习内容和你已有的知识。",
+        "先分别理解每种方法。",
+        "然后混合几种相关类型的任务。",
+        "在作答前，先确定任务类型并解释你的选择依据。",
+        "完成任务并分别检查你的选择和结果是否正确。",
+        "专门针对错误进行练习，然后再回到混合练习。",
+        "矩形：面积 = 长 × 宽。三角形：面积 = 底 × 对应高 ÷ 2。一个长4厘米、宽3厘米的矩形面积为12平方厘米。一个底为4厘米、对应高为3厘米的三角形面积为6平方厘米。",
+        "相同的数字并不意味着相同的计算过程。形状决定了规则：三角形需要乘以二分之一的因子。混合任务要求在应用规则前先识别出任务类型。",
+        "任务A：一个底为6厘米、对应高为4厘米的三角形。任务B：一个长6厘米、宽4厘米的矩形。给出每种任务的规则和面积。",
+        "选择你已经学习过的两种或三种相关任务类型，混合它们，并在求解前说明哪种方法更合适。"
+      ],
+      "ja": [
+        "関連する方法を選び分ける",
+        "関連するタスクの種類を混ぜて、自分自身で適切なアプローチを選択します。これにより、方法の選択およびその適用が練習されます。",
+        "まず、明確な例を通じて新しいアプローチを学びます。トピックをランダムに切り替えたり、マルチタスクを実施するのは異なります。メリットは、素材や既存の知識に依存します。",
+        "まず、それぞれのアプローチを個別に理解します。",
+        "その後、関連するタスクのいくつかを混ぜます。",
+        "答えを出す前に、タスクの種類を特定し、その選択理由を説明します。",
+        "タスクを解き、その後、選択と結果を別々に確認します。",
+        "誤りを特に取り上げて練習し、その後に混ぜた練習に戻ります。",
+        "長方形：面積 = 長さ × 幅。三角形：面積 = 底辺 × 対応する高さ ÷ 2。長さ4cm、幅3cmの長方形は面積12cm²です。底辺4cm、対応する高さ3cmの三角形は面積6cm²です。",
+        "数値が同じでも、計算方法が同じとは限りません。図形によって使う公式が決まり、三角形では2で割ります。問題を混ぜると、公式を使う前に問題の種類を見分ける必要があります。",
+        "タスクA：底辺6cm、対応する高さ4cmの三角形。タスクB：長さ6cm、幅4cmの長方形。それぞれのルールと面積を示してください。",
+        "すでに学んだ2つまたは3つの関連タスクタイプを選び、混ぜて、どのアプローチが適しているかを説明した上で、それぞれを解きます。"
+      ]
+    },
+    "recallBoundary": 89.07804374999999,
+    "credits": [
+      {
+        "name": "ANITEW original illustrations",
+        "url": "https://github.com/Impekal/anitew",
+        "license": "Original ANITEW graphics"
+      },
+      {
+        "name": "Atta voice · Qwen3-TTS",
+        "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+        "license": "Apache-2.0"
+      },
+      {
+        "name": "ANITEW synthetic reference · Qwen VoiceDesign",
+        "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+        "license": "Apache-2.0"
+      }
+    ]
+  },
+  {
+    "course": "story-method",
+    "coach": "rafael",
+    "language": "de",
+    "mime": "video/mp4",
+    "presentation": "illustrated",
+    "src": "/course-media/video/atta-story-de-visual-04f09d8aa552.mp4",
+    "bytes": 1641297,
+    "sha256": "04f09d8aa5520824119183482aa7aa45c42739494cf1f28b261e8afaa7544a3e",
+    "duration": 102.6,
+    "cues": [
+      {
+        "start": 0.0,
+        "end": 2.6
+      },
+      {
+        "start": 2.6,
+        "end": 5.44
+      },
+      {
+        "start": 5.44,
+        "end": 8.64
+      },
+      {
+        "start": 8.64,
+        "end": 16.6
+      },
+      {
+        "start": 16.6,
+        "end": 24.8
+      },
+      {
+        "start": 24.8,
+        "end": 28.16
+      },
+      {
+        "start": 28.16,
+        "end": 34.96
+      },
+      {
+        "start": 34.96,
+        "end": 39.96
+      },
+      {
+        "start": 39.96,
+        "end": 45.04
+      },
+      {
+        "start": 45.04,
+        "end": 50.76
+      },
+      {
+        "start": 50.76,
+        "end": 56.32
+      },
+      {
+        "start": 56.32,
+        "end": 62.52
+      },
+      {
+        "start": 62.52,
+        "end": 65.96
+      },
+      {
+        "start": 65.96,
+        "end": 70.88
+      },
+      {
+        "start": 70.88,
+        "end": 73.0
+      },
+      {
+        "start": 73.0,
+        "end": 77.64
+      },
+      {
+        "start": 77.64,
+        "end": 80.64
+      },
+      {
+        "start": 80.64,
+        "end": 84.28
+      },
+      {
+        "start": 84.28,
+        "end": 90.96
+      },
+      {
+        "start": 90.96,
+        "end": 97.4
+      },
+      {
+        "start": 97.4,
+        "end": 102.6
+      }
+    ],
+    "captions": {
+      "es": [
+        "Bienvenido a ANITEW.",
+        "Soy un entrenador de aprendizaje generado por IA.",
+        "Hoy conocerás el método de las historias.",
+        "Es una técnica de memoria: conectas distintas informaciones en una sola historia.",
+        "Puede ayudarte a recordar un orden, como una lista de compras o las ideas de una presentación.",
+        "No sustituye la comprensión del contenido.",
+        "Primero conocerás el principio, verás un ejemplo y después lo probarás.",
+        "Tu objetivo es recordar tres palabras en el orden correcto.",
+        "Nuestro ejemplo: llave, limón, bicicleta.",
+        "Imagina primero una llave gigante que exprime un limón.",
+        "El zumo salpica una bicicleta y hace girar sus ruedas.",
+        "Una acción conecta la primera palabra con la segunda y otra conecta la segunda con la tercera.",
+        "La historia inusual es solo una ayuda para la memoria.",
+        "Lo importante es imaginar claramente las acciones.",
+        "Ahora desaparecerán las imágenes.",
+        "Haz una pausa y recuerda las tres palabras en orden.",
+        "Cuando estés listo, muestra la respuesta.",
+        "Eran: llave, limón, bicicleta.",
+        "Si falta una palabra, repasa su conexión y vuelve a intentarlo.",
+        "Para terminar, inventa una historia con otras tres palabras y recuérdalas sin mirar.",
+        "También puedes leer todo el curso y hacer los ejercicios a tu ritmo."
+      ],
+      "it": [
+        "Benvenuto su ANITEW.",
+        "Sono un tutor creato con l'intelligenza artificiale.",
+        "Oggi scoprirai il metodo delle storie.",
+        "È una tecnica di memoria: colleghi informazioni diverse in un'unica storia.",
+        "Può aiutarti a ricordare una sequenza, come una lista della spesa o i punti di un discorso.",
+        "Non sostituisce la comprensione del contenuto.",
+        "Prima scoprirai il principio, vedrai un esempio e poi proverai il metodo.",
+        "Il tuo obiettivo è ricordare tre parole nell'ordine giusto.",
+        "Il nostro esempio: chiave, limone, bicicletta.",
+        "Immagina una chiave gigante che spreme un limone.",
+        "Il succo schizza su una bicicletta e ne fa girare le ruote.",
+        "Un'azione collega la prima parola alla seconda e un'altra collega la seconda alla terza.",
+        "La storia insolita è soltanto un aiuto per la memoria.",
+        "Conta immaginare chiaramente le azioni.",
+        "Ora le immagini scompariranno.",
+        "Fai una pausa e ricorda le tre parole nell'ordine giusto.",
+        "Quando sei pronto, mostra la risposta.",
+        "Erano: chiave, limone, bicicletta.",
+        "Se manca una parola, rivedi il collegamento e riprova.",
+        "Infine, inventa una storia con altre tre parole e ricordale senza guardare.",
+        "Puoi anche leggere tutto il corso e fare gli esercizi al tuo ritmo."
+      ],
+      "pt": [
+        "Bem-vindo ao ANITEW.",
+        "Sou um orientador de aprendizagem gerado por IA.",
+        "Hoje vamos conhecer o método das histórias.",
+        "É uma técnica de memorização: ligas informações separadas numa única história.",
+        "Pode ajudar a recordar uma sequência, como uma lista de compras ou os pontos de uma apresentação.",
+        "Não substitui a compreensão do conteúdo.",
+        "Primeiro conhecerás o princípio, verás um exemplo e depois experimentarás o método.",
+        "O objetivo é recordar três palavras na ordem certa.",
+        "O nosso exemplo: chave, limão, bicicleta.",
+        "Imagina uma chave gigante a espremer um limão.",
+        "O sumo salpica uma bicicleta e faz girar as rodas.",
+        "Uma ação liga a primeira palavra à segunda e outra liga a segunda à terceira.",
+        "A história invulgar é apenas uma ajuda para a memória.",
+        "O importante é imaginar claramente as ações.",
+        "Agora as imagens vão desaparecer.",
+        "Faz uma pausa e recorda as três palavras pela ordem certa.",
+        "Quando estiveres pronto, mostra a resposta.",
+        "Eram: chave, limão, bicicleta.",
+        "Se faltar uma palavra, revê a ligação e tenta novamente.",
+        "Por fim, inventa uma história com outras três palavras e recorda-as sem olhar.",
+        "Também podes ler o curso inteiro e fazer os exercícios ao teu ritmo."
+      ],
+      "nl": [
+        "Welkom bij ANITEW.",
+        "Ik ben een door AI gemaakte leercoach.",
+        "Vandaag ontdek je de verhalenmethode.",
+        "Dit is een geheugentechniek: je verbindt losse informatie in één verhaal.",
+        "Dat kan helpen om een volgorde te onthouden, zoals een boodschappenlijst of de hoofdpunten van een presentatie.",
+        "Het vervangt niet het begrijpen van de inhoud.",
+        "Eerst leer je het principe, dan zie je een voorbeeld en probeer je het zelf.",
+        "Je doel is drie woorden in de juiste volgorde te herinneren.",
+        "Ons voorbeeld: sleutel, citroen, fiets.",
+        "Stel je eerst een enorme sleutel voor die een citroen uitperst.",
+        "Het sap spat op een fiets en laat de wielen draaien.",
+        "Eén handeling verbindt het eerste woord met het tweede; een andere het tweede met het derde.",
+        "Het ongewone verhaal is alleen een geheugensteuntje.",
+        "Het gaat erom dat je de handelingen zelf duidelijk voor je ziet.",
+        "Nu verdwijnen de beelden.",
+        "Pauzeer en noem de drie woorden in de juiste volgorde.",
+        "Toon het antwoord zodra je klaar bent.",
+        "Het waren: sleutel, citroen, fiets.",
+        "Mis je een woord, bekijk dan de verbinding opnieuw en probeer het nog eens.",
+        "Bedenk tot slot een verhaal met drie andere woorden en herinner ze zonder te kijken.",
+        "Je kunt ook de hele cursus lezen en alle oefeningen in je eigen tempo doen."
+      ],
+      "tr": [
+        "ANITEW'e hoş geldin.",
+        "Ben yapay zekâyla oluşturulmuş bir öğrenme koçuyum.",
+        "Bugün hikâye yöntemini öğreneceksin.",
+        "Bu bir hafıza tekniğidir: ayrı bilgileri tek bir hikâyede birleştirirsin.",
+        "Alışveriş listesi veya sunum başlıkları gibi bir sırayı hatırlamana yardımcı olabilir.",
+        "İçeriği anlamanın yerini tutmaz.",
+        "Önce yöntemi öğrenecek, bir örnek görecek, ardından kendin deneyeceksin.",
+        "Hedefin üç kelimeyi doğru sırayla hatırlamak.",
+        "Örneğimiz: anahtar, limon, bisiklet.",
+        "Önce dev bir anahtarın bir limonu sıktığını hayal et.",
+        "Limon suyu bir bisiklete sıçrar ve tekerleklerini döndürür.",
+        "Bir hareket ilk kelimeyi ikinciye, başka bir hareket ikinciyi üçüncüye bağlar.",
+        "Bu alışılmadık hikâye yalnızca bir hatırlama aracıdır.",
+        "Önemli olan hareketleri zihninde açıkça canlandırmandır.",
+        "Şimdi resimler kaybolacak.",
+        "Duraklat ve üç kelimeyi doğru sırayla söyle.",
+        "Hazır olduğunda yanıtı göster.",
+        "Kelimeler: anahtar, limon, bisiklet.",
+        "Bir kelime eksikse ilgili bağlantıya yeniden bak ve tekrar dene.",
+        "Son olarak başka üç kelimeyle bir hikâye kur ve bakmadan hatırla.",
+        "Kursun tamamını okuyabilir ve alıştırmaları kendi hızında yapabilirsin."
+      ],
+      "ar": [
+        "مرحبًا بك في ANITEW.",
+        "أنا مدرب تعلّم مولّد بالذكاء الاصطناعي.",
+        "سنتعرّف اليوم على طريقة القصص.",
+        "هي تقنية للتذكّر تربط معلومات منفصلة في قصة واحدة.",
+        "قد تساعدك على تذكّر ترتيب الأشياء، مثل قائمة مشتريات أو النقاط الأساسية لعرض تقديمي.",
+        "لكنها لا تغني عن فهم المحتوى.",
+        "ستتعرّف أولًا على الفكرة، ثم تشاهد مثالًا وتجرّب الطريقة بنفسك.",
+        "هدفك تذكّر ثلاث كلمات بالترتيب الصحيح.",
+        "مثالنا هو: مفتاح، ليمونة، دراجة.",
+        "تخيّل أولًا مفتاحًا ضخمًا يعصر ليمونة.",
+        "يتناثر عصير الليمون على دراجة فيجعل عجلاتها تدور.",
+        "يربط فعلٌ الكلمة الأولى بالثانية، وفعلٌ آخر يربط الثانية بالثالثة.",
+        "القصة غير المعتادة مجرد وسيلة مساعدة للتذكّر.",
+        "المهم أن تتخيّل الأفعال بوضوح بنفسك.",
+        "ستختفي الصور الآن.",
+        "توقّف مؤقتًا واذكر الكلمات الثلاث بالترتيب الصحيح.",
+        "عندما تكون مستعدًا، أظهر الإجابة.",
+        "الكلمات هي: مفتاح، ليمونة، دراجة.",
+        "إذا نسيت كلمة، راجع الرابط المتعلق بها ثم حاول مجددًا.",
+        "أخيرًا، ابتكر قصة بثلاث كلمات أخرى وتذكّرها دون النظر.",
+        "يمكنك أيضًا قراءة الدرس كاملًا وأداء التمارين بالسرعة المناسبة لك."
+      ],
+      "zh": [
+        "欢迎来到 ANITEW。",
+        "我是一位由人工智能生成的学习教练。",
+        "今天我们来了解故事记忆法。",
+        "这是一种记忆技巧：把零散的信息串成一个故事。",
+        "它可以帮助你记住顺序，例如购物清单或演讲要点。",
+        "但它不能代替对内容的理解。",
+        "你将先了解原理，再看一个例子，然后亲自尝试。",
+        "你的目标是按正确顺序回忆三个词。",
+        "我们的例子是：钥匙、柠檬、自行车。",
+        "先想象一把巨大的钥匙挤压一个柠檬。",
+        "柠檬汁溅到自行车上，让车轮转动起来。",
+        "一个动作连接第一个词和第二个词，另一个动作连接第二个词和第三个词。",
+        "这个不寻常的故事只是辅助记忆的工具。",
+        "关键是自己清晰地想象这些动作。",
+        "现在图片将会消失。",
+        "请暂停，按正确顺序说出这三个词。",
+        "准备好后再显示答案。",
+        "它们是：钥匙、柠檬、自行车。",
+        "如果忘了一个词，就再看一遍对应的联系，然后重试。",
+        "最后，用另外三个词编一个故事，再不看提示回忆这些词。",
+        "你也可以阅读整个课程，按自己的节奏完成所有练习。"
+      ],
+      "ja": [
+        "ANITEWへようこそ。",
+        "私はAIで生成された学習コーチです。",
+        "今日は物語を使った記憶法を学びます。",
+        "これは、別々の情報を一つの物語につなげる記憶の技法です。",
+        "買い物リストや発表の要点など、順序を覚えるのに役立つことがあります。",
+        "ただし、内容を理解する代わりにはなりません。",
+        "まず考え方を知り、例を見てから、自分で試してみましょう。",
+        "目標は三つの言葉を正しい順序で思い出すことです。",
+        "例は、鍵、レモン、自転車です。",
+        "まず、巨大な鍵がレモンを搾るところを想像してください。",
+        "レモンの汁が自転車にかかり、車輪を回します。",
+        "一つの動作が一番目と二番目の言葉をつなぎ、別の動作が二番目と三番目をつなぎます。",
+        "この変わった物語は、記憶を助けるためのものです。",
+        "大切なのは、動作を自分ではっきりと想像することです。",
+        "これから画像が消えます。",
+        "一時停止して、三つの言葉を正しい順序で思い出してください。",
+        "準備ができたら答えを表示しましょう。",
+        "答えは、鍵、レモン、自転車です。",
+        "忘れた言葉があれば、そのつながりをもう一度見て、再び試してください。",
+        "最後に、別の三つの言葉で物語を作り、見ずに思い出してください。",
+        "コース全体を文章で読み、自分のペースで練習することもできます。"
+      ],
+      "de": [
+        "Willkommen bei ANITEW.",
+        "Ich bin ein KI-generierter Lerncoach.",
+        "Heute geht es um die Geschichten-Methode.",
+        "Die Geschichten-Methode ist eine Merktechnik: Du verknüpfst einzelne Informationen zu einer zusammenhängenden Geschichte.",
+        "Sie kann dir helfen, eine Reihenfolge zu behalten, etwa bei einer Einkaufsliste oder den Stichpunkten eines Vortrags.",
+        "Sie ersetzt nicht das Verstehen des Inhalts.",
+        "In diesem Kurs lernst du zuerst das Prinzip, siehst ein Beispiel und probierst die Methode anschließend selbst aus.",
+        "Dein Ziel: drei Begriffe in der richtigen Reihenfolge erinnern.",
+        "Unser Beispiel ist: Schlüssel, Zitrone, Fahrrad.",
+        "Zuerst stellst du dir vor, wie ein riesiger Schlüssel eine Zitrone aufdrückt.",
+        "Der Zitronensaft spritzt auf ein Fahrrad und setzt seine Räder in Bewegung.",
+        "So verbindet eine Handlung den ersten Begriff mit dem zweiten, und eine weitere den zweiten mit dem dritten.",
+        "Die ungewöhnliche Geschichte ist nur eine Merkhilfe.",
+        "Entscheidend ist, dass du dir die Handlung selbst deutlich vorstellst.",
+        "Jetzt verschwinden die Bilder.",
+        "Pausiere hier und nenne die drei Begriffe in der richtigen Reihenfolge.",
+        "Wenn du bereit bist, blende die Lösung ein.",
+        "Es waren: Schlüssel, Zitrone, Fahrrad.",
+        "Fehlt dir ein Begriff, schau dir die passende Verbindung noch einmal an und versuche es erneut.",
+        "Zum Schluss: Erfinde eine eigene Geschichte mit drei anderen Begriffen und rufe sie ohne Vorlage ab.",
+        "Du kannst den gesamten Kurs auch lesen und alle Übungen in deinem eigenen Tempo machen."
+      ],
+      "en": [
+        "Welcome to ANITEW.",
+        "I am an AI-generated learning coach.",
+        "Today we will explore the story method.",
+        "The story method is a memory technique: you connect separate pieces of information in a single story.",
+        "It can help you remember a sequence, such as a shopping list or the main points of a talk.",
+        "It does not replace understanding the material.",
+        "In this course, you will first learn the idea, see an example, and then try the method yourself.",
+        "Your goal is to recall three words in the correct order.",
+        "Our example is: key, lemon, bicycle.",
+        "First, imagine a giant key squeezing a lemon.",
+        "The lemon juice splashes onto a bicycle and makes its wheels turn.",
+        "One action connects the first word to the second, and another connects the second to the third.",
+        "The unusual story is simply a memory aid.",
+        "What matters is imagining the actions clearly for yourself.",
+        "Now the pictures will disappear.",
+        "Pause here and name the three words in the correct order.",
+        "When you are ready, reveal the answer.",
+        "The words were: key, lemon, bicycle.",
+        "If you missed a word, look at its connection again and have another try.",
+        "Finally, make up your own story with three different words and recall them without looking.",
+        "You can also read the entire course and do every exercise at your own pace."
+      ],
+      "fr": [
+        "Bienvenue sur ANITEW.",
+        "Je suis un coach pédagogique créé par intelligence artificielle.",
+        "Aujourd'hui, nous allons découvrir la méthode des histoires.",
+        "La méthode des histoires est une technique de mémorisation : elle relie plusieurs informations dans une même histoire.",
+        "Elle peut aider à retenir un ordre, par exemple une liste de courses ou les points principaux d'un exposé.",
+        "Elle ne remplace pas la compréhension du contenu.",
+        "Dans ce cours, tu découvriras le principe, tu verras un exemple, puis tu essaieras la méthode toi-même.",
+        "Ton objectif : retrouver trois mots dans le bon ordre.",
+        "Voici notre exemple : clé, citron, vélo.",
+        "Imagine d'abord une clé géante qui presse un citron.",
+        "Le jus de citron éclabousse un vélo et fait tourner ses roues.",
+        "Une action relie le premier mot au deuxième, puis une autre relie le deuxième au troisième.",
+        "Cette histoire inhabituelle sert simplement d'aide-mémoire.",
+        "L'essentiel est de te représenter clairement les actions.",
+        "Les images vont maintenant disparaître.",
+        "Fais une pause et retrouve les trois mots dans le bon ordre.",
+        "Quand tu es prêt, affiche la réponse.",
+        "Les mots étaient : clé, citron, vélo.",
+        "Si tu as oublié un mot, revois le lien correspondant et essaie à nouveau.",
+        "Pour terminer, invente une histoire avec trois autres mots, puis retrouve-les sans regarder.",
+        "Tu peux aussi lire tout le cours et faire chaque exercice à ton rythme."
+      ]
+    },
+    "recallBoundary": 77.64,
+    "credits": [
+      {
+        "name": "ANITEW original illustrations",
+        "url": "https://github.com/Impekal/anitew",
+        "license": "Original ANITEW graphics"
+      },
+      {
+        "name": "Atta voice · Qwen3-TTS",
+        "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+        "license": "Apache-2.0"
+      },
+      {
+        "name": "ANITEW synthetic reference · Qwen VoiceDesign",
+        "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+        "license": "Apache-2.0"
+      },
+      {
+        "name": "ANITEW AI coach portrait and logo animation",
+        "url": "https://github.com/Impekal/anitew",
+        "license": "Original ANITEW assets"
+      }
+    ]
+  },
+  {
+    "course": "story-method",
+    "coach": "rafael",
+    "language": "fr",
+    "mime": "video/mp4",
+    "presentation": "illustrated",
+    "src": "/course-media/video/atta-story-fr-visual-017409c07a09.mp4",
+    "bytes": 1310725,
+    "sha256": "017409c07a09a69f0143e67ee95cbd420075684e07077a2093b3f41cb67fd3c0",
+    "duration": 83.88,
+    "cues": [
+      {
+        "start": 0.0,
+        "end": 2.32
+      },
+      {
+        "start": 2.32,
+        "end": 6.04
+      },
+      {
+        "start": 6.04,
+        "end": 10.16
+      },
+      {
+        "start": 10.16,
+        "end": 17.48
+      },
+      {
+        "start": 17.48,
+        "end": 24.16
+      },
+      {
+        "start": 24.16,
+        "end": 27.48
+      },
+      {
+        "start": 27.48,
+        "end": 32.44
+      },
+      {
+        "start": 32.44,
+        "end": 36.64
+      },
+      {
+        "start": 36.64,
+        "end": 40.96
+      },
+      {
+        "start": 40.96,
+        "end": 44.72
+      },
+      {
+        "start": 44.72,
+        "end": 48.88
+      },
+      {
+        "start": 48.88,
+        "end": 53.4
+      },
+      {
+        "start": 53.4,
+        "end": 56.24
+      },
+      {
+        "start": 56.24,
+        "end": 59.96
+      },
+      {
+        "start": 59.96,
+        "end": 61.8
+      },
+      {
+        "start": 61.8,
+        "end": 64.48
+      },
+      {
+        "start": 64.48,
+        "end": 67.84
+      },
+      {
+        "start": 67.84,
+        "end": 71.08
+      },
+      {
+        "start": 71.08,
+        "end": 75.92
+      },
+      {
+        "start": 75.92,
+        "end": 80.6
+      },
+      {
+        "start": 80.6,
+        "end": 83.88
+      }
+    ],
+    "captions": {
+      "es": [
+        "Bienvenido a ANITEW.",
+        "Soy un entrenador de aprendizaje generado por IA.",
+        "Hoy conocerás el método de las historias.",
+        "Es una técnica de memoria: conectas distintas informaciones en una sola historia.",
+        "Puede ayudarte a recordar un orden, como una lista de compras o las ideas de una presentación.",
+        "No sustituye la comprensión del contenido.",
+        "Primero conocerás el principio, verás un ejemplo y después lo probarás.",
+        "Tu objetivo es recordar tres palabras en el orden correcto.",
+        "Nuestro ejemplo: llave, limón, bicicleta.",
+        "Imagina primero una llave gigante que exprime un limón.",
+        "El zumo salpica una bicicleta y hace girar sus ruedas.",
+        "Una acción conecta la primera palabra con la segunda y otra conecta la segunda con la tercera.",
+        "La historia inusual es solo una ayuda para la memoria.",
+        "Lo importante es imaginar claramente las acciones.",
+        "Ahora desaparecerán las imágenes.",
+        "Haz una pausa y recuerda las tres palabras en orden.",
+        "Cuando estés listo, muestra la respuesta.",
+        "Eran: llave, limón, bicicleta.",
+        "Si falta una palabra, repasa su conexión y vuelve a intentarlo.",
+        "Para terminar, inventa una historia con otras tres palabras y recuérdalas sin mirar.",
+        "También puedes leer todo el curso y hacer los ejercicios a tu ritmo."
+      ],
+      "it": [
+        "Benvenuto su ANITEW.",
+        "Sono un tutor creato con l'intelligenza artificiale.",
+        "Oggi scoprirai il metodo delle storie.",
+        "È una tecnica di memoria: colleghi informazioni diverse in un'unica storia.",
+        "Può aiutarti a ricordare una sequenza, come una lista della spesa o i punti di un discorso.",
+        "Non sostituisce la comprensione del contenuto.",
+        "Prima scoprirai il principio, vedrai un esempio e poi proverai il metodo.",
+        "Il tuo obiettivo è ricordare tre parole nell'ordine giusto.",
+        "Il nostro esempio: chiave, limone, bicicletta.",
+        "Immagina una chiave gigante che spreme un limone.",
+        "Il succo schizza su una bicicletta e ne fa girare le ruote.",
+        "Un'azione collega la prima parola alla seconda e un'altra collega la seconda alla terza.",
+        "La storia insolita è soltanto un aiuto per la memoria.",
+        "Conta immaginare chiaramente le azioni.",
+        "Ora le immagini scompariranno.",
+        "Fai una pausa e ricorda le tre parole nell'ordine giusto.",
+        "Quando sei pronto, mostra la risposta.",
+        "Erano: chiave, limone, bicicletta.",
+        "Se manca una parola, rivedi il collegamento e riprova.",
+        "Infine, inventa una storia con altre tre parole e ricordale senza guardare.",
+        "Puoi anche leggere tutto il corso e fare gli esercizi al tuo ritmo."
+      ],
+      "pt": [
+        "Bem-vindo ao ANITEW.",
+        "Sou um orientador de aprendizagem gerado por IA.",
+        "Hoje vamos conhecer o método das histórias.",
+        "É uma técnica de memorização: ligas informações separadas numa única história.",
+        "Pode ajudar a recordar uma sequência, como uma lista de compras ou os pontos de uma apresentação.",
+        "Não substitui a compreensão do conteúdo.",
+        "Primeiro conhecerás o princípio, verás um exemplo e depois experimentarás o método.",
+        "O objetivo é recordar três palavras na ordem certa.",
+        "O nosso exemplo: chave, limão, bicicleta.",
+        "Imagina uma chave gigante a espremer um limão.",
+        "O sumo salpica uma bicicleta e faz girar as rodas.",
+        "Uma ação liga a primeira palavra à segunda e outra liga a segunda à terceira.",
+        "A história invulgar é apenas uma ajuda para a memória.",
+        "O importante é imaginar claramente as ações.",
+        "Agora as imagens vão desaparecer.",
+        "Faz uma pausa e recorda as três palavras pela ordem certa.",
+        "Quando estiveres pronto, mostra a resposta.",
+        "Eram: chave, limão, bicicleta.",
+        "Se faltar uma palavra, revê a ligação e tenta novamente.",
+        "Por fim, inventa uma história com outras três palavras e recorda-as sem olhar.",
+        "Também podes ler o curso inteiro e fazer os exercícios ao teu ritmo."
+      ],
+      "nl": [
+        "Welkom bij ANITEW.",
+        "Ik ben een door AI gemaakte leercoach.",
+        "Vandaag ontdek je de verhalenmethode.",
+        "Dit is een geheugentechniek: je verbindt losse informatie in één verhaal.",
+        "Dat kan helpen om een volgorde te onthouden, zoals een boodschappenlijst of de hoofdpunten van een presentatie.",
+        "Het vervangt niet het begrijpen van de inhoud.",
+        "Eerst leer je het principe, dan zie je een voorbeeld en probeer je het zelf.",
+        "Je doel is drie woorden in de juiste volgorde te herinneren.",
+        "Ons voorbeeld: sleutel, citroen, fiets.",
+        "Stel je eerst een enorme sleutel voor die een citroen uitperst.",
+        "Het sap spat op een fiets en laat de wielen draaien.",
+        "Eén handeling verbindt het eerste woord met het tweede; een andere het tweede met het derde.",
+        "Het ongewone verhaal is alleen een geheugensteuntje.",
+        "Het gaat erom dat je de handelingen zelf duidelijk voor je ziet.",
+        "Nu verdwijnen de beelden.",
+        "Pauzeer en noem de drie woorden in de juiste volgorde.",
+        "Toon het antwoord zodra je klaar bent.",
+        "Het waren: sleutel, citroen, fiets.",
+        "Mis je een woord, bekijk dan de verbinding opnieuw en probeer het nog eens.",
+        "Bedenk tot slot een verhaal met drie andere woorden en herinner ze zonder te kijken.",
+        "Je kunt ook de hele cursus lezen en alle oefeningen in je eigen tempo doen."
+      ],
+      "tr": [
+        "ANITEW'e hoş geldin.",
+        "Ben yapay zekâyla oluşturulmuş bir öğrenme koçuyum.",
+        "Bugün hikâye yöntemini öğreneceksin.",
+        "Bu bir hafıza tekniğidir: ayrı bilgileri tek bir hikâyede birleştirirsin.",
+        "Alışveriş listesi veya sunum başlıkları gibi bir sırayı hatırlamana yardımcı olabilir.",
+        "İçeriği anlamanın yerini tutmaz.",
+        "Önce yöntemi öğrenecek, bir örnek görecek, ardından kendin deneyeceksin.",
+        "Hedefin üç kelimeyi doğru sırayla hatırlamak.",
+        "Örneğimiz: anahtar, limon, bisiklet.",
+        "Önce dev bir anahtarın bir limonu sıktığını hayal et.",
+        "Limon suyu bir bisiklete sıçrar ve tekerleklerini döndürür.",
+        "Bir hareket ilk kelimeyi ikinciye, başka bir hareket ikinciyi üçüncüye bağlar.",
+        "Bu alışılmadık hikâye yalnızca bir hatırlama aracıdır.",
+        "Önemli olan hareketleri zihninde açıkça canlandırmandır.",
+        "Şimdi resimler kaybolacak.",
+        "Duraklat ve üç kelimeyi doğru sırayla söyle.",
+        "Hazır olduğunda yanıtı göster.",
+        "Kelimeler: anahtar, limon, bisiklet.",
+        "Bir kelime eksikse ilgili bağlantıya yeniden bak ve tekrar dene.",
+        "Son olarak başka üç kelimeyle bir hikâye kur ve bakmadan hatırla.",
+        "Kursun tamamını okuyabilir ve alıştırmaları kendi hızında yapabilirsin."
+      ],
+      "ar": [
+        "مرحبًا بك في ANITEW.",
+        "أنا مدرب تعلّم مولّد بالذكاء الاصطناعي.",
+        "سنتعرّف اليوم على طريقة القصص.",
+        "هي تقنية للتذكّر تربط معلومات منفصلة في قصة واحدة.",
+        "قد تساعدك على تذكّر ترتيب الأشياء، مثل قائمة مشتريات أو النقاط الأساسية لعرض تقديمي.",
+        "لكنها لا تغني عن فهم المحتوى.",
+        "ستتعرّف أولًا على الفكرة، ثم تشاهد مثالًا وتجرّب الطريقة بنفسك.",
+        "هدفك تذكّر ثلاث كلمات بالترتيب الصحيح.",
+        "مثالنا هو: مفتاح، ليمونة، دراجة.",
+        "تخيّل أولًا مفتاحًا ضخمًا يعصر ليمونة.",
+        "يتناثر عصير الليمون على دراجة فيجعل عجلاتها تدور.",
+        "يربط فعلٌ الكلمة الأولى بالثانية، وفعلٌ آخر يربط الثانية بالثالثة.",
+        "القصة غير المعتادة مجرد وسيلة مساعدة للتذكّر.",
+        "المهم أن تتخيّل الأفعال بوضوح بنفسك.",
+        "ستختفي الصور الآن.",
+        "توقّف مؤقتًا واذكر الكلمات الثلاث بالترتيب الصحيح.",
+        "عندما تكون مستعدًا، أظهر الإجابة.",
+        "الكلمات هي: مفتاح، ليمونة، دراجة.",
+        "إذا نسيت كلمة، راجع الرابط المتعلق بها ثم حاول مجددًا.",
+        "أخيرًا، ابتكر قصة بثلاث كلمات أخرى وتذكّرها دون النظر.",
+        "يمكنك أيضًا قراءة الدرس كاملًا وأداء التمارين بالسرعة المناسبة لك."
+      ],
+      "zh": [
+        "欢迎来到 ANITEW。",
+        "我是一位由人工智能生成的学习教练。",
+        "今天我们来了解故事记忆法。",
+        "这是一种记忆技巧：把零散的信息串成一个故事。",
+        "它可以帮助你记住顺序，例如购物清单或演讲要点。",
+        "但它不能代替对内容的理解。",
+        "你将先了解原理，再看一个例子，然后亲自尝试。",
+        "你的目标是按正确顺序回忆三个词。",
+        "我们的例子是：钥匙、柠檬、自行车。",
+        "先想象一把巨大的钥匙挤压一个柠檬。",
+        "柠檬汁溅到自行车上，让车轮转动起来。",
+        "一个动作连接第一个词和第二个词，另一个动作连接第二个词和第三个词。",
+        "这个不寻常的故事只是辅助记忆的工具。",
+        "关键是自己清晰地想象这些动作。",
+        "现在图片将会消失。",
+        "请暂停，按正确顺序说出这三个词。",
+        "准备好后再显示答案。",
+        "它们是：钥匙、柠檬、自行车。",
+        "如果忘了一个词，就再看一遍对应的联系，然后重试。",
+        "最后，用另外三个词编一个故事，再不看提示回忆这些词。",
+        "你也可以阅读整个课程，按自己的节奏完成所有练习。"
+      ],
+      "ja": [
+        "ANITEWへようこそ。",
+        "私はAIで生成された学習コーチです。",
+        "今日は物語を使った記憶法を学びます。",
+        "これは、別々の情報を一つの物語につなげる記憶の技法です。",
+        "買い物リストや発表の要点など、順序を覚えるのに役立つことがあります。",
+        "ただし、内容を理解する代わりにはなりません。",
+        "まず考え方を知り、例を見てから、自分で試してみましょう。",
+        "目標は三つの言葉を正しい順序で思い出すことです。",
+        "例は、鍵、レモン、自転車です。",
+        "まず、巨大な鍵がレモンを搾るところを想像してください。",
+        "レモンの汁が自転車にかかり、車輪を回します。",
+        "一つの動作が一番目と二番目の言葉をつなぎ、別の動作が二番目と三番目をつなぎます。",
+        "この変わった物語は、記憶を助けるためのものです。",
+        "大切なのは、動作を自分ではっきりと想像することです。",
+        "これから画像が消えます。",
+        "一時停止して、三つの言葉を正しい順序で思い出してください。",
+        "準備ができたら答えを表示しましょう。",
+        "答えは、鍵、レモン、自転車です。",
+        "忘れた言葉があれば、そのつながりをもう一度見て、再び試してください。",
+        "最後に、別の三つの言葉で物語を作り、見ずに思い出してください。",
+        "コース全体を文章で読み、自分のペースで練習することもできます。"
+      ],
+      "de": [
+        "Willkommen bei ANITEW.",
+        "Ich bin ein KI-generierter Lerncoach.",
+        "Heute geht es um die Geschichten-Methode.",
+        "Die Geschichten-Methode ist eine Merktechnik: Du verknüpfst einzelne Informationen zu einer zusammenhängenden Geschichte.",
+        "Sie kann dir helfen, eine Reihenfolge zu behalten, etwa bei einer Einkaufsliste oder den Stichpunkten eines Vortrags.",
+        "Sie ersetzt nicht das Verstehen des Inhalts.",
+        "In diesem Kurs lernst du zuerst das Prinzip, siehst ein Beispiel und probierst die Methode anschließend selbst aus.",
+        "Dein Ziel: drei Begriffe in der richtigen Reihenfolge erinnern.",
+        "Unser Beispiel ist: Schlüssel, Zitrone, Fahrrad.",
+        "Zuerst stellst du dir vor, wie ein riesiger Schlüssel eine Zitrone aufdrückt.",
+        "Der Zitronensaft spritzt auf ein Fahrrad und setzt seine Räder in Bewegung.",
+        "So verbindet eine Handlung den ersten Begriff mit dem zweiten, und eine weitere den zweiten mit dem dritten.",
+        "Die ungewöhnliche Geschichte ist nur eine Merkhilfe.",
+        "Entscheidend ist, dass du dir die Handlung selbst deutlich vorstellst.",
+        "Jetzt verschwinden die Bilder.",
+        "Pausiere hier und nenne die drei Begriffe in der richtigen Reihenfolge.",
+        "Wenn du bereit bist, blende die Lösung ein.",
+        "Es waren: Schlüssel, Zitrone, Fahrrad.",
+        "Fehlt dir ein Begriff, schau dir die passende Verbindung noch einmal an und versuche es erneut.",
+        "Zum Schluss: Erfinde eine eigene Geschichte mit drei anderen Begriffen und rufe sie ohne Vorlage ab.",
+        "Du kannst den gesamten Kurs auch lesen und alle Übungen in deinem eigenen Tempo machen."
+      ],
+      "en": [
+        "Welcome to ANITEW.",
+        "I am an AI-generated learning coach.",
+        "Today we will explore the story method.",
+        "The story method is a memory technique: you connect separate pieces of information in a single story.",
+        "It can help you remember a sequence, such as a shopping list or the main points of a talk.",
+        "It does not replace understanding the material.",
+        "In this course, you will first learn the idea, see an example, and then try the method yourself.",
+        "Your goal is to recall three words in the correct order.",
+        "Our example is: key, lemon, bicycle.",
+        "First, imagine a giant key squeezing a lemon.",
+        "The lemon juice splashes onto a bicycle and makes its wheels turn.",
+        "One action connects the first word to the second, and another connects the second to the third.",
+        "The unusual story is simply a memory aid.",
+        "What matters is imagining the actions clearly for yourself.",
+        "Now the pictures will disappear.",
+        "Pause here and name the three words in the correct order.",
+        "When you are ready, reveal the answer.",
+        "The words were: key, lemon, bicycle.",
+        "If you missed a word, look at its connection again and have another try.",
+        "Finally, make up your own story with three different words and recall them without looking.",
+        "You can also read the entire course and do every exercise at your own pace."
+      ],
+      "fr": [
+        "Bienvenue sur ANITEW.",
+        "Je suis un coach pédagogique créé par intelligence artificielle.",
+        "Aujourd'hui, nous allons découvrir la méthode des histoires.",
+        "La méthode des histoires est une technique de mémorisation. Elle relie plusieurs informations dans une même histoire.",
+        "Elle peut aider à retenir un ordre. Par exemple une liste de courses ou les points principaux d'un exposé.",
+        "Elle ne remplace pas la compréhension du contenu.",
+        "Dans ce cours, tu découvriras le principe, tu verras un exemple, puis tu essaieras la méthode toi-même.",
+        "Ton objectif est de retrouver trois mots dans le bon ordre.",
+        "Voici notre exemple. clé, citron, vélo.",
+        "Imagine d'abord une clé géante qui presse un citron.",
+        "Le jus de citron éclabousse un vélo et fait tourner ses roues.",
+        "Une action relie le premier mot au deuxième, puis une autre relie le deuxième au troisième.",
+        "Cette histoire inhabituelle sert simplement d'aide-mémoire.",
+        "L'essentiel est de te représenter clairement les actions.",
+        "Les images vont maintenant disparaître.",
+        "Fais une pause et retrouve les trois mots dans le bon ordre.",
+        "Quand tu es prêt, affiche la réponse.",
+        "Les mots étaient : clé, citron, vélo.",
+        "Si tu as oublié un mot, revois le lien correspondant et essaie à nouveau.",
+        "Pour terminer, invente une histoire avec trois autres mots, puis retrouve-les sans regarder.",
+        "Tu peux aussi lire tout le cours et faire chaque exercice à ton rythme."
+      ]
+    },
+    "recallBoundary": 66.6,
+    "credits": [
+      {
+        "name": "ANITEW original illustrations",
+        "url": "https://github.com/Impekal/anitew",
+        "license": "Original ANITEW graphics"
+      },
+      {
+        "name": "Atta voice · Qwen3-TTS",
+        "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+        "license": "Apache-2.0"
+      },
+      {
+        "name": "ANITEW synthetic reference · Qwen VoiceDesign",
+        "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+        "license": "Apache-2.0"
+      },
+      {
+        "name": "ANITEW AI coach portrait and logo animation",
+        "url": "https://github.com/Impekal/anitew",
+        "license": "Original ANITEW assets"
+      }
+    ]
   }
 ]
 export function courseVideo(course:CourseId,language:SpokenLanguage,coach:CoachId|null){

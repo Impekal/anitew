@@ -331,3 +331,30 @@ Sechs Offline-Videoprüfungen (DE/EN/FR, Desktop/Mobilansicht) einschließlich
 das gewählte lokale Coach-Porträt während der Vorstellung und nach der Übung
 kurz zum Abschluss. Dies ist ein Standbild, keine neue Sprechanimation.
 Folgekurse zeigen dieses Porträt nicht.
+
+## 2026-10-11 · Alle 36 Kursvideos lokal verfügbar
+
+Alle zwölf Methoden haben nun eine lokale Videofassung in DE/EN/FR.
+Die letzten drei französischen Folgelektionen (Loci, Zahlenbilder, gemischtes
+Üben) sind integriert. Die aktuellen Geschichten-Bildfassungen in DE/FR
+zeigen das lokale Coach-Porträt; sie sind ausdrücklich keine neuen
+Sprechanimationen. Nach der Begrüßung läuft die vorhandene Logoanimation
+für eine Sekunde. Tonpakete bleiben bytegleich zu den jeweiligen Quellen.
+Der bestätigte englische Geschichtenfilm bleibt unverändert.
+
+Die deutsche Bildfassung verwendet dieselbe aktuelle Aufnahme wie der
+App-Audiokurs (74d05d37735a). Methodengrafiken ersetzen Absatztafeln;
+Untertitel behalten den vollständigen Text. DE zeigt das Porträt außerdem
+kurz zum Abschluss. Quellen/Prüfsummen stehen im Videokatalog und in
+outputs/story-visual-integration.json. Eine lokale Übernahme ist keine
+pauschale subjektive Freigabe.
+
+Neue Übersicht mit 36 geprüften Vorschauverweisen:
+outputs/anitew-abschlusspruefung.html im Aufgaben-Arbeitsbereich.
+Keine Actions, kein Push, kein Deployment, kein Merge.
+
+Abschlussprüfung: 36 vollständige Videodekodierungen, Prüfsummen, Dauer und
+Katalogvollständigkeit bestanden. Fünf Medien-Kernprüfungen, sechs ergänzende
+FR-Offline-Fälle und zwölf Geschichtenfälle bestanden; zwei veraltete
+Testannahmen zur FR-Pausengrenze wurden korrigiert und gezielt erneut geprüft.
+Build und Kaltstartbudget bestanden. Zusätzliche WebKit-Prüfung folgt.
