@@ -455,7 +455,7 @@ export const courseVideos:CourseVideo[]=[
         "Break a long word into meaningful parts, put them together again and practise its meaning, pronunciation and spelling.",
         "Meaningful parts are not always spoken syllables. Some technical terms are unfamiliar throughout. Check their meaning and pronunciation before practising.",
         "Clarify the meaning of the whole word.",
-        "Identify familiar parts and explain what they contribute.",
+        "Find familiar parts and explain their role.",
         "Notice spelling changes and connecting elements.",
         "Say the parts slowly, then say the whole word fluently. Syllable boundaries may differ from meaning boundaries.",
         "Hide the example, write the whole word and explain it.",
@@ -1198,7 +1198,7 @@ export const courseVideos:CourseVideo[]=[
         "Frage: Warum kühlt verdunstendes Wasser eine Oberfläche?\nAntwort: Zum Verdunsten wird Energie benötigt. Diese Energie wird der Oberfläche und ihrer Umgebung als Wärme entzogen.",
         "Lies und verstehe zunächst die Antwort. Decke sie dann ab und beantworte die Frage selbst. „Wasser kühlt“ allein erklärt den Zusammenhang noch nicht; entscheidend sind Energiebedarf und Wärmeentzug.",
         "Warum kann verdunstendes Wasser eine Oberfläche kühlen? Erkläre den Zusammenhang ohne Vorlage.",
-        "Formuliere zu deinem eigenen Material eine konkrete Frage. Antworte zunächst ohne Vorlage, vergleiche danach und versuche es später erneut. Die App nutzt Abrufversuche auch in ihren Trainingseinheiten."
+        "Stelle eine konkrete Frage zu deinem Lernstoff. Antworte ohne Vorlage, vergleiche und versuche es später erneut. Auch ANITEW nutzt Abrufübungen."
       ],
       "en": [
         "Active recall",
@@ -8092,7 +8092,7 @@ export const courseVideos:CourseVideo[]=[
         "Rechteck: Fläche = Länge × Breite. Dreieck: Fläche = Grundseite × zugehörige Höhe ÷ 2. Beispiel: Ein Rechteck mit 4 cm Länge und 3 cm Breite hat 12 cm². Ein Dreieck mit 4 cm Grundseite und 3 cm zugehöriger Höhe hat 6 cm².",
         "Gleiche Zahlen verlangen nicht automatisch dieselbe Rechnung. Die Figur entscheidet: Beim Dreieck gehört der Faktor ein Halb dazu. In gemischten Aufgaben muss die Aufgabenart erkannt werden, bevor die Regel angewandt wird.",
         "Aufgabe A: Dreieck mit Grundseite 6 cm und zugehöriger Höhe 4 cm. Aufgabe B: Rechteck mit Länge 6 cm und Breite 4 cm. Nenne jeweils die passende Regel und die Fläche.",
-        "Wähle zwei oder drei bereits eingeführte, verwandte Aufgabentypen aus deinem Lernstoff. Mische sie und begründe vor jeder Lösung deine Auswahl des Vorgehens."
+        "Mische zwei oder drei verwandte Aufgabentypen, die du schon gelernt hast. Begründe vor jeder Lösung deinen Lösungsweg."
       ],
       "en": [
         "Choose between related approaches",
@@ -8926,12 +8926,12 @@ export const courseVideos:CourseVideo[]=[
         "Die ungewöhnliche Geschichte ist nur eine Merkhilfe.",
         "Entscheidend ist, dass du dir die Handlung selbst deutlich vorstellst.",
         "Jetzt verschwinden die Bilder.",
-        "Pausiere hier und nenne die drei Begriffe in der richtigen Reihenfolge.",
+        "Pause: Nenne die drei Begriffe in richtiger Reihenfolge.",
         "Wenn du bereit bist, blende die Lösung ein.",
         "Es waren: Schlüssel, Zitrone, Fahrrad.",
         "Fehlt dir ein Begriff, schau dir die passende Verbindung noch einmal an und versuche es erneut.",
         "Zum Schluss: Erfinde eine eigene Geschichte mit drei anderen Begriffen und rufe sie ohne Vorlage ab.",
-        "Du kannst den gesamten Kurs auch lesen und alle Übungen in deinem eigenen Tempo machen."
+        "Du kannst den ganzen Kurs lesen und alle Übungen im eigenen Tempo machen."
       ],
       "en": [
         "Welcome to ANITEW.",
