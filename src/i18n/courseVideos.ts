@@ -21,9 +21,9 @@ export const courseVideos:CourseVideo[]=[
     "coach": "rafael",
     "language": "en",
     "mime": "video/mp4",
-    "src": "/course-media/video/atta-story-en-798e41c0c793.mp4",
-    "bytes": 1775668,
-    "sha256": "798e41c0c79399926a50b2f7984533e86ad375fb480fd743382d7eae8b116da3",
+    "src": "/course-media/video/atta-story-en-922ac048065b.mp4",
+    "bytes": 1600248,
+    "sha256": "922ac048065bb3f29dd87c310a7002e55a9ebd50013c7850c50b38c43ff5ed94",
     "duration": 98.67999999999999,
     "cues": [
       {

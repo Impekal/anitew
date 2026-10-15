@@ -6,9 +6,9 @@
       "coach": "rafael",
       "language": "en",
       "presentation": "coach-and-illustrations",
-      "src": "/course-media/video/atta-story-en-798e41c0c793.mp4",
-      "bytes": 1775668,
-      "sha256": "798e41c0c79399926a50b2f7984533e86ad375fb480fd743382d7eae8b116da3",
+      "src": "/course-media/video/atta-story-en-922ac048065b.mp4",
+      "bytes": 1600248,
+      "sha256": "922ac048065bb3f29dd87c310a7002e55a9ebd50013c7850c50b38c43ff5ed94",
       "duration": 98.67999999999999,
       "credits": [
         {
@@ -431,9 +431,9 @@
       "coach": "rafael",
       "language": "de",
       "presentation": "illustrated",
-      "src": "/course-media/video/atta-long-words-de-visual-2bb5ab97d897.mp4",
-      "bytes": 1402694,
-      "sha256": "2bb5ab97d897ef86b3e5b31bf7afe7c4792f722a6128eea7d101de79ffaa8333",
+      "src": "/course-media/video/atta-long-words-de-visual-1dc3178c6cf5.mp4",
+      "bytes": 1403236,
+      "sha256": "1dc3178c6cf56b1a9b0fec29547ff34fd093e8700a6ff7dbd29e631102bc965e",
       "duration": 93.8,
       "credits": [
         {
@@ -463,9 +463,9 @@
       "coach": "rafael",
       "language": "en",
       "presentation": "illustrated",
-      "src": "/course-media/video/atta-long-words-en-visual-a9f8ee33ebc3.mp4",
-      "bytes": 1258006,
-      "sha256": "a9f8ee33ebc3e642d3480d6049dc14e5d390c04bf4098a937efb48e3042fb471",
+      "src": "/course-media/video/atta-long-words-en-visual-5e38f84558b9.mp4",
+      "bytes": 1257098,
+      "sha256": "5e38f84558b905f4a932cb383d071b913ffe6bd1d820e76e54315064722f4692",
       "duration": 90.44,
       "credits": [
         {
