@@ -44,6 +44,24 @@ it('keeps all eleven story caption tracks within each actual narration and hides
 
 import { libraryCaptions } from '../../src/i18n/courseCaptions.ts'
 import { courseLibraryMedia } from '../../src/i18n/courseLibraryMedia.ts'
+import { courseVideo } from '../../src/i18n/courseVideos.ts'
+it('retains the narrated recall actions when English examples have German or French captions',()=>{
+ const expectations={
+  de:{'long-words':['Schreibe','Bedeutung','mündlich','flüssig'],'keyword-method':['französische','Brot','Schreibe','Beispielsatz'],'number-images':['tin','Zahl','Rückweg','Konsonantenlaute']},
+  fr:{'long-words':['Écris','sens','voix haute','fluidité'],'keyword-method':['français','Écris','sens','phrase'],'number-images':['tin','nombre','retour','consonnes']},
+ }
+ for(const target of ['de','fr'] as const){
+  for(const course of ['long-words','keyword-method','number-images'] as const){
+   const i=courseLibraryMedia[course].en.cues.findIndex(c=>c.section==='recall')
+   const audio=libraryCaptions(course,'en',target)![i]!
+   const video=courseVideo(course,'en','rafael')!.captions![target]![i]!
+   for(const word of expectations[target][course]){
+    expect(audio).toContain(word)
+    expect(video).toContain(word)
+   }
+  }
+ }
+})
 it('keeps the long-word spelling instruction tied to the spoken language example',()=>{
  for(const spoken of ['de','en','fr'] as const){
   const index=courseLibraryMedia['long-words'][spoken].cues.findIndex(c=>c.section==='step-2')

@@ -207,7 +207,7 @@ export const courseVideos:CourseVideo[]=[
         "Prüfe das Original: Aussprache, Schreibweise und ein passender Beispielsatz.",
         "Englisch: bell = cloche auf Französisch, Glocke auf Deutsch. Beispiel: The bell rings. = La cloche sonne.",
         "Das französische Wort „belle“ kann als Klangbrücke dienen: Stelle dir eine sehr schöne Glocke vor, die läutet. „Belle“ ist die Merkhilfe, keine Umschrift der englischen Aussprache von bell.",
-        "Rufe das gehörte Beispiel ohne Vorlage ab. Erkläre die Bedeutung und den Weg der Merkhilfe.",
+        "Welche englische Vokabel bedeutet cloche (Glocke)? Schreibe die Vokabel, ihre Bedeutung und den Beispielsatz aus dem Gedächtnis.",
         "Teste die Technik an einer Vokabel, die du wirklich brauchst. Prüfe auch die Gegenrichtung: Kannst du aus der Bedeutung die fremdsprachige Form abrufen? Verwirrt dich das Schlüsselwort, ändere die Brücke oder nutze direktes Abrufen."
       ],
       "en": [
@@ -221,7 +221,7 @@ export const courseVideos:CourseVideo[]=[
         "Check the original pronunciation, spelling and an example sentence.",
         "English: bell = cloche in French. Example: The bell rings. = La cloche sonne.",
         "The French word “belle” can be a sound cue: imagine a very beautiful bell ringing. “Belle” is the mnemonic, not a transcription of the English pronunciation of bell.",
-        "Recall the example you heard without looking. Explain its meaning and how the memory cue works.",
+        "Which English word means cloche (bell)? Write the word, its meaning and the example sentence from memory.",
         "Try a word you actually need. Test the reverse direction too: can you retrieve the foreign form from its meaning? If the keyword confuses you, change the bridge or use direct retrieval."
       ],
       "fr": [
@@ -447,7 +447,7 @@ export const courseVideos:CourseVideo[]=[
         "Vergleiche Schreibweise und Bedeutung. Übe unsichere Stellen und setze danach wieder das ganze Wort zusammen.",
         "incompréhensible",
         "in | compréhensible: etwas, das man nicht verstehen kann. „in“ verneint hier „compréhensible“. „Compréhensible“ hängt mit dem Verb „comprendre“ zusammen. Die Bausteine helfen beim Verstehen; sie sind keine Umschrift der Aussprache.",
-        "Rufe das gehörte Beispiel ohne Vorlage ab. Erkläre die Bedeutung und den Weg der Merkhilfe.",
+        "Schreibe das vollständige Wort aus dem Gedächtnis. Erkläre anschließend mündlich seine Bedeutung und sprich es flüssig aus.",
         "Wähle ein langes Wort aus deinem Alltag. Suche sinnvolle Bausteine und prüfe danach das vollständige Wort. Für andere Sprachen gelten deren Wortbildungs- und Ausspracheregeln."
       ],
       "en": [
@@ -462,7 +462,7 @@ export const courseVideos:CourseVideo[]=[
         "Check spelling and meaning. Practise uncertain parts, then put the whole word together again.",
         "incompréhensible",
         "in | compréhensible: something that cannot be understood. Here, “in” negates “compréhensible”. “Compréhensible” is related to the verb “comprendre”. This division helps with meaning; it is not a transcription of pronunciation.",
-        "Recall the example you heard without looking. Explain its meaning and how the memory cue works.",
+        "Write the complete word from memory. Then explain its meaning aloud and say it fluently.",
         "Choose a long word relevant to your life. Find meaningful parts, then practise the whole word. Use the word formation and pronunciation rules of its language."
       ],
       "fr": [
@@ -3186,7 +3186,7 @@ export const courseVideos:CourseVideo[]=[
         "Check the original pronunciation, spelling and an example sentence.",
         "English: bell = Glocke (German). Example: The bell rings. = Die Glocke läutet.",
         "The German word “bellen” can provide a sound cue: imagine a bell barking like a dog. “Bellen” is the mnemonic, not the English pronunciation of bell.",
-        "Recall the example you heard without looking. Explain its meaning and how the memory cue works.",
+        "Which English word means Glocke (bell)? Write the word, its meaning and the example sentence from memory.",
         "Try a word you actually need. Test the reverse direction too: can you retrieve the foreign form from its meaning? If the keyword confuses you, change the bridge or use direct retrieval."
       ],
       "fr": [
@@ -3200,7 +3200,7 @@ export const courseVideos:CourseVideo[]=[
         "Vérifie la prononciation, l’orthographe et une phrase d’exemple.",
         "Anglais : bell = Glocke en allemand, « cloche » en français. Exemple : The bell rings. = Die Glocke läutet.",
         "Le mot allemand « bellen » peut servir d’indice sonore : imagine une cloche qui aboie comme un chien. « Bellen » est l’aide-mémoire, pas la prononciation anglaise de bell.",
-        "Rappelle l’exemple entendu sans modèle. Explique son sens et le chemin de l’aide-mémoire.",
+        "Quel mot anglais signifie Glocke (cloche) ? Écris le mot, son sens et la phrase d’exemple de mémoire.",
         "Essaie avec un mot dont tu as réellement besoin. Teste aussi le sens inverse : peux-tu retrouver la forme étrangère à partir du sens ? Si le mot-clé te perturbe, change de lien ou utilise le rappel direct."
       ],
       "es": [
@@ -3412,7 +3412,7 @@ export const courseVideos:CourseVideo[]=[
         "Prüfe das Original: Aussprache, Schreibweise und ein passender Beispielsatz.",
         "Französisch: pain = Brot. Beispielsatz: Je mange du pain. = Ich esse Brot.",
         "Das englische Wort „pan“ kann als ungefähre Klangbrücke dienen: Stelle dir Brot vor, das aus einer Pfanne springt. Französisch „pain“ hat einen Nasalvokal und wird nicht wie englisch „pan“ oder „pain“ ausgesprochen. Die Brücke ist eine Merkhilfe, kein Aussprachemodell.",
-        "Rufe das gehörte Beispiel ohne Vorlage ab. Erkläre die Bedeutung und den Weg der Merkhilfe.",
+        "Welche französische Vokabel bedeutet Brot? Schreibe die Vokabel, ihre Bedeutung und den Beispielsatz aus dem Gedächtnis.",
         "Teste die Technik an einer Vokabel, die du wirklich brauchst. Prüfe auch die Gegenrichtung: Kannst du aus der Bedeutung die fremdsprachige Form abrufen? Verwirrt dich das Schlüsselwort, ändere die Brücke oder nutze direktes Abrufen."
       ],
       "en": [
@@ -3440,7 +3440,7 @@ export const courseVideos:CourseVideo[]=[
         "Vérifie la prononciation, l’orthographe et une phrase d’exemple.",
         "Français : pain = bread en anglais. Exemple : Je mange du pain. = I eat bread.",
         "Le mot anglais « pan » peut servir d’indice sonore approximatif : imagine du pain qui saute d’une poêle. Le français « pain » contient une voyelle nasale et ne se prononce pas comme les mots anglais « pan » ou « pain ». Cet indice aide à mémoriser, pas à prononcer.",
-        "Rappelle l’exemple entendu sans modèle. Explique son sens et le chemin de l’aide-mémoire.",
+        "Quel mot français signifie pain ? Écris le mot, son sens et la phrase d’exemple de mémoire.",
         "Essaie avec un mot dont tu as réellement besoin. Teste aussi le sens inverse : peux-tu retrouver la forme étrangère à partir du sens ? Si le mot-clé te perturbe, change de lien ou utilise le rappel direct."
       ],
       "es": [
@@ -3667,7 +3667,7 @@ export const courseVideos:CourseVideo[]=[
         "Check spelling and meaning. Practise uncertain parts, then put the whole word together again.",
         "Krankenversicherungsbeitrag",
         "Kranken | versicherung | s | beitrag: a health insurance contribution. The s connects word parts; it has no separate meaning here. These are meaning units, not syllables.",
-        "Recall the example you heard without looking. Explain its meaning and how the memory cue works.",
+        "Write the complete word from memory. Then explain its meaning aloud and say it fluently.",
         "Choose a long word relevant to your life. Find meaningful parts, then practise the whole word. Use the word formation and pronunciation rules of its language."
       ],
       "fr": [
@@ -3682,7 +3682,7 @@ export const courseVideos:CourseVideo[]=[
         "Vérifie l’orthographe et le sens. Travaille les parties incertaines, puis rassemble à nouveau le mot.",
         "Krankenversicherungsbeitrag",
         "Kranken | versicherung | s | beitrag : la cotisation à l’assurance maladie. Le s relie les éléments ; il ne porte pas de sens autonome ici. Ce découpage montre des éléments de sens, pas des syllabes.",
-        "Rappelle l’exemple entendu sans modèle. Explique son sens et le chemin de l’aide-mémoire.",
+        "Écris le mot entier de mémoire. Explique ensuite son sens à voix haute et prononce-le avec fluidité.",
         "Choisis un mot long utile dans ta vie. Repère ses éléments de sens, puis travaille le mot entier. Respecte les règles de formation et de prononciation de sa langue."
       ],
       "es": [
@@ -3907,7 +3907,7 @@ export const courseVideos:CourseVideo[]=[
         "Vergleiche Schreibweise und Bedeutung. Übe unsichere Stellen und setze danach wieder das ganze Wort zusammen.",
         "unpredictability",
         "un | predict | ability: die Eigenschaft, schwer oder gar nicht vorhersagbar zu sein. Das letzte e von „predictable“ bleibt in „unpredictability“ nicht erhalten. Dies sind hilfreiche Bedeutungsbausteine, keine Ausspracheanleitung.",
-        "Rufe das gehörte Beispiel ohne Vorlage ab. Erkläre die Bedeutung und den Weg der Merkhilfe.",
+        "Schreibe das vollständige Wort aus dem Gedächtnis. Erkläre anschließend mündlich seine Bedeutung und sprich es flüssig aus.",
         "Wähle ein langes Wort aus deinem Alltag. Suche sinnvolle Bausteine und prüfe danach das vollständige Wort. Für andere Sprachen gelten deren Wortbildungs- und Ausspracheregeln."
       ],
       "en": [
@@ -3937,7 +3937,7 @@ export const courseVideos:CourseVideo[]=[
         "Vérifie l’orthographe et le sens. Travaille les parties incertaines, puis rassemble à nouveau le mot.",
         "unpredictability",
         "un | predict | ability : le caractère difficile ou impossible à prévoir. Le e final de « predictable » disparaît dans « unpredictability ». Ce sont des unités de sens utiles, pas un guide de prononciation.",
-        "Rappelle l’exemple entendu sans modèle. Explique son sens et le chemin de l’aide-mémoire.",
+        "Écris le mot entier de mémoire. Explique ensuite son sens à voix haute et prononce-le avec fluidité.",
         "Choisis un mot long utile dans ta vie. Repère ses éléments de sens, puis travaille le mot entier. Respecte les règles de formation et de prononciation de sa langue."
       ],
       "es": [
@@ -5146,7 +5146,7 @@ export const courseVideos:CourseVideo[]=[
         "Retrieve the word from the image and decode its sounds back into the number.",
         "1 → t/d; 2 → n. The number 12 can become an image of a fir tree, “Tanne” in German: t + n.",
         "In reverse, t gives 1 and n gives 2: this recovers 12. The consonant sounds of “Tanne” matter, not just its spelling.",
-        "Recall the example you heard without looking. Explain its meaning and how the memory cue works.",
+        "Which number does the image of a fir tree, German “Tanne”, encode? Explain the reverse path through the two consonant sounds.",
         "Practise further fixed mappings in the existing Major lessons before tackling longer numbers. Check that every image you create decodes to the exact intended number."
       ],
       "fr": [
@@ -5160,7 +5160,7 @@ export const courseVideos:CourseVideo[]=[
         "Retrouve le mot à partir de l’image, puis le nombre à partir de ses sons.",
         "1 → t/d ; 2 → n. Le nombre 12 peut devenir l’image d’un sapin, « Tanne » en allemand : t + n.",
         "Dans l’autre sens, t donne 1 et n donne 2 : on retrouve 12. Ce sont les sons consonantiques de « Tanne » qui comptent, pas seulement les lettres.",
-        "Rappelle l’exemple entendu sans modèle. Explique son sens et le chemin de l’aide-mémoire.",
+        "Quel nombre code l’image d’un sapin, « Tanne » en allemand ? Explique le retour par les deux consonnes prononcées.",
         "Travaille les autres correspondances fixes dans les leçons existantes avant de mémoriser des nombres plus longs. Vérifie que chaque image te ramène exactement au nombre voulu."
       ],
       "es": [
@@ -5372,7 +5372,7 @@ export const courseVideos:CourseVideo[]=[
         "Rufe aus dem Bild das Wort und aus dessen Lauten wieder die Zahl ab.",
         "1 → t/d; 2 → n. Die Zahl 12 kann zum Bild einer Dose werden, englisch „tin“: t + n.",
         "Rückwärts ergibt t die 1 und n die 2, also wieder 12. Entscheidend sind die Konsonantenlaute des englischen Wortes „tin“, nicht nur die geschriebenen Buchstaben.",
-        "Rufe das gehörte Beispiel ohne Vorlage ab. Erkläre die Bedeutung und den Weg der Merkhilfe.",
+        "Welche Zahl steckt im Bild einer Dose, englisch „tin“? Erkläre den Rückweg über die beiden Konsonantenlaute.",
         "Übe die weiteren festen Zuordnungen in den bestehenden Major-Lektionen. Füge erst dann längere Zahlenfolgen hinzu. Prüfe bei jedem eigenen Bild den Rückweg zur exakten Zahl."
       ],
       "en": [
@@ -5400,7 +5400,7 @@ export const courseVideos:CourseVideo[]=[
         "Retrouve le mot à partir de l’image, puis le nombre à partir de ses sons.",
         "1 → t/d ; 2 → n. Le nombre 12 peut devenir l’image d’une boîte en métal, « tin » en anglais : t + n.",
         "Dans l’autre sens, t donne 1 et n donne 2 : on retrouve 12. Les sons consonantiques du mot anglais « tin » comptent, pas seulement les lettres.",
-        "Rappelle l’exemple entendu sans modèle. Explique son sens et le chemin de l’aide-mémoire.",
+        "Quel nombre code l’image d’une boîte en métal, « tin » en anglais ? Explique le retour par les deux consonnes prononcées.",
         "Travaille les autres correspondances fixes dans les leçons existantes avant de mémoriser des nombres plus longs. Vérifie que chaque image te ramène exactement au nombre voulu."
       ],
       "es": [
@@ -7856,7 +7856,7 @@ export const courseVideos:CourseVideo[]=[
         "Rufe aus dem Bild das Wort und aus dessen Lauten wieder die Zahl ab.",
         "1 → t/d; 2 → n. Die Zahl 12 kann zum Bild einer Tonne Sand werden, französisch „tonne“: t + n.",
         "Rückwärts ergibt t die 1 und n die 2, also wieder 12. Entscheidend sind die Konsonantenlaute des französischen Wortes „tonne“, nicht nur die geschriebenen Buchstaben.",
-        "Rufe das gehörte Beispiel ohne Vorlage ab. Erkläre die Bedeutung und den Weg der Merkhilfe.",
+        "Welche Zahl steckt im Bild einer Tonne Sand, französisch „tonne“? Erkläre den Rückweg über die beiden Konsonantenlaute.",
         "Übe die weiteren festen Zuordnungen in den bestehenden Major-Lektionen. Füge erst dann längere Zahlenfolgen hinzu. Prüfe bei jedem eigenen Bild den Rückweg zur exakten Zahl."
       ],
       "en": [
@@ -7870,7 +7870,7 @@ export const courseVideos:CourseVideo[]=[
         "Retrieve the word from the image and decode its sounds back into the number.",
         "1 → t/d; 2 → n. The number 12 can become an image of a tonne of sand, “tonne” in French: t + n.",
         "In reverse, t gives 1 and n gives 2: this recovers 12. The consonant sounds of the French word “tonne” matter, not just the written letters.",
-        "Recall the example you heard without looking. Explain its meaning and how the memory cue works.",
+        "Which number does the image of a tonne of sand, French “tonne”, encode? Explain the reverse path through the two consonant sounds.",
         "Practise further fixed mappings in the existing Major lessons before tackling longer numbers. Check that every image you create decodes to the exact intended number."
       ],
       "fr": [

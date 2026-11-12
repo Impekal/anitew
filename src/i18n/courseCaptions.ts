@@ -23,6 +23,21 @@ const examples = {
  },
 } as const
 
+// Preserve the actual exercise, including writing/speaking and the reverse path.
+// A generic request to explain a mnemonic omits parts of the narrated task.
+const recallPrompts = {
+ 'keyword-method': {
+  de:{en:'Which English word means Glocke (bell)? Write the word, its meaning and the example sentence from memory.',fr:'Quel mot anglais signifie Glocke (cloche) ? Écris le mot, son sens et la phrase d’exemple de mémoire.'},
+  en:{de:'Welche französische Vokabel bedeutet Brot? Schreibe die Vokabel, ihre Bedeutung und den Beispielsatz aus dem Gedächtnis.',fr:'Quel mot français signifie pain ? Écris le mot, son sens et la phrase d’exemple de mémoire.'},
+  fr:{de:'Welche englische Vokabel bedeutet cloche (Glocke)? Schreibe die Vokabel, ihre Bedeutung und den Beispielsatz aus dem Gedächtnis.',en:'Which English word means cloche (bell)? Write the word, its meaning and the example sentence from memory.'},
+ },
+ 'number-images': {
+  de:{en:'Which number does the image of a fir tree, German “Tanne”, encode? Explain the reverse path through the two consonant sounds.',fr:'Quel nombre code l’image d’un sapin, « Tanne » en allemand ? Explique le retour par les deux consonnes prononcées.'},
+  en:{de:'Welche Zahl steckt im Bild einer Dose, englisch „tin“? Erkläre den Rückweg über die beiden Konsonantenlaute.',fr:'Quel nombre code l’image d’une boîte en métal, « tin » en anglais ? Explique le retour par les deux consonnes prononcées.'},
+  fr:{de:'Welche Zahl steckt im Bild einer Tonne Sand, französisch „tonne“? Erkläre den Rückweg über die beiden Konsonantenlaute.',en:'Which number does the image of a tonne of sand, French “tonne”, encode? Explain the reverse path through the two consonant sounds.'},
+ },
+} as const
+
 export function libraryCaptions(id:Exclude<CourseId,'story-method'>,spoken:CourseLanguage,target:string):string[]|undefined {
  if(target!=='de'&&target!=='en'&&target!=='fr')return courseExtraCaptions[id]?.[spoken]?.[target]
  const source=courseLibraryMedia[id][spoken]
@@ -39,7 +54,10 @@ export function libraryCaptions(id:Exclude<CourseId,'story-method'>,spoken:Cours
      ? target==='fr'?'Observe les éléments de liaison, comme le s dans Versicherungsbeitrag.':'Notice connecting elements such as the s in Versicherungsbeitrag.'
      : target==='de'?'Achte auf Änderungen der Schreibweise und auf Verbindungselemente.':translated[index]!
    }
-   if(cue.section==='recall')translated[index]=target==='de'?'Rufe das gehörte Beispiel ohne Vorlage ab. Erkläre die Bedeutung und den Weg der Merkhilfe.':target==='fr'?'Rappelle l’exemple entendu sans modèle. Explique son sens et le chemin de l’aide-mémoire.':'Recall the example you heard without looking. Explain its meaning and how the memory cue works.'
+   if(cue.section==='recall'&&(id==='keyword-method'||id==='number-images')) {
+    const prompts=recallPrompts[id][spoken] as Partial<Record<CourseLanguage,string>>
+    translated[index]=prompts[target]??translated[index]!
+   }
   }
  }
  return translated
