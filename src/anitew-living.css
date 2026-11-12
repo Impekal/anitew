@@ -298,7 +298,15 @@
     inset 0 0 60px rgb(140 207 192 / 4%),
     0 26px 90px rgb(0 0 0 / 36%),
     0 0 70px rgb(216 168 90 / 10%) !important;
-  backdrop-filter: blur(18px) saturate(116%);
+  /*
+   * Kein Hintergrund-Weichzeichner am Startknopf (Gerätemeldung 13.09.).
+   * Ein `backdrop-filter` muss neu gerechnet werden, sobald sich darunter
+   * etwas rührt — und unter diesem Knopf rührt sich das Neuronenfeld
+   * dauerhaft, dazu seine eigenen beiden Ringe. Gemessen kostete er 10 von
+   * 43 Bildern. Zu sehen ist davon fast nichts: Die Knopffläche ist zu 58
+   * Prozent deckend, der Unterschied betrifft gemessen 50 von 1 130 940
+   * Farbkanälen, höchstens 19 von 255 Stufen.
+   */
   transform-style: preserve-3d;
 }
 .start::before {

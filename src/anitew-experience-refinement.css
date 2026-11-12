@@ -115,7 +115,10 @@ body::after {
   opacity: .78 !important;
   background:
     conic-gradient(from 18deg at 50% 38%, transparent 0 17%, color-mix(in oklab, var(--v4-mint) 7%, transparent) 24%, transparent 31% 62%, color-mix(in oklab, var(--v4-gold) 6%, transparent) 70%, transparent 78%) !important;
-  filter: blur(25px) !important;
+  /* Kein Weichzeichner auf der bewegten Aurora (Gerätemeldung 13.09.).
+     Ein Verlauf ist schon weich: gemessen höchstens 4 von 255
+     Helligkeitsstufen Unterschied — bei der Hälfte des Bildbudgets. */
+  filter: none !important;
 }
 .note,
 .constellation,
@@ -148,9 +151,20 @@ body::after {
 /* ── Neural field: wieder klar Teil der Identität ------------------------ */
 .neural {
   opacity: .94 !important;
-  filter:
-    drop-shadow(0 0 8px color-mix(in oklab, var(--v4-mint) 22%, transparent))
-    drop-shadow(0 0 24px color-mix(in oklab, var(--v4-gold) 8%, transparent)) !important;
+  /*
+   * Kein Leuchten mehr über dem ganzen Feld (Gerätemeldung 13.09., „sehr
+   * heiß"). Ein Filter am Behälter zwingt den gesamten Teilbaum in eine
+   * eigene Ebene, und die wird neu gerastert, sobald sich darin etwas rührt
+   * — hier rühren sich 108 Linien und 50 Knoten, dauerhaft, über den
+   * ganzen Schirm. Gemessen kostete das 7,7 von 28 Bildern.
+   *
+   * Zu sehen war davon nichts: Ein Schein mit Alpha 0,08 über 24 Pixel auf
+   * fast schwarzem Grund bleibt unter einer Helligkeitsstufe. Vier Phasen
+   * der Animation verglichen, jedes Mal **null** Pixel Unterschied.
+   *
+   * Die Knoten behalten ihr eigenes kleines Leuchten: 2 Pixel auf 16 bis 42
+   * px² sind sichtbar und kosten angehalten gemessen nichts.
+   */
 }
 .neural-links line {
   stroke: var(--v4-neural) !important;

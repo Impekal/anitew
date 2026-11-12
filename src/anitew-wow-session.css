@@ -32,7 +32,6 @@
   width: min(38vw, 210px);
   aspect-ratio: 1;
   background: radial-gradient(circle, rgb(158 230 210 / 8%), transparent 66%);
-  filter: blur(10px);
   animation: wow-settle-core 3s ease-in-out infinite;
 }
 .settle-breath {
