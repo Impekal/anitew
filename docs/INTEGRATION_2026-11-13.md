@@ -34,7 +34,7 @@ bytegleich. Keine neuen Sprechproben sind damit für die App freigegeben.
   Kursmedien gelten gemeinsam. Große Kursdateien bleiben bewusste Downloads.
 - Detaillierte Fortschrittsdarstellung und Hilfetexte laden in einem eigenen
   vorgecachten Modul. Die bestehenden Kaltstart-Budgets werden nicht erhöht.
-- V4.2 wird Produktzweig. CI prüft Desktop in vier Shards, die mobile
+- V4.2 wird Produktzweig. CI prüft Desktop in bis zu acht Shards, die mobile
   Release-Auswahl einschließlich Kurse sowie die Layoutmatrix. Nur ein grünes
   Gesamttor desselben Commits darf automatisch veröffentlichen.
 
@@ -84,3 +84,15 @@ und unverändertes Größenbudget bestanden; vier Foto-Browserprüfungen auf
 Desktop/Mobilansicht bestanden (Anfragen abgefangen, keine echten KI-Aufrufe).
 Die Layoutmatrix davor bestand 51 Fälle; fünf reine Breitbildprüfungen wurden
 auf schmalen Geräten bestimmungsgemäß übersprungen.
+
+Ein zusätzlicher Rückkehrtest fand eine fehlerhafte Konfliktauflösung:
+der Ritual-Observer wurde bei `pagehide` dauerhaft abgetrennt. Bei BFCache
+bleibt er jetzt verbunden; der Cleanup läuft bei jeder Rückkehr erneut,
+nicht nur einmal. Der bestehende Test wurde auf zwei Rückkehrzyklen erweitert.
+
+Die Browsermatrix verteilt dieselben Fälle auf bis zu acht Desktop- und zwei
+Mobilmaschinen (je ein Worker). Die Vorbereitung und das Zähltor vergleichen
+die Summe mit der vollständigen ursprünglichen Auswahl. Leere dateibasierte
+Shard-Slots starten keine Maschine. Screenshots/Traces fehlgeschlagener Fälle
+werden pro Maschine getrennt gesichert. Die langen echten Trainingszeiten
+bleiben erhalten; es wird kein Test übersprungen, um früher zu veröffentlichen.

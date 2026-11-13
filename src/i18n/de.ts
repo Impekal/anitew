@@ -12,6 +12,7 @@ export const de = {
     tagline: 'Gedächtnis ist Technik, kein Talent.',
   },
   language: {
+    fallbackLabel: "Oberfläche: Englisch",
     label: 'Sprache',
     // Endonyme: jede Sprache in ihrer eigenen Schreibweise. Wer die App auf
     // Türkisch sucht, sucht „Türkçe“ und nicht „Turkish“.

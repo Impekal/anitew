@@ -6,7 +6,9 @@ for(const language of ['es','it','pt','nl','tr','ar','zh','ja']) {
  test(`library captions stay ${language} while the spoken language changes`,async({page,context})=>{
   await visit(page)
   await page.getByRole('combobox',{name:'Sprache',exact:true}).selectOption(language)
-  await openPage(page,'Learning courses')
+  await expect(page.locator('html')).toHaveAttribute('lang',language)
+  const menuLabel:Record<string,string>={es:'Cursos de aprendizaje',it:'Corsi di apprendimento',pt:'Cursos de aprendizagem'}
+  await openPage(page,menuLabel[language]??'Learning courses')
   await page.getByRole('button',{name:'Open course : Remember long words',exact:true}).click()
   await page.getByRole('button',{name:'Listen and watch',exact:true}).click()
   const caption=page.locator('.course-caption')

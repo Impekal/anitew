@@ -1957,18 +1957,13 @@ function LanguageSoundControls({
       <label className="language">
         <span>{dictionary.language.label}</span>
         <select value={language} onChange={(event) => choose(event.target.value as Language)}>
-          {/*
-            Nur Sprachen mit echtem Wörterbuch (TRANSLATION_WORKFLOW §6):
-            Ein Eintrag, der auf Englisch zurückfällt — bei Arabisch sogar
-            als RTL-Dokument mit englischem Text —, verspricht eine
-            Übersetzung, die es nicht gibt. Wer die App in einer noch
-            nicht übersetzten Systemsprache öffnet, bekommt weiterhin die
-            ehrliche Fußnote; angeboten wird sie erst, wenn sie fertig ist.
-          */}
-          {SUPPORTED_LANGUAGES.filter((tag) => tag === language || isTranslated(tag)).map(
+          {/* Course-caption languages remain selectable. Incomplete UI languages
+              are explicitly labelled as English fallback; onboarding still offers
+              only the six complete interface dictionaries. */}
+          {SUPPORTED_LANGUAGES.map(
             (tag) => (
               <option key={tag} value={tag}>
-                {dictionary.language.names[tag]}
+                {dictionary.language.names[tag]}{isTranslated(tag) ? '' : ` · ${dictionary.language.fallbackLabel}`}
               </option>
             ),
           )}
@@ -1987,7 +1982,7 @@ function LanguageSoundControls({
           >
             {trainable.map((tag) => (
               <option key={tag} value={tag}>
-                {dictionary.language.names[tag]}
+                {dictionary.language.names[tag]}{isTranslated(tag) ? '' : ` · ${dictionary.language.fallbackLabel}`}
               </option>
             ))}
           </select>

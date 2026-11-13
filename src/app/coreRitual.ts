@@ -207,8 +207,8 @@ function installCoreRitual(): void {
 
   window.addEventListener(
     'pagehide',
-    () => {
-      observer.disconnect()
+    (event) => {
+      if (!event.persisted) observer.disconnect()
       clearTimer(coreTimer)
       clearTimer(enteringFallback)
       clearTimer(arrivalTimer)
@@ -217,7 +217,6 @@ function installCoreRitual(): void {
       delete root().dataset.anitewEntering
       delete root().dataset.anitewSessionArriving
     },
-    { once: true },
   )
 }
 

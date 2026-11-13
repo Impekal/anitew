@@ -14,16 +14,17 @@ test('Core-Ritual bleibt nach einem BFCache-artigen pagehide beobachtungsfähig'
   // nicht. Der frühere `{ once: true }`-Cleanup trennte hier den
   // MutationObserver dauerhaft; nach der Rückkehr konnte die Session deshalb
   // nicht mehr als Ritual-Ankunft erkannt werden.
-  await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pagehide', { persisted: true })))
-
-  await page.evaluate(() => {
-    document.documentElement.dataset.anitewEntering = 'true'
-    const session = document.createElement('section')
-    session.className = 'session'
-    ;(document.getElementById('root') ?? document.body).append(session)
-  })
-
-  await expect
-    .poll(() => page.evaluate(() => document.documentElement.dataset.anitewSessionArriving))
-    .toBe('true')
+  for (let returnVisit = 0; returnVisit < 2; returnVisit++) {
+    await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pagehide', { persisted: true })))
+    await page.evaluate(() => {
+      document.documentElement.dataset.anitewEntering = 'true'
+      const session = document.createElement('section')
+      session.className = 'session lifecycle-probe'
+      ;(document.getElementById('root') ?? document.body).append(session)
+    })
+    await expect
+      .poll(() => page.evaluate(() => document.documentElement.dataset.anitewSessionArriving))
+      .toBe('true')
+    await page.locator('.lifecycle-probe').evaluate(node => node.remove())
+  }
 })

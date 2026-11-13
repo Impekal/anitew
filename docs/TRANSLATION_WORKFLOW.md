@@ -105,3 +105,12 @@ Fallback der App), alle in verzögerten Panels außerhalb des Erstkontakts:
 (Support-Text), `SyncPanelImpl.tsx` (Drive-Text), `peopleScenarioCopy.ts`,
 `memoryDeadline.ts`. Nachziehen heißt: dieselben vier Sprachen dort
 ergänzen — keine neue Mechanik nötig.
+
+## 13. November 2026 · Kursuntertitel und unvollständige Oberflächen
+
+Der Erstlauf bietet weiterhin nur die sechs vollständigen Wörterbücher an.
+In den Einstellungen bleiben die elf Kursuntertitelsprachen auswählbar, wie
+für den Kursausbau gefordert. Für NL/TR/AR/ZH/JA kennzeichnet bereits die
+Auswahl die englische Oberfläche; der bestehende Rückfallhinweis bleibt
+sichtbar. Das ist keine vollständige oder muttersprachlich geprüfte
+Oberflächenübersetzung. Tonsprachen und Untertitelwahl bleiben getrennt.

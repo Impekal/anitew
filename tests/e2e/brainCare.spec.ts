@@ -72,7 +72,7 @@ test('der Bereich fuehrt ins fordernde Training statt daneben ein zweites zu bau
   await expect(page.locator('.page')).toBeHidden()
 
   const plan = await page.evaluate(() => {
-    return new Promise<{ sekunden?: number; module?: string[] } | undefined>((resolve) => {
+    return new Promise<{ mode?: string; sekunden?: number; blockSeconds?: number; module?: string[] } | undefined>((resolve) => {
       const open = indexedDB.open('anitew')
       open.onsuccess = () => {
         const request = open.result
@@ -81,9 +81,11 @@ test('der Bereich fuehrt ins fordernde Training statt daneben ein zweites zu bau
           .get('activeSession')
         request.onsuccess = () => {
           const value = request.result?.value as
-            | { plan?: { totalSeconds?: number; blocks?: { moduleId?: string }[] } }
+            | { plan?: { mode?: string; totalSeconds?: number; blocks?: { moduleId?: string; seconds?: number }[] } }
             | undefined
           resolve({
+            mode: value?.plan?.mode,
+            blockSeconds: value?.plan?.blocks?.reduce((sum, block) => sum + (block.seconds ?? 0), 0),
             ...(value?.plan?.totalSeconds === undefined
               ? {}
               : { sekunden: value.plan.totalSeconds }),
@@ -96,8 +98,12 @@ test('der Bereich fuehrt ins fordernde Training statt daneben ein zweites zu bau
     })
   })
 
-  // Die lange Länge, nicht die Voreinstellung.
-  expect(plan?.sekunden, 'die Einheit ist nicht die fordernde').toBe(900)
+  // Extended is the actual selected mode. Its nominal 900s includes the
+  // separately requested answer reserve in the stored/displayed duration.
+  expect(plan?.mode, 'die Einheit ist nicht die fordernde').toBe('extended')
+  expect(plan?.sekunden).toBe(plan?.blockSeconds)
+  expect(plan?.sekunden).toBeGreaterThanOrEqual(900)
+  expect(plan?.sekunden).toBeLessThanOrEqual(1125)
 
   /*
    * Und kein zweiter Aufgabenvorrat — das ist die eigentliche Aussage dieses

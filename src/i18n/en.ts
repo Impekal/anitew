@@ -6,6 +6,7 @@ export const en: Dictionary = {
     tagline: 'Memory is a skill, not a gift.',
   },
   language: {
+    fallbackLabel: "Interface: English",
     label: 'Language',
     names: {
       de: 'Deutsch',

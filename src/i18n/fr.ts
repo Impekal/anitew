@@ -14,6 +14,7 @@ export const fr: Dictionary = {
     tagline: 'La mémoire est une technique, pas un don.',
   },
   language: {
+    fallbackLabel: "Interface : anglais",
     label: 'Langue',
     names: {
       de: 'Deutsch',

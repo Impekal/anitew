@@ -49,6 +49,8 @@ jobs:
   # Alles, was ohne Browser auskommt — und der Build, den alle Scherben teilen.
   fundament:
     runs-on: ubuntu-latest
+    outputs:
+      browser_matrix: ${{ steps.browser_matrix.outputs.matrix }}
     env:
       VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID || vars.VITE_GOOGLE_CLIENT_ID || '360791045103-jvbjtv7mdatp4f5svtcfj7uabjm7jdok.apps.googleusercontent.com' }}
     steps:
@@ -58,6 +60,11 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci --force
+      - name: Browsermatrix vorbereiten
+        id: browser_matrix
+        run: |
+          matrix=$(node scripts/ci-browser-matrix.mjs)
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
       - name: Typen prüfen (App und Kern getrennt)
         run: npm run typecheck
       - name: Tests (Kern, ohne Browser)
@@ -91,48 +98,7 @@ jobs:
       # Branch-Protection kein Fehlschlag, sondern „cancelled" — genau die
       # Falle aus PR #87.
       fail-fast: false
-      matrix:
-        include:
-          - name: Desktop-Chromium 1/4
-            args: --project=chromium --shard=1/4
-          - name: Desktop-Chromium 2/4
-            args: --project=chromium --shard=2/4
-          - name: Desktop-Chromium 3/4
-            args: --project=chromium --shard=3/4
-          - name: Desktop-Chromium 4/4
-            args: --project=chromium --shard=4/4
-          # Ein Telefon ist der eigentliche Zielfall. Dieselbe Dateiliste wie
-          # bisher — hier wird nichts weggelassen.
-          - name: Mobile Release Gate
-            args: >-
-              --project=mobile
-              tests/e2e/accessibility.spec.ts
-              tests/e2e/install.spec.ts
-              tests/e2e/livingInterface.spec.ts
-              tests/e2e/memory.spec.ts
-              tests/e2e/offlineFirstLaunch.spec.ts
-              tests/e2e/resilience.spec.ts
-              tests/e2e/session.spec.ts
-              tests/e2e/sync.spec.ts
-              tests/e2e/oauthResume.spec.ts
-              tests/e2e/reset.spec.ts
-              tests/e2e/coreNavigation.spec.ts
-              tests/e2e/reminders.spec.ts
-              tests/e2e/privacy.spec.ts
-              tests/e2e/upgrade.spec.ts
-              tests/e2e/portraits.spec.ts
-              tests/e2e/coach.spec.ts
-              tests/e2e/journey.spec.ts
-              tests/e2e/courses.spec.ts
-              tests/e2e/course-playback.spec.ts
-              tests/e2e/course-accessibility.spec.ts
-              tests/e2e/course-backup.spec.ts
-              tests/e2e/course-subtitles.spec.ts
-              tests/e2e/course-video.spec.ts
-              tests/e2e/course-voices.spec.ts
-          # Die Gerätematrix läuft nur den Layouttest, über sieben Profile.
-          - name: Layout-Matrix
-            args: tests/e2e/layout.spec.ts
+      matrix: ${{ fromJSON(needs.fundament.outputs.browser_matrix) }}
     name: ${{ matrix.name }}
     steps:
       - uses: actions/checkout@v4
@@ -151,8 +117,17 @@ jobs:
       - name: ${{ matrix.name }}
         run: npx playwright test ${{ matrix.args }}
 
+      - name: Browser-Fehlerdiagnose sichern
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-failure-${{ strategy.job-index }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: test-results/
+          if-no-files-found: ignore
+          retention-days: 7
+
   # Ein verrutschter Scherbenschnitt darf nicht stillschweigend Tests
-  # verschlucken. Die vier Scherben zusammen müssen genau so viele Desktop-
+  # verschlucken. Die acht Desktop-Scherben zusammen müssen genau so viele Desktop-
   # Tests ergeben wie der ungeteilte Lauf.
   zaehlung:
     needs: fundament
@@ -164,22 +139,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci --force
-      - name: Scherben decken die ganze Suite ab
-        run: |
-          ganz=$(npx playwright test --project=chromium --list --reporter=json \
-            | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const j=JSON.parse(s);let n=0;const w=x=>{if(x.specs)n+=x.specs.length;(x.suites||[]).forEach(w)};(j.suites||[]).forEach(w);console.log(n)})")
-          summe=0
-          for i in 1 2 3 4; do
-            teil=$(npx playwright test --project=chromium --shard=$i/4 --list --reporter=json \
-              | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const j=JSON.parse(s);let n=0;const w=x=>{if(x.specs)n+=x.specs.length;(x.suites||[]).forEach(w)};(j.suites||[]).forEach(w);console.log(n)})")
-            echo "Scherbe $i/4: $teil Tests"
-            summe=$((summe + teil))
-          done
-          echo "Ungeteilt: $ganz — Scherben zusammen: $summe"
-          if [ "$ganz" != "$summe" ]; then
-            echo "::error::Die Scherben decken nicht die ganze Suite ab ($summe von $ganz)."
-            exit 1
-          fi
+      - name: Desktop- und Mobil-Scherben decken die ganze Auswahl ab
+        run: node scripts/ci-browser-matrix.mjs --verify
 
   # Der Name dieses Jobs ist Vertrag: Die Branch-Protection verlangt eine
   # Prüfung namens `check`. Er fasst nur zusammen — und ist ausdrücklich

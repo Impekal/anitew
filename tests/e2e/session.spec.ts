@@ -72,7 +72,8 @@ test('führt durch Einprägen und Abrufen und zählt ehrlich', async ({ page }) 
   const moduleId = await pollFirstModule(page)
   const erwartet = de.session.encodeHints[moduleId as keyof typeof de.session.encodeHints]
   expect(erwartet, `kein Einprägetext für „${moduleId}“`).toBeTruthy()
-  await expect(page.locator('.hint').first()).toHaveText(erwartet)
+  await expect(page.locator('.session > .session-duration')).toContainText(de.session.plannedTime.split('{time}')[0])
+  await expect(page.locator('.session .hint:not(.session-duration)').first()).toHaveText(erwartet)
 
   /*
    * Die Punktreihe wird **während** des Einprägens gezählt, nicht danach.

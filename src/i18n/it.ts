@@ -14,6 +14,7 @@ export const it: Dictionary = {
     tagline: 'La memoria è una tecnica, non un talento.',
   },
   language: {
+    fallbackLabel: "Interfaccia: inglese",
     label: 'Lingua',
     names: {
       de: 'Deutsch',
