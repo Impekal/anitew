@@ -184,6 +184,22 @@ const KEINE_BEWEGUNG_AUF_WEICHZEICHNER = async (page: import('@playwright/test')
 test('keine Dauerbewegung sitzt auf einer Weichzeichner-Fläche', async ({ page }) => {
   test.setTimeout(180_000)
 
+  /*
+   * Zuerst der **Startvorhang**. Er liegt als Inline-Stil im `index.html`,
+   * steht nur Sekunden und fällt deshalb leicht durch jedes Raster — er trug
+   * aber `blur(34px)` über 917 400 px², dauerhaft bewegt, im Kaltstart.
+   * Gemessen kostete er die Hälfte des Bildbudgets: 28,3 statt 57,2 fps.
+   * Eine frühere Fassung dieser Prüfung sah ihn gar nicht an.
+   */
+  await page.goto('/')
+  await page.locator('#anitew-launch').waitFor({ timeout: 20_000 })
+  await page.waitForTimeout(600)
+  const amVorhang = await KEINE_BEWEGUNG_AUF_WEICHZEICHNER(page)
+  expect(
+    amVorhang.slice(0, 8).join(' | '),
+    'bewegte Weichzeichner am Startvorhang',
+  ).toBe('')
+
   await visit(page)
   await expect(startButton(page)).toBeVisible()
   await page.waitForTimeout(1200)

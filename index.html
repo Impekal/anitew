@@ -96,7 +96,16 @@
         opacity: .34;
         background:
           conic-gradient(from 12deg at 50% 48%, transparent 0 18%, rgb(142 231 208 / 6%) 23%, transparent 29% 62%, rgb(240 184 100 / 5%) 69%, transparent 76%);
-        filter: blur(34px);
+        /*
+         * Kein Weichzeichner (Gerätemeldung 13.09., „sehr heiß"). Diese
+         * Fläche ist 917 400 px² groß, bewegt sich dauerhaft und muss
+         * deshalb in jedem Bild neu gerastert werden — ausgerechnet im
+         * Kaltstart, wo das Gerät ohnehin am meisten zu tun hat. Gemessen,
+         * Telefonformat, CPU sechsfach gedrosselt: 28,3 → 57,2 fps.
+         * Zu sehen ist davon nichts: ein konischer Verlauf ist schon weich,
+         * drei Phasen verglichen, jedes Mal null Pixel Unterschied.
+         * Die Bewegung bleibt — sie kostet ohne Filter nichts.
+         */
         animation: anitew-launch-aurora 16s ease-in-out infinite alternate;
       }
       .anitew-launch-terms {
