@@ -1,6 +1,6 @@
 # Privacy policy
 
-**As of: 2026-08-29**
+**As of: 2026-11-13**
 
 <!-- verbindlich: de -->
 > **The German version is the legally binding one.** This translation is provided for convenience. In case of any discrepancy, the German text at [/datenschutz.html](/datenschutz.html) applies.
@@ -204,18 +204,13 @@ Google’s own privacy terms apply in addition.
 
 ## 10. AI features with your own API key
 
-The coach and AI suggestions are off until you store your own key and explicitly
-trigger a corresponding feature. For the text coach, Gemini, Anthropic, OpenAI,
-Groq, OpenRouter or Mistral are supported depending on your selection. The
-question and the numeric context described for it then go directly to the chosen
-AI provider. Your own memory texts are only transmitted for an AI suggestion
-feature that you trigger.
+The coach sends a question only after you store your own keys and explicitly ask it. Gemini, Anthropic, OpenAI, Groq, OpenRouter and Mistral are supported. You can save multiple keys and arrange their order. On an error, quota limit, empty answer or timeout, the next configured entry is tried. Your question and numeric context may therefore go to several configured providers. Each key is sent only to its own provider. The interface identifies the entry currently being tried.
 
-For photo analysis, only Gemini, Anthropic or OpenAI are supported. As described
-in section 4, a prepared image copy is only transmitted after “Analyse photo”.
+Memory texts are sent only when you explicitly request AI suggestions; the same ordered fallback applies. Keys remain in local storage and are excluded from file backups and Google Drive sync. Keys in old imported backups are ignored. The provider’s privacy policy and your account’s costs and limits also apply.
 
-The API key stays on your device. For processing at the respective provider,
-that provider’s privacy policy applies in addition.
+Photo analysis supports Gemini, Anthropic and OpenAI. Only after “Analyse photo” is a prepared image copy sent to the first configured entry. Images do not automatically fall back to a reserve provider. If the first entry does not support photos, analysis stops with an explanation.
+
+Training portraits are bundled locally and cached for offline use. Training does not request images from Pexels or another image service. Names and scene details are fictional exercise data; sources are listed under “Portraits and photo credits”.
 
 ## 11. Legal bases and storage periods
 

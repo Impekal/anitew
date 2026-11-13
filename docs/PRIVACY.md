@@ -1,6 +1,6 @@
 # Datenschutzerklärung
 
-**Stand: 2026-09-30** · Backlog R4
+**Stand: 2026-11-13** · Backlog R4
 
 > Der kurze Teil zuerst: **ANITEW bleibt local-first.** Es gibt **kein Konto bei ANITEW**,
 > keine Werbung, keine externen Analyse-Dienste und keine Tracker. Training,
@@ -235,7 +235,9 @@ anderen Bilddiensten angefordert. Namen und Szenendetails sind fiktive
 
 Für die Fotoanalyse werden ausschließlich Gemini, Anthropic oder OpenAI
 unterstützt. Wie in Abschnitt 4 beschrieben, wird dabei erst nach „Foto auswerten“
-eine vorbereitete Bildkopie übertragen.
+eine vorbereitete Bildkopie an den ersten konfigurierten Eintrag übertragen.
+Fotos werden bei Fehlern nicht automatisch an einen Reserveanbieter geschickt.
+Unterstützt der erste Eintrag keine Fotoanalyse, stoppt sie mit einer Erklärung.
 
 Der API-Schlüssel bleibt auf deinem Gerät. Für die Verarbeitung beim jeweiligen
 Anbieter gilt zusätzlich dessen Datenschutzerklärung.

@@ -499,7 +499,7 @@ export const fr: Dictionary = {
       firstSteps: 'Tes chiffres ne donnent pas encore de conseil. Quelques séances, et ici s’écrira ce qu’on peut en lire — ni plus, ni moins.',
     },
     askHeading: 'Questions libres',
-    keyNote: 'Avec ta propre clé d’un fournisseur d’IA, tu peux poser des questions libres au coach. La clé reste sur cet appareil et ne part, à chaque question, que chez le fournisseur choisi — il n’y a pas de serveur entre les deux. Coûts ou limites relèvent de ton compte là-bas.',
+    keyNote: "Avec tes propres clés, tu peux poser des questions au coach. En cas d’échec, la question et son contexte sont transmis dans l’ordre aux fournisseurs que tu as configurés ; chaque clé ne part que chez son fournisseur. Aucun serveur intermédiaire. Les coûts et limites dépendent de ton compte chez eux.",
     providerLabel: 'Fournisseur',
     providers: {
       gemini: 'Google Gemini — recommandé',

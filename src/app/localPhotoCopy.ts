@@ -27,7 +27,7 @@ const de: LocalPhotoCopy = {
   analyze: 'Foto auswerten',
   analyzing: 'Foto wird ausgewertet …',
   analyzeNote:
-    'Nur wenn du „Foto auswerten“ drückst, sendet ANITEW eine verkleinerte Kopie ohne Dateimetadaten direkt an deinen gewählten KI-Anbieter. Erst deine spätere Bestätigung speichert Erinnerungen.',
+    "Nur nach „Foto auswerten“ sendet ANITEW eine verkleinerte Kopie ohne Dateimetadaten an den ersten Eintrag deiner KI-Schlüsselreihenfolge. Fotos werden nicht automatisch an Reserveanbieter geschickt. Erst deine spätere Bestätigung speichert Erinnerungen.",
   noKey: 'Für die Foto-Auswertung fehlt ein eigener KI-Schlüssel. Du kannst das Foto weiterhin lokal als Vorlage nutzen.',
   unsupportedProvider:
     'Der aktuell gewählte KI-Anbieter ist für Foto-Auswertung nicht freigeschaltet. Wähle Gemini, Anthropic oder OpenAI — oder nutze das Foto lokal als Vorlage.',
@@ -47,7 +47,7 @@ const en: LocalPhotoCopy = {
   analyze: 'Analyze photo',
   analyzing: 'Analyzing photo …',
   analyzeNote:
-    'Only when you press “Analyze photo” does ANITEW send a reduced copy without file metadata directly to your selected AI provider. Nothing becomes a memory until you confirm it afterwards.',
+    "Only after “Analyze photo” does ANITEW send a reduced copy without file metadata to the first entry in your AI key order. Photos never automatically fall back to reserve providers. Nothing becomes a memory until you confirm it afterwards.",
   noKey: 'Photo analysis needs your own AI key. You can still use the photo locally as a reference.',
   unsupportedProvider:
     'The selected AI provider is not enabled for photo analysis. Choose Gemini, Anthropic or OpenAI — or keep using the photo locally as a reference.',
@@ -67,7 +67,7 @@ const fr: LocalPhotoCopy = {
   analyze: 'Analyser la photo',
   analyzing: 'Analyse de la photo …',
   analyzeNote:
-    'Ce n’est que si tu touches « Analyser la photo » qu’ANITEW envoie une copie réduite sans métadonnées de fichier directement au fournisseur d’IA que tu as choisi. Rien ne devient un souvenir avant ta confirmation.',
+    "Après « Analyser la photo » seulement, ANITEW envoie une copie réduite sans métadonnées à la première entrée de ta liste de clés IA. Les photos ne passent jamais automatiquement à un fournisseur de secours. Rien n’est mémorisé avant ta confirmation.",
   noKey: 'L’analyse de photo demande ta propre clé d’IA. Tu peux continuer à utiliser la photo localement comme référence.',
   unsupportedProvider:
     'Le fournisseur d’IA sélectionné n’est pas activé pour l’analyse de photo. Choisis Gemini, Anthropic ou OpenAI — ou continue d’utiliser la photo localement comme référence.',
@@ -87,7 +87,7 @@ const es: LocalPhotoCopy = {
   analyze: 'Analizar foto',
   analyzing: 'Analizando la foto …',
   analyzeNote:
-    'Solo si tocas «Analizar foto», ANITEW envía una copia reducida sin metadatos de archivo directamente al proveedor de IA que hayas elegido. Nada se convierte en recuerdo hasta que lo confirmes después.',
+    "Solo tras «Analizar foto», ANITEW envía una copia reducida sin metadatos a la primera entrada del orden de claves de IA. Las fotos no pasan automáticamente a proveedores de reserva. Nada se guarda como recuerdo hasta tu confirmación.",
   noKey: 'El análisis de fotos necesita tu propia clave de IA. Puedes seguir usando la foto localmente como referencia.',
   unsupportedProvider:
     'El proveedor de IA seleccionado no está habilitado para el análisis de fotos. Elige Gemini, Anthropic u OpenAI, o sigue usando la foto localmente como referencia.',
@@ -107,7 +107,7 @@ const it: LocalPhotoCopy = {
   analyze: 'Analizza foto',
   analyzing: 'Analisi della foto …',
   analyzeNote:
-    'Solo se tocchi «Analizza foto», ANITEW invia una copia ridotta senza metadati di file direttamente al fornitore di IA che hai scelto. Nulla diventa un ricordo prima della tua conferma.',
+    "Solo dopo «Analizza foto», ANITEW invia una copia ridotta senza metadati alla prima voce nell’ordine delle tue chiavi IA. Le foto non passano automaticamente a fornitori di riserva. Nulla viene memorizzato prima della tua conferma.",
   noKey: 'L’analisi delle foto richiede una tua chiave di IA. Puoi continuare a usare la foto localmente come riferimento.',
   unsupportedProvider:
     'Il fornitore di IA selezionato non è abilitato all’analisi delle foto. Scegli Gemini, Anthropic o OpenAI — oppure continua a usare la foto localmente come riferimento.',
@@ -127,7 +127,7 @@ const pt: LocalPhotoCopy = {
   analyze: 'Analisar foto',
   analyzing: 'A analisar a foto …',
   analyzeNote:
-    'Só se tocares em «Analisar foto» é que a ANITEW envia uma cópia reduzida sem metadados de ficheiro diretamente ao fornecedor de IA que escolheste. Nada se torna memória antes da tua confirmação.',
+    "Só após «Analisar foto», a ANITEW envia uma cópia reduzida sem metadados à primeira entrada na ordem das tuas chaves de IA. As fotos nunca passam automaticamente a fornecedores de reserva. Nada é guardado como memória antes da tua confirmação.",
   noKey: 'A análise de fotos precisa da tua própria chave de IA. Podes continuar a usar a foto localmente como referência.',
   unsupportedProvider:
     'O fornecedor de IA selecionado não está ativado para a análise de fotos. Escolhe Gemini, Anthropic ou OpenAI — ou continua a usar a foto localmente como referência.',

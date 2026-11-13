@@ -1,6 +1,6 @@
 # Informativa sulla privacy
 
-**Versione del: 2026-08-29**
+**Versione del: 2026-11-13**
 
 <!-- verbindlich: de -->
 > **La versione tedesca è quella vincolante.** Questa traduzione è fornita per comodità. In caso di divergenza prevale il testo tedesco su [/datenschutz.html](/datenschutz.html).
@@ -213,19 +213,13 @@ Per Google valgono inoltre le condizioni sulla privacy di Google.
 
 ## 10. Funzioni di IA con la tua chiave API
 
-Il coach e le proposte di IA sono spenti finché non depositi una tua chiave e non
-avvii espressamente una funzione corrispondente. Per il coach testuale sono
-supportati, a seconda della selezione, Gemini, Anthropic, OpenAI, Groq,
-OpenRouter o Mistral. La domanda e il contesto numerico descritto per essa vanno
-allora direttamente al fornitore di IA scelto. I tuoi testi di ricordi vengono
-trasmessi solo in una funzione di proposta di IA avviata da te.
+Il coach trasmette una domanda solo dopo che hai salvato le tue chiavi e l’hai posta esplicitamente. Sono supportati Gemini, Anthropic, OpenAI, Groq, OpenRouter e Mistral. Puoi salvare più chiavi e ordinarle. In caso di errore, quota esaurita, risposta vuota o tempo scaduto, viene provata la voce successiva. La domanda e il contesto numerico possono quindi raggiungere più fornitori configurati. Ogni chiave viene inviata solo al proprio fornitore. L’interfaccia indica la voce in uso.
 
-Per l'analisi delle foto sono supportati esclusivamente Gemini, Anthropic o
-OpenAI. Come descritto nella sezione 4, una copia dell'immagine preparata viene
-trasmessa solo dopo «Analizza foto».
+I testi dei ricordi vengono trasmessi solo su richiesta esplicita di suggerimenti IA; vale lo stesso ordine di riserva. Le chiavi restano nell’archivio locale e sono escluse dalle copie di sicurezza e dalla sincronizzazione Google Drive. Le chiavi di vecchie copie vengono ignorate durante l’importazione. Valgono anche l’informativa del fornitore e i costi e limiti del tuo account.
 
-La chiave API resta sul tuo dispositivo. Per il trattamento presso il rispettivo
-fornitore vale inoltre la sua informativa sulla privacy.
+L’analisi delle foto supporta Gemini, Anthropic e OpenAI. Solo dopo « Analizza foto » viene inviata una copia preparata alla prima voce configurata. Le immagini non passano automaticamente a un fornitore di riserva. Se la prima voce non supporta le foto, l’analisi si ferma con una spiegazione.
+
+I ritratti di allenamento sono inclusi localmente e memorizzati per l’uso offline. L’allenamento non richiede immagini a Pexels o ad altri servizi. Nomi e dettagli delle scene sono fittizi; le fonti sono elencate in « Ritratti e crediti fotografici ».
 
 ## 11. Basi giuridiche e tempi di conservazione
 

@@ -501,7 +501,7 @@ export const pt: Dictionary = {
       firstSteps: 'Os teus números ainda não dão conselho. Umas sessões, e aqui estará o que se pode ler deles — nem mais, nem menos.',
     },
     askHeading: 'Perguntas livres',
-    keyNote: 'Com a tua própria chave de um fornecedor de IA podes fazer perguntas livres ao coach. A chave fica neste aparelho e vai, com cada pergunta, só para o fornecedor escolhido — não há servidor pelo meio. Custos ou limites regula-os a tua conta lá.',
+    keyNote: "Com as tuas próprias chaves podes fazer perguntas ao coach. Em caso de falha, pergunta e contexto passam por ordem aos fornecedores configurados; cada chave vai apenas ao seu fornecedor. Não há servidor intermédio. Os custos e limites dependem da tua conta.",
     providerLabel: 'Fornecedor',
     providers: {
       gemini: 'Google Gemini — recomendado',

@@ -5,15 +5,11 @@ import {
   type RememberSuggestions,
 } from '../../core/index.ts'
 import {
-  COACH_PROVIDERS,
-  COACH_PROVIDER_SETTING,
   type CoachFailure,
-  type CoachProvider,
-  DEFAULT_COACH_PROVIDER,
-  LEGACY_COACH_KEY_SETTING,
-  coachKeySettingFor,
   failureForStatus,
 } from './coach.ts'
+import type { SettingsStore } from '../../core/ports.ts'
+import { loadCoachKeys } from './coachKeys.ts'
 import { createWebSettings } from './settings.ts'
 
 /**
@@ -238,17 +234,15 @@ function callFor(provider: VisionProvider, key: string, photo: PreparedPhoto): P
   }
 }
 
-async function configuredProvider(): Promise<{ provider: CoachProvider; key: string | undefined }> {
-  const settings = createWebSettings()
-  const stored = await settings.read<CoachProvider>(COACH_PROVIDER_SETTING)
-  const provider =
-    stored !== undefined && COACH_PROVIDERS.includes(stored) ? stored : DEFAULT_COACH_PROVIDER
-  const key =
-    (await settings.read<string>(coachKeySettingFor(provider))) ??
-    (provider === 'anthropic'
-      ? await settings.read<string>(LEGACY_COACH_KEY_SETTING)
-      : undefined)
-  return { provider, key }
+/** Photos use only the first configured entry. Never silently send an image
+ * to a second provider when the first cannot process it or fails. */
+export async function configuredPhotoProvider(settings: SettingsStore): Promise<{ provider: VisionProvider; key: string }> {
+  const [first] = await loadCoachKeys(settings)
+  if (first === undefined) throw new PhotoArchitectError('no-key')
+  if (!VISION_PROVIDERS.includes(first.provider as VisionProvider)) {
+    throw new PhotoArchitectError('unsupported-provider')
+  }
+  return { provider: first.provider as VisionProvider, key: first.key }
 }
 
 /**
@@ -257,11 +251,7 @@ async function configuredProvider(): Promise<{ provider: CoachProvider; key: str
  * Anzeigen oder Speichern eines Fotos automatisch auslösen.
  */
 export async function suggestMemoriesFromPhoto(file: File): Promise<RememberSuggestions> {
-  const { provider, key } = await configuredProvider()
-  if (key === undefined || key.trim() === '') throw new PhotoArchitectError('no-key')
-  if (!VISION_PROVIDERS.includes(provider as VisionProvider)) {
-    throw new PhotoArchitectError('unsupported-provider')
-  }
+  const { provider, key } = await configuredPhotoProvider(createWebSettings())
 
   const photo = await preparePhoto(file)
   const call = callFor(provider as VisionProvider, key.trim(), photo)

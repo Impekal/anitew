@@ -1,6 +1,6 @@
 # Politique de confidentialité
 
-**Version du : 2026-08-29**
+**Version du : 2026-11-13**
 
 <!-- verbindlich: de -->
 > **La version allemande fait foi.** Cette traduction est fournie à titre de commodité. En cas de divergence, le texte allemand sur [/datenschutz.html](/datenschutz.html) prévaut.
@@ -215,19 +215,13 @@ Les conditions de confidentialité de Google s'appliquent en outre.
 
 ## 10. Fonctions d'IA avec ta propre clé d'API
 
-Le coach et les propositions d'IA sont coupés tant que tu n'as pas enregistré ta
-propre clé et déclenché expressément une fonction correspondante. Pour le coach
-textuel, Gemini, Anthropic, OpenAI, Groq, OpenRouter ou Mistral sont pris en
-charge selon ta sélection. La question et le contexte chiffré décrit pour elle
-vont alors directement au fournisseur d'IA choisi. Tes propres textes de souvenir
-ne sont transmis que lors d'une fonction de proposition d'IA que tu déclenches.
+Le coach ne transmet une question qu’après l’enregistrement de tes propres clés et une demande explicite. Gemini, Anthropic, OpenAI, Groq, OpenRouter et Mistral sont pris en charge. Plusieurs clés peuvent être enregistrées et ordonnées. En cas d’erreur, de quota épuisé, de réponse vide ou de délai dépassé, l’entrée suivante est essayée. La question et son contexte chiffré peuvent donc être transmis à plusieurs fournisseurs configurés. Chaque clé ne part que chez son propre fournisseur. L’interface indique l’entrée en cours.
 
-Pour l'analyse de photo, seuls Gemini, Anthropic ou OpenAI sont pris en charge.
-Comme décrit à la section 4, une copie d'image préparée n'est transmise qu'après
-« Analyser la photo ».
+Les textes de souvenirs ne sont transmis que pour une demande explicite de suggestions IA ; le même ordre de secours s’applique. Les clés restent dans le stockage local, sont exclues des sauvegardes et du partage Google Drive, et sont ignorées lors de l’importation d’anciennes sauvegardes. Les conditions de confidentialité du fournisseur ainsi que les coûts et limites de ton compte s’appliquent également.
 
-La clé d'API reste sur ton appareil. Pour le traitement chez le fournisseur
-concerné s'applique en outre sa propre politique de confidentialité.
+L’analyse photo prend en charge Gemini, Anthropic et OpenAI. Une copie préparée n’est envoyée qu’après « Analyser la photo », à la première entrée configurée. Les images ne sont jamais envoyées automatiquement à un fournisseur de secours. Si la première entrée ne prend pas en charge les photos, l’analyse s’arrête avec une explication.
+
+Les portraits d’entraînement sont inclus localement et mis en cache pour une utilisation hors ligne. L’entraînement ne demande aucune image à Pexels ni à un autre service. Les noms et détails des scènes sont fictifs ; les sources figurent sous « Portraits et crédits photo ».
 
 ## 11. Bases juridiques et durées de conservation
 

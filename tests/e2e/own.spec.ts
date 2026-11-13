@@ -70,7 +70,9 @@ test('Foto bleibt ohne Auswertungs-Tap eine lokale Vorlage und wird nicht gespei
   await expect(photo).toBeVisible()
   await expect(photo).toHaveAttribute('src', /^blob:/)
   await expect(page.locator('.own-photo-note')).toContainText('speichert oder synchronisiert es nicht')
-  await expect(page.locator('.own-photo-analysis-note')).toContainText('Nur wenn du')
+  await expect(page.locator('.own-photo-analysis-note')).toContainText('Nur nach „Foto auswerten“')
+  await expect(page.locator('.own-photo-analysis-note')).toContainText('ersten Eintrag')
+  await expect(page.locator('.own-photo-analysis-note')).toContainText('nicht automatisch an Reserveanbieter')
   expect(imageRequests).toBe(0)
   await expect(page.locator('.own-list li')).toHaveCount(0)
 

@@ -68,3 +68,19 @@ auf diesem Mac.
 Die CI baut mit derselben öffentlichen Google-Client-Konfiguration für Tests
 und Produktion. Der Deploy übernimmt exakt das geprüfte `dist`-Artefakt statt
 es nach dem Tor unter anderen Einstellungen erneut zu bauen.
+
+## Fotoanalyse mit migrierten Schlüsseln
+
+Die Fotoanalyse liest denselben kanonischen Schlüsselvorrat wie der Coach.
+Eine gespeicherte leere Liste verhindert das Wiederbeleben alter Schlüssel.
+Fotos werden ausschließlich an den ersten konfigurierten Eintrag geschickt;
+ungeeignete Anbieter führen zu einer Erklärung, nicht zu einem stillen Upload
+an Reserveanbieter. Oberfläche und Datenschutzhinweise erklären diese Grenze
+in allen sechs Oberflächensprachen. Vier zusätzliche Regressionstests decken
+Priorität, Altdaten, leere Listen und ungeeignete Hauptanbieter ab.
+
+Nach der Foto-Korrektur: Typecheck, alle 986 Kern-/Workerprüfungen, Build
+und unverändertes Größenbudget bestanden; vier Foto-Browserprüfungen auf
+Desktop/Mobilansicht bestanden (Anfragen abgefangen, keine echten KI-Aufrufe).
+Die Layoutmatrix davor bestand 51 Fälle; fünf reine Breitbildprüfungen wurden
+auf schmalen Geräten bestimmungsgemäß übersprungen.
