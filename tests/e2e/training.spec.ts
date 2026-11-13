@@ -115,16 +115,28 @@ test('sagt, warum nur vollständig trainierbare Sprachen zur Auswahl stehen', as
    * ein genauer Vergleich findet gar nichts mehr.
    */
   /*
-    Die Oberfläche bietet nur an, was wirklich übersetzt ist
+    Die Oberfläche verspricht nichts, wofür es keine Deckung gibt
     (TRANSLATION_WORKFLOW §6). Neun Einträge, die still auf Englisch
     zurückfielen — Arabisch sogar als RTL-Dokument mit englischem Text —,
-    wären ein Versprechen ohne Deckung. Eine per Systemsprache aufgelöste,
-    noch unübersetzte Sprache bleibt mit ehrlicher Fußnote nutzbar.
+    wären ein Versprechen ohne Deckung. Eine noch unübersetzte Sprache
+    bleibt mit ehrlicher Fußnote nutzbar; genau das war schon immer die
+    Ausnahme.
 
-    Seit den sechs Oberflächensprachen ist die gedeckte Menge
-    TRANSLATED_LANGUAGES — exakt diese sechs, exakt in dieser Reihenfolge.
-    Die Genau-Gleichheit bleibt der Wächter: eine siebte, nur halb
-    übersetzte Sprache dürfte hier wieder nicht auftauchen.
+    Geändert am 13.11.2026, nach der Zusammenführung. Diese Prüfung verlangte
+    bis dahin **exakt sechs** Einträge. Seit `813670f` stehen in den
+    Einstellungen alle elf Kursuntertitelsprachen zur Wahl, und die fünf
+    unvollständigen tragen sichtbar „· Oberfläche: Englisch“. Das ist eine
+    bewusste, dokumentierte Entscheidung für den Kursausbau
+    (TRANSLATION_WORKFLOW, Abschnitt „13. November 2026“); der Erstlauf
+    bietet weiterhin nur die sechs vollständigen Wörterbücher an.
+
+    Der Wächter behält deshalb seine Zähne, er greift nur eine Stufe tiefer:
+    Nicht die **Anzahl** ist festgeschrieben, sondern das Versprechen. Jede
+    Sprache **ohne** Fußnote muss eine der sechs vollständigen sein. Eine
+    siebte, die sich still und unbeschriftet hineinschlich, stünde damit in
+    dieser Liste — und die Prüfung fiele. Das ist genau der Fehler, vor dem
+    sie seit jeher schützt. Die Anzahl dagegen darf mit den Kursen wachsen,
+    ohne dass hier jemand eine Zahl nachzieht.
   */
   // Wie in `foundation.spec.ts`: Drei Zeilen tragen `.language`, gemeint ist
   // die App-Sprache.
@@ -132,5 +144,11 @@ test('sagt, warum nur vollständig trainierbare Sprachen zur Auswahl stehen', as
     .locator('.language:not(.language-training):not(.language-pace) select')
     .locator('option')
     .allTextContents()
-  expect(ui).toEqual(['Deutsch', 'English', 'Français', 'Español', 'Italiano', 'Português'])
+  const FUSSNOTE = ' \u00b7 Oberfläche: Englisch'
+  const ohneFussnote = ui.filter((eintrag) => !eintrag.endsWith(FUSSNOTE))
+  expect(ohneFussnote).toEqual(['Deutsch', 'English', 'Français', 'Español', 'Italiano', 'Português'])
+
+  // Und es gibt die beschrifteten überhaupt — sonst prüfte die Zeile darüber
+  // eine Liste, die zufällig wieder nur sechs Einträge hat.
+  expect(ui.length).toBeGreaterThan(ohneFussnote.length)
 })
