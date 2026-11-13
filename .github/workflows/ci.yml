@@ -49,6 +49,8 @@ jobs:
   # Alles, was ohne Browser auskommt — und der Build, den alle Scherben teilen.
   fundament:
     runs-on: ubuntu-latest
+    env:
+      VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID || vars.VITE_GOOGLE_CLIENT_ID || '360791045103-jvbjtv7mdatp4f5svtcfj7uabjm7jdok.apps.googleusercontent.com' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -226,7 +228,12 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci --force
-      - run: npm run build
+      # Promote the exact files tested above; do not rebuild after the gate.
+      - name: Geprueften Build holen
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
       # Web Push darf nicht davon abhängen, dass die drei VAPID-Secrets
       # irgendwann einmal manuell gesetzt wurden (siehe deploy.yml).
       - name: Web-Push-Schlüssel sicherstellen

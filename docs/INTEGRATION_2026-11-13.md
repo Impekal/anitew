@@ -54,3 +54,17 @@ Kaltstartbudget (JS 165.0 / CSS 11.8 / gesamt 176.8 KiB gzip), Worker-Dry-Run,
 letzten Änderungen (inklusive echter Sicherungsdatei mit `coach.keys`, Reset,
 Offline-Portraits, Schlüsselreihenfolge und Wärmebudget). Vollständige
 Desktop-/Mobil-/Layout-Suite folgt am Veröffentlichungscommit in CI.
+
+## Claudes parallel geprüfte Wärme-Korrektur
+
+Die inzwischen veröffentlichten Commits `dde55d9` und `544c316` werden mit
+ihrer Historie übernommen. Die dort entfernten bewegten Weichzeichner sind
+im September-Stand bereits entfernt; die aktuellen Konturen und Abstände
+bleiben erhalten. Claudes zusätzlicher Wächter für große Filterflächen bleibt
+neben dem strengeren Animationsbudget erhalten. Die von Claude dokumentierten
+FPS-Werte stammen aus dessen Messung, nicht aus einer neuen Hardwaremessung
+auf diesem Mac.
+
+Die CI baut mit derselben öffentlichen Google-Client-Konfiguration für Tests
+und Produktion. Der Deploy übernimmt exakt das geprüfte `dist`-Artefakt statt
+es nach dem Tor unter anderen Einstellungen erneut zu bauen.

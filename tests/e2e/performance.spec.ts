@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-import { startButton, visit } from './helpers.ts'
+import { startButton, startEmergency, visit } from './helpers.ts'
 
 /**
  * Kaltstart und ruckelfreie Timer (Backlog P4).
@@ -445,4 +445,143 @@ test('bleibt unter der Schranke, auch wenn zwanzig Dinge gemerkt sind', async ({
     laufend.length,
     `${laufend.length} Bewegungen bei zwanzig Erinnerungen: ${laufend.map((a) => a.where).slice(0, 12).join(' | ')}`,
   ).toBeLessThanOrEqual(24)
+})
+
+/**
+ * Keine Dauerbewegung sitzt auf einer weichgezeichneten Fläche.
+ *
+ * Gemeldet am 13.09. vom Gerät: „Die App macht das Handy sehr heiß." Am
+ * 14.11. auf diesem Zweig nachgemessen, Telefonformat 412 × 915, CPU
+ * sechsfach gedrosselt:
+ *
+ *   unverändert                       11,2 fps
+ *   ohne background-position          12,0   (+0,8 — im Rauschen)
+ *   ohne stroke-dashoffset            11,0   (keine Wirkung)
+ *   ohne box-shadow                   11,5   (+0,5)
+ *   ohne Verlaufs-Weichzeichner       16,9   (+5,4)  ← der große Posten
+ *   ohne backdrop-filter              18,4   (+1,5)
+ *
+ * Die als teuer geltenden Neuzeichen-Eigenschaften kosten hier nichts
+ * Messbares; der Weichzeichner auf den **bewegten** Verlaufsflächen kostet
+ * die Hälfte des Budgets. Grund: Solange so eine Fläche sich bewegt, muss
+ * sie in jedem Bild neu gerastert werden. Steht sie still, wird sie einmal
+ * gerastert und danach nur noch überblendet — dann ist sie gratis.
+ *
+ * ── Warum eine frühere Fassung dieser Prüfung blind war ──────────────────
+ *
+ * Sie fragte `getComputedStyle(node)` **ohne** das Pseudo-Element. Bei
+ * `body::after` ist `effect.target` schlicht `body`, und `body` hat keinen
+ * Filter — der liegt auf dem Pseudo. Die teuerste Fläche der App galt damit
+ * als sauber. Hier wird deshalb zuerst das Pseudo-Element selbst befragt und
+ * erst danach die Vorfahren.
+ *
+ * Der Weichzeichner darf weg, ohne dass jemand es sieht: Ein Verlauf ist
+ * schon weich. Gemessen (gleicher Bildausschnitt, Animationen angehalten)
+ * ändert er im Mittel 0,068 und höchstens 4 von 255 Helligkeitsstufen.
+ * Bewegung bleibt davon unberührt — sie kostet ohne Filter nichts.
+ */
+const KEINE_BEWEGUNG_AUF_WEICHZEICHNER = async (page: import('@playwright/test').Page) =>
+  page.evaluate(() => {
+    const treffer: string[] = []
+    /*
+     * Ein Pseudo-Element hat keinen eigenen Kasten in der DOM-Abfrage. Seine
+     * Fläche steht aber in seinem Stil: `inset: -18vmax` macht `body::after`
+     * größer als den Schirm. Deshalb wird sie aus den Kanten gerechnet,
+     * sonst meldete die Prüfung die Fläche von `body` statt die der Ebene.
+     */
+    const größteFläche = (el: Element, pseudo: string | null): number => {
+      const kasten = el.getBoundingClientRect()
+      if (pseudo === null) return kasten.width * kasten.height
+      const stil = getComputedStyle(el, pseudo)
+      const zahl = (wert: string) => (wert.endsWith('px') ? Number.parseFloat(wert) : 0)
+      const breite = kasten.width - zahl(stil.left) - zahl(stil.right)
+      const höhe = kasten.height - zahl(stil.top) - zahl(stil.bottom)
+      return Math.max(kasten.width * kasten.height, breite * höhe)
+    }
+    const prüfe = (stil: CSSStyleDeclaration): string => {
+      if (stil.backdropFilter !== 'none' && stil.backdropFilter !== '') {
+        return `backdrop-filter: ${stil.backdropFilter}`
+      }
+      if (
+        stil.filter !== 'none' &&
+        stil.filter !== '' &&
+        (stil.filter.includes('blur') || stil.filter.includes('drop-shadow'))
+      ) {
+        return `filter: ${stil.filter}`
+      }
+      return ''
+    }
+
+    for (const animation of document.getAnimations()) {
+      const wirkung = animation.effect as KeyframeEffect | null
+      if (wirkung === null) continue
+      if (wirkung.getComputedTiming().iterations !== Infinity) continue
+      const ziel = wirkung.target
+      if (ziel === null) continue
+      const pseudo =
+        (wirkung as unknown as { pseudoElement?: string | null }).pseudoElement ?? null
+
+      // Erst die bewegte Fläche selbst — Pseudo-Element eingeschlossen.
+      let weich = prüfe(getComputedStyle(ziel, pseudo))
+      // Dann jede Weichzeichner-Fläche darüber: Ein Filter am Container
+      // zwingt den ganzen Teilbaum in eine eigene Ebene, und die wird neu
+      // gerechnet, sobald sich darin etwas rührt.
+      for (let knoten: Element | null = ziel; knoten !== null && weich === ''; knoten = knoten.parentElement) {
+        weich = prüfe(getComputedStyle(knoten))
+      }
+      if (weich === '') continue
+
+      /*
+       * Nur **große** Flächen zählen. Teuer ist das Neurastern einer großen
+       * Ebene, nicht ein Leuchten von zwei Pixeln an einem Punkt. Gemessen
+       * am 14.11.: Die beiden Schuldigen waren 1 026 125 px² (`body::after`)
+       * und 376 980 px² (`.neural`) und kosteten zusammen 17 von 28 Bildern;
+       * die fünfzig Knotenleuchten sind 16 bis 42 px² groß und brachten
+       * angehalten **null**. Die Schranke liegt dazwischen, bei einem Achtel
+       * Telefonschirm — sie fängt die Ebenen und lässt die Zierde in Ruhe.
+       */
+      const fläche = größteFläche(ziel, pseudo)
+      if (fläche < 50_000) continue
+
+      const name = `${ziel.getAttribute('class') ?? ziel.tagName}${pseudo ?? ''}`
+      treffer.push(`${name.slice(0, 48)} · ${weich} · ${Math.round(fläche)} px²`)
+    }
+    return [...new Set(treffer)]
+  })
+
+test('keine Dauerbewegung sitzt auf einer Weichzeichner-Fläche', async ({ page }) => {
+  test.setTimeout(180_000)
+
+  /*
+   * Zuerst der **Startvorhang**. Er liegt als Inline-Stil im `index.html`,
+   * steht nur Sekunden und fällt deshalb leicht durch jedes Raster — er trug
+   * aber `blur(34px)` über 917 400 px², dauerhaft bewegt, im Kaltstart.
+   * Gemessen kostete er die Hälfte des Bildbudgets: 28,3 statt 57,2 fps.
+   * Eine frühere Fassung dieser Prüfung sah ihn gar nicht an.
+   */
+  await page.goto('/')
+  await page.locator('#anitew-launch').waitFor({ timeout: 20_000 })
+  await page.waitForTimeout(600)
+  const amVorhang = await KEINE_BEWEGUNG_AUF_WEICHZEICHNER(page)
+  expect(
+    amVorhang.slice(0, 8).join(' | '),
+    'bewegte Weichzeichner am Startvorhang',
+  ).toBe('')
+
+  await visit(page)
+  await expect(startButton(page)).toBeVisible()
+  await page.waitForTimeout(1200)
+  const aufDemStart = await KEINE_BEWEGUNG_AUF_WEICHZEICHNER(page)
+  expect(
+    aufDemStart.slice(0, 8).join(' | '),
+    'bewegte Weichzeichner auf dem Startbildschirm',
+  ).toBe('')
+
+  await startEmergency(page)
+  await page.waitForTimeout(1200)
+  const inDerEinheit = await KEINE_BEWEGUNG_AUF_WEICHZEICHNER(page)
+  expect(
+    inDerEinheit.slice(0, 8).join(' | '),
+    'bewegte Weichzeichner in der Einheit',
+  ).toBe('')
 })
