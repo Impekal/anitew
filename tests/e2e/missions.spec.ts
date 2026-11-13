@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { pollFirstModule, startButton, visit } from './helpers.ts'
+import { reachModuleRound, visit } from './helpers.ts'
 
 /**
  * Memory Missions, im Browser nachgeprüft (Backlog H1, H2, H4).
@@ -23,26 +23,17 @@ import { pollFirstModule, startButton, visit } from './helpers.ts'
  * Der Notfallmodus reicht dafür: Eine Runde ist eine Szene.
  */
 
-/** Startet neu, bis der Plan das Missionsmodul zieht. */
-async function startMission(page: Page): Promise<boolean> {
-  for (let attempt = 0; attempt < 60; attempt++) {
-    await visit(page)
-    await page.getByRole('button', { name: '60 Sekunden' }).click()
-    await startButton(page).click()
-    await page.locator('.settle').click()
-    if ((await pollFirstModule(page)) === 'missions') {
-      await page.locator('.scene').first().waitFor({ timeout: 30_000 })
-      return true
-    }
-    await page.evaluate(() => indexedDB.deleteDatabase('anitew'))
-  }
-  return false
+/** Erreicht die normale Missionsrunde ohne zufällige Wiederholungswette. */
+async function startMission(page: Page): Promise<void> {
+  await visit(page)
+  await reachModuleRound(page, 'missions')
+  await expect(page.locator('.scene').first()).toBeVisible({ timeout: 30_000 })
 }
 
 test('zeigt die Szene als Ganzes und fragt sie mit weltneutraler Semantik ab', async ({ page }) => {
   test.setTimeout(360_000)
 
-  expect(await startMission(page), 'in sechzig Anläufen kam keine Mission').toBe(true)
+  await startMission(page)
 
   const person = ((await page.locator('.scene-person').textContent()) ?? '').trim()
   expect(person.length).toBeGreaterThan(1)

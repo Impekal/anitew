@@ -127,3 +127,13 @@ drei betroffenen Abläufe auf Desktop und Mobilprofil), Typecheck, Build und
 das unveränderte Größenbudget von 176.9 KiB gzip. Für die Wiederholungsdatei
 werden künftig auch Spuren des ersten Fehlversuchs behalten, damit ein
 bestandener Retry nicht die einzige verfügbare Ablaufaufnahme ist.
+
+Der vollständige Lauf für `bb8e32d` bestand alle Mobil-/Layoutprüfungen und
+344 Desktopfälle direkt. Der letzte Desktopfall fand in seiner alten Suche
+nach 50 zufälligen Starts keine Zwillingsrunde und bestand erst im Retry;
+das strenge Tor blockierte deshalb erneut korrekt. Dieser Test verwendet
+jetzt denselben reproduzierbaren Starthelfer wie die Rechen-/Personenmodule.
+Die identische Zufallssuche im Missions-Test wurde ebenfalls ersetzt.
+Echte Einheitstimer, Antwort-/Köderprüfungen und gespeicherte Termine bleiben
+unverändert. Sechs lokale Zwillingsläufe (drei pro Profil) bestanden danach.
+Auch beide vollständigen Missionsprüfungen auf Desktop/Mobilprofil bestanden.

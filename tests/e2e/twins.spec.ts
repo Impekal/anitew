@@ -1,14 +1,15 @@
 import { expect, test } from '@playwright/test'
 
-import { answerRecall, collectItems, pollFirstModule, startButton, visit } from './helpers.ts'
+import { answerRecall, collectItems, reachModuleRound, startButton, visit } from './helpers.ts'
 
 /**
  * Die Zwillinge im Browser (C6 · D-027).
  *
  * Erkennbar ist das Modul erst beim Abruf (die Wahlknöpfe) — beim Einprägen
  * sieht es aus wie das Wortmodul, und genau so soll es sein: Der Köder
- * kommt erst mit der Frage. Der Test startet deshalb Einheiten und bricht
- * alles ab, was sich als etwas anderes herausstellt.
+ * kommt erst mit der Frage. Der gemeinsame Starthelfer erreicht das Modul
+ * über reproduzierbare Startzeitpunkte, ohne die Einheit oder ihre Timer
+ * abzukürzen.
  */
 
 test('prägt ein Wort ein, fragt mit dem Zwilling — und zählt den Köder als falsch', async ({
@@ -19,25 +20,12 @@ test('prägt ein Wort ein, fragt mit dem Zwilling — und zählt den Köder als 
   await visit(page)
   await expect(startButton(page)).toBeVisible()
 
-  let found = false
-  let learned = { items: [] as string[] }
-  for (let attempt = 0; attempt < 50 && !found; attempt++) {
-    await page.getByRole('button', { name: '60 Sekunden' }).click()
-    await startButton(page).click()
-    await page.locator('.settle').click()
-
-    // Welches Modul die Runde hat, sagt der persistierte Plan — kein
-    // Bildschirm-Raten (dieselbe Lehre wie in `startEmergency`).
-    if ((await pollFirstModule(page)) !== 'twins') {
-      await page.locator('.session-abort').click()
-      await expect(page.locator('.challenge')).toBeVisible()
-      continue
-    }
-    learned = await collectItems(page, 8)
-    await page.locator('.twin-choice').first().waitFor({ timeout: 30_000 })
-    found = true
-  }
-  expect(found, 'in fünfzig Anläufen kam keine Zwillingsrunde').toBe(true)
+  // Dieselbe Härtung wie bei math/people/associative: Nicht fünfzigmal auf
+  // eine passende Millisekunde hoffen. Der Helfer prüft den echten Plan und
+  // scheitert weiterhin, wenn Zwillinge nicht erreichbar sind.
+  await reachModuleRound(page, 'twins')
+  const learned = await collectItems(page, 8)
+  await page.locator('.twin-choice').first().waitFor({ timeout: 30_000 })
 
   // Beide Knöpfe tragen echte Wörter, und eines davon stand beim Einprägen da.
   const words = (await page.locator('.twin-choice').allTextContents()).map((word) => word.trim())
