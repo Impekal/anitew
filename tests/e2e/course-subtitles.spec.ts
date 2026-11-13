@@ -1,5 +1,5 @@
 import {test,expect} from '@playwright/test'
-import {visit,openPage} from './helpers.ts'
+import {visitCourseReader as visit,openPage} from './helpers.ts'
 import {courseNarration} from '../../src/i18n/courseNarrations.ts'
 
 for(const language of ['es','it','pt','nl','tr','ar','zh','ja']) {

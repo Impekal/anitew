@@ -21,6 +21,7 @@ const MOBILE_FILES = [
   "tests/e2e/coach.spec.ts",
   "tests/e2e/journey.spec.ts",
   "tests/e2e/courses.spec.ts",
+  "tests/e2e/course-default.spec.ts",
   "tests/e2e/course-playback.spec.ts",
   "tests/e2e/course-accessibility.spec.ts",
   "tests/e2e/course-backup.spec.ts",

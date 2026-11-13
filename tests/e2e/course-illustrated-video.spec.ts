@@ -1,5 +1,5 @@
 import {test,expect} from '@playwright/test'
-import {visit,openPage} from './helpers.ts'
+import {visitCourseReader as visit,openPage} from './helpers.ts'
 import {courseVideo} from '../../src/i18n/courseVideos.ts'
 test.use({channel:'chromium',launchOptions:{args:['--disable-gpu',...(process.platform==='darwin'?['--disable-audio-output']:[])]}})
 for(const spoken of ['fr','de','en'] as const)test.describe(`${spoken} illustrated video`,()=>{

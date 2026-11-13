@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { leavePage, openPage, visit } from './helpers.ts'
+import { leavePage, openPage, visitCourseReader as visit } from './helpers.ts'
 import { courseNarration } from '../../src/i18n/courseNarrations.ts'
 
 // Preserve the first failing attempt: a successful retry cannot explain an offline failure.

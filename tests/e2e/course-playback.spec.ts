@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { visit, openPage } from './helpers.ts'
+import { visitCourseReader as visit, openPage } from './helpers.ts'
 
 // Full Chromium uses the native media pipeline, unlike headless shell.
 // On macOS a missing audio output device can freeze Chromium's playback clock.

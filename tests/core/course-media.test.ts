@@ -13,8 +13,8 @@ it('defaults primary languages to their narration and all others to English',()=
   }
 })
 it('rejects invalid saved media preferences',()=>{
-  for(const value of [null,[],false,{}, {audio:'https://external.test',speed:100}])expect(mediaPreferences(value)).toEqual({audio:'auto',speed:1,view:'read'})
-  for(const speed of MEDIA_SPEEDS)expect(mediaPreferences({audio:'fr',speed})).toEqual({audio:'fr',speed,view:'read'})
+  for(const value of [null,[],false,{}, {audio:'https://external.test',speed:100}])expect(mediaPreferences(value)).toEqual({audio:'auto',speed:1,view:'listen',video:true})
+  for(const speed of MEDIA_SPEEDS)expect(mediaPreferences({audio:'fr',speed})).toEqual({audio:'fr',speed,view:'listen',video:true})
 })
 it('keeps local media, cue order and subtitles consistent',()=>{
   for(const pack of Object.values(storyMedia.packs)){
@@ -34,7 +34,10 @@ it('preserves the accepted German narration byte for byte',()=>{
   expect(createHash('sha256').update(audio).digest('hex')).toBe('d32cfdbcb103610d1d387dc32ef8fb4585dd51efbf8db8c0b513d544c455dd80')
 })
 
-it('remembers an explicit video choice without enabling it from untrusted strings',()=>{
+it('migrates the implicit old audio default and persists explicit audio or reading choices',()=>{
  expect(mediaPreferences({video:true}).video).toBe(true)
- expect(mediaPreferences({video:'true'}).video).toBeUndefined()
+ expect(mediaPreferences({view:'listen',audio:'fr',speed:1.5})).toEqual({view:'listen',audio:'fr',speed:1.5,video:true})
+ expect(mediaPreferences(JSON.parse(JSON.stringify({view:'listen',video:false})))).toEqual({audio:'auto',speed:1,view:'listen',video:false})
+ expect(mediaPreferences({view:'read'})).toEqual({audio:'auto',speed:1,view:'read',video:true})
+ for(const video of ['false','true',null,0])expect(mediaPreferences({video}).video).toBe(true)
 })

@@ -1,5 +1,5 @@
 import {test,expect} from '@playwright/test'
-import {visit,openPage} from './helpers.ts'
+import {visitCourseReader as visit,openPage} from './helpers.ts'
 
 for(const colorScheme of ['light','dark'] as const)test(`course controls stay usable with large text in ${colorScheme} mode`,async({page})=>{
  await page.emulateMedia({colorScheme,reducedMotion:'reduce'})

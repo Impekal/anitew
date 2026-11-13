@@ -66,7 +66,7 @@ export function StoryCourseMedia({coach,language,platform,solution=false,onRecal
   const safeCue=!solution && cue>=stopIndex ? -1 : cue
   useEffect(()=>{
     let active=true
-    void platform.settings.read(MEDIA_SETTINGS_KEY).then(value=>{if(active){const saved=mediaPreferences(value);setPreferences(saved);setEnabled(saved.view==='listen')}}).catch(()=>{if(active)setError(t.saveFailed)}).finally(()=>{if(active)setReady(true)})
+    void platform.settings.read(MEDIA_SETTINGS_KEY).then(value=>{if(active){const saved=mediaPreferences(value);setPreferences(saved);setEnabled(saved.view==='listen')}}).catch(()=>{if(active){setEnabled(true);setError(t.saveFailed)}}).finally(()=>{if(active)setReady(true)})
     return()=>{active=false}
   },[platform,t.saveFailed])
   useEffect(()=>{
@@ -110,7 +110,7 @@ export function StoryCourseMedia({coach,language,platform,solution=false,onRecal
   return <section className="course-media" aria-label={t.title}>
     <h4>{t.title}</h4><p className="hint">{playingVideo?(videoAsset?.presentation==='illustrated'?vt.illustratedNote:vt.note):t.note}</p>
     <p className="hint">{playingVideo?(locale==='de'?'Videodauer':locale==='fr'?'Durée vidéo':'Video duration'):(locale==='de'?'Tonspur':locale==='fr'?'Piste audio':'Audio')}: {Math.floor(Math.ceil(playbackDuration/preferences.speed)/60)}:{String(Math.ceil(playbackDuration/preferences.speed)%60).padStart(2,'0')} · {locale==='de'?'Übungszeit zusätzlich':locale==='fr'?'temps de pratique en plus':'plus practice time'}</p>
-    <button type="button" aria-pressed={enabled} disabled={!ready} onClick={()=>{player.current?.pause();setTime(0);setEnabled(!enabled);void save({...preferences,view:enabled?'read':'listen'})}}>{enabled?t.read:t.listen}</button>
+    <button type="button" aria-pressed={enabled} disabled={!ready||saving} onClick={()=>{player.current?.pause();setTime(0);setEnabled(!enabled);void save({...preferences,view:enabled?'read':'listen'})}}>{enabled?t.read:t.listen}</button>
     {enabled && <>
       <fieldset disabled={saving}><legend className="course-sr-only">{t.title}</legend>
         <label htmlFor="course-audio-language">{t.audio}</label>
@@ -125,7 +125,7 @@ export function StoryCourseMedia({coach,language,platform,solution=false,onRecal
       </fieldset>
       <p className="hint">{locale==='de'?'Kursstimme':locale==='fr'?'Voix du cours':'Course voice'}: {voiceName}. {coach&&coach!=='original'&&!narration&&(locale==='de'?`Die Aufnahme mit ${courseCoachCopy.de.names[coach]} ist für diesen Kurs und diese Sprache noch in Arbeit.`:locale==='fr'?`L’enregistrement avec ${courseCoachCopy.fr.names[coach]} pour ce cours et cette langue est en préparation.`:`The recording with ${courseCoachCopy.en.names[coach]} for this course and language is in preparation.`)}</p>
       <p className="hint">{t.captions}: {subtitleLanguage.toUpperCase()} · {t.draft}</p>
-      {videoAsset && <><label htmlFor="course-format">{vt.format}</label><select id="course-format" disabled={saving} value={playingVideo?'video':'audio'} onChange={e=>void save({...preferences,video:e.target.value==='video'?true:undefined})}><option value="audio">{vt.audio}</option><option value="video">{vt.video}</option></select></>}
+      {videoAsset && <><label htmlFor="course-format">{vt.format}</label><select id="course-format" disabled={saving} value={playingVideo?'video':'audio'} onChange={e=>void save({...preferences,video:e.target.value==='video'})}><option value="audio">{vt.audio}</option><option value="video">{vt.video}</option></select></>}
       {downloadAsset && <CourseDownload key={`download-${downloadAsset.src}`} asset={downloadAsset} locale={locale} />}
       {library && language!==subtitleLanguage && <p className="hint">The translated subtitles for this audio track are being prepared. Its original spoken text is shown here.</p>}
       <div className={`course-playback${playingVideo?' has-video':''}`}><div className="course-screen">

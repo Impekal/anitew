@@ -1,5 +1,5 @@
 import {test,expect} from '@playwright/test'
-import {visit,openPage} from './helpers.ts'
+import {visitCourseReader as visit,openPage} from './helpers.ts'
 import {courseVideo} from '../../src/i18n/courseVideos.ts'
 test.use({channel:'chromium',launchOptions:{args:['--disable-gpu',...(process.platform==='darwin'?['--disable-audio-output']:[])]}})
 for(const [id,title] of [['method-of-loci','Orte als Gedächtnisstützen nutzen'],['number-images','Zahlen in Bilder übersetzen'],['interleaved-practice','Passende Vorgehensweisen unterscheiden']] as const){

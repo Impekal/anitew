@@ -137,3 +137,20 @@ Die identische Zufallssuche im Missions-Test wurde ebenfalls ersetzt.
 Echte Einheitstimer, Antwort-/Köderprüfungen und gespeicherte Termine bleiben
 unverändert. Sechs lokale Zwillingsläufe (drei pro Profil) bestanden danach.
 Auch beide vollständigen Missionsprüfungen auf Desktop/Mobilprofil bestanden.
+
+## Videokurs als Standard
+
+Auf Nutzerwunsch öffnet die erste Kursstufe ohne gespeicherte Wahl direkt
+den Videokurs. Video und Ton starten weiterhin erst per Wiedergabegeste;
+`preload=none` verhindert den ungefragten großen Download. Explizites Lesen
+bleibt erhalten. Eine explizite Tonwahl speichert jetzt `video:false`, statt
+die Formatangabe zu entfernen. Alte Einträge ohne Formatangabe übernehmen
+den neuen Videostandard; Sprache und Tempo ändern sich dabei nicht.
+
+Die bisherigen Lese-/Tonprüfungen setzen ihre geprüfte Wahl ausdrücklich,
+ohne später gespeicherte Test-Auswahlen zu überschreiben. Sechs neue Fälle
+prüfen den ungesetzten Standard, alle zwölf Kurse, DE/EN/FR, Migration,
+Wiedergabeschutz und Wahl nach Neustart; sie sind auch im mobilen CI-Tor.
+Lokal bestanden fünf Kernprüfungen, Typecheck/Build, unverändertes Budget
+und24Desktop-/Mobilprüfungen. Neue Sprechclips wurden nicht integriert;
+natürliche Coach-Auftritte bleiben ein eigener offener Qualitätsauftrag.

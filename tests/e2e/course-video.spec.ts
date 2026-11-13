@@ -1,5 +1,5 @@
 import {test,expect} from '@playwright/test'
-import {visit,openPage} from './helpers.ts'
+import {visitCourseReader as visit,openPage} from './helpers.ts'
 test('reading view does not load a video before playback is selected',async({page})=>{
  const videos:string[]=[]
  page.on('request',request=>{if(request.url().includes('/course-media/video/'))videos.push(request.url())})

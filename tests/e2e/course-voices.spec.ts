@@ -1,5 +1,5 @@
 import {test,expect} from '@playwright/test'
-import {visit,openPage} from './helpers.ts'
+import {visitCourseReader as visit,openPage} from './helpers.ts'
 import {courseNarration} from '../../src/i18n/courseNarrations.ts'
 // On macOS a missing audio output device can freeze Chromium's playback clock.
 // Keep real media decoding and timing, but use its silent output sink in local tests.

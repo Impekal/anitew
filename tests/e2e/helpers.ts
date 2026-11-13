@@ -109,6 +109,36 @@ export async function visit(page: Page) {
 }
 
 /**
+ * Explicit reader/audio preference for tests of those existing modes. Fresh
+ * users now enter video directly; course-default.spec.ts tests that unseeded
+ * path. Never overwrite a choice persisted by the test under examination.
+ */
+export async function visitCourseReader(page: Page) {
+  await visit(page)
+  await page.evaluate(async () => {
+    const request = indexedDB.open('anitew')
+    const database: IDBDatabase = await new Promise((resolve, reject) => {
+      request.onsuccess = () => resolve(request.result)
+      request.onerror = () => reject(request.error)
+    })
+    await new Promise<void>((resolve, reject) => {
+      const transaction = database.transaction('settings', 'readwrite')
+      const settings = transaction.objectStore('settings')
+      const saved = settings.get('courses.media.v1')
+      saved.onsuccess = () => {
+        if (saved.result === undefined) settings.put({
+          key: 'courses.media.v1', value: {view:'read',video:false,audio:'auto',speed:1},
+        })
+      }
+      transaction.oncomplete = () => resolve()
+      transaction.onabort = () => reject(transaction.error)
+      transaction.onerror = () => reject(transaction.error)
+    })
+    database.close()
+  })
+}
+
+/**
  * Warten, bis die **nachgeladene** Stilvorlage am Band angekommen ist.
  *
  * `anitew-living.css` wird erst nach dem ersten Bild geholt (`main.tsx`), und
