@@ -1,3 +1,4 @@
+import { driveCopyForCurrentUi } from '../i18n/driveCopy.ts'
 import { createWebPlatform } from '../platform/web/index.ts'
 import {
   SYNC_ACCOUNT_NAME_SETTING,
@@ -8,17 +9,17 @@ import { takeDriveRedirectNotice } from './driveRedirectNotice.ts'
 
 const platform = createWebPlatform()
 
-function copy() {
-  const de = document.documentElement.lang.toLowerCase().startsWith('de')
-  return de
-    ? {
-        connected: 'Angemeldet. Daten im eigenen Google Drive gespeichert',
-        failed: 'Google-Anmeldung konnte nicht abgeschlossen werden.',
-      }
-    : {
-        connected: 'Signed in. Data saved in your own Google Drive',
-        failed: 'Google sign-in could not be completed.',
-      }
+/** Die Kennung aus `requestDriveToken`, wenn Google die Drive-Freigabe nicht mitgab. */
+const SCOPE_MISSING = 'drive_scope_missing'
+
+/* Dieselbe Quelle wie der Drive-Bildschirm — sechs Sprachen, keine Insel. */
+function copy(): { connected: string; failed: string; boxMissing: string } {
+  const texts = driveCopyForCurrentUi()
+  return {
+    connected: texts.redirectConnected,
+    failed: texts.redirectFailed,
+    boxMissing: texts.boxMissing,
+  }
 }
 
 let applying = false
@@ -35,7 +36,16 @@ async function applyFeedback(): Promise<void> {
     const notice = takeDriveRedirectNotice()
     if (notice?.kind === 'error') {
       status.dataset.error = 'true'
-      status.textContent = `${copy().failed} · ${notice.detail}`
+      /*
+       * Das leere Drive-Kästchen ist keine gescheiterte Anmeldung — sie hat
+       * geklappt. „Google-Anmeldung konnte nicht abgeschlossen werden ·
+       * drive_scope_missing" wäre hier gleich zweimal irreführend: falsch in
+       * der Sache und ein Kürzel statt einer Auskunft.
+       */
+      status.textContent =
+        notice.detail === SCOPE_MISSING
+          ? copy().boxMissing
+          : `${copy().failed} · ${notice.detail}`
       return
     }
 
@@ -48,6 +58,7 @@ async function applyFeedback(): Promise<void> {
 
     delete status.dataset.error
     button.disabled = true
+    button.setAttribute('aria-label', button.textContent ?? copy().connected)
     button.textContent = '✓'
     const identity = accountName ?? account
     status.textContent = `${copy().connected}${identity === undefined ? '' : ` · ${identity}`}`

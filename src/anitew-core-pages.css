@@ -1,0 +1,152 @@
+/* ANITEW — Stile für die tiefen Core-Seiten
+ *
+ * Diese Regeln gehören zu Bildschirmen, die erst hinter dem Core liegen:
+ * „Etwas merken", der Coach-Schlüssel, „Sicherung" und „Neu anfangen". Sie
+ * werden deshalb **nachgeladen** und nicht im Kaltstart mitgeschleppt.
+ *
+ * Die Annahme dahinter, ausgesprochen: Das Blatt kommt 750 ms nach dem Start
+ * mit der Signature-Schicht. Diese Bildschirme liegen **zwei** Tipps tief —
+ * erst den Core öffnen, dann eine Seite — und sind in dieser Zeit nicht
+ * erreichbar.
+ *
+ * Der Deck-Streifen hinter dem Schließen-Knopf stand einmal hier und ist
+ * wieder heraus: Die Schublade ist **einen** Tipp entfernt, also kann sie
+ * schneller offen sein als das Blatt da. Genau das ist im CI passiert, an
+ * meinem eigenen Test. Eine Regel, die Verdeckung herstellt, darf nicht von
+ * einer Zeitannahme abhängen.
+ *
+ * Der Anlass war das Kaltstart-Budget (P4): Mit den Korrekturen aus dem
+ * Gesamt-Audit lag das CSS bei 12,1 KB gegen 12 KB. Das Budget zu heben wäre
+ * der bequeme Weg gewesen und der falsche — eine Regel für eine Seite, die
+ * man erst nach dem dritten Fingertipp sieht, gehört nicht ins erste Bild.
+ */
+
+/*
+ * Der Satz, der vom Splash hierher gezogen ist. Er steht zwischen der
+ * Abschnittsüberschrift und der Erklärung und darf deshalb weder wie die eine
+ * noch wie die andere aussehen: kein Versalsatz, kein Grau — die Mintfarbe der
+ * Signature-Palette, eine Spur größer als der Fließtext daneben.
+ */
+.remember-tagline {
+  margin: 0 0 0.5rem;
+  color: var(--calm);
+  font-size: 1.02rem;
+  line-height: 1.4;
+}
+
+/*
+ * Rang zwei statt drei: Über diesen Karten steht die Seiten-h1, eine Ebene
+ * dazwischen gibt es nicht — ein h3 überspringt sie (WCAG 1.3.1). Die Größe
+ * bleibt die des alten h3, damit sich am Bild nichts ändert.
+ */
+.wipe h2 {
+  margin: 1em 0;
+  font-size: 1.17em;
+  font-weight: 700;
+}
+
+/*
+ * Der Weg zum Schlüssel ist ein Link mitten im Fließtext — und damit
+ * genauso hoch wie eine Zeile (gemessen 163 × 17 px). Für einen Daumen ist
+ * das zu wenig. Die Schrift bleibt Fließtext; nur die Fläche wird auf die
+ * Mindestgröße gepolstert, ohne den Absatz auseinanderzuziehen.
+ */
+
+.coach-key-link {
+  display: inline-block;
+  padding: 6px 0;
+  min-height: 24px;
+}
+
+/*
+ * Der Palast-Bildschirm: Stationsaktionen und Speicheraktionen trennen.
+ *
+ * „Ort anhängen" und „Weg anlegen" standen in zwei `.note-actions` direkt
+ * untereinander und sahen aus wie ein Block aus zwei Knöpfen — als wäre der
+ * zweite eine Variante des ersten. Sie tun aber ganz Verschiedenes: Der eine
+ * ändert das Formular, der andere schickt es ab.
+ */
+.own-station-actions {
+  margin-bottom: 1.4rem;
+}
+
+.own-palace-entry .note-actions:not(.own-station-actions) {
+  margin-top: 1.2rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--line);
+}
+
+/* Jeder Ort trägt sein eigenes Kreuz — entfernen geht überall, nicht nur hinten. */
+.own-stations li {
+  align-items: center;
+}
+
+.own-station-drop {
+  flex: 0 0 auto;
+  width: 44px;
+  min-height: 44px;
+  margin-left: 6px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink-faint);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.own-station-drop:hover,
+.own-station-drop:focus-visible {
+  color: var(--bad);
+}
+
+/* Die Regel steht jetzt immer da, solange etwas fehlt — sie darf nicht schreien. */
+.own-rule {
+  margin-top: 0.6rem;
+}
+
+/*
+ * Tap-Ziele auf 44 Pixel (Audit 29.08., B-03).
+ *
+ * Gemessen bei iPhone-Größe waren drei Bedienelemente deutlich unter Apples
+ * 44 × 44: der Ton-Schalter (63 × 30), „Schlüssel-Seite öffnen" (163 × 34) und
+ * die beiden Sprachauswahlen (102 × 34 und 115 × 34). WCAG 2.2 AA (24 × 24)
+ * war überall erfüllt — das ist die niedrigere Latte, und sie ist nicht die,
+ * an der sich ein Daumen misst.
+ *
+ * Zwei Wege, mit Absicht getrennt:
+ *
+ * Bei Knopf und Link wächst nur die **Trefferfläche**, nicht das Aussehen. Ein
+ * unsichtbares `::after` legt sich über den Rand hinaus; die Zeile bleibt
+ * optisch genau so zurückhaltend wie vorher. Ein Ton-Schalter im Fußbereich
+ * soll klein aussehen — er soll nur nicht klein zu treffen sein.
+ *
+ * Bei `<select>` geht das nicht: Ein ersetztes Element rendert keine
+ * Pseudoelemente verlässlich. Dort wächst die Höhe wirklich. Das ist auf einem
+ * Telefon auch richtig so — ein Auswahlfeld darf nach Bedienelement aussehen.
+ *
+ * Dieses Blatt wird verzögert geladen, das Kaltstart-Budget bleibt also
+ * unberührt (B-01 lässt dort nur neun Bytes Luft).
+ */
+.sound-toggle,
+.coach-key-link {
+  position: relative;
+}
+.sound-toggle::after,
+.coach-key-link::after {
+  content: '';
+  position: absolute;
+  inset: -7px -8px;
+  border-radius: inherit;
+}
+/* Die Sprachauswahl steht in `<label class="language">`, die
+   Trainingssprache daneben in derselben Bauform; `.about-field` deckt die
+   Auswahlfelder unter „Über dich" ab. */
+label.language select,
+.language-choice select,
+.about-field select,
+.page select,
+.page input:not([type='checkbox']):not([type='radio']):not([type='file']),
+.coach-key-input {
+  min-height: 44px;
+}

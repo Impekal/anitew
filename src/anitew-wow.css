@@ -25,13 +25,16 @@ body::after {
     conic-gradient(from 18deg at 50% 38%, transparent 0 18%, rgb(158 230 210 / 3%) 24%, transparent 31% 62%, rgb(229 184 109 / 3%) 70%, transparent 78%),
     radial-gradient(circle at 50% 34%, rgb(158 230 210 / 7%), transparent 24vmax),
     radial-gradient(circle at 50% 70%, rgb(229 184 109 / 4%), transparent 30vmax);
-  filter: blur(22px);
   animation: wow-aurora 28s ease-in-out infinite alternate;
 }
 
+/* Kein zweiter Filter ueber dem Netz (Geraetemeldung 01.09.): Derselbe
+   Fehler stand in `anitew-experience-refinement.css` und wurde dort
+   entfernt — hier stand er noch einmal. Ein Filter auf dem Container zieht
+   den ganzen Teilbaum in eine eigene Ebene, die neu gezeichnet wird, sobald
+   sich darin etwas ruehrt. */
 .neural {
   opacity: .62;
-  filter: drop-shadow(0 0 7px rgb(158 230 210 / 8%));
 }
 .neural-links line {
   stroke: rgb(158 230 210 / 10%);
@@ -157,7 +160,6 @@ body::after {
   z-index: -1;
   border-radius: 50%;
   background: radial-gradient(circle, rgb(158 230 210 / 7%), transparent 63%);
-  filter: blur(18px);
   animation: wow-constellation-breathe 8s ease-in-out infinite;
 }
 .constellation svg {
@@ -168,7 +170,11 @@ body::after {
   stroke: rgb(158 230 210 / 7%);
   stroke-width: .18;
   stroke-dasharray: .8 2.2;
-  transform-origin: 50px 50px;
+  /* In Prozent statt in Einheiten: Die Ringe drehen sich um die Mitte ihrer
+     Zeichenfläche — und die ist auf der Startseite eine andere als auf der
+     Gedächtnis-Seite. Feste 50px 50px ließen sie im Band um einen Punkt
+     unter sich eiern. */
+  transform-origin: 50% 50%;
   animation: wow-orbit 44s linear infinite;
 }
 .constellation-orbit-inner {
@@ -215,7 +221,10 @@ body::after {
 }
 .constellation-label {
   fill: #e8eee8;
-  font-size: 2.2px;
+  /* 3,2 statt 2,2 Einheiten: Mit dem Band-Maßstab (3,88) sind das 12,4 statt
+     8,5 Pixel. Zusammen mit der Geometrie bringt das die gemeldeten „kaum
+     leserlichen" 3,9 Pixel auf eine Größe, die man am Telefon lesen kann. */
+  font-size: 3.2px;
   paint-order: stroke;
   stroke: rgb(5 9 8 / 82%);
   stroke-width: .65px;

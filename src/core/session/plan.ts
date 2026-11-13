@@ -1,4 +1,6 @@
+import { missionPool } from '../content/missions.ts'
 import { spatialCellOf, spatialPool } from '../content/spatial.ts'
+import type { Language } from '../language.ts'
 import * as base from './planBase.ts'
 import type { Leniency } from './grading.ts'
 
@@ -49,7 +51,10 @@ export const sceneItemsOf = base.sceneItemsOf as (
   moduleId: ModuleId,
   anchor: string,
 ) => readonly string[]
-export const secondsPerItemFor = base.secondsPerItemFor as (moduleId: ModuleId) => number
+export const secondsPerItemFor = base.secondsPerItemFor as (
+  moduleId: ModuleId,
+  input?: base.PaceInput,
+) => number
 export const subjectOf = base.subjectOf as (moduleId: ModuleId, item: string) => string
 
 export function displayOf(moduleId: ModuleId, item: string, language: string): string {
@@ -83,13 +88,25 @@ export function learnableModules(
 }
 
 export function planSession(input: PlanInput): SessionPlan {
+  /*
+   * H4/H5: `App` liefert weiterhin den bewährten Namensvorrat. Erst hier,
+   * direkt an der Modulgrenze, kommen zusätzliche Missionspersonen aus
+   * Konferenz und Coworking dazu. Das Gesicht-/Namenmodul bleibt dadurch
+   * unverändert und alte Hotel-IDs bleiben vollständig im Vorrat.
+   */
+  const missions =
+    (input.pools.missions?.length ?? 0) === 0
+      ? []
+      : missionPool(input.pools.missions ?? [], input.language as Language)
+
   const associative =
     input.pools.associative ??
-    (input.pools.missions ?? [])
+    missions
       .flatMap((person) => base.sceneItemsOf('missions', person))
       .map((item) => `${item}~person`)
   const pools = {
     ...input.pools,
+    missions,
     spatial: input.pools.spatial ?? spatialPool(input.seed, 40),
     associative,
   }

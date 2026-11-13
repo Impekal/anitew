@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import {
   type NodeSuggestion,
@@ -12,6 +12,11 @@ import { applyRememberedSuggestions } from '../core/index.ts'
 import { createWebArchitect } from '../platform/web/architect.ts'
 import { scheduleDriveSync } from './driveSync.ts'
 import {
+  inferMemoryDeadlineInput,
+  memoryDeadlineCopyForCurrentUi,
+  parseMemoryDeadline,
+} from './memoryDeadline.ts'
+import {
   COACH_PROVIDER_NAMES,
   CoachError,
   type CoachFailure,
@@ -19,6 +24,7 @@ import {
 } from '../platform/web/coach.ts'
 import { loadCoachKeys } from '../platform/web/coachKeys.ts'
 import type { Dictionary } from '../i18n/index.ts'
+import './memoryDeadline.css'
 
 /**
  * „Etwas merken“ (D-036).
@@ -34,17 +40,39 @@ export function RememberThisPanel({
   platform,
   dictionary,
   onSaved,
+  initialDraft,
+  initialSuggestions,
 }: {
   platform: Platform
   dictionary: Dictionary
   onSaved: (created: { nodeIds: readonly string[]; edgeIds: readonly string[] }) => void
+  /**
+   * Flüchtige Übergabe aus „Eigene Inhalte“ (I3). Sie füllt nur ein leeres
+   * Feld und wird nie selbst gespeichert. Sobald der Mensch hier editiert,
+   * gewinnt seine Eingabe — spätere Prop-Änderungen überschreiben nichts.
+   */
+  initialDraft?: string
+  /**
+   * Bereits gewaschene Vorschläge, z. B. aus der ausdrücklich ausgelösten
+   * Fotoanalyse. Auch sie landen nur in der Vorschau; dieser Prop ist **kein**
+   * Schreibzugriff. Abwählen, Editieren und Bestätigen bleiben unverändert.
+   */
+  initialSuggestions?: RememberSuggestions
 }) {
   const texts = dictionary.memory
+  const deadlineTexts = memoryDeadlineCopyForCurrentUi()
 
   const [draft, setDraft] = useState('')
   const [suggestions, setSuggestions] = useState<RememberSuggestions | undefined>(undefined)
   const [dropped, setDropped] = useState<ReadonlySet<string>>(new Set())
   const [saved, setSaved] = useState(false)
+  // F-10 (Runde 2): Ein fehlgeschlagenes Speichern wird gesagt, nicht verschluckt.
+  const [saveFailed, setSaveFailed] = useState(false)
+  const [deadlineInput, setDeadlineInput] = useState('')
+  const [deadlineInferred, setDeadlineInferred] = useState(false)
+  const [deadlineError, setDeadlineError] = useState<string | undefined>()
+  const appliedInitialDraft = useRef<string | undefined>(undefined)
+  const appliedInitialSuggestions = useRef<RememberSuggestions | undefined>(undefined)
 
   // Der KI-Weg (D-037) ist ein Angebot, kein Pflichtpfad (M2): Er erscheint
   // nur, wenn beim gewählten Coach-Anbieter ein eigener Schlüssel liegt.
@@ -56,6 +84,30 @@ export function RememberThisPanel({
   const [fromAi, setFromAi] = useState(false)
 
   useEffect(() => {
+    if (
+      initialDraft === undefined ||
+      initialDraft.trim() === '' ||
+      appliedInitialDraft.current === initialDraft
+    ) {
+      return
+    }
+    appliedInitialDraft.current = initialDraft
+    setDraft((current) => (current.trim() === '' ? initialDraft : current))
+  }, [initialDraft])
+
+  useEffect(() => {
+    if (initialSuggestions === undefined || appliedInitialSuggestions.current === initialSuggestions) {
+      return
+    }
+    appliedInitialSuggestions.current = initialSuggestions
+    setSuggestions(initialSuggestions)
+    setDropped(new Set())
+    setSaved(false)
+    setFromAi(true)
+    setAiFailure(undefined)
+  }, [initialSuggestions])
+
+  useEffect(() => {
     void (async () => {
       const keys = await loadCoachKeys(platform.settings)
       setAiProvider(keys[0]?.provider)
@@ -63,7 +115,17 @@ export function RememberThisPanel({
     })().catch(() => undefined)
   }, [platform])
 
+  const inferDeadline = () => {
+    if (deadlineInput !== '') return
+    const inferred = inferMemoryDeadlineInput(draft, platform.clock.now())
+    if (inferred === undefined) return
+    setDeadlineInput(inferred)
+    setDeadlineInferred(true)
+    setDeadlineError(undefined)
+  }
+
   const propose = () => {
+    inferDeadline()
     const next = suggestMemories({ text: draft })
     setSuggestions(next)
     setDropped(new Set())
@@ -73,6 +135,7 @@ export function RememberThisPanel({
   }
 
   const proposeWithAi = () => {
+    inferDeadline()
     setAiBusy(true)
     setAiAttempt('')
     setAiFailure(undefined)
@@ -139,9 +202,22 @@ export function RememberThisPanel({
       edges: suggestions.edges,
     }
     if (confirmed.nodes.length === 0) return
+
+    const now = platform.clock.now()
+    const deadline = deadlineInput === '' ? undefined : parseMemoryDeadline(deadlineInput)
+    if (deadlineInput !== '' && deadline === undefined) {
+      setDeadlineError(deadlineTexts.invalid)
+      return
+    }
+    if (deadline !== undefined && deadline.at <= now) {
+      setDeadlineError(deadlineTexts.past)
+      return
+    }
+    setDeadlineError(undefined)
+
     void (async () => {
       const graph = await loadMemoryGraph()
-      const next = applyRememberedSuggestions(graph, confirmed, platform.clock.now())
+      const next = applyRememberedSuggestions(graph, confirmed, now, deadline)
       const existing = new Set(graph.nodes.map((node) => node.id))
       const newNodeIds = next.nodes.filter((node) => !existing.has(node.id)).map((node) => node.id)
       const existingEdges = new Set(graph.edges.map((edge) => edge.id))
@@ -149,15 +225,26 @@ export function RememberThisPanel({
       const newConnections = next.edges.length - graph.edges.length
       await saveMemoryGraph(next)
       setDraft('')
+      setDeadlineInput('')
+      setDeadlineInferred(false)
       setSuggestions(undefined)
       setFromAi(false)
+      setSaveFailed(false)
       setSaved(true)
       // Der Ton der Klangsprache fürs Aufheben — leise, kein Jubel (G-1).
       platform.sound.play('remember')
       if (newConnections > 0) platform.sound.play('connection')
       scheduleDriveSync(platform)
       onSaved({ nodeIds: newNodeIds, edgeIds: newEdgeIds })
-    })().catch(() => undefined)
+    })().catch(() => {
+      /*
+       * F-10 (Runde 2): Lehnt IndexedDB den Schreibvorgang ab (z. B. volle
+       * Quota), bleiben Eingabe und Vorschläge stehen — und der Grund steht
+       * sichtbar da, statt dass „Bestätigen“ scheinbar nichts tut.
+       */
+      setSaved(false)
+      setSaveFailed(true)
+    })
   }
 
   const kept = (node: NodeSuggestion) => !dropped.has(node.id)
@@ -166,19 +253,52 @@ export function RememberThisPanel({
 
   return (
     <section className="remember" aria-label={texts.rememberHeading}>
-      <h3 className="coach-source">{texts.rememberHeading}</h3>
+      <h2 className="coach-source">{texts.rememberHeading}</h2>
+      <p className="remember-tagline">{texts.rememberTagline}</p>
       <p className="hint">{texts.rememberIntro}</p>
 
       <textarea
         className="remember-input"
+        aria-label={texts.rememberInputLabel}
         rows={3}
         placeholder={texts.rememberPlaceholder}
         value={draft}
         onChange={(event) => {
           setDraft(event.target.value)
+          if (deadlineInferred) {
+            setDeadlineInput('')
+            setDeadlineInferred(false)
+          }
           setSaved(false)
         }}
       />
+
+      <label className="memory-deadline-field">
+        <span>{deadlineTexts.label}</span>
+        <input
+          type="datetime-local"
+          className="remember-deadline-input"
+          value={deadlineInput}
+          onChange={(event) => {
+            setDeadlineInput(event.target.value)
+            setDeadlineInferred(false)
+            setDeadlineError(undefined)
+            setSaved(false)
+          }}
+        />
+      </label>
+      <p className="hint memory-deadline-hint">{deadlineTexts.hint}</p>
+      {deadlineInferred && (
+        <p className="hint memory-deadline-inferred" role="status">
+          {deadlineTexts.inferred}
+        </p>
+      )}
+      {deadlineError !== undefined && (
+        <p className="memory-deadline-error" role="status" aria-live="polite">
+          {deadlineError}
+        </p>
+      )}
+
       <div className="remember-actions">
         <button
           type="button"
@@ -283,7 +403,12 @@ export function RememberThisPanel({
         </div>
       )}
 
-      {saved && <p className="remember-saved">{texts.saved}</p>}
+      {saved && <p className="remember-saved" role="status" aria-live="polite">{texts.saved}</p>}
+      {saveFailed && (
+        <p className="coach-failure remember-failure" role="alert">
+          {texts.saveFailed}
+        </p>
+      )}
     </section>
   )
 }

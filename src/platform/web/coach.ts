@@ -74,13 +74,34 @@ const MODELS: Readonly<Record<Exclude<CoachProvider, 'openai'>, string>> = {
   mistral: 'mistral-small-latest',
 }
 
-export type CoachFailure = 'no-key' | 'bad-key' | 'offline' | 'refused' | 'failed'
+export type CoachFailure =
+  | 'no-key'
+  | 'bad-key'
+  | 'forbidden'
+  | 'limited'
+  | 'offline'
+  | 'refused'
+  | 'failed'
 
 export class CoachError extends Error {
   constructor(readonly reason: CoachFailure) {
     super(reason)
     this.name = 'CoachError'
   }
+}
+
+/**
+ * Eine HTTP-Antwort der Anbieter in eine ehrliche Diagnose übersetzen
+ * (F-09, Runde 2). 401 und 403 sind **nicht** dasselbe: Groq etwa meldet
+ * 403 bei fehlender Berechtigung trotz gültigem Schlüssel — wer dann
+ * „Schlüssel prüfen“ liest, sucht am falschen Ort. Text- und Fotopfad
+ * benutzen dieselbe Tabelle, damit die Diagnosen nie auseinanderlaufen.
+ */
+export function failureForStatus(status: number): CoachFailure | undefined {
+  if (status === 401) return 'bad-key'
+  if (status === 403) return 'forbidden'
+  if (status === 429) return 'limited'
+  return undefined
 }
 
 interface ProviderCall {
@@ -225,11 +246,12 @@ export function createWebCoach(readConfig: () => Promise<CoachConfig | readonly 
               const date = retry === null ? NaN : Date.parse(retry)
               const until = Number.isFinite(seconds) ? Date.now() + seconds * 1000 : date
               unavailable.set(identity, { until: Math.max(Date.now() + 30_000,
-                Number.isFinite(until) ? until : Date.now() + 300_000), reason: 'failed' })
+                Number.isFinite(until) ? until : Date.now() + 300_000), reason: 'limited' })
             }
-            if (response.status === 401 || response.status === 403) {
-              unavailable.set(identity, { until: Date.now() + 300_000, reason: 'bad-key' })
-              throw new CoachError('bad-key')
+            const classified = failureForStatus(response.status)
+            if (classified !== undefined) {
+              if (classified !== 'limited') unavailable.set(identity, { until: Date.now() + 300_000, reason: classified })
+              throw new CoachError(classified)
             }
             if (!response.ok) throw new CoachError('failed')
             const text = call.parse(await response.json()).trim()

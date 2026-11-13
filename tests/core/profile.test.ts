@@ -37,8 +37,30 @@ describe('die Achsen', () => {
      * Seit D13 ist auch die Mission selbst die Szene/Übung; die Achse
      * „Zusammenhänge“ misst den separaten fact-to-person-Querabruf aus
      * `associative`, damit dieselbe Mission nicht zweimal als Profilwert zählt.
+     *
+     * Seit dem 02.09. gehören die **Persönlichkeiten** in dieselbe Gruppe, und
+     * zwar aus zwei Gründen, die beide an der Sache liegen:
+     *
+     * - Der Vorrat ist kuratiert und **endlich**. Eine Achse vergleicht
+     *   Module miteinander; neunundzwanzig feste Karten, bei denen nach einer
+     *   Jahreszahl gefragt wird, haben eine ganz andere Schwierigkeit als ein
+     *   Wortvorrat, der nie ausgeht. In einer Zahl zusammengerührt sagte das
+     *   Profil etwas, das die Daten nicht hergeben.
+     * - Ist der Vorrat durch, käme nichts Neues mehr nach. Die Achse fröre
+     *   mit ihrem letzten Wert ein und behauptete weiter etwas über heute.
+     *
+     * Trainiert und wiedergesehen wird trotzdem: FSRS bleibt zuständig. Nur
+     * als Messquelle für einen Vergleich zwischen Achsen taugt das Modul
+     * nicht — genau wie die eigenen Inhalte.
      */
-    const chosen = new Set(['facts', 'memory', 'palace', 'missions'])
+    /*
+     * Module ohne eigene Achse, jedes aus einem eigenen Grund. Kopfrechnen
+     * kam am 05.09. dazu: Sein Vorrat ist endlich und soll erschöpft werden —
+     * eine Achse daraus wäre nach ein paar Wochen eingefroren und behauptete
+     * weiter etwas über heute. Dieselbe Überlegung wie bei den
+     * Persönlichkeiten.
+     */
+    const chosen = new Set(['facts', 'memory', 'palace', 'missions', 'people', 'math'])
     const measured = TRAINING_MODULES.filter((moduleId) => !chosen.has(moduleId))
     for (const moduleId of measured) {
       expect(dimensionOf(moduleId), `${moduleId} ohne Achse`).toBeDefined()
@@ -47,6 +69,8 @@ describe('die Achsen', () => {
     expect(dimensionOf('memory')).toBeUndefined()
     expect(dimensionOf('palace')).toBeUndefined()
     expect(dimensionOf('missions')).toBeUndefined()
+    expect(dimensionOf('people')).toBeUndefined()
+    expect(dimensionOf('math')).toBeUndefined()
     const mapped = measured.map(dimensionOf)
     expect(new Set(mapped).size).toBe(measured.length)
   })
@@ -158,7 +182,7 @@ describe('der Schwerpunkt im Bauplan (E5)', () => {
     palace: many('home~'),
     reverse: ['48293', '17546', '90287', '35761', '82154', '46029'],
     twins: ['Kirche%Kirsche', 'Mantel%Mangel', 'Fliege%Fliese', 'Karte%Kante', 'Bogen%Boden', 'Wolke%Wolle'],
-    gaze: ['bild~1', 'bild~2', 'bild~3', 'bild~4', 'bild~5', 'bild~6'], facts: [], memory: [],
+    gaze: ['bild~1', 'bild~2', 'bild~3', 'bild~4', 'bild~5', 'bild~6'], facts: [], memory: [], people: [], math: [],
   }
 
   const modulesOf = (plan: ReturnType<typeof planSession>) =>

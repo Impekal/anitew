@@ -34,3 +34,7 @@ Add future names and photos explicitly; never reshuffle existing assignments.
 The switch from drawings to photos changes the visual cue once for existing
 users. It does not delete history or reset FSRS state. Historical drawing and
 new photo performance should not be presented as directly comparable evidence.
+
+## 2026-11-13 · Italian and Portuguese name pools
+
+The merged language pools use stable fictional aliases for the existing licensed local photographs. Each language pool has distinct images; existing DE/EN/FR/ES name assignments are unchanged. Aliases share source attribution through the photograph ID in `public/portraits/manifest.json`. No new photographs or external image requests were introduced.

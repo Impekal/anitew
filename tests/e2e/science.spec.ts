@@ -36,8 +36,26 @@ test('sagt, was Gehirnjogging nicht kann (F4, R-2)', async ({ page }) => {
   await expect(block.getByText('Nicht belegt')).toBeVisible()
   await expect(block.getByText('Gehirnjogging macht nicht allgemein klüger')).toBeVisible()
 
-  // Der entscheidende Satz: Auf einer unbelegten Annahme steht hier nichts.
-  await expect(block.getByText('Darauf ist in der App nichts gebaut.')).toBeVisible()
+  /*
+   * Seit dem 05.09. steht hier eine zweite Aussage: die Schlagzeile, dass
+   * Gehirntraining das Demenzrisiko senke. Sie gehört hierher, weil man ihr
+   * begegnet — zwei Auswertungen derselben Studie fanden etwas, eine
+   * veröffentlichte Gegenanalyse hebt es nach Korrektur für mehrfaches Testen
+   * wieder auf, und die Autoren widersprechen. Der Streit läuft.
+   */
+  await expect(block.getByText('Demenzrisiko')).toBeVisible()
+
+  /*
+   * Der entscheidende Satz: Auf einer unbelegten Annahme steht hier nichts.
+   *
+   * Geprüft wird er jetzt für **jede** Aussage im Block und nicht mehr für
+   * „irgendeine" — vorher war der Selektor eindeutig, weil es nur eine gab.
+   * Genau daran ist der Test beim Hinzufügen der zweiten rot geworden.
+   */
+  const aussagen = block.locator('.claim')
+  await expect(aussagen).toHaveCount(2)
+  await expect(block.locator('.rests')).toHaveCount(2)
+  await expect(block.getByText('Darauf ist in der App nichts gebaut.')).toHaveCount(2)
 })
 
 test('gibt zu, was niemand gemessen hat — auch nicht wir', async ({ page }) => {
@@ -56,8 +74,20 @@ test('trennt „wirkt“ von „wirkt auf alles“', async ({ page }) => {
 
   const block = page.locator('.standing-narrow')
   await expect(block.getByText('Belegt, aber nur dafür')).toBeVisible()
+
+  /*
+   * Beide Aussagen dieses Standes nennen ausdrücklich, was NICHT folgt —
+   * geprüft je an ihrem eigenen Satz statt an einem Muster, das auf beide
+   * passt. Seit die Belohnungs-Aussage dazukam, traf `/nicht.*gezeigt/`
+   * zwei Absätze; die Prüfung ist damit genauer geworden, nicht lockerer.
+   */
   await expect(block.getByText(/Merktechniken heben die Leistung/)).toBeVisible()
-  await expect(block.getByText(/nicht.*gezeigt/)).toBeVisible()
+  await expect(
+    block.getByText(/Was daraus für Namen, Termine oder deinen Alltag folgt/),
+  ).toBeVisible()
+
+  await expect(block.getByText(/Belohnungen können die eigene Motivation verdrängen/)).toBeVisible()
+  await expect(block.getByText(/ist nirgends gezeigt/)).toBeVisible()
 })
 
 test('hält den ersten Bildschirm davon frei (D-011/G-2)', async ({ page }) => {

@@ -7,7 +7,6 @@
  */
 
 .memoryzone {
-  --world-depth: 24px;
   perspective: 1100px;
 }
 
@@ -37,7 +36,6 @@
   left: 13%;
   top: -18%;
   background: radial-gradient(circle, rgba(140, 207, 192, .09), rgba(140, 207, 192, .025) 40%, transparent 68%);
-  filter: blur(18px);
   animation: world-breathe calc(var(--motion-breathe) * 1.4) ease-in-out infinite;
 }
 
@@ -47,7 +45,6 @@
   right: -10%;
   bottom: -24%;
   background: radial-gradient(circle, rgba(216, 168, 90, .09), transparent 68%);
-  filter: blur(22px);
   animation: world-drift 18s ease-in-out infinite alternate;
 }
 
@@ -64,11 +61,25 @@
  * A remembered node should stay exactly where the person expects it to be;
  * atmosphere may breathe around it, the target itself remains stable.
  */
+/*
+ * Die Neigung bleibt, die Tiefe fällt weg — und zwar nicht aus Geschmack.
+ *
+ * `translateZ(24px)` stand hier für Tiefe, hat aber in dieser Komposition
+ * **keine** erzeugt: Die Box des SVG ist mit und ohne exakt dieselbe (gemessen
+ * 542 × 338,68 px an derselben Stelle). Was es dagegen sehr wohl tat: Es
+ * zwang das SVG in einen 3D-Kontext, und darin trifft Chromiums Treffer-
+ * Prüfung die Kinder nicht mehr. Ein Fingertipp auf einen Erinnerungsknoten
+ * landete auf dem leeren SVG dahinter statt auf dem Knoten.
+ *
+ * Gemessen am selben Aufbau, dreimal nacheinander: mit `translateZ` schlägt
+ * der Klick fehl, ohne es trifft er. Das ist kein Testproblem — es ist die
+ * Memory World, in der man einen Knoten nicht zuverlässig auswählen kann.
+ */
 .constellation svg {
   position: relative;
   z-index: 2;
   transform-origin: 50% 55%;
-  transform: translateZ(var(--world-depth)) rotateX(1.2deg);
+  transform: rotateX(1.2deg);
   transition: transform 420ms var(--ease);
 }
 
@@ -231,7 +242,6 @@
   z-index: -1;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(140, 207, 192, .055), transparent 66%);
-  filter: blur(16px);
   animation: session-aura 7.5s ease-in-out infinite;
 }
 
@@ -304,7 +314,7 @@
 .session-bar > span {
   position: relative;
   box-shadow: 0 0 12px rgba(140, 207, 192, .18);
-  transition: width 900ms linear;
+  /* Kein Übergang auf `width` — Begründung in styles.css. */
 }
 
 .session-bar > span::after {
@@ -412,7 +422,7 @@
     border-radius: 18px;
   }
   .constellation svg {
-    transform: translateZ(12px);
+    transform: rotateX(1.2deg);
   }
   .session::before {
     width: 92vw;

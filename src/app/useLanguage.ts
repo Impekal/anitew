@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useState } from 'react'
+
+import { persistThenApply } from './persistThenApply.ts'
 
 import {
   type Language,
@@ -6,9 +8,42 @@ import {
   isRightToLeft,
   resolveLanguage,
 } from '../core/index.ts'
-import { type Dictionary, dictionaryFor, isTranslated } from '../i18n/index.ts'
+import { type Dictionary, dictionaryFor, ensureDictionary, isTranslated } from '../i18n/index.ts'
 
 const SETTING_KEY = 'language'
+const LANGUAGE_CHANGE_EVENT = 'anitew:interface-language-change'
+
+function announceLanguageChange(language: Language): void {
+  window.dispatchEvent(
+    new CustomEvent<Language>(LANGUAGE_CHANGE_EVENT, {
+      detail: language,
+    }),
+  )
+}
+
+/**
+ * Persistiert eine Sprachwahl außerhalb des regulären Einstellungs-Panels.
+ *
+ * Der First-Run braucht denselben Wahrheitsvertrag wie die Einstellungen:
+ * erst speichern, dann sichtbar umschalten. Das Ereignis hält den bereits
+ * gemounteten App-Hook synchron, ohne eine zweite Sprachquelle einzuführen.
+ */
+export async function persistInterfaceLanguageChoice(
+  platform: Platform,
+  next: Language,
+): Promise<boolean> {
+  try {
+    await platform.settings.write(SETTING_KEY, next)
+    // Erst das Wörterbuch, dann das Ereignis: Wer das Ereignis vor dem
+    // Laden feuerte, zeigte für einen Moment fremde Texte unter richtig
+    // markierter Sprache — genau die Halbwahrheit, die F-2 beseitigt hat.
+    await ensureDictionary(next)
+    announceLanguageChange(next)
+    return true
+  } catch {
+    return false
+  }
+}
 
 export interface LanguageState {
   language: Language
@@ -16,6 +51,8 @@ export interface LanguageState {
   translated: boolean
   ready: boolean
   choose: (language: Language) => void
+  /** Ließ sich die zuletzt gewählte Sprache nicht speichern? (R3-06) */
+  saveFailed: boolean
 }
 
 /**
@@ -58,6 +95,7 @@ export function useLanguage(platform: Platform): LanguageState {
     resolveLanguage(undefined, systemLanguages()),
   )
   const [ready, setReady] = useState(false)
+  const [saveFailed, setSaveFailed] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -70,7 +108,17 @@ export function useLanguage(platform: Platform): LanguageState {
         chosen = undefined
       }
       if (cancelled) return
-      setLanguage(resolveLanguage(chosen, systemLanguages()))
+      const resolved = resolveLanguage(chosen, systemLanguages())
+      /*
+       * Nachladbare Sprache (fr/es/it/pt): erst das Wörterbuch, dann die
+       * Freigabe. `ready` hält die Anzeige ohnehin zurück, bis die
+       * gespeicherte Wahl gelesen ist — dieselbe Wartezeit deckt jetzt auch
+       * den kleinen Sprachchunk ab (vorab gecacht, offline eingeschlossen).
+       * Schlägt das Laden fehl, zeigt dictionaryFor geschlossen Englisch.
+       */
+      await ensureDictionary(resolved).catch(() => undefined)
+      if (cancelled) return
+      setLanguage(resolved)
       setReady(true)
     })()
     return () => {
@@ -78,18 +126,85 @@ export function useLanguage(platform: Platform): LanguageState {
     }
   }, [platform])
 
-  useEffect(() => {
+  /*
+   * `useLayoutEffect`, nicht `useEffect` — und das ist hier kein Geschmack.
+   *
+   * `document.documentElement.lang` ist die **einzige** Sprachquelle für alles
+   * außerhalb von React: die beiden Schichten, die den Welcome-Screen
+   * imperativ ausbauen, und rund ein Dutzend ausgelagerter Textmodule
+   * (`…CopyFor(document.documentElement.lang)`). Die Schichten hängen an
+   * MutationObservern; deren Rückrufe laufen am Mikrotask-Checkpoint
+   * desselben Tasks, in dem React die DOM-Änderung committet.
+   *
+   * Ein *passiver* Effekt (`useEffect`) läuft erst danach, in einem eigenen
+   * Task. Beim Sprachwechsel remountet `.arrival` (key in OnboardingScreen);
+   * die Schichten bauten es dann mit dem **alten** `lang` aus, markierten es
+   * als erledigt und fassten es nie wieder an — halb übersetzt, dauerhaft.
+   *
+   * Gemessen am 02.09. unter CPU-Drosselung ×20: sechs von acht Wechseln
+   * blieben vollständig in der alten Sprache stehen. Auf schnellen Maschinen
+   * gewann meist der Effekt, deshalb sah es in CI wie Flackern aus.
+   *
+   * Ein Layout-Effekt läuft synchron in derselben Commit-Phase, direkt nach
+   * der DOM-Änderung und vor jedem Mikrotask. Damit ist die Reihenfolge kein
+   * Wettlauf mehr, sondern festgelegt.
+   */
+  useLayoutEffect(() => {
     document.documentElement.lang = language
     document.documentElement.dir = isRightToLeft(language) ? 'rtl' : 'ltr'
   }, [language])
 
+  /*
+   * Der First-Run sitzt innerhalb derselben App, bekommt `dictionary` aber als
+   * Prop. Wenn dort die Sprache gespeichert wurde, teilt dieses Ereignis dem
+   * bereits laufenden Hook die neue Wahrheit mit; dadurch übersetzt sich der
+   * Welcome-Screen sofort, ohne Neuladen und ohne zweiten Sprachzustand.
+   *
+   * „Sofort übersetzt“ galt dabei nur für die React-eigenen Texte: Die
+   * imperativ eingebauten Teile hängen am Remount des `.arrival`-Elements
+   * (key in OnboardingScreen.tsx, gemessen 30.08.) — erst beides zusammen
+   * macht den Satz oben wahr.
+   */
+  useEffect(() => {
+    const onLanguageChange = (event: Event) => {
+      const detail = (event as CustomEvent<string>).detail
+      if (typeof detail !== 'string') return
+      const next = resolveLanguage(detail, [detail])
+      if (next !== detail) return
+      void ensureDictionary(next)
+        .catch(() => undefined)
+        .then(() => {
+          setSaveFailed(false)
+          setLanguage(next)
+        })
+    }
+    window.addEventListener(LANGUAGE_CHANGE_EVENT, onLanguageChange)
+    return () => window.removeEventListener(LANGUAGE_CHANGE_EVENT, onLanguageChange)
+  }, [])
+
+  /*
+   * R3-06: Dieselbe Regel wie bei Ton und Trainingssprache — die Oberfläche
+   * wechselt erst, wenn die Wahl wirklich gespeichert ist. Vorher wechselte
+   * sie optimistisch und verschluckte den Fehler; nach einem Neuladen stand
+   * dann wieder die alte Sprache da, ohne dass es jemand gesagt hätte.
+   */
   const choose = useCallback(
     (next: Language) => {
-      setLanguage(next)
-      void platform.settings.write(SETTING_KEY, next).catch(() => {
-        // Die Wahl gilt für diese Sitzung auch dann, wenn sie sich nicht
-        // speichern lässt. Ein Fehlerdialog hilft hier niemandem.
-      })
+      void persistThenApply(
+        async () => {
+          await platform.settings.write(SETTING_KEY, next)
+          // Gehört zum Wahrheitsvertrag: sichtbar wird erst der vollständig
+          // geladene Zustand, nie ein englischer Zwischenstand unter
+          // fremdem Etikett.
+          await ensureDictionary(next)
+        },
+        () => {
+          setSaveFailed(false)
+          setLanguage(next)
+          announceLanguageChange(next)
+        },
+        () => setSaveFailed(true),
+      )
     },
     [platform],
   )
@@ -100,6 +215,7 @@ export function useLanguage(platform: Platform): LanguageState {
     translated: isTranslated(language),
     ready,
     choose,
+    saveFailed,
   }
 }
 

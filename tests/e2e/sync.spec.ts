@@ -40,6 +40,9 @@ interface DriveStubOptions {
   name?: string
   uploads?: string[]
   folderCreates?: string[]
+  /** Hat Google die Drive-Freigabe mitgegeben? Fehlt der Wert, wie bei einer
+   *  Anmeldung von vor dieser Auskunft, sagt der Worker nichts dazu. */
+  driveGranted?: boolean
 }
 
 async function installGoogleStub(page: Page, options: DriveStubOptions = {}) {
@@ -50,7 +53,10 @@ async function installGoogleStub(page: Page, options: DriveStubOptions = {}) {
   await page.route('**/oauth/google/access-token', (route) =>
     route.fulfill({
       contentType: 'application/json',
-      body: JSON.stringify({ access_token: 'test-token' }),
+      body: JSON.stringify({
+        access_token: 'test-token',
+        ...(options.driveGranted === undefined ? {} : { drive_granted: options.driveGranted }),
+      }),
     }),
   )
   await page.route('**/oauth/google/logout', (route) => route.fulfill({ status: 204, body: '' }))
@@ -268,4 +274,151 @@ test('gleicht unsichtbar ab: nach dem Merken wandert der Graph still in Anitew',
       timeout: 20_000,
     })
     .toBe(true)
+})
+
+/**
+ * Die Anmeldung, die gelingt und trotzdem nicht reicht (Gerätebild 02.09.).
+ *
+ * Googles Zustimmungsbildschirm führt die Drive-Freigabe als **eigenes,
+ * nicht vorausgewähltes Kästchen**. Bleibt es leer, ist die Anmeldung gültig
+ * — nur ohne Drive. Vorher merkte das niemand: Die App schrieb „angemeldet"
+ * und der erste Schreibversuch endete in Googles Kürzel
+ * `drive_403_insufficientPermissions`, unter einem Satz, der von Anmeldung
+ * sprach. Damit hat der Mensch ein Wort in der Hand, das ihm nicht sagt,
+ * dass ein Kästchen leer geblieben ist.
+ */
+test('sagt bei fehlender Drive-Freigabe, welches Kästchen leer blieb', async ({ page }) => {
+  await installGoogleStub(page, { driveGranted: false })
+  await visit(page)
+  await seedClientId(page)
+  await openPage(page, 'Synchronisieren / Abmelden')
+  await page.locator('.sync-run').click()
+
+  const meldung = page.locator('.sync-failure')
+  await expect(meldung).toBeVisible()
+  await expect(meldung).toContainText('Freigabe für Google Drive')
+  await expect(meldung).toContainText('Kästchen')
+  /*
+   * Und **nicht** „die Anmeldung kam nicht zustande": Sie kam zustande. Wer
+   * das liest, tippt noch einmal auf Anmelden, hakt wieder nichts an und
+   * landet beim selben Ergebnis — die App schickte im Kreis.
+   */
+  await expect(meldung).not.toContainText('kam nicht zustande')
+  // Googles Kürzel steht nicht mehr allein da, wo ein Satz hingehört.
+  await expect(meldung).not.toContainText('drive_scope_missing')
+})
+
+/**
+ * Der Satz stimmt — der Knopf hielt sich nicht daran (Gerätebild 09.09.).
+ *
+ * `boxMissing` sagt: „Melde dich noch einmal an und setze dort den Haken."
+ * Genau das ging nicht. Nach der leer gebliebenen Freigabe liegt eine
+ * **gültige** Google-Sitzung im Browser — 180 Tage lang. Der Knopf lief
+ * gegen sie, bekam vom Worker wieder `drive_granted: false` und warf.
+ * `needsInteractiveAuthorization` kannte nur `denied`; die fehlende
+ * Freigabe ist aber `blocked`. Also kein Rücksprung zu Google, sondern
+ * gemessen:
+ *
+ *   Weiterleitungen zu accounts.google.com   0
+ *   Meldung danach   „Anmeldung nicht abgeschlossen … · drive_scope_missing"
+ *
+ * Beides falsch: Die Anmeldung *war* abgeschlossen, und Googles Kürzel
+ * stand wieder da, wo ein Satz hingehört. Wer der Meldung folgte, drehte
+ * sich im Kreis — und auf dem Erstbildschirm gibt es nicht einmal einen
+ * Trennen-Knopf, mit dem man herauskäme.
+ */
+test('führt nach dem leeren Kästchen wirklich zu Google zurück', async ({ page }) => {
+  let zuGoogle = 0
+  await installGoogleStub(page, { driveGranted: false })
+  await page.route('https://accounts.google.com/**', (route) => {
+    zuGoogle += 1
+    return route.fulfill({ contentType: 'text/html', body: '<p>Google</p>' })
+  })
+
+  await visit(page)
+  await seedClientId(page)
+  await openPage(page, 'Synchronisieren / Abmelden')
+  await page.locator('.sync-run').click()
+  await expect(page.locator('.sync-failure')).toContainText('Kästchen')
+
+  // Das zweite Tippen — genau das, was die Meldung verlangt.
+  await page.locator('.sync-run').click()
+  await expect
+    .poll(() => zuGoogle, { message: 'der Knopf springt nicht zu Google zurück', timeout: 15_000 })
+    .toBeGreaterThan(0)
+})
+
+/**
+ * Derselbe Weg auf dem **Erstbildschirm** — dort kam das Gerätebild her.
+ *
+ * Die Karte „Deine Daten. Deine Kontrolle." hatte bis zum 09.09. keine
+ * einzige Prüfung ihrer Statuszeile: nicht für „verbunden", nicht für einen
+ * Fehler, nicht für das leere Kästchen. Und sie ist der einzige Ort, an dem
+ * jemand die Freigabe gibt, bevor die App überhaupt aufgeht — ohne
+ * Trennen-Knopf, also ohne zweiten Ausweg.
+ */
+test('die Erstkarte erklärt das leere Kästchen und führt dann zu Google', async ({ page }) => {
+  let zuGoogle = 0
+  await installGoogleStub(page, { driveGranted: false })
+  await page.route('https://accounts.google.com/**', (route) => {
+    zuGoogle += 1
+    return route.fulfill({ contentType: 'text/html', body: '<p>Google</p>' })
+  })
+
+  // Nicht über `visit`: Der Erstbildschirm ist genau der zu prüfende Ort.
+  await page.goto('/')
+  await page.locator('.arrival').waitFor({ timeout: 30_000 })
+  await seedClientId(page)
+  // Die Rückkehr von Googles Zustimmung, ohne dass dort der Haken gesetzt wurde.
+  await page.goto('/?googleOAuth=complete')
+
+  const status = page.locator('.first-run-drive-status')
+  const knopf = page.locator('.first-run-drive-connect')
+  await expect(status).toContainText('Kästchen', { timeout: 30_000 })
+  // Kein „nicht abgeschlossen": Sie war abgeschlossen, nur ohne Drive.
+  await expect(status).not.toContainText('nicht abgeschlossen')
+  await expect(status).not.toContainText('drive_scope_missing')
+  // Und die Karte behauptet nichts: Ohne Freigabe ist nichts verbunden.
+  await expect(knopf).toBeEnabled()
+
+  await knopf.click()
+  await expect
+    .poll(() => zuGoogle, { message: 'die Erstkarte ist eine Sackgasse', timeout: 15_000 })
+    .toBeGreaterThan(0)
+})
+
+/**
+ * Der abgelehnte Zugriff bekommt seinen eigenen Satz — er stand schon im
+ * Wörterbuch, kam aber nie an.
+ *
+ * `sync.errors.blocked` wurde am 01.09. eingeführt, damit ein 403 nicht mehr
+ * der Anmeldung angelastet wird. Der Bildschirm filterte `blocked` jedoch
+ * heraus (`driveFailure` kannte nur `denied | offline | drive`) und zeigte
+ * weiter den allgemeinen Drive-Satz. Der Text war da und unerreichbar.
+ */
+test('lastet einen abgelehnten Drive-Zugriff nicht der Anmeldung an', async ({ page }) => {
+  await installGoogleStub(page)
+  await page.route('https://www.googleapis.com/drive/v3/files**', (route) =>
+    route.fulfill({
+      status: 403,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        error: {
+          code: 403,
+          message: 'Insufficient Permission',
+          errors: [{ reason: 'insufficientPermissions', message: 'Insufficient Permission' }],
+        },
+      }),
+    }),
+  )
+
+  await visit(page)
+  await seedClientId(page)
+  await openPage(page, 'Synchronisieren / Abmelden')
+  await page.locator('.sync-run').click()
+
+  const meldung = page.locator('.sync-failure')
+  await expect(meldung).toBeVisible()
+  await expect(meldung).toContainText('Die Anmeldung selbst hat geklappt')
+  await expect(meldung).toContainText('insufficientPermissions')
 })

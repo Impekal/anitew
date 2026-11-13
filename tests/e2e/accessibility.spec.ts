@@ -35,6 +35,52 @@ test('führt die Tastatur zum Startknopf und zeigt den Fokus', async ({ page }) 
   expect(outlineWidth, 'kein sichtbarer Fokusring').not.toBe('0px')
 })
 
+test('hält den Fokus im offenen Menü und gibt ihn danach zurück', async ({ page }) => {
+  await visit(page)
+  const menu = page.locator('.hamburger')
+  await expect(menu).toHaveAttribute('aria-haspopup', 'dialog')
+
+  await menu.focus()
+  await page.keyboard.press('Enter')
+
+  const dialog = page.locator('.drawer-veil[role="dialog"]')
+  await expect(dialog).toBeVisible()
+  await expect(dialog).toHaveAttribute('aria-modal', 'true')
+  await expect(page.locator('.drawer-close')).toBeFocused()
+
+  /*
+   * Die eigentliche Zusage ist Verhalten: Bei offenem Modal kann Tab den
+   * Drawer nicht verlassen. Ein früherer Test verlangte zusätzlich `[inert]`
+   * auf dem React-Hintergrund. Das war eine Implementierungsforderung und
+   * machte in Chromium die sichtbaren Drawer-Einträge selbst unanklickbar,
+   * weil Overlay und Hintergrund im selben #root leben.
+   */
+  for (let step = 0; step < 16; step++) {
+    await page.keyboard.press('Tab')
+    expect(
+      await page.evaluate(() => document.querySelector('.drawer')?.contains(document.activeElement) === true),
+      `Tab ${step + 1} hat den Fokus aus dem Drawer verloren`,
+    ).toBe(true)
+  }
+
+  // Pointer und Tastatur müssen gleichzeitig funktionieren — genau diese
+  // Kombination hat der fragile inert-Ansatz zuvor zerstört.
+  const firstItem = page.locator('.drawer-item').first()
+  await expect(firstItem).toBeVisible()
+  await firstItem.click()
+  await expect(page.locator('.page')).toBeVisible()
+
+  // Noch einmal öffnen und Escape als echten Modal-Ausgang prüfen.
+  await page.locator('.page-back').click()
+  await expect(menu).toBeVisible()
+  await menu.focus()
+  await page.keyboard.press('Enter')
+  await expect(dialog).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(dialog).toHaveCount(0)
+  await expect(menu).toBeFocused()
+})
+
 test('benennt jedes Bild oder blendet es aus', async ({ page }) => {
   await visit(page)
   await expect(startButton(page)).toBeVisible()

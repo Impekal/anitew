@@ -6,6 +6,101 @@ const REVOKE_ENDPOINT = 'https://oauth2.googleapis.com/revoke'
 const CREDENTIAL_COOKIE = 'anitew_google_oauth'
 const STATE_COOKIE = 'anitew_google_oauth_state'
 const PUSH_STATE_KEY = 'push-state-v1'
+
+/**
+ * Der Scope, ohne den ANITEW nichts in Google Drive schreiben kann.
+ *
+ * Er steht hier noch einmal wörtlich statt als Import: Der Worker ist
+ * bewusst schlichtes, abhängigkeitsfreies JavaScript. Die App führt dieselbe
+ * Zeichenkette in `src/core/sync/drive.ts`; ein Test hält beide zusammen.
+ */
+const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file'
+
+/**
+ * Hat Google die Drive-Freigabe wirklich mitgegeben?
+ *
+ * Googles Zustimmungsbildschirm zeigt `drive.file` als **eigenes, anfangs
+ * leeres Kästchen**. Bleibt es leer, ist die Anmeldung trotzdem gültig — nur
+ * ohne Drive. Google sagt das im Feld `scope` der Token-Antwort. Ohne diese
+ * Prüfung hielt sich die App für verbunden und erfuhr die Wahrheit erst beim
+ * ersten Schreibversuch, als `drive_403_insufficientPermissions`.
+ *
+ * Verglichen wird auf ganze Einträge, nicht mit `includes`: Ein Scope, der
+ * zufällig auf denselben Text endet, ist ein anderer Scope.
+ */
+function grantsDrive(scope) {
+  if (typeof scope !== 'string') return false
+  return scope.split(/\s+/u).includes(DRIVE_SCOPE)
+}
+
+/**
+ * Absolute Obergrenze einer Google-Sitzung (D-049). PRIVACY verspricht
+ * „läuft nach spätestens 180 Tagen ab“ — deshalb wird der Ablauf beim
+ * ersten Login mit versiegelt und bei jedem Refresh nur **übernommen**,
+ * nie verlängert. Ein rollierendes Fenster wäre eine stille Falschaussage.
+ */
+const SESSION_MAX_AGE_MS = 1000 * 60 * 60 * 24 * 180
+
+/**
+ * Übergangsfrist für Sitzungen aus der Zeit vor D-049 (R3-02, Runde 3).
+ *
+ * Solche Cookies tragen keinen Anmeldezeitpunkt, und er lässt sich auch
+ * nicht rekonstruieren — raten wäre eine erfundene Zahl. Ihnen erneut volle
+ * 180 Tage zu geben, machte PRIVACYs „höchstens 180 Tage ab Anmeldung“ zur
+ * Falschaussage; sie sofort abzumelden, wäre ein grundloser Datenverlust
+ * für bestehende Nutzer. Sie laufen deshalb 30 Tage nach der ersten
+ * Begegnung mit dieser Fassung ab — kürzer als jede Restlaufzeit, die sie
+ * unter der alten Regel noch gehabt hätten, und in PRIVACY §9/§11 als
+ * Übergangsregel benannt.
+ */
+const LEGACY_SESSION_GRACE_MS = 1000 * 60 * 60 * 24 * 30
+
+/**
+ * Die Schreib-Endpunkte unter /push/* sind ohne Konto erreichbar — der
+ * CSRF-Schutz (sameOriginRequest) hält Browser fremder Seiten fern, aber
+ * kein Skript mit frei gesetzten Headern. Damit der Worker nicht als
+ * Relais für beliebige HTTPS-Adressen taugt (F-03, Runde 2), akzeptiert er
+ * nur die echten Web-Push-Dienste der Browser. Wer einen Browser mit
+ * anderem Pushdienst mitbringt, bekommt eine ehrliche Ablehnung statt
+ * einer stillen — die Liste ist bewusst erweiterbar.
+ */
+const PUSH_ENDPOINT_HOSTS = [
+  'fcm.googleapis.com', // Chrome, Chromium-Familie (FCM)
+  'updates.push.services.mozilla.com', // Firefox
+  'web.push.apple.com', // Safari / iOS
+]
+const PUSH_ENDPOINT_SUFFIXES = [
+  '.push.apple.com', // Apples regionale Varianten
+  '.notify.windows.com', // Edge (WNS)
+]
+
+/**
+ * Wie weit ein Termin in der Zukunft liegen darf. Die App plant nie weiter
+ * als bis morgen; 60 Tage sind großzügig für Uhren, die falsch gehen — und
+ * eng genug, dass niemand Jahre im Voraus Speicher belegt.
+ */
+const SCHEDULE_HORIZON_MS = 60 * 86_400_000
+
+/**
+ * Wie lange eine Zustellnotiz auf ihre Abholung warten darf (F-05, Runde 2).
+ * Die Tagesnotiz ist nach einem Tag vom nächsten Termin überholt; die
+ * Messnotiz gehört zu einem 45-Minuten-Fenster. Danach wird gelöscht statt
+ * veraltet zugestellt — und PRIVACY kann eine echte Höchstfrist nennen.
+ */
+const PENDING_TTL_MS = { daily: 24 * 3_600_000, benchmark: 60 * 60_000 }
+const PENDING_MAX = 8
+
+/**
+ * Wie oft eine Zustellung wiederholt wird, bevor sie aufgegeben wird
+ * (R3-01, Runde 3). Vorher warf der Alarm bei jedem Pushdienst-Fehler, und
+ * die Wiederholung lag allein bei Cloudflare: Sind dessen Versuche
+ * erschöpft, hätte niemand mehr aufgeräumt — die zugesagte Höchstfrist der
+ * Zustellnotiz wäre damit nicht mehr garantiert gewesen. ANITEW steuert die
+ * Wiederholungen deshalb selbst, mit wachsendem Abstand (1, 2, 4, 8 min)
+ * statt eines 250-ms-Dauerfeuers auf einen längst überfälligen Termin.
+ */
+const PUSH_MAX_ATTEMPTS = 5
+const PUSH_RETRY_BASE_MS = 60_000
 const encoder = new TextEncoder()
 const decoder = new TextDecoder()
 
@@ -42,7 +137,7 @@ async function credentialKey(secret) {
   return crypto.subtle.importKey('raw', digest, { name: 'AES-GCM' }, false, ['encrypt', 'decrypt'])
 }
 
-async function seal(value, secret) {
+export async function seal(value, secret) {
   const iv = crypto.getRandomValues(new Uint8Array(12))
   const key = await credentialKey(secret)
   const encrypted = new Uint8Array(
@@ -54,7 +149,7 @@ async function seal(value, secret) {
   return base64Url(packed)
 }
 
-async function unseal(value, secret) {
+export async function unseal(value, secret) {
   try {
     const packed = fromBase64Url(value)
     if (packed.length <= 12) return undefined
@@ -154,9 +249,15 @@ async function handleCallback(request, env) {
       accessToken: token.access_token,
       expiresAt: Date.now() + Math.max(60, expiresIn - 60) * 1000,
       refreshToken: typeof token.refresh_token === 'string' ? token.refresh_token : undefined,
+      // Der absolute Sitzungsablauf entsteht genau einmal: beim Login.
+      sessionExpiresAt: Date.now() + SESSION_MAX_AGE_MS,
+      // Und genauso das Ja/Nein zur Drive-Freigabe — direkt aus Googles Antwort.
+      driveGranted: grantsDrive(token.scope),
     }
     const sealed = await seal(credential, env.GOOGLE_CLIENT_SECRET)
-    const maxAge = credential.refreshToken ? 60 * 60 * 24 * 180 : Math.max(60, expiresIn)
+    const maxAge = credential.refreshToken
+      ? Math.floor(SESSION_MAX_AGE_MS / 1000)
+      : Math.max(60, expiresIn)
     return appRedirect('complete', undefined, [credentialCookie(sealed, maxAge)])
   } catch (error) {
     return appRedirect('error', error instanceof Error ? error.message : 'token_exchange_failed')
@@ -191,8 +292,51 @@ async function handleAccessToken(request, env) {
     return json({ error: 'invalid_session' }, 401, clearCredentialCookie())
   }
 
+  /*
+   * Altbestand ohne absoluten Ablauf bekommt die kurze Übergangsfrist, nicht
+   * ein frisches 180-Tage-Fenster (R3-02).
+   */
+  /*
+   * Ein Ja/Nein, nie Googles Scope-Zeile. Der Browser braucht die Auskunft
+   * „Drive ist frei", nicht die Liste, aus der sie stammt (PRIVACY §5:
+   * nach außen nur, was gebraucht wird).
+   *
+   * Sitzungen aus der Zeit vor dieser Prüfung tragen das Feld nicht. Sie
+   * gelten als freigegeben: Sie synchronisieren seit Wochen erfolgreich, und
+   * ihnen jetzt die Freigabe abzusprechen wäre eine erfundene Auskunft — sie
+   * würde funktionierende Abgleiche grundlos anhalten.
+   */
+  const driveGranted = credential.driveGranted !== false
+
+  const legacy = typeof credential.sessionExpiresAt !== 'number'
+  const sessionExpiresAt = legacy
+    ? Date.now() + LEGACY_SESSION_GRACE_MS
+    : credential.sessionExpiresAt
+  if (sessionExpiresAt <= Date.now()) {
+    return json({ error: 'session_expired' }, 401, clearCredentialCookie())
+  }
+
   if (typeof credential.expiresAt === 'number' && credential.expiresAt > Date.now() + 30_000) {
-    return json({ access_token: credential.accessToken })
+    /*
+     * R4-01 (Runde 4): Die Frist muss **hier** festgeschrieben werden, nicht
+     * erst beim nächsten Refresh. Vorher berechnete dieser Pfad zwar die
+     * 30 Tage, gab aber kein neues Cookie zurück — war Googles Access-Token
+     * noch gültig, blieb die Alt-Sitzung ohne Ablauf gespeichert. Wer erst
+     * nach vier Wochen wiederkam, bekam die Frist erst dann versiegelt und
+     * lebte damit deutlich länger als die in PRIVACY §9 zugesagten 30 Tage.
+     */
+    if (!legacy) return json({ access_token: credential.accessToken, drive_granted: driveGranted })
+
+    const sealedNow = await seal(
+      { ...credential, sessionExpiresAt },
+      env.GOOGLE_CLIENT_SECRET,
+    )
+    const remainingNow = Math.max(60, Math.floor((sessionExpiresAt - Date.now()) / 1000))
+    return json(
+      { access_token: credential.accessToken, drive_granted: driveGranted },
+      200,
+      credentialCookie(sealedNow, remainingNow),
+    )
   }
 
   if (typeof credential.refreshToken !== 'string' || credential.refreshToken === '') {
@@ -207,12 +351,23 @@ async function handleAccessToken(request, env) {
     accessToken: refreshed.access_token,
     expiresAt: Date.now() + Math.max(60, expiresIn - 60) * 1000,
     refreshToken: credential.refreshToken,
+    sessionExpiresAt,
+    /*
+     * Google schickt `scope` beim Erneuern nicht immer mit. Fehlt es, bleibt
+     * die bisherige Auskunft stehen — sie neu zu erfinden hieße, entweder
+     * einem Verbundenen grundlos den Abgleich zu nehmen oder eine Freigabe
+     * zu behaupten, die niemand erteilt hat.
+     */
+    driveGranted:
+      typeof refreshed.scope === 'string' ? grantsDrive(refreshed.scope) : driveGranted,
   }
   const nextSealed = await seal(next, env.GOOGLE_CLIENT_SECRET)
+  // Das Cookie lebt nur noch die **Rest**laufzeit — kein rollierendes Fenster.
+  const remaining = Math.max(60, Math.floor((sessionExpiresAt - Date.now()) / 1000))
   return json(
-    { access_token: next.accessToken },
+    { access_token: next.accessToken, drive_granted: next.driveGranted },
     200,
-    credentialCookie(nextSealed, 60 * 60 * 24 * 180),
+    credentialCookie(nextSealed, remaining),
   )
 }
 
@@ -239,10 +394,18 @@ function pushConfigured(env) {
   return Boolean(env.VAPID_PUBLIC_KEY && env.VAPID_PRIVATE_KEY && env.VAPID_SUBJECT)
 }
 
+function allowedPushHost(hostname) {
+  return (
+    PUSH_ENDPOINT_HOSTS.includes(hostname) ||
+    PUSH_ENDPOINT_SUFFIXES.some((suffix) => hostname.endsWith(suffix))
+  )
+}
+
 function validEndpoint(value) {
   if (typeof value !== 'string' || value.length < 12 || value.length > 4096) return false
   try {
-    return new URL(value).protocol === 'https:'
+    const url = new URL(value)
+    return url.protocol === 'https:' && allowedPushHost(url.hostname)
   } catch {
     return false
   }
@@ -251,6 +414,7 @@ function validEndpoint(value) {
 function validReminder(value) {
   if (!value || (value.id !== 'daily' && value.id !== 'benchmark')) return false
   if (!Number.isFinite(value.at) || value.at <= 0) return false
+  if (value.at > Date.now() + SCHEDULE_HORIZON_MS) return false
   if (typeof value.title !== 'string' || value.title.length < 1 || value.title.length > 100) return false
   if (typeof value.body !== 'string' || value.body.length > 300) return false
   if (value.recurrence === undefined) return value.id !== 'daily'
@@ -263,6 +427,32 @@ function validReminder(value) {
   } catch {
     return false
   }
+}
+
+/**
+ * Reduziert eine Erinnerung auf genau die Felder, die PRIVACY §7 nennt
+ * (R3-07, Runde 3).
+ *
+ * `validReminder` prüft die bekannten Felder — es warf bisher aber nichts
+ * weg: Was ein Aufrufer sonst noch mitschickte, landete unverändert im
+ * Durable Object. Damit war „speichert serverseitig nur …" eine Zusage, die
+ * von der Höflichkeit des Aufrufers abhing. Gefunden von einem
+ * Verhaltenstest, der den Satz aus der Datenschutzerklärung nachstellt.
+ */
+function normalizeReminder(reminder) {
+  const normalized = {
+    id: reminder.id,
+    at: reminder.at,
+    title: reminder.title,
+    body: reminder.body,
+  }
+  if (reminder.recurrence !== undefined) {
+    normalized.recurrence = {
+      localTime: reminder.recurrence.localTime,
+      timeZone: reminder.recurrence.timeZone,
+    }
+  }
+  return normalized
 }
 
 async function pushStub(env, endpoint) {
@@ -383,6 +573,34 @@ function localToInstant(wanted, timeZone) {
   return sameLocalMinute(zonedParts(guess, timeZone), wanted) ? guess : undefined
 }
 
+/**
+ * Sommerzeit-Lücke (F-11, Runde 2): Springt die Uhr über die gewünschte
+ * Minute hinweg (z. B. 02:30 am Umstellungssonntag), gibt es diese lokale
+ * Zeit an dem Tag nicht. Die Erinnerung fällt dann **nicht** aus, sondern
+ * kommt zur ersten existierenden Minute nach der Lücke — Lücken sind bis
+ * zu einer Stunde groß (selten 30 Minuten), drei Stunden Suchraum reichen.
+ */
+function firstInstantAfterGap(wanted, timeZone) {
+  const base = Date.UTC(wanted.year, wanted.month - 1, wanted.day, wanted.hour, wanted.minute)
+  // Minutenweise (R3-05): In Fünf-Minuten-Schritten lieferte etwa 02:31 nicht
+  // die erste existierende Minute nach der Lücke, sondern erst 03:00.
+  for (let addMinutes = 1; addMinutes <= 180; addMinutes += 1) {
+    const shifted = new Date(base + addMinutes * 60_000)
+    const candidate = localToInstant(
+      {
+        year: shifted.getUTCFullYear(),
+        month: shifted.getUTCMonth() + 1,
+        day: shifted.getUTCDate(),
+        hour: shifted.getUTCHours(),
+        minute: shifted.getUTCMinutes(),
+      },
+      timeZone,
+    )
+    if (candidate !== undefined) return candidate
+  }
+  return undefined
+}
+
 function nextLocalOccurrence(localTime, timeZone, after) {
   const [hour, minute] = localTime.split(':').map(Number)
   const here = zonedParts(after, timeZone)
@@ -396,14 +614,26 @@ function nextLocalOccurrence(localTime, timeZone, after) {
       hour,
       minute,
     }
-    const candidate = localToInstant(wanted, timeZone)
+    const candidate = localToInstant(wanted, timeZone) ?? firstInstantAfterGap(wanted, timeZone)
     if (candidate !== undefined && candidate > after) return candidate
   }
   throw new Error('next_local_occurrence_missing')
 }
 
 function emptyPushState(endpoint = '') {
-  return { endpoint, reminders: {}, pending: [] }
+  return { endpoint, reminders: {}, pending: [], attempts: {} }
+}
+
+/**
+ * Wirft abgelaufene Zustellnotizen weg (F-05, Runde 2). Notizen ohne
+ * Ablaufdatum stammen aus einer älteren Fassung und gelten als abgelaufen —
+ * lieber eine alte Notiz zu wenig als eine veraltete „Messung wartet“
+ * lange nach ihrem Fenster.
+ */
+function prunePending(value, now) {
+  value.pending = value.pending.filter(
+    (notice) => typeof notice.expiresAt === 'number' && notice.expiresAt > now,
+  )
 }
 
 export class PushReminder {
@@ -420,13 +650,77 @@ export class PushReminder {
     await this.state.storage.put(PUSH_STATE_KEY, value)
   }
 
+  /**
+   * Der nächste Alarm zeigt auf den **frühesten** Zeitpunkt, an dem etwas zu
+   * tun ist: den nächsten Termin ODER den nächsten Notiz-Ablauf (R3-01).
+   *
+   * Vorher gewann der Termin, sobald es einen gab (`next?.at ?? …`) — eine
+   * Messnotiz mit 60-Minuten-Frist konnte damit neben einer erst am Abend
+   * fälligen Tageserinnerung stundenlang liegen bleiben. Die Frist in
+   * PRIVACY war dann eine Zusage, die der Code nicht hielt.
+   */
   async rearm(value) {
-    const next = Object.values(value.reminders).sort((a, b) => a.at - b.at)[0]
-    if (next === undefined) {
+    const times = [
+      ...Object.values(value.reminders).map((reminder) => reminder.at),
+      ...value.pending.map((notice) => notice.expiresAt),
+    ].filter((at) => typeof at === 'number' && Number.isFinite(at))
+
+    if (times.length === 0) {
+      // Nichts geplant, nichts wartend: Der Eintrag verschwindet vollständig.
       await this.state.storage.deleteAlarm()
+      await this.state.storage.deleteAll()
       return
     }
-    await this.state.storage.setAlarm(Math.max(Date.now() + 250, next.at))
+    await this.state.storage.setAlarm(Math.max(Date.now() + 250, Math.min(...times)))
+  }
+
+  /**
+   * Ein Pushdienst antwortet nicht (5xx, Netzfehler). Der Termin bleibt
+   * erhalten, der nächste Versuch bekommt wachsenden Abstand — und der
+   * Aufräumzeitpunkt der wartenden Notiz wird dabei nie überschritten.
+   * Nach `PUSH_MAX_ATTEMPTS` wird diese eine Zustellung aufgegeben: Die
+   * Tageserinnerung rollt weiter, eine einmalige verschwindet. Aufgeräumt
+   * wird in jedem Fall.
+   */
+  /**
+   * Diese eine Zustellung ist erledigt — zugestellt, aufgegeben oder ihr
+   * Fenster ist vorbei. Die Tageserinnerung rollt auf ihren nächsten
+   * Termin, eine einmalige verschwindet.
+   */
+  async retireDelivery(value, due, now) {
+    const attempts = { ...(value.attempts ?? {}) }
+    delete attempts[due.id]
+    value.attempts = attempts
+    if (due.id === 'daily' && due.recurrence) {
+      due.at = nextLocalOccurrence(due.recurrence.localTime, due.recurrence.timeZone, now + 1_000)
+      value.reminders.daily = due
+    } else {
+      delete value.reminders[due.id]
+    }
+    await this.save(value)
+    await this.rearm(value)
+  }
+
+  async retryLater(value, due, now) {
+    const attempts = { ...(value.attempts ?? {}) }
+    const count = (attempts[due.id] ?? 0) + 1
+
+    if (count >= PUSH_MAX_ATTEMPTS) {
+      await this.retireDelivery(value, due, now)
+      return
+    }
+
+    attempts[due.id] = count
+    value.attempts = attempts
+    await this.save(value)
+
+    const backoff = now + PUSH_RETRY_BASE_MS * 2 ** (count - 1)
+    const expiries = value.pending
+      .map((notice) => notice.expiresAt)
+      .filter((at) => typeof at === 'number' && Number.isFinite(at))
+    // Der Aufräumtermin der Notiz ist eine Obergrenze, keine Verhandlungsmasse.
+    const at = expiries.length === 0 ? backoff : Math.min(backoff, Math.min(...expiries))
+    await this.state.storage.setAlarm(Math.max(now + 1_000, at))
   }
 
   async fetch(request) {
@@ -439,7 +733,8 @@ export class PushReminder {
 
     if (url.pathname === '/schedule') {
       if (!validReminder(body.reminder)) return json({ error: 'invalid_reminder' }, 400)
-      value.reminders[body.reminder.id] = body.reminder
+      // Nur die in PRIVACY §7 genannten Felder werden gespeichert (R3-07).
+      value.reminders[body.reminder.id] = normalizeReminder(body.reminder)
       await this.save(value)
       await this.rearm(value)
       return json({ ok: true })
@@ -463,8 +758,12 @@ export class PushReminder {
     }
 
     if (url.pathname === '/pending') {
+      // Veraltetes wird gelöscht statt zugestellt (F-05, Runde 2).
+      prunePending(value, Date.now())
       const pending = value.pending.shift()
       await this.save(value)
+      // rearm räumt einen leeren Zustand vollständig weg (R3-01).
+      await this.rearm(value)
       return pending === undefined ? json({ error: 'nothing_pending' }, 404) : json(pending)
     }
 
@@ -485,41 +784,78 @@ export class PushReminder {
     }
 
     const now = Date.now()
+    prunePending(value, now)
     const due = Object.values(value.reminders)
       .filter((reminder) => reminder.at <= now + 1_000)
       .sort((a, b) => a.at - b.at)[0]
     if (due === undefined) {
+      // Abgelaufene Notizen sind oben schon weg; rearm löscht einen leeren
+      // Eintrag vollständig und setzt sonst den nächsten Zeitpunkt (R3-01).
+      await this.save(value)
       await this.rearm(value)
       return
     }
 
+    /*
+     * R4-02 (Runde 4): Die Frist hängt an der **ursprünglichen Fälligkeit**,
+     * nicht am Zeitpunkt dieses Alarms.
+     *
+     * Vorher wurde `now + TTL` gerechnet. Lief ein Wiederholungsalarm stark
+     * verspätet, war die alte Notiz oben schon weggeräumt — und dieselbe
+     * Zustellung entstand mit einer **frischen** Stunde neu. Aus der
+     * zugesagten Höchstfrist wurde damit eine Frist je Versuch. Da
+     * `deliveryId` ohnehin aus `due.at` gebildet wird, ist derselbe Anker
+     * schon da; er bleibt über alle Wiederholungen hinweg gleich.
+     */
     const deliveryId = `${due.id}:${due.at}`
+    const expiresAt = due.at + (PENDING_TTL_MS[due.id] ?? 3_600_000)
+
+    if (expiresAt <= now) {
+      /*
+       * Das Fenster dieser Zustellung ist vorbei. Verspätet zuzustellen wäre
+       * genau das, was PRIVACY §7 ausschließt — also wird nicht gepusht,
+       * keine Notiz neu angelegt und die Zustellung zurückgezogen.
+       */
+      await this.retireDelivery(value, due, now)
+      return
+    }
+
     if (!value.pending.some((notice) => notice.deliveryId === deliveryId)) {
       value.pending.push({
         deliveryId,
         title: due.title,
         body: due.body,
         tag: `anitew-${due.id}`,
+        expiresAt,
       })
+      // Eine harte Obergrenze gegen unbegrenztes Wachstum: Älteste zuerst raus.
+      while (value.pending.length > PENDING_MAX) value.pending.shift()
       await this.save(value)
     }
 
-    const response = await sendEmptyPush(value.endpoint, this.env)
-    if (response.status === 404 || response.status === 410) {
+    /*
+     * Ein Netzfehler ist derselbe Fall wie eine 5xx-Antwort: Der Termin
+     * bleibt, der nächste Versuch bekommt Abstand (R3-01).
+     */
+    let response
+    try {
+      response = await sendEmptyPush(value.endpoint, this.env)
+    } catch {
+      response = undefined
+    }
+
+    if (response !== undefined && (response.status === 404 || response.status === 410)) {
       await this.state.storage.deleteAlarm()
       await this.state.storage.deleteAll()
       return
     }
-    if (!response.ok) throw new Error(`push_http_${response.status}`)
-
-    if (due.id === 'daily' && due.recurrence) {
-      due.at = nextLocalOccurrence(due.recurrence.localTime, due.recurrence.timeZone, now + 1_000)
-      value.reminders.daily = due
-    } else {
-      delete value.reminders[due.id]
+    if (response === undefined || !response.ok) {
+      await this.retryLater(value, due, now)
+      return
     }
-    await this.save(value)
-    await this.rearm(value)
+
+    // Zugestellt: Zähler zurück auf null, Zustellung zurückziehen.
+    await this.retireDelivery(value, due, now)
   }
 }
 

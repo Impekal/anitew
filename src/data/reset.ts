@@ -2,7 +2,7 @@
  * Alles löschen (Backlog N4).
  *
  * Das Gegenstück zur Sicherung — und der praktische Vollzug des Rechts auf
- * Löschung aus der Datenschutzerklärung (§7). Wer geht, soll gehen können,
+ * Löschung aus der Datenschutzerklärung (§8, „Löschen und Übertragbarkeit“). Wer geht, soll gehen können,
  * und zwar restlos: keine verwaisten Reste, keine Zeile, die den nächsten
  * Nutzer desselben Geräts überrascht.
  *

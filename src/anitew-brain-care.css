@@ -1,0 +1,11 @@
+/* Der Weg ins fordernde Training (Gerätewunsch 31.08.). Er steht oben auf
+   der Seite, vor den Tipps: Wer den Bereich öffnet, um etwas zu tun, soll
+   nicht erst durch sechs Erklärungen scrollen. */
+.brain-care-demanding {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.4rem;
+  padding-bottom: 1.2rem;
+  border-bottom: 1px solid var(--line);
+}

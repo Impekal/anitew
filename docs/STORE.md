@@ -83,7 +83,7 @@ und wird rot, wenn ein gesperrter Ausdruck darin auftaucht.
 >
 > **Ohne alles**
 >
-> Ohne Konto, ohne Server, ohne Werbung, ohne Tracker. Alles bleibt auf
+> Ohne Konto, ohne Werbung, ohne Tracker. Alles bleibt auf
 > deinem Gerät; die Sicherung ist eine Datei, die dir gehört. Läuft offline.
 > Der Kern ist und bleibt kostenlos.
 
@@ -146,7 +146,7 @@ und wird rot, wenn ein gesperrter Ausdruck darin auftaucht.
 >
 > **Without all of it**
 >
-> No account, no server, no ads, no trackers. Everything stays on your
+> No account, no ads, no trackers. Everything stays on your
 > device; the backup is a file that belongs to you. Works offline. The core
 > is free and stays free.
 
@@ -169,7 +169,7 @@ seine Zeile hier ändern können — geht das nicht, ist der Satz nicht belegt.
 | „mit dir selbst, nie mit anderen“ | F3 |
 | „macht nicht klüger“ | `science.brainTraining` (nicht belegt) |
 | „im Alltag hat es niemand gemessen“ | `science.everyday` (nicht gemessen) · F4, R-2 |
-| „ohne Konto, ohne Server, offline“ | N1, A-Reihe — Eigenschaft der App |
+| „ohne Konto, offline“ | N1, A-Reihe — Eigenschaft der App |
 | „Kern bleibt kostenlos“ | D-002 |
 
 ## Sperrliste (R5)

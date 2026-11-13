@@ -69,11 +69,14 @@ body::before {
   background-size: 37px 37px, 61px 61px;
   opacity: .65;
   pointer-events: none;
-  /* Drift über die Rasterposition, nicht per Rotation: Eine rotierende
-     Layout-Box ragt diagonal über den Rahmen und schiebt die Seite
-     seitlich — die Layout-Matrix hat es gefangen. Die Rasterweiten (37/61)
-     machen die Schleife nahtlos. */
-  animation: dot-drift var(--motion-drift) linear infinite;
+  /* Die Scheibe steht still (Gerätemeldung 01.09.).
+
+     Hier wanderte die Rasterposition. `background-position` ist eine
+     Zeichen-Eigenschaft: Der Browser malt die Fläche in jedem Bild neu, und
+     das dauerhaft, auf jedem Bildschirm — und weil die Scheibe hinter dem
+     Startknopf liegt, rechnete sie dessen Weichzeichner gleich mit neu.
+     Eine Drift, die so langsam ist, dass sie kaum auffällt, ist diesen
+     Preis nicht wert. Das Punktraster bleibt. */
 }
 
 .brand {
@@ -256,7 +259,7 @@ body::before {
   color: var(--an-muted);
   box-shadow: 0 10px 35px rgba(0,0,0,.12);
 }
-.note h3 { color: var(--an-text); font-family: var(--serif); }
+.note h2 { color: var(--an-text); font-family: var(--serif); }
 .note-actions .quiet, .quiet {
   border-color: var(--an-line-strong);
   color: var(--an-muted);
@@ -277,11 +280,9 @@ body::before {
 .footer .language,
 .footer .sound-toggle { opacity: .72; }
 
-/* The technical stack is still available, but no longer dominates the daily experience. */
-.footer .benchmark-panel,
-.footer .science-panel,
-.footer .backup-panel,
-.footer .sync-panel { opacity: .72; }
+/* Hier stand eine Regel fuer vier Fusszeilen-Kacheln — `benchmark-panel`,
+   `science-panel`, `backup-panel`, `sync-panel`. Keine dieser Klassen kommt
+   in der App noch vor; die Bereiche sind laengst in den Core gewandert. */
 
 .drawer-veil { background: rgba(2,6,5,.76) !important; backdrop-filter: blur(18px); }
 .drawer {
@@ -315,11 +316,6 @@ body::before {
   0%, 100% { transform: scale(.82); opacity: .24; }
   50% { transform: scale(1.08); opacity: .65; }
 }
-@keyframes dot-drift {
-  from { background-position: 0 0, 0 0; }
-  to { background-position: 37px 74px, -61px 61px; }
-}
-
 @media (max-width: 560px) {
   .app { width: min(100% - 22px, 760px); padding-top: 18px; }
   .challenge { padding: 24px 16px 18px; border-radius: 22px; }
@@ -345,18 +341,45 @@ body::before {
   --motion-quick: 460ms;
   --motion-breathe: 6s;
   --motion-drift: 60s;
-  --paper: #0a100e;
-  --paper-glow: #101815;
-  --card: #121b18;
-  --line: #24322c;
-  --ink: #f0eee4;
-  --ink-soft: #b4bfb4;
-  --ink-faint: #8a978c;
-  --accent: #d8a85a;
-  --accent-soft: #33291a;
-  --accent-ink: #14100a;
-  --calm: #8ccfc0;
-  --bad: #e0715f;
+  /*
+   * Diese zwölf Werte sind **dieselben** wie in
+   * `anitew-experience-refinement.css` unter `html[data-anitew-theme='dark']`.
+   * Das ist keine Doppelung aus Bequemlichkeit, sondern eine bewusst
+   * gleichgehaltene Kopie — und sie muss gleich bleiben.
+   *
+   * Vorher liefen hier zwei dunkle Paletten nebeneinander: diese beim
+   * Kaltstart, jene 750 ms später, wenn `experienceRefinement.ts` sein
+   * Stilblatt nachlädt und das Themen-Attribut setzt. Zwölf Token wichen ab,
+   * und bei zweien war der Sprung sichtbar — `--ink-soft` von grüngrau
+   * (#b4bfb4) nach warmgrau (#b8b1a3), `--calm` von #8ccfc0 nach #8fbab0.
+   * Die Farben der App sprangen also dreiviertel Sekunden nach dem Start um.
+   *
+   * Es gewinnen die späten Werte, weil der Nutzer sie fast die ganze Zeit
+   * sieht; die ersten 750 ms folgen jetzt dem Rest statt umgekehrt.
+   *
+   * Eine Ausnahme: `--ink-faint` war in **beiden** Paletten #827b70 und ergab
+   * auf `--card` nur **4,27:1** — unter den 4,5:1, die diese Datei zwei Absätze
+   * weiter oben zusichert. Der Wert ist deshalb sechs Stufen heller
+   * (#888176): für das Auge derselbe Ton, gemessen **4,64:1 auf `--card`**
+   * und **5,01:1 auf `--paper`**.
+   *
+   * Gemessen (dunkel, gegen `--paper` / `--card`):
+   *   --ink        16,63:1 / 15,42:1      --accent   9,53:1 / 8,83:1
+   *   --ink-soft    9,06:1 /  8,40:1      --calm     9,02:1 / 8,37:1
+   *   --ink-faint   5,01:1 /  4,64:1      --bad      7,39:1 / 6,85:1
+   */
+  --paper: #0b0f0d;
+  --paper-glow: #14201b;
+  --card: #111915;
+  --line: #25352e;
+  --ink: #f1eee5;
+  --ink-soft: #b8b1a3;
+  --ink-faint: #888176;
+  --accent: #e5ab6b;
+  --accent-soft: #392b1c;
+  --accent-ink: #181008;
+  --calm: #8fbab0;
+  --bad: #e0897c;
   --shadow: 0 1px 2px rgb(0 0 0 / 30%), 0 8px 24px -12px rgb(0 0 0 / 55%);
   --shadow-lift: 0 2px 4px rgb(0 0 0 / 35%), 0 18px 40px -18px rgb(0 0 0 / 65%);
 }
@@ -394,10 +417,15 @@ body::before {
   stroke-width: .7;
   filter: drop-shadow(0 0 3px var(--an-cyan));
 }
+/* Unten **mittig**, nicht in der Ecke (Nutzerfrage 08.09.: „Wo genau soll
+   17/20 stehen?"). Am Telefon liegt auf dem Band eine Kreismaske; die untere
+   rechte Ecke lag gemessen bei 133 % des Radius, und ab 92 % lässt die Maske
+   nichts mehr durch. Der Zähler war ausgeliefert und unsichtbar. */
 .constellation-window {
   position: absolute;
-  right: .75rem;
-  bottom: .55rem;
+  left: 50%;
+  translate: -50% 0;
+  bottom: 9%;
   color: var(--an-dim);
   font: .65rem var(--mono);
   letter-spacing: .08em;
@@ -415,10 +443,14 @@ body::before {
 .memory-detail dt { color: var(--an-dim); font: .7rem var(--mono); text-transform: uppercase; }
 .memory-detail dd { margin: 0; color: var(--an-muted); }
 
+/* Das Seitenverhältnis kommt aus der Zeichenfläche und wird vom Bauteil
+   gesetzt — nicht hier geraten. Genau dieses Raten war der Fehler vom
+   08.09.: Die Stilvorlage sagte 16:7, gezeichnet wurden 100 × 44, und der
+   sichtbare Ausschnitt war ein Kreis. Drei Formen, keine passte zur
+   anderen. */
 .constellation svg {
   display: block;
   width: 100%;
-  aspect-ratio: 16 / 10;
 }
 
 .constellation-edge {
@@ -434,21 +466,79 @@ body::before {
   animation: connection-draw 1.2s var(--ease) forwards;
 }
 
+/* Drehpunkt siehe `.constellation-node` weiter unten — er gilt für jeden
+   Punkt und stand hier doppelt. Vier tote Angaben, die nichts bewirkt haben:
+   Sie setzten genau die Werte, die ohnehin schon anlagen. */
 .constellation-memory-new .constellation-node {
-  transform-box: fill-box;
-  transform-origin: center;
   animation: memory-born 1.1s var(--ease) both;
 }
 .constellation-memory-recalled .constellation-node {
-  transform-box: fill-box;
-  transform-origin: center;
   animation: recall-signal 1.8s var(--ease) both;
 }
 
+/*
+   Die Punkte atmen an ihrem Platz und treiben leicht — statt auf ihrem Radius
+   nach außen und zurück zu fahren (Nutzerwunsch 02.09.: „die bewegenden Punkte
+   gehen nur in eine Richtung und zurück. Kann das eleganter sein?").
+
+   Die Ursache war ein fehlender Drehpunkt: Ohne `transform-box: fill-box`
+   skaliert ein SVG-Element um den Ursprung der **Zeichenfläche**, nicht um
+   sich selbst. Ein `scale(1.25)` verschob deshalb jeden Punkt vom Mittelpunkt
+   weg und wieder hin — alle gleichzeitig, alle auf einer Geraden. Das sah
+   nicht nach einem Netz aus, sondern nach einem Kolben.
+
+   Mit eigenem Drehpunkt wird aus derselben einen Bewegung ein Atmen an Ort
+   und Stelle, und die kleine geschlossene Schleife darüber macht daraus ein
+   Treiben. Den Gleichschritt bricht der gestaffelte Beginn, den die Komponente
+   ohnehin je Punkt setzt — dafür braucht es keine zweite Regel. **Es bleibt bei einer Bewegung je Punkt**, weiterhin nur
+   `transform` — kein Neuzeichnen, keine zusätzliche Last (D-038, PR #107).
+*/
 .constellation-node {
   fill: var(--an-text);
-  animation: node-glimmer calc(var(--motion-breathe) * 0.85) ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
 }
+
+/* Nur die schmückende Konstellation treibt. Auf der Gedächtnis-Seite ist jeder
+   Punkt ein Knopf, und ein Knopf, der wandert, ist für eine unruhige Hand
+   schwerer zu treffen — bei dieser Zielgruppe kein Detail. Nebenbei laufen auf
+   der Seite dadurch weniger Bewegungen, nicht mehr.
+
+   Die Bewegung sitzt an der **Gruppe**, nicht am Punkt (Nutzerbefund 07.09.:
+   „sollten sich konstant bewegen wie in einem Billard oder bei den Galaxys").
+   Vorher trieb nur der Kreis, und zwar um ±1,6 Einheiten — der Name stand
+   still daneben. Damit sah die Konstellation aus, als bewege sich nichts.
+   An der Gruppe wandern Punkt und Name zusammen.
+
+   **Es ist dieselbe Anzahl Animationen wie vorher, nämlich eine je Punkt.**
+   Das ist hier keine Nebensache: Auf der Startseite laufen 23 Dauerbewegungen
+   und die Schranke steht bei 24 (`performance.spec.ts`, Gerätemeldung 01.09.
+   „Le téléphone chauffe toujours"). Eine zweite Animation je Punkt wären
+   fünfunddreißig gewesen. Bewegt wird ausschließlich `transform` — das
+   schiebt die Grafikkarte, ohne neu zu zeichnen. */
+.constellation:not(.constellation-tappable) .constellation-layer {
+  animation: node-drift var(--drift) ease-in-out infinite;
+}
+
+/* Die Reise des ganzen Feldes (Nutzerwunsch 08.09.: „mehr aleatoire Bewegung
+   in unterschiedlichen Richtungen … was oben versteckt ist kann bald unten
+   sichtbar sein").
+
+   Dieselbe Bahn wie die Ebenen, nur **viel langsamer** — eine eigene Kurve
+   hätte 60 Byte gekostet, und das Kaltstart-Budget ist auf drei Byte genau
+   ausgereizt. Ein Bewegungsvokabular in zwei Zeitmaßstäben liest sich
+   ohnehin ruhiger als zwei verschiedene.
+
+   Sie liegt auf **einer** Gruppe, kostet also genau eine Dauerbewegung — und
+   weil sich alle Punkte gemeinsam bewegen, ändert sie keinen einzigen
+   Abstand: Was nicht überlappt, überlappt auch unterwegs nicht. Zusammen mit
+   den sechs Ebenen darunter, die je eigene Dauer und eigenen Vorlauf haben,
+   mischt sich die Nachbarschaft ständig neu. */
+.constellation:not(.constellation-tappable) .constellation-reise {
+  animation: node-drift 97s ease-in-out infinite;
+}
+}
+
 
 .constellation-node-anchor {
   fill: var(--an-gold);
@@ -495,9 +585,41 @@ body::before {
   50% { opacity: 0.5; }
 }
 
-@keyframes node-glimmer {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.25); }
+/*
+   Eine geschlossene Schleife: Der Punkt kommt dort an, wo er losgelaufen ist.
+   Die Wege sind winzig — 0,6 Nutzereinheiten sind auf dem Telefon gut zwei
+   Pixel. Mehr wäre Zappeln; das hier ist das Flimmern eines Sternenfelds.
+*/
+/* Die Auslenkung rechnet in Zeicheneinheiten, nicht in Bildschirmpixeln.
+   Das Band ist 100 Einheiten breit und wird am Telefon 388 Pixel breit
+   gezeichnet — Maßstab 3,88. Die alten 0,5 Einheiten waren damit 1,9 Pixel
+   und blieben unter der Wahrnehmungsschwelle: „die Punkte bewegen sich nicht
+   mehr" (gemeldet 02.09.). 1,6 Einheiten sind rund 6 Pixel — sichtbar, ohne
+   dass ein Punkt seinen Platz verlässt. Es bleibt dieselbe eine Animation je
+   Punkt, nur mit größeren Zahlen: kein Deut mehr Rechenarbeit. */
+/* Ein Weg, kein Puls (Nutzerbefund 07.09.).
+
+   Die Amplitude ist nicht frei gewählt: Die Anordnung rechnet mit genau drei
+   Einheiten Drift je Punkt und hält jeden Kasten um so viel größer frei
+   (`DRIFT` in `MemoryConstellation.tsx`). Wer sie hier erhöht, muss sie dort
+   erhöhen — sonst berühren sich zwei Namen wieder.
+
+   Vier Stützstellen mit ungleichen Abständen und ungleichen Richtungen: Eine
+   Bahn, die auf halber Strecke umkehrt, sieht nach Pendel aus. Diese hier
+   kommt an keiner Stelle zweimal vorbei und wirkt deshalb wie Trift, nicht
+   wie Takt.
+
+   **Nur Verschiebung, keine Skalierung.** Zwei Gründe, und beide zählen: An
+   der Gruppe hängt jetzt auch der Name, und ein Name, der atmet, liest sich
+   unruhig. Und eine Verschiebung braucht keinen Drehpunkt — damit entfallen
+   `transform-box` und `transform-origin` an dieser Regel, und das ist der
+   Unterschied zwischen 12,0 KB Kaltstart-CSS und darüber. */
+@keyframes node-drift {
+  0%, 100% { transform: translate(0, 0); }
+  27% { transform: translate(2.6px, -1.9px); }
+  53% { transform: translate(-2.2px, 1.4px); }
+  74% { transform: translate(1.1px, 2.4px); }
+  89% { transform: translate(-1.4px, -1.1px); }
 }
 
 @keyframes memory-born {
@@ -713,7 +835,11 @@ body::before {
   letter-spacing: .24em;
 }
 .today .constellation { border: 0; border-radius: 50% 50% 18px 18px; background: radial-gradient(circle, rgba(140,207,192,.1), transparent 64%); }
-.today .constellation svg { aspect-ratio: 16 / 7; }
+/* Kein Seitenverhältnis mehr für das Band: Das Bauteil setzt es aus der
+   Zeichenfläche (100 × 75 — die Form des sichtbaren Kreises), und eine
+   Regel, die eine eigene Angabe am Element nie schlagen kann, ist tote
+   Fracht. Vorher stand hier 16:7 — ein flacher Streifen in einem runden
+   Ausschnitt, dessen Enden niemand je sah. */
 .today-mission { display: flex; justify-content: space-between; gap: 1rem; align-items: baseline; margin: 1rem 0 .65rem; }
 .today-mission-label { margin: 0; color: var(--an-text); font: clamp(1.45rem, 5vw, 2.2rem) var(--serif); }
 .today-duration { margin: 0; color: var(--an-dim); font: .68rem var(--mono); text-align: right; }
@@ -781,7 +907,10 @@ body::before {
 .memory-pulse-mark::after,
 .memory-pulse-mark span { content: ''; position: absolute; inset: 50% auto auto 50%; border-radius: 50%; transform: translate(-50%, -50%); }
 .memory-pulse-mark::before { width: .45rem; height: .45rem; background: var(--an-gold); box-shadow: 0 0 14px rgba(216,168,90,.4); }
-.memory-pulse-mark::after { width: 1.5rem; height: 1.5rem; border: 1px solid rgba(140,207,192,.35); animation: pulse-orbit var(--motion-breathe) ease-in-out infinite; }
+/* Ohne Dauerpuls (Gerätemeldung 01.09.): Der Ring sitzt in einer Karte mit
+   `backdrop-filter`. Jede Bewegung darin lässt den Weichzeichner in jedem
+   Bild neu rechnen — für einen Ring, der still genauso aussieht. */
+.memory-pulse-mark::after { width: 1.5rem; height: 1.5rem; border: 1px solid rgba(140,207,192,.35); }
 .memory-pulse-label { margin: 0 0 .25rem; color: var(--an-cyan); font: .65rem var(--mono); letter-spacing: .18em; }
 .memory-pulse-line { margin: .15rem 0; color: var(--an-text); font: 1rem var(--serif); }
 

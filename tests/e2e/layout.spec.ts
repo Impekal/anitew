@@ -24,11 +24,15 @@ import { startButton, visit } from './helpers.ts'
  * Der klassische Layoutfehler: Etwas ragt seitlich hinaus, und die ganze
  * Seite lässt sich hin- und herschieben. Ein Pixel Toleranz gegen Rundung.
  */
-async function noHorizontalOverflow(page: Page) {
-  const overflow = await page.evaluate(() => {
+async function horizontalOverflow(page: Page): Promise<number> {
+  return page.evaluate(() => {
     const root = document.documentElement
     return root.scrollWidth - root.clientWidth
   })
+}
+
+async function noHorizontalOverflow(page: Page) {
+  const overflow = await horizontalOverflow(page)
   expect(overflow, 'die Seite lässt sich seitlich schieben').toBeLessThanOrEqual(1)
 }
 
@@ -60,6 +64,22 @@ test('der Startbildschirm passt, ohne seitlich zu schieben', async ({ page }) =>
   }
 })
 
+
+/*
+ * Klicken ohne Koordinaten. Ein force-Klick feuert auf die **zuletzt
+ * bekannte** Stelle — orbitiert der Menüknoten gerade weiter, geht er
+ * daneben (in #94 dokumentiert, auf android-tablet in Lauf 33385906424
+ * wieder getroffen). Auf Positionsruhe warten geht auch nicht: Die
+ * Dauerdeko (living-orbit u. a.) ruht nie, ein Ruhe-Warte-Helfer hat hier
+ * gemessen an jeder Klickstelle sein volles Frame-Budget verbrannt und den
+ * Test auf desktop-wide in den 30s-Timeout getrieben. Deshalb löst dieser
+ * Helfer den echten Click-Handler direkt am Element aus. Dieser Test prüft
+ * Seitenbreite, nicht Trefferflächen — dafür gibt es tapTargets.spec.
+ */
+async function clickDirect(target: Locator): Promise<void> {
+  await target.evaluate((el) => (el as HTMLElement).click())
+}
+
 test('hält die Breite auf jeder Menüseite — und in der Schublade', async ({ page }) => {
   await visit(page)
   await expect(startButton(page)).toBeVisible()
@@ -87,21 +107,22 @@ test('hält die Breite auf jeder Menüseite — und in der Schublade', async ({ 
    * Der Drawer darf beim Öffnen/Zurückkehren animieren. Auf sehr breiten CI-
    * Viewports kann Playwright einen normalen `.click()` deshalb minutenlang
    * auf „stable“ warten, obwohl die Seite bereits korrekt im Viewport liegt.
-   * Für diesen Layout-Test löst `force` denselben echten Click-Handler aus,
-   * ohne die Animationsstabilität zu einer zweiten, fachfremden Assertion zu
-   * machen. Falls Core nach einer Unterseite bereits geschlossen ist, öffnen
-   * wir es für die nächste Breitenmessung ausdrücklich wieder.
+   * Für diesen Layout-Test löst `clickDirect` denselben echten Click-Handler
+   * aus, ohne die Animationsstabilität zu einer zweiten, fachfremden
+   * Assertion zu machen. Falls Core nach einer Unterseite bereits
+   * geschlossen ist, öffnen wir es für die nächste Breitenmessung
+   * ausdrücklich wieder.
    */
   for (const label of labels) {
     if (!(await drawer.isVisible())) {
-      await hamburger.click({ force: true })
+      await clickDirect(hamburger)
       await expect(drawer).toBeVisible()
       await noHorizontalOverflow(page)
     }
 
     const item = page.getByRole('button', { name: label, exact: true })
     await expect(item).toBeVisible()
-    await item.click({ force: true })
+    await clickDirect(item)
     await page.locator('.page').waitFor()
     await noHorizontalOverflow(page)
 
@@ -112,8 +133,35 @@ test('hält die Breite auf jeder Menüseite — und in der Schublade', async ({ 
     await page.locator('.page-back').click()
     await expect(page.locator('.page')).toBeHidden()
 
-    if (!(await drawer.isVisible())) {
-      await hamburger.click({ force: true })
+    /*
+     * Zurück führt in den Core, und die Schublade öffnet animiert.
+     *
+     * Hier stand eine einzelne Momentaufnahme: „ist die Schublade sichtbar?
+     * Wenn nein, Hamburger antippen." Genau dieses Fenster wird getroffen —
+     * steht die Schublade noch nicht, tippt der Test den Hamburger an und
+     * **schließt damit die Schublade, die gerade aufgeht.** Die Zeile danach
+     * wartet dann dreißig Sekunden auf etwas, das der Test selbst zugemacht
+     * hat. Zweimal auf `desktop-wide` erlebt (Läufe 1458 und 1465, an zwei
+     * verschiedenen Zeilen dieser Schleife).
+     *
+     * **Nachgewiesen ist der Zusammenhang nicht.** Lokal ist der Fehlschlag in
+     * neun Wiederholungen nie aufgetreten, auch nicht in einem A/B-Versuch
+     * zwischen alter und neuer Fassung bei sechsfach gedrosselter CPU (je drei
+     * Läufe, alle grün). Was hier steht, ist eine Härtung mit plausibler
+     * Begründung, kein bewiesener Fix: Sie nimmt eine Möglichkeit weg und
+     * kostet nichts. Fällt der Test wieder um, ist diese Erklärung falsch.
+     *
+     * Gewartet wird deshalb auf den Zustand, der nach dem Zurück **gilt**.
+     * Der Hamburger bleibt als Rückfall, falls der Core einmal nicht von
+     * selbst aufgeht — dann soll dieser Test weiterlaufen und nicht die
+     * Breitenprüfung an einer fremden Frage scheitern.
+     */
+    const coreOeffnetVonSelbst = await drawer
+      .waitFor({ state: 'visible', timeout: 4_000 })
+      .then(() => true)
+      .catch(() => false)
+    if (!coreOeffnetVonSelbst) {
+      await clickDirect(hamburger)
     }
     await expect(drawer).toBeVisible()
     await noHorizontalOverflow(page)
@@ -184,4 +232,183 @@ test('zentriert den Inhalt auf breiten Schirmen, statt ihn zu strecken', async (
   // Und sie steht mittig: links und rechts etwa gleich viel Luft.
   const rightGap = size.width - (box.x + box.width)
   expect(Math.abs(box.x - rightGap), 'die Spalte steht nicht mittig').toBeLessThan(4)
+})
+
+test('Fließtext bekommt echte Zeilenbreite — kein senkrechtes Wort-für-Wort', async ({ page }) => {
+  /*
+   * Der Memory Pulse lief auf einem echten iPhone senkrecht: ein Wort je
+   * Zeile in einer 40 px schmalen Spalte. Ursache war ein zweispaltiges
+   * Raster aus einem Stylesheet, dessen Marke ein späteres Stylesheet
+   * absolut positionierte — der Text rutschte in die leere erste Spalte.
+   *
+   * Kein Test hat das gesehen: Schmaler Text erzeugt keinen horizontalen
+   * Überlauf, und Sichtbarkeit war gegeben. Diese Prüfung schließt die
+   * Lücke — und zwar allgemein: **Jeder** Fließtextblock muss den Platz
+   * bekommen, den sein Kasten hergibt.
+   */
+  await visit(page)
+  await expect(startButton(page)).toBeVisible()
+
+  const squeezed = await page.evaluate(() => {
+    const problems: string[] = []
+    const blocks = document.querySelectorAll<HTMLElement>(
+      '.memory-pulse-line, .today-line, .greeting, .focus, .note p',
+    )
+    for (const block of blocks) {
+      const box = block.getBoundingClientRect()
+      if (box.width === 0 || box.height === 0) continue
+      const text = (block.textContent ?? '').trim()
+      // Erst ab einem echten Satz ist die Frage sinnvoll.
+      if (text.length < 25) continue
+      /*
+       * Die Signatur des Fehlers, gerätunabhängig: Ein Satz steht in einer
+       * Spalte, die **schmaler als jede lesbare Zeile** ist, und läuft
+       * deshalb nach unten statt nach rechts. Der Memory Pulse maß
+       * 40 × 252 px — Wort für Wort untereinander.
+       *
+       * Der erste Anlauf verglich zusätzlich mit der Elternbreite („nutzt
+       * mindestens 60 %"). Das war zu grob und meldete auf breiten Schirmen
+       * gesunde Zeilen: Eine Tageszeile, die ihre Inhaltsbreite nimmt, ist
+       * 299 von 544 px breit und völlig in Ordnung. Ein Fehlalarm, der zum
+       * Ignorieren erzieht, ist schlimmer als kein Test — deshalb prüft die
+       * Regel jetzt genau das, was den Fehler ausmacht, und nichts sonst.
+       */
+      if (box.width < 160 && box.height > box.width) {
+        problems.push(`${block.className}: ${Math.round(box.width)}×${Math.round(box.height)} px (senkrecht)`)
+      }
+    }
+    return problems
+  })
+
+  expect(squeezed, 'eingeklemmter Fließtext').toEqual([])
+})
+
+test('kein Seitwärts-Schieben, wenn man sich Zeit lässt', async ({ page }) => {
+  /*
+   * Diese Lücke war der Grund für den Fund im Gesamt-Audit.
+   *
+   * `visit()` ist auf Tempo gebaut: Es klickt den Ankunftsbildschirm weg,
+   * sobald er da ist, und überspringt die Einführung. Genau dieser Weg ist
+   * der einzige, auf dem die Seite **nicht** seitlich schiebt. Gemessen auf
+   * einem iPhone 14 Pro, jeweils nach demselben Startbildschirm:
+   *
+   * - sofort weiterklicken (der bisherige Gate-Weg): 2 px
+   * - vier Sekunden auf dem Ankunftsbildschirm bleiben: **30 px**
+   * - die Einführung durchklicken statt überspringen: **25 px**
+   *
+   * Der Grund ist keine Animation, sondern der Aufbau: Die lebende Schicht
+   * setzt ihre Zierverläufe erst, wenn der Startbildschirm fertig steht
+   * (`.today::before`, `.challenge::before` mit `inset: 8% -10% 24%`). Die
+   * treten absichtlich über ihre Box hinaus — nur darf daraus keine
+   * schiebbare Seite werden.
+   *
+   * Der Test nimmt sich deshalb bewusst die Zeit, die ein Mensch sich nimmt.
+   */
+  await page.goto('/')
+  await page.locator('.arrival, .challenge').first().waitFor()
+
+  if ((await page.locator('.arrival').count()) > 0) {
+    // So lange, wie jemand braucht, um den Ankunftsbildschirm zu lesen.
+    await page.waitForTimeout(3_000)
+    await page.locator('.arrival .quiet').click()
+    await page.locator('.challenge').waitFor()
+  }
+
+  const skip = page.locator('.first-run-guide-skip')
+  if ((await skip.count()) > 0) {
+    await skip.click()
+    await expect(page.locator('.first-run-guide')).toBeHidden()
+  }
+
+  /*
+   * Nicht einmal messen, sondern über das Ankommen hinweg — und den
+   * schlimmsten Moment nehmen. Die lebende Schicht setzt ihre Verläufe in
+   * Stufen; ein einzelner Blick trifft leicht die Lücke dazwischen und meldet
+   * grün, während die Seite eine halbe Sekunde später schiebt.
+   */
+  let worst = 0
+  for (let step = 0; step < 8; step++) {
+    await page.waitForTimeout(500)
+    worst = Math.max(worst, await horizontalOverflow(page))
+    // Ganz nach unten: Die Zierverläufe von `.today` und `.challenge` liegen
+    // im unteren Teil des Startbildschirms.
+    await page.mouse.wheel(0, 600)
+  }
+
+  expect(worst, 'die Seite lässt sich seitlich schieben').toBeLessThanOrEqual(1)
+})
+
+test('der Schließen-Knopf lässt beim Scrollen nichts durch sich hindurchlaufen', async ({ page }) => {
+  /*
+   * Vom Gerät gemeldet: „«Dein Stand» bleibt genau auf «Menü schließen»."
+   *
+   * Der Knopf klebte mit `position: sticky` oben in der scrollenden Schublade,
+   * und weil sein Grund durchsichtig ist, lief jeder Eintrag durch das ✕
+   * hindurch — bei Scrollstand 80 „Dein Stand", bei 200 „Memory DNA", bei 400
+   * „Der Gedächtnispalast".
+   *
+   * Zwei Anläufe waren falsch. **Mehr Abstand** verschiebt nur, welcher
+   * Eintrag wann darunterläuft. Ein **deckender Streifen** dahinter löste es,
+   * veränderte aber das Aussehen des Knopfs. Jetzt scrollen die Einträge in
+   * einem eigenen Kasten und der Knopf steht darüber: Der Inhalt wird an der
+   * Oberkante des Kastens abgeschnitten und betritt die Knopffläche nie.
+   *
+   * Geprüft wird über **Punkte**, nicht über Kästen. Ein Eintrag, der im
+   * Kasten nach oben weggescrollt ist, hat weiterhin ein Rechteck, das über
+   * dem Knopf liegt — sichtbar ist er deshalb nicht. Ein erster Anlauf dieses
+   * Tests hat genau das verwechselt und Alarm geschlagen, wo nichts war.
+   */
+  await visit(page)
+  await expect(startButton(page)).toBeVisible()
+
+  await page.locator('button.hamburger').click()
+  const drawer = page.locator('.drawer')
+  await expect(drawer).toBeVisible()
+
+  for (const top of [0, 80, 200, 400, 700]) {
+    /*
+     * Gescrollt wird, was scrollt — nicht der Kasten, den die Korrektur
+     * eingeführt hat.
+     *
+     * Der erste Anlauf setzte `scrollTop` nur auf `.drawer-scroll`. Damit war
+     * der Test wertlos: Nimmt man die Korrektur heraus, scrollt wieder die
+     * Schublade selbst, der Kasten bleibt bei null — und der Test meldet
+     * fröhlich Ruhe. Aufgefallen ist das erst in der Gegenprobe, die genau
+     * dafür da ist.
+     */
+    await page.evaluate((value) => {
+      for (const node of document.querySelectorAll<HTMLElement>('.drawer, .drawer-scroll')) {
+        node.scrollTop = value
+      }
+    }, top)
+
+    const durchgelaufen = await page.evaluate(() => {
+      const close = document.querySelector<HTMLElement>('.drawer-close')
+      if (close === null) return 'kein Schließen-Knopf'
+
+      /*
+       * Geprüft wird der Knopf **und sein Schild**.
+       *
+       * Gemeldet wurde „«Menü schließen» steht auf «Dein Stand»" — und
+       * „Menü schließen" ist nicht das ✕, sondern die Beschriftung darunter
+       * (`.drawer-close-label`, absolut positioniert unter dem Knopf). Ein
+       * erster Anlauf dieses Tests hat nur die Fläche des ✕ abgetastet und
+       * damit genau die Stelle verfehlt, um die es ging.
+       */
+      const flaechen = [close, close.querySelector<HTMLElement>('.drawer-close-label')]
+      for (const node of flaechen) {
+        if (node === null) continue
+        const box = node.getBoundingClientRect()
+        if (box.width === 0 || box.height === 0) continue
+        for (const share of [0.15, 0.5, 0.85]) {
+          const at = document.elementFromPoint(box.left + box.width * share, box.top + box.height / 2)
+          const text = at?.closest('.drawer-item, .menu-label')
+          if (text !== null && text !== undefined) return (text.textContent ?? '').trim()
+        }
+      }
+      return null
+    })
+
+    expect(durchgelaufen, `bei Scrollstand ${top} läuft Text durch den Knopf`).toBeNull()
+  }
 })

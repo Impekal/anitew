@@ -11,7 +11,12 @@ import { defineConfig } from 'vitest/config'
  */
 export default defineConfig({
   test: {
-    include: ['tests/core/**/*.test.ts'],
+    /*
+      tests/worker/ prüft den Cloudflare-Worker (OAuth + Web Push) als reine
+      fetch-Handler mit gestubbtem env — dieselbe Node-Umgebung genügt, denn
+      der Worker benutzt nur Web-Standards (crypto.subtle, Response, Intl).
+    */
+    include: ['tests/core/**/*.test.ts', 'tests/worker/**/*.test.ts'],
     environment: 'node',
   },
 })

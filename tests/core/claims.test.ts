@@ -4,6 +4,8 @@ import { fileURLToPath } from 'node:url'
 
 import { describe, expect, it } from 'vitest'
 
+import { NAVIGATION_DENYLIST } from '../../scripts/navigation-denylist.ts'
+
 /**
  * Die Sperrliste als Test (Backlog F7, R-2, R5).
  *
@@ -35,6 +37,13 @@ const SURFACES = [
   'docs/STORE.md',
   'src/i18n/de.ts',
   'src/i18n/en.ts',
+  /*
+   * Die Tipps von „Geistig aktiv bleiben" liegen in einer eigenen Datei,
+   * damit sie nicht im Kaltstart haengen (P4). Sie stehen trotzdem in der
+   * App — also gilt die Sperrliste dort genauso. Ohne diese Zeile waere das
+   * Auslagern ein Weg an der Regel vorbei.
+   */
+  'src/i18n/brainCareCopy.ts',
 ]
 
 /**
@@ -170,12 +179,41 @@ describe('die Datenschutzerklärung (R4)', () => {
      * Empfänger und der Zusage, dass nichts davon Voreinstellung ist.
      */
     expect(privacy).toMatch(/Drive-Abgleich/)
-    // Alle wählbaren Coach-Anbieter (D-034) müssen benannt sein — wer
-    // einen ergänzt, ergänzt ihn auch hier.
-    for (const provider of ['Gemini', 'Anthropic', 'Groq', 'OpenRouter', 'Mistral']) {
-      expect(privacy, `ohne ${provider}`).toContain(provider)
+    /*
+     * Alle wählbaren Coach-Anbieter müssen benannt sein — abgelesen aus dem
+     * Code statt hier abgeschrieben: Als OpenAI dazukam, hat eine
+     * hartkodierte Fünferliste den sechsten Anbieter monatelang übersehen.
+     */
+    const coachSource = textOf('src/platform/web/coach.ts')
+    const providersBlock = /COACH_PROVIDERS = \[([^\]]*)\]/u.exec(coachSource)?.[1] ?? ''
+    const providerIds = [...providersBlock.matchAll(/'([a-z]+)'/gu)].map((match) => match[1])
+    expect(providerIds.length).toBeGreaterThanOrEqual(6)
+    const providerNames: Record<string, string> = {
+      gemini: 'Gemini',
+      anthropic: 'Anthropic',
+      openai: 'OpenAI',
+      groq: 'Groq',
+      openrouter: 'OpenRouter',
+      mistral: 'Mistral',
     }
+    for (const id of providerIds) {
+      const name = providerNames[id as string]
+      expect(name, `unbekannter Anbieter ${id} — Namenszuordnung ergänzen`).toBeDefined()
+      expect(privacy, `ohne ${name}`).toContain(name as string)
+    }
+    // Die Fotoanalyse nennt ihre drei Empfänger ausdrücklich.
+    expect(privacy).toMatch(/Fotoanalyse[^.]*Gemini, Anthropic oder OpenAI/u)
     expect(privacy).toMatch(/aus,\s*bis du sie anfasst/)
+    /*
+     * Web Push ist die dritte Übertragung: Die Erklärung muss die
+     * Push-Adresse, den Speicherort (Durable Object) und die konkrete
+     * Cookie-Laufzeit der Google-Sitzung nennen — der Worker existiert,
+     * also darf kein Text mehr „keinen Server“ behaupten.
+     */
+    expect(privacy).toContain('Push-Adresse')
+    expect(privacy).toContain('Durable Object')
+    expect(privacy).toContain('180 Tage')
+    expect(privacy).not.toMatch(/keinen Server/u)
   })
 
   it('hält auch hier die Sperrliste ein (R5)', () => {
@@ -186,6 +224,28 @@ describe('die Datenschutzerklärung (R4)', () => {
     for (const pattern of FORBIDDEN) {
       expect(pattern.test(privacy), `PRIVACY.md enthält ${pattern}`).toBe(false)
     }
+  })
+})
+
+describe('die Store-Texte bleiben ehrlich', () => {
+  it('behauptet keinen serverlosen Betrieb mehr', () => {
+    const store = textOf('docs/STORE.md')
+    expect(store).not.toMatch(/ohne Server/u)
+    expect(store).not.toMatch(/no server/u)
+  })
+})
+
+describe('die Splash-Signatur', () => {
+  it('bleibt bewusst englisch — nur im Splash, nie im Wörterbuch', () => {
+    /*
+     * „MEMORIZE · RECALL · RETAIN · MASTER“ ist Marke, keine Kopie: Sie
+     * steht fest englisch in index.html und darf von keinem
+     * Übersetzungsdurchgang „vervollständigt“ werden.
+     */
+    const signature = 'MEMORIZE · RECALL · RETAIN · MASTER'
+    expect(textOf('index.html')).toContain(signature)
+    expect(textOf('src/i18n/de.ts')).not.toContain(signature)
+    expect(textOf('src/i18n/en.ts')).not.toContain(signature)
   })
 })
 
@@ -211,9 +271,198 @@ describe('die Installationsanleitung (Q5)', () => {
   it('verspricht durch die Installation nichts, was sie nicht tut', () => {
     const install = textOf('docs/INSTALL.md')
     expect(install).toMatch(/Sie legt kein Konto an/)
-    expect(install).toMatch(/Es gibt keinen Server/)
+    // Seit dem OAuth-/Push-Worker wäre „Es gibt keinen Server“ eine
+    // Falschaussage. Die ehrliche Fassung ist jetzt festgeschrieben.
+    expect(install).toMatch(/keine Trainingsdaten/)
+    expect(install).toMatch(/ohne Nutzerdatenbank/)
+    expect(install).not.toMatch(/Es gibt keinen Server/)
     for (const pattern of FORBIDDEN) {
       expect(pattern.test(install), `INSTALL.md enthält ${pattern}`).toBe(false)
     }
+  })
+})
+
+describe('Datenschutz-Aussagen sind an den Code gebunden (Runde 2, ergänzt in Runde 3)', () => {
+  /*
+   * Diese Wächter prüfen, dass Text und Code nicht auseinanderlaufen — mehr
+   * können sie nicht. Dass die Zusagen tatsächlich **eingehalten** werden,
+   * beweisen die Verhaltenstests in `tests/worker/privacyGuarantees.test.ts`
+   * (R3-07, Runde 3): Sie spielen die Sätze aus §7 und §9 als echte Abläufe
+   * durch. Genau diese Arbeitsteilung hat Runde 3 nötig gemacht — ein
+   * Treffer auf `PENDING_TTL_MS` bewies eben nicht, dass die Frist hält.
+   */
+  const privacy = textOf('docs/PRIVACY.md')
+  const worker = textOf('worker/index.js')
+
+  it('Sicherung ohne Schlüssel: Versprechen und Filter existieren beide', async () => {
+    const { portableSetting } = await import('../../src/core/backup.ts')
+    // Der Filter im Code …
+    expect(portableSetting('coach.key')).toBe(false)
+    expect(portableSetting('coach.key.gemini')).toBe(false)
+    expect(portableSetting('coach.key.openai')).toBe(false)
+    expect(portableSetting('sync.account')).toBe(false)
+    expect(portableSetting('sync.accountName')).toBe(false)
+    expect(portableSetting('language')).toBe(true)
+    expect(portableSetting('memory.graph')).toBe(true)
+    // … und das Versprechen im Text.
+    expect(privacy).toMatch(/Nicht in der Sicherung enthalten/u)
+    expect(privacy).toMatch(/KI-API-Schlüssel/u)
+  })
+
+  it('180-Tage-Sitzung: absolute Grenze im Worker, ehrlicher Satz im Text', () => {
+    // Der Worker versiegelt einen absoluten Ablauf und verlängert ihn nie.
+    expect(worker).toMatch(/SESSION_MAX_AGE_MS = 1000 \* 60 \* 60 \* 24 \* 180/u)
+    expect(worker).toMatch(/sessionExpiresAt/u)
+    // Und PRIVACY behauptet keine rollierende Laufzeit mehr.
+    expect(privacy).toMatch(/wird\s+durch Nutzung \*\*nicht\*\* verlängert/u)
+    expect(privacy).toMatch(/180 Tage/u)
+  })
+
+  it('Zustellnotizen: Ablauffristen im Worker decken die Fristen im Text', () => {
+    expect(worker).toMatch(/PENDING_TTL_MS = \{ daily: 24 \* 3_600_000, benchmark: 60 \* 60_000 \}/u)
+    expect(privacy).toMatch(/längstens (aber )?24 Stunden/u)
+    expect(privacy).toMatch(/60 Minuten/u)
+  })
+
+  it('Push-Relais: Der Worker nimmt nur echte Pushdienste als Ziel an', () => {
+    expect(worker).toMatch(/fcm\.googleapis\.com/u)
+    expect(worker).toMatch(/updates\.push\.services\.mozilla\.com/u)
+    expect(worker).toMatch(/web\.push\.apple\.com/u)
+    expect(worker).toMatch(/\.notify\.windows\.com/u)
+    expect(worker).toMatch(/allowedPushHost/u)
+  })
+})
+
+describe('die eigenen Seiten neben der App (Runde 3)', () => {
+  /*
+   * Impressum und Datenschutz sind echte Dateien, keine App-Ansichten. In
+   * der installierten PWA beantwortete der Navigations-Fallback sie mit der
+   * gecachten index.html — ein Tipp darauf sah aus, als starte ANITEW neu
+   * (auf echtem iPhone gefunden). Der Wächter bindet die Ausnahme an die
+   * Adressen, die der Fuß und das Installations-Gate wirklich verlinken.
+   */
+  /*
+   * Hier stand ein Wächter, der den **Text** der Sperrliste aus
+   * `vite.config.ts` gelesen und auf `impressum\.html` geprüft hat. Er war
+   * grün — und der Weg war trotzdem kaputt. Ein Test, der eine Schreibweise
+   * abschreibt statt eine Wirkung zu prüfen, schreibt den Fehler fest,
+   * statt ihn zu finden: Cloudflare leitet `/impressum.html` auf
+   * `/impressum` um, und genau diese Form fehlte.
+   *
+   * Deshalb wird jetzt die Liste selbst benutzt und gefragt, ob sie die
+   * Adressen trifft, die tatsächlich vorkommen. Die Herleitung steht in
+   * `scripts/navigation-denylist.ts`, die Fälle in
+   * `tests/core/navigationDenylist.test.ts`.
+   */
+  const trifft = (pfad: string): boolean =>
+    NAVIGATION_DENYLIST.some((muster) => muster.test(pfad))
+
+  it('nimmt Impressum und Datenschutz vom PWA-Navigations-Fallback aus', () => {
+    expect(trifft('/impressum.html')).toBe(true)
+    expect(trifft('/datenschutz.html')).toBe(true)
+    // Die Worker-Endpunkte bleiben ebenfalls ausgenommen.
+    expect(trifft('/oauth/google/start')).toBe(true)
+    expect(trifft('/push/subscribe')).toBe(true)
+  })
+
+  it('verlinkt genau die Adressen, die auch ausgenommen sind', () => {
+    for (const source of ['src/main.tsx', 'src/app/install/InstallGate.tsx']) {
+      const text = textOf(source)
+      for (const href of text.matchAll(/href="(\/[a-z]+)\.html"/gu)) {
+        const ohneEndung = href[1] as string
+        expect(
+          trifft(`${ohneEndung}.html`),
+          `${source} verlinkt ${ohneEndung}.html, aber der Fallback fängt es ab`,
+        ).toBe(true)
+        /*
+         * Und die Form, auf die Cloudflare umleitet. Ohne sie liefert der
+         * Service Worker nach der Umleitung die App-Shell — der Nutzer landet
+         * auf dem Startbildschirm, ohne Text. Genau das war die Meldung.
+         */
+        expect(
+          trifft(ohneEndung),
+          `${source} verlinkt ${ohneEndung}.html; die Umleitung auf ${ohneEndung} wird abgefangen`,
+        ).toBe(true)
+      }
+    }
+  })
+
+  it('erzeugt beide Seiten aus den Dokumenten, mit Weg zurück in die App', () => {
+    const generator = textOf('scripts/privacy-page.mjs')
+    expect(generator).toMatch(/IMPRESSUM/u)
+    expect(generator).toMatch(/PRIVACY/u)
+
+    const build = JSON.parse(textOf('package.json')).scripts.build as string
+    expect(
+      build.indexOf('privacy-page.mjs') < build.indexOf('vite build'),
+      'privacy-page.mjs muss vor `vite build` laufen, sonst fehlt der Precache',
+    ).toBe(true)
+
+    /*
+     * Und das Ziel muss `public/` sein, nicht `dist/`: Aus `dist/` geschrieben
+     * kämen die Seiten nach dem Precache und wären offline nicht da — die
+     * Zusage in `vite.config.ts` war genau deshalb einmal unwahr.
+     */
+    expect(generator).toMatch(/`public\//u)
+    expect(generator).not.toMatch(/writeFileSync\(\s*`?dist\//u)
+  })
+
+  /**
+   * Der Erzeuger wird **ausgeführt**, nicht gelesen.
+   *
+   * Zwei Anläufe davor lagen daneben, beide auf dieselbe Art zu bequem:
+   *
+   * 1. Der ursprüngliche Test suchte `public/datenschutz.html` als Literal im
+   *    Skript. Das prüfte die Schreibweise, nicht die Wirkung — und schlug
+   *    fehl, sobald der Pfad für sechs Sprachen zusammengesetzt wurde.
+   * 2. Mein erster Ersatz las die **erzeugte** Datei aus `public/`. Lokal lag
+   *    sie da, in der CI nicht: Die Unit-Tests laufen vor dem Bau, und die
+   *    Seiten stehen in `.gitignore`. Grün auf dem Rechner, rot in der
+   *    Auslieferung — genau die Falle, an der dieses Haus schon einmal hing.
+   *
+   * Der Ausweg ist keiner von beiden: Die Funktionen des Erzeugers werden
+   * aufgerufen und ihr Ergebnis geprüft. Das hängt weder an einer Reihenfolge
+   * noch an einer Datei, die es im Arbeitsverzeichnis geben mag oder nicht.
+   */
+  it('macht aus beiden Dokumenten eine Seite mit Weg zurück in die App', async () => {
+    const modul = await import('../../scripts/privacy-page.mjs')
+
+    for (const [quelle, art] of [
+      ['docs/PRIVACY.md', 'privacy'],
+      ['docs/IMPRESSUM.md', 'imprint'],
+    ] as const) {
+      const html = modul.page(modul.render(textOf(quelle)), 'ANITEW', 'de', art)
+      expect(html, `${quelle} ergibt kein Dokument`).toMatch(/^<!doctype html>/u)
+      // Ohne Rücklink stünde man in der installierten App in einer Sackgasse.
+      expect(html, `${quelle} ohne Weg zurück in die App`).toMatch(/<a href="\/">ANITEW<\/a>/u)
+      // Und der Text selbst muss ankommen, nicht nur das Gerüst.
+      expect(html).toMatch(/<h1>/u)
+    }
+  })
+})
+
+describe('jede Datenschutz-Zusage hat einen Verhaltenstest (R3-07)', () => {
+  /*
+   * Der Wächter über den Wächtern: Er hält fest, dass die Fristen aus
+   * PRIVACY nicht nur im Text und im Quelltext stehen, sondern in
+   * `tests/worker/privacyGuarantees.test.ts` als Ablauf durchgespielt
+   * werden. Verschwindet dort ein Fall, fällt es hier auf.
+   */
+  const behaviour = textOf('tests/worker/privacyGuarantees.test.ts')
+
+  it('prüft die Höchstfrist der Zustellnotiz am laufenden Durable Object', () => {
+    expect(behaviour).toMatch(/60 Minuten/u)
+    expect(behaviour).toMatch(/neben einer späteren Tageserinnerung/u)
+    expect(behaviour).toMatch(/bei dauerhaft gestörtem Pushdienst/u)
+  })
+
+  it('prüft beide Sitzungsfristen am echten Endpunkt', () => {
+    expect(behaviour).toMatch(/180 Tage/u)
+    expect(behaviour).toMatch(/30 Tagen/u)
+    expect(behaviour).toMatch(/session_expired/u)
+  })
+
+  it('prüft, dass nur die genannten Felder gespeichert werden', () => {
+    expect(behaviour).toMatch(/nur Adresse, Zeit, Zone und den generischen Text/u)
   })
 })

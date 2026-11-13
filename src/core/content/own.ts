@@ -31,6 +31,19 @@ export const MAX_SIDE_LENGTH = 120
 export interface OwnFact {
   readonly prompt: string
   readonly answer: string
+  /**
+   * Wann zuletzt bewusst berichtigt — nur gesetzt, wenn jemand die Karte
+   * geändert hat (Nutzerwunsch 02.09.).
+   *
+   * Der Geräteabgleich braucht das: Die Frage ist der Schlüssel, also treffen
+   * beim Abgleich zwei Karten mit derselben Frage und womöglich verschiedenen
+   * Antworten aufeinander. Ohne Marke gewönne stur die lokale — die
+   * Berichtigung käme nie beim zweiten Gerät an. Dieselbe Auflösung wie bei
+   * der Deadline im Memory-Graph (`neededByUpdatedAt`): die jüngste bewusste
+   * Änderung gewinnt. Fehlt sie auf beiden Seiten (alle Karten von vor dem
+   * 02.09.), bleibt es beim Alten.
+   */
+  readonly editedAt?: number
 }
 
 /** Beide Seiten in eine Kennung — der Vorratseintrag des Moduls `facts`. */
@@ -107,4 +120,43 @@ export function parseOwnText(text: string): ParsedOwnText {
   }
 
   return { facts, rejected }
+}
+
+/**
+ * Berichtigt ein eigenes Paar in der Liste (Nutzerwunsch 02.09.).
+ *
+ * „Man kann den Begriff löschen — aber vielleicht hat man ihn auch nur falsch
+ * geschrieben und möchte das korrigieren."
+ *
+ * Gibt die neue Liste zurück, oder `undefined`, wenn nichts zu tun ist oder
+ * die Änderung nicht trägt. Drei Fälle sagen ausdrücklich Nein:
+ *
+ * - **Leeres.** Eine Karte ohne Frage oder ohne Antwort ist keine Karte.
+ * - **Eine fremde Frage.** Die Frage ist der Schlüssel (`addOwnFacts`); eine
+ *   Karte auf den Namen einer anderen umzuschreiben hieße, zwei zu einer zu
+ *   verschmelzen — und eine davon samt ihrem Wiederholungsverlauf zu
+ *   verlieren. Zusammenlegen ist etwas anderes als berichtigen.
+ * - **Eine Frage, die es nicht gibt.**
+ *
+ * Der Platz in der Liste bleibt. Der Umzug des Termins von der alten auf die
+ * neue Kennung steht in `data/own.ts` — dort liegt die Datenbank.
+ */
+export function editOwnFactList(
+  facts: readonly OwnFact[],
+  oldPrompt: string,
+  next: OwnFact,
+  now: number,
+): readonly OwnFact[] | undefined {
+  const prompt = next.prompt.trim()
+  const answer = next.answer.trim()
+  if (prompt === '' || answer === '') return undefined
+
+  const at = facts.findIndex((fact) => fact.prompt === oldPrompt)
+  if (at === -1) return undefined
+  if (prompt !== oldPrompt && facts.some((fact) => fact.prompt === prompt)) return undefined
+
+  const kopie = [...facts]
+  // `editedAt` trägt die Berichtigung zum zweiten Gerät (siehe `OwnFact`).
+  kopie[at] = { prompt, answer, editedAt: now }
+  return kopie
 }

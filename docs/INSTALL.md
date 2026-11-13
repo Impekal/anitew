@@ -55,6 +55,6 @@ Safari auf dem Mac: „Ablage → Zum Dock hinzufügen“.
 ## Was die Installation **nicht** tut
 
 - Sie legt kein Konto an und fragt nach nichts.
-- Sie überträgt nichts. Es gibt keinen Server (siehe `PRIVACY.md`).
+- Sie legt kein Konto an und überträgt keine Trainingsdaten. Der einzige Servercode ist ein kleiner Endpunkt für die freiwillige Google-Anmeldung und die Push-Zustellung — ohne Nutzerdatenbank (siehe `PRIVACY.md`).
 - Sie ändert nichts an deinen Daten: Sie liegen im selben Speicher wie vorher,
   nur unter einem anderen Dach.

@@ -13,14 +13,25 @@
  */
 
 export * from './backup.ts'
+export * from './backupSettings.ts'
 export * from './content/associations.ts'
 export * from './content/faces.ts'
+/*
+  `content/people.ts` steht hier bewusst NICHT: Die Personenliste wird erst
+  beim Bau einer Einheit gebraucht und beim ersten Bild nicht. Über diesen
+  Sammelexport käme sie in den Kaltstart (gemessen: +2,3 KB). Die Oberfläche
+  lädt sie mit `await import(...)`; die Form der Karte steht in
+  `content/peopleCard.ts` und darf hier stehen.
+*/
+export * from './content/peopleCard.ts'
 export * from './content/interference.ts'
 export * from './content/names.ts'
 export * from './content/missions.ts'
 export * from './content/numbers.ts'
+export * from './content/arithmetic.ts'
 export * from './content/own.ts'
 export * from './content/palace.ts'
+export * from './content/ownRemoved.ts'
 export * from './content/gaze.ts'
 export * from './content/spans.ts'
 export * from './content/spatial.ts'
@@ -28,10 +39,12 @@ export * from './content/twins.ts'
 export * from './content/words.ts'
 export * from './install.ts'
 export * from './language.ts'
+export * from './memory/label.ts'
 export * from './memory/memoryGraph.ts'
 export * from './memory/memoryArchitect.ts'
 export * from './memory/missionComposer.ts'
 export * from './memory/rememberThis.ts'
+export * from './memory/peopleScenario.ts'
 export * from './memory/memoryPulse.ts'
 export * from './memory/memoryWorld.ts'
 export * from './memory/dailyMission.ts'
@@ -95,9 +108,11 @@ export {
   type SessionPlan,
   type PlanInput,
   type Pools,
+  type Pace,
 } from './session/plan.ts'
 export { planSession } from './session/adaptivePlan.ts'
 export * from './technique/encodings.ts'
+export * from './technique/learn.ts'
 export * from './technique/major.ts'
 export * from './time.ts'
 export * from './training.ts'

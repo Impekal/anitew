@@ -42,6 +42,8 @@ export const DOMAIN_OF: Readonly<Record<AchievementId, SkillDomain>> = {
   toldApart: 'distinguish',
   sawDetails: 'visual',
   namesHeld: 'people',
+  heldTwelve: 'recall',
+  heldThirty: 'recall',
 }
 
 /** Die Tatsachen einer Fähigkeit, in der festen Reihenfolge des Erreichten. */

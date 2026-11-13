@@ -149,6 +149,22 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100%;
+  /*
+   * Der Schein darf über den Rand, die Seite nicht.
+   *
+   * Mehrere Zierschichten treten absichtlich über ihre Box hinaus — am
+   * deutlichsten `.challenge::before` mit `inset: 8% -10% 24%`. Das ist so
+   * gewollt: ein Leuchten, das an der Kante endet, sieht abgeschnitten aus.
+   * Auf dem Telefon summierte sich dieses Übertreten aber zu echtem
+   * Seitwärts-Scrollen — gemessen 421 statt 393 px auf einem iPhone 14 Pro,
+   * und ebenso bei 320, 375 und 430 px Breite. Der Inhalt selbst ragt
+   * nirgends heraus; es sind nur die Verläufe.
+   *
+   * `clip` statt `hidden`: `hidden` macht aus dem Wurzelelement einen
+   * Scroll-Container und nimmt damit `position: sticky` die Grundlage.
+   * `clip` schneidet nur ab und lässt die Höhe in Ruhe.
+   */
+  overflow-x: clip;
   color: var(--ink);
   font-family: var(--sans);
   line-height: 1.55;
@@ -256,9 +272,17 @@ body::before {
   font: inherit;
   box-shadow: var(--shadow-lift), var(--glow-soft);
   transition: transform var(--step) var(--ease), box-shadow var(--step) var(--ease);
-  /* Der Knopf atmet, sehr langsam. Nicht um Aufmerksamkeit zu fordern,
-     sondern damit der Bildschirm lebt, solange niemand etwas tut (G-7). */
-  animation: button-breathe 5.5s ease-in-out infinite;
+  /*
+    Der Knopf atmet weiter — aber nicht mehr ueber `box-shadow`
+    (Geraetemeldung 01.09.).
+
+    Hier lief `button-breathe` endlos und bewegte den Schatten zwischen zwei
+    Staerken. Ein Schatten ist eine Zeichen-Eigenschaft: Der Browser malt ihn
+    in jedem Bild neu, auf dem groessten Element des Startbildschirms, und das
+    dauerhaft. Das Atmen kommt jetzt vom Ring darueber (`.start::before`,
+    `living-core-breathe`) — der bewegt Groesse und Deckkraft, und die schiebt
+    die Grafikkarte. G-7 bleibt erfuellt, der Bildschirm lebt weiter.
+  */
 }
 
 .start:hover {
@@ -340,8 +364,11 @@ body::before {
   box-shadow: var(--shadow);
 }
 
-.note h3,
-.foundation h3 {
+/* Rang zwei, nicht drei: Über diesen Karten steht die Seiten-h1, eine Ebene
+   dazwischen gibt es nicht — ein h3 übersprang sie (WCAG 1.3.1). Die alten
+   h3-Selektoren sind mit weg: Es gibt keinen mehr, auf den sie zeigen. */
+.note h2,
+.foundation h2 {
   margin: 0 0 0.7rem;
   font-size: 0.72rem;
   text-transform: uppercase;
@@ -371,9 +398,20 @@ body::before {
   transition: background var(--step) var(--ease), border-color var(--step) var(--ease);
 }
 
-.quiet:hover {
-  background: var(--accent-soft);
-  border-color: transparent;
+/*
+  Nur dort, wo es wirklich einen Zeiger gibt (Gerätemeldung 01.09.).
+
+  Auf einem Telefon bleibt `:hover` an dem Element kleben, das man zuletzt
+  berührt hat. Damit sah immer die zuletzt angetippte Fläche „ausgewählt“
+  aus — bei den Ton-Bereichen las sich das als Entweder-oder, obwohl alle
+  drei unabhängig schalten. Gemessen: die **abgeschaltete** Fläche war mit
+  0,43 gefüllt, die eingeschaltete mit 0.
+*/
+@media (hover: hover) and (pointer: fine) {
+  .quiet:hover {
+    background: var(--accent-soft);
+    border-color: transparent;
+  }
 }
 
 /* ── Fuß und Nebensachen ──────────────────────────────────────────────── */
@@ -598,13 +636,17 @@ body::before {
  * mit einem weichen Schein. Sie liegen dadurch optisch vor dem übrigen Netz,
  * und das reicht schon, damit der Hintergrund nicht flach wirkt.
  *
- * Nur jeder siebte, weil `drop-shadow` je Element gerechnet wird: sieben
- * leuchtende Punkte kosten nichts, fünfzig würden auf einem älteren Telefon
- * die Uhr der Einheit ins Stocken bringen.
+ * Hier stand: „Nur jeder siebte, weil `drop-shadow` je Element gerechnet
+ * wird“ — die Kosten waren also bekannt, nur zu niedrig veranschlagt. Sieben
+ * Filter sind billiger als fünfzig und trotzdem nicht umsonst: Jeder zwingt
+ * sein Element in eine eigene Ebene, die neu **gezeichnet** wird, solange die
+ * Bewegung läuft — und die läuft endlos. Gemessen am 01.09., nachdem ein
+ * Telefon zum zweiten Mal heiß gemeldet wurde.
+ *
+ * Die sieben bleiben hell; das trägt die Farbe, nicht der Filter.
  */
 .neural-nodes circle:nth-child(7n) {
   fill: var(--accent);
-  filter: drop-shadow(0 0 1.4px color-mix(in oklab, var(--accent) 80%, transparent));
   animation-duration: 9s;
 }
 
@@ -705,7 +747,14 @@ body::before {
   height: 100%;
   background: var(--accent);
   opacity: 0.55;
-  transition: width 240ms linear;
+  /*
+    Kein Übergang auf `width` (Gerätemeldung 01.09.).
+
+    Die Breite ändert sich ohnehin nur einmal je Sekunde — der Runner rundet
+    die Restzeit auf ganze Sekunden. Der Übergang machte daraus 900 ms
+    Neuzeichnen je Schritt, über die ganze Einheit hinweg. Ein Balken von
+    zwei Pixeln Höhe, der einmal je Sekunde weiterrückt, ist das nicht wert.
+  */
 }
 
 /* ── Einprägen ────────────────────────────────────────────────────────── */
@@ -1096,6 +1145,18 @@ body::before {
   box-shadow: var(--shadow), var(--glow);
 }
 
+/* Der Zeilenwechsel für den Ziffernblock (Gerätemeldung 31.08.: „auf der
+   Tastatur wird keine Möglichkeit gegeben, auf die nächste Zeile zu gehen").
+   Er steht direkt unter dem Feld und vor den Marken — dort sucht ihn die
+   Hand, die gerade die nächste Zahl tippen will. Rechtsbündig, damit der
+   Daumen ihn erreicht, ohne die Marken zu verdecken. Die 44-Pixel-Höhe
+   erbt er von `.quiet` (O5). */
+.recall-next {
+  align-self: flex-end;
+  padding-inline: 1rem;
+  font-size: 0.9rem;
+}
+
 /* Jedes getippte Wort landet sichtbar (D-011/G-7, Punkt 3). Es ist nur die
    eigene Eingabe zurückgespiegelt — keine Bewertung, kein Hinweis, ob es
    richtig war. Das wäre ein Hinweis und würde den freien Abruf zerstören. */
@@ -1211,16 +1272,6 @@ body::before {
   }
 }
 
-@keyframes button-breathe {
-  0%,
-  100% {
-    box-shadow: var(--shadow-lift), var(--glow-soft);
-  }
-  50% {
-    box-shadow: var(--shadow-lift), var(--glow-strong);
-  }
-}
-
 @keyframes chip-in {
   from {
     opacity: 0;
@@ -1308,7 +1359,7 @@ body::before {
   border-left-color: var(--bad);
 }
 
-.standing h3 {
+.standing h2 {
   margin: 0;
   font-size: 0.82rem;
   font-weight: 600;
@@ -1324,7 +1375,7 @@ body::before {
   margin-top: 0.4rem;
 }
 
-.claim h4 {
+.claim h3 {
   margin: 0;
   font-family: var(--serif);
   font-size: 1.02rem;
@@ -1431,6 +1482,16 @@ body::before {
   font-size: 1.05rem;
   line-height: 1.5;
   color: var(--ink);
+}
+
+/* Was das Major-System ist und wozu es hilft — zwei ruhige Zeilen zwischen
+   dem Namen und den Schritten. Etwas kleiner als der Name und etwas größer
+   als die Schritte: Es ist die Antwort auf „worum geht es hier überhaupt",
+   und die liest man vor der Anleitung. */
+.lesson-what {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
 }
 
 .lesson-steps {
@@ -1892,22 +1953,12 @@ body::before {
   animation: none;
 }
 
-.arrival-name {
-  font: inherit;
-  font-family: var(--serif);
-  font-size: 1.2rem;
-  padding: 0.75rem 1rem;
-  border-radius: 1rem;
-  border: 1px solid var(--line);
-  background: var(--card);
-  color: var(--ink);
-  width: 100%;
-}
-
-.arrival-name:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
+/* `.arrival-name` stand hier — das Namensfeld des alten Ankommens. Die Klasse
+   kommt in keiner Vorlage und in keinem erzeugten Knoten mehr vor (geprueft
+   ueber die gesamte Quelle, nicht nur ueber die Vorlagen: `standing-*`,
+   `session-phase-*` und `constellation-node-*` sehen ebenso tot aus, werden
+   aber zur Laufzeit zusammengesetzt). Zwei tote Regeln im Kaltstart-Blatt
+   kosten jeden Besucher Bytes. */
 
 .choices {
   display: flex;
@@ -2024,7 +2075,21 @@ body::before {
 }
 
 .drawer-close {
-  align-self: flex-end;
+  /* Hier stand `align-self: flex-end` — aus der Zeit, als der Schliessknopf in
+   * der Ecke einer Kopfzeile sass. Heute ist er ein zentrierter Kreis, und die
+   * Zentrierung kam ausschliesslich aus `anitew-first-run.css`. Dieses Blatt
+   * wird aber **nur beim allerersten Besuch** geladen (firstRunExperience.ts
+   * haengt an `.arrival-begin` / `.onboarding`); auf jedem spaeteren Besuch
+   * fehlte es, und dann stand der Knopf rechts — gemessen im iPhone-Profil bei
+   * x=293 statt mittig. Die zweite Haelfte desselben Fehlers steht in
+   * `anitew-living.css`.
+   *
+   * Die Ausrichtung steht jetzt an genau **einer** Stelle: bei
+   * `nav.drawer .drawer-close` in `anitew-overlay-safety.css`. Dieser Knopf
+   * kommt nur dort vor (App.tsx), jenes Blatt laedt ebenfalls im Kaltstart und
+   * gewinnt mit Vorfahren-Selektor unabhaengig von der Ladefolge. Eine zweite
+   * Ausrichtungsregel hier waere genau die Doppelung, aus der der Fehler
+   * entstanden ist. */
   border: none;
   background: transparent;
   color: var(--ink-faint);
@@ -2204,19 +2269,50 @@ body::before {
   border: 2px solid var(--accent);
 }
 
-.training-journey { display: flex; gap: 1rem; padding: 1.1rem; margin: 1.5rem 0; border: 1px solid #a98a5140; border-radius: 18px; background: linear-gradient(120deg, #ad8a4512, transparent); }
-.journey-level { width: 3rem; height: 3rem; flex: 0 0 3rem; display: grid; place-items: center; border: 1px solid #a98a5170; border-radius: 50%; font-size: 1.4rem; font-weight: 700; }
-.journey-content { min-width: 0; flex: 1; }
-.journey-eyebrow { font-size: .75rem; letter-spacing: .08em; margin: 0 0 .3rem; opacity: .7; }
-.journey-content h2 { font-size: 1rem; margin: 0; }
-.journey-xp { font-size: .82rem; margin: .4rem 0; }
-.journey-content progress { display: block; width: 100%; height: .5rem; accent-color: #ae8c4f; margin: .8rem 0; }
-.journey-content summary { cursor: pointer; font-size: .8rem; padding-block: .4rem; }
-.journey-path { list-style: none; padding: 0; display: grid; gap: .5rem; font-size: .8rem; }
-.journey-path li { display: flex; flex-wrap: wrap; gap: .4rem; opacity: .65; }
-.journey-path .journey-reached { opacity: 1; }
-.journey-path small { margin-left: auto; }
 .response-time-note { max-width: 34rem; }
 
 /* Supplemental ranges; mode names and engine timing stay unchanged. */
 .mode .mode-range { display:block; margin-top:3px; font-size:.72em; font-weight:400; line-height:1.2; letter-spacing:0; color:var(--an-muted,var(--ink-soft)); opacity:.8; text-shadow:none; }
+/* Die Core-Seite „Einstellungen“ (Runde 2): dieselben Regler wie am Fuß des
+   Startbildschirms, nur mit eigenem Atem — ohne die zurückgenommene
+   Fuß-Deckkraft, denn hier sind sie der Inhalt der Seite. */
+.settings-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Die Core-Seite „Messung“ (Runde 2): Reihe und Termin, mit Atem. */
+.benchmark-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+
+/* Überschrift und Konstellation als ein Weg (Gerätebefund 02.09.).
+
+   Ein Knopf, der nicht wie einer aussieht: Er umschließt, was ohnehin dasteht,
+   und gibt ihm nur eine Fläche zum Antippen. Bewusst ohne `.quiet` — dessen
+   Pille, Polster und Mindesthöhe müsste hier alles wieder zurückgenommen
+   werden, und ein Kasten um eine Zeichnung wäre das Möbel, das G-2 weglässt.
+   Den Tastatur-Fokus zeigt der Browser selbst; ihn nachzubauen kostet Zeilen
+   und bringt nichts. */
+.today-system-open {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.today-system-open .today-system {
+  display: block;
+}
+
+/* Die Rückmeldung sitzt auf der Zeichnung — sie ist das Große, das man
+   trifft. Nur `opacity`: kein Neuzeichnen. */
+.today-system-open:active .constellation {
+  opacity: .82;
+}

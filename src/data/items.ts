@@ -16,12 +16,14 @@ import {
   type Instant,
   isImmediate,
   type Memory,
+  memoryNodeIdOfItem,
   moduleForDimension,
   type ModuleId,
   newMemory,
   review,
 } from '../core/index.ts'
 import { type ItemStateRow, db } from './db.ts'
+import { loadMemoryGraph } from './memoryStore.ts'
 
 /** Das Modul, zu dem die Wortlisten gehören. */
 export const WORD_MODULE = 'words'
@@ -49,8 +51,32 @@ export function wordOf(itemId: string): string {
 
 /** Alle Informationen dieser Sprache, die einen Termin haben. */
 export async function loadDue(language: string): Promise<DueItem[]> {
-  const rows = await db.itemStates.where('language').equals(language).toArray()
-  return rows.filter(hasMemory).map((row) => ({ itemId: row.itemId, memory: toMemory(row) }))
+  const rows = (await db.itemStates.where('language').equals(language).toArray()).filter(hasMemory)
+
+  /*
+   * I5 liegt absichtlich **nicht** in der Item-State-Tabelle: Die reale
+   * Deadline gehört zur bestätigten persönlichen Erinnerung im Memory Graph,
+   * während FSRS dort weiter ausschließlich seinen Lernzustand hält. Beim
+   * Lesen verbinden wir beides über die stabile Graph-ID, die jedes moderne
+   * `memory:`-Item ohnehin in seiner Kennung trägt.
+   */
+  let neededBy = new Map<string, DayKey>()
+  if (rows.some((row) => row.moduleId === 'memory')) {
+    const graph = await loadMemoryGraph()
+    neededBy = new Map(
+      graph.nodes
+        .filter((node) => node.neededByDay !== undefined)
+        .map((node) => [node.id, node.neededByDay as DayKey]),
+    )
+  }
+
+  return rows.map((row) => {
+    const item: DueItem = { itemId: row.itemId, memory: toMemory(row) }
+    if (row.moduleId !== 'memory') return item
+    const nodeId = memoryNodeIdOfItem(wordOf(row.itemId))
+    const neededByDay = nodeId === undefined ? undefined : neededBy.get(nodeId)
+    return neededByDay === undefined ? item : { ...item, neededByDay }
+  })
 }
 
 /**
@@ -205,6 +231,36 @@ export async function loadRecentOutcomes(moduleId: string, limit: number): Promi
     .sort((a, b) => a.at - b.at)
     .slice(-limit)
     .map((row) => row.correct === true)
+}
+
+/**
+ * Die längste Ziffernfolge, die dieser Mensch je richtig abgerufen hat.
+ *
+ * Die Grundlage für die Decke oberhalb von sechs Ziffern (Nutzerwunsch
+ * 04.09.: „Das kann ruhig bis zu dreißig, 60 Zeichen gehen je nachdem. Aber
+ * das muss halt stufenweise sein und wenn ich weiterkomme, darf das mehr.").
+ *
+ * **Gerechnet, nicht gespeichert** — dieselbe Haltung wie bei Serie,
+ * Wiedersehen und Erreichtem (D-015, D-019). Es gibt keinen „Rang", der
+ * hochgezählt wird; es gibt nur die Rohereignisse, und daraus folgt die
+ * Decke. Wer die App zurücksetzt, fängt ehrlich wieder unten an.
+ *
+ * Alte Zeilen ohne `module` fallen heraus (D-026) — sie würden sonst Wörter
+ * als Ziffernfolgen zählen. Und gezählt wird nur, was wirklich eine
+ * Ziffernfolge ist: Die Kennung einer Zahl **ist** die Zahl.
+ */
+export async function loadLongestRecalled(moduleId: string): Promise<number> {
+  const rows = await db.events
+    .filter(
+      (event) =>
+        event.kind === 'answered' &&
+        event.module === moduleId &&
+        event.correct === true &&
+        typeof event.itemId === 'string' &&
+        /^\d+$/.test(event.itemId),
+    )
+    .toArray()
+  return rows.reduce((longest, row) => Math.max(longest, (row.itemId as string).length), 0)
 }
 
 /** Wie viele Informationen warten insgesamt auf ihren nächsten Termin? */

@@ -24,7 +24,14 @@ export function planSession(input: PlanInput): SessionPlan {
   const shifts = new Map<number, number>()
   for (const block of plan.blocks) {
     if (block.moduleId !== 'missions' || block.kind !== 'encode') continue
-    const desired = block.items.length * missionSecondsPerFact(delta)
+    /*
+     * Der Takt, den dieser Block wirklich bekommen hat, ist der Bezugspunkt —
+     * nicht eine feste Fünf (Nutzerbefund 05.09.). Sonst verschöbe H6 nicht
+     * um eine Sekunde, sondern auf einen absoluten Wert, und „leichter" könnte
+     * weniger Zeit bedeuten als „normal".
+     */
+    const geplant = block.seconds / block.items.length
+    const desired = block.items.length * missionSecondsPerFact(delta, geplant)
     shifts.set(block.round, desired - block.seconds)
   }
   if (shifts.size === 0) return plan

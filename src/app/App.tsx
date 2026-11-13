@@ -33,7 +33,7 @@ import {
   profileOf,
   weakest,
   returnsOf,
-  palaceOf,
+  ownPalaceGone,
   walkPool,
   type BenchmarkRun,
   nextRunDue,
@@ -52,9 +52,14 @@ import {
   spanPool,
   DIFFICULTY_WINDOW,
   itemsDeltaFor,
+  arithmeticPool,
+  type ArithmeticStage,
+  numberLengthFor,
+  type Pace,
   spanLengthFor,
   TRAINING_MODULES,
   gazePool,
+  factPrompt,
   twinChoices,
   twinPairs,
   twinPool,
@@ -66,6 +71,7 @@ import {
   loadRecentOutcomes,
   loadDue,
   loadReviewed,
+  loadLongestRecalled,
   loadTrackedWords,
   moduleOf,
   wordOf,
@@ -80,23 +86,36 @@ import {
   loadTrainingDays,
 } from '../data/sessions.ts'
 import { abandonRun, beginRun, loadOpenRun, loadRuns } from '../data/benchmark.ts'
-import { loadOwnPalace } from '../data/palace.ts'
+import { loadOwnPalaces } from '../data/palace.ts'
 import { loadDailyTime } from '../data/reminders.ts'
 import {
   loadLinkTaught,
+  loadMajorMethodTaught,
   loadPalaceTaught,
   loadStoryTaught,
   loadTaught,
 } from '../data/technique.ts'
 
+import { type Dictionary, isTranslated } from '../i18n/index.ts'
 import { AboutPanel } from './AboutPanel.tsx'
 import { BackupPanel } from './BackupPanel.tsx'
+import { LearnPanel } from './LearnPanel.tsx'
 import { MenuIcon, type MenuIconKind } from './MenuIcon.tsx'
 import { OnboardingScreen } from './onboarding/OnboardingScreen.tsx'
 import { CoursesPanel } from './CoursesPanel.tsx'
 import { PalacePanel } from './PalacePanel.tsx'
 import { ProfilePanel } from './ProfilePanel.tsx'
 import { ReminderPanel } from './ReminderPanel.tsx'
+import { ResetPanel } from './ResetPanel.tsx'
+import { BrainCarePanel } from './BrainCarePanel.tsx'
+/*
+ * Nur die Ueberschrift, nicht die Tipps: Sie steht im Menue und im Seitenkopf,
+ * also im Kaltstart. Die Texte selbst liegen im verzoegerten Chunk (P4).
+ */
+import { brainCareHeading } from './brainCareHeading.ts'
+import { HelpPanel } from './HelpPanel.tsx'
+import { faqHeading, helpHeading, understandLabel } from './helpHeadings.ts'
+import { DailyTipMount } from './DailyTipMount.tsx'
 import { SciencePanel } from './SciencePanel.tsx'
 import { FoundationPanel } from './FoundationPanel.tsx'
 import { TrainingJourney } from './TrainingJourney.tsx'
@@ -117,6 +136,8 @@ import { useLanguage } from './useLanguage.ts'
 import { useProfile } from './useProfile.ts'
 import { useStoragePersists } from './useStoragePersists.ts'
 import { useTrainingLanguage } from './useTrainingLanguage.ts'
+import { SoundAreas } from './SoundAreas.tsx'
+import { usePaceSetting } from './usePaceSetting.ts'
 import { useSoundSetting } from './useSoundSetting.ts'
 
 const MODE_ORDER: readonly TrainingMode[] = ['emergency', 'short', 'daily', 'extended']
@@ -124,14 +145,25 @@ const MODE_RANGES: Record<TrainingMode, string> = { emergency: '60–120 s', sho
 
 export function App() {
   const platform = useMemo(() => createWebPlatform(), [])
-  const { language, dictionary, translated, ready, choose } = useLanguage(platform)
+  const {
+    language,
+    dictionary,
+    translated,
+    ready,
+    choose,
+    saveFailed: languageSaveFailed,
+  } = useLanguage(platform)
   /*
    * Worin trainiert wird, ist nicht dasselbe wie worin die App spricht (L7).
    * Ab hier heißt `language` die Oberfläche und `training` der Inhalt — jede
    * Stelle, die Wörter, Namen, Termine oder Messungen anfasst, nimmt
    * `training`.
    */
-  const { training, chooseTraining } = useTrainingLanguage(platform, language)
+  const {
+    training,
+    chooseTraining,
+    saveFailed: trainingSaveFailed,
+  } = useTrainingLanguage(platform, language)
   // Speichert dieses Gerät überhaupt? Sonst wird es gesagt (P7).
   const storagePersists = useStoragePersists(platform)
   const trainable = trainingLanguages()
@@ -147,6 +179,9 @@ export function App() {
     ),
   )
   const sound = useSoundSetting(platform)
+  // Zeit zum Einprägen (Nutzerbefund 05.09.) — wirkt beim Planen der
+  // nächsten Einheit, nicht in der laufenden.
+  const tempo = usePaceSetting(platform)
   /*
    * Das Ankommens-Profil (Onboarding).
    *
@@ -196,7 +231,13 @@ export function App() {
    */
   const [pageId, setPageId] = useState<MenuIconKind | undefined>(undefined)
   const [menuOpen, setMenuOpen] = useState(false)
+  /*
+   * Wo die Startseite stand, als eine Core-Seite geöffnet wurde. Beim
+   * Schließen kehrt man dorthin zurück, statt oben zu landen.
+   */
+  const startseitenScroll = useRef(0)
   const openPage = useCallback((id: MenuIconKind) => {
+    startseitenScroll.current = window.scrollY
     setMenuOpen(false)
     setPageId(id)
     window.history.pushState({ page: id }, '')
@@ -210,6 +251,34 @@ export function App() {
       window.history.back()
     }
   }, [])
+  /*
+   * Eine geöffnete Seite fängt oben an.
+   *
+   * Die Core-Seiten sind Zustand, kein Router — es gibt also keinen Browser,
+   * der beim Wechsel von sich aus nach oben scrollt. Wer die Startseite ein
+   * Stück heruntergescrollt hatte und dann eine Seite öffnete, bekam sie mit
+   * genau diesem Versatz zu sehen: Der Schließen-Knopf lag dann um die
+   * gescrollten Pixel zu hoch — auf einem iPhone im Standalone-Modus unter der
+   * Dynamic Island, also außerhalb der Safe Area und nicht mehr sicher
+   * antippbar.
+   *
+   * Das war kein neuer Fehler. Auf f1e9f6a — dem Stand, der bis eben live war
+   * — blieb das Dokument in fünf von sechs Messungen um 62 Pixel gescrollt,
+   * und der Knopf stand bei 3 statt bei 65 Pixeln. Der Test dazu
+   * (`safeArea.spec.ts`) ging nur deshalb meist durch, weil er selbst keinen
+   * definierten Ausgangszustand hatte; einmal ist er auf CI darüber gefallen
+   * (Lauf 1394), und das war zu Recht.
+   *
+   * Beim Schließen geht es dorthin zurück, wo man auf der Startseite war —
+   * sonst wäre das Beheben des einen Ärgernisses das Einführen eines anderen.
+   */
+  useEffect(() => {
+    if (pageId !== undefined) {
+      window.scrollTo(0, 0)
+      return
+    }
+    window.scrollTo(0, startseitenScroll.current)
+  }, [pageId])
   useEffect(() => {
     const onPop = () => {
       setPageId(undefined)
@@ -293,9 +362,9 @@ export function App() {
    * weil die Datenbank beim Start eine Handbreit langsamer war als der
    * Finger. Der Planer lehrt ausdrücklich nur bei `false`.
    */
-  const [own, setOwn] = useState<OwnPalace | undefined>(undefined)
+  const [own, setOwn] = useState<readonly OwnPalace[]>([])
   const reloadOwn = useCallback(() => {
-    void loadOwnPalace()
+    void loadOwnPalaces()
       .then(setOwn)
       .catch(() => undefined)
   }, [])
@@ -312,12 +381,17 @@ export function App() {
   // `undefined` heißt „noch nicht nachgesehen“, und dann lehrt der Planer nicht.
   const [storyTaught, setStoryTaught] = useState<boolean | undefined>(undefined)
   const [linkTaught, setLinkTaught] = useState<boolean | undefined>(undefined)
+  // Das Verfahren des Major-Systems (D5): ein Ja/Nein wie die drei anderen.
+  const [majorMethodTaught, setMajorMethodTaught] = useState<boolean | undefined>(undefined)
   useEffect(() => {
     void loadStoryTaught()
       .then(setStoryTaught)
       .catch(() => undefined)
     void loadLinkTaught()
       .then(setLinkTaught)
+      .catch(() => undefined)
+    void loadMajorMethodTaught()
+      .then(setMajorMethodTaught)
       .catch(() => undefined)
   }, [running])
 
@@ -342,6 +416,49 @@ export function App() {
   useEffect(() => {
     void loadTrackedWords('twins', training)
       .then((words) => setTwinsDone(new Set(words.map((word) => twinChoices(word).join('%')))))
+      .catch(() => undefined)
+  }, [training, running])
+
+  /*
+   * Persönlichkeiten (Nutzerwunsch 02.09.): derselbe endliche Vorrat wie bei
+   * den Zwillingen, dieselbe Regel. Wer schon einen Termin hat, kommt nie
+   * wieder als neu; ist der Rest aufgebraucht, fällt das Modul über den
+   * Vorratsfilter still aus der Lernrotation. Der Schlüssel ist der Name —
+   * die Antwortseite hängt an der Trainingssprache und wäre kein Schlüssel.
+   */
+  const [peopleDone, setPeopleDone] = useState<ReadonlySet<string>>(new Set())
+  useEffect(() => {
+    void loadTrackedWords('people', training)
+      .then((words) => setPeopleDone(new Set(words.map(factPrompt))))
+      .catch(() => undefined)
+  }, [training, running])
+
+  /*
+   * Kopfrechnen (Nutzerwunsch 05.09.): Was schon einen Termin hat, kommt
+   * nicht noch einmal als neuer Stoff — dieselbe Regel wie bei den
+   * Persönlichkeiten. Anders als dort ist das Erschöpfen hier aber das
+   * **Ziel**: Das Einmaleins ist endlich, und es zu können heißt, es
+   * gesehen zu haben.
+   */
+  const [mathDone, setMathDone] = useState<ReadonlySet<string>>(new Set())
+  useEffect(() => {
+    void loadTrackedWords('math', training)
+      .then((words) => setMathDone(new Set(words.map(factPrompt))))
+      .catch(() => undefined)
+  }, [training, running])
+
+  /*
+   * Die längste Ziffernfolge, die je richtig war (Nutzerwunsch 04.09.).
+   *
+   * Der Motor für alles oberhalb von sechs Ziffern. Gerechnet aus den
+   * Rohereignissen, nie gespeichert — wie Serie und Wiedersehen (D-015,
+   * D-019). Nach jeder Einheit neu gelesen, damit die Decke am selben Abend
+   * steigt, an dem der Beleg entstanden ist.
+   */
+  const [longestNumber, setLongestNumber] = useState(0)
+  useEffect(() => {
+    void loadLongestRecalled('numbers')
+      .then(setLongestNumber)
       .catch(() => undefined)
   }, [training, running])
 
@@ -443,17 +560,63 @@ export function App() {
     })().catch(() => setMissionPreview(undefined))
   }, [dimensionCounts, mode, platform, recentByModule, training, systemPulse])
 
-  const start = useCallback(() => {
+  /**
+   * Eine Einheit starten — normal, oder als Übungsrunde zu einer Methode.
+   *
+   * Die Übungsrunde (Nutzerwunsch 04.09.) kommt über `uebung` herein und
+   * enthält **nur** dieses Modul. Vorher setzte „Üben" bloß einen
+   * Schwerpunkt und schloss die Seite; auf dem Gerät sah das aus, als
+   * lande man grundlos wieder im Core. Der Wunsch war deutlich: „wo nur
+   * Dinge zur ausgewählten Methode angeboten werden."
+   *
+   * Länge und Modul kommen als Argument und nicht aus dem Zustand: Ein
+   * `setMode(...)` unmittelbar vor dem Start würde beim selben Durchlauf
+   * noch den alten Wert lesen.
+   *
+   * `onlyModule` ist optional, und das ist seit dem 06.09. der Unterschied
+   * zwischen zwei Aufrufern: Die Übungsrunde schränkt auf **ein** Modul ein,
+   * „Fordernde Einheit starten" will die **volle** Bandbreite — nur eben
+   * fünfzehn Minuten lang. Ohne diese Unterscheidung konnte der zweite Knopf
+   * gar nicht starten und musste sich auf `setMode` beschränken.
+   */
+  const start = useCallback((uebung?: { onlyModule?: ModuleId; mode: TrainingMode }) => {
     // Der erste Ton der Einheit, ausgelöst vom Fingertipp — genau die Geste,
     // die iOS verlangt, bevor eine Seite überhaupt klingen darf.
     platform.sound.play('start')
+    const laufMode = uebung?.mode ?? mode
     const now = platform.clock.now()
     const day = dayKeyOf(now, { offsetMinutes: platform.clock.offsetMinutes(now) })
     // Der Seed macht die Einheit reproduzierbar (A11): Aus Tag, Modus und
     // Startzeit folgen genau diese Wörter in genau dieser Reihenfolge.
-    const seed = `${day}:${mode}:${now}`
+    const seed = `${day}:${laufMode}:${now}`
     const sessionId = `s-${now.toString(36)}-${createRng(seed).int(1_000_000).toString(36)}`
-    const seconds = MODES[mode].seconds
+    const seconds = MODES[laufMode].seconds
+
+    /*
+     * Welche Rechenstufen offen sind — gerechnet aus dem, was schon einen
+     * Termin hat, nie gespeichert (dieselbe Haltung wie bei Serie und
+     * Wiedersehen, D-019).
+     *
+     * Stufenweise, wie bei der Zahllänge: Wer das kleine Einmaleins fast
+     * durchhat, bekommt die Quadratzahlen dazu — nicht vorher. Die Schwellen
+     * liegen knapp unter der vollen Stufe, damit die letzte Aufgabe nicht die
+     * Tür blockiert; die übrigen kommen als Wiedersehen ohnehin.
+     */
+    /*
+     * Die Zahllänge dieser Einheit — einmal gerechnet und dreimal gebraucht:
+     * für den Vorrat, für die Uhr und für die Rundengröße. Dreimal gerechnet
+     * wären drei Wahrheiten über dieselbe Einheit.
+     */
+    const zahlLaenge = numberLengthFor({
+      taught,
+      recent: recentByModule['numbers'] ?? [],
+      longestRecalled: longestNumber,
+    })
+
+    const mathStages: ArithmeticStage[] = ['times']
+    if (mathDone.size >= 30) mathStages.push('squares')
+    if (mathDone.size >= 44) mathStages.push('powers')
+    if (mathDone.size >= 50) mathStages.push('percent')
 
     void (async () => {
       /*
@@ -478,7 +641,7 @@ export function App() {
            * ohne das „hier“ ist keine Frage. Gelöscht wird deshalb nichts: Wer
            * seinen Palast neu anlegt, hat seine Gänge wieder.
            */
-          if (moduleId === 'palace' && own === undefined && palaceOf(word) === 'own') continue
+          if (moduleId === 'palace' && ownPalaceGone(word, own)) continue
           ;(due[moduleId] ??= []).push(word)
         }
       } catch {
@@ -490,6 +653,16 @@ export function App() {
       const memoryGraph = await loadMemoryGraph().catch(() => createMemoryGraph())
       const ownPool = await loadOwnPool(training).catch(() => [])
       const memoryPool = composeMemoryPool(memoryGraph)
+      /*
+       * Die Personenliste wird erst hier geholt, nicht beim ersten Bild: Sie
+       * wiegt gut zwei Kilobyte und wird auf dem Startbildschirm nie
+       * gebraucht. Fällt das Nachladen aus — offline, Datei weg —, bleibt der
+       * Vorrat leer, und der Vorratsfilter nimmt das Modul still heraus. Die
+       * Einheit läuft ohne es weiter; das ist der bessere Tausch.
+       */
+      const peoplePool = await import('../core/content/people.ts')
+        .then((modul) => modul.peoplePool(training, seed))
+        .catch(() => [] as readonly string[])
       const memoryAnchors = new Set(memoryGraph.edges.map((edge) => edge.from))
       const mission = composeDailyMission({
         seconds,
@@ -507,7 +680,7 @@ export function App() {
       })
 
       const plan = planSession({
-        mode,
+        mode: laufMode,
         day,
         language: training,
         seed,
@@ -521,7 +694,12 @@ export function App() {
         pools: {
           words: wordPool(training),
           faces: namePool(training),
-          numbers: numberPool(seed, 60),
+          /*
+           * Die Decke wächst mit dem Lernstand (Nutzerbefund 04.09.): Wer
+           * erst die 1 kennt, bekommt keine sechsstellige Zahl vorgesetzt.
+           * Begründung und Messung stehen bei `numberLengthFor`.
+           */
+          numbers: numberPool(seed, 60, zahlLaenge),
           /*
            * Missionen ziehen aus demselben Namensvorrat wie die Gesichter
            * (H1): Aus dem Namen entsteht die ganze Szene, so wie aus ihm das
@@ -536,7 +714,13 @@ export function App() {
            * nie aus, und niemand läuft zweimal durch dieselbe Wohnung mit
            * denselben Dingen darin.
            */
-          palace: walkPool(seed, 30, own === undefined ? undefined : [...READY_PALACES, 'own']),
+          palace: walkPool(seed, 30, [
+            ...READY_PALACES.map((id) => ({ id, stationIds: [] })),
+            ...own.map((palace) => ({
+              id: palace.id,
+              stationIds: palace.stations.map((station) => station.id),
+            })),
+          ]),
           /*
            * Rückwärts-Folgen (D7): wie die Zahlen aus dem Seed erzeugt und
            * sprachfrei. Vierzig, nicht zwanzig — der Schwerpunkt kann dem
@@ -579,12 +763,27 @@ export function App() {
            * Der Vorratsfilter nimmt das Modul dann still heraus.
            */
           memory: memoryPool,
+          /*
+           * Persönlichkeiten (Nutzerwunsch 02.09.): kuratiert und endlich,
+           * gefiltert um alles, was schon einen Termin hat. Ohne Bild — der
+           * Grund steht in `core/content/people.ts`.
+           */
+          people: peoplePool.filter((item) => !peopleDone.has(factPrompt(item))),
+          /*
+           * Kopfrechnen: der Vorrat der offenen Stufen, ohne alles, was schon
+           * einen Termin hat.
+           */
+          math: arithmeticPool(seed, mathStages).filter(
+            (item) => !mathDone.has(factPrompt(item)),
+          ),
         },
+        numberDigits: zahlLaenge,
         due,
         taught,
         palaceTaught,
         storyTaught,
         linkTaught,
+        majorMethodTaught,
         /*
          * D2: ein Stück mehr oder weniger je Modul, aus der eigenen
          * Trefferquote gerechnet. Keine Anzeige — Planung, keine Aussage
@@ -596,8 +795,23 @@ export function App() {
             itemsDeltaFor({ recent: recentByModule[moduleId] ?? [] }),
           ]),
         ),
-        focus: mission.focus ?? focus?.moduleId,
-        modules: mission.modules,
+        // Was der Mensch im Lernbereich geübt haben will, geht vor: Er hat es
+        // gerade eben ausgesucht, die Zählung spricht über die letzten Wochen.
+        /*
+         * Der eingestellte Takt (Nutzerbefund 05.09.). Er verschiebt keine
+         * Sekunde des Zeitbudgets — er entscheidet nur, wie viele Stücke in
+         * dieselbe Zeit passen.
+         */
+        pace: tempo.pace,
+        focus: uebung?.onlyModule ?? mission.focus ?? focus?.moduleId,
+        /*
+         * Eine Übungsrunde enthält genau ein Modul. Der Planer lässt ein
+         * erzwungenes Einzelmodul bewusst nicht still herausfallen — und das
+         * ist hier richtig: Wer „Zahlen üben" antippt, will Zahlen und nicht
+         * einen Ersatz. Keiner der vier Vorräte kann leer sein; die Paläste
+         * fallen notfalls auf die drei eingebauten zurück.
+         */
+        modules: uebung?.onlyModule === undefined ? mission.modules : [uebung.onlyModule],
       })
       const progress: SessionProgress = {
         sessionId,
@@ -611,7 +825,7 @@ export function App() {
       setRunning(progress)
       void beginSession(progress, day, now).catch(() => undefined)
     })()
-  }, [training, mode, platform, taught, palaceTaught, storyTaught, linkTaught, own, focus, recentByModule, dimensionCounts])
+  }, [training, mode, platform, taught, palaceTaught, storyTaught, linkTaught, majorMethodTaught, own, focus, peopleDone, mathDone, longestNumber, recentByModule, dimensionCounts, tempo.pace])
 
   const leave = useCallback(() => {
     setRunning(undefined)
@@ -688,13 +902,14 @@ export function App() {
       streakBest: streak.best,
       taughtCount: taught.length,
       completedBenchmarks: runs.filter(isComplete).length,
-      hasOwnPalace: own !== undefined,
+      hasOwnPalace: own.length > 0,
       heldBackTotal: heldOf('working'),
       toldApartTotal: heldOf('attention'),
       detailsHeldTotal: heldOf('visual'),
       namesHeldTotal: heldOf('faces'),
+      longestNumberDigits: longestNumber,
     }
-  }, [returns, streak.best, taught.length, runs, own, dimensionCounts])
+  }, [returns, streak.best, taught.length, runs, own, dimensionCounts, longestNumber])
 
 
   /*
@@ -736,12 +951,37 @@ export function App() {
       .finally(reloadBenchmark)
   }, [open, reloadBenchmark])
 
+  /*
+   * R3-04 (Runde 3): Der Startvorgang ist sofort gesperrt — synchron im Ref,
+   * damit ein zweiter Tipp gar nicht erst losläuft, und sichtbar über
+   * `starting`, damit der Knopf im selben Moment inaktiv wird. Die eigentliche
+   * Invariante liegt darunter in `beginRun`: Zwei parallele Starts können dort
+   * nicht zwei Messungen anlegen, und vor der Fälligkeit beginnt keine.
+   */
+  const startingBenchmark = useRef(false)
+  const [starting, setStarting] = useState(false)
   const startBenchmark = useCallback(() => {
+    if (startingBenchmark.current) return
+    startingBenchmark.current = true
+    setStarting(true)
     setAborted(undefined)
     void (async () => {
       const now = platform.clock.now()
       const day = dayKeyOf(now, { offsetMinutes: platform.clock.offsetMinutes(now) })
       const started = await beginRun(day, now, training)
+      if (!started.ok) {
+        /*
+         * Abgelehnt heißt: Es läuft bereits eine Messung, oder sie ist noch
+         * nicht fällig. Beides ist kein Fehler — der Stand wird neu gelesen,
+         * damit die Oberfläche zeigt, was wirklich gilt.
+         */
+        const open = await loadOpenRun()
+        if (open !== undefined) {
+          setOpen(open)
+          setMeasuring(true)
+        }
+        return
+      }
       setOpen({
         id: started.id,
         items: started.items,
@@ -749,6 +989,11 @@ export function App() {
       })
       setMeasuring(true)
     })()
+      .catch(() => undefined)
+      .finally(() => {
+        startingBenchmark.current = false
+        setStarting(false)
+      })
   }, [training, platform])
 
 
@@ -773,6 +1018,11 @@ export function App() {
     return (
       <OnboardingScreen
         dictionary={dictionary}
+        language={language}
+        training={training}
+        chooseTraining={chooseTraining}
+        trainable={trainable}
+        trainingSaveFailed={trainingSaveFailed}
         onDone={(answers, firstMemory) => {
           void (async () => {
             if (firstMemory !== undefined) {
@@ -859,7 +1109,7 @@ export function App() {
       counts: dimensionCounts,
       deltas: coachDeltas,
       taughtDigits: taught.length,
-      hasPalace: own !== undefined,
+      hasPalace: own.length > 0,
     }
     const pages: Partial<Record<MenuIconKind, { title: string; body: ReactNode }>> = {
       ...(reached.length > 0
@@ -882,6 +1132,52 @@ export function App() {
           />
         ),
       },
+      /*
+        Die Messung bekommt eine Tür im Core (Runde 2, Nutzerwunsch): Reihe,
+        Eichung und der nächste Termin sind auffindbar — gestartet wird aber
+        weiterhin nur, wenn sie fällig ist. Ein jederzeitiger Startknopf wäre
+        genau das Dauermessen, das die Methode ausschließt (F2b, R-1).
+      */
+      benchmark: {
+        title: dictionary.benchmark.heading,
+        body: (() => {
+          const nextDue = nextRunDue(runs[runs.length - 1])
+          const dueLine =
+            nextDue === undefined
+              ? undefined
+              : dictionary.benchmark.nextDueLine.replace(
+                  '{day}',
+                  new Date(`${nextDue}T00:00:00`).toLocaleDateString(language, {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                  }),
+                )
+          return (
+            <div className="benchmark-page">
+              {step.kind === 'invite' ? (
+                <section className="note" role="status">
+                  <h2>{dictionary.benchmark.invite}</h2>
+                  <p>{dictionary.benchmark.inviteNote}</p>
+                  <div className="note-actions">
+                    <button type="button" className="quiet" onClick={startBenchmark} disabled={starting}>
+                      {dictionary.benchmark.start}
+                    </button>
+                  </div>
+                </section>
+              ) : step.kind === 'none' ? (
+                dueLine !== undefined && <p className="hint">{dueLine}</p>
+              ) : (
+                <p className="hint">{dictionary.benchmark.runningNote}</p>
+              )}
+              <BenchmarkPanel runs={runs} language={training} dictionary={dictionary} />
+              {!runs.some(isComplete) && (
+                <p className="hint">{dictionary.benchmark.noneYet}</p>
+              )}
+            </div>
+          )
+        })(),
+      },
       coach: {
         title: dictionary.coach.heading,
         body: (
@@ -895,7 +1191,7 @@ export function App() {
       },
       contents: {
         title: dictionary.own.heading,
-        body: <OwnPanel language={training} dictionary={dictionary} />,
+        body: <OwnPanel language={training} dictionary={dictionary} platform={platform} />,
       },
       memories: {
         title: dictionary.memory.heading,
@@ -915,7 +1211,13 @@ export function App() {
       },
       palace: {
         title: dictionary.palace.heading,
-        body: <PalacePanel dictionary={dictionary} own={own} onChange={reloadOwn} />,
+        body: (
+          <PalacePanel
+            own={own}
+            onChange={reloadOwn}
+            platform={platform}
+          />
+        ),
       },
       reminder: {
         title: dictionary.reminder.heading,
@@ -932,12 +1234,91 @@ export function App() {
         ),
       },
       courses: {
-        title: language === 'de' ? 'Lernkurse' : language === 'fr' ? 'Cours d’apprentissage' : 'Learning courses',
+        title: dictionary.coursesHeading,
         body: <CoursesPanel language={language} platform={platform} />,
       },
       science: {
         title: dictionary.science.heading,
-        body: <SciencePanel dictionary={dictionary} />,
+        body: <SciencePanel language={language} />,
+      },
+      /*
+        „Geistig aktiv bleiben" steht direkt neben „Was belegt ist" — die
+        beiden gehoeren zusammen: Hier stehen Gewohnheiten mit ihrem
+        Belegstand, dort die Grundlagen der App mit ihrem. Wer den einen Ton
+        kennt, erkennt den anderen wieder (Geraetewunsch 31.08.).
+      */
+      /*
+        Der Lernbereich (Nutzerwunsch 03.09.): alle vier Methoden an einem
+        Ort, ohne Uhr. Er steht in der Schublade weit oben, weil er zum
+        Anfangen gehört und nicht zur Verwaltung.
+      */
+      learn: {
+        title: dictionary.learn.heading,
+        body: (
+          <LearnPanel
+            dictionary={dictionary}
+            language={language}
+            onPractise={(moduleId, laenge) => {
+              /*
+               * Die Übungsrunde beginnt sofort und enthält nur diese Methode
+               * (Nutzerbefund 04.09.). Vorher wurde hier bloß ein Schwerpunkt
+               * gesetzt und die Seite geschlossen — auf dem Gerät sah das
+               * aus, als lande man grundlos wieder im Core.
+               */
+              closePage()
+              start({ onlyModule: moduleId, mode: laenge })
+            }}
+          />
+        ),
+      },
+      /*
+        Hilfe und Fragen & Antworten (Nutzerwunsch 04.09.). Zwei Seiten, eine
+        Textdatei, ein Panel: Die Hilfe liest man der Reihe nach, die Fragen
+        schlägt man nach — derselbe Stoff wäre zweimal geführt der sichere Weg,
+        dass eine Hälfte veraltet.
+      */
+      help: {
+        title: helpHeading(language),
+        body: <HelpPanel language={language} view="help" />,
+      },
+      faq: {
+        title: faqHeading(language),
+        body: <HelpPanel language={language} view="faq" />,
+      },
+      brainCare: {
+        title: brainCareHeading(language),
+        body: (
+          <BrainCarePanel
+            onDemanding={() => {
+              /*
+               * Der Knopf heißt „Fordernde Einheit starten" — also startet er
+               * (Gerätemeldung 01.09., erneut am 06.09.).
+               *
+               * Zweimal gemeldet, wörtlich: „‚lancer une séance exigeante‘
+               * ramène au Core" und „fordernde Einheit starten führt zurück
+               * ins Core". Der erste Eingriff holte nur den Startknopf ins
+               * Bild und gab ihm den Fokus — das war eine Verbesserung am
+               * Landeplatz, aber es blieb dabei, dass der Knopf die Einheit
+               * bloß **einstellte** statt sie zu beginnen. Ein Etikett mit
+               * einem Verb, das nichts tut, wird beim zweiten Mal genauso
+               * gemeldet wie beim ersten.
+               *
+               * Dieselbe Lehre steht seit dem 04.09. eine Ebene höher bei
+               * `start`: „Vorher setzte ‚Üben' bloß einen Schwerpunkt und
+               * schloss die Seite; auf dem Gerät sah das aus, als lande man
+               * grundlos wieder im Core." Genau dieselbe Form, nur am anderen
+               * Knopf — und dort war sie längst behoben.
+               *
+               * Die Länge geht als Argument mit, nicht über den Zustand:
+               * `setMode` wirkt erst im nächsten Durchlauf. Es steht trotzdem
+               * dabei, damit der Startbildschirm hinterher zeigt, was lief.
+               */
+              setMode('extended')
+              closePage()
+              start({ mode: 'extended' })
+            }}
+          />
+        ),
       },
       ...(advice.kind === 'ios'
         ? {
@@ -983,6 +1364,35 @@ export function App() {
       check: {
         title: dictionary.check.heading,
         body: <FoundationPanel platform={platform} dictionary={dictionary} />,
+      },
+      settings: {
+        title: dictionary.settings.heading,
+        body: (
+          <div className="settings-page">
+            <LanguageSoundControls
+              dictionary={dictionary}
+              language={language}
+              choose={choose}
+              training={training}
+              chooseTraining={chooseTraining}
+              trainable={trainable}
+              translated={translated}
+              sound={sound}
+              tempo={tempo}
+              saveFailed={languageSaveFailed || trainingSaveFailed || sound.saveFailed || tempo.saveFailed}
+            />
+            <p className="hint">{dictionary.settings.note}</p>
+            {/*
+              Der Weg zurück auf null gehört dorthin, wo Menschen ihn suchen
+              (Runde 4, Nutzerwunsch) — dieselbe Komponente wie unter
+              „Sicherung", damit es nur einen Löschweg gibt. Der Hinweis
+              nennt vorher die Sicherung: Wer löscht, soll wissen, dass es
+              einen Weg gab, vorher etwas mitzunehmen.
+            */}
+            <p className="hint">{dictionary.settings.resetNote}</p>
+            <ResetPanel platform={platform} dictionary={dictionary} />
+          </div>
+        ),
       },
     }
     const entry = pages[pageId]
@@ -1075,7 +1485,7 @@ export function App() {
       */}
       {aborted !== undefined && (
         <section className="note" role="status">
-          <h3>{dictionary.benchmark.abortedTitle}</h3>
+          <h2>{dictionary.benchmark.abortedTitle}</h2>
           <p>{dictionary.benchmark.abortedNote}</p>
           <p className="hint">
             {aborted === 'again'
@@ -1090,7 +1500,7 @@ export function App() {
           */}
           {aborted === 'again' && step.kind === 'invite' && (
             <div className="note-actions">
-              <button type="button" className="quiet" onClick={startBenchmark}>
+              <button type="button" className="quiet" onClick={startBenchmark} disabled={starting}>
                 {dictionary.benchmark.start}
               </button>
             </div>
@@ -1100,10 +1510,10 @@ export function App() {
 
       {step.kind === 'invite' && aborted === undefined && (
         <section className="note" role="status">
-          <h3>{dictionary.benchmark.invite}</h3>
+          <h2>{dictionary.benchmark.invite}</h2>
           <p>{dictionary.benchmark.inviteNote}</p>
           <div className="note-actions">
-            <button type="button" className="quiet" onClick={startBenchmark}>
+            <button type="button" className="quiet" onClick={startBenchmark} disabled={starting}>
               {dictionary.benchmark.start}
             </button>
           </div>
@@ -1112,7 +1522,7 @@ export function App() {
 
       {step.kind === 'recall' && (
         <section className="note" role="status">
-          <h3>{dictionary.benchmark.ready}</h3>
+          <h2>{dictionary.benchmark.ready}</h2>
           <div className="note-actions">
             <button type="button" className="quiet" onClick={() => setMeasuring(true)}>
               {dictionary.benchmark.continue}
@@ -1123,7 +1533,7 @@ export function App() {
 
       {step.kind === 'waiting' && (
         <section className="note" role="status">
-          <h3>{dictionary.benchmark.waitingTitle}</h3>
+          <h2>{dictionary.benchmark.waitingTitle}</h2>
           <p>
             {step.phase === 'after20Minutes'
               ? dictionary.benchmark.waitingSoon
@@ -1139,7 +1549,7 @@ export function App() {
       */}
       {step.kind === 'missed' && open !== undefined && (
         <section className="note" role="status">
-          <h3>{dictionary.benchmark.missedTitle}</h3>
+          <h2>{dictionary.benchmark.missedTitle}</h2>
           <p>{dictionary.benchmark.missedNote}</p>
           <div className="note-actions">
             <button
@@ -1159,7 +1569,7 @@ export function App() {
 
       {resumable !== undefined && (
         <section className="note" role="status">
-          <h3>{dictionary.resume.heading}</h3>
+          <h2>{dictionary.resume.heading}</h2>
           <p>{dictionary.resume.body}</p>
           <div className="note-actions">
             <button
@@ -1201,7 +1611,12 @@ export function App() {
       <section className="challenge">
         {/* Kein Titel über dem Knopf — „5:00 Beginnen“ erklärt sich, und ein
             Etikett darüber wäre genau das Möbel, das G-2 weglässt. */}
-        <button type="button" className="start" onClick={start}>
+        {/*
+          `() => start()` und nicht `start`: Sonst reicht React das
+          Klick-Ereignis als Argument durch, und `start` läse darin eine
+          Übungsrunde, die es nicht gibt.
+        */}
+        <button type="button" className="start" onClick={() => start()}>
           <span className="start-time">{label}</span>
           <span className="start-label">{dictionary.start.start}</span>
         </button>
@@ -1262,72 +1677,37 @@ export function App() {
       </section>
 
       <div className="today-history" aria-label={dictionary.today.heading}>
-        <TrainingJourney courses={practisedCourses} days={trainingDays} today={today} returns={returns.total} dictionary={dictionary} />
+        <TrainingJourney courses={practisedCourses} days={trainingDays} today={today} returns={returns.total} language={language} />
         <StreakLine streak={streak} dictionary={dictionary} />
         <ReturnsLine returns={returns} dictionary={dictionary} />
       </div>
 
+      {/*
+        Der Tipp des Tages (Geraetewunsch 31.08.) — hoechstens einmal taeglich,
+        wegtippbar, mit dem Abschalter in sich selbst. Er sitzt bewusst hier
+        und nicht ueber dem Start: Er soll begleiten, nicht den Weg
+        versperren (D-015).
+      */}
+      <DailyTipMount platform={platform} today={today} />
+
       <footer className="footer">
-        <label className="language">
-          <span>{dictionary.language.label}</span>
-          <select value={language} onChange={(event) => choose(event.target.value as Language)}>
-            {SUPPORTED_LANGUAGES.map((tag) => (
-              <option key={tag} value={tag}>
-                {dictionary.language.names[tag]}
-              </option>
-            ))}
-          </select>
-        </label>
         {/*
-          Die Trainingssprache steht nur da, wenn es überhaupt eine Wahl gibt
-          (L7, G-2). Ein Auswahlfeld mit einem Eintrag wäre Möbel.
+          Sprache und Ton stehen doppelt: hier am Fuß **und** als
+          Core-Seite „Einstellungen“ (Runde 2, Nutzerwunsch) — dieselbe
+          Komponente, kein zweiter Zustand.
         */}
-        {trainable.length > 1 && (
-          <label className="language language-training">
-            <span>{dictionary.language.training}</span>
-            <select
-              value={training}
-              onChange={(event) => chooseTraining(event.target.value as Language)}
-            >
-              {trainable.map((tag) => (
-                <option key={tag} value={tag}>
-                  {dictionary.language.names[tag]}
-                </option>
-              ))}
-            </select>
-          </label>
-        )}
-
-        <button
-          type="button"
-          className="sound-toggle"
-          onClick={sound.toggle}
-          aria-pressed={sound.enabled}
-        >
-          <span aria-hidden="true">{sound.enabled ? '♪' : '·'}</span>
-          {sound.enabled ? dictionary.sound.on : dictionary.sound.off}
-        </button>
-
-        {/*
-          Fehlen Texte oder die eigene Wortliste (Backlog L6), wird auf der
-          Rückfallsprache trainiert. Das ist eine Einschränkung und wird als
-          solche gesagt, statt sie zu verstecken.
-        */}
-        {!translated && <p className="hint">{dictionary.language.incomplete}</p>}
-
-        {/*
-          Der Satz zur Trainingssprache steht bei ihr und nicht bei der
-          Oberfläche — er erklärt, was ein Wechsel bedeutet, und dass er
-          nichts verliert.
-        */}
-        {trainable.length > 1 && (
-          <>
-            <p className="hint">{dictionary.language.trainingNote}</p>
-            {trainable.length < SUPPORTED_LANGUAGES.length && (
-              <p className="hint">{dictionary.language.trainingOnly}</p>
-            )}
-          </>
-        )}
+        <LanguageSoundControls
+          dictionary={dictionary}
+          language={language}
+          choose={choose}
+          training={training}
+          chooseTraining={chooseTraining}
+          trainable={trainable}
+          translated={translated}
+          sound={sound}
+          tempo={tempo}
+          saveFailed={languageSaveFailed || trainingSaveFailed || sound.saveFailed || tempo.saveFailed}
+        />
 
         {/*
           Der Systemcheck aus M0 hat seinen Zweck erfüllt und beherrscht den
@@ -1388,6 +1768,23 @@ export function App() {
                 <path d="M6 6l12 12M18 6L6 18" />
               </svg>
             </button>
+            {/*
+              Die Einträge scrollen in einem eigenen Kasten, der Schließen-Knopf
+              steht darüber.
+
+              Vorher scrollte die ganze Schublade und der Knopf klebte mit
+              `position: sticky` oben — und weil sein Grund durchsichtig ist,
+              lief jeder Eintrag durch das ✕ hindurch. Gemessen auf einem
+              iPhone 14 Pro: bei Scrollstand 80 „Dein Stand", bei 200
+              „Memory DNA", bei 300 „Eigene Inhalte".
+
+              Mehr Abstand hätte das nicht gelöst, sondern nur verschoben,
+              welcher Eintrag wann darunterläuft. Ein deckender Streifen dahinter
+              löste es zwar, veränderte aber das Aussehen des Knopfs. Der Kasten
+              hier löst es an der Wurzel: Sein Inhalt wird an seiner Oberkante
+              abgeschnitten und betritt die Knopffläche gar nicht erst.
+            */}
+            <div className="drawer-scroll">
             <section className="menu-group">
               <h2 className="menu-label">{dictionary.menu.yours}</h2>
               {achievementsOf(achievementInput).length > 0 && (
@@ -1400,9 +1797,17 @@ export function App() {
                 <MenuIcon kind="profile" />
                 <span>{dictionary.profile.heading}</span>
               </button>
+              <button type="button" className="drawer-item" onClick={() => openPage('benchmark')}>
+                <MenuIcon kind="benchmark" />
+                <span>{dictionary.benchmark.heading}</span>
+              </button>
               <button type="button" className="drawer-item" onClick={() => openPage('coach')}>
                 <MenuIcon kind="coach" />
                 <span>{dictionary.coach.heading}</span>
+              </button>
+              <button type="button" className="drawer-item" onClick={() => openPage('learn')}>
+                <MenuIcon kind="learn" />
+                <span>{dictionary.learn.heading}</span>
               </button>
               <button type="button" className="drawer-item" onClick={() => openPage('memories')}>
                 <MenuIcon kind="memories" />
@@ -1420,20 +1825,67 @@ export function App() {
                 <MenuIcon kind="palace" />
                 <span>{dictionary.palace.heading}</span>
               </button>
+              {/*
+                „Geistig aktiv bleiben" gehört hierher (Nutzerentscheidung
+                06.09.: „der Punkt sollte her unter ‚Dein Stand' sein und
+                nicht ‚App & Gerät'").
+
+                Ich hatte es zuerst zu „Verstehen" gelegt, weil die Seite
+                etwas erklärt. Der Einwand ist besser: Sie erklärt nicht nur,
+                sie **handelt** — sie hat den Tipp des Tages und den Knopf in
+                die fordernde Einheit. Damit steht sie bei dem, was der Mensch
+                mit sich vorhat, und nicht bei den Auskunftsseiten.
+              */}
+              <button type="button" className="drawer-item" onClick={() => openPage('brainCare')}>
+                <MenuIcon kind="brainCare" />
+                <span>{brainCareHeading(language)}</span>
+              </button>
+            </section>
+            {/*
+              Die Gruppe für alles, was **erklärt** statt zu messen oder
+              einzustellen: Unter „Dein Stand" stünde eine Hilfe falsch — sie
+              sagt nichts über den Menschen —, und unter „App & Gerät" ginge
+              sie zwischen Sicherung und Einstellungen unter. Wer Hilfe sucht,
+              sucht sie oben.
+
+              Nutzerbefund 06.09., wörtlich: „wo bleibt jetzt aktiv bleiben.
+              Das finde ich nicht mehr im Core." Gemessen am Telefon
+              (390 × 844): Das Menü ist 1328 Pixel hoch, sichtbar sind 633 —
+              und „Geistig aktiv bleiben" saß bei 1027, als dritter Eintrag
+              unter „App & Gerät". Es war nie weg, aber es stand zwischen
+              Datenschutz und Sicherung, während direkt darüber eine Gruppe
+              namens „Verstehen" aufmachte, in der es nicht vorkam.
+
+              Beide Seiten erklären etwas und stellen nichts ein. Sie stehen
+              deshalb jetzt hier. „App & Gerät" wird dadurch um zwei Einträge
+              kürzer, und das zählt am Telefon doppelt: Diese Gruppe ist dort
+              als einzige **einspaltig** (`anitew-core-mobile.css`), acht
+              Einträge waren allein 656 Pixel.
+            */}
+            <section className="menu-group">
+              <h2 className="menu-label">{understandLabel(language)}</h2>
+              <button type="button" className="drawer-item" onClick={() => openPage('courses')}>
+                <MenuIcon kind="courses" />
+                <span>{dictionary.coursesHeading}</span>
+              </button>
+              <button type="button" className="drawer-item" onClick={() => openPage('help')}>
+                <MenuIcon kind="help" />
+                <span>{helpHeading(language)}</span>
+              </button>
+              <button type="button" className="drawer-item" onClick={() => openPage('faq')}>
+                <MenuIcon kind="faq" />
+                <span>{faqHeading(language)}</span>
+              </button>
+              <button type="button" className="drawer-item" onClick={() => openPage('science')}>
+                <MenuIcon kind="science" />
+                <span>{dictionary.science.heading}</span>
+              </button>
             </section>
             <section className="menu-group menu-group-device">
               <h2 className="menu-label">{dictionary.menu.device}</h2>
               <button type="button" className="drawer-item" onClick={() => openPage('reminder')}>
                 <MenuIcon kind="reminder" />
                 <span>{dictionary.reminder.heading}</span>
-              </button>
-              <button type="button" className="drawer-item" onClick={() => openPage('courses')}>
-                <MenuIcon kind="courses" />
-                <span>{language === 'de' ? 'Lernkurse' : language === 'fr' ? 'Cours d’apprentissage' : 'Learning courses'}</span>
-              </button>
-              <button type="button" className="drawer-item" onClick={() => openPage('science')}>
-                <MenuIcon kind="science" />
-                <span>{dictionary.science.heading}</span>
               </button>
               {advice.kind === 'ios' && (
                 <button type="button" className="drawer-item" onClick={() => openPage('install')}>
@@ -1457,10 +1909,182 @@ export function App() {
                 <MenuIcon kind="check" />
                 <span>{dictionary.check.heading}</span>
               </button>
+              <button type="button" className="drawer-item" onClick={() => openPage('settings')}>
+                <MenuIcon kind="settings" />
+                <span>{dictionary.settings.heading}</span>
+              </button>
             </section>
+            </div>
           </nav>
         </div>
       )}
     </main>
+  )
+}
+
+/*
+ * Sprache und Ton — als eine Komponente, weil sie an zwei Orten stehen:
+ * am Fuß des Startbildschirms und auf der Core-Seite „Einstellungen“
+ * (Runde 2, Nutzerwunsch). Zwei Abschriften derselben Regler wären der
+ * sichere Weg, dass eine davon veraltet.
+ */
+function LanguageSoundControls({
+  dictionary,
+  language,
+  choose,
+  training,
+  chooseTraining,
+  trainable,
+  translated,
+  sound,
+  tempo,
+  saveFailed,
+}: {
+  dictionary: Dictionary
+  language: Language
+  choose: (next: Language) => void
+  training: Language
+  chooseTraining: (next: Language) => void
+  trainable: readonly Language[]
+  translated: boolean
+  sound: ReturnType<typeof useSoundSetting>
+  tempo: ReturnType<typeof usePaceSetting>
+  /** R3-06: Eine der drei Einstellungen ließ sich nicht speichern. */
+  saveFailed: boolean
+}) {
+  return (
+    <>
+      <label className="language">
+        <span>{dictionary.language.label}</span>
+        <select value={language} onChange={(event) => choose(event.target.value as Language)}>
+          {/*
+            Nur Sprachen mit echtem Wörterbuch (TRANSLATION_WORKFLOW §6):
+            Ein Eintrag, der auf Englisch zurückfällt — bei Arabisch sogar
+            als RTL-Dokument mit englischem Text —, verspricht eine
+            Übersetzung, die es nicht gibt. Wer die App in einer noch
+            nicht übersetzten Systemsprache öffnet, bekommt weiterhin die
+            ehrliche Fußnote; angeboten wird sie erst, wenn sie fertig ist.
+          */}
+          {SUPPORTED_LANGUAGES.filter((tag) => tag === language || isTranslated(tag)).map(
+            (tag) => (
+              <option key={tag} value={tag}>
+                {dictionary.language.names[tag]}
+              </option>
+            ),
+          )}
+        </select>
+      </label>
+      {/*
+        Die Trainingssprache steht nur da, wenn es überhaupt eine Wahl gibt
+        (L7, G-2). Ein Auswahlfeld mit einem Eintrag wäre Möbel.
+      */}
+      {trainable.length > 1 && (
+        <label className="language language-training">
+          <span>{dictionary.language.training}</span>
+          <select
+            value={training}
+            onChange={(event) => chooseTraining(event.target.value as Language)}
+          >
+            {trainable.map((tag) => (
+              <option key={tag} value={tag}>
+                {dictionary.language.names[tag]}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+
+      <button
+        type="button"
+        className="sound-toggle"
+        onClick={sound.toggle}
+        aria-pressed={sound.enabled}
+      >
+        <span aria-hidden="true">{sound.enabled ? '♪' : '·'}</span>
+        {sound.enabled ? dictionary.sound.on : dictionary.sound.off}
+      </button>
+
+      {/*
+        Die drei Bereiche einzeln (Geraetewunsch 31.08.: „Toene nach
+        individuellen Bereichen aktivierbar oder alle auf einmal").
+
+        Sie stehen nur da, wenn der Hauptschalter an ist: Bei stiller App
+        waeren drei Schalter, die nichts bewirken, genau die Art Moebel, die
+        G-2 verbietet — und der eine Schalter darueber ist bereits das „alle
+        auf einmal". Der Inhalt wird verzoegert geladen (P4).
+      */}
+      {sound.enabled && <SoundAreas dictionary={dictionary} sound={sound} />}
+
+      {/*
+        Fehlen Texte oder die eigene Wortliste (Backlog L6), wird auf der
+        Rückfallsprache trainiert. Das ist eine Einschränkung und wird als
+        solche gesagt, statt sie zu verstecken.
+      */}
+      {!translated && <p className="hint">{dictionary.language.incomplete}</p>}
+
+      {/*
+        Der Satz zur Trainingssprache steht bei ihr und nicht bei der
+        Oberfläche — er erklärt, was ein Wechsel bedeutet, und dass er
+        nichts verliert.
+      */}
+      {trainable.length > 1 && (
+        <>
+          <p className="hint">{dictionary.language.trainingNote}</p>
+          {trainable.length < SUPPORTED_LANGUAGES.length && (
+            <p className="hint">{dictionary.language.trainingOnly}</p>
+          )}
+        </>
+      )}
+
+      {/*
+        Zeit zum Einprägen (Nutzerbefund 05.09.): „Man hat kaum Zeit, sich was
+        auszudenken."
+
+        Ein Auswahlfeld und keine drei Knöpfe — und zwar aus zwei Gründen, die
+        beide erst ein Fehlschlag gezeigt hat.
+
+        Der erste Entwurf benutzte `.mode`/`.mode-active`, die Pillen der
+        Längenwahl. Das kostete zwar kein Byte Kaltstart-CSS, machte aber
+        `.mode-active` doppeldeutig: Die Klasse bedeutete „die gewählte Länge",
+        wird in sechs Stylesheets beschrieben, und ein Kommentar nennt sie „den
+        einzigen anderen Schalter". Zwei Bildschirmprüfungen fanden auf einmal
+        zwei gewählte Pillen statt einer — zu Recht.
+
+        Ein eigener Zustandsstil hätte das Kaltstart-CSS von 12 288 auf 12 294
+        Byte gehoben. Das Auswahlfeld löst beides: Es ist dieselbe Bauform wie
+        die Sprach- und Trainingssprachwahl unmittelbar darüber, erbt deren
+        Stil vollständig und braucht weder eine neue Klasse noch eine neue
+        Regel.
+      */}
+      {/*
+        `language-pace` ist eine Marke und kein Stil: Sie trägt keine einzige
+        CSS-Regel. Ohne sie hieß der Selektor für die App-Sprache
+        `.language:not(.language-training) select` — und traf mit dieser Zeile
+        plötzlich zwei Felder. Dieselbe Sorte Fehler wie bei `.mode-active`
+        einen Schritt vorher: Ein vorhandener Stil ist geliehen, seine
+        Bedeutung nicht.
+      */}
+      <label className="language language-pace">
+        <span>{dictionary.settings.pace.heading}</span>
+        <select
+          value={tempo.pace}
+          onChange={(event) => tempo.choose(event.target.value as Pace)}
+        >
+          {(['much', 'normal', 'little'] as const).map((wahl) => (
+            <option key={wahl} value={wahl}>
+              {dictionary.settings.pace[wahl]}
+            </option>
+          ))}
+        </select>
+      </label>
+      <p className="hint">{dictionary.settings.pace.note}</p>
+
+      {/* R3-06: Nicht gespeichert heißt: gesagt, nicht angezeigt. */}
+      {saveFailed && (
+        <p className="coach-failure" role="alert">
+          {dictionary.settings.saveFailed}
+        </p>
+      )}
+    </>
   )
 }

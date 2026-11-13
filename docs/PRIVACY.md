@@ -2,26 +2,35 @@
 
 **Stand: 2026-09-30** · Backlog R4
 
-> Der kurze Teil zuerst: **ANITEW bleibt local-first.** Es gibt **kein Konto**
-> bei ANITEW, keine Werbung, keine Analyse-Dienste und keine Tracker.
-> Training, Erinnerungen, Messungen und Profil bleiben auf deinem Gerät. Nur
-> Funktionen, die du ausdrücklich einschaltest — Google-Drive-Abgleich, Coach
-> und Systembenachrichtigungen — benutzen dafür notwendige Netzdienste.
+> Der kurze Teil zuerst: **ANITEW bleibt local-first.** Es gibt **kein Konto bei ANITEW**,
+> keine Werbung, keine externen Analyse-Dienste und keine Tracker. Training,
+> Erinnerungen, Messungen und Profil bleiben auf deinem Gerät. Nur Funktionen,
+> die du ausdrücklich einschaltest oder auslöst — Google-Drive-Abgleich, KI-
+> Funktionen, Fotoanalyse und Systembenachrichtigungen — benutzen dafür notwendige
+> Netzdienste.
 
-Dieses Dokument ist die Quelle für den Datenschutztext im Store-Eintrag und
-für die Fassung in der App. Es steht nur drin, was die aktuelle Fassung tut.
+Dieses Dokument beschreibt, was die aktuelle Fassung von ANITEW tatsächlich tut.
 
 ---
 
-## 1. Wer verantwortlich ist
+## 1. Verantwortlicher für den Datenschutz
 
-Wer ANITEW betreibt und unter welcher Kontaktadresse, steht im Impressum bzw.
-im jeweiligen Store-Eintrag. Diese Angabe gehört dorthin, weil sie sich ändern
-kann, ohne dass sich die technische Verarbeitung ändert.
+Verantwortlicher im Sinne der Datenschutz-Grundverordnung (DSGVO):
+
+**ANITEW by Impekal**  
+Inhaber: **Dr. Mèhèza Kalibani**  
+Holstenwall 24  
+20335 Hamburg  
+Deutschland
+
+E-Mail: impekaltech+anitew@gmail.com  
+Telefon: +49 151 12784951
+
+Weitere Anbieterangaben stehen im [Impressum](/impressum.html).
 
 ## 2. Was auf deinem Gerät gespeichert wird
 
-Im Browserspeicher (IndexedDB) liegen unter anderem:
+Im Browserspeicher (vor allem IndexedDB; daneben localStorage/sessionStorage für Gerätevorlieben wie Theme, Erststart-Marken und flüchtige Hinweise) liegen unter anderem:
 
 | Was | Wofür |
 |---|---|
@@ -33,15 +42,47 @@ Im Browserspeicher (IndexedDB) liegen unter anderem:
 
 Diese Inhalte werden **nicht** für Web Push auf einen ANITEW-Server kopiert.
 
+ANITEW kann zusätzlich auf dem Gerät rein technische Diagnoseinformationen und
+aggregierte Beta-Messwerte berechnen. Sie enthalten keine Erinnerungstexte,
+Antwortinhalte, API-Schlüssel oder OAuth-Tokens und werden **nicht automatisch
+übertragen**. Ein Nutzer muss einen solchen Bericht ausdrücklich exportieren,
+bevor er ihn freiwillig weitergeben kann.
+
 ## 3. Was ANITEW nicht tut
 
 - Keine Werbung, Werbe-ID oder werbliche Profilbildung.
-- Keine Analyse-Dienste, Nutzungsstatistik oder Tracker.
+- Keine externen Analyse-Dienste, automatische Nutzungsstatistik oder Tracker.
 - Kein Upload deiner Trainings- oder Gedächtnisinhalte für Push.
-- Kein Zugriff auf Kontakte, Standort, Mikrofon oder Kamera.
+- Kein Zugriff auf Kontakte oder Standort.
+- Keine dauerhafte Aufzeichnung von Mikrofon oder Kamera im Hintergrund.
 - Keine öffentliche Bestenliste oder soziale Nutzerprofile.
 
-## 4. Was beim Aufruf technisch passiert
+## 4. Mikrofon, Diktat und Fotos
+
+### Diktat
+
+Wenn du die Diktierfunktion ausdrücklich startest, darf ANITEW das Mikrofon für
+**einen kurzen Diktatvorgang** verwenden. Die Spracherkennung wird nur gestartet,
+wenn der Browser eine lokale Spracherkennung bestätigt und `processLocally`
+unterstützt. ANITEW fällt bewusst **nicht** auf einen entfernten Browser-
+Sprachdienst zurück. Ist lokale Verarbeitung nicht verfügbar, bleibt Diktat aus.
+Der erkannte Text wird wie selbst eingegebener Text behandelt.
+
+### Fotoauswahl und Kamera
+
+„Foto wählen“ öffnet die vom Gerät bereitgestellte Bild-/Kameraauswahl. Das
+gewählte Originalfoto bleibt zunächst als flüchtige lokale Arbeitsvorlage im
+Browser-Arbeitsspeicher und wird nicht automatisch in IndexedDB, Backup oder
+Google Drive gespeichert.
+
+Erst wenn du zusätzlich **„Foto auswerten“** antippst, erzeugt ANITEW im Browser
+eine verkleinerte JPEG-Kopie ohne Datei-/EXIF-Metadaten und sendet diese direkt
+an den von dir gewählten und mit deinem eigenen API-Schlüssel eingerichteten
+KI-Anbieter. Das Originalfoto wird nicht an den Anbieter geschickt. Die KI-
+Antwort ist nur ein Vorschlag; gespeichert wird erst nach deiner ausdrücklichen
+Bestätigung.
+
+## 5. Was beim Aufruf technisch passiert
 
 Die App wird über Cloudflare Workers/Static Assets ausgeliefert. Wie bei jedem
 Webserver fallen dabei technisch Verbindungsdaten wie IP-Adresse, Zeitpunkt,
@@ -50,19 +91,26 @@ kein Nutzungsprofil.
 
 **Klartext:** Nach dem Laden ist das **Training selbst offlinefähig**.
 Netzzugriff wird nur für ausdrücklich gewählte Online-Funktionen benötigt.
-Drive-Abgleich, Coach und Systembenachrichtigungen sind aus,
-bis du sie anfasst.
+Drive-Abgleich, KI-Funktionen und Systembenachrichtigungen sind aus,
+bis du sie anfasst. Erst eine ausdrückliche Aktivierung oder Aktion startet den
+jeweiligen Online-Weg.
 
-## 5. Sicherung und Wiederherstellung
+## 6. Sicherung und Wiederherstellung
 
 „Sicherung speichern“ erzeugt eine JSON-Datei mit deinem ANITEW-Stand. Du
 entscheidest, wo sie liegt. Wer diese Datei besitzt, kann ihren Inhalt lesen.
+
+**Nicht in der Sicherung enthalten** sind gerätegebundene Werte: hinterlegte
+KI-API-Schlüssel, die Google-Kontoanzeige des Geräts und der technische
+Zustand des Drive-Abgleichs. Sie verlassen das Gerät weder in der Datei noch
+beim Drive-Abgleich; auch beim Einlesen einer älteren Datei, die solche Werte
+noch enthält, werden sie verworfen.
 
 Beim optionalen Google-Drive-Abgleich legt ANITEW dieselbe Sicherungsdatei in
 einem eigenen `Anitew`-Ordner deines Google Drive ab. ANITEW fasst andere
 Dateien nicht an.
 
-## 6. Systembenachrichtigungen / Web Push
+## 7. Systembenachrichtigungen / Web Push
 
 Wenn du „Benachrichtigungen erlauben“ ausdrücklich antippst und dein Gerät Web
 Push unterstützt, erzeugt der Browser eine **technische Push-Adresse** für
@@ -72,7 +120,15 @@ dieses Gerät. Für die Zustellung speichert ANITEW serverseitig nur:
 - die Kennung der Erinnerung (`daily` oder `benchmark`),
 - den fälligen Zeitpunkt,
 - bei der täglichen Erinnerung Uhrzeit und IANA-Zeitzone,
-- den generischen Benachrichtigungstext.
+- den generischen Benachrichtigungstext — auch als kurze Zustell-Notiz, die
+  nach dem Auslösen beim Server bereitliegt, bis dein Gerät sie abholt,
+  längstens aber 24 Stunden **ab dem fälligen Zeitpunkt** (bei der
+  Messerinnerung 60 Minuten); danach wird sie gelöscht statt verspätet
+  zugestellt. Die Frist zählt ab der Fälligkeit und beginnt durch einen
+  erneuten Zustellversuch nicht neu. Diese Frist gilt unabhängig davon,
+  ob noch spätere Erinnerungen geplant sind oder ob der Pushdienst gerade
+  nicht erreichbar ist. Bleibt weder ein Termin noch eine
+  Notiz übrig, wird der gesamte serverseitige Eintrag gelöscht.
 
 **Nicht gespeichert werden dafür:** Trainingsantworten, Gedächtnisinhalte,
 Profil, Name, E-Mail-Adresse, Messwerte oder Sicherungsdateien.
@@ -94,29 +150,66 @@ hinzugefügte Web-App auf unterstützten iOS/iPadOS-Versionen. Wenn Web Push auf
 einem Gerät nicht verfügbar ist, verspricht ANITEW keine geschlossene
 Systembenachrichtigung und fällt auf den Hinweis „nur solange offen“ zurück.
 
-## 7. Löschen und Übertragbarkeit
+## 8. Löschen und Übertragbarkeit
 
 - **Übertragbarkeit:** „Sicherung speichern“ exportiert deinen lokalen Stand.
 - **Vollständiger Neustart:** „Neu anfangen“ löscht die lokalen ANITEW-Daten,
-  trennt Google und widerruft das Push-Abonnement. Optional kann dabei auch
-  ANITEWs eigene Sicherungsdatei in deinem Google Drive gelöscht werden.
+  schaltet den Google-Abgleich lokal aus und widerruft das Push-Abonnement.
+  Optional kann dabei auch ANITEWs eigene Sicherungsdatei in deinem Google
+  Drive gelöscht werden. Ist der OAuth-Worker beim Neustart gerade nicht
+  erreichbar, wird die technische Browser-Abmeldung beim nächsten erreichbaren
+  Start nachgeholt; ein Drive-Abgleich kann in dieser Zwischenzeit nicht mehr
+  starten, weil sein lokaler Schalter bereits gelöscht ist.
 - **Nur Erinnerung aus:** „Keine Erinnerung“ beendet die tägliche Erinnerung,
   ohne deine Trainingsdaten zu löschen.
 
-## 8. Google-Drive-Abgleich
+## 9. Google-Drive-Abgleich
 
 Google Drive ist aus, bis du ihn selbst einschaltest. Die Anmeldung erfolgt
-über Google OAuth. Der Cloudflare Worker tauscht den Google-
-Autorisierungscode gegen Tokens und hält die Sitzung verschlüsselt in einem
-`HttpOnly`-Cookie des Browsers; der Token wird nicht in einer ANITEW-
-Nutzerdatenbank gespeichert. Das Gerät nutzt den Zugriff anschließend für den
-ANITEW-Ordner im eigenen Drive. Name/E-Mail, die in der Oberfläche zur
-Kontokontrolle angezeigt werden, werden lokal in ANITEWs Gerätespeicher
-gehalten und beim Trennen entfernt.
+über Google OAuth. ANITEW fordert dabei neben dem Drive-Zugriff die
+Google-Basisauskunft (`openid email profile`) an — nur damit die Oberfläche
+zeigen kann, als wer du verbunden bist. Der Cloudflare Worker tauscht den
+Google-Autorisierungscode gegen Tokens und hält die Sitzung — einschließlich
+des Google-Refresh-Tokens — verschlüsselt in einem `HttpOnly`-Cookie deines
+Browsers. Die Laufzeit ist ab Anmeldung fest auf höchstens 180 Tage begrenzt;
+die Frist wird durch Nutzung **nicht** verlängert.
+
+Googles Zustimmungsbildschirm führt den Drive-Zugriff als eigenes, nicht
+vorausgewähltes Kästchen. Ob du es angehakt hast, sagt Google dem Worker in
+seiner Antwort; der Worker merkt sich davon **ein Ja oder Nein** in derselben
+verschlüsselten Sitzung und gibt dieses Ja/Nein an die Oberfläche weiter —
+nie Googles Freigabeliste selbst. Nur dadurch kann ANITEW dir gleich bei der
+Anmeldung sagen, dass das Kästchen leer geblieben ist, statt dich das beim
+ersten Speicherversuch an einer Fehlermeldung von Google merken zu lassen.
+Ohne dieses Häkchen bleibt alles auf deinem Gerät; verloren geht nichts.
+
+Beim Antippen von „Google-Konto trennen“ wird der Drive-Abgleich auf dem Gerät
+**sofort dauerhaft ausgeschaltet** und die lokal angezeigte Kontoidentität
+entfernt. Ist der Worker erreichbar, löscht er dabei zugleich den HttpOnly-
+Sitzungscookie und versucht den Google-Token zu widerrufen. Ist der Worker
+vorübergehend nicht erreichbar — etwa weil das Gerät offline ist — kann der
+Browser den HttpOnly-Cookie technisch nicht selbst löschen. ANITEW merkt dann
+nur diesen ausstehenden technischen Logout lokal vor und versucht ihn beim
+nächsten Start bzw. beim nächsten Online-Werden erneut. Der Drive-Abgleich
+bleibt währenddessen aus; der liegengebliebene Cookie allein aktiviert ihn
+nicht. Unabhängig davon endet die versiegelte Sitzung spätestens mit ihrer
+festen 180-Tage-Frist.
+
+**Übergangsregel für ältere Anmeldungen:** Sitzungen, die vor Einführung
+dieser festen Frist entstanden sind, tragen keinen Anmeldezeitpunkt in sich;
+er lässt sich nachträglich nicht ermitteln und wird auch nicht geschätzt.
+Solche Sitzungen laufen deshalb spätestens **30 Tage** nach der ersten
+Nutzung mit der neuen Fassung ab — kürzer als jede Restlaufzeit, die sie
+zuvor gehabt hätten. Danach ist eine neue Anmeldung nötig; für diese gilt
+dann die feste 180-Tage-Frist ab Anmeldung. Es gibt keine ANITEW-Nutzerdatenbank, in der Tokens
+lägen. Das Gerät nutzt den Zugriff anschließend für den ANITEW-Ordner im
+eigenen Drive. Name/E-Mail, die in der Oberfläche zur Kontokontrolle
+angezeigt werden, werden lokal in ANITEWs Gerätespeicher gehalten und beim
+Trennen entfernt.
 
 Für Google gelten zusätzlich Googles Datenschutzbedingungen.
 
-## 9. Coach mit eigenem API-Schlüssel
+## 10. KI-Funktionen mit eigenem API-Schlüssel
 
 Der Coach überträgt erst etwas, wenn du eigene Schlüssel hinterlegst und eine
 Frage stellst. Unterstützt werden **Gemini, Anthropic, OpenAI, Groq, OpenRouter
@@ -140,14 +233,48 @@ lokal zwischengespeichert. Beim Training werden keine Bilder von Pexels oder
 anderen Bilddiensten angefordert. Namen und Szenendetails sind fiktive
 Übungsdaten; Bildquellen stehen unter „Portraits und Bildnachweise“.
 
-## 10. Kinder
+Für die Fotoanalyse werden ausschließlich Gemini, Anthropic oder OpenAI
+unterstützt. Wie in Abschnitt 4 beschrieben, wird dabei erst nach „Foto auswerten“
+eine vorbereitete Bildkopie übertragen.
+
+Der API-Schlüssel bleibt auf deinem Gerät. Für die Verarbeitung beim jeweiligen
+Anbieter gilt zusätzlich dessen Datenschutzerklärung.
+
+## 11. Rechtsgrundlagen und Speicherdauer
+
+Soweit ANITEW Daten nur auf deinem Gerät verarbeitet, bestimmst du durch Nutzung,
+Export und Löschen über ihren Bestand. Bei freiwillig aktivierten Online-
+Funktionen erfolgt die Verarbeitung zur Bereitstellung der jeweils ausdrücklich
+gewählten Funktion. Konkrete Fristen: Das verschlüsselte Google-Sitzungs-Cookie
+läuft spätestens 180 Tage nach Anmeldung ab und wird durch Nutzung nicht
+verlängert. Bei einer Abmeldung wird der lokale Drive-Abgleich sofort beendet;
+der Worker löscht den Cookie beim bestätigten Logout. Kann der Worker in diesem
+Moment nicht erreicht werden, wird genau dieser technische Logout beim nächsten
+Online-Start erneut versucht. Sitzungen aus der Zeit vor der 180-Tage-Regel
+laufen nach der Übergangsregel in Abschnitt 9 spätestens 30 Tage nach der
+ersten Nutzung mit der neuen Fassung ab. Serverseitige Push-Einträge bestehen,
+bis der Termin zugestellt und abgeholt ist, du die Erinnerung beendest oder das
+Push-Abonnement endet — nicht abgeholte Zustell-Notizen längstens 24 Stunden
+(Messerinnerung: 60 Minuten). Technische Infrastrukturprotokolle und Daten bei
+externen Anbietern unterliegen zusätzlich deren gesetzlichen und vertraglichen
+Aufbewahrungsregeln.
+
+## 12. Deine Rechte
+
+Soweit personenbezogene Daten durch den Verantwortlichen verarbeitet werden,
+hast du im gesetzlichen Umfang insbesondere Rechte auf Auskunft, Berichtigung,
+Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch.
+Außerdem besteht das Recht, sich bei einer zuständigen Datenschutzaufsichtsbehörde
+zu beschweren. Für Anfragen genügt die oben genannte E-Mail-Adresse.
+
+## 13. Kinder
 
 ANITEW hat keine Chatfunktion zwischen Nutzern, keine öffentliche Bestenliste
-und keine Werbung. Die oben beschriebenen freiwilligen Online-Funktionen
-folgen denselben Regeln unabhängig vom Alter.
+und keine Werbung. Die oben beschriebenen freiwilligen Online-Funktionen folgen
+denselben technischen Regeln unabhängig vom Alter.
 
-## 11. Änderungen
+## 14. Änderungen
 
 Ändert sich die Verarbeitung, wird diese Erklärung mit neuem Datum angepasst.
-Eine Funktion, die zusätzliche Daten überträgt, darf nicht stillschweigend
-unter einem alten Datenschutztext erscheinen.
+Eine Funktion, die zusätzliche Daten überträgt, darf nicht stillschweigend unter
+einem alten Datenschutztext erscheinen.

@@ -1,0 +1,93 @@
+/* ── Ton-Bereiche (Gerätewunsch 31.08.) ────────────────────────────────────
+   Drei Schalter unter dem Hauptschalter: Rückmeldung, Ankommen, Klang
+   während der Einheit. Sie sind bewusst untereinander und nicht in einer
+   Reihe — jeder trägt eine Erklärzeile, und drei Erklärungen nebeneinander
+   sind auf einem Telefon unlesbar. */
+.sound-areas {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+}
+
+.sound-areas-label {
+  margin: 0;
+  color: var(--ink-soft);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.sound-area {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  padding: 0.6rem 1rem;
+  text-align: left;
+}
+
+.sound-area-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.sound-area-name {
+  color: var(--ink);
+}
+
+/* Abgeschaltet bleibt lesbar, wirkt aber zurückgenommen — kein Ausgrauen,
+   das die Schrift unter den Kontrastanspruch drückt (O4). */
+.sound-area[aria-pressed='false'] .sound-area-name {
+  color: var(--ink-soft);
+}
+
+/*
+  Eingeschaltet trägt eine Fläche (Gerätemeldung 01.09.: „Das ist entweder
+  oder. Man kann nicht mehrere aktivieren").
+
+  Der Zustand hing vorher an einem ♪ gegen einen Punkt. Daneben füllte
+  `:hover` die zuletzt berührte Zeile ganz aus — und auf einem Telefon
+  bleibt das kleben. Das Auge glaubt der Fläche, nicht dem Zeichen: Also
+  bekommt der eingeschaltete Bereich die Fläche, und zwar dieselbe für alle
+  drei, unabhängig davon, welchen man zuletzt berührt hat.
+
+  Dieselbe Sprache wie bei `.mode-active`, dem einzigen anderen Schalter der
+  App, der eine Auswahl trägt.
+*/
+.sound-area[aria-pressed='true'] {
+  background: var(--accent-soft);
+  border-color: color-mix(in oklab, var(--accent) 42%, transparent);
+}
+
+.sound-area[aria-pressed='true'] .sound-area-name {
+  color: var(--ink);
+}
+
+/*
+  Der Zeiger darf nicht aussehen wie der Zustand (CI-Fund auf dem
+  Desktop-Profil, 01.09.).
+
+  Auf dem Telefon greift `:hover` seit derselben Runde gar nicht mehr. Am
+  Schreibtisch soll er greifen — dort zeigt er, wo der Zeiger steht, und das
+  ist eine nützliche Auskunft. Nur trug er bis hier dieselbe Farbe wie
+  „eingeschaltet“: Eine **abgeschaltete** Zeile unter dem Zeiger sah damit aus
+  wie eine eingeschaltete. Der eigene Test hat es gefunden, und der Befund war
+  echt, nicht der Test zu streng.
+
+  Deshalb ist die Fläche unter dem Zeiger schwächer als die eingeschaltete —
+  und wer eine eingeschaltete Zeile berührt, sieht weiterhin die volle.
+*/
+@media (hover: hover) and (pointer: fine) {
+  .quiet.sound-area:hover {
+    background: color-mix(in oklab, var(--accent-soft) 40%, transparent);
+    border-color: var(--line);
+  }
+
+  .quiet.sound-area[aria-pressed='true']:hover {
+    background: var(--accent-soft);
+    border-color: color-mix(in oklab, var(--accent) 42%, transparent);
+  }
+}

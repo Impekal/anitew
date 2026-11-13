@@ -139,8 +139,11 @@
   text-transform: uppercase !important;
 }
 .today-system {
-  color: rgb(140 207 192 / 70%) !important;
-  font-size: 9px !important;
+  /* 9 Pixel bei 70 % Deckkraft waren gemessen — und für eine Zeile, die den
+     ganzen Bereich benennt, zu wenig. Sie ist jetzt lesbar und trägt ihre
+     Farbe voll; die Sperrung bleibt, sie macht die Zeile ruhig, nicht klein. */
+  color: rgb(140 207 192 / 92%) !important;
+  font-size: 12px !important;
   text-align: center;
 }
 .today .constellation {
@@ -156,7 +159,9 @@
   mask-image: radial-gradient(circle, black 0 64%, transparent 92%);
 }
 .today .constellation svg {
-  transform: translateZ(30px) scale(1.04) !important;
+  /* Ohne die Tiefe, aus demselben Grund wie in anitew-phase4.css: Sie war
+     wirkungslos und machte die Knoten unantippbar. Die Vergrößerung bleibt. */
+  transform: scale(1.04) !important;
 }
 .today-mission {
   position: relative;
@@ -208,6 +213,16 @@
 /* Pulse is a signal emerging from the world, not another dashboard card. */
 .memory-pulse {
   position: relative;
+  /*
+    Einspaltig — und das ist kein Geschmack, sondern die Bedingung dafür,
+    dass der Text überhaupt lesbar ist: Das Redesign-Stylesheet setzt hier
+    ein zweispaltiges Raster (`2.5rem 1fr`) mit der Marke in Spalte 1.
+    Unten wird die Marke aber absolut positioniert und damit aus dem Raster
+    genommen; der Textblock rutschte dadurch in die 40 px schmale erste
+    Spalte und lief senkrecht Wort für Wort nach unten (auf echtem iPhone
+    gefunden). Der Platz für die Marke kommt hier aus `padding-left`.
+  */
+  display: block !important;
   margin: 12px 0 4px !important;
   padding: 18px 0 20px 76px !important;
   border: 0 !important;
@@ -298,7 +313,9 @@
     inset 0 0 60px rgb(140 207 192 / 4%),
     0 26px 90px rgb(0 0 0 / 36%),
     0 0 70px rgb(216 168 90 / 10%) !important;
-  backdrop-filter: blur(18px) saturate(116%);
+  /* Kein `backdrop-filter` (Gerätemeldung 01.09.): 270 × 270 px Weichzeichner
+     über einer Fläche, in der sich etwas bewegt, werden in jedem Bild neu
+     gerechnet. Die drei Verläufe darüber tragen den Knopf auch ohne. */
   transform-style: preserve-3d;
 }
 .start::before {
@@ -423,14 +440,38 @@
   overflow-y: auto !important;
   overscroll-behavior: contain;
 }
+/*
+ * Zentriert wird ueber automatische Aussenabstaende, nicht ueber `left: 50%`.
+ *
+ * Hier stand `left: 50% !important; translate: -50% 0` zusammen mit
+ * `margin: 0 0 46px !important`. Beides zusammen ergibt nur dann die Mitte,
+ * wenn der Knopf statisch schon links am Rand beginnt. Genau das tat er, weil
+ * `anitew-first-run.css` `margin: 0 auto` und `left: auto` setzte — dieses
+ * Blatt wird jedoch **nur beim ersten Besuch** geladen.
+ *
+ * Ohne es blieb `left: 50%` allein stehen und schob den Knopf zusaetzlich zu
+ * seiner (durch `align-self: flex-end` ohnehin schon rechten) Position um
+ * weitere 171 px nach rechts. Gemessen im iPhone-Profil, zweiter Besuch:
+ * Knopf bei x=428, `scrollWidth` der Schublade 522 gegen 374 sichtbare Pixel.
+ * Der Ueberstand machte die Schublade zu einem Scrollbehaelter, WebKit merkte
+ * sich `scrollLeft: 120` — und `overflow-x: hidden` verhinderte danach das
+ * Zurueckscrollen. Das ist die vom Geraet gemeldete „halbe, nicht scrollbare"
+ * Anzeige.
+ *
+ * `margin: 0 auto` zentriert in allen drei Kontexten, in denen dieser Knopf
+ * vorkommt: Blockfluss, Flex-Spalte (automatische Abstaende auf der
+ * Querachse schlagen `align-self`) und Grid. Eine Verschiebung, die von der
+ * Anwesenheit eines anderen Blattes abhaengt, gibt es damit nicht mehr.
+ */
 .drawer-close {
   position: relative !important;
-  left: 50% !important;
+  left: auto !important;
+  right: auto !important;
   top: auto !important;
-  translate: -50% 0;
+  translate: none !important;
   width: 72px !important;
   height: 72px !important;
-  margin: 0 0 46px !important;
+  margin: 0 auto 46px !important;
   border: 0 !important;
   border-radius: 50% !important;
   background:
@@ -639,7 +680,6 @@
   #challenge-heading { margin-top: 66px !important; }
   .modes { grid-template-columns: repeat(2, 1fr) !important; width: min(100%, 380px); }
   .drawer { padding-left: 15px !important; padding-right: 15px !important; }
-  .drawer-close { margin-bottom: 34px !important; }
   .menu-group { gap: 12px 7px !important; }
   .drawer-item { min-height: 104px !important; }
   .drawer-item > span:last-child { font-size: 12.5px; }

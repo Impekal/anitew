@@ -55,7 +55,7 @@ export function ProfilePanel({
   const bars = trainingFootprint(trained, today, 8)
   const footprint = bars.some((week) => week.daysTrained > 0) && (
     <div className="footprint">
-      <h3 className="coach-source">{t.footprintHeading}</h3>
+      <h2 className="coach-source">{t.footprintHeading}</h2>
       <div className="footprint-bars" aria-hidden="true">
         {bars.map((week, index) => (
           <span
@@ -111,7 +111,7 @@ export function ProfilePanel({
       */}
       {trajectories.length > 0 && (
         <div className="profile-history">
-          <h3 className="coach-source">{dictionary.benchmark.series}</h3>
+          <h2 className="coach-source">{dictionary.benchmark.series}</h2>
           <ul className="axes profile-history-axes">
             {trajectories.map(({ id, first, last }) => (
               <li key={id} className="axis axis-measured">

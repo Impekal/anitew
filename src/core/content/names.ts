@@ -81,11 +81,37 @@ const esMasculine = [
   'Salvador', 'Tomás', 'Vicente', 'Xabier', 'Bruno', 'Gael', 'Íñigo', 'Ramiro',
 ]
 
+const itFeminine = [
+  'Alessia', 'Bianca', 'Chiara', 'Donatella', 'Elisa', 'Federica', 'Giada', 'Ilaria',
+  'Laura', 'Mirella', 'Nadia', 'Paola', 'Renata', 'Silvia', 'Teresa', 'Valentina',
+  'Zoe', 'Arianna', 'Camilla', 'Eleonora', 'Francesca', 'Giorgia', 'Ludovica', 'Serena',
+]
+
+const itMasculine = [
+  'Aldo', 'Cristiano', 'Davide', 'Enzo', 'Federico', 'Giulio', 'Ivan', 'Leonardo',
+  'Massimo', 'Nicola', 'Ottavio', 'Paolo', 'Riccardo', 'Salvatore', 'Tiziano', 'Valerio',
+  'Walter', 'Emanuele', 'Gabriele', 'Maurizio', 'Renato', 'Sergio', 'Tommaso', 'Vincenzo',
+]
+
+const ptFeminine = [
+  'Adriana', 'Bárbara', 'Clarice', 'Débora', 'Eloá', 'Fabiana', 'Helena', 'Ivone',
+  'Jéssica', 'Lígia', 'Madalena', 'Nara', 'Priscila', 'Quitéria', 'Rita', 'Sílvia',
+  'Tainá', 'Valéria', 'Yara', 'Zélia', 'Aparecida', 'Cecília', 'Flávia', 'Mônica',
+]
+
+const ptMasculine = [
+  'Afonso', 'Breno', 'Caetano', 'Davi', 'Estevão', 'Fábio', 'Gilberto', 'Heitor',
+  'Ivo', 'Júlio', 'Leandro', 'Murilo', 'Nélio', 'Otávio', 'Rafael', 'Saulo',
+  'Tiago', 'Vítor', 'Wagner', 'Zeca', 'Augusto', 'Cássio', 'Henrique', 'Márcio',
+]
+
 const POOLS: Partial<Record<Language, readonly string[]>> = {
   de: interleave(deMasculine, deFeminine),
   en: interleave(enMasculine, enFeminine),
   fr: interleave(frMasculine, frFeminine),
   es: interleave(esMasculine, esFeminine),
+  it: interleave(itMasculine, itFeminine),
+  pt: interleave(ptMasculine, ptFeminine),
 }
 
 const FEMININE: ReadonlySet<string> = new Set([
@@ -93,6 +119,8 @@ const FEMININE: ReadonlySet<string> = new Set([
   ...enFeminine,
   ...frFeminine,
   ...esFeminine,
+  ...itFeminine,
+  ...ptFeminine,
 ])
 
 export function namePool(language: Language): readonly string[] {

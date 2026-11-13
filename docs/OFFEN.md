@@ -1,5 +1,18 @@
 # Was noch offen ist — und wer es tun muss
 
+## 2026-11-13 · Produktlinien zusammenführen und geprüft veröffentlichen
+
+Die ausdrückliche Freigabe für Push und Deployment ersetzt die älteren
+Sperren unten. Produktzweig ist `anitew-v4-2-living-memory`; automatische
+Veröffentlichung erst nach dem vollständigen grünen CI-Tor. Kein Merge von PR #57.
+Die 30-Minuten-Automation ist auf Nutzerwunsch pausiert; aktive Arbeit läuft
+in der Unterhaltung weiter. Aktueller Prüfstand: `CURRENT_STATE.md` und
+`INTEGRATION_2026-11-13.md`. Historische Einträge bleiben erhalten.
+
+Offen bleiben natürliche DE/FR-Sprechanimationen, vollständige audiovisuelle
+Abnahme und reale iOS-/Android-Geräteprüfungen. Der Nutzer wünscht weiterhin
+sprechenden Atta; illustrierte Kurse ersetzen diesen Auftrag nicht.
+
 ## 2026-10-11 · Alle 36 Kursvideos lokal verfügbar
 
 Alle zwölf Methoden haben nun eine lokale Videofassung in DE/EN/FR.
@@ -131,15 +144,20 @@ Das kann kein Code erledigen. Reihenfolge wie im Gespräch: Geld zuletzt.
 1. [console.cloud.google.com](https://console.cloud.google.com) → neues Projekt (Name z. B. „ANITEW“).
 2. **APIs & Dienste → Bibliothek** → „Google Drive API“ aktivieren.
 3. **APIs & Dienste → OAuth-Zustimmungsbildschirm**: extern, App-Name
-   ANITEW, deine Mail. Unter Datenzugriff/Scopes den Scope
-   `…/auth/drive.appdata` hinzufügen. Solange die App im Status
+   ANITEW, deine Mail. Unter Datenzugriff/Scopes die Scopes
+   `…/auth/drive.file` sowie `openid`, `email`, `profile` hinzufügen
+   (seit dem sichtbaren „Anitew“-Ordner gilt `drive.file`, nicht mehr
+   `drive.appdata`). Solange die App im Status
    „Testing“ ist, dich selbst als Testnutzer eintragen — für dich
    funktioniert alles sofort; Googles Freigabeverfahren für alle (N10)
    kann später folgen.
 4. **Anmeldedaten → Anmeldedaten erstellen → OAuth-Client-ID**: Typ
    „Webanwendung“. Bei „Autorisierte JavaScript-Quellen“
    `https://anitew.impekaltech.workers.dev` eintragen (und später die
-   eigene Domain). Weiterleitungs-URIs braucht es nicht.
+   eigene Domain). Als **autorisierte Weiterleitungs-URI** ist seit dem
+   Redirect-Code-Flow zwingend
+   `https://anitew.impekaltech.workers.dev/oauth/google/callback`
+   einzutragen.
 5. Die Client-ID (endet auf `.apps.googleusercontent.com`) entweder mir
    geben — oder selbst in Cloudflare unter *Workers & Pages → Projekt →
    Einstellungen → Variablen* als `VITE_GOOGLE_CLIENT_ID` setzen und neu

@@ -55,6 +55,30 @@ test('lässt die Oberfläche deutsch und den Inhalt englisch werden', async ({ p
   expect(await itemLanguages(page)).toEqual(['en'])
 })
 
+test('trainiert Italienisch als eigene Reihe statt als englischen Rückfall', async ({ page }) => {
+  test.setTimeout(180_000)
+
+  await visit(page)
+  await expect(startButton(page)).toBeVisible()
+  await page.locator('.language-training select').selectOption('it')
+  await expect(page.locator('.language-training select')).toHaveValue('it')
+
+  await trainOnce(page)
+  expect(await itemLanguages(page)).toEqual(['it'])
+})
+
+test('trainiert Portugiesisch als eigene Reihe statt als englischen Rückfall', async ({ page }) => {
+  test.setTimeout(180_000)
+
+  await visit(page)
+  await expect(startButton(page)).toBeVisible()
+  await page.locator('.language-training select').selectOption('pt')
+  await expect(page.locator('.language-training select')).toHaveValue('pt')
+
+  await trainOnce(page)
+  expect(await itemLanguages(page)).toEqual(['pt'])
+})
+
 test('legt für jede Trainingssprache eine eigene Reihe an (L5)', async ({ page }) => {
   test.setTimeout(240_000)
 
@@ -73,14 +97,14 @@ test('legt für jede Trainingssprache eine eigene Reihe an (L5)', async ({ page 
   expect(await itemLanguages(page)).toEqual(['de', 'en'])
 })
 
-test('sagt, warum nicht alle elf Sprachen zur Auswahl stehen', async ({ page }) => {
+test('sagt, warum nur vollständig trainierbare Sprachen zur Auswahl stehen', async ({ page }) => {
   await visit(page)
   await expect(startButton(page)).toBeVisible()
 
   // Angeboten wird nur, wofür es eigenen Inhalt gibt — und die App sagt das,
   // statt eine Sprache zu versprechen, in der sie englische Wörter zeigt.
   const options = await page.locator('.language-training select').locator('option').allTextContents()
-  expect(options).toEqual(['Deutsch', 'English', 'Français', 'Español'])
+  expect(options).toEqual(['Deutsch', 'English', 'Français', 'Español', 'Italiano', 'Português'])
   await expect(page.getByText(/Eine Sprache anzubieten und dann englische Wörter/)).toBeVisible()
 
   /*
@@ -90,7 +114,23 @@ test('sagt, warum nicht alle elf Sprachen zur Auswahl stehen', async ({ page }) 
    * `<select>` umschließt. Sein Text enthält damit auch alle Optionen, und
    * ein genauer Vergleich findet gar nichts mehr.
    */
-  // Die Oberfläche kann trotzdem alle elf.
-  const ui = await page.locator('.language:not(.language-training) select').locator('option').allTextContents()
-  expect(ui.length).toBe(11)
+  /*
+    Die Oberfläche bietet nur an, was wirklich übersetzt ist
+    (TRANSLATION_WORKFLOW §6). Neun Einträge, die still auf Englisch
+    zurückfielen — Arabisch sogar als RTL-Dokument mit englischem Text —,
+    wären ein Versprechen ohne Deckung. Eine per Systemsprache aufgelöste,
+    noch unübersetzte Sprache bleibt mit ehrlicher Fußnote nutzbar.
+
+    Seit den sechs Oberflächensprachen ist die gedeckte Menge
+    TRANSLATED_LANGUAGES — exakt diese sechs, exakt in dieser Reihenfolge.
+    Die Genau-Gleichheit bleibt der Wächter: eine siebte, nur halb
+    übersetzte Sprache dürfte hier wieder nicht auftauchen.
+  */
+  // Wie in `foundation.spec.ts`: Drei Zeilen tragen `.language`, gemeint ist
+  // die App-Sprache.
+  const ui = await page
+    .locator('.language:not(.language-training):not(.language-pace) select')
+    .locator('option')
+    .allTextContents()
+  expect(ui).toEqual(['Deutsch', 'English', 'Français', 'Español', 'Italiano', 'Português'])
 })

@@ -9,7 +9,7 @@ describe('25% answer reserve', () => {
   for (const mode of TRAINING_MODES) for (const difficulty of [-1, 0, 1] as const) {
     it(`${mode}, difficulty ${difficulty}: preserves content and encoding, extends every answer block`, () => {
       const input: PlanInput = { mode, day: '2026-09-29', language: 'de', seed: 'reserve',
-        pools: { words: wordPool('de'), faces: [], numbers: [], missions: [], palace: [], reverse: [], twins: [], gaze: gazePool('reserve', 40), facts: [], memory: [] },
+        pools: { words: wordPool('de'), faces: [], numbers: [], missions: [], palace: [], reverse: [], twins: [], gaze: gazePool('reserve', 40), facts: [], memory: [], people: [], math: [] },
         modules: ['words', 'gaze'], due: { words: ['Anker', 'Besen'] }, difficulty: { words: difficulty, gaze: difficulty } }
       const before = basePlan(input as BaseInput)
       const after = planSession(input)

@@ -15,9 +15,9 @@ import type { Dictionary } from '../../i18n/index.ts'
  *
  * - Vor der dritten Messung steht **keine Veränderung** da, nur „Eichung“.
  * - Danach steht eine **Spanne**, kein exakter Wert.
- * - Enthält die Spanne die Null, sagt die App **„kein Unterschied, der sich
- *   vom Zufall trennen lässt“** — statt eine kleine Zahl als Erfolg zu
- *   verkaufen.
+ * - Enthält die Spanne die Null, sagt die App **„Veränderung innerhalb der
+ *   Zählunsicherheit“** (F-07, Runde 2) — statt eine kleine Zahl als Erfolg
+ *   zu verkaufen.
  * - Daneben stehen die **echten Zahlen** (F5): „1. Messung 8/20“. Sie
  *   überzeugen mehr als jede Prozentzahl, und sie stimmen.
  *

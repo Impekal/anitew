@@ -38,6 +38,15 @@ die Begründung wird hiermit korrigiert, damit eine falsche Annahme nicht
 unbemerkt weiterlebt. Die eigentliche Freigabe (Register-Recherche) steht
 weiter aus.
 
+**Nachtrag 2026-09-04:** Die Bedeutung ist inzwischen belegt — **Daniel 1,17**
+der Akan-Bibel führt „nimdeɛ ne anitew" dort, wo die King-James-Übersetzung
+„knowledge and skill" hat: Klugheit, Scharfsinn, Einsicht (`docs/TRADEMARK.md`,
+Nachtrag vom selben Tag). Die wörtliche Lesart „das Auge ist offen" blieb
+unbelegt und steht in der App ausdrücklich als Lesart. Das ändert an D-001 wieder
+nichts, und die App macht daraus ausdrücklich kein Versprechen: Ein Name, der
+eine Eigenschaft nennt, ist kein Beleg, dass die Anwendung sie liefert (R-1).
+Der Bereich „Fragen & Antworten" sagt genau das.
+
 ## D-002 · 2026-08-17 · Kostenlos, mit Spende. Pro bleibt möglich, aber gebunden
 
 Die App ist kostenlos. Wer will, kann spenden. Ein späteres Pro-Angebot wird
@@ -1542,3 +1551,242 @@ Alte Schlüssel werden beim Lesen übernommen und beim ersten Speichern in die
 neue Liste migriert. Schlüssel sind von Backup, Import und Drive ausgeschlossen.
 Coach und Memory-Architekt verwenden denselben Weg; ungültige strukturierte
 Antworten lösen ebenfalls den nächsten Versuch aus.
+## D-044 · 2026-08-26 · Die alten Backlog-Ideen, neu entschieden statt blind gebaut
+
+Acht Punkte aus Product Bible und Alt-Backlog wurden gegen den heutigen
+Stand (Web Push, Durable Objects, sechs Trainingssprachen, Memory-Graph)
+**neu bewertet**. Ergebnis — vier bewusste Abschlüsse, kein blinder Nachbau:
+
+1. **H3 verzögerte Mission-Abfrage (~20 min): abgelehnt als Push-Automatik.**
+   Technisch wäre sie heute sauber möglich (dieselbe DO-Alarm-Mechanik wie
+   die Benchmark-Erinnerung, Push bliebe inhaltsleer, die Frage entstünde
+   lokal). Aber der 15–45-Minuten-Slot ist im Produkt bereits **besetzt und
+   besser besetzt**: durch die Messung (F2, mit eigener Push-Erinnerung) —
+   dort zählt der verzögerte Abruf wissenschaftlich —, und durch das
+   FSRS-Wiedersehen auf Tagesskala fürs Training. Eine dritte Push-Quelle
+   nach jeder Einheit wäre Benachrichtigungsdruck (K7) ohne Messgewinn und
+   verwischte die Grenze Training/Messung (R-1). Falls je gewünscht: nur als
+   ausdrückliches Opt-in pro Einheit, Store-Phase.
+2. **Micro-Recall (10–60 s): abgelehnt als eigener Pfad.** Der Zweck —
+   ein Alltagseinstieg unter einer Minute — ist doppelt erfüllt: der
+   60-Sekunden-Modus ist ein echter, streak-erhaltender Trainingslauf
+   derselben Engine, und die Reencounter-Karte holt die fällige persönliche
+   Erinnerung auf den Startbildschirm. Ein dritter Sonderablauf wäre
+   Funktionsdopplung mit eigener Grading-/Fairness-Debatte.
+3. **Focus-Block (Ablenkungen ignorieren): abgelehnt.** Die
+   Aufmerksamkeits-Dimension ist über Twins/Interferenz ehrlich abgedeckt
+   (dimensions.ts sagt ausdrücklich, was sie misst und was nicht). Für
+   transferwirksames „Ablenkungstraining“ ist die Evidenzlage dünn; ein
+   Block, der die 5-Minuten-Einheit voller macht, ohne sie besser zu machen,
+   verstößt gegen G-2.
+4. **Fotorealistische Porträts: abgelehnt.** Die deterministischen
+   SVG-Gesichter sind kein Sparmodus, sondern ein Feature: keine
+   Persönlichkeitsrechte, keine Lizenzen, kein Nachladen, keine
+   Benchmark-Verzerrung durch bekannte Gesichter, identisch offline.
+5. **Unlockable Worlds: abgelehnt als Freischaltmechanik — und in der
+   ehrlichen Form längst gebaut.** Die Memory World wächst sichtbar aus
+   echten Daten (Zusammenhangswelten, D-043; Constellation-Helligkeit =
+   Übungsstand). Kosmetik hinter künstlicher Verknappung wäre genau die
+   Gamification, die D-019/K7 ausschließen.
+6. **AI Response Cache: abgelehnt.** Coach-Antworten sind persönlich und
+   kontextabhängig (Zahlen des Tages); eine gecachte Antwort wäre morgen
+   eine falsche. Gespeicherte KI-Antworten wären zusätzliche Daten ohne
+   Funktion. BYOK-Kosten bleiben die informierte Wahl des Menschen.
+7. **Free AI Allowance: bestätigt abgelehnt.** BYOK ist die Entscheidung
+   (D-002: keine laufenden Kosten; R-3: kein Server, der Fragen mitliest).
+   Eine bezahlte Entwickler-KI-Schicht widerspräche beidem.
+8. **Spendenweg (K9): bleibt gewollt, ist aber auf den Menschen blockiert**
+   (Konto bei Ko-fi/PayPal/GitHub Sponsors). Kein Training hinter einer
+   Schranke; nach Kontoanlage genügt ein stiller Link in „Über“/Impressum.
+
+## D-045 · 2026-08-26 · Der UI-Sprachwähler bietet nur Übersetztes an
+
+**Entscheidung:** Der Oberflächen-Sprachwähler zeigt nur Sprachen mit
+echtem Wörterbuch (heute DE, EN). Vorher standen alle elf zur Wahl; neun
+fielen still auf Englisch zurück — Arabisch sogar als RTL-Dokument mit
+englischem Text. Das verletzte TRANSLATION_WORKFLOW §6 („kein
+Selector-Eintrag vor Nutzbarkeit“). Wer die App in einer noch nicht
+übersetzten **Systemsprache** öffnet, bekommt weiter den ehrlichen
+EN-Fallback samt Fußnote — aufgelöst wird die Systemsprache unverändert.
+Die Trainingssprachen (sechs, aus Inhalten abgeleitet) sind davon
+unberührt. Die technischen Blocker für NL/TR/AR/ZH/JA (türkisches
+Lowercasing, CJK-Worttrennung, Kana-Faltung, arabische Normalisierung und
+Ziffern, RTL-Layout in 27 Stylesheets) sind in TRANSLATION_WORKFLOW §5
+konkretisiert — jede dieser Sprachen ist ein eigener Arbeitsblock mit
+muttersprachlicher Abnahme, keine Listenarbeit.
+
+## D-046 · 2026-08-26 · Der Optimierer wird nicht vorgecached
+
+**Entscheidung:** Die FSRS-Optimierer-Chunks (WASI-Worker + Binding,
+~400 KB) stehen in `globIgnores` des Precache. Ihre `.wasm`-Datei war nie
+im Precache — offline konnte der Optimierer also nie laufen, während
+jede Veröffentlichung trotzdem ~400 KB Optimierer-JS auf jedes Gerät
+vorlud. Der Optimierungszyklus ist best-effort (items.ts fängt den
+Importfehler) und läuft in der nächsten Online-Sitzung. Kein
+Funktionsverlust, spürbar schlankere Updates.
+
+## D-047 · 2026-08-26 · Sicherungen tragen keine gerätegebundenen Einstellungen (Runde 2, F-01)
+
+**Entscheidung:** `makeBackup`/`readBackup` filtern eine feste Liste
+gerätegebundener Einstellungen: `coach.key`, alle `coach.key.*`,
+`sync.account`, `sync.accountName`, `sync.on`, `sync.lastAt`,
+`sync.clientId`. Vorher wanderte die komplette settings-Tabelle in die
+Datei — und damit BYOK-Schlüssel in Downloads und (über den Abgleich) in
+Google Drive, im Widerspruch zu PRIVACY §10. Gefiltert wird an beiden
+Kanten (Schreiben **und** Lesen), damit ältere Dateien die Werte nicht
+wieder einschleppen. Wer je eine Sicherung mit hinterlegtem Schlüssel
+geteilt hat, sollte den Schlüssel beim Anbieter rotieren (USER ACTION).
+
+## D-048 · 2026-08-26 · Push-Endpunkte nur zu echten Pushdiensten, mit Horizont und Notiz-Ablauf (Runde 2, F-03/F-05)
+
+**Entscheidung:** `/push/*` akzeptiert als Ziel nur die Hosts der realen
+Browser-Pushdienste (FCM, Mozilla, Apple, WNS) — der Same-Origin-Schutz
+ist CSRF-Abwehr, keine Authentisierung, und ohne Host-Liste wäre der
+Worker ein signierendes Relais an beliebige HTTPS-Adressen. Dazu: Termine
+höchstens 60 Tage voraus, Zustellnotizen mit hartem Ablauf (täglich 24 h,
+Messung 60 min, maximal 8), Aufräum-Alarm auch für reine Notizen, und
+ein leerer Eintrag löscht sich selbst.
+
+**Korrektur vom 2026-08-26 (Runde 4):** Der ursprüngliche Satz „Rate-Limits
+bleiben als USER ACTION im Cloudflare-Dashboard" war **nicht ausführbar**
+und wurde beim Aufschreiben nicht zu Ende geprüft. Cloudflares
+Rate-Limiting-Regeln (WAF) gelten nur für Domains in einer eigenen
+Cloudflare-Zone; ANITEW läuft auf `anitew.impekaltech.workers.dev`, einer
+Cloudflare-eigenen Domain, für die sich solche Regeln nicht anlegen
+lassen. Eine Auflage, die niemand erfüllen kann, ist schlimmer als keine —
+deshalb steht hier jetzt, was tatsächlich zur Wahl steht:
+
+1. **Für Phase 0 nichts tun** — die gewählte Entscheidung. Seit der
+   Host-Allowlist kann niemand mehr fremde Adressen anpingen; das
+   Restrisiko ist, dass jemand viele Durable Objects anlegt und damit
+   Speicher belegt. Bei einem unbeworbenen Pilot mit drei bis fünf
+   Personen ist das kein realistischer Angriff.
+2. **Rate-Limit im Worker** über Cloudflares Rate-Limiting-Binding — eine
+   kleine, abgegrenzte Codeänderung. Der Weg, sobald ANITEW öffentlich
+   beworben wird.
+3. **Eigene Domain** in einer Cloudflare-Zone, danach greifen die
+   Dashboard-Regeln. Berührt aber OAuth-Redirect-URI und die
+   Push-Adressen — kein Schritt für die Pilotphase.
+
+Zu erledigen ist damit vor dem Piloten: **nichts**. Nach dem Piloten und
+vor jeder Bewerbung der App: Weg 2.
+
+## D-049 · 2026-08-26 · Google-Sitzung endet absolut nach 180 Tagen (Runde 2, F-04)
+
+**Entscheidung:** Der versiegelte Sitzungsablauf entsteht einmal beim
+Login (`sessionExpiresAt`) und wird bei Refreshes übernommen, nie
+verlängert; das Cookie erhält nur die Restlaufzeit. Vorher setzte jeder
+Refresh erneut 180 Tage — ein rollierendes Fenster, das PRIVACYs
+„spätestens 180 Tage“ falsch machte. Bestehende Sitzungen ohne Feld
+beginnen die Zählung beim nächsten Refresh (strengste Deutung ohne
+Zwangs-Logout). Nach Ablauf: neue Anmeldung.
+
+## D-050 · 2026-08-26 · Produktion nur noch hinter dem vollen CI-Tor (Runde 2, F-12)
+
+**Entscheidung:** Der Deploy ist ein Job in ci.yml (`needs: check`) und
+läuft nur auf `main`/`anitew-redesign-v2` nach vollständig grünem Tor
+desselben Commits. `workflow_run` schied aus, weil GitHub es nur aus dem
+Default-Branch (`main`) bedient — der Produktbranch ist aber
+`anitew-redesign-v2`. deploy.yml bleibt als manueller Notweg
+(`workflow_dispatch`), bewusst ohne Tor. Branchschutz mit Required
+Checks für den Produktbranch ist eine GitHub-Einstellung (USER ACTION) —
+ohne ihn bleibt das Tor eine Selbstverpflichtung statt einer Sperre.
+
+**Konkret (ergänzt in Runde 4):** Repo → Settings → Rules → Rulesets →
+New branch ruleset, Enforcement *Active*, Zielmuster
+`anitew-redesign-v2`, dann *Require a pull request before merging*,
+*Require status checks to pass* mit dem Check **`check`** (so heißt der
+Job in ci.yml) und *Block force pushes*. Der klassische Weg über
+Settings → Branches → Add branch protection rule tut dasselbe.
+
+## D-051 · 2026-08-26 · Die Notiz-Frist ist eine harte Obergrenze, und Wiederholungen steuert ANITEW selbst (Runde 3, R3-01)
+
+**Entscheidung:** Der Alarm des Durable Objects zeigt immer auf den
+**frühesten** relevanten Zeitpunkt — nächster Termin *oder* nächster
+Notiz-Ablauf. Vorher gewann der Termin, sobald es einen gab; eine
+Messnotiz mit 60-Minuten-Frist konnte neben einer abends fälligen
+Tageserinnerung stundenlang liegen bleiben, entgegen der Zusage in
+PRIVACY §7. Fehlgeschlagene Pushes werden nicht mehr durch einen Wurf an
+Cloudflares Retry übergeben (dessen Versuche enden irgendwann, und danach
+räumte niemand mehr auf), sondern selbst wiederholt: fünf Versuche mit
+wachsendem Abstand (1, 2, 4, 8 min), gedeckelt durch den Notiz-Ablauf.
+Danach gilt die Zustellung als gescheitert — die Tageserinnerung rollt
+weiter, eine einmalige verschwindet. Ein Eintrag ohne Termin und ohne
+Notiz löscht sich vollständig (Alarm **und** Speicher), zentral in
+`rearm()`.
+
+## D-052 · 2026-08-26 · Alt-Sitzungen ohne Anmeldezeitpunkt bekommen 30 Tage, nicht 180 (Runde 3, R3-02)
+
+**Entscheidung:** Cookies aus der Zeit vor D-049 tragen kein
+`sessionExpiresAt`. Der Anmeldezeitpunkt lässt sich nicht rekonstruieren,
+und ihn zu schätzen wäre eine erfundene Zahl (R-1). Ihnen erneut volle
+180 Tage zu geben, machte PRIVACYs „höchstens 180 Tage ab Anmeldung" zur
+Falschaussage; sie sofort abzumelden, wäre grundloser Datenverlust. Sie
+laufen deshalb 30 Tage nach der ersten Nutzung mit der neuen Fassung ab —
+kürzer als jede Restlaufzeit unter der alten Regel — und PRIVACY §9/§11
+nennen diese Übergangsregel ausdrücklich. Neue Sitzungen bleiben strikt
+bei 180 Tagen ab Anmeldung.
+
+## D-053 · 2026-08-26 · Die Startregel der Messung gehört unter die Oberfläche (Runde 3, R3-04)
+
+**Entscheidung:** `benchmarkStartRefusal()` im Kern entscheidet, ob eine
+Messung beginnen darf („läuft schon eine?", „ist sie fällig?"), und
+`beginRun()` prüft das in **einer** Dexie-Transaktion mit dem Schreiben.
+Vorher entschied allein die Sichtbarkeit eines Knopfes: Zwei Klicks im
+selben Ausführungsschritt legten zwei offene Messungen mit derselben
+Ordnungszahl an, und der feste 14-Tage-Abstand — die Grundlage dafür,
+dass eine Messung überhaupt etwas misst (F2b) — hing an der Anzeige.
+Zusätzlich sperrt die Oberfläche den Start synchron beim ersten Tipp.
+
+## D-054 · 2026-08-26 · Einstellungen zeigen nur, was gespeichert ist (Runde 3, R3-06)
+
+**Entscheidung:** Sprache, Trainingssprache und Ton teilen sich
+`persistThenApply()`: angewandt wird erst nach erfolgreichem Schreiben,
+und ein Fehlschlag wird sichtbar gesagt. Vorher wechselten Sprache und
+Trainingssprache optimistisch und verschluckten den Fehler, und der Ton
+setzte seine Anzeige im `finally` — also auch im Fehlerfall, entgegen dem
+eigenen Kommentar daneben. Beim Ton bleibt das sofortige Umschalten der
+Klangmaschine erhalten (iOS verlangt die Nutzergeste), wird bei einem
+Schreibfehler aber zurückgenommen.
+
+## D-055 · 2026-08-26 · Datenschutz-Zusagen werden am Verhalten geprüft (Runde 3, R3-07)
+
+**Entscheidung:** `tests/worker/privacyGuarantees.test.ts` spielt die
+Sätze aus PRIVACY §7 und §9 als echte Abläufe durch (Notiz-Frist neben
+späterem Termin und bei dauerhaft gestörtem Pushdienst, 180-Tage- und
+30-Tage-Sitzung, „speichert nur …"). Die Quelltext-Wächter in
+`claims.test.ts` bleiben daneben bestehen — sie fangen auseinanderlaufende
+Texte, beweisen aber nichts über das Verhalten. Der erste Lauf dieser
+Verhaltenstests hat sofort einen echten Fehler gefunden: Der Worker
+speicherte mitgeschickte Fremdfelder einer Erinnerung unverändert; jetzt
+wird auf die in §7 genannten Felder normalisiert.
+
+## D-056 · 2026-08-26 · Zwei Fristen, die nur fast hielten (Runde 4, R4-01/R4-02)
+
+**Entscheidung:** Zwei Lücken aus Runde 3 geschlossen, beide von der
+Zweitprüfung am Code gefunden — und beide von den damaligen Tests
+übersehen, weil die Testaufbauten genau am Problemfall vorbeiliefen.
+
+*R4-01:* Bei einer Alt-Sitzung ohne `sessionExpiresAt` berechnete der
+Worker die 30-Tage-Frist zwar, gab aber **kein neues Cookie zurück**,
+solange Googles Access-Token noch gültig war — die Frist wurde erst beim
+nächsten Refresh versiegelt. Wer nach vier Wochen wiederkam, lebte damit
+deutlich länger als die zugesagten 30 Tage. Die Frist wird jetzt beim
+allerersten Zugriff festgeschrieben. Die beiden Runde-3-Tests hatten das
+nie getroffen: Sie erzeugten absichtlich ein abgelaufenes Access-Token und
+landeten sofort im Refresh-Pfad.
+
+*R4-02:* Die Notiz-Frist wurde als `now + TTL` gerechnet. Lief ein
+Wiederholungsalarm stark verspätet, war die alte Notiz bereits geräumt und
+dieselbe Zustellung entstand mit einer **frischen** Frist neu — aus der
+Höchstfrist wurde eine Frist je Versuch. Sie hängt jetzt an der
+ursprünglichen Fälligkeit (`due.at + TTL`, derselbe Anker wie die
+`deliveryId`). Ist das Fenster vorbei, wird nicht mehr gepusht, keine
+Notiz neu angelegt und die Zustellung zurückgezogen. Die Runde-3-Tests
+riefen den Alarm stets exakt zur angeforderten Zeit auf und konnten das
+nicht sehen.
+
+**Lehre für die Testführung:** Ein Verhaltenstest beweist nur den Pfad,
+den sein Aufbau erzwingt. Beide neuen Fälle prüfen deshalb ausdrücklich
+den *anderen* Zweig — gültiges Token statt abgelaufenem, verspäteter
+Alarm statt pünktlichem.

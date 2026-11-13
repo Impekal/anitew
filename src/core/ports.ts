@@ -14,6 +14,7 @@
 
 import type { CoachPort } from './coach/prompt.ts'
 import type { Instant } from './time.ts'
+import type { SoundCategorySetting } from './sound/categories.ts'
 
 export interface Clock {
   /** Jetzt, in Millisekunden seit 1970. */
@@ -48,6 +49,8 @@ export interface SettingsStore {
 export type SoundCue =
   /** Die Einheit beginnt. Zugleich der Griff, der auf iOS die Tonausgabe freischaltet. */
   | 'start'
+  /** Das Ankommen vor der Einheit — die einzige Stelle mit einer Melodie. */
+  | 'arrival'
   /** Ein neues Wort erscheint beim Einprägen. */
   | 'word'
   /** Ein getipptes Wort ist gelandet. */
@@ -78,6 +81,20 @@ export interface Sound {
   play(cue: SoundCue, step?: number): void
   setEnabled(on: boolean): void
   isEnabled(): boolean
+  /**
+   * Die Bereiche einzeln (Geraetewunsch 31.08.). Der Hauptschalter bleibt
+   * darueber: Ist er aus, schweigt alles.
+   */
+  setCategories(next: SoundCategorySetting): void
+  categories(): SoundCategorySetting
+  /**
+   * Der ruhige Dauerklang der Einheit. Beginnt nur, wenn Hauptschalter und
+   * Bereich `focus` beide an sind, und wird am Ende der Einheit sowie beim
+   * Wechsel in den Hintergrund angehalten — Dauerarbeit ist auf einem Telefon
+   * Waerme (BACKLOG P9).
+   */
+  startAmbient(): void
+  stopAmbient(): void
 }
 
 /**

@@ -20,15 +20,19 @@
  * Stichprobe: Zwei Wörter mehr oder weniger sind zehn Prozentpunkte. Wer
  * daraus einen exakten Wert macht, behauptet eine Genauigkeit, die die
  * Messung nicht hat. Und wenn die Spanne die Null enthält, sagt die App genau
- * das — **kein Unterschied, der sich vom Zufall trennen lässt** — statt eine
- * kleine Zahl als Erfolg zu verkaufen.
+ * das — **Veränderung innerhalb der Zählunsicherheit** — statt eine kleine
+ * Zahl als Erfolg zu verkaufen.
  *
- * ── Was die Spanne ist und was sie nicht ist ──────────────────────────────
+ * ── Was die Spanne ist und was sie nicht ist (F-07, Runde 2) ─────────────
  *
  * Sie kommt aus der Streuung, die eine Zählung von zwanzig Dingen von sich
- * aus hat (Standardfehler eines Anteils, zwei Fehler breit). Das ist eine
- * grobe Schätzung und keine klinische Aussage: Sie sagt, wie stark dieselbe
- * Person allein durch Zufall schwanken kann — nicht, ob ein Training wirkt.
+ * aus hat (Binomial-Standardfehler, zwei Fehler breit). Das ist eine **grobe
+ * Zählunsicherheit und kein Signifikanztest**: Die Wortblöcke sind nicht
+ * nach Schwierigkeit geeicht, und die Tag-zu-Tag-Schwankung derselben Person
+ * steckt nicht in der Rechnung. Deshalb sprechen alle Oberflächentexte von
+ * „Zählunsicherheit“ und nicht mehr von „vom Zufall trennen“ — eine
+ * Zufalls-/Signifikanzaussage gäbe die Methode nicht her. `distinguishable`
+ * heißt nur: Die Spanne schließt die Null aus, mehr nicht.
  */
 
 import { type BenchmarkRun, isComplete } from './plan.ts'

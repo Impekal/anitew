@@ -31,11 +31,22 @@
 export function keepUpToDate(): void {
   if (!('serviceWorker' in navigator)) return
 
-  const hadController = navigator.serviceWorker.controller !== null
+  /*
+   * Veränderlich, nicht eingefroren (F-08, Runde 2): Beim Erstbesuch gibt es
+   * noch keinen Controller — die **erste** Übernahme ist die Erstinstallation
+   * und lädt nicht neu. Ab da zählt derselbe Tab aber als kontrolliert; jede
+   * spätere Übernahme ist eine echte Aktualisierung. Eine `const` hätte einen
+   * langlebigen Erstbesuchs-Tab für immer von Updates abgeschnitten.
+   */
+  let hadController = navigator.serviceWorker.controller !== null
   let reloading = false
 
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (!hadController || reloading) return
+    if (!hadController) {
+      hadController = true
+      return
+    }
+    if (reloading) return
     reloading = true
     reloadWhenNotTraining()
   })

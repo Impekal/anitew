@@ -12,8 +12,10 @@
 import {
   type BenchmarkPhase,
   type BenchmarkRun,
+  type BenchmarkStartRefusal,
   BENCHMARK_ITEMS,
   benchmarkItems,
+  benchmarkStartRefusal,
   type DayKey,
   type Instant,
   type Language,
@@ -61,26 +63,52 @@ export async function loadOpenRun(): Promise<
   }
 }
 
-/** Legt eine Messung an und gibt ihre Wörter zurück. */
+export type BeginRunResult =
+  | { ok: true; id: string; ordinal: number; items: readonly string[] }
+  | { ok: false; reason: BenchmarkStartRefusal }
+
+/**
+ * Legt eine Messung an — oder lehnt begründet ab (R3-04, Runde 3).
+ *
+ * Lesen und Schreiben liegen in **einer** Transaktion, und die Startregel
+ * wird darin geprüft. Vorher genügte ein schneller Doppeltipp: Beide Aufrufe
+ * lasen dieselbe höchste Nummer, beide schrieben — es entstanden zwei offene
+ * Messungen mit derselben Ordnungszahl. Und der feste Abstand von vierzehn
+ * Tagen hing allein daran, ob die Oberfläche einen Knopf zeigte.
+ */
 export async function beginRun(
   day: DayKey,
   at: Instant,
   language: Language,
-): Promise<{ id: string; ordinal: number; items: readonly string[] }> {
-  const rows = await db.benchmarks.toArray().catch(() => [])
-  const ordinal = rows.reduce((highest, row) => Math.max(highest, row.ordinal), 0) + 1
-  const items = [...benchmarkItems(ordinal, language)]
-  const id = `b-${ordinal}-${at.toString(36)}`
-  await db.benchmarks.put({
-    id,
-    day,
-    startedAt: at,
-    ordinal,
-    total: items.length,
-    items,
-    completed: false,
+): Promise<BeginRunResult> {
+  return db.transaction('rw', db.benchmarks, async () => {
+    const rows = await db.benchmarks.toArray()
+    const refusal = benchmarkStartRefusal(
+      rows.map((row) => ({
+        ordinal: row.ordinal,
+        day: row.day,
+        completed: row.completed,
+        abandoned: row.abandoned,
+        immediate: row.immediate,
+      })),
+      day,
+    )
+    if (refusal !== undefined) return { ok: false, reason: refusal } as const
+
+    const ordinal = rows.reduce((highest, row) => Math.max(highest, row.ordinal), 0) + 1
+    const items = [...benchmarkItems(ordinal, language)]
+    const id = `b-${ordinal}-${at.toString(36)}`
+    await db.benchmarks.put({
+      id,
+      day,
+      startedAt: at,
+      ordinal,
+      total: items.length,
+      items,
+      completed: false,
+    })
+    return { ok: true, id, ordinal, items } as const
   })
-  return { id, ordinal, items }
 }
 
 /**

@@ -45,6 +45,8 @@ export function CoachPanelImpl({
   const [answer, setAnswer] = useState<string | undefined>(undefined)
   const [failure, setFailure] = useState<CoachFailure | undefined>(undefined)
   const [busy, setBusy] = useState(false)
+  // F-02 (Runde 2): Ein fehlgeschlagener Einstellungs-Schreibvorgang wird gesagt.
+  const [saveFailed, setSaveFailed] = useState(false)
 
   useEffect(() => {
     let active = true
@@ -64,10 +66,11 @@ export function CoachPanelImpl({
     setFailure(undefined)
     try {
       await saveCoachKeys(platform.settings, next)
+      setSaveFailed(false)
       setKeys(next)
       setAttempt('')
       return true
-    } catch { setFailure('failed'); return false }
+    } catch { setSaveFailed(true); return false }
     finally { setSaving(false) }
   }
 
@@ -129,7 +132,7 @@ export function CoachPanelImpl({
   return (
     <div className="coach">
       <section aria-label={texts.adviceHeading}>
-        <h3 className="coach-source">{texts.adviceHeading}</h3>
+        <h2 className="coach-source">{texts.adviceHeading}</h2>
         <ul className="coach-advice">
           {advice.map((entry) => (
             <li key={entry.id}>{line(entry)}</li>
@@ -138,7 +141,7 @@ export function CoachPanelImpl({
       </section>
 
       <section aria-label={texts.askHeading}>
-        <h3 className="coach-source">{texts.askHeading}</h3>
+        <h2 className="coach-source">{texts.askHeading}</h2>
         <p className="hint">{texts.keyNote}</p>
 
         <ol className="coach-keys" aria-label={texts.keyOrder}>
@@ -181,6 +184,7 @@ export function CoachPanelImpl({
                 }
                 target="_blank"
                 rel="noreferrer"
+                className="coach-key-link"
               >
                 {texts.keyLink}
               </a>
@@ -193,8 +197,8 @@ export function CoachPanelImpl({
               <input
                 type="password"
                 className="coach-key-input"
+                aria-label={texts.keyFieldLabel}
                 placeholder={texts.keyPlaceholder}
-                aria-label={texts.keyPlaceholder}
                 value={keyDraft}
                 autoComplete="off"
                 onChange={(event) => setKeyDraft(event.target.value)}
@@ -223,6 +227,7 @@ export function CoachPanelImpl({
           </>
         )}
 
+        {saveFailed && <p className="coach-failure" role="alert">{texts.saveFailed}</p>}
         {attempt && <p className="coach-attempt" role="status">{attempt}</p>}
         {failure !== undefined && <p className="coach-failure">{texts.errors[failure]}</p>}
         {answer !== undefined && <p className="coach-answer">{answer}</p>}

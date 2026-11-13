@@ -43,6 +43,7 @@ test('der erste Eindruck trägt die englische Marke sechs Sekunden und erklärt 
   })
   expect(sizes.tagline).toBeLessThan(sizes.name)
 
+  expect(await page.locator('.anitew-launch-terms').evaluate(el => getComputedStyle(el).textShadow)).toContain('229, 184, 109')
   await expect(page.locator('.anitew-mark-path')).toHaveCount(1)
   await expect(page.locator('.anitew-mark-node')).toHaveCount(6)
 
@@ -112,7 +113,9 @@ test('die Orientierung erklärt Core, Coach, Techniken, Memory World, Sync und M
 }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/')
-  await expect(page.locator('#anitew-launch')).toBeHidden({ timeout: 4_000 })
+  // Jedes weitere Öffnen dauert drei Sekunden (vorher 1,65 s). Der Spielraum
+  // wächst mit der Dauer mit — er verdeckt keine Fehlersuche.
+  await expect(page.locator('#anitew-launch')).toBeHidden({ timeout: 6_000 })
   await expect(page.locator('.first-run-questions')).toBeVisible({ timeout: 8_000 })
 
   await page.locator('.arrival .quiet').click()
@@ -139,7 +142,39 @@ test('die Orientierung erklärt Core, Coach, Techniken, Memory World, Sync und M
   await expect(guide).toBeHidden()
 
   await page.reload()
-  await expect(page.locator('#anitew-launch')).toBeHidden({ timeout: 4_000 })
+  await expect(page.locator('#anitew-launch')).toBeHidden({ timeout: 6_000 })
+  await expect(startButton(page)).toBeVisible({ timeout: 15_000 })
+  await page.waitForTimeout(1_500)
+  await expect(page.locator('.first-run-guide')).toHaveCount(0)
+})
+
+test('eine angefangene Führung übersteht das Schließen der App', async ({ page }) => {
+  /*
+   * Die Führung merkt sich ihr „angefangen, nicht beendet“ absichtlich in
+   * localStorage (pending=1) — ihr einziger Zweck ist, einen Abbruch zu
+   * überleben. Genau das konnte sie nicht: `firstRunExperience.ts` wurde nur
+   * geladen, wenn `.onboarding` im DOM steht, und das gibt es nach dem
+   * Erstbesuch nie wieder. Gemessen 30.08.: Neuladen mit pending=1 — keine
+   * Führung, nie wieder. Seither lädt coreRitual das Modul auch dann, wenn
+   * eine angefangene Führung aussteht.
+   */
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/')
+  await expect(page.locator('.first-run-questions')).toBeVisible({ timeout: 8_000 })
+  await page.locator('.arrival .quiet').click()
+  await expect(startButton(page)).toBeVisible({ timeout: 15_000 })
+  await expect(page.locator('.first-run-guide')).toBeVisible({ timeout: 8_000 })
+
+  // Die App schließt mitten in der Führung — kein Skip, kein „ANITEW öffnen“.
+  await page.reload()
+  await expect(startButton(page)).toBeVisible({ timeout: 15_000 })
+  await expect(page.locator('.first-run-guide')).toBeVisible({ timeout: 8_000 })
+  await expect(page.getByText('Der ANITEW Core', { exact: true })).toBeVisible()
+
+  // Beendet bleibt beendet: Nach „ANITEW öffnen“/Überspringen ist Ruhe.
+  await page.locator('.first-run-guide-skip').click()
+  await expect(page.locator('.first-run-guide')).toBeHidden()
+  await page.reload()
   await expect(startButton(page)).toBeVisible({ timeout: 15_000 })
   await page.waitForTimeout(1_500)
   await expect(page.locator('.first-run-guide')).toHaveCount(0)
@@ -194,4 +229,47 @@ test('a suspended splash animation cannot permanently block the app', async ({ p
   await expect(page.locator('#anitew-launch')).toBeHidden({ timeout: 6000 })
   await page.locator('.arrival .quiet').click()
   await expect(startButton(page)).toBeVisible()
+})
+
+test('drei Sekunden beim Wiederkommen — und gar kein Splash, wenn die App schon offen war', async ({
+  page,
+}) => {
+  test.setTimeout(40_000)
+  await page.setViewportSize({ width: 390, height: 844 })
+
+  /*
+   * Drei Fälle, drei Längen (siehe den Kommentar im Kopf von index.html):
+   * allererstes Öffnen fünf Sekunden, jedes weitere drei, und wer nur kurz
+   * aus dem Fenster war, bekommt gar nichts.
+   *
+   * Der dritte Fall ist der, um den es hier wirklich geht. Er hing vorher an
+   * nichts: Jedes Neuladen — auch das, das iOS einer im Hintergrund
+   * liegenden PWA verordnet — zeigte das volle Ritual noch einmal.
+   */
+
+  // Fall 2: nicht das erste Öffnen (Playwright meldet sich als Automat), also
+  // drei Sekunden. Nach 2,4 s steht der Splash noch, nach 4 s ist er weg.
+  await page.goto('/')
+  const launch = page.locator('#anitew-launch')
+  await expect(launch).toBeVisible()
+  await page.waitForTimeout(2_400)
+  await expect(launch).toBeVisible()
+  await expect(launch).toBeHidden({ timeout: 3_000 })
+
+  // Fall 3: dieselbe Sitzung, erneut geladen — kein Splash mehr. Nicht „schnell
+  // weg“, sondern von Anfang an nicht da.
+  await page.goto('/')
+  await expect(page.locator('#anitew-launch')).toBeHidden()
+  expect(await page.evaluate(() => document.documentElement.dataset.anitewLaunch)).toBe('skip')
+
+  // Und ein wirklich neuer Start zeigt ihn wieder. Ein frischer Kontext ist
+  // das Nächste an „App geschlossen und neu geöffnet“, was ein Browser kennt.
+  const fresh = await page.context().browser()?.newContext({ locale: 'de-DE' })
+  if (fresh !== undefined) {
+    const second = await fresh.newPage()
+    await second.goto('http://127.0.0.1:4173/')
+    await expect(second.locator('#anitew-launch')).toBeVisible()
+    expect(await second.evaluate(() => document.documentElement.dataset.anitewLaunch)).toBe('show')
+    await fresh.close()
+  }
 })

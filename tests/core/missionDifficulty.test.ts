@@ -16,7 +16,7 @@ const pools: Pools = {
   twins: [],
   gaze: [],
   facts: [],
-  memory: [],
+  memory: [], people: [], math: [],
 }
 
 const input = {

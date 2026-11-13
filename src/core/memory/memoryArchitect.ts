@@ -90,25 +90,46 @@ export function sanitizeArchitectSuggestions(raw: unknown): RememberSuggestions 
   return { nodes, edges }
 }
 
-/**
- * Die Anweisung an den Anbieter. Sie verlangt **nur** die Form, die auch
- * die deterministische Extraktion liefert — und verbietet, was die
- * Hausregeln verbieten: Erfundenes (R-1 in KI-Gestalt). Kanten nennen
- * ihre Enden beim Namen (Beschriftung, nicht ID) — IDs sind ANITEW-Sache.
- */
-export function architectSystem(): string {
+function architectOutputRules(source: 'Text' | 'Bild'): readonly string[] {
+  const sourceRule =
+    source === 'Text'
+      ? '- "label" steht wörtlich oder fast wörtlich im Text. Erfinde nichts hinzu.'
+      : '- "label" muss durch klar sichtbaren Text oder klar erkennbare Bildinformation gedeckt sein. Erfinde nichts hinzu.'
   return [
-    'Du extrahierst Gedächtnis-Knoten aus einem Text für ANITEW, eine Gedächtnistraining-App.',
     'Antworte AUSSCHLIESSLICH mit einem JSON-Objekt, ohne Erklärung, ohne Markdown-Zaun:',
     '{"nodes":[{"type":"person","label":"..."}],"edges":[{"from":"Label","to":"Label"}]}',
     'Regeln, ohne Ausnahme:',
     `- "type" ist eines von: ${NODE_TYPES.join(', ')}.`,
-    '- "label" ist kurz (1 bis 3 Wörter), in der Sprache des Textes, und steht',
-    '  wörtlich oder fast wörtlich im Text. Erfinde nichts hinzu.',
+    '- "label" ist kurz (1 bis 3 Wörter) und in der Sprache der Quelle.',
+    sourceRule,
     '- Höchstens 10 Knoten. Nur, was sich zu merken lohnt.',
     '- "edges" verbinden Zusammengehöriges; "from" und "to" sind exakt Labels',
     '  aus "nodes". Meist hängt alles an einer Person oder einem Thema.',
-    '- Findest du nichts, antworte {"nodes":[],"edges":[]}.',
+    '- Findest du nichts Sicheres, antworte {"nodes":[],"edges":[]}.',
+  ]
+}
+
+/**
+ * Die Anweisung an den Text-Anbieter. Sie verlangt **nur** die Form, die auch
+ * die deterministische Extraktion liefert — und verbietet Erfundenes.
+ */
+export function architectSystem(): string {
+  return [
+    'Du extrahierst Gedächtnis-Knoten aus einem Text für ANITEW, eine Gedächtnistraining-App.',
+    ...architectOutputRules('Text'),
+  ].join('\n')
+}
+
+/**
+ * Dasselbe Datenformat für ein Foto, aber mit einer strengeren Quellenregel:
+ * Nur sichtbar gedeckte Information darf vorgeschlagen werden. Die Bildanalyse
+ * bleibt dadurch Vorschlag — die menschliche Bestätigung folgt unverändert.
+ */
+export function architectPhotoSystem(): string {
+  return [
+    'Du extrahierst Gedächtnis-Knoten aus einem Bild für ANITEW, eine Gedächtnistraining-App.',
+    'Transkribiere nicht wahllos das ganze Bild. Wähle nur wenige Informationen, die sich sinnvoll abrufen lassen.',
+    ...architectOutputRules('Bild'),
   ].join('\n')
 }
 

@@ -5,11 +5,18 @@ import {
   type Platform,
   type TimeOfDay,
   isTimeOfDay,
+  nextDailyAt,
 } from '../core/index.ts'
 import { clearDailyTime, saveDailyTime } from '../data/reminders.ts'
+import { reminderFailureFor } from '../i18n/panelCopy.ts'
 import type { Dictionary } from '../i18n/index.ts'
 
 import { Emphasis } from './Emphasis.tsx'
+
+/* Sechs Sprachen aus `i18n/panelCopy.ts` — hier stand eine Zwei-Sprachen-Insel. */
+function reminderFailureText(): string {
+  return reminderFailureFor(document.documentElement.lang)
+}
 
 export function ReminderPanelImpl({
   platform,
@@ -27,7 +34,8 @@ export function ReminderPanelImpl({
   const t = dictionary.reminder
   const [permission, setPermission] = useState(platform.reminders.permission())
   const [time, setTime] = useState<string>(daily ?? suggested ?? '19:30')
-  const [said, setSaid] = useState<'saved' | 'cleared' | undefined>(undefined)
+  const [said, setSaid] = useState<'saved' | 'cleared' | 'failed' | undefined>(undefined)
+  const [busy, setBusy] = useState(false)
 
   const [loaded, setLoaded] = useState(daily)
   if (daily !== loaded) {
@@ -39,7 +47,11 @@ export function ReminderPanelImpl({
 
   return (
     <div className="reminder">
-      <p className="hint">{t.note}</p>
+      {/* Bei echtem Web Push liegt die technische Push-Adresse samt Termin
+          notwendigerweise beim Pushdienst/Worker. Der alte Satz „ohne Server,
+          bleibt auf dem Gerät“ gilt nur für den lokalen while-open-Fallback
+          und darf deshalb nicht neben einer Closed-App-Push-Zusage stehen. */}
+      {ability !== 'scheduled' && <p className="hint">{t.note}</p>}
       <p className="hint">
         <Emphasis
           text={
@@ -59,11 +71,14 @@ export function ReminderPanelImpl({
           <button
             type="button"
             className="quiet"
+            disabled={busy}
             onClick={() => {
+              setBusy(true)
               void platform.reminders
                 .ask()
                 .then(setPermission)
                 .catch(() => undefined)
+                .finally(() => setBusy(false))
             }}
           >
             {t.ask}
@@ -78,23 +93,57 @@ export function ReminderPanelImpl({
             <input
               type="time"
               value={time}
+              disabled={busy}
+              aria-describedby="reminder-time-hint"
               onChange={(event) => {
                 setTime(event.target.value)
                 setSaid(undefined)
               }}
             />
           </label>
+          {/*
+            Der Hinweis steht **unter** dem Feld und nicht in einem
+            Platzhalter: Ein `input type="time"` hat keinen — er zeigt seine
+            eigenen Segmente. Und `aria-describedby` sorgt dafür, dass eine
+            Vorlesehilfe ihn beim Hineinspringen mitliest, nicht erst, wenn
+            jemand danach sucht.
+          */}
+          <p className="hint" id="reminder-time-hint">
+            {t.timeHint}
+          </p>
 
           <div className="note-actions">
             <button
               type="button"
               className="quiet"
-              disabled={!isTimeOfDay(time)}
+              disabled={busy || !isTimeOfDay(time)}
               onClick={() => {
-                void saveDailyTime(time)
-                  .then((ok) => setSaid(ok ? 'saved' : undefined))
-                  .catch(() => undefined)
-                  .finally(onChange)
+                if (!isTimeOfDay(time) || busy) return
+                setBusy(true)
+                setSaid(undefined)
+                void (async () => {
+                  const stored = await saveDailyTime(time)
+                  if (!stored) return false
+
+                  // Der Fingertipp plant den Termin selbst und wartet auf die
+                  // Antwort der Plattform. Das verhindert den alten Zustand,
+                  // in dem IndexedDB bereits „Gemerkt.“ meldete, während ein
+                  // kaputter Pushpfad erst in einem separaten Effect scheiterte.
+                  const now = platform.clock.now()
+                  const at = nextDailyAt(time, now, platform.clock.offsetMinutes(now))
+                  return platform.reminders.schedule({
+                    id: DAILY_REMINDER_ID,
+                    at,
+                    title: t.dailyTitle,
+                    body: t.dailyBody,
+                  })
+                })()
+                  .then((scheduled) => setSaid(scheduled ? 'saved' : 'failed'))
+                  .catch(() => setSaid('failed'))
+                  .finally(() => {
+                    setBusy(false)
+                    onChange()
+                  })
               }}
             >
               {t.save}
@@ -103,12 +152,28 @@ export function ReminderPanelImpl({
               <button
                 type="button"
                 className="quiet"
+                disabled={busy}
                 onClick={() => {
-                  void clearDailyTime()
-                    .then(() => platform.reminders.cancel(DAILY_REMINDER_ID, true))
-                    .catch(() => undefined)
-                    .finally(onChange)
-                  setSaid('cleared')
+                  if (busy) return
+                  setBusy(true)
+                  setSaid(undefined)
+                  /*
+                   * Ausschalten ist eine kleine Transaktion über zwei Welten:
+                   * erst den realen Termin widerrufen, dann die lokale
+                   * Präferenz löschen. Scheitert der Widerruf unerwartet,
+                   * bleibt die Uhrzeit lokal sichtbar und der Nutzer kann
+                   * erneut versuchen. „Aus.“ erscheint erst, wenn beides
+                   * tatsächlich abgeschlossen ist.
+                   */
+                  void platform.reminders
+                    .cancel(DAILY_REMINDER_ID, true)
+                    .then(() => clearDailyTime())
+                    .then(() => setSaid('cleared'))
+                    .catch(() => setSaid('failed'))
+                    .finally(() => {
+                      setBusy(false)
+                      onChange()
+                    })
                 }}
               >
                 {t.off}
@@ -116,7 +181,11 @@ export function ReminderPanelImpl({
             )}
           </div>
 
-          {said !== undefined && <p className="hint">{said === 'saved' ? t.saved : t.cleared}</p>}
+          {said !== undefined && (
+            <p className="hint" role="status" aria-live="polite">
+              {said === 'saved' ? t.saved : said === 'cleared' ? t.cleared : reminderFailureText()}
+            </p>
+          )}
         </>
       )}
     </div>

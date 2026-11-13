@@ -212,7 +212,35 @@ test('löscht auf Wunsch alles — aber erst nach einer echten Rückfrage (N4)',
   // Bewusst bestätigt: zweite Warnstufe plus explizite Eingabe von ANITEW.
   await page.locator('.wipe').getByRole('button', { name: 'Alles löschen' }).click()
   await page.locator('.wipe-warn').waitFor()
-  await expect(page.locator('.wipe-go')).toBeDisabled()
+
+  /*
+   * Hier stand bis zum 02.09. `expect(.wipe-go).toBeDisabled()`.
+   *
+   * Der Knopf ist jetzt nicht mehr gesperrt, sondern auskunftsfähig: Am Gerät
+   * hieß „gesperrt", dass der Knopf mit dem leuchtenden Rahmen wie die
+   * Hauptaktion aussieht und auf einen Druck nichts tut — keinen Hinweis,
+   * keine Bewegung, keine Auskunft, was fehlt. Ein gesperrter Knopf ist eine
+   * Auskunft, die niemand hört.
+   *
+   * Die Zusage aus N4 — „ein einzelner Fehlgriff richtet nichts an" — ist
+   * dieselbe geblieben und wird hier ab jetzt **schärfer** geprüft als
+   * vorher: nicht mehr am `disabled`-Attribut, sondern am Ergebnis. Ein
+   * Druck ohne das Wort löscht nachweislich nichts und sagt, was fehlt.
+   */
+  await page.locator('.wipe-go').click()
+  await expect(page.locator('.wipe-missing')).toBeVisible()
+  const nachFehlgriff = await page.evaluate(() => {
+    return new Promise<number>((resolve) => {
+      const open = indexedDB.open('anitew')
+      open.onsuccess = () => {
+        const req = open.result.transaction('itemStates').objectStore('itemStates').count()
+        req.onsuccess = () => resolve(req.result)
+        req.onerror = () => resolve(-1)
+      }
+    })
+  })
+  expect(nachFehlgriff, 'ein Druck ohne das Wort hat gelöscht').toBe(1)
+
   await page.locator('.wipe-confirm-input').fill('ANITEW')
   await expect(page.locator('.wipe-go')).toBeEnabled()
 

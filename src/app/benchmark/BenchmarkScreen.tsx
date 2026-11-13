@@ -50,6 +50,20 @@ export function BenchmarkScreen({
   const today = dayKeyOf(now, { offsetMinutes: platform.clock.offsetMinutes(now) })
   const step = nextStep(run, now, today)
 
+  /*
+    Dieselbe Sperre wie in der Einheit: Solange gemessen wird, darf der
+    Service-Worker-Update-Reload (keepUpToDate) den Bildschirm nicht unter
+    den Händen neu laden — eine unterbrochene Messung wäre teurer als eine
+    unterbrochene Übungsrunde (F1).
+  */
+  useEffect(() => {
+    const root = document.documentElement
+    root.dataset.focus = 'on'
+    return () => {
+      delete root.dataset.focus
+    }
+  }, [])
+
   if (step.kind === 'encode') {
     return (
       <Encode

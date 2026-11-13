@@ -99,33 +99,19 @@ export const de = {
   sound: {
     on: 'Ton an',
     off: 'Ton aus',
-  },
-  journey: {
-    help: 'Hilfe & Fragen zu AP',
-    pointsQuestion: 'Was sind AP?',
-    pointsAnswer: 'AP steht für ANITEW Points. Du sammelst sie durch abgeschlossene Trainingstage, Wiedersehen und erstmals abgeschlossene Kursübungen. Sie bestimmen deine Fortschrittsstufe.',
-    earnQuestion: 'Wie erhalte ich AP?',
-    meaningQuestion: 'Was sagen AP aus? Verliere ich sie bei Pausen?',
-    heading: 'Dein Trainingsweg',
-    level: 'Level',
-    names: [
-      'Entdecken',
-      'Verknüpfen',
-      'Wiederfinden',
-      'Dranbleiben',
-      'Vertiefen',
-      'Ausbauen',
-      'Navigieren',
-      'Festigen',
-      'Weiterdenken',
-      'Erfahrung'
-    ],
-    next: 'Noch {xp} AP bis Level {level}',
-    complete: 'Alle Etappen erreicht',
-    progress: 'Fortschritt zum nächsten Trainingslevel',
-    path: 'Level und Spielregeln',
-    rules: '10 AP pro abgeschlossenem Trainingstag, 2 AP pro Wiedersehen nach dem ersten Tag. Mehrere Einheiten am selben Tag zählen einmal. Für jede erstmals abgeschlossene Kursübung gibt es 10 AP; erneutes Üben zählt nicht doppelt.',
-    note: 'AP zeigen deine Trainingsaktivität, keine gemessene Gedächtnisleistung. Pausen kosten keine AP. Alle Methoden bleiben jederzeit verfügbar.'
+    /*
+     * Die Bereiche einzeln (Geraetewunsch 31.08.). `honest` ist die Zeile, die
+     * verhindert, dass aus einem angenehmen Klang ein Wirkungsversprechen wird
+     * (R-1): Die App misst keinen Konzentrationseffekt und behauptet keinen.
+     */
+    heading: 'Was klingt',
+    feedback: 'Rückmeldung',
+    feedbackNote: 'Die kurzen Töne beim Bedienen.',
+    arrival: 'Ankommen',
+    arrivalNote: 'Die Melodie der drei Sekunden vor der Einheit.',
+    focus: 'Klang während der Einheit',
+    focusNote: 'Ein sehr leiser Dauerklang beim Üben.',
+    honest: 'Ob ein Dauerklang beim Merken hilft, ist von Mensch zu Mensch verschieden — manche brauchen Stille. Gemessen haben wir das nicht, deshalb behaupten wir es auch nicht.',
   },
   session: {
     plannedTime: 'Geplante Trainingszeit: {time} inklusive Antwortreserve',
@@ -159,10 +145,16 @@ export const de = {
       gaze: 'Sieh das Bild an. Jedes Ding hat seine Farbe — merk dir beides zusammen.',
       facts: 'Deine Karte: Frage und Antwort. Bau eine Brücke — ein Bild, in dem beide vorkommen.',
       memory: 'Deine Erinnerung. Sieh alles zusammen — ein Bild, in dem alles am Anker hängt.',
+      people: 'Ein Mensch, den viele kennen. Jahr, Fach, Herkunft — häng die drei an den Namen.',
+      math: 'Eine Aufgabe und ihr Ergebnis. Nicht rechnen — merken: 7 × 8 ist 56, so wie „Paris ist die Hauptstadt“.',
+      // Querabruf (D13): Bis zum 06.09. stand hier nichts — das Modul war
+      // nie zu sehen, also fiel die leere Zeile niemandem auf.
+      associative: 'Zwei, die zusammengehören. Gleich wird von der anderen Seite gefragt.',
     },
     recallHint: 'Was ist geblieben? Reihenfolge egal.',
     reviewHint: 'Und jetzt von früher: Woran erinnerst du dich noch?',
     promptHint: 'Wer ist das?',
+    associativeAsk: 'Wer gehört dazu?',
     reviewPromptHint: 'Und von früher: Wer ist das?',
     promptPlaceholder: 'Name',
     /*
@@ -209,8 +201,18 @@ export const de = {
     // gehört dazu?“ nach Tagen keine beantwortbare Frage.
     memoryAsk: '{subject} — was gehört dazu?',
     memoryPlaceholder: 'Was dazugehört',
+    peopleAsk: 'Welcher Jahrgang?',
+    peoplePlaceholder: 'Geburtsjahr',
+    mathAsk: 'Wie viel ist das?',
+    mathPlaceholder: 'Ergebnis',
     recallPlaceholder: 'Ein Wort pro Zeile',
     recallNumbersPlaceholder: 'Eine Zahl pro Zeile',
+    /*
+     * Der Ziffernblock des Telefons hat keine Return-Taste (Gerätemeldung
+     * 31.08.). „Eine Zahl pro Zeile“ verlangte damit etwas, das das Gerät
+     * nicht hergibt — also gibt die App den Zeilenwechsel selbst.
+     */
+    recallNextNumber: 'Nächste Zahl',
     doneWithBlock: 'Fertig',
     abort: 'Abbrechen',
   },
@@ -227,7 +229,7 @@ export const de = {
     heading: 'Messung',
     // Der Aufruf auf dem Startbildschirm. Sachlich, kein Ausrufezeichen.
     invite: 'Zeit für eine Messung',
-    inviteNote: 'Drei Minuten. Zwanzig Wörter, die im Training nie vorkommen — deshalb misst sie dein Gedächtnis und nicht deine Übung.',
+    inviteNote: 'Drei Minuten. Zwanzig Wörter, die im Training nie vorkommen — gemessen wird, wie viele du davon behältst: getrennt von deiner Übung, ohne Behauptung über deinen Alltag.',
     start: 'Messung beginnen',
     encodeHint: 'Zwanzig Wörter. Sieh sie an.',
     recallNow: 'Was ist geblieben?',
@@ -253,79 +255,29 @@ export const de = {
     // dem Grund, aus dem es sie gibt, statt sie als Regel hinzustellen (R-1).
     abortedLater: 'Der erste Abruf steht schon in der Zeile. Die nächste Messung ist deshalb erst in vierzehn Tagen dran: Wer eine begonnene Messung wiederholen kann, bis das Gefühl dabei stimmt, misst nicht mehr sein Gedächtnis.',
     // Die Ergebnisanzeige.
-    resultTitle: 'Gemessen',
-    ofItems: 'von 20',
-    phaseImmediate: 'sofort',
-    phaseAfter: 'nach 20 Minuten',
-    phaseNextDay: 'am Folgetag',
     calibrating: 'Eichung',
     calibratingNote: 'Auch eine Messung wird durch Gewöhnung an ihren Ablauf ein wenig besser. Die ersten beiden zählen deshalb als Eichung — eine Veränderung steht hier erst ab der dritten.',
     changeUp: 'Prozentpunkte mehr behalten als bei der Eichung',
     changeDown: 'Prozentpunkte weniger behalten als bei der Eichung',
     range: 'Spanne',
     // Der wichtigste Satz der ganzen App.
-    tooClose: 'Kein Unterschied, der sich vom Zufall trennen lässt. Zwanzig Wörter sind eine kleine Stichprobe: Zwei Wörter mehr oder weniger sind schon zehn Prozentpunkte.',
+    tooClose: 'Der Unterschied liegt innerhalb der groben Zählunsicherheit dieser kleinen Stichprobe. Zwanzig Wörter: Zwei mehr oder weniger sind schon zehn Prozentpunkte — mehr sagt die Spanne nicht.',
     explain: 'Was hier gemessen wurde',
     explainNote: 'Zwanzig Wörter, die es sonst nirgends in der App gibt und die nie in den Wiederholungsplan wandern. Gezählt wird, wie viele davon am Folgetag noch da sind — verglichen mit dir selbst bei der Eichung, nie mit anderen. Was hier steht, ist gezählt. Über dein Gedächtnis im Alltag sagt es nichts, solange es niemand dort gemessen hat.',
     series: 'Die Reihe',
-    cycles: 'Ab der {n}. Messung wiederholen sich die Wörter. Ein Wort, das man vor Monaten einmal drei Minuten lang gesehen hat, verfälscht wenig — aber es verfälscht.',
+    cycles: 'Ab der {n}. Messung wiederholen sich die Wörter. Ein Wort, das man bei einer früheren Messung einmal drei Minuten lang gesehen hat, verfälscht wenig — aber es verfälscht.',
+    /*
+      Die Core-Seite „Messung“ (Runde 2, Nutzerwunsch): Ergebnisse und
+      nächster Termin sind jetzt auffindbar, ohne dass die Messung selbst
+      jederzeit startbar würde — der feste Abstand bleibt die Methode.
+    */
+    nextDueLine: 'Die nächste Messung ist ab dem {day} fällig. Früher geht absichtlich nicht — der feste Abstand gehört zur Methode.',
+    runningNote: 'Eine Messung läuft gerade — der Startbildschirm führt dich weiter.',
+    noneYet: 'Noch keine abgeschlossene Messung.',
   },
   science: {
-    /*
-      Die Seite, die in dieser Branche fehlt (F6).
-
-      Zwei Dinge macht sie zugleich: Sie erklärt, warum ANITEW so gebaut ist,
-      wie es gebaut ist — und sie nennt die Stelle, an der das Wissen aufhört.
-      Der zweite Teil ist der wichtigere. Wer nur die stützenden Studien
-      zitiert, betreibt Werbung mit Fußnoten.
-
-      Der Stand einer Aussage steht nicht hier, sondern in `core/science.ts`:
-      Eine Übersetzung darf einen Satz umformulieren, aber aus „nicht belegt“
-      nicht „umstritten“ machen.
-    */
+    /* Nur die Überschrift — der Rest steht in `scienceCopy.ts`. */
     heading: 'Was belegt ist',
-    note: 'ANITEW steht auf ein paar Befunden, die seit Jahrzehnten halten — und lässt weg, was nur gut klingt. Beides steht hier, mit Quellen.',
-    standings: {
-      established: 'Gut belegt',
-      narrow: 'Belegt, aber nur dafür',
-      unsupported: 'Nicht belegt',
-      unmeasured: 'Nicht gemessen',
-    },
-    standingNotes: {
-      established: 'Vielfach wiederholt, in unabhängigen Arbeiten. Darauf ist die App gebaut.',
-      narrow: 'Der Effekt ist da — er gilt aber für das, was geübt wurde, und nicht darüber hinaus.',
-      unsupported: 'Wird von Gedächtnis-Apps regelmäßig behauptet und hält der Prüfung nicht stand. ANITEW behauptet es deshalb nicht.',
-      unmeasured: 'Niemand hat es gemessen. Auch wir nicht.',
-    },
-    claims: {
-      spacing: {
-        title: 'Verteiltes Üben schlägt Blockübung',
-        body: 'Derselbe Aufwand, über Tage verteilt, bringt deutlich mehr als am Stück. Deshalb plant ANITEW Wiederholungen, statt dich lange üben zu lassen.',
-      },
-      retrieval: {
-        title: 'Abrufen lernt, Ansehen nicht',
-        body: 'Etwas aus dem Kopf zu holen ist der Lernvorgang selbst — Wiederlesen fühlt sich besser an und bringt weniger. Deshalb fragt die App ab, statt vorzuzeigen.',
-      },
-      forgetting: {
-        title: 'Vergessen verläuft vorhersagbar',
-        body: 'Die Kurve ist alt und wurde 2015 sauber wiederholt. Vergessen ist kein Defekt, sondern der Grund, warum ein Termin überhaupt planbar ist.',
-      },
-      mnemonics: {
-        title: 'Merktechniken heben die Leistung — in der geübten Aufgabe',
-        body: 'Sechs Wochen Loci-Training verändern messbar, wie viele Wörter einer Liste jemand behält. Was daraus für Namen, Termine oder deinen Alltag folgt, ist damit **nicht** gezeigt. ANITEW bringt dir die Technik bei und behauptet über den Rest nichts.',
-      },
-      brainTraining: {
-        title: 'Gehirnjogging macht nicht allgemein klüger',
-        body: 'Große Untersuchungen finden dasselbe: Man wird besser in den Übungen und sonst nirgends. Ein Arbeitsgedächtnistraining hebt weder Intelligenz noch Alltagsleistung. ANITEW verspricht es deshalb nicht — und der Werbespruch heißt genau darum „Technik, kein Talent“.',
-      },
-      everyday: {
-        title: 'Ob ANITEW deinem Alltag hilft',
-        body: 'Dazu gibt es keine Studie, weil es diese App noch keine gibt. Was wir messen können, misst die Messung: wie viele von zwanzig Wörtern am Folgetag noch da sind. Alles darüber hinaus wäre geraten — und geraten wird hier nicht.',
-      },
-    },
-    sources: 'Quellen',
-    restsOn: 'Daran hängt in der App:',
-    nothingRests: 'Darauf ist in der App nichts gebaut.',
   },
   palace: {
     /*
@@ -371,18 +323,6 @@ export const de = {
       knee: 'Knie',
       foot: 'Fuß',
     },
-    // G3 ist da: Der Satz sagt jetzt, wo es weitergeht, statt eine Lücke
-    // einzuräumen.
-    ownNote: 'Drei fertige Wege raten, wie deine Wohnung aussieht. Einen eigenen legst du unten an — der trägt deutlich besser.',
-    ownIntro: 'Fünf Orte auf einem Weg, den du blind gehen kannst. Immer dieselbe Richtung. Die Arbeit liegt nicht im Tippen, sondern im Überlegen.',
-    ownName: 'Wie heißt der Weg?',
-    ownNamePlaceholder: 'Meine Wohnung',
-    ownStation: 'Station',
-    ownStationPlaceholder: 'Ort',
-    ownSave: 'Weg merken',
-    ownDiscard: 'Weg verwerfen',
-    ownSaved: 'Gemerkt. Er kommt ab jetzt im Training vor.',
-    ownRule: 'Fünf Orte, alle verschieden, keiner leer — und ein Name für den Weg.',
   },
   returns: {
     /*
@@ -416,8 +356,8 @@ export const de = {
     sourceImmediate: 'Quelle: Training · sofort',
     sourceBenchmark: 'Quelle: wissenschaftliche Messung',
     sourceNone: 'Quelle: noch keine Messung vorhanden',
-    benchmarkChange: 'Belastbare Veränderung: Spanne {low} bis {high} Prozentpunkte.',
-    benchmarkNoChange: 'Noch kein vom Zufall trennbarer Unterschied (Spanne {low} bis {high}).',
+    benchmarkChange: 'Veränderung über die Zählunsicherheit hinaus: Spanne {low} bis {high} Prozentpunkte.',
+    benchmarkNoChange: 'Veränderung innerhalb der Zählunsicherheit (Spanne {low} bis {high}).',
     note: 'Gezählt wird nur das Wiedersehen: wie oft eine Information nach Tagen zurückkam und noch da war. Wie gut du am Lerntag selbst abschneidest, steht hier absichtlich nicht — das ist Übung, nicht Gedächtnis.',
     names: {
       words: 'Wörter',
@@ -474,8 +414,18 @@ export const de = {
       gaze: 'Bilder',
       facts: 'Eigenes',
       memory: 'Erinnerungen',
+      people: 'Persönlichkeiten',
+      math: 'Kopfrechnen',
+      /*
+       * Die beiden Module ohne eigenen Vorrat: Räume erzeugt der Planer,
+       * der Querabruf dreht eine gelernte Mission um. Ihre Namen fehlten
+       * hier bis zum 06.09. — der Startbildschirm hätte einen leeren
+       * Schwerpunkt angekündigt, sobald einer von beiden vorrückt.
+       */
+      spatial: 'Räume',
+      associative: 'Zusammenhänge',
     },
-    noWeakest: 'Kein Unterschied zwischen den Achsen, der sich vom Zufall trennen lässt.',
+    noWeakest: 'Kein Unterschied zwischen den Achsen, der über die Zählunsicherheit hinausgeht.',
     empty: 'Noch nichts zu zeigen. Das Profil entsteht aus dem Training — nicht aus einem Test am Anfang.',
   },
   reminder: {
@@ -489,7 +439,7 @@ export const de = {
       als wenn sie gar keine angeboten hätte (R-2).
     */
     heading: 'Erinnerung',
-    note: 'Ohne Konto, ohne Server. Was hier eingestellt wird, bleibt auf dem Gerät.',
+    note: 'Kein Konto. Push speichert Geräteadresse, Zeit, Zeitzone und den generischen Text — keine Trainingsdaten.',
     // Die drei Fähigkeitsstufen, im Klartext.
     whileOpen: 'Auf diesem Gerät kann ANITEW nur erinnern, **solange es offen ist** — auch im Hintergrund, aber nicht nach dem Schließen. Eine feste Uhrzeit am nächsten Tag lässt sich im Browser nicht zusagen. Die Uhrzeit wird trotzdem gemerkt: Sie gilt, sobald ANITEW als App aus dem Store läuft.',
     scheduled: 'Erinnerungen kommen an, auch wenn ANITEW geschlossen ist.',
@@ -497,6 +447,16 @@ export const de = {
     denied: 'Benachrichtigungen sind für ANITEW abgelehnt. Das lässt sich nur in den Einstellungen des Browsers ändern — von hier aus geht es nicht.',
     ask: 'Benachrichtigungen erlauben',
     time: 'Uhrzeit',
+    /*
+      Wie die Uhrzeit einzugeben ist (Gerätemeldung 01.09.).
+
+      Gemeldet wurde: „on peut pas mettre ‚:‘ pour separer l'heure, seuls les
+      chiffres … et aucune indice“. Dass ein `input type="time"` nur Ziffern
+      annimmt und den Doppelpunkt selbst setzt, ist richtig — nur stand es
+      nirgends. Wer auf den Doppelpunkt wartet, bleibt bei einer halben
+      Eingabe stehen, und der Merken-Knopf ist dann stumm abgeschaltet.
+    */
+    timeHint: 'Nur Ziffern: erst die Stunde, dann die Minuten. Den Doppelpunkt setzt das Feld selbst — 07:15 tippst du als 0715.',
     save: 'Erinnerung merken',
     off: 'Keine Erinnerung',
     saved: 'Gemerkt.',
@@ -508,6 +468,7 @@ export const de = {
     benchmarkTitle: 'Die Messung wartet',
     benchmarkBody: 'Zwanzig Minuten sind um. Was ist geblieben?',
   },
+  coursesHeading: 'Lernkurse',
   portraitCredits: 'Portraits und Bildnachweise',
   privacy: {
     /*
@@ -518,12 +479,12 @@ export const de = {
       Punkt ist der unbequeme — und er gehört genau deshalb dazu.
     */
     heading: 'Datenschutz',
-    lead: 'ANITEW hat keinen Server.',
+    lead: 'ANITEW bleibt local-first.',
     points: [
       'Kein Konto bei uns, keine Werbung, keine Tracker.',
       'Alles, was beim Training entsteht, bleibt auf diesem Gerät — bis du selbst etwas anderes wählst: den Abgleich mit deinem eigenen Google Drive oder eine Coach-Frage mit eigenem Schlüssel. Beides ist aus, bis du es anfasst.',
       'Die Sicherung ist eine Datei, die du speicherst; der Abgleich legt dieselbe Datei in deinen eigenen Drive-App-Ordner. Zu uns fließt in beiden Fällen nichts.',
-      'Erinnerungen entstehen auf dem Gerät. Es gibt keinen Push-Dienst.',
+      'Für Push speichert ANITEW nur die technische Push-Adresse dieses Geräts, Fälligkeit, Zeitzone und den generischen Benachrichtigungstext. Keine Trainings- oder Gedächtnisinhalte.',
       'Löschen heißt: Browserspeicher leeren oder die App entfernen. Danach ist es weg — auch für uns, denn wir hatten es nie.',
     ],
     honest: 'Was trotzdem passiert: Damit die App überhaupt auf dein Gerät kommt, wird sie einmal geladen. Der Anbieter, der sie ausliefert, sieht dabei das, was jeder Webserver sieht. Danach läuft ANITEW ohne Netz.',
@@ -595,6 +556,8 @@ export const de = {
       toldApart: 'Fünfundzwanzigmal Ähnliches nach Tagen auseinandergehalten.',
       sawDetails: 'Fünfundzwanzig Einzelheiten aus Bildern nach Tagen zurückgeholt.',
       namesHeld: 'Fünfundzwanzig Namen nach Tagen noch gewusst.',
+      heldTwelve: 'Eine zwölfstellige Zahl behalten.',
+      heldThirty: 'Eine dreißigstellige Zahl behalten.',
     },
   },
   today: {
@@ -606,6 +569,7 @@ export const de = {
     */
     heading: 'Heute',
     systemHeading: 'DEIN GEDÄCHTNISSYSTEM',
+    numberRecord: 'Längste korrekt erinnerte Zahl: {digits} Ziffern.',
     missionHeading: 'Deine Mission heute',
     duration: '{duration} · angepasst an das, was jetzt ansteht',
     quietMission: 'Heute wartet noch nichts Altes — die Mission legt neue Spuren an.',
@@ -641,8 +605,19 @@ export const de = {
     strengthNote: 'Die Stärke ist dein Übungsstand mit dieser Erinnerung — keine Messung deines Gedächtnisses. Die macht weiterhin nur die Messung.',
     trainNote: 'Trainiert wird im normalen Training: Die Runde zeigt den Anker mit allem, was dazugehört, fragt dann am Anker — und das Wiedersehen kommt nach Tagen über den Wiederholungsplan.',
     rememberHeading: 'Etwas merken',
+    /*
+     * Der zweite Satz des Marken-Slogans. Auf dem Splash stand er neben
+     * „Train the memory you actually use." und versprach dort ein Ergebnis,
+     * für das es keine Studie gibt. Hier ist er kein Versprechen mehr,
+     * sondern eine Aufforderung an genau der Stelle, an der man sie befolgen
+     * kann: über dem Feld, in das man schreibt, was einem wichtig ist.
+     */
+    rememberTagline: 'Behalte, was zählt.',
     rememberIntro: 'Schreib, was du behalten willst — ein Satz genügt. ANITEW schlägt vor, was daraus wird; gespeichert wird erst, was du bestätigst.',
     rememberPlaceholder: 'Daniel arbeitet im Museum, kommt aus Madrid und spielt Gitarre.',
+    // Ein Platzhalter ist keine Beschriftung: Er verschwindet beim Tippen und
+    // wird von Screenreadern nicht zuverlässig als Name des Feldes gelesen.
+    rememberInputLabel: 'Was du behalten willst',
     suggest: 'Vorschläge ansehen',
     /*
       Der KI-Weg (D-037): ein Angebot neben dem eingebauten, kein
@@ -659,6 +634,9 @@ export const de = {
     confirm: 'Bestätigen und merken',
     cancel: 'Verwerfen',
     saved: 'Gemerkt. Die nächste Einheit nimmt die schwächsten zuerst.',
+    // F-10 (Runde 2): Ein fehlgeschlagener Speichervorgang wird gesagt, die
+    // Eingabe bleibt stehen — kein stilles Nichts nach „Bestätigen“.
+    saveFailed: 'Konnte auf diesem Gerät nicht speichern — nichts wurde übernommen. Deine Eingabe steht noch da: versuch es gleich noch einmal.',
     types: {
       person: 'Person',
       place: 'Ort',
@@ -697,6 +675,7 @@ export const de = {
     heading: 'Eigene Inhalte',
     intro: 'Eigener Stoff wird zu Karten: eine Zeile, ein Paar aus Frage und Antwort — getrennt durch „–“, Doppelpunkt oder Tabulator. Die Karten gehen denselben Weg wie alles hier: einprägen, abrufen, Wiedersehen nach Tagen. Alles bleibt auf diesem Gerät.',
     placeholder: 'Hauptstadt von Portugal – Lissabon\nfr: die Ampel – le feu\nNotrufnummer: 112',
+    inputLabel: 'Dein Stoff, Zeile für Zeile',
     preview: 'Das würden Karten:',
     rejected: 'Keine Karte (keine Trennung erkannt):',
     save: 'Karten übernehmen',
@@ -714,7 +693,7 @@ export const de = {
       ein Abgleich, der bei Zweifel löscht, wäre keiner.
     */
     heading: 'Synchronisieren / Abmelden',
-    intro: 'Deine Daten wandern in einen App-Ordner in deinem eigenen Google Drive — dieselbe Datei wie die Sicherung. Kein Konto bei uns, kein Server dazwischen: Dieses Gerät spricht direkt mit Google, und im Drive sieht die App nur ihren eigenen Ordner.',
+    intro: 'Deine Daten wandern in einen App-Ordner in deinem eigenen Google Drive — dieselbe Datei wie die Sicherung. Kein Konto bei uns, keine ANITEW-Datenbank dazwischen: Die Inhalte laufen direkt zwischen diesem Gerät und Google; nur die Google-Anmeldung geht über ANITEWs kleinen Anmelde-Endpunkt, der nichts davon speichert. Im Drive sieht die App nur ihren eigenen Ordner.',
     how: 'Abgleichen heißt: Erst wird geholt, was dort liegt, und nach den Regeln der Sicherung eingemischt — nichts wird gelöscht. Dann wird der vereinigte Stand hochgelegt. Zwei Geräte, die getrennt liefen, haben danach beide alles.',
     start: 'Mit Google anmelden und abgleichen',
     again: 'Jetzt abgleichen',
@@ -728,12 +707,25 @@ export const de = {
     account: 'Verbunden als {account}.',
     errors: {
       denied: 'Die Anmeldung kam nicht zustande. Beim nächsten Versuch fragt Google erneut.',
+      /*
+        Der Fall vom Geraetebild 01.09.: Anmeldung erfolgreich, Drive lehnt ab.
+        Frueher stand hier `denied` — „die Anmeldung kam nicht zustande, beim
+        naechsten Versuch fragt Google erneut“. Das schickte im Kreis.
+      */
+      blocked: 'Google Drive hat diese Anfrage abgelehnt. Die Anmeldung selbst hat geklappt — noch einmal anmelden hilft hier nicht. Was Google als Grund nennt, steht dahinter.',
       offline: 'Keine Verbindung zu Google. Später noch einmal — trainieren geht ohne.',
       drive: 'Google Drive hat nicht geantwortet, wie es sollte. Später noch einmal.',
       'remote-invalid': 'Im App-Ordner liegt eine Datei, die keine ANITEW-Sicherung ist. Sie wurde nicht angerührt. Bitte sieh sie dir an, bevor wieder abgeglichen wird.',
     },
     notConfigured: 'Der Abgleich ist in dieser Installation noch nicht eingerichtet — es fehlt ihre Google-Kennung. Sicherung und Training sind davon unberührt.',
   },
+  /*
+    Nur die Überschrift steht hier — die Sätze des Lernbereichs liegen in
+    `learnCopy.ts` und werden erst geladen, wenn jemand ihn öffnet. Diese
+    eine Zeile braucht die Schublade, und die gehört zum Kaltstart.
+  */
+  learn: { heading: 'Lernen' },
+
   coach: {
     keyOrder: 'Reihenfolge der KI-Schlüssel: zuerst der oberste, bei einem Fehler automatisch der nächste. Bis zu 20 Schlüssel.',
     keyLabel: 'Bezeichnung (optional)',
@@ -783,6 +775,7 @@ export const de = {
     },
     keyLink: 'Schlüssel-Seite öffnen',
     keyPlaceholder: 'Schlüssel hier einfügen',
+    keyFieldLabel: 'Dein Schlüssel',
     keySave: 'Schlüssel speichern',
     keyRemove: 'Schlüssel entfernen',
     keyPresent: 'Ein Schlüssel ist hinterlegt.',
@@ -796,10 +789,16 @@ export const de = {
     errors: {
       'no-key': 'Ohne Schlüssel keine freien Fragen. Die Hinweise oben kommen ohne aus.',
       'bad-key': 'Der Schlüssel wurde nicht angenommen. Prüfe ihn beim Anbieter — oder entferne ihn hier.',
+      // 403 ist kein Schlüsselproblem: Der Schlüssel gilt, darf das aber nicht.
+      forbidden: 'Der Anbieter lehnt die Anfrage trotz gültigem Schlüssel ab — meist fehlt dem Konto dort eine Berechtigung für das Modell. Das regelst du beim Anbieter, nicht hier.',
+      limited: 'Der Anbieter bremst gerade (Rate- oder Kontingentgrenze). Kurz warten und noch einmal — der Schlüssel ist in Ordnung.',
       offline: 'Keine Verbindung zum Anbieter. Später noch einmal — die Hinweise oben funktionieren ohne Netz.',
       refused: 'Auf diese Frage antwortet das Modell nicht. Anders gestellt klappt es oft.',
       failed: 'Die Antwort kam nicht an. Später noch einmal.',
     },
+    // F-02 (Runde 2): Ein fehlgeschlagener Einstellungs-Schreibvorgang wird
+    // gesagt — die Anzeige bleibt bei dem, was wirklich gespeichert ist.
+    saveFailed: 'Konnte auf diesem Gerät nicht speichern. Es gilt weiterhin die vorherige Einstellung.',
   },
   streak: {
     /*
@@ -823,66 +822,6 @@ export const de = {
     departure: 'Abfahrt',
     carrying: 'Dabei',
     restaurant: 'Restaurant',
-  },
-  technique: {
-    /*
-      Geschichte und Verknüpfung (D5 · D-013): je eine Lektion, drei
-      Schritte, imperativ. Kein Beispiel-Merkbild von uns — selbst gebaute
-      sitzen besser (dieselbe Entscheidung wie beim Major-System).
-    */
-    story: {
-      heading: 'Neue Technik',
-      intro: 'Die Geschichten-Methode',
-      steps: [
-        'Nimm die Wörter der Reihe nach.',
-        'Verbinde je zwei zu einer kleinen Handlung — je absurder, desto fester.',
-        'Beim Abruf erzählst du einfach weiter: Ein Bild zieht das nächste.',
-      ],
-      build: 'Bau deine eigene Geschichte — vorgekaute hält nicht.',
-      ready: 'Tippen — die erste Runde gehört ihr.',
-    },
-    link: {
-      heading: 'Neue Technik',
-      intro: 'Die Verknüpfung',
-      steps: [
-        'Such am Gesicht das Merkmal, das dir zuerst auffällt.',
-        'Mach aus dem Namen ein Bild — eine „Rose“ blüht, ein „Stein“ wiegt.',
-        'Häng das Bild an das Merkmal: groß, unübersehbar, in Bewegung.',
-      ],
-      build: 'Dein Bild, dein Haken — fremde halten nicht.',
-      ready: 'Tippen — das erste Gesicht wartet.',
-    },
-    /*
-      D5 — die Technik wird beigebracht, nicht nur abgefragt. Das ist der
-      Unterschied zu jeder Brain-Game-App, und deshalb steht hier Prosa und
-      kein Etikett.
-    */
-    heading: 'Merktechnik',
-    majorName: 'Das Major-System',
-    // Nur beim allerersten Mal. Danach wäre es das Möbel aus G-2.
-    intro: 'Ziffern sind schwer zu behalten, Bilder nicht. Jede Ziffer bekommt einen Laut — daraus wird ein Wort, und ein Wort merkt man sich.',
-    // Der Satz nach der Lektion. Kein Lob (G-5), nur der nächste Schritt.
-    ready: 'Ab jetzt steht sie unter den Zahlen.',
-    // Die Brücke je Ziffer. Sie ist der eigentliche Inhalt der Lektion:
-    // Ohne Bild ist die Zuordnung Willkür, und Willkür merkt sich niemand.
-    hooks: {
-      0: 'Die Null ist rund wie ein zischendes S — und „Zero“ beginnt mit Z.',
-      1: 'Das kleine t hat einen Abstrich, genau wie die Eins.',
-      2: 'Das kleine n hat zwei Abstriche.',
-      3: 'Das kleine m hat drei Abstriche.',
-      4: '„vieR“ endet auf r. Das ist die ganze Brücke.',
-      5: 'Die römische Fünfzig ist ein L — und die offene Hand mit fünf Fingern bildet eines.',
-      6: 'Ein gespiegeltes j ist eine Sechs. Dazu der weiche Zischlaut: sch, ch, j.',
-      7: 'Zwei Siebenen aneinandergelegt ergeben ein K.',
-      8: 'Das geschriebene f hat zwei Schlaufen — wie die Acht.',
-      9: 'Die Neun gespiegelt ist ein p, gedreht ein b.',
-    },
-    // Steht unter der Zahl beim Einprägen, sobald die erste Ziffer sitzt.
-    hint: 'Mach ein Wort daraus. Vokale sind frei.',
-    progress: 'Ziffern gelernt',
-    // Im Fußbereich nachzulesen — wer die Technik vertiefen will, soll nicht
-    // auf die nächste Lektion warten müssen.
-    note: 'Die Vokale zählen nicht mit, nur die Konsonanten. Aus 4–7 wird r–k, daraus „Rakete“ oder „Rock“ — welches Bild du nimmst, ist deine Sache. Selbst gebaute Bilder sitzen besser als vorgesetzte, deshalb liefert ANITEW keins.',
   },
   summary: {
     heading: 'Geblieben',
@@ -929,7 +868,6 @@ export const de = {
     wipeNote: 'Löscht die ganze Trainingsgeschichte auf diesem Gerät — unwiderruflich. Vorher sichern, wenn du sie behalten willst.',
     wipeConfirm: 'Wirklich alles löschen? Das lässt sich nicht rückgängig machen.',
     wipeCancel: 'Abbrechen',
-    wipeDone: 'Gelöscht. Wie am ersten Tag.',
     failed: 'Das Einlesen ist nicht durchgelaufen. Es wurde nichts verändert.',
   },
   check: {
@@ -1019,5 +957,31 @@ export const de = {
     close: 'Menü schließen',
     yours: 'Dein Stand',
     device: 'App & Gerät',
+  },
+  settings: {
+    /*
+      Die Einstellungsseite im Core (Runde 2, Nutzerwunsch): dieselben
+      Regler wie am Fuß des Startbildschirms — Sprache und Ton —, nur dort,
+      wo App-Gewohnheit sie sucht. Kein zweiter Zustand: Es sind wörtlich
+      dieselben Bedienelemente mit denselben Handgriffen.
+    */
+    heading: 'Einstellungen',
+    note: 'Dieselben Regler stehen auch unten auf dem Startbildschirm.',
+    // R3-06: Was sich nicht speichern ließ, wird gesagt statt angezeigt.
+    saveFailed: 'Diese Einstellung ließ sich auf dem Gerät nicht speichern. Es gilt weiterhin die vorherige.',
+    resetNote: 'Wenn du ganz von vorn anfangen willst: Der Weg dorthin steht unten. Vorher lohnt sich eine Sicherung unter „Sicherung“ — danach ist nichts mehr da.',
+    /*
+      Der Regler fürs Tempo (Nutzerbefund 05.09.): „Man hat kaum Zeit, sich
+      was auszudenken." Gemessen waren es vier Sekunden je Stück — in jedem
+      Modus dieselben. Wie schnell jemand sich ein Bild ausdenkt, weiß keine
+      Trefferquote; deshalb eine Einstellung und keine Automatik.
+    */
+    pace: {
+      heading: 'Zeit zum Einprägen',
+      note: 'Wie lange ein Wort, ein Name oder eine Zahl stehen bleibt, ehe die nächste kommt. Die Einheit bleibt gleich lang — bei mehr Zeit kommen weniger Aufgaben, dafür in Ruhe.',
+      much: 'viel',
+      normal: 'normal',
+      little: 'wenig',
+    },
   },
 } as const

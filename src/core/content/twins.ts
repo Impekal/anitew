@@ -44,6 +44,19 @@ const PAIRS: Readonly<Partial<Record<Language, readonly (readonly [string, strin
     ['hasta', 'asta'], ['honda', 'onda'], ['botar', 'votar'], ['barón', 'varón'],
     ['baca', 'vaca'], ['sabia', 'savia'], ['rebelar', 'revelar'],
   ],
+  it: [
+    ['cassa', 'casa'], ['penna', 'panna'], ['sete', 'seta'], ['mela', 'vela'],
+    ['collo', 'colpo'], ['manto', 'mento'], ['sale', 'sole'], ['cane', 'carne'],
+    ['vetro', 'metro'], ['notte', 'note'], ['palco', 'parco'], ['riso', 'viso'],
+    ['lana', 'luna'], ['pasta', 'posta'], ['tetto', 'letto'],
+  ],
+  pt: [
+    ['acento', 'assento'], ['censo', 'senso'], ['cela', 'sela'], ['cozer', 'coser'],
+    ['concerto', 'conserto'], ['comprimento', 'cumprimento'], ['descrição', 'discrição'],
+    ['emergir', 'imergir'], ['eminente', 'iminente'], ['mandado', 'mandato'],
+    ['peão', 'pião'], ['soar', 'suar'], ['tráfego', 'tráfico'], ['sessão', 'seção'],
+    ['ratificar', 'retificar'],
+  ],
 }
 
 /** Gibt es für diese Sprache Zwillingspaare? */

@@ -9,19 +9,25 @@
 export type MenuIconKind =
   | 'reached'
   | 'profile'
+  | 'benchmark'
   | 'coach'
   | 'contents'
+  | 'learn'
   | 'memories'
   | 'about'
   | 'palace'
   | 'reminder'
   | 'courses'
   | 'science'
+  | 'brainCare'
+  | 'help'
+  | 'faq'
   | 'install'
   | 'privacy'
   | 'backup'
   | 'sync'
   | 'check'
+  | 'settings'
 
 function Glyph({ kind }: { kind: MenuIconKind }) {
   switch (kind) {
@@ -33,6 +39,32 @@ function Glyph({ kind }: { kind: MenuIconKind }) {
       return <path d="M4.5 5.5h15v10h-8.5L7 19v-3.5H4.5zM8 9.5h8M8 12.5h5" />
     case 'contents':
       return <path d="M7.5 4.5h12v11h-12zM7.5 7.5h12M4.5 8.5v11h12" />
+    /*
+      Hilfe: ein Rettungsring. Kein Fragezeichen — das trägt schon die
+      Nachbarseite, und zwei Fragezeichen nebeneinander sind keine Ordnung.
+    */
+    case 'help':
+      return (
+        <>
+          <circle cx="12" cy="12" r="8.2" />
+          <circle cx="12" cy="12" r="3.4" />
+          <path d="M6.2 6.2l3.4 3.4M17.8 6.2l-3.4 3.4M17.8 17.8l-3.4-3.4M6.2 17.8l3.4-3.4" />
+        </>
+      )
+    /* Fragen & Antworten: zwei Sprechblasen — gefragt und geantwortet. */
+    case 'faq':
+      return (
+        <>
+          <path d="M4 5.5h11v7.5H8.5L5.5 16v-3H4z" />
+          <path d="M18 9.5h2v7.5h-1.5v3l-3-3H10.5" />
+        </>
+      )
+    /*
+      Lernen: ein aufgeschlagenes Buch. Bewusst kein Doktorhut — der gehört
+      zu Prüfungen, und hier wird nicht geprüft.
+    */
+    case 'learn':
+      return <path d="M12 7.5v12M12 7.5C10 6 7.5 5.5 4.5 5.5v12c3 0 5.5.5 7.5 2M12 7.5c2-1.5 4.5-2 7.5-2v12c-3 0-5.5.5-7.5 2" />
     case 'memories':
       return <path d="M6 8.5l6.5-3 5.5 5-4.5 8-6-2.5zM6 8.5l7.5 9.5M12.5 5.5l-1 9.5" />
     case 'about':
@@ -56,6 +88,18 @@ function Glyph({ kind }: { kind: MenuIconKind }) {
           <path d="M7.3 15.2h9.4" />
           <circle cx="10" cy="17.2" r=".65" fill="currentColor" stroke="none" />
           <circle cx="14.3" cy="16.5" r=".45" fill="currentColor" stroke="none" />
+        </>
+      )
+    case 'brainCare':
+      /*
+        Ein Kopf im Profil mit einem wachen Punkt darin — kein Gehirn mit
+        Hantel, keine Glühbirne. „Geistig aktiv bleiben" ist kein
+        Leistungsversprechen, und das Zeichen soll auch keines machen.
+      */
+      return (
+        <>
+          <path d="M15.6 20.6v-2.4c2.2-1 3.7-3.3 3.7-5.9 0-3.9-3.2-7-7.1-7-3.4 0-6.2 2.3-6.9 5.4l-1.6 3.2a.8.8 0 0 0 .7 1.2h1.4v2.2c0 1.3 1 2.3 2.3 2.3h1.6v1z" />
+          <circle cx="13.4" cy="11.6" r="1.6" />
         </>
       )
     case 'install':
@@ -96,6 +140,24 @@ function Glyph({ kind }: { kind: MenuIconKind }) {
         <>
           <circle cx="12" cy="12" r="9" />
           <path d="M4.9 12h3.3l1.7-3.6 2.7 7.2 1.8-3.6h4.7" />
+        </>
+      )
+    case 'benchmark':
+      // Eine Stoppuhr: Die Messung ist ein Termin mit fester Frist, kein Spiel.
+      return (
+        <>
+          <circle cx="12" cy="13.2" r="7.3" />
+          <path d="M12 13.2l3.4-3.4M12 3.2v2.7M9.4 3.2h5.2" />
+        </>
+      )
+    case 'settings':
+      // Drei Schieberegler — Einstellungen ohne das abgegriffene Zahnrad.
+      return (
+        <>
+          <path d="M4 7h16M4 12h16M4 17h16" />
+          <circle cx="9.5" cy="7" r="1.7" fill="currentColor" stroke="none" />
+          <circle cx="15" cy="12" r="1.7" fill="currentColor" stroke="none" />
+          <circle cx="7.5" cy="17" r="1.7" fill="currentColor" stroke="none" />
         </>
       )
   }

@@ -27,48 +27,111 @@
       }
 
       /*
-       * Das sechssekündige Markenritual gehört nur zum allerersten Öffnen auf
-       * diesem Gerät. Spätere echte Dokument-/App-Starts zeigen die kompakte
-       * Drei-Sekunden-Version. Ein bloßer Wechsel aus einer bereits laufenden
-       * PWA heraus und wieder hinein erzeugt kein neues Dokument und deshalb
-       * auch keinen neuen Splash. Der Query-Schalter ist ausschließlich für
-       * den expliziten E2E-Vertrag.
+       * Drei Fälle, drei Längen:
+       *
+       * 1. **Allererstes Öffnen auf diesem Gerät** — sechs Sekunden. Einmal im
+       *    Leben darf die Marke sich Zeit nehmen.
+       * 2. **Jedes weitere Öffnen** — drei Sekunden. Lang genug, dass das
+       *    Ritual als Ritual erkennbar bleibt, kurz genug, dass ANITEW ein
+       *    Werkzeug bleibt.
+       * 3. **Die App war schon offen** — gar kein Splash. Wer nur kurz aus dem
+       *    Fenster war und wieder drauftippt, startet nichts neu; ihn noch
+       *    einmal drei Sekunden warten zu lassen, wäre reine Schikane.
+       *
+       * Fall 3 hängt an `sessionStorage`, und zwar mit Absicht: Der Marker
+       * überlebt ein Neuladen innerhalb derselben Sitzung — also auch das
+       * Neuladen, das iOS einer im Hintergrund liegenden PWA verordnet — und
+       * verschwindet, sobald die App wirklich geschlossen wird. Genau das ist
+       * die Grenze, die hier gemeint ist. Ohne `sessionStorage` (privater
+       * Modus) fällt der Fall weg und es bleibt beim normalen Splash; das ist
+       * die richtige Richtung zu irren.
+       *
+       * Der Query-Schalter ist ausschließlich für den expliziten E2E-Vertrag;
+       * normale automatisierte Browser zahlen die sechs Sekunden nicht bei
+       * jedem isolierten Testkontext erneut. Er sticht auch Fall 3, sonst
+       * könnte ein Test das Ritual nicht zweimal prüfen.
        */
       try {
         const key = 'anitew.launch.seen.v3'
+        const openKey = 'anitew.launch.open.v1'
         const forced = new URLSearchParams(location.search).get('firstLaunch') === '1'
+
+        let resumed = false
+        try {
+          resumed = !forced && sessionStorage.getItem(openKey) === '1'
+          sessionStorage.setItem(openKey, '1')
+        } catch {
+          // Ohne Sitzungsspeicher gibt es Fall 3 nicht. Kein Grund zu scheitern.
+        }
+
         const first = forced || (navigator.webdriver !== true && localStorage.getItem(key) !== '1')
         document.documentElement.dataset.anitewFirstLaunch = first ? 'true' : 'false'
+        document.documentElement.dataset.anitewLaunch = resumed ? 'skip' : 'show'
         if (first && !forced) localStorage.setItem(key, '1')
       } catch {
         document.documentElement.dataset.anitewFirstLaunch = 'true'
+        document.documentElement.dataset.anitewLaunch = 'show'
       }
+
+      /*
+       * Nach dem Ritual verlässt der Splash das Dokument — wirklich.
+       *
+       * `anitew-launch-away` endet auf `visibility: hidden`, aber unsichtbar
+       * ist nicht abwesend: Feld, Aurora und Marke tragen Endlos-Animationen,
+       * und die liefen sonst die ganze Sitzung unsichtbar weiter (gemessen:
+       * 69 % eines Kerns nur dafür — Wärme und Akku auf jedem Telefon, bei
+       * jedem Öffnen). Der `skip`-Fall (App war schon offen, `display: none`)
+       * räumt beim Laden auf; der Wecker ist Rettungsanker, falls das
+       * Wegblenden nie feuert (fremde Browser-Einstellungen, die Animationen
+       * ganz abschalten) — sonst stünde der Splash für immer über der App.
+       */
     </script>
     <style>
       /*
        * Splash = Marke, nicht Oberfläche. Deshalb ist seine Sprache immer
        * Englisch und unabhängig von Geräte-, App- und Trainingssprache.
+       *
+       * Die Choreografie erzählt das Produktprinzip: ein schwacher Abrufpfad
+       * wird sichtbar, verdichtet sich über mehrere Knoten und sendet am Ende
+       * ein Signal zurück. Keine UI, kein Ladeindikator — ein kurzes Ritual.
        */
+      /*
+       * Die App war schon offen — dann gibt es nichts zu eröffnen. `display:
+       * none` und nicht bloß durchsichtig: Ein Element mit z-index 99999 über
+       * der ganzen Oberfläche soll gar nicht erst da sein.
+       */
+      html[data-anitew-launch='skip'] #anitew-launch {
+        display: none;
+      }
+
       #anitew-launch {
         --launch-duration: 3s;
         position: fixed;
         inset: 0;
         z-index: 99999;
         display: grid;
+        /*
+         * Sechs Zeilen, zwei davon dehnbar: Name und Satz stehen zwischen den
+         * beiden `1fr` in der Mitte, die Herkunftszeile sitzt in der letzten
+         * Zeile am Fuß — wie die Signatur am Fuß der Bibliothek in RReader.
+         * Eine Signatur gehört ans Ende, nicht an den Text.
+         */
         grid-template-rows: 1fr auto auto auto 1fr auto;
         place-items: center;
-        gap: 17px;
+        gap: 15px;
         padding:
-          max(36px, env(safe-area-inset-top))
+          max(38px, env(safe-area-inset-top))
           24px
-          max(28px, env(safe-area-inset-bottom));
+          max(30px, env(safe-area-inset-bottom));
         background:
-          radial-gradient(circle at 50% 45%, rgb(142 231 208 / 11%), transparent 24rem),
-          radial-gradient(circle at 58% 51%, rgb(240 184 100 / 8%), transparent 16rem),
-          linear-gradient(180deg, #020605 0%, #050a08 52%, #020403 100%);
+          radial-gradient(ellipse at 50% 47%, rgb(142 231 208 / 13%) 0, rgb(142 231 208 / 4%) 26%, transparent 56%),
+          radial-gradient(circle at 61% 44%, rgb(240 184 100 / 9%) 0, transparent 32%),
+          radial-gradient(circle at 48% 80%, rgb(44 111 91 / 8%) 0, transparent 35%),
+          linear-gradient(180deg, #010403 0%, #030806 47%, #010302 100%);
         color: #f4f1e7;
         pointer-events: auto;
         overflow: hidden;
+        isolation: isolate;
         animation: anitew-launch-away var(--launch-duration) cubic-bezier(.4,0,.2,1) forwards;
       }
       html[data-anitew-first-launch='true'] #anitew-launch {
@@ -78,47 +141,111 @@
       #anitew-launch::after {
         content: '';
         position: absolute;
-        inset: 0;
         pointer-events: none;
       }
       #anitew-launch::before {
-        opacity: .74;
+        inset: -12%;
+        z-index: -2;
+        opacity: .68;
         background-image:
-          radial-gradient(circle at 12% 18%, rgb(142 231 208 / 30%) 0 1px, transparent 1.6px),
-          radial-gradient(circle at 78% 16%, rgb(240 184 100 / 24%) 0 1px, transparent 1.6px),
-          radial-gradient(circle at 88% 72%, rgb(142 231 208 / 23%) 0 1px, transparent 1.6px),
-          radial-gradient(circle at 24% 81%, rgb(240 184 100 / 20%) 0 1px, transparent 1.6px);
-        background-size: 86px 103px, 121px 97px, 143px 131px, 167px 149px;
+          radial-gradient(circle at 12% 18%, rgb(142 231 208 / 36%) 0 .8px, transparent 1.5px),
+          radial-gradient(circle at 78% 16%, rgb(240 184 100 / 27%) 0 .8px, transparent 1.5px),
+          radial-gradient(circle at 88% 72%, rgb(142 231 208 / 25%) 0 .8px, transparent 1.5px),
+          radial-gradient(circle at 24% 81%, rgb(240 184 100 / 22%) 0 .8px, transparent 1.5px),
+          linear-gradient(rgb(142 231 208 / 2.8%) 1px, transparent 1px),
+          linear-gradient(90deg, rgb(142 231 208 / 2.3%) 1px, transparent 1px);
+        background-size:
+          86px 103px,
+          121px 97px,
+          143px 131px,
+          167px 149px,
+          56px 56px,
+          56px 56px;
+        mask-image: radial-gradient(ellipse at center, black 0 34%, rgb(0 0 0 / 70%) 52%, transparent 78%);
         animation: anitew-launch-field 6.4s ease-in-out infinite alternate;
       }
       #anitew-launch::after {
-        inset: -28%;
-        opacity: .34;
+        inset: -35%;
+        z-index: -1;
+        opacity: .32;
         background:
-          conic-gradient(from 12deg at 50% 48%, transparent 0 18%, rgb(142 231 208 / 6%) 23%, transparent 29% 62%, rgb(240 184 100 / 5%) 69%, transparent 76%);
-        filter: blur(34px);
-        animation: anitew-launch-aurora 16s ease-in-out infinite alternate;
+          conic-gradient(
+            from 10deg at 50% 48%,
+            transparent 0 17%,
+            rgb(142 231 208 / 8%) 22%,
+            transparent 29% 61%,
+            rgb(240 184 100 / 6%) 68%,
+            transparent 76%
+          );
+        /*
+         * Kein Weichzeichner mehr (Gerätemeldung 13.09., „sehr heiß").
+         * Ein Verlauf ist schon weich; 42 Pixel Unschärfe darüber ändern
+         * gemessen höchstens 5 von 255 Helligkeitsstufen — dafür muss die
+         * Fläche in jedem Bild neu gerastert werden, solange sie sich
+         * bewegt. Die Bewegung bleibt, sie kostet ohne Filter nichts.
+         */
+        animation: anitew-launch-aurora 14s ease-in-out infinite alternate;
       }
+      /*
+       * Die vier Wörter sind die Kopfzeile der Marke — sie gehören nach oben
+       * und nicht knapp über das Zeichen. `align-self: start` setzt sie an
+       * den Anfang der dehnbaren ersten Zeile, also direkt unter den oberen
+       * Sicherheitsrand.
+       *
+       * Farbe aus der Signature-Palette: Gold (`--wow-gold`, #e5b86d) gegen
+       * das Mint des Slogans. Das ist dasselbe Paar, das der Marke im Zeichen
+       * schon zugrunde liegt — die Knoten laufen von Mint nach Gold. Das
+       * bisherige kühle Grau (rgb(195 224 214 / 62%)) stand in keiner der
+       * beiden Reihen.
+       */
       .anitew-launch-terms {
         grid-row: 1;
-        align-self: end;
-        margin-bottom: 29px;
-        color: rgb(188 219 207 / 68%);
-        font: 650 8px/1.7 ui-monospace, SFMono-Regular, Menlo, monospace;
-        letter-spacing: .245em;
+        align-self: start;
+        /*
+         * Nicht ganz an den Rand: `align-self: start` setzte die Zeile direkt
+         * unter den Sicherheitsabstand, und das sah geklebt aus statt gesetzt.
+         */
+        margin-top: 34px;
+        margin-bottom: 0;
+        color: rgb(229 184 109 / 78%);
+        /*
+         * Nur EIN Schein, und zwar der goldene: Hier stand zusätzlich ein
+         * zweites `text-shadow` in Mint aus der Grau-Fassung — die spätere
+         * Deklaration gewann, und der oben begründete Gold-Schein war nie zu
+         * sehen (gemessen 30.08.: berechnet rgba(142 231 208 / 10%)).
+         */
+        text-shadow: 0 0 18px rgb(229 184 109 / 22%);
+        font: 650 10px/1.7 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: .27em;
         text-align: center;
         text-transform: uppercase;
         opacity: 0;
-        animation: anitew-launch-copy .72s .12s ease forwards;
+        transform: translateY(4px);
+        animation: anitew-launch-copy .7s .08s ease forwards;
       }
       .anitew-launch-core {
         grid-row: 2;
-        width: 154px;
-        height: 154px;
+        width: clamp(164px, 22vw, 182px);
+        height: clamp(164px, 22vw, 182px);
         overflow: visible;
-        filter:
-          drop-shadow(0 0 18px rgb(240 184 100 / 16%))
-          drop-shadow(0 0 48px rgb(142 231 208 / 10%));
+        /*
+          Kein Weichzeichner ueber der Marke (Geraetemeldung 01.09.).
+
+          Hier standen drei `drop-shadow`, der groesste mit 90 px Radius, ueber
+          einer Flaeche von 182 x 182 px — und darin laufen zwei endlose
+          Bewegungen. Ein Filter auf dem Container zwingt den ganzen Teilbaum
+          in eine eigene Ebene, die neu gezeichnet wird, sobald sich darin
+          etwas ruehrt. Das lief auf dem Startbildschirm, also genau dann, wenn
+          das Geraet ohnehin am meisten zu tun hat.
+
+          Das Leuchten kommt jetzt aus einem ruhenden Verlauf dahinter: Der
+          wird einmal gezeichnet und nicht je Bild.
+        */
+        background:
+          radial-gradient(circle at 50% 50%, rgb(240 184 100 / 9%), transparent 58%),
+          radial-gradient(circle at 50% 50%, rgb(142 231 208 / 6%), transparent 72%);
+        transform-origin: 50% 50%;
+        animation: anitew-core-arrive .85s cubic-bezier(.16,.84,.22,1) both;
       }
       .anitew-mark-path,
       .anitew-mark-branch {
@@ -128,60 +255,73 @@
         stroke-dasharray: 170;
         stroke-dashoffset: 170;
         vector-effect: non-scaling-stroke;
-        animation: anitew-mark-draw 1.18s cubic-bezier(.16,.84,.22,1) forwards;
+        animation: anitew-mark-draw 1.24s cubic-bezier(.16,.84,.22,1) forwards;
       }
       .anitew-mark-path {
         stroke: url(#anitew-mark-gradient);
-        stroke-width: 1.55;
+        stroke-width: 1.65;
       }
       .anitew-mark-branch {
-        stroke: rgb(142 231 208 / 58%);
-        stroke-width: 1.35;
-        animation-delay: .25s;
+        stroke: rgb(142 231 208 / 56%);
+        stroke-width: 1.32;
+        animation-delay: .22s;
       }
       .anitew-mark-halo {
         fill: none;
-        stroke: rgb(142 231 208 / 9%);
-        stroke-width: .8;
+        stroke: rgb(142 231 208 / 12%);
+        stroke-width: .75;
         opacity: 0;
         transform-box: fill-box;
         transform-origin: center;
-        animation: anitew-mark-halo 4.8s 1.15s ease-in-out infinite;
+        animation: anitew-mark-halo 3.8s 1.02s ease-in-out infinite;
       }
       .anitew-mark-node {
         fill: #f0b864;
         opacity: 0;
         transform-box: fill-box;
         transform-origin: center;
-        filter: drop-shadow(0 0 5px rgb(240 184 100 / 48%));
+        filter: drop-shadow(0 0 6px rgb(240 184 100 / 58%));
         animation: anitew-mark-node .48s cubic-bezier(.16,.84,.22,1) forwards;
       }
-      .anitew-mark-node:nth-of-type(1) { animation-delay: .34s; }
-      .anitew-mark-node:nth-of-type(2) { animation-delay: .46s; }
-      .anitew-mark-node:nth-of-type(3) { animation-delay: .58s; }
-      .anitew-mark-node:nth-of-type(4) { animation-delay: .70s; }
-      .anitew-mark-node:nth-of-type(5) { animation-delay: .82s; }
+      /* Die zwei Halo-Kreise stehen im SVG vor den fünf Hauptknoten. */
+      .anitew-mark-node:nth-of-type(3) { animation-delay: .28s; }
+      .anitew-mark-node:nth-of-type(4) { animation-delay: .40s; }
+      .anitew-mark-node:nth-of-type(5) { animation-delay: .52s; }
+      .anitew-mark-node:nth-of-type(6) { animation-delay: .64s; }
+      .anitew-mark-node:nth-of-type(7) { animation-delay: .76s; }
       .anitew-mark-node-branch {
         fill: #8ee7d0;
-        filter: drop-shadow(0 0 5px rgb(142 231 208 / 55%));
-        animation-delay: .78s !important;
+        filter: drop-shadow(0 0 6px rgb(142 231 208 / 62%));
+        animation-delay: .72s !important;
       }
       .anitew-mark-signal {
-        fill: #fff1c9;
+        fill: #fff4d6;
         opacity: 0;
-        filter: drop-shadow(0 0 5px rgb(255 225 167 / 86%));
-        animation: anitew-mark-signal 2.9s 1.05s ease-in-out infinite;
+        /* Ohne eigenen Weichzeichner: Der Punkt wandert endlos, und ein Filter
+           an einem endlos bewegten Element wird in jedem Bild neu gerechnet.
+           Bei drei Pixeln Groesse traegt die helle Fuellung das Leuchten. */
+        animation: anitew-mark-signal 2.75s .92s cubic-bezier(.4,0,.2,1) infinite;
       }
       .anitew-launch-name {
         grid-row: 3;
         opacity: 0;
-        transform: translateY(5px);
-        font: 520 21px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        letter-spacing: .46em;
-        text-indent: .46em;
-        text-shadow: 0 0 28px rgb(142 231 208 / 12%);
-        animation: anitew-launch-name .56s .62s ease forwards;
+        transform: translateY(7px) scale(.985);
+        font: 520 22px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        letter-spacing: .49em;
+        text-indent: .49em;
+        text-shadow:
+          0 0 25px rgb(142 231 208 / 15%),
+          0 0 60px rgb(240 184 100 / 5%);
+        animation: anitew-launch-name .62s .56s cubic-bezier(.16,.84,.22,1) forwards;
       }
+      /*
+       * Der Satz, der sagt, worum es geht — direkt über der Herkunftszeile.
+       *
+       * Er steht bewusst **zwischen** Name und „Powered by Impekal“: größer
+       * und in Mint statt Grau, damit er als Aussage gelesen wird und nicht
+       * als Kleingedrucktes. Die Herkunftszeile bleibt, was sie war — klein,
+       * grau, ganz unten.
+       */
       .anitew-launch-tagline {
         grid-row: 4;
         margin-top: -6px;
@@ -198,7 +338,7 @@
         align-self: end;
         color: rgb(205 211 205 / 42%);
         font: 500 9px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        letter-spacing: .12em;
+        letter-spacing: .13em;
         opacity: 0;
         animation: anitew-launch-copy .55s .96s ease forwards;
       }
@@ -219,43 +359,66 @@
         z-index: 3 !important;
         pointer-events: auto !important;
       }
-      @keyframes anitew-mark-draw { to { stroke-dashoffset: 0; } }
+      @keyframes anitew-core-arrive {
+        0% { opacity: 0; transform: scale(.88); }
+        58% { opacity: 1; }
+        100% { opacity: 1; transform: scale(1); }
+      }
+      @keyframes anitew-mark-draw {
+        0% { stroke-dashoffset: 170; opacity: .2; }
+        20% { opacity: 1; }
+        100% { stroke-dashoffset: 0; opacity: 1; }
+      }
       @keyframes anitew-mark-node {
-        0% { opacity: 0; transform: scale(.24); }
-        70% { opacity: 1; transform: scale(1.18); }
+        0% { opacity: 0; transform: scale(.18); }
+        68% { opacity: 1; transform: scale(1.2); }
         100% { opacity: 1; transform: scale(1); }
       }
       @keyframes anitew-mark-halo {
-        0%, 100% { opacity: .1; transform: scale(.78); }
-        50% { opacity: .68; transform: scale(1.35); }
+        0%, 100% { opacity: .08; transform: scale(.72); }
+        48% { opacity: .74; transform: scale(1.42); }
+        70% { opacity: .2; transform: scale(1.58); }
       }
       @keyframes anitew-mark-signal {
-        0% { opacity: 0; offset-distance: 0%; }
-        10% { opacity: .95; }
-        88% { opacity: .9; }
-        100% { opacity: 0; offset-distance: 100%; }
+        0% { opacity: 0; offset-distance: 0%; transform: scale(.7); }
+        9% { opacity: 1; transform: scale(1); }
+        82% { opacity: .96; transform: scale(1); }
+        100% { opacity: 0; offset-distance: 100%; transform: scale(.62); }
       }
       @keyframes anitew-launch-name {
         to { opacity: 1; transform: none; }
       }
       @keyframes anitew-launch-copy {
-        to { opacity: 1; }
+        to { opacity: 1; transform: none; }
       }
       @keyframes anitew-launch-field {
-        to { transform: translate3d(1.2%, -1%, 0) scale(1.02); opacity: .92; }
+        to { transform: translate3d(1.5%, -1.2%, 0) scale(1.025); opacity: .9; }
       }
       @keyframes anitew-launch-aurora {
-        to { transform: translate3d(2%, 1.4%, 0) rotate(2deg) scale(1.04); opacity: .48; }
+        to { transform: translate3d(2.4%, 1.6%, 0) rotate(2.4deg) scale(1.05); opacity: .46; }
       }
       @keyframes anitew-launch-away {
-        0%, 84% { opacity: 1; visibility: visible; }
+        0%, 82% { opacity: 1; visibility: visible; }
         100% { opacity: 0; visibility: hidden; }
+      }
+      @media (max-width: 430px) {
+        .anitew-launch-terms {
+          font-size: 9px;
+          letter-spacing: .21em;
+        }
+        .anitew-launch-name {
+          font-size: 21px;
+          letter-spacing: .45em;
+          text-indent: .45em;
+        }
+
       }
       @media (prefers-reduced-motion: reduce) {
         #anitew-launch { --launch-duration: 3s; }
         html[data-anitew-first-launch='true'] #anitew-launch { --launch-duration: 6s; }
         #anitew-launch::before,
         #anitew-launch::after,
+        .anitew-launch-core,
         .anitew-mark-path,
         .anitew-mark-branch,
         .anitew-mark-halo,
@@ -279,16 +442,16 @@
       <svg class="anitew-launch-core" viewBox="0 0 120 120" aria-hidden="true">
         <defs>
           <linearGradient id="anitew-mark-gradient" x1="18" y1="84" x2="103" y2="37" gradientUnits="userSpaceOnUse">
-            <stop offset="0" stop-color="#8ee7d0" stop-opacity=".54" />
-            <stop offset=".48" stop-color="#b7ddbd" stop-opacity=".72" />
-            <stop offset="1" stop-color="#f0b864" stop-opacity=".92" />
+            <stop offset="0" stop-color="#8ee7d0" stop-opacity=".50" />
+            <stop offset=".46" stop-color="#b7ddbd" stop-opacity=".76" />
+            <stop offset="1" stop-color="#f0b864" stop-opacity=".96" />
           </linearGradient>
         </defs>
         <!-- Das ursprüngliche ANITEW-Prinzip: Wiederholungskurve + echter Seitenzweig. -->
         <path class="anitew-mark-path" d="M24 79L36 67L54 54L78 43L100 38" />
         <path class="anitew-mark-branch" d="M54 54L67 76" />
         <circle class="anitew-mark-halo" cx="78" cy="43" r="8.5" />
-        <circle class="anitew-mark-halo" cx="100" cy="38" r="10" style="animation-delay:1.65s" />
+        <circle class="anitew-mark-halo" cx="100" cy="38" r="10" style="animation-delay:1.48s" />
         <circle class="anitew-mark-node" cx="24" cy="79" r="3.5" />
         <circle class="anitew-mark-node" cx="36" cy="67" r="3.8" />
         <circle class="anitew-mark-node" cx="54" cy="54" r="4.2" />
@@ -297,7 +460,7 @@
         <circle class="anitew-mark-node anitew-mark-node-branch" cx="67" cy="76" r="3.2" />
         <circle
           class="anitew-mark-signal"
-          r="1.65"
+          r="1.7"
           style="offset-path:path('M24 79L36 67L54 54L78 43L100 38');offset-rotate:0deg"
         />
       </svg>
@@ -310,6 +473,7 @@
       (() => {
         const launch = document.getElementById('anitew-launch')
         if (!launch) return
+        if (document.documentElement.dataset.anitewLaunch === 'skip') { launch.remove(); return }
         const duration = document.documentElement.dataset.anitewFirstLaunch === 'true' ? 6000 : 3000
         const deadline = performance.now() + duration + 500
         let timer

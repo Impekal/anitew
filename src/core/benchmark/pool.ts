@@ -56,7 +56,29 @@ const es = [
   'ventilador', 'yogur', 'zorro', 'berenjena',
 ]
 
-const POOLS: Partial<Record<Language, readonly string[]>> = { de, en, fr, es }
+const it = [
+  'albicocca', 'armadio', 'balena', 'bastone', 'berretto', 'bracciale', 'brocca', 'cacciavite',
+  'caffettiera', 'calice', 'camion', 'carrello', 'cavatappi', 'ciliegia', 'cinghia', 'cocomero',
+  'conchiglia', 'culla', 'dado', 'elica', 'farfalla', 'finestra', 'forchetta', 'fossile',
+  'fragola', 'imbuto', 'incudine', 'lattina', 'lucertola', 'mandolino', 'maniglia', 'medusa',
+  'mensola', 'nocciola', 'obelisco', 'padella', 'palloncino', 'panchina', 'pattino', 'pera',
+  'piuma', 'poltrona', 'rastrello', 'rinoceronte', 'rospo', 'saliera', 'sciarpa', 'scoiattolo',
+  'spazzola', 'spugna', 'teiera', 'tovaglia', 'trattore', 'valigia', 'vaso', 'vetrina',
+  'zerbino', 'zanzara', 'zucca', 'ceppo',
+]
+
+const pt = [
+  'alicate', 'almofada', 'antena', 'avental', 'balança', 'bengala', 'bigode', 'boia',
+  'broche', 'cabide', 'caderno', 'cafeteira', 'calça', 'câmera', 'carrinho', 'carteira',
+  'cebola', 'chaleira', 'chinelo', 'colher', 'cortina', 'dado', 'dominó', 'elefante',
+  'envelope', 'escaravelho', 'esponja', 'estante', 'fechadura', 'ferradura', 'fóssil', 'funil',
+  'gravata', 'hélice', 'ímã', 'janela', 'lagarto', 'lápis', 'lenço', 'maçã',
+  'mandolina', 'medalha', 'óculos', 'peruca', 'pinça', 'pregador', 'pulseira', 'raquete',
+  'rinoceronte', 'rolha', 'serrote', 'tesoura', 'tigela', 'torneira', 'travesseiro', 'trevo',
+  'tulipa', 'ventilador', 'xícara', 'iogurte',
+]
+
+const POOLS: Partial<Record<Language, readonly string[]>> = { de, en, fr, es, it, pt }
 
 /** Wörter je Messung. Zwanzig — die Zahl aus F5 („Day 1: 8/20“). */
 export const BENCHMARK_ITEMS = 20

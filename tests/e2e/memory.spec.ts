@@ -31,6 +31,15 @@ test('merkt echte Information: Vorschläge, Bestätigung, Constellation, Neulade
   await openPage(page, 'Mein Gedächtnis')
   await expect(page.locator('.memory-empty')).toBeVisible()
 
+  /*
+   * „Behalte, was zählt." stand einmal auf dem Splash, neben dem englischen
+   * Slogan. Dort war es ein Versprechen über ein Ergebnis, für das es keine
+   * Studie gibt (siehe den Anspruch `everyday` in core/science.ts). Hier ist
+   * es eine Aufforderung an der einzigen Stelle, an der man sie befolgen
+   * kann — direkt über dem Feld. Deshalb steht es hier und nirgends sonst.
+   */
+  await expect(page.locator('.remember-tagline')).toHaveText('Behalte, was zählt.')
+
   await page.locator('.remember-input').fill(DANIEL)
   await page.getByRole('button', { name: 'Vorschläge ansehen' }).click()
 
@@ -53,8 +62,13 @@ test('merkt echte Information: Vorschläge, Bestätigung, Constellation, Neulade
   // Die Constellation zeigt die echten Daten: 4 Punkte, 3 Linien, der Anker
   // trägt seinen Namen.
   await expect(page.locator('.memory-counts')).toHaveText('4 Erinnerungen · 3 Verbindungen')
-  await expect(page.locator('.constellation circle')).toHaveCount(4)
-  await expect(page.locator('.constellation line')).toHaveCount(3)
+  // Gezählt werden die Erinnerungspunkte und die echten Verbindungen, nicht
+  // jeder Kreis und jede Linie in der Fläche: Die Constellation trägt seit
+  // dem Hintergrundnetz auch Schmuck (`.constellation-web`), und ein fälliger
+  // Punkt bekommt zwei Rückkehr-Ringe dazu. `circle` und `line` hätten das
+  // alles mitgezählt und dabei behauptet, es seien Erinnerungen.
+  await expect(page.locator('.constellation .constellation-node')).toHaveCount(4)
+  await expect(page.locator('.constellation .constellation-edge')).toHaveCount(3)
   await expect(page.locator('.constellation-label')).toHaveText('Daniel')
 
   // Neuladen darf den Graphen nicht verlieren.

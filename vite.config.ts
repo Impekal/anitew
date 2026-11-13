@@ -5,6 +5,8 @@ import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
+import { NAVIGATION_DENYLIST } from './scripts/navigation-denylist.ts'
+
 const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')) as {
   version: string
 }
@@ -50,6 +52,7 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,webp,json,woff2}', 'course-media/lesson-intro.mp4'],
+        globIgnores: ['**/fsrsOptimizerWasi-*.js', '**/wasi-worker-*.js'],
         // Der kleine Push-Handler bleibt eigenes, gut prüfbares JS und wird in
         // den von Workbox erzeugten Service Worker importiert.
         importScripts: ['push-sw.js', 'course-media-sw.js'],
@@ -66,7 +69,7 @@ export default defineConfig({
         }],
         // OAuth und Push sind echte Worker-Endpunkte. Der PWA-Navigations-
         // Fallback darf sie niemals mit einer gecachten index.html beantworten.
-        navigateFallbackDenylist: [/^\/oauth\/google\//, /^\/push\//],
+        navigateFallbackDenylist: [...NAVIGATION_DENYLIST],
         // Bei einem Release soll kein alter App-Shell-Cache weiterleben. Das
         // ist besonders auf iOS wichtig, wo offene/installierte PWAs sonst
         // noch die vorherige JS-Fassung ausliefern koennen.

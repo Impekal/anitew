@@ -1,6 +1,6 @@
 import type { DimensionCounts } from '../profile/profile.ts'
 import { type DimensionId, isImmediate, moduleForDimension } from '../profile/dimensions.ts'
-import type { ModuleId } from '../session/plan.ts'
+import { TRAINING_MODULES, type ModuleId } from '../session/plan.ts'
 
 export type MissionReason = 'due' | 'personal' | 'undertrained' | 'interference' | 'balanced'
 
@@ -23,19 +23,24 @@ export interface DailyMissionDecision {
   readonly signals: readonly MissionSignal[]
 }
 
-const CORE_MODULES: readonly ModuleId[] = [
-  'memory',
-  'facts',
-  'faces',
-  'numbers',
-  'words',
-  'missions',
-  'twins',
-  'reverse',
-  'palace',
-  'gaze',
-  'spatial',
-]
+/**
+ * Woraus eine Einheit bestehen kann — **die** Liste, denn `App.tsx` reicht
+ * `modules` genau von hier an den Planer weiter.
+ *
+ * Bis zum 06.09. stand hier eine zweite, von Hand gepflegte Aufzählung. Sie
+ * ist zweimal von `TRAINING_MODULES` abgewichen, und beide Male hieß das:
+ * ein fertig gebautes, geprüftes und ausgeliefertes Modul, das kein Mensch
+ * je zu sehen bekam.
+ *
+ *   `associative`  seit 22.08.  (einen Tag nach der letzten Pflege hier)
+ *   `people`       seit 02.09.
+ *
+ * Eine Rangfolge steht hier bewusst **nicht** mehr drin: Welches Modul eine
+ * Runde bekommt, entscheidet ein gewürfelter Versatz auf dieser Liste
+ * (`moduleForRound`), nicht ihre Reihenfolge. Was wirklich vorrücken soll,
+ * rückt weiter unten über ein belegtes Signal vor — und nur darüber.
+ */
+const CORE_MODULES: readonly ModuleId[] = TRAINING_MODULES
 
 const REASON_ORDER: Readonly<Record<Exclude<MissionReason, 'balanced'>, number>> = {
   due: 0,
