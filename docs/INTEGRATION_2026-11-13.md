@@ -96,3 +96,34 @@ die Summe mit der vollständigen ursprünglichen Auswahl. Leere dateibasierte
 Shard-Slots starten keine Maschine. Screenshots/Traces fehlgeschlagener Fälle
 werden pro Maschine getrennt gesichert. Die langen echten Trainingszeiten
 bleiben erhalten; es wird kein Test übersprungen, um früher zu veröffentlichen.
+
+## Übergabe von Claude und weitere Browserbefunde
+
+`ceb82df` und `eae332b` sind auf demselben Zweig als Fast-forward aufgenommen.
+Die Glasflächen bleiben nach Claudes dokumentiertem Gerätebefund unverändert.
+Der Sprachwächter unterscheidet jetzt vollständige Oberflächen von sichtbar
+beschrifteten englischen Rückfällen, entsprechend dem Kursuntertitel-Vertrag.
+
+Der vollständige CI-Lauf für `813670f` hat die Veröffentlichung blockiert:
+der veraltete Sprachwächter scheiterte; Menüfokus und Wiederholung bestanden
+erst im Diagnose-Retry und dürfen deshalb weiterhin nicht als grün gelten.
+
+Der Menütest griff nach „Zurück“ in die automatische Rückkehr zum Core ein.
+Er wartet jetzt auf diese Rückkehr und prüft danach Escape sowie erneutes
+Tastaturöffnen. Diese stärkere Prüfung reproduzierte zusätzlich einen echten
+Fokusfehler: Beim automatisch geöffneten Drawer war der vorherige Fokus nicht
+zwingend sein Menüknopf. Escape kehrt jetzt zu diesem sichtbaren Auslöser zurück.
+
+Der Wiederholungstest meldete im ersten Versuch eine fertige Runde ohne
+Wiedersehen. Sein Datenbank-Helfer kehrte nach dem Einreihen von `put()` zurück,
+ohne den Transaktionsabschluss abzuwarten. Er wartet jetzt ausdrücklich auf
+`oncomplete` und prüft die vordatierten Termine nach dem Reload, bevor er den
+Scheduler startet. Das schließt eine reale Lücke im Testaufbau; die alte
+Fehlaufnahme allein beweist noch nicht, dass sie dessen einzige Ursache war.
+Kein Scheduler, Zeitbudget, Retry- oder Flake-Gate wurde dafür abgeschwächt.
+
+Lokal bestanden anschließend alle 18 Wiederholungen (je drei Durchläufe der
+drei betroffenen Abläufe auf Desktop und Mobilprofil), Typecheck, Build und
+das unveränderte Größenbudget von 176.9 KiB gzip. Für die Wiederholungsdatei
+werden künftig auch Spuren des ersten Fehlversuchs behalten, damit ein
+bestandener Retry nicht die einzige verfügbare Ablaufaufnahme ist.

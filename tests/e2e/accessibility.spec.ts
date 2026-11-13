@@ -70,8 +70,18 @@ test('hält den Fokus im offenen Menü und gibt ihn danach zurück', async ({ pa
   await firstItem.click()
   await expect(page.locator('.page')).toBeVisible()
 
-  // Noch einmal öffnen und Escape als echten Modal-Ausgang prüfen.
+  // Zurück aus einer Core-Seite stellt den übergeordneten Drawer selbst
+  // wieder her. Nicht in dieses asynchrone Wiederöffnen hinein fokussieren
+  // und Enter senden: Der Fokus kann dann bereits zum Schließen-Knopf
+  // wandern, und Enter schließt genau das soeben zurückgekehrte Menü.
   await page.locator('.page-back').click()
+  await expect(dialog).toBeVisible()
+  await expect(page.locator('.drawer-close')).toBeFocused()
+  await page.keyboard.press('Escape')
+  await expect(dialog).toHaveCount(0)
+  await expect(menu).toBeFocused()
+
+  // Auch nach diesem echten Modal-Ausgang erneut per Tastatur öffnen.
   await expect(menu).toBeVisible()
   await menu.focus()
   await page.keyboard.press('Enter')

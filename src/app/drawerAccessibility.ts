@@ -48,7 +48,12 @@ export function installDrawerAccessibility(): () => void {
   const enhance = (drawer: HTMLElement, veil: HTMLElement) => {
     activeDrawer = drawer
     activeVeil = veil
-    opener = document.activeElement instanceof HTMLElement ? document.activeElement : null
+    // Auch die automatische Rückkehr aus einer Core-Seite öffnet diesen
+    // Drawer. Ein synthetischer Klick fokussiert seinen Auslöser nicht;
+    // activeElement kann dann body oder der gerade entfernte Zurück-Knopf
+    // sein. Escape muss trotzdem zum sichtbaren Menü-Auslöser zurückkehren.
+    opener = document.querySelector<HTMLElement>('.hamburger') ??
+      (document.activeElement instanceof HTMLElement ? document.activeElement : null)
 
     veil.setAttribute('role', 'dialog')
     veil.setAttribute('aria-modal', 'true')

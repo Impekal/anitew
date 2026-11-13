@@ -2,6 +2,11 @@ import { expect, test, type Page } from '@playwright/test'
 
 import { answerRecall, collectItems, recallKind, startEmergency, visit } from './helpers.ts'
 
+// Ein grüner Retry erklärt den ersten fehlgeschlagenen Terminlauf nicht.
+// Gerade hier die Spur des tatsächlichen Fehlversuchs behalten, nicht erst
+// den nachfolgenden Diagnoseversuch aufzeichnen.
+test.use({ trace: 'retain-on-failure-and-retries' })
+
 /**
  * Das Versprechen aus D-004, im Browser nachgeprüft: **Was du heute lernst,
  * kommt an einem späteren Tag von selbst zurück.**
@@ -67,7 +72,15 @@ async function makeEverythingDueToday(page: Page, expected: number) {
       open.onsuccess = () => resolve(open.result)
       open.onerror = () => reject(open.error)
     })
-    const store = database.transaction('itemStates', 'readwrite').objectStore('itemStates')
+    const transaction = database.transaction('itemStates', 'readwrite')
+    // put() reiht Schreibaufträge ein; erst oncomplete bestätigt den Commit.
+    // Ein Reload vorher kann die gerade vordatierten Termine verwerfen.
+    const committed = new Promise<void>((resolve, reject) => {
+      transaction.oncomplete = () => resolve()
+      transaction.onabort = () => reject(transaction.error ?? new Error('Vordatierung abgebrochen'))
+      transaction.onerror = () => reject(transaction.error ?? new Error('Vordatierung fehlgeschlagen'))
+    })
+    const store = transaction.objectStore('itemStates')
     const rows: { dueDay?: string }[] = await new Promise((resolve, reject) => {
       const request = store.getAll()
       request.onsuccess = () => resolve(request.result)
@@ -77,6 +90,8 @@ async function makeEverythingDueToday(page: Page, expected: number) {
       row.dueDay = '2000-01-01'
       store.put(row)
     }
+    await committed
+    database.close()
     return rows.length
   })
   expect(count).toBeGreaterThan(0)
@@ -91,8 +106,26 @@ test('holt gelernte Wörter an einem späteren Tag zurück (D8)', async ({ page 
   expect(learned.items.length).toBeGreaterThanOrEqual(3)
 
   // Der Sprung in die Zukunft.
-  await makeEverythingDueToday(page, learned.items.length)
+  const dueCount = await makeEverythingDueToday(page, learned.items.length)
   await page.reload()
+
+  // Den Testaufbau nach dem Dokumentwechsel nachweisen, bevor der Scheduler
+  // drankommt. Fehlende Termine sind damit kein späterer UI-Timeout mehr.
+  await expect.poll(() => page.evaluate(async () => {
+    const open = indexedDB.open('anitew')
+    const database: IDBDatabase = await new Promise((resolve, reject) => {
+      open.onsuccess = () => resolve(open.result)
+      open.onerror = () => reject(open.error)
+    })
+    return new Promise<number>((resolve, reject) => {
+      const request = database.transaction('itemStates').objectStore('itemStates').getAll()
+      request.onsuccess = () => {
+        database.close()
+        resolve(request.result.filter((row: { dueDay?: string }) => row.dueDay === '2000-01-01').length)
+      }
+      request.onerror = () => { database.close(); reject(request.error) }
+    })
+  }), { message: 'Vordatierte Termine müssen den Reload überleben' }).toBe(dueCount)
 
   await startEmergency(page)
 
