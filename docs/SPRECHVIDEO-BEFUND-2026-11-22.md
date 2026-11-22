@@ -107,3 +107,60 @@ Diese Sitzung hat **keine GPU** (`/dev/nvidia*` fehlt), vier Rechenkerne,
 und `huggingface.co` ist durch die Netzregeln gesperrt. Modelle lassen sich
 weder laden noch rechnen. Die Videoerzeugung gehört auf den Mac; von hier
 kommen Befund, Maß und Versuchsplan.
+
+---
+
+# NACHTRAG 22.11.2026 — der Befund oben ist widerlegt
+
+Die Sitzung auf dem Mac hat Messwerte gefunden, die es schon gab. Sie
+widerlegen Abschnitt 2 und 3 dieses Dokuments:
+
+| Durchlauf | Mittel | Maximum | Satzende |
+|---|---|---|---|
+| Atta, TTS-Ton | 3,5 | 5,2 | **2,9** |
+| Atta, HeyGen-Ton | 7,9 | 9,4 | **8,2** |
+
+**Dasselbe bärtige Porträt in beiden Fällen.** Mit anderem Ton öffnet sich
+derselbe Mund mehr als doppelt so weit. Der Bart erlaubt also 7,9 — er ist
+nicht der Engpass. Die Vermutung oben ist damit erledigt, und der
+vorgeschlagene Versuch mit Lins Porträt ist hinfällig.
+
+**Der Ton ist der Engpass, und zwar am Satzende.** 2,9 gegen 8,2 ist fast
+das Dreifache und trifft genau das seit Wochen gemeldete Symptom.
+
+## Nachgemessen am Band im Projekt
+
+`atta-story-de-74d05d37735a.m4a`, 21 Sätze, Hüllkurve je Videobild,
+letztes Fünftel jedes Satzes gegen seine Mitte:
+
+```
+Satz 1   -10,3 dB
+Satz 2   -10,1 dB
+Satz 3    -3,2 dB
+…
+über alle 21 Sätze: Mitte -22,4 dB, Ende -25,3 dB, mittlerer Abfall -2,9 dB
+```
+
+Die Stimme verhaucht am Satzende, bei kurzen Sätzen auf ein Drittel. Ein
+tonbasiertes Modell folgt dieser Hüllkurve und schließt den Mund. Es macht
+dabei keinen Fehler — es bildet ab, was es hört.
+
+**Was damit noch nicht gezeigt ist:** Auch natürliche Sprache wird gegen
+Satzende leiser. Ob die Synthese *stärker* abfällt als die HeyGen-Spur,
+lässt sich nur durch dieselbe Messung an der HeyGen-Spur entscheiden. Die
+liegt nicht in diesem Repository.
+
+## Nächster Schritt, und er kostet keinen Durchlauf
+
+1. Dieselbe Satzende-Messung auf der HeyGen-Tonspur. Fällt sie deutlich
+   weniger ab, ist die Ursache benannt.
+2. Dann die TTS-Spur entsprechend behandeln — Lautheit nachführen, damit
+   Satzenden nicht verhauchen — und **einen** Durchlauf damit.
+3. Erreicht er die Größenordnung des HeyGen-Durchlaufs, liegt die Behebung
+   in der Tonstufe. Das wäre billig und gälte für alle 84 Bänder.
+
+## Lehre
+
+Abschnitt 2 war eine Vermutung aus einem Standbild, ohne Gegenprobe. Die
+Gegenprobe gab es bereits, sie lag nur in einem anderen Verzeichnis. Erst
+suchen, was schon gemessen wurde.
